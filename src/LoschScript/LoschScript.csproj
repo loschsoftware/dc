@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<AssemblyName>lsc</AssemblyName>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Folder Include="Lowering\" />
+		<Folder Include="CodeGeneration\" />
+		<Folder Include="Errors\" />
+		<Folder Include="Parser\Generated\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Antlr4.Runtime.Standard" Version="4.12.0" />
+	  <PackageReference Include="Microsoft.NETCore.ILAsm" Version="7.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\LoschScript.Configuration\LoschScript.Configuration.csproj" />
+	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="java -jar $(SolutionDir)tools\antlr-4.12.0-complete.jar -visitor -Dlanguage=CSharp -package LoschScript.Parser -o $(ProjectDir)Parser\Generated $(ProjectDir)Parser\LoschScriptLexer.g4 $(ProjectDir)Parser\LoschScriptParser.g4" />
+	</Target>
+</Project>

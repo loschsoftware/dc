@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<AssemblyName>lsconfig</AssemblyName>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+</Project>
