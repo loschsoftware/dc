@@ -1,0 +1,2 @@
+# lsc
+The LoschScript compiler
