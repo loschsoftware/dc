@@ -10,7 +10,7 @@ namespace LoschScript.Errors;
 /// <summary>
 /// Provides methods for emitting LoschScript error messages.
 /// </summary>
-internal static class ErrorWriter
+public static class ErrorWriter
 {
     private static readonly List<ErrorInfo> messages = new();
 
