@@ -4,12 +4,11 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<AssemblyName>lsc</AssemblyName>
 		<Platforms>x64</Platforms>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Folder Include="Lowering\" />
-		<Folder Include="CodeGeneration\" />
-		<Folder Include="Errors\" />
 		<Folder Include="Parser\Generated\" />
 	</ItemGroup>
 

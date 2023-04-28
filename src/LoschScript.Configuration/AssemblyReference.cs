@@ -4,7 +4,7 @@ namespace Losch.LoschScript.Configuration;
 
 [Serializable]
 [XmlRoot("AssemblyReference")]
-public sealed class AssemblyReference : Reference
+public class AssemblyReference : Reference
 {
     [XmlText]
     public string AssemblyPath { get; set; }

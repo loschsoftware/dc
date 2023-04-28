@@ -9,25 +9,25 @@ public sealed class LSConfig
     [XmlArray("References")]
     [XmlArrayItem(Type = typeof(AssemblyReference))]
     [XmlArrayItem(Type = typeof(FileReference))]
-    public Reference[] References { get; set; } = new Reference[] { };
+    public Reference[] References { get; set; }
 
     [XmlElement("DefaultNamespace")]
-    public string DefaultNamespace { get; set; } = "asm";
+    public string DefaultNamespace { get; set; }
 
     [XmlElement("AssemblyFileName")]
-    public string AssemblyName { get; set; } = "asm";
+    public string AssemblyName { get; set; }
 
     [XmlElement("ApplicationType")]
-    public ApplicationType ApplicationType { get; set; } = ApplicationType.Console;
+    public ApplicationType ApplicationType { get; set; }
 
-    [XmlElement("Icon")]
+    [XmlElement("IconFile")]
     public string ApplicationIcon { get; set; }
 
     [XmlElement("Version")]
-    public string Version { get; set; } = "1.0.0.0";
+    public string Version { get; set; }
 
     [XmlElement("BuildDirectory")]
-    public string BuildOutputDirectory { get; set; } = ".\\build";
+    public string BuildOutputDirectory { get; set; }
 
     [XmlElement("EmitPdb")]
     public bool CreatePdb { get; set; } = false;
@@ -46,6 +46,9 @@ public sealed class LSConfig
 
     [XmlElement("VersionInformation")]
     public VersionInformation VersionInformation { get; set; }
+
+    [XmlElement("IncludeDependencies")]
+    public bool IncludeDependencies { get; set; }
 }
 
 [Serializable]

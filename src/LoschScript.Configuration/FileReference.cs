@@ -4,7 +4,7 @@ namespace Losch.LoschScript.Configuration;
 
 [Serializable]
 [XmlRoot("FileReference")]
-public sealed class FileReference : Reference
+public class FileReference : Reference
 {
     [XmlText]
     public string FileName { get; set; }

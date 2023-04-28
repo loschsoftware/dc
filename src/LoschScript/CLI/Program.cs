@@ -2,7 +2,7 @@
 
 namespace LoschScript.CLI;
 
-internal class Startup
+internal class Program
 {
     static int Main(string[] args) => args switch
     {
@@ -27,6 +27,8 @@ internal class Startup
         Console.WriteLine("The following switches are valid for this argument:");
         Console.WriteLine();
 
+        Console.Write("-i".PadRight(25).PadRight(50));
+        Console.WriteLine("Interprets the program and doesn't save an assembly to the disk.");
         Console.Write("-ts".PadRight(25).PadRight(50));
         Console.WriteLine("Measures the elapsed build time.");
         Console.Write("-default".PadRight(25).PadRight(50));
