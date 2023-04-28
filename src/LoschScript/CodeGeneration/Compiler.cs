@@ -50,6 +50,8 @@ public static class Compiler
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
     public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, LSConfig config = null)
     {
+        LogOut.WriteLine("Compiling files...");
+
         foreach (string file in sourceFiles)
             yield return FileCompiler.CompileSingleFile(file, config ?? new());
     }

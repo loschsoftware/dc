@@ -3,7 +3,6 @@ using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Parser;
 using LoschScript.Validation;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
