@@ -26,7 +26,7 @@
 		<Exec Command="java -jar $(SolutionDir)tools\antlr-4.12.0-complete.jar -visitor -Dlanguage=CSharp -package LoschScript.Parser -o $(ProjectDir)Parser\Generated $(ProjectDir)Parser\LoschScriptLexer.g4 $(ProjectDir)Parser\LoschScriptParser.g4" />
 	</Target>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	<!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="@echo off &amp; chcp 1252 > nul &amp; cd $(SolutionDir) &amp; dotnet publish -r win-x64 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true --self-contained true --no-build &amp; exit 0" />
-	</Target>
+	</Target>-->
 </Project>
