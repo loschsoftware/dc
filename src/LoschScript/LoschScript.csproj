@@ -3,8 +3,9 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net7.0</TargetFramework>
 		<AssemblyName>lsc</AssemblyName>
+		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 		<Platforms>x64</Platforms>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -13,15 +14,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Antlr4.Runtime.Standard" Version="4.12.0" />
-	  <PackageReference Include="Microsoft.NETCore.ILAsm" Version="7.0.0" />
+		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.12.0" />
+		<PackageReference Include="Microsoft.NETCore.ILAsm" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LoschScript.Configuration\LoschScript.Configuration.csproj" />
+		<ProjectReference Include="..\LoschScript.Configuration\LoschScript.Configuration.csproj" />
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
 		<Exec Command="java -jar $(SolutionDir)tools\antlr-4.12.0-complete.jar -visitor -Dlanguage=CSharp -package LoschScript.Parser -o $(ProjectDir)Parser\Generated $(ProjectDir)Parser\LoschScriptLexer.g4 $(ProjectDir)Parser\LoschScriptParser.g4" />
+	</Target>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="@echo off &amp; chcp 1252 > nul &amp; cd $(SolutionDir) &amp; dotnet publish -r win-x64 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true --self-contained true --no-build &amp; exit 0" />
 	</Target>
 </Project>

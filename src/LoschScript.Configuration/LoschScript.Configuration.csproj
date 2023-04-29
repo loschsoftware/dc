@@ -3,5 +3,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<AssemblyName>lsconfig</AssemblyName>
 		<Platforms>x64</Platforms>
+		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+		<IsPublishable>false</IsPublishable>
 	</PropertyGroup>
 </Project>
