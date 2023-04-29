@@ -52,6 +52,8 @@ public static class Compiler
     {
         LogOut.WriteLine("Compiling files...");
 
+        Context = new();
+
         foreach (string file in sourceFiles)
             yield return FileCompiler.CompileSingleFile(file, config ?? new());
     }

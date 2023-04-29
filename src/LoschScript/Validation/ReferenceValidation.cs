@@ -7,6 +7,9 @@ internal class ReferenceValidation
 {
     public static void ValidateReferences(Reference[] references)
     {
+        if (references == null)
+            return;
+
         foreach (Reference reference in references)
         {
             if (reference is AssemblyReference && !File.Exists((reference as AssemblyReference).AssemblyPath))

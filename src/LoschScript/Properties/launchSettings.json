@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LoschScript": {
+      "commandName": "Project",
+      "commandLineArgs": "code.txt"
+    }
+  }
+}

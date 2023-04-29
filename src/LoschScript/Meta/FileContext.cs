@@ -11,12 +11,20 @@ internal class FileContext
         Path = path;
         AvailableTypes = new(path);
     }
-
-    public static FileContext CurrentContext { get; set; }
+    
+    public static FileContext CurrentFile { get; set; }
 
     public TypeRegistry AvailableTypes { get; }
 
     public string Path { get; }
+
+    public List<string> ImportedNamespaces { get; } = new();
+    
+    public List<string> ImportedTypes { get; } = new();
+
+    public List<(string Name, string Alias)> Aliases { get; } = new();
+
+    public string ExportedNamespace { get; set; }
 
     public bool CompilationFailed { get; set; }
 

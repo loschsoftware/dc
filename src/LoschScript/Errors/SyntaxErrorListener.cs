@@ -15,7 +15,7 @@ internal class SyntaxErrorListener : BaseErrorListener
             CodePosition = (line, charPositionInLine),
             ErrorCode = LS0001_SyntaxError,
             ErrorMessage = msg,
-            File = CurrentContext.Path
+            File = CurrentFile.Path
         }, true);
     }
 }

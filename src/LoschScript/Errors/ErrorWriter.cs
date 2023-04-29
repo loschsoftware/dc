@@ -45,10 +45,10 @@ public static class ErrorWriter
 
         Console.CursorLeft = 0;
         ErrorOut.WriteLine($"{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): error {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}\r\n");
-        CurrentContext.CompilationFailed = true;
+        CurrentFile.CompilationFailed = true;
 
         if (addToErrorList)
-            CurrentContext.Errors.Add(error);
+            CurrentFile.Errors.Add(error);
 
         Console.ForegroundColor = ConsoleColor.Gray;
 
@@ -77,8 +77,8 @@ public static class ErrorWriter
 
         if (treatAsError)
         {
-            CurrentContext.Errors.Add(error);
-            CurrentContext.CompilationFailed = true;
+            CurrentFile.Errors.Add(error);
+            CurrentFile.CompilationFailed = true;
         }
 
         messages.Add(error);
@@ -116,7 +116,7 @@ public static class ErrorWriter
             //CodeEndPosition = (line.lnEnd, column.colEnd),
             ErrorCode = errorType,
             ErrorMessage = msg,
-            File = file ?? CurrentContext.Path
+            File = file ?? CurrentFile.Path
         }, addToErrorList);
     }
 
@@ -131,7 +131,7 @@ public static class ErrorWriter
             //CodeEndPosition = (line.lnEnd, column.colEnd),
             ErrorCode = errorType,
             ErrorMessage = msg,
-            File = file ?? CurrentContext.Path
+            File = file ?? CurrentFile.Path
         }, treatAsError);
     }
 
@@ -146,7 +146,7 @@ public static class ErrorWriter
             //CodeEndPosition = (line.lnEnd, column.colEnd),
             ErrorCode = errorType,
             ErrorMessage = msg,
-            File = file ?? CurrentContext.Path
+            File = file ?? CurrentFile.Path
         });
     }
 }

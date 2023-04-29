@@ -3,13 +3,13 @@ parser grammar LoschScriptParser;
 options { tokenVocab = LoschScriptLexer; }
 
 compilation_unit
-    : import_directive* export_directive? EOF
+    : import_directive* export_directive? expression* EOF
     ;
 
 import_directive
-    : Import full_identifier (Comma full_identifier)* #basic_import
-    | Import Type full_identifier (Comma full_identifier)* #type_import
-    | Import Identifier Equals full_identifier (Comma Identifier Equals full_identifier)* #alias
+    : Exclamation_Mark? Import full_identifier (Comma full_identifier)* #basic_import
+    | Exclamation_Mark? Import Type full_identifier (Comma full_identifier)* #type_import
+    | Exclamation_Mark? Import Identifier Equals full_identifier (Comma Identifier Equals full_identifier)* #alias
     ;
 
 export_directive

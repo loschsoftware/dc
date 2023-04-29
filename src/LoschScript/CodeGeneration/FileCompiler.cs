@@ -12,6 +12,9 @@ internal static class FileCompiler
 {
     public static ErrorInfo[] CompileSingleFile(string path, LSConfig config)
     {
+        Context.Files.Add(new(path));
+        CurrentFile = Context.GetFile(path);
+
         string source = File.ReadAllText(path);
 
         ICharStream charStream = CharStreams.fromString(source);
@@ -26,7 +29,7 @@ internal static class FileCompiler
 
         // Visit and emit IL here...
 
-        LogOut.WriteLine($"Compilation of source file '{path}' {(CurrentContext.Errors.Any() ? "failed" : "successful")}.");
-        return CurrentContext.Errors.ToArray();
+        LogOut.WriteLine($"Compilation of source file '{path}' {(CurrentFile.Errors.Any() ? "failed" : "successful")}.");
+        return CurrentFile.Errors.ToArray();
     }
 }
