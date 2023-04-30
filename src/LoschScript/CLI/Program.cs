@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoschScript.Templates;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -11,7 +12,7 @@ internal class Program
         ["config"] => Helpers.BuildLSConfig(),
         ["build"] => Helpers.CompileAll(),
         ["interactive" or "repl"] => Helpers.StartReplSession(),
-        ["make" or "new"] => Helpers.CreateProjectStructure(args),
+        ["make" or "new"] => LSTemplates.CreateStructure(args),
         ["watch" or "auto"] => WatchForFileChanges(),
         ["-watch-indefinetly"] => WatchIndefinetly(),
         ["quit"] => QuitWatching(),

@@ -1,7 +1,9 @@
 ﻿using Losch.LoschScript.Configuration;
+using LoschScript.Templates;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
@@ -76,11 +78,6 @@ internal static class Helpers
         xmls.Serialize(configWriter, new LSConfig(), ns);
 
         LogOut.WriteLine("Created lsconfig.xml using default values.");
-        return 0;
-    }
-
-    public static int CreateProjectStructure(string[] args)
-    {
         return 0;
     }
 
