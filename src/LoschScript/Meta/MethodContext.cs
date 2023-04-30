@@ -7,10 +7,12 @@ internal class MethodContext
 {
     public MethodContext()
     {
-        Current = this;
+        CurrentMethod = this;
     }
 
-    public static MethodContext Current { get; set; }
+    public static MethodContext CurrentMethod { get; set; }
+
+    public ILGenerator IL { get; }
 
     public List<string> FilesWhereDefined { get; } = new();
 
