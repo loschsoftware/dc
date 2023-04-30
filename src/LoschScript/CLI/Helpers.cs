@@ -78,4 +78,14 @@ internal static class Helpers
         LogOut.WriteLine("Created lsconfig.xml using default values.");
         return 0;
     }
+
+    public static int CreateProjectStructure(string[] args)
+    {
+        return 0;
+    }
+
+    public static int StartReplSession()
+    {
+        return 0;
+    }
 }

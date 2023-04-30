@@ -10,10 +10,12 @@ internal class Program
     {
         ["config"] => Helpers.BuildLSConfig(),
         ["build"] => Helpers.CompileAll(),
+        ["interactive" or "repl"] => Helpers.StartReplSession(),
+        ["make" or "new"] => Helpers.CreateProjectStructure(args),
         ["watch" or "auto"] => WatchForFileChanges(),
         ["-watch-indefinetly"] => WatchIndefinetly(),
         ["quit"] => QuitWatching(),
-        [] or ["help" or "?"] => DisplayHelpMessage(),
+        [] or["help" or "?"] => DisplayHelpMessage(),
         _ => Helpers.HandleArgs(args)
     };
 
@@ -180,7 +182,7 @@ internal class Program
         LogOut.WriteLine("Preprocesses <FileName>.");
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("interactive".PadRight(50));
+        LogOut.Write("interactive, repl".PadRight(50));
         Console.ForegroundColor = ConsoleColor.Gray;
         LogOut.WriteLine("Provides a read-evaluate-print-loop to run single expressions.");
 
