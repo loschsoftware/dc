@@ -1,2 +1,2 @@
-# lsc
-The LoschScript compiler
+# LoschScript Compiler Command Line (lsc.exe)
+The LoschScript Compiler
