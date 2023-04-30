@@ -39,6 +39,24 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitCompilation_unit([NotNull] LoschScriptParser.Compilation_unitContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.file_body"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFile_body([NotNull] LoschScriptParser.File_bodyContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.top_level_statements"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.full_program"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFull_program([NotNull] LoschScriptParser.Full_programContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>basic_import</c>
 	/// labeled alternative in <see cref="LoschScriptParser.import_directive"/>.
 	/// </summary>
@@ -350,5 +368,11 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitAttribute([NotNull] LoschScriptParser.AttributeContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_definition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_definition([NotNull] LoschScriptParser.Type_definitionContext context);
 }
 } // namespace LoschScript.Parser

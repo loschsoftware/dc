@@ -49,6 +49,42 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitCompilation_unit([NotNull] LoschScriptParser.Compilation_unitContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.file_body"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterFile_body([NotNull] LoschScriptParser.File_bodyContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.file_body"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitFile_body([NotNull] LoschScriptParser.File_bodyContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.top_level_statements"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.top_level_statements"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.full_program"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterFull_program([NotNull] LoschScriptParser.Full_programContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.full_program"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitFull_program([NotNull] LoschScriptParser.Full_programContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>basic_import</c>
 	/// labeled alternative in <see cref="LoschScriptParser.import_directive"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -672,6 +708,18 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAttribute([NotNull] LoschScriptParser.AttributeContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_definition"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterType_definition([NotNull] LoschScriptParser.Type_definitionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_definition"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitType_definition([NotNull] LoschScriptParser.Type_definitionContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

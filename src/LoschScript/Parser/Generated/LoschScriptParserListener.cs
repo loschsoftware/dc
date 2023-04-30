@@ -42,6 +42,36 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitCompilation_unit([NotNull] LoschScriptParser.Compilation_unitContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.file_body"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterFile_body([NotNull] LoschScriptParser.File_bodyContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.file_body"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitFile_body([NotNull] LoschScriptParser.File_bodyContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.top_level_statements"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.top_level_statements"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.full_program"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterFull_program([NotNull] LoschScriptParser.Full_programContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.full_program"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitFull_program([NotNull] LoschScriptParser.Full_programContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>basic_import</c>
 	/// labeled alternative in <see cref="LoschScriptParser.import_directive"/>.
 	/// </summary>
@@ -571,5 +601,15 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitAttribute([NotNull] LoschScriptParser.AttributeContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_definition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_definition([NotNull] LoschScriptParser.Type_definitionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_definition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_definition([NotNull] LoschScriptParser.Type_definitionContext context);
 }
 } // namespace LoschScript.Parser

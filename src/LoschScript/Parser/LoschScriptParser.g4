@@ -3,7 +3,20 @@ parser grammar LoschScriptParser;
 options { tokenVocab = LoschScriptLexer; }
 
 compilation_unit
-    : import_directive* export_directive? expression* EOF
+    : import_directive* export_directive? file_body EOF
+    ;
+
+file_body
+    : top_level_statements
+    | full_program
+    ;
+
+top_level_statements
+    : expression+
+    ;
+
+full_program
+    : type_definition+
     ;
 
 import_directive
@@ -131,4 +144,8 @@ arglist
 
 attribute
     : Less_Than full_identifier arglist Greater_Than
+    ;
+
+type_definition
+    : Type
     ;
