@@ -18,7 +18,7 @@ internal class FileContext
 
     public string Path { get; }
 
-    public List<string> ImportedNamespaces { get; } = new();
+    public List<string> Imports { get; } = new();
     
     public List<string> ImportedTypes { get; } = new();
 

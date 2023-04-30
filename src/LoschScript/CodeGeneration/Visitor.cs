@@ -23,7 +23,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<dynamic>
         {
             if (context.Exclamation_Mark() == null)
             {
-                CurrentFile.ImportedNamespaces.Add(ns);
+                CurrentFile.Imports.Add(ns);
                 return null;
             }
 

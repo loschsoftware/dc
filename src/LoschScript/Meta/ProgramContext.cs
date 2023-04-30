@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 
 namespace LoschScript.Meta;
 
@@ -16,6 +17,10 @@ internal class ProgramContext
     public List<string> GlobalTypeImports { get; } = new();
 
     public List<(string Name, string Alias)> GlobalAliases { get; } = new();
+
+    public AssemblyBuilder Assembly { get; set; }
+
+    public ModuleBuilder Module { get; set; }
 
     public FileContext GetFile(string path) => Files.Where(f => f.Path == path).First();
 
