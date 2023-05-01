@@ -101,4 +101,9 @@ internal class Listener : LoschScriptParserBaseListener
             Context.GlobalAliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));
         }
     }
+
+    public override void EnterInteger_atom([NotNull] LoschScriptParser.Integer_atomContext context)
+    {
+        base.EnterInteger_atom(context);
+    }
 }
