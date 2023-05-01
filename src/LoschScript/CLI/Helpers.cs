@@ -148,7 +148,7 @@ internal static class Helpers
             return -1;
         }
 
-        Assembly a = Assembly.LoadFile(args[1]);
+        Assembly a = Assembly.LoadFile(Path.GetFullPath(args[1]));
 
         string type = string.Join('.', args[2].Split('.')[0..^1]);
         Type t = a.GetType(type);
@@ -163,7 +163,7 @@ internal static class Helpers
 
         try
         {
-            m = t.GetMethod(args[2].Split('.').Last());
+            m = t.GetMethod(args[2].Split('.').Last(), BindingFlags.NonPublic | BindingFlags.Static);
         }
         catch (Exception)
         {
@@ -171,20 +171,20 @@ internal static class Helpers
             return -1;
         }
 
-        if (m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string[]) && args.Length >= 3)
+        if (m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string[]) && args.Length > 3)
         {
-            m.Invoke(null, args[3..]);
+            m.Invoke(null, new object[] { args[3..] });
             return 0;
         }
         else if (m.GetParameters().Length == 0)
         {
-            m.Invoke(null, null);
+            m.Invoke(null, Array.Empty<object>());
             return 0;
         }
         else
         {
-            Console.WriteLine("Unsupported parameters.");
-            return -1;
+            m.Invoke(null, new object[] { Array.Empty<string>() });
+            return 0;
         }
     }
 }

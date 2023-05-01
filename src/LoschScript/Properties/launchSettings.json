@@ -2,7 +2,7 @@
   "profiles": {
     "LoschScript": {
       "commandName": "Project",
-      "commandLineArgs": "code.txt"
+      "commandLineArgs": "call out.dll Test.Program.Main"
     }
   }
 }

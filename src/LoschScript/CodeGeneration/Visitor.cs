@@ -118,7 +118,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
-        MethodBuilder mb = tb.DefineMethod("Main", MethodAttributes.Static, CallingConventions.Standard, typeof(void), new Type[] { typeof(string[]) });
+        MethodBuilder mb = tb.DefineMethod("Main", MethodAttributes.Static, CallingConventions.Standard, typeof(void), new Type[] { /*typeof(string[])*/ });
         ILGenerator il = mb.GetILGenerator();
         MethodContext mc = new()
         {
