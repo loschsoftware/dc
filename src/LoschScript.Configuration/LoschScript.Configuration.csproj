@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<AssemblyName>lsconfig</AssemblyName>
 		<Platforms>x64</Platforms>
 		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 		<IsPublishable>false</IsPublishable>
+		<LangVersion>11</LangVersion>
 	</PropertyGroup>
 </Project>

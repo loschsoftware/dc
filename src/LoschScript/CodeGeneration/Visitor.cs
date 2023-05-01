@@ -198,7 +198,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type t2 = Visit(context.expression()[1]);
 
         MethodInfo m = typeof(Math)
-            .GetMethod("Pow", BindingFlags.Public | BindingFlags.Static, new Type[]
+            .GetMethod("Pow", new Type[]
             {
                 t,
                 t2
@@ -358,7 +358,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (text.EndsWith("un"))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, nuint.Parse(text[0..^2].Replace("'", "")));
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, int.Parse(text[0..^2].Replace("'", "")));
             return typeof(nuint);
         }
 
@@ -366,7 +366,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             text += "0";
 
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, nint.Parse(text[0..^2].Replace("'", "")));
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, int.Parse(text[0..^2].Replace("'", "")));
             return typeof(nint);
         }
 

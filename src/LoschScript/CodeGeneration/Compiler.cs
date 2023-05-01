@@ -57,9 +57,9 @@ public static class Compiler
         Context = new();
 
         AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
-        AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+        AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndSave);
 
-        ModuleBuilder mb = ab.DefineDynamicModule(name.Name);
+        ModuleBuilder mb = ab.DefineDynamicModule(name.Name, $"{config.AssemblyName}.{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}");
 
         Context.Assembly = ab;
         Context.Module = mb;

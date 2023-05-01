@@ -1,16 +1,11 @@
-﻿using Lokad.ILPack;
-using Losch.LoschScript.Configuration;
-using LoschScript.CodeGeneration;
+﻿using Losch.LoschScript.Configuration;
 using LoschScript.Meta;
-using LoschScript.Templates;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Xml.Serialization;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LoschScript.CLI;
 
@@ -39,14 +34,18 @@ internal static class Helpers
         }
 
         config ??= new();
+        config.AssemblyName ??= args.Where(File.Exists).First();
 
-        if (args.Where(s => (s.StartsWith('-') || s.StartsWith('/') || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
+        if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
 
-        if (args.Where(s => !s.StartsWith('-') && !s.StartsWith("--") && !s.StartsWith('/')).Where(f => !File.Exists(f)).Any())
+        if (args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Where(f => !File.Exists(f)).Any())
             LogOut.WriteLine($"Skipping non-existent files.{Environment.NewLine}");
 
-        return CompileSource(args.Where(File.Exists).ToArray(), config).Any() ? -1 : 0;
+        var errors = CompileSource(args.Where(File.Exists).ToArray(), config).Any() ? -1 : 0;
+
+        Context.Assembly.Save($"{config.AssemblyName}.{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}");
+        return errors;
     }
 
     public static int CompileAll()
@@ -150,7 +149,7 @@ internal static class Helpers
 
         Assembly a = Assembly.LoadFile(Path.GetFullPath(args[1]));
 
-        string type = string.Join('.', args[2].Split('.')[0..^1]);
+        string type = string.Join(".", args[2].Split('.')[0..^1]);
         Type t = a.GetType(type);
 
         if (t == null)
