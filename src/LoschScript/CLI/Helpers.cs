@@ -1,4 +1,5 @@
 ﻿using Losch.LoschScript.Configuration;
+using LoschScript.Errors;
 using LoschScript.Meta;
 using System;
 using System.Collections.Generic;
@@ -34,18 +35,28 @@ internal static class Helpers
         }
 
         config ??= new();
-        config.AssemblyName ??= args.Where(File.Exists).First();
+        config.AssemblyName ??= Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
 
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
 
         if (args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Where(f => !File.Exists(f)).Any())
             LogOut.WriteLine($"Skipping non-existent files.{Environment.NewLine}");
+        
+        string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
-        var errors = CompileSource(args.Where(File.Exists).ToArray(), config).Any() ? -1 : 0;
+        IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
-        Context.Assembly.Save($"{config.AssemblyName}.{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}");
-        return errors;
+        Context.Assembly.Save(assembly);
+
+        if (errors.Select(e => e.Length).Sum() == 0)
+        {
+            Console.WriteLine($"Compilation successful, generated assembly {assembly}.");
+            return 0;
+        }
+
+        Console.WriteLine($"Compilation failed with {errors.Select(e => e.Length).Sum()} errors.");
+        return -1;
     }
 
     public static int CompileAll()
@@ -108,7 +119,7 @@ internal static class Helpers
             foreach (string ns in CurrentFile.Imports)
             {
                 string n = $"{ns}.{name}";
-                
+
                 type = Type.GetType(n);
 
                 List<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetType(n) != null).ToList();
@@ -128,7 +139,7 @@ internal static class Helpers
             }
         }
 
-        FoundType:
+    FoundType:
 
         return type;
     }

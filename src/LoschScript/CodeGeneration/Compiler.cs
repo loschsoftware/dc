@@ -56,15 +56,21 @@ public static class Compiler
 
         Context = new();
 
-        AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
-        AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndSave);
+        string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
-        ModuleBuilder mb = ab.DefineDynamicModule(name.Name, $"{config.AssemblyName}.{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}");
+        AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
+        AssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndSave);
+
+        ModuleBuilder mb = ab.DefineDynamicModule(asmFileName, asmFileName, config.CreatePdb);
 
         Context.Assembly = ab;
         Context.Module = mb;
 
+        List<ErrorInfo[]> errors = new();
+
         foreach (string file in sourceFiles)
-            yield return FileCompiler.CompileSingleFile(file, config ?? new());
+            errors.Add(FileCompiler.CompileSingleFile(file, config ?? new()));
+
+        return errors;
     }
 }

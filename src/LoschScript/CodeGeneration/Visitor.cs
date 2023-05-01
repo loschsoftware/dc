@@ -118,7 +118,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
-        MethodBuilder mb = tb.DefineMethod("Main", MethodAttributes.Static, CallingConventions.Standard, typeof(void), new Type[] { /*typeof(string[])*/ });
+        MethodBuilder mb = tb.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard, typeof(void), new Type[] { typeof(string[]) });
         ILGenerator il = mb.GetILGenerator();
         MethodContext mc = new()
         {
@@ -137,6 +137,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         // Last expression is like return statement
         Type ret = Visit(context.expression().Last());
+
+        CurrentMethod.IL.Emit(OpCodes.Ret);
+        Context.Assembly.SetEntryPoint(mb);
 
         tb.CreateType();
         return ret;

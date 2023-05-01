@@ -29,4 +29,10 @@ public class ErrorInfo
     /// The end position of the error in the file. The first tuple item represents the row, the second the column of the error.
     /// </summary>
     public (int, int) CodeEndPosition { get; set; }
+
+    /// <summary>
+    /// Converts the error into a human-readable format.
+    /// </summary>
+    /// <returns>A friendly representation of the error.</returns>
+    public override string ToString() => $"{File} ({CodePosition.Item1},{CodePosition.Item2}): error {ErrorCode.ToString().Split('_')[0]}: {ErrorMessage}\r\n";
 }
