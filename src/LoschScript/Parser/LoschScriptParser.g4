@@ -33,6 +33,10 @@ full_identifier
     : Identifier (Dot Identifier)*
     ;
 
+code_block
+    : Open_Brace expression* Close_Brace
+    ;
+
 expression
     : expression Double_Asterisk expression #power_expression
     | Minus expression #unary_negation_expression
@@ -61,6 +65,10 @@ expression
     | range #range_expression
     | attribute expression #attributed_expression
     | expression (Dot Identifier)+ arglist #member_access_expression
+    | if_branch elif_branch* else_branch?  #prefix_if_expression
+    | (code_block | expression) postfix_if_branch #postfix_if_expression
+    | unless_branch else_unless_branch* else_branch? #prefix_unless_expression
+    | (code_block | expression) postfix_unless_branch #postfix_unless_expression
     | atom #atom_expression
     ;
 
@@ -130,12 +138,36 @@ assignment_operator
     | Tilde_Equals
     ;
 
-range
-    : Integer_Literal Double_Dot Caret? Integer_Literal
+if_branch
+    : Question_Mark expression Equals (code_block | expression)
     ;
 
-member_access
-    : expression (Dot Identifier)+ arglist
+postfix_if_branch
+    : Question_Mark expression
+    ;
+
+elif_branch
+    : Colon expression Equals (code_block | expression)
+    ;
+
+else_branch
+    : Colon Equals (code_block | expression)
+    ;
+
+unless_branch
+    : Exclamation_Mark Question_Mark expression Equals (code_block | expression)
+    ;
+
+else_unless_branch
+    : Exclamation_Mark Colon expression Equals (code_block | expression)
+    ;
+
+postfix_unless_branch
+    : Exclamation_Mark Question_Mark expression
+    ;
+
+range
+    : Integer_Literal Double_Dot Caret? Integer_Literal
     ;
 
 arglist
