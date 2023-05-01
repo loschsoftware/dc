@@ -51,11 +51,11 @@ internal static class Helpers
 
         if (errors.Select(e => e.Length).Sum() == 0)
         {
-            Console.WriteLine($"Compilation successful, generated assembly {assembly}.");
+            Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
             return 0;
         }
 
-        Console.WriteLine($"Compilation failed with {errors.Select(e => e.Length).Sum()} errors.");
+        Console.WriteLine($"\r\nCompilation failed with {errors.Select(e => e.Length).Sum()} errors.");
         return -1;
     }
 
