@@ -105,5 +105,6 @@ internal class Listener : LoschScriptParserBaseListener
     public override void EnterInteger_atom([NotNull] LoschScriptParser.Integer_atomContext context)
     {
         base.EnterInteger_atom(context);
+
     }
 }

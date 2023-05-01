@@ -53,8 +53,7 @@ public partial class LoschScriptParser : Parser {
 		Tilde_Equals=72, Double_Less_Than=73, Double_Less_Than_Equals=74, Double_Greater_Than=75, 
 		Double_Greater_Than_Equals=76, Arrow_Right=77, Arrow_Left=78, Double_Backtick=79, 
 		Identifier=80, Integer_Literal=81, Hex_Integer_Literal=82, Binary_Integer_Literal=83, 
-		Real_Literal=84, Character_Literal=85, String_Literal=86, Verbatim_String_Literal=87, 
-		Integer_Suffix=88, ExponentPart=89;
+		Real_Literal=84, Character_Literal=85, String_Literal=86, Verbatim_String_Literal=87;
 	public const int
 		RULE_compilation_unit = 0, RULE_file_body = 1, RULE_top_level_statements = 2, 
 		RULE_full_program = 3, RULE_import_directive = 4, RULE_export_directive = 5, 
@@ -105,7 +104,7 @@ public partial class LoschScriptParser : Parser {
 		"Double_Less_Than_Equals", "Double_Greater_Than", "Double_Greater_Than_Equals", 
 		"Arrow_Right", "Arrow_Left", "Double_Backtick", "Identifier", "Integer_Literal", 
 		"Hex_Integer_Literal", "Binary_Integer_Literal", "Real_Literal", "Character_Literal", 
-		"String_Literal", "Verbatim_String_Literal", "Integer_Suffix", "ExponentPart"
+		"String_Literal", "Verbatim_String_Literal"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -3732,7 +3731,7 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,89,384,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
+		4,1,87,384,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
 		7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,
 		2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,21,
 		2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,2,27,7,27,2,28,7,28,

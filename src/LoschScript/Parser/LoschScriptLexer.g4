@@ -106,8 +106,8 @@ Character_Literal: '\'' (~['\\\r\n\u0085\u2028\u2029] | CommonCharacter) '\'';
 String_Literal: '"' (~["\\\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
 Verbatim_String_Literal: '^"' (~'"' | '""')* '"';
 
-Integer_Suffix: 'sb' | 'b' | 's' | 'us' | 'u' | 'l' | 'ul' | 'n' | 'un';
-ExponentPart: [eE] ('+' | '-')? [0-9] ('`'* [0-9])*;
+fragment Integer_Suffix: 'sb' | 'b' | 's' | 'us' | 'u' | 'l' | 'ul' | 'n' | 'un';
+fragment ExponentPart: [eE] ('+' | '-')? [0-9] ('`'* [0-9])*;
 
 fragment CommonCharacter
 	: SimpleEscapeSequence
