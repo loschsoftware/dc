@@ -27,7 +27,8 @@ internal static class FileCompiler
 
         ReferenceValidation.ValidateReferences(config.References);
 
-        // Visit and emit IL here...
+        Visitor v = new();
+        v.Visit(parser.compilation_unit());
 
         LogOut.WriteLine($"Compilation of source file '{path}' {(CurrentFile.Errors.Any() ? "failed" : "successful")}.");
         return CurrentFile.Errors.ToArray();

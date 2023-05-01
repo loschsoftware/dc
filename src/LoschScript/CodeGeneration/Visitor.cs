@@ -1,5 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
 using LoschScript.Parser;
+using System;
 using System.Linq;
 
 namespace LoschScript.CodeGeneration;
@@ -65,6 +67,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<dynamic>
 
             Context.GlobalAliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));
         }
+
+        return null;
+    }
+
+    public override dynamic Visit(IParseTree tree)
+    {
+        base.Visit(tree);
+
+        Console.WriteLine($"Visiting {tree.GetType()}: {tree.GetText()}");
 
         return null;
     }

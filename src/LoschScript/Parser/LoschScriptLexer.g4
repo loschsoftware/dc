@@ -1,6 +1,8 @@
 lexer grammar LoschScriptLexer;
 
-channels { Comments_Channel }
+channels { Comments_Channel, Whitespace }
+
+Ws: [ \n\t\r]+ -> channel(Whitespace);
 
 Single_Line_Comment: '#' InputCharacter* -> channel(Comments_Channel);
 Delimited_Comment: '#[' .*? ']#' -> channel(Comments_Channel);
