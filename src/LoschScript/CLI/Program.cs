@@ -15,6 +15,7 @@ internal class Program
         ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
         ["make" or "new"] => LSTemplates.CreateStructure(args),
         ["watch" or "auto"] => WatchForFileChanges(),
+        ["call", ..] => Helpers.CallMethod(args),
         ["-watch-indefinetly"] => WatchIndefinetly(),
         ["quit"] => QuitWatching(),
         [] or["help" or "?"] => DisplayHelpMessage(),

@@ -116,7 +116,7 @@ public static class ErrorWriter
             //CodeEndPosition = (line.lnEnd, column.colEnd),
             ErrorCode = errorType,
             ErrorMessage = msg,
-            File = file ?? CurrentFile.Path
+            File = file ?? Path.GetFileName(CurrentFile.Path)
         }, addToErrorList);
     }
 

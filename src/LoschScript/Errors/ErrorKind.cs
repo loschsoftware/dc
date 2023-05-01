@@ -156,5 +156,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the entry point of a LoschScript program is not a static function.
     /// </summary>
-    LS0035_EntryPointNotStatic
+    LS0035_EntryPointNotStatic,
+    /// <summary>
+    /// General error message emitted for various kinds of arithmetic errors.
+    /// </summary>
+    LS0036_ArithmeticError
 }

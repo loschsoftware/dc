@@ -97,10 +97,10 @@ Double_Backtick: '``';
 
 Identifier: Double_Backtick? IdentifierOrKeyword Double_Backtick?;
 
-Integer_Literal: [0-9] ('`'* [0-9])* Integer_Suffix?;
-Hex_Integer_Literal: '0' [xX] ('`'* HexDigit)+ Integer_Suffix?;
-Binary_Integer_Literal: '0' [bB] ('`'* [01])+ Integer_Suffix?;
-Real_Literal: ([0-9] ('`'* [0-9])*)? '.' [0-9] ('`'* [0-9])* ExponentPart? [SsDdMm]? | [0-9] ('`'* [0-9])* ([SsDdMm] | ExponentPart [SsDdMm]?);
+Integer_Literal: [0-9] ('\''* [0-9])* Integer_Suffix?;
+Hex_Integer_Literal: '0' [xX] ('\''* HexDigit)+ Integer_Suffix?;
+Binary_Integer_Literal: '0' [bB] ('\''* [01])+ Integer_Suffix?;
+Real_Literal: ([0-9] ('\''* [0-9])*)? '.' [0-9] ('\''* [0-9])* ExponentPart? [SsDdMm]? | [0-9] ('\''* [0-9])* ([SsDdMm] | ExponentPart [SsDdMm]?);
 
 Character_Literal: '\'' (~['\\\r\n\u0085\u2028\u2029] | CommonCharacter) '\'';
 String_Literal: '"' (~["\\\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';

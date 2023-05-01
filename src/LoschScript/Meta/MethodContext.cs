@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection.Emit;
 
 namespace LoschScript.Meta;
@@ -17,4 +18,6 @@ internal class MethodContext
     public List<string> FilesWhereDefined { get; } = new();
 
     public MethodBuilder Builder { get; set; }
+
+    public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 }

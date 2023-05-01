@@ -61,14 +61,16 @@ expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_exception
     | expression assignment_operator expression #assignment
-    | expression (Dot Identifier)+ #dotted_expression
+    | expression Dot Identifier arglist? #member_access_expression
+    | expression Dot Identifier #dotted_expression
     | range #range_expression
     | attribute expression #attributed_expression
-    | expression (Dot Identifier)+ arglist #member_access_expression
     | if_branch elif_branch* else_branch?  #prefix_if_expression
-    | code_block postfix_if_branch #postfix_if_expression
+    | expression postfix_if_branch #postfix_if_expression
+    | code_block postfix_if_branch #block_postfix_unless_expression
     | unless_branch else_unless_branch* else_branch? #prefix_unless_expression
-    | code_block postfix_unless_branch #postfix_unless_expression
+    | expression postfix_unless_branch #postfix_unless_expression
+    | code_block postfix_unless_branch #block_postfix_unless_expression
     | atom #atom_expression
     ;
 
@@ -171,7 +173,7 @@ range
     ;
 
 arglist
-    : (((Identifier Colon)? expression) (Comma ((Identifier Colon)? expression))*)? Double_Comma?
+    : ((Identifier Colon)? expression) (Comma ((Identifier Colon)? expression))* Double_Comma?
     ;
 
 attribute
