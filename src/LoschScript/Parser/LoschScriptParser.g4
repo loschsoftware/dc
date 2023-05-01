@@ -66,9 +66,9 @@ expression
     | attribute expression #attributed_expression
     | expression (Dot Identifier)+ arglist #member_access_expression
     | if_branch elif_branch* else_branch?  #prefix_if_expression
-    | (code_block | expression) postfix_if_branch #postfix_if_expression
+    | code_block postfix_if_branch #postfix_if_expression
     | unless_branch else_unless_branch* else_branch? #prefix_unless_expression
-    | (code_block | expression) postfix_unless_branch #postfix_unless_expression
+    | code_block postfix_unless_branch #postfix_unless_expression
     | atom #atom_expression
     ;
 
