@@ -33,7 +33,7 @@ internal class Listener : LoschScriptParserBaseListener
             if (context.Exclamation_Mark() == null)
             {
                 CurrentFile.Imports.Add(ns);
-                return null;
+                return;
             }
 
             Context.GlobalImports.Add(ns);
@@ -49,7 +49,7 @@ internal class Listener : LoschScriptParserBaseListener
             if (context.Exclamation_Mark() == null)
             {
                 CurrentFile.ImportedTypes.Add(ns);
-                return null;
+                return;
             }
 
             Context.GlobalTypeImports.Add(ns);
@@ -65,7 +65,7 @@ internal class Listener : LoschScriptParserBaseListener
             if (context.Exclamation_Mark() == null)
             {
                 CurrentFile.Aliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));
-                return null;
+                return;
             }
 
             Context.GlobalAliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));
