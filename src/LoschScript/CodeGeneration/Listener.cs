@@ -14,7 +14,7 @@ internal class Listener : LoschScriptParserBaseListener
         base.EnterEveryRule(context);
 
         if (GlobalConfig.AdvancedDiagnostics)
-            Console.WriteLine($"Entering rule '{context.GetType().Name}': {context.GetText()}");
+            Console.WriteLine($"Entering rule '{context.GetType().Name}': {context.GetText()}{Environment.NewLine}");
     }
 
     public override void EnterExport_directive([NotNull] LoschScriptParser.Export_directiveContext context)
