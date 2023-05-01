@@ -1,4 +1,5 @@
 ﻿using Losch.LoschScript.Configuration;
+using LoschScript.Meta;
 using LoschScript.Templates;
 using System;
 using System.IO;
@@ -34,7 +35,10 @@ internal static class Helpers
 
         config ??= new();
 
-        if (args.Where(f => !File.Exists(f)).Any())
+        if (args.Where(s => (s.StartsWith('-') || s.StartsWith('/') || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
+            GlobalConfig.AdvancedDiagnostics = true;
+
+        if (args.Where(s => !s.StartsWith('-') && !s.StartsWith("--") && !s.StartsWith('/')).Where(f => !File.Exists(f)).Any())
             LogOut.WriteLine($"Skipping non-existent files.{Environment.NewLine}");
 
         return CompileSource(args.Where(File.Exists).ToArray(), config).Any() ? -1 : 0;

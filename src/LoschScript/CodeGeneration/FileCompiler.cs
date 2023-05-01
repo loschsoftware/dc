@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Parser;
@@ -27,8 +28,9 @@ internal static class FileCompiler
 
         ReferenceValidation.ValidateReferences(config.References);
 
-        Visitor v = new();
-        v.Visit(parser.compilation_unit());
+        Listener listener = new();
+        IParseTree compilationUnit = parser.compilation_unit();
+        ParseTreeWalker.Default?.Walk(listener, compilationUnit);
 
         LogOut.WriteLine($"Compilation of source file '{path}' {(CurrentFile.Errors.Any() ? "failed" : "successful")}.");
         return CurrentFile.Errors.ToArray();

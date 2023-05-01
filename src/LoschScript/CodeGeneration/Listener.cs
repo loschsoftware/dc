@@ -1,25 +1,32 @@
-﻿using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using LoschScript.Meta;
 using LoschScript.Parser;
 using System;
 using System.Linq;
 
 namespace LoschScript.CodeGeneration;
 
-internal class Visitor : LoschScriptParserBaseVisitor<dynamic>
+internal class Listener : LoschScriptParserBaseListener
 {
-    public override dynamic VisitExport_directive([NotNull] LoschScriptParser.Export_directiveContext context)
+    public override void EnterEveryRule([NotNull] ParserRuleContext context)
     {
-        base.VisitExport_directive(context);
+        base.EnterEveryRule(context);
 
-        CurrentFile.ExportedNamespace = context.full_identifier().GetText();
-
-        return null;
+        if (GlobalConfig.AdvancedDiagnostics)
+            Console.WriteLine($"Entering rule '{context.GetType().Name}': {context.GetText()}");
     }
 
-    public override dynamic VisitBasic_import([NotNull] LoschScriptParser.Basic_importContext context)
+    public override void EnterExport_directive([NotNull] LoschScriptParser.Export_directiveContext context)
     {
-        base.VisitBasic_import(context);
+        base.EnterExport_directive(context);
+
+        CurrentFile.ExportedNamespace = context.full_identifier().GetText();
+    }
+
+    public override void EnterBasic_import([NotNull] LoschScriptParser.Basic_importContext context)
+    {
+        base.EnterBasic_import(context);
 
         foreach (string ns in context.full_identifier().Select(f => f.GetText()))
         {
@@ -31,13 +38,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<dynamic>
 
             Context.GlobalImports.Add(ns);
         }
-
-        return null;
     }
 
-    public override dynamic VisitType_import([NotNull] LoschScriptParser.Type_importContext context)
+    public override void EnterType_import([NotNull] LoschScriptParser.Type_importContext context)
     {
-        base.VisitType_import(context);
+        base.EnterType_import(context);
 
         foreach (string ns in context.full_identifier().Select(f => f.GetText()))
         {
@@ -49,13 +54,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<dynamic>
 
             Context.GlobalTypeImports.Add(ns);
         }
-
-        return null;
     }
-    
-    public override dynamic VisitAlias([NotNull] LoschScriptParser.AliasContext context)
+
+    public override void EnterAlias([NotNull] LoschScriptParser.AliasContext context)
     {
-        base.VisitAlias(context);
+        base.EnterAlias(context);
 
         for (int i = 0; i < context.Identifier().Length; i++)
         {
@@ -67,16 +70,5 @@ internal class Visitor : LoschScriptParserBaseVisitor<dynamic>
 
             Context.GlobalAliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));
         }
-
-        return null;
-    }
-
-    public override dynamic Visit(IParseTree tree)
-    {
-        base.Visit(tree);
-
-        Console.WriteLine($"Visiting {tree.GetType()}: {tree.GetText()}");
-
-        return null;
     }
 }

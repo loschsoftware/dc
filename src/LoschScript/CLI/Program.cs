@@ -111,6 +111,8 @@ internal class Program
 
         LogOut.Write("-i".PadRight(25).PadRight(50));
         LogOut.WriteLine("Interprets the program and doesn't save an assembly to the disk.");
+        LogOut.Write("-diagnostics".PadRight(25).PadRight(50));
+        LogOut.WriteLine("Provide advanced diagnostic information.");
         LogOut.Write("-ts".PadRight(25).PadRight(50));
         LogOut.WriteLine("Measures the elapsed build time.");
         LogOut.Write("-default".PadRight(25).PadRight(50));
