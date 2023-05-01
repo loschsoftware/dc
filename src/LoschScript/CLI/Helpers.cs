@@ -62,6 +62,11 @@ internal static class Helpers
         return CompileSource(Directory.EnumerateFiles(".\\", "*.ls", SearchOption.AllDirectories).ToArray(), config).Any() ? -1 : 0;
     }
 
+    public static int InterpretFiles(string[] args)
+    {
+        return 0;
+    }
+
     public static int BuildLSConfig()
     {
         if (File.Exists("lsconfig.xml"))

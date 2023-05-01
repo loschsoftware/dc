@@ -12,6 +12,7 @@ internal class Program
         ["config"] => Helpers.BuildLSConfig(),
         ["build"] => Helpers.CompileAll(),
         ["interactive" or "repl"] => Helpers.StartReplSession(),
+        ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
         ["make" or "new"] => LSTemplates.CreateStructure(args),
         ["watch" or "auto"] => WatchForFileChanges(),
         ["-watch-indefinetly"] => WatchIndefinetly(),

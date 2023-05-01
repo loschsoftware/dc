@@ -12,7 +12,7 @@ internal class MethodContext
 
     public static MethodContext CurrentMethod { get; set; }
 
-    public ILGenerator IL { get; }
+    public ILGenerator IL { get; set; }
 
     public List<string> FilesWhereDefined { get; } = new();
 

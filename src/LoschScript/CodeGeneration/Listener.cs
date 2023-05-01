@@ -4,6 +4,8 @@ using LoschScript.Meta;
 using LoschScript.Parser;
 using System;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace LoschScript.CodeGeneration;
 
@@ -15,6 +17,34 @@ internal class Listener : LoschScriptParserBaseListener
 
         if (GlobalConfig.AdvancedDiagnostics)
             Console.WriteLine($"Entering rule '{context.GetType().Name}': {context.GetText()}{Environment.NewLine}");
+    }
+
+    public override void EnterTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context)
+    {
+        base.EnterTop_level_statements(context);
+
+        TypeBuilder tb = Context.Module.DefineType($"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}Program");
+        
+        TypeContext tc = new()
+        {
+            Builder = tb
+        };
+
+        tc.FilesWhereDefined.Add(CurrentFile.Path);
+
+        MethodBuilder mb = tb.DefineMethod("Main", MethodAttributes.Static);
+        ILGenerator il = mb.GetILGenerator();
+        MethodContext mc = new()
+        {
+            Builder = mb,
+            IL = il
+        };
+
+        mc.FilesWhereDefined.Add(CurrentFile.Path);
+
+        tc.Methods.Add(mc);
+
+        Context.Types.Add(tc);
     }
 
     public override void EnterExport_directive([NotNull] LoschScriptParser.Export_directiveContext context)

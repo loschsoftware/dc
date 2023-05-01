@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace LoschScript.CodeGeneration;
 
@@ -53,6 +55,14 @@ public static class Compiler
         LogOut.WriteLine("Compiling files...");
 
         Context = new();
+
+        AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
+        AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+
+        ModuleBuilder mb = ab.DefineDynamicModule(name.Name);
+
+        Context.Assembly = ab;
+        Context.Module = mb;
 
         foreach (string file in sourceFiles)
             yield return FileCompiler.CompileSingleFile(file, config ?? new());
