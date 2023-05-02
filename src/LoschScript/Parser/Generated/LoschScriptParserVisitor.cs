@@ -180,6 +180,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBlock_postfix_unless_expression([NotNull] LoschScriptParser.Block_postfix_unless_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>and_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAnd_expression([NotNull] LoschScriptParser.And_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>range_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -256,6 +263,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitAtom_expression([NotNull] LoschScriptParser.Atom_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>index_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIndex_expression([NotNull] LoschScriptParser.Index_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>comparison_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

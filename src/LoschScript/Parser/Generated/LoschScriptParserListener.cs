@@ -282,6 +282,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitBlock_postfix_unless_expression([NotNull] LoschScriptParser.Block_postfix_unless_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>and_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterAnd_expression([NotNull] LoschScriptParser.And_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>and_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitAnd_expression([NotNull] LoschScriptParser.And_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>range_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -413,6 +425,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitAtom_expression([NotNull] LoschScriptParser.Atom_expressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>index_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterIndex_expression([NotNull] LoschScriptParser.Index_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>index_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitIndex_expression([NotNull] LoschScriptParser.Index_expressionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>comparison_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

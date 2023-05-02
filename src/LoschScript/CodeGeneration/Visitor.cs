@@ -145,12 +145,232 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return ret;
     }
 
+    public override Type VisitExpression_atom([NotNull] LoschScriptParser.Expression_atomContext context)
+    {
+        return Visit(context.expression());
+    }
+
+    public override Type VisitUnary_negation_expression([NotNull] LoschScriptParser.Unary_negation_expressionContext context)
+    {
+        Type t = Visit(context.expression());
+
+        if (Helpers.IsNumericType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Neg);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_UnaryNegation", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    LS0036_ArithmeticError,
+                    $"The type '{t.Name}' does not implement the unary negation operation.",
+                    Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+
+        return t;
+    }
+
+    public override Type VisitUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context)
+    {
+        Type t = Visit(context.expression());
+
+        if (Helpers.IsNumericType(t))
+            return t;
+
+        MethodInfo op = t.GetMethod("op_UnaryPlus", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    LS0036_ArithmeticError,
+                    $"The type '{t.Name}' does not implement the unary plus operation.",
+                    Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+
+        return t;
+    }
+
+    public override Type VisitLogical_negation_expression([NotNull] LoschScriptParser.Logical_negation_expressionContext context)
+    {
+        Type t = Visit(context.expression());
+
+        if (t == typeof(bool))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_0);
+            CurrentMethod.IL.Emit(OpCodes.Ceq);
+
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_LogicalNot", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement the logical negation operation.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+
+        return t;
+    }
+
+    public override Type VisitLogical_and_expression([NotNull] LoschScriptParser.Logical_and_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if (t == typeof(bool) && t2 == typeof(bool))
+        {
+            CurrentMethod.IL.Emit(OpCodes.And);
+            return t;
+        }
+
+        EmitErrorMessage(
+            context.Start.Line,
+            context.Start.Column,
+            LS0002_MethodNotFound,
+            $"The logical and operation is only supported by boolean types.",
+            Path.GetFileName(CurrentFile.Path));
+
+        return t;
+    }
+
+    public override Type VisitLogical_or_expression([NotNull] LoschScriptParser.Logical_or_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if (t == typeof(bool) && t2 == typeof(bool))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Or);
+            return t;
+        }
+
+        EmitErrorMessage(
+            context.Start.Line,
+            context.Start.Column,
+            LS0002_MethodNotFound,
+            $"The logical or operation is only supported by boolean types.",
+            Path.GetFileName(CurrentFile.Path));
+
+        return t;
+    }
+
+    public override Type VisitOr_expression([NotNull] LoschScriptParser.Or_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if (Helpers.IsNumericType(t) || t == typeof(bool))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Or);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_BitwiseOr", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a bitwise or operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+
+        return t;
+    }
+
+    public override Type VisitAnd_expression([NotNull] LoschScriptParser.And_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if (Helpers.IsNumericType(t) || t == typeof(bool))
+        {
+            CurrentMethod.IL.Emit(OpCodes.And);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_BitwiseAnd", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a bitwise and operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+
+        return t;
+    }
+
+    // Other operators (Xor, Complement, ...)
+
+    public override Type VisitBitwise_complement_expression([NotNull] LoschScriptParser.Bitwise_complement_expressionContext context)
+    {
+        return base.VisitBitwise_complement_expression(context);
+    }
+
     public override Type VisitMultiply_expression([NotNull] LoschScriptParser.Multiply_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Visit(context.expression()[1]);
+        Type t2 = Visit(context.expression()[1]);
 
-        CurrentMethod.IL.Emit(OpCodes.Mul);
+        if (Helpers.IsNumericType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Mul);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_Multiply", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a multiplication operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
 
         return t;
     }
@@ -158,9 +378,29 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitDivide_expression([NotNull] LoschScriptParser.Divide_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Visit(context.expression()[1]);
+        Type t2 = Visit(context.expression()[1]);
 
-        CurrentMethod.IL.Emit(OpCodes.Div);
+        if (Helpers.IsNumericType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Div);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_Division", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a division operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
 
         return t;
     }
@@ -168,9 +408,29 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitAddition_expression([NotNull] LoschScriptParser.Addition_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Visit(context.expression()[1]);
+        Type t2 = Visit(context.expression()[1]);
 
-        CurrentMethod.IL.Emit(OpCodes.Add);
+        if (Helpers.IsNumericType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Add);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_Addition", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement an addition operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
 
         return t;
     }
@@ -178,9 +438,29 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitSubtraction_expression([NotNull] LoschScriptParser.Subtraction_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Visit(context.expression()[1]);
+        Type t2 = Visit(context.expression()[1]);
 
-        CurrentMethod.IL.Emit(OpCodes.Sub);
+        if (Helpers.IsNumericType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Sub);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_Subtraction", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a subtraction operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
 
         return t;
     }
@@ -188,9 +468,29 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Visit(context.expression()[1]);
+        Type t2 = Visit(context.expression()[1]);
 
-        CurrentMethod.IL.Emit(OpCodes.Rem);
+        if (Helpers.IsNumericType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Rem);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_Modulus", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a remainder operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
 
         return t;
     }
@@ -236,18 +536,29 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             MethodInfo[] methods = t.GetMethods().Where(m => m.Name == context.Identifier().GetText()).ToArray();
 
+            bool success = false;
+
             foreach (MethodInfo possible in methods)
             {
                 if (possible.GetParameters().Length != CurrentMethod.ArgumentTypesForNextMethodCall.Count)
                     continue;
 
-                for (int i = 0; i < possible.GetParameters().Length; i++)
+                string[] _params = possible.GetParameters().Select(p => p.ParameterType.FullName).ToArray();
+                string[] _params2 = CurrentMethod.ArgumentTypesForNextMethodCall.Select(t => t.FullName).ToArray();
+
+                for (int i = 0; i < _params.Length; i++)
                 {
-                    if (possible.GetParameters()[i].ParameterType != CurrentMethod.ArgumentTypesForNextMethodCall[i])
+                    if (_params[i] != _params2[i])
                         continue;
+
+                    success = true;
                 }
 
-                m = possible;
+                if (success)
+                {
+                    m = possible;
+                    break;
+                }
             }
 
             CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
@@ -303,6 +614,33 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitFull_identifier([NotNull] LoschScriptParser.Full_identifierContext context)
     {
         return Helpers.ResolveTypeName(context.GetText());
+    }
+
+    public override Type VisitReal_atom([NotNull] LoschScriptParser.Real_atomContext context)
+    {
+        string text = context.GetText();
+
+        if (text.EndsWith("s"))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, float.Parse(text[0..^1].Replace("'", "")));
+            return typeof(float);
+        }
+
+        if (text.EndsWith("d"))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text[0..^1].Replace("'", "")));
+            return typeof(double);
+        }
+
+        if (text.EndsWith("m"))
+        {
+            // TODO: Apparently decimals are a pain in the ass... For now we'll cheat and emit doubles instead
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text[0..^1].Replace("'", "")));
+            return typeof(double);
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text.Replace("'", "")));
+        return typeof(double);
     }
 
     public override Type VisitInteger_atom([NotNull] LoschScriptParser.Integer_atomContext context)

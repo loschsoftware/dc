@@ -2,6 +2,7 @@
 using LoschScript.Errors;
 using LoschScript.Meta;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -142,6 +143,28 @@ internal static class Helpers
     FoundType:
 
         return type;
+    }
+
+    public static bool IsNumericType(Type type)
+    {
+        Type[] numerics =
+        {
+            typeof(byte),
+            typeof(sbyte),
+            typeof(short),
+            typeof(ushort),
+            typeof(int),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
+            typeof(float),
+            typeof(double),
+            typeof(decimal),
+            typeof(nint),
+            typeof(nuint)
+        };
+
+        return numerics.Contains(type);
     }
 
     public static int CallMethod(string[] args)

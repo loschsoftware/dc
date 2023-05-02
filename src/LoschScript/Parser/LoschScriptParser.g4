@@ -39,8 +39,6 @@ code_block
 
 expression
     : expression Double_Asterisk expression #power_expression
-    | Minus expression #unary_negation_expression
-    | Plus expression #unary_plus_expression
     | Exclamation_Mark expression #logical_negation_expression
     | expression Asterisk expression #multiply_expression
     | expression Slash expression #divide_expression
@@ -52,11 +50,14 @@ expression
     | Tilde expression #bitwise_complement_expression
     | expression op=(Less_Than | Less_Equals | Greater_Than | Greater_Equals) expression #comparison_expression
     | expression op=(Double_Equals | Exclamation_Equals) expression #equality_expression
-    | expression Ampersand expression #addition_expression
+    | expression Ampersand expression #and_expression
     | expression Double_Ampersand expression #logical_and_expression
     | expression Bar expression #or_expression
     | expression Double_Bar expression #logical_or_expression
     | expression Caret expression #xor_expression
+    | Minus expression #unary_negation_expression
+    | Plus expression #unary_plus_expression
+    | expression At_Sign export_directive #index_expression
     | Caret  #typeof_expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_exception
