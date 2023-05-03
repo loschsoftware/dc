@@ -339,11 +339,63 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return t;
     }
 
-    // Other operators (Xor, Complement, ...)
+    public override Type VisitXor_expression([NotNull] LoschScriptParser.Xor_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if (Helpers.IsNumericType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Xor);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_ExclusiveOr", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement an exclusive or operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+
+        return t;
+    }
 
     public override Type VisitBitwise_complement_expression([NotNull] LoschScriptParser.Bitwise_complement_expressionContext context)
     {
-        return base.VisitBitwise_complement_expression(context);
+        Type t = Visit(context.expression());
+
+        if (Helpers.IsNumericType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Not);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_OnesComplement", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t}, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a complement operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+
+        return t;
     }
 
     public override Type VisitMultiply_expression([NotNull] LoschScriptParser.Multiply_expressionContext context)
