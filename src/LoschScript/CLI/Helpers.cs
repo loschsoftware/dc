@@ -14,19 +14,8 @@ namespace LoschScript.CLI;
 
 internal static class Helpers
 {
-    private static void HandleAllExceptions()
-    {
-        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-        {
-            EmitErrorMessage(0, 0, LS0000_UnexpectedError, "Unhandled exception.", "lsc.exe");
-            Console.ForegroundColor = ConsoleColor.Gray;
-        };
-    }
-
     public static int HandleArgs(string[] args)
     {
-        HandleAllExceptions();
-
         LSConfig config = null;
 
         if (File.Exists("lsconfig.xml"))
@@ -63,8 +52,6 @@ internal static class Helpers
 
     public static int CompileAll()
     {
-        HandleAllExceptions();
-
         LSConfig config = null;
 
         if (File.Exists("lsconfig.xml"))

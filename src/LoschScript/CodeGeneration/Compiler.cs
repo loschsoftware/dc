@@ -75,8 +75,10 @@ public static class Compiler
 
             return errors;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            EmitErrorMessage(0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
+
 #if DEBUG
             throw;
 #endif
