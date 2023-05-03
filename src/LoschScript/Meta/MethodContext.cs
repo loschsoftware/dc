@@ -19,5 +19,7 @@ internal class MethodContext
 
     public MethodBuilder Builder { get; set; }
 
+    public int LocalIndex { get; set; } = -1;
+
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 }

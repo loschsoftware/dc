@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
@@ -144,6 +145,8 @@ internal static class Helpers
 
         return type;
     }
+
+    public static OpCode GetCallOpCode(Type type) => type.IsValueType ? OpCodes.Call : OpCodes.Callvirt;
 
     public static bool IsNumericType(Type type)
     {

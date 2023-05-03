@@ -4,6 +4,7 @@ using LoschScript.CLI;
 using LoschScript.Meta;
 using LoschScript.Parser;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -410,7 +411,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (Helpers.IsNumericType(t))
+        if (Helpers.IsNumericType(t) && Helpers.IsNumericType(t2))
         {
             CurrentMethod.IL.Emit(OpCodes.Add);
             return t;
@@ -420,8 +421,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             if (t2 != typeof(string))
             {
-                MethodInfo toString = t2.GetMethod("ToString", BindingFlags.Public, null, Array.Empty<Type>(), null);
-                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, toString, null);
+                CurrentMethod.IL.DeclareLocal(t2);
+                CurrentMethod.IL.Emit(OpCodes.Stloc, ++CurrentMethod.LocalIndex);
+                CurrentMethod.IL.Emit(OpCodes.Ldloca, CurrentMethod.LocalIndex);
+
+                MethodInfo toString = t2.GetMethod("ToString", Array.Empty<Type>());
+                CurrentMethod.IL.EmitCall(Helpers.GetCallOpCode(t2), toString, null);
             }
             else
             {
@@ -429,16 +434,20 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
-                MethodInfo toString = t.GetMethod("ToString", BindingFlags.Public, null, Array.Empty<Type>(), null);
-                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, toString, null);
+                CurrentMethod.IL.DeclareLocal(t);
+                CurrentMethod.IL.Emit(OpCodes.Stloc, ++CurrentMethod.LocalIndex);
+                CurrentMethod.IL.Emit(OpCodes.Ldloca, CurrentMethod.LocalIndex);
+
+                MethodInfo toString = t.GetMethod("ToString", Array.Empty<Type>());
+                CurrentMethod.IL.EmitCall(Helpers.GetCallOpCode(t), toString, null);
 
                 Visit(context.expression()[1]);
             }
 
-            MethodInfo concat = t.GetMethod("Concat", BindingFlags.Public, null, new Type[] { typeof(string), typeof(string) }, null);
+            MethodInfo concat = typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string) });
             CurrentMethod.IL.EmitCall(OpCodes.Call, concat, null);
 
-            return t;
+            return typeof(string);
         }
 
         MethodInfo op = t.GetMethod("op_Addition", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
@@ -647,24 +656,24 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (text.EndsWith("s"))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, float.Parse(text[0..^1].Replace("'", "")));
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, float.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
             return typeof(float);
         }
 
         if (text.EndsWith("d"))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text[0..^1].Replace("'", "")));
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
             return typeof(double);
         }
 
         if (text.EndsWith("m"))
         {
             // TODO: Apparently decimals are a pain in the ass... For now we'll cheat and emit doubles instead
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text[0..^1].Replace("'", "")));
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
             return typeof(double);
         }
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text.Replace("'", "")));
+        CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text.Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
         return typeof(double);
     }
 
