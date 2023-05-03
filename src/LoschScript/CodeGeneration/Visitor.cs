@@ -610,6 +610,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return t;
     }
 
+    public override Type VisitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context)
+    {
+        Type t = Helpers.ResolveTypeName(context.Identifier().ToString());
+        CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
+        
+        MethodInfo typeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
+        CurrentMethod.IL.EmitCall(OpCodes.Call, typeFromHandle, null);
+
+        return typeof(Type);
+    }
+
     public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
     {
         Type t = Visit(context.expression());
@@ -664,6 +675,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 return typeof(void);
             }
+        }
+
+        MethodInfo parameterlessFunc = t.GetMethod(context.Identifier().GetText(), Array.Empty<Type>());
+        if (parameterlessFunc != null)
+        {
+            CurrentMethod.IL.EmitCall(OpCodes.Call, parameterlessFunc, null);
+            return parameterlessFunc.ReturnType;
         }
 
         FieldInfo f = t.GetField(context.Identifier().GetText());
