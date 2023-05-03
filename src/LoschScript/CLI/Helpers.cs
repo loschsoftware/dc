@@ -1,4 +1,5 @@
-﻿using Losch.LoschScript.Configuration;
+﻿using Antlr4.Runtime.Misc;
+using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Meta;
 using System;
@@ -52,6 +53,8 @@ internal static class Helpers
 
     public static int CompileAll()
     {
+        string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ls", SearchOption.AllDirectories).ToArray();
+
         LSConfig config = null;
 
         if (File.Exists("lsconfig.xml"))
@@ -62,11 +65,11 @@ internal static class Helpers
         }
 
         config ??= new();
-        config.AssemblyName ??= Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
+        config.AssemblyName ??= Path.GetFileNameWithoutExtension(filesToCompile.Where(File.Exists).First());
 
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
-        IEnumerable<ErrorInfo[]> errors = CompileSource(Directory.EnumerateFiles(".\\", "*.ls", SearchOption.AllDirectories).ToArray(), config);
+        IEnumerable<ErrorInfo[]> errors = CompileSource(filesToCompile, config);
 
         Context.Assembly.Save(assembly);
 
