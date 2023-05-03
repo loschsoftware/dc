@@ -662,18 +662,18 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (text.EndsWith("d"))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R8, double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
             return typeof(double);
         }
 
         if (text.EndsWith("m"))
         {
             // TODO: Apparently decimals are a pain in the ass... For now we'll cheat and emit doubles instead
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R8, double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
             return typeof(double);
         }
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_R4, double.Parse(text.Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
+        CurrentMethod.IL.Emit(OpCodes.Ldc_R8, double.Parse(text.Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
         return typeof(double);
     }
 
