@@ -379,7 +379,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        MethodInfo op = t.GetMethod("op_OnesComplement", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t}, null);
+        MethodInfo op = t.GetMethod("op_OnesComplement", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
 
         if (op == null)
         {
@@ -387,7 +387,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Start.Line,
                 context.Start.Column,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a complement operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a complement operation.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
