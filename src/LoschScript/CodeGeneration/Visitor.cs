@@ -60,7 +60,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (context.Exclamation_Mark() == null)
             {
                 CurrentFile.Imports.Add(ns);
-                return typeof(void);
+                continue;
             }
 
             Context.GlobalImports.Add(ns);
@@ -68,7 +68,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         return typeof(void);
     }
-
+    
     public override Type VisitType_import([NotNull] LoschScriptParser.Type_importContext context)
     {
         foreach (string ns in context.full_identifier().Select(f => f.GetText()))
@@ -76,7 +76,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (context.Exclamation_Mark() == null)
             {
                 CurrentFile.ImportedTypes.Add(ns);
-                return typeof(void);
+                continue;
             }
 
             Context.GlobalTypeImports.Add(ns);
@@ -92,7 +92,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (context.Exclamation_Mark() == null)
             {
                 CurrentFile.Aliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));
-                return typeof(void);
+                continue;
             }
 
             Context.GlobalAliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));

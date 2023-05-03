@@ -124,6 +124,9 @@ internal static class Helpers
 
                 type = Type.GetType(n);
 
+                if (type != null)
+                    goto FoundType;
+
                 List<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetType(n) != null).ToList();
                 if (assemblies.Any())
                     return assemblies.First().GetType(n);
