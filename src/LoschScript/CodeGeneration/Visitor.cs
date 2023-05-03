@@ -480,7 +480,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 MethodInfo toString = t2.GetMethod("ToString", Array.Empty<Type>());
                 CurrentMethod.IL.EmitCall(Helpers.GetCallOpCode(t2), toString, null);
             }
-            else
+            else if (t != typeof(string))
             {
                 // TODO: Fix this mess ASAP
 
