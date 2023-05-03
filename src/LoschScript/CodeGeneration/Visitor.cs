@@ -416,6 +416,31 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
+        if (t == typeof(string) || t2 == typeof(string))
+        {
+            if (t2 != typeof(string))
+            {
+                MethodInfo toString = t2.GetMethod("ToString", BindingFlags.Public, null, Array.Empty<Type>(), null);
+                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, toString, null);
+            }
+            else
+            {
+                // TODO: Fix this mess ASAP
+
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+
+                MethodInfo toString = t.GetMethod("ToString", BindingFlags.Public, null, Array.Empty<Type>(), null);
+                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, toString, null);
+
+                Visit(context.expression()[1]);
+            }
+
+            MethodInfo concat = t.GetMethod("Concat", BindingFlags.Public, null, new Type[] { typeof(string), typeof(string) }, null);
+            CurrentMethod.IL.EmitCall(OpCodes.Call, concat, null);
+
+            return t;
+        }
+
         MethodInfo op = t.GetMethod("op_Addition", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
         if (op == null)
