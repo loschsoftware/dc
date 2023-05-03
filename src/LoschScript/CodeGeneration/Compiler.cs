@@ -77,6 +77,7 @@ public static class Compiler
         }
         catch (Exception ex)
         {
+            Console.WriteLine();
             EmitErrorMessage(0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
 
 #if DEBUG
