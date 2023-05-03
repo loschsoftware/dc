@@ -62,8 +62,22 @@ internal static class Helpers
         }
 
         config ??= new();
+        config.AssemblyName ??= Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
 
-        return CompileSource(Directory.EnumerateFiles(".\\", "*.ls", SearchOption.AllDirectories).ToArray(), config).Any() ? -1 : 0;
+        string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
+
+        IEnumerable<ErrorInfo[]> errors = CompileSource(Directory.EnumerateFiles(".\\", "*.ls", SearchOption.AllDirectories).ToArray(), config);
+
+        Context.Assembly.Save(assembly);
+
+        if (errors.Select(e => e.Length).Sum() == 0)
+        {
+            Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
+            return 0;
+        }
+
+        Console.WriteLine($"\r\nCompilation failed with {errors.Select(e => e.Length).Sum()} errors.");
+        return -1;
     }
 
     public static int InterpretFiles(string[] args)
