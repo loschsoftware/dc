@@ -3,7 +3,7 @@ parser grammar LoschScriptParser;
 options { tokenVocab = LoschScriptLexer; }
 
 compilation_unit
-    : import_directive* export_directive? file_body EOF
+    : (import_directive NewLine)* (export_directive NewLine)? file_body EOF
     ;
 
 file_body
