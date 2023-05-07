@@ -151,6 +151,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return Visit(context.expression());
     }
 
+    public override Type VisitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context)
+    {
+        return Visit(context.expression());
+    }
+
     public override Type VisitUnary_negation_expression([NotNull] LoschScriptParser.Unary_negation_expressionContext context)
     {
         Type t = Visit(context.expression());
