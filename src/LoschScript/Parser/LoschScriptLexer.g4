@@ -1,8 +1,111 @@
 lexer grammar LoschScriptLexer;
 
-channels { Comments_Channel, Whitespace }
+channels { Comments_Channel }
 
-Ws: [ \n\t\r]+ -> channel(Whitespace);
+tokens { INDENT, DEDENT }
+
+@header {
+	using System.Collections.Generic;
+	using System.Linq;
+}
+
+@lexer::members {
+	// Initializing `pendingDent` to true means any whitespace at the beginning
+	// of the file will trigger an INDENT, which will probably be a syntax error,
+	// as it is in Python.
+	private bool pendingDent = true;
+
+	private int indentCount = 0;
+
+	private LinkedList<IToken> tokenQueue = new();
+
+	private Stack<int> indentStack = new();
+
+	private IToken initialIndentToken = null;
+
+	private int getSavedIndent() => indentStack.Count == 0 ? 0 : indentStack.Peek();
+
+	private CommonToken createToken(int type, string text, IToken next) {
+		CommonToken token = new(type, text);
+
+		if (initialIndentToken != null) {
+			token.StartIndex = initialIndentToken.StartIndex;
+			token.Line = initialIndentToken.Line;
+			token.Column = initialIndentToken.Column;
+			token.StopIndex = next.StartIndex - 1;
+		}
+
+		return token;
+	}
+	
+	public override IToken NextToken() {
+
+		// Return tokens from the queue if it is not empty.
+		if (tokenQueue.Count != 0) { var rv = tokenQueue.First(); tokenQueue.RemoveFirst(); return rv; }
+
+		// Grab the next token and if nothing special is needed, simply return it.
+		// Initialize `initialIndentToken` if needed.
+		IToken next = base.NextToken();
+		//NOTE: This could be an appropriate spot to count whitespace or deal with
+		//NEWLINES, but it is already handled with custom actions down in the
+		//lexer rules.
+		if (pendingDent && null == initialIndentToken && NewLine != next.Type) { initialIndentToken = next; }
+		if (null == next || next.Channel == Hidden || NewLine == next.Type) { return next; }
+
+		// Handle EOF. In particular, handle an abrupt EOF that comes without an
+		// immediately preceding NEWLINE.
+		if (next.Type == Eof) {
+			indentCount = 0;
+			// EOF outside of `pendingDent` state means input did not have a final
+			// NEWLINE before end of file.
+			if (!pendingDent) {
+				initialIndentToken = next;
+				tokenQueue.AddLast(createToken(NewLine, "NewLine", next));
+			}
+		}
+
+		// Before exiting `pendingDent` state queue up proper INDENTS and DEDENTS.
+		while (indentCount != getSavedIndent()) {
+			if (indentCount > getSavedIndent()) {
+				indentStack.Push(indentCount);
+				tokenQueue.AddLast(createToken(INDENT, "INDENT" + indentCount, next));
+			} else {
+				indentStack.Pop();
+				tokenQueue.AddLast(createToken(DEDENT, "DEDENT" + getSavedIndent(), next));
+			}
+		}
+		pendingDent = false;
+		tokenQueue.AddLast(next);
+
+		var returnValue = tokenQueue.First();
+
+		tokenQueue.RemoveFirst();
+
+		return returnValue;
+	}
+}
+
+Ws: [ \t]+ {
+	Channel = Hidden;
+	if (pendingDent) {
+		indentCount += Text.Length;
+	}
+};
+
+NewLine
+	: '\r\n' | '\r' | '\n'
+	| '\u0085' // <Next Line CHARACTER (U+0085)>'
+	| '\u2028' //'<Line Separator CHARACTER (U+2028)>'
+	| '\u2029' //'<Paragraph Separator CHARACTER (U+2029)>'
+	{
+		if (pendingDent) {
+			Channel = Hidden;
+		}
+
+		pendingDent = true;
+		indentCount = 0;
+		initialIndentToken = null;
+	};
 
 Single_Line_Comment: '#' InputCharacter* -> channel(Comments_Channel);
 Delimited_Comment: '#[' .*? ']#' -> channel(Comments_Channel);
@@ -134,13 +237,6 @@ fragment HexEscapeSequence
 	| '^x' HexDigit HexDigit
 	| '^x' HexDigit HexDigit HexDigit
 	| '^x' HexDigit HexDigit HexDigit HexDigit
-	;
-
-fragment NewLine
-	: '\r\n' | '\r' | '\n'
-	| '\u0085' // <Next Line CHARACTER (U+0085)>'
-	| '\u2028' //'<Line Separator CHARACTER (U+2028)>'
-	| '\u2029' //'<Paragraph Separator CHARACTER (U+2029)>'
 	;
 
 fragment Whitespace

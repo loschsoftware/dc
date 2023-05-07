@@ -387,6 +387,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>newlined_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>newlined_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>remainder_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>

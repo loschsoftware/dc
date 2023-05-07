@@ -208,6 +208,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>newlined_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>remainder_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

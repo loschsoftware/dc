@@ -34,7 +34,7 @@ full_identifier
     ;
 
 code_block
-    : Open_Brace expression* Close_Brace
+    : INDENT expression* DEDENT
     ;
 
 expression
@@ -73,6 +73,7 @@ expression
     | expression postfix_unless_branch #postfix_unless_expression
     | code_block postfix_unless_branch #block_postfix_unless_expression
     | atom #atom_expression
+    | expression NewLine #newlined_expression
     ;
 
 atom
