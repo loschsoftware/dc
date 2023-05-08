@@ -715,6 +715,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(void);
     }
 
+    public override Type VisitCode_block([NotNull] LoschScriptParser.Code_blockContext context)
+    {
+        foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
+            Visit(tree);
+
+        return Visit(context.expression().Last());
+    }
+
     public override Type VisitIdentifier_atom([NotNull] LoschScriptParser.Identifier_atomContext context)
     {
         return Helpers.ResolveTypeName(context.Identifier().GetText());
