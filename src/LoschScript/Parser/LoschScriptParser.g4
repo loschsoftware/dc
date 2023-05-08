@@ -34,7 +34,7 @@ full_identifier
     ;
 
 code_block
-    : INDENT expression* DEDENT
+    : NewLine INDENT expression* DEDENT
     ;
 
 expression
