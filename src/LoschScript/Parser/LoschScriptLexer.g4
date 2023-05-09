@@ -152,6 +152,8 @@ Single_Quote: '\'';
 Double_Quote: '"';
 Question_Mark: '?';
 Exclamation_Mark: '!';
+Exclamation_Question: '!?';
+Exclamation_Colon: '!:';
 At_Sign: '@';
 Dollar_Sign: '$';
 Caret: '^';

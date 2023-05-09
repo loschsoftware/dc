@@ -366,6 +366,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>block_postfix_if_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBlock_postfix_if_expression([NotNull] LoschScriptParser.Block_postfix_if_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>block_postfix_if_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBlock_postfix_if_expression([NotNull] LoschScriptParser.Block_postfix_if_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>postfix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
