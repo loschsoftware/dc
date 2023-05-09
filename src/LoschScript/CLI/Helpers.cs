@@ -71,15 +71,17 @@ internal static class Helpers
 
         IEnumerable<ErrorInfo[]> errors = CompileSource(filesToCompile, config);
 
-        Context.Assembly.Save(assembly);
-
         if (errors.Select(e => e.Length).Sum() == 0)
         {
+            Context.Assembly.Save(assembly);
+
             Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
             return 0;
         }
 
-        Console.WriteLine($"\r\nCompilation failed with {errors.Select(e => e.Length).Sum()} errors.");
+        int count = errors.Select(e => e.Length).Sum();
+
+        Console.WriteLine($"\r\nCompilation failed with {count} error{(count > 1 ? "s" : "")}.");
         return -1;
     }
 
@@ -175,6 +177,17 @@ internal static class Helpers
         };
 
         return numerics.Contains(type);
+    }
+
+    public static bool IsFloatingPointType(Type type)
+    {
+        Type[] floats =
+        {
+            typeof(float),
+            typeof(double),
+        };
+
+        return floats.Contains(type);
     }
 
     public static int CallMethod(string[] args)

@@ -4,6 +4,8 @@ using LoschScript.CLI;
 using LoschScript.Meta;
 using LoschScript.Parser;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -68,7 +70,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         return typeof(void);
     }
-    
+
     public override Type VisitType_import([NotNull] LoschScriptParser.Type_importContext context)
     {
         foreach (string ns in context.full_identifier().Select(f => f.GetText()))
@@ -156,6 +158,137 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return Visit(context.expression());
     }
 
+    public override Type VisitEquality_expression([NotNull] LoschScriptParser.Equality_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if ((Helpers.IsNumericType(t) && Helpers.IsNumericType(t2)) || (t == typeof(bool) && t2 == typeof(bool)))
+        {
+            if (Helpers.IsFloatingPointType(t) && !Helpers.IsFloatingPointType(t2))
+            {
+                CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+            }
+            else if (Helpers.IsFloatingPointType(t2) && !Helpers.IsFloatingPointType(t))
+            {
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+                CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+                Visit(context.expression()[1]);
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Ceq);
+
+            if (context.op.Text == "!=")
+            {
+                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_0);
+                CurrentMethod.IL.Emit(OpCodes.Ceq);
+            }
+
+            return typeof(bool);
+        }
+
+        if (context.op.Text == "==")
+        {
+
+            MethodInfo op = t.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+            if (op == null)
+            {
+                EmitErrorMessage(
+                        context.Start.Line,
+                        context.Start.Column,
+                        LS0036_ArithmeticError,
+                        $"The type '{t.Name}' does not implement the equality operation.",
+                        Path.GetFileName(CurrentFile.Path));
+
+                return typeof(bool);
+            }
+
+            CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+        }
+        else
+        {
+            MethodInfo op = t.GetMethod("op_Inequality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+            if (op == null)
+            {
+                EmitErrorMessage(
+                        context.Start.Line,
+                        context.Start.Column,
+                        LS0036_ArithmeticError,
+                        $"The type '{t.Name}' does not implement the inequality operation.",
+                        Path.GetFileName(CurrentFile.Path));
+
+                return typeof(bool);
+            }
+
+            CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+        }
+
+        return typeof(bool);
+    }
+
+    public override Type VisitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if ((Helpers.IsNumericType(t) && Helpers.IsNumericType(t2)) || (t == typeof(bool) && t2 == typeof(bool)))
+        {
+            if (Helpers.IsFloatingPointType(t) && !Helpers.IsFloatingPointType(t2))
+            {
+                CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+            }
+            else if (Helpers.IsFloatingPointType(t2) && !Helpers.IsFloatingPointType(t))
+            {
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+                CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+                Visit(context.expression()[1]);
+            }
+
+            CurrentMethod.IL.Emit(context.op.Text switch
+            {
+                // Looks weird, but is the correct logic
+                "<" or ">=" => OpCodes.Clt,
+                _ => OpCodes.Cgt,
+            });
+
+            if (context.op.Text == "<=" || context.op.Text == ">=")
+            {
+                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_0);
+                CurrentMethod.IL.Emit(OpCodes.Ceq);
+            }
+
+            return typeof(bool);
+        }
+
+        string methodName = $"op_{context.op.Text switch
+        {
+            "<" => "LessThan",
+            ">" => "GreaterThan",
+            "<=" => "LessThanOrEqual",
+            _ => "GreaterThanOrEqual"
+        }}";
+
+        MethodInfo op = t.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    LS0036_ArithmeticError,
+                    $"The type '{t.Name}' does not implement this comparison operation.",
+                    Path.GetFileName(CurrentFile.Path));
+
+            return typeof(bool);
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+
+        return typeof(bool);
+    }
+
     public override Type VisitUnary_negation_expression([NotNull] LoschScriptParser.Unary_negation_expressionContext context)
     {
         Type t = Visit(context.expression());
@@ -180,7 +313,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -206,7 +339,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -237,7 +370,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -309,7 +442,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -339,7 +472,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -369,7 +502,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -398,7 +531,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -428,7 +561,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -458,7 +591,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -521,7 +654,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -551,7 +684,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -581,7 +714,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Callvirt, op, null);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
         return t;
     }
@@ -619,7 +752,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         Type t = Helpers.ResolveTypeName(context.Identifier().ToString());
         CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
-        
+
         MethodInfo typeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
         CurrentMethod.IL.EmitCall(OpCodes.Call, typeFromHandle, null);
 
@@ -731,6 +864,131 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitFull_identifier([NotNull] LoschScriptParser.Full_identifierContext context)
     {
         return Helpers.ResolveTypeName(context.GetText());
+    }
+
+    public override Type VisitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context)
+    {
+        Type t;
+        List<Type> t2 = new();
+        Type t3 = null;
+
+        Label falseBranch = CurrentMethod.IL.DefineLabel();
+        Label restBranch = CurrentMethod.IL.DefineLabel();
+
+        // Comparative expression
+        Type ct = Visit(context.if_branch().expression()[0]);
+
+        if (ct != typeof(bool))
+        {
+            EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    LS0038_ConditionalExpressionClauseNotBoolean,
+                    $"The condition of a conditional expression has to be a boolean.");
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Brfalse, falseBranch);
+
+        if (context.if_branch().code_block() != null)
+            t = Visit(context.if_branch().code_block());
+        else
+            t = Visit(context.if_branch().expression().Last());
+
+        CurrentMethod.IL.Emit(OpCodes.Br, restBranch);
+
+        CurrentMethod.IL.MarkLabel(falseBranch);
+
+        if (context.elif_branch() != null)
+        {
+            foreach (LoschScriptParser.Elif_branchContext tree in context.elif_branch())
+            {
+                Label stillFalseBranch = CurrentMethod.IL.DefineLabel();
+
+                Type _ct = Visit(tree.expression()[0]);
+
+                if (_ct != typeof(bool))
+                {
+                    EmitErrorMessage(
+                            context.Start.Line,
+                            context.Start.Column,
+                            LS0038_ConditionalExpressionClauseNotBoolean,
+                            $"The condition of a conditional expression has to be a boolean.");
+                }
+
+                CurrentMethod.IL.Emit(OpCodes.Brfalse, stillFalseBranch);
+
+                if (tree.code_block() != null)
+                    t2.Add(Visit(tree.code_block()));
+                else
+                    t2.Add(Visit(tree.expression().Last()));
+
+                CurrentMethod.IL.Emit(OpCodes.Br, restBranch);
+                CurrentMethod.IL.MarkLabel(stillFalseBranch);
+            }
+        }
+
+        if (context.else_branch() != null)
+        {
+            if (context.else_branch().code_block() != null)
+                t3 = Visit(context.else_branch().code_block());
+            else
+                t3 = Visit(context.else_branch().expression());
+        }
+
+        CurrentMethod.IL.MarkLabel(restBranch);
+
+        bool allEqual = t2.Select(t => t.Name).Distinct().Count() == 1;
+
+        if (t2.Count == 0)
+        {
+            allEqual = true;
+            t2.Add(t);
+        }
+
+        if (allEqual && t3 == null)
+            return t;
+
+        if (!allEqual || t != t3 || t != t2[0])
+        {
+            EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    LS0037_BranchExpressionTypesUnequal,
+                    $"The return types of the branches of the conditional expression do not match.");
+
+            return t;
+        }
+
+        return t;
+    }
+
+    public override Type VisitPostfix_if_expression([NotNull] LoschScriptParser.Postfix_if_expressionContext context)
+    {
+        Label fb = CurrentMethod.IL.DefineLabel();
+        Label rest = CurrentMethod.IL.DefineLabel();
+
+        // Comparative expression
+        Type ct = Visit(context.postfix_if_branch().expression());
+
+        if (ct != typeof(bool))
+        {
+            EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    LS0038_ConditionalExpressionClauseNotBoolean,
+                    $"The condition of a conditional expression has to be a boolean.");
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Brfalse, fb);
+
+        Type t = Visit(context.expression());
+
+        CurrentMethod.IL.MarkLabel(fb);
+        CurrentMethod.IL.Emit(OpCodes.Br, rest);
+
+        CurrentMethod.IL.MarkLabel(rest);
+
+        return t;
     }
 
     public override Type VisitReal_atom([NotNull] LoschScriptParser.Real_atomContext context)

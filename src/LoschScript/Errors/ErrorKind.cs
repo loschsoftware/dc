@@ -160,5 +160,13 @@ public enum ErrorKind
     /// <summary>
     /// General error message emitted for various kinds of arithmetic errors.
     /// </summary>
-    LS0036_ArithmeticError
+    LS0036_ArithmeticError,
+    /// <summary>
+    /// Emitted when the return types of branches do not match.
+    /// </summary>
+    LS0037_BranchExpressionTypesUnequal,
+    /// <summary>
+    /// Emitted when the condition of a conditional expression is not a boolean.
+    /// </summary>
+    LS0038_ConditionalExpressionClauseNotBoolean
 }

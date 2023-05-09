@@ -18,7 +18,11 @@ internal class FileContext
 
     public string Path { get; }
 
-    public List<string> Imports { get; } = new();
+    public List<string> Imports { get; } = new()
+    {
+        // Implicit imports
+        "LoschScript.Core"
+    };
     
     public List<string> ImportedTypes { get; } = new();
 
