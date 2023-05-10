@@ -748,9 +748,69 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return t;
     }
 
+    public override Type VisitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if (Helpers.IsIntegerType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Shl);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_LeftShift", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a left shift operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+
+        return t;
+    }
+
+    public override Type VisitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if (Helpers.IsIntegerType(t))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Shr);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_RightShift", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                LS0002_MethodNotFound,
+                $"The type '{t.Name}' does not implement a right shift operation with the specified parameter types.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+
+        return t;
+    }
+
     public override Type VisitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context)
     {
-        Type t = Helpers.ResolveTypeName(context.Identifier().ToString());
+        Type t = Helpers.ResolveTypeName(context.Identifier().ToString(), context.Start.Line, context.Start.Column);
         CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
 
         MethodInfo typeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
@@ -858,12 +918,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitIdentifier_atom([NotNull] LoschScriptParser.Identifier_atomContext context)
     {
-        return Helpers.ResolveTypeName(context.Identifier().GetText());
+        return Helpers.ResolveTypeName(context.Identifier().GetText(), context.Start.Line, context.Start.Column);
     }
 
     public override Type VisitFull_identifier([NotNull] LoschScriptParser.Full_identifierContext context)
     {
-        return Helpers.ResolveTypeName(context.GetText());
+        return Helpers.ResolveTypeName(context.GetText(), context.Start.Line, context.Start.Column);
     }
 
     public override Type VisitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context)

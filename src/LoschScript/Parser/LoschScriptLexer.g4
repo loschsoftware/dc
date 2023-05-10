@@ -155,6 +155,7 @@ Exclamation_Mark: '!';
 Exclamation_Question: '!?';
 Exclamation_Colon: '!:';
 At_Sign: '@';
+Exclamation_At: '!@';
 Dollar_Sign: '$';
 Caret: '^';
 Percent_Caret: '%^';

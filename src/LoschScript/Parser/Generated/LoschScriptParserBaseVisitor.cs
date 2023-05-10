@@ -194,6 +194,28 @@ public partial class LoschScriptParserBaseVisitor<Result> : AbstractParseTreeVis
 	/// <return>The visitor result.</return>
 	public virtual Result VisitBitwise_complement_expression([NotNull] LoschScriptParser.Bitwise_complement_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by the <c>until_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitUntil_loop([NotNull] LoschScriptParser.Until_loopContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>while_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitWhile_loop([NotNull] LoschScriptParser.While_loopContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by the <c>xor_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>
@@ -259,6 +281,17 @@ public partial class LoschScriptParserBaseVisitor<Result> : AbstractParseTreeVis
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitLogical_or_expression([NotNull] LoschScriptParser.Logical_or_expressionContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>array_or_list_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitArray_or_list_expression([NotNull] LoschScriptParser.Array_or_list_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>block_postfix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -326,6 +359,17 @@ public partial class LoschScriptParserBaseVisitor<Result> : AbstractParseTreeVis
 	/// <return>The visitor result.</return>
 	public virtual Result VisitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by the <c>for_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitFor_loop([NotNull] LoschScriptParser.For_loopContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by the <c>remainder_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>
@@ -380,6 +424,17 @@ public partial class LoschScriptParserBaseVisitor<Result> : AbstractParseTreeVis
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitPower_expression([NotNull] LoschScriptParser.Power_expressionContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>dictionary_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -446,6 +501,17 @@ public partial class LoschScriptParserBaseVisitor<Result> : AbstractParseTreeVis
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>tuple_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>unary_plus_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

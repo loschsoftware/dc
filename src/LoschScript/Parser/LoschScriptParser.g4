@@ -66,6 +66,7 @@ expression
     | expression Dot Identifier arglist? #member_access_expression
     | expression Dot Identifier #dotted_expression
     | range #range_expression
+    | expression At_Sign expression #index_expression
     | attribute expression #attributed_expression
     | if_branch elif_branch* else_branch?  #prefix_if_expression
     | expression postfix_if_branch #postfix_if_expression
@@ -73,6 +74,12 @@ expression
     | unless_branch else_unless_branch* else_branch? #prefix_unless_expression
     | expression postfix_unless_branch #postfix_unless_expression
     | code_block postfix_unless_branch #block_postfix_unless_expression
+    | At_Sign expression Equals (code_block | expression) #while_loop
+    | Exclamation_At expression Equals (code_block | expression) #until_loop
+    | At_Sign expression (Arrow_Right expression)* Equals (code_block | expression) #for_loop
+    | Open_Bracket (expression (Comma expression)*)? Close_Bracket #array_or_list_expression
+    | Open_Paren (expression (Comma expression)*)? Close_Paren #tuple_expression
+    | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
     | atom #atom_expression
     | expression NewLine #newlined_expression
     ;

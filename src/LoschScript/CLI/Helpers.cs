@@ -5,10 +5,12 @@ using LoschScript.Meta;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.Remoting.Contexts;
 using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
@@ -34,12 +36,12 @@ internal static class Helpers
 
         if (args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Where(f => !File.Exists(f)).Any())
             LogOut.WriteLine($"Skipping non-existent files.{Environment.NewLine}");
-        
+
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
-        Context.Assembly.Save(assembly);
+        ProgramContext.Context.Assembly.Save(assembly);
 
         if (errors.Select(e => e.Length).Sum() == 0)
         {
@@ -73,7 +75,7 @@ internal static class Helpers
 
         if (errors.Select(e => e.Length).Sum() == 0)
         {
-            Context.Assembly.Save(assembly);
+            ProgramContext.Context.Assembly.Save(assembly);
 
             Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
             return 0;
@@ -118,7 +120,7 @@ internal static class Helpers
         return 0;
     }
 
-    public static Type ResolveTypeName(string name)
+    public static Type ResolveTypeName(string name, int row, int col)
     {
         Type type = Type.GetType(name);
 
@@ -152,6 +154,15 @@ internal static class Helpers
 
     FoundType:
 
+        if (type == null)
+        {
+            EmitErrorMessage(
+                row,
+                col,
+                LS0009_TypeNotFound,
+                $"The type \"{name}\" could not be found.");
+        }
+
         return type;
     }
 
@@ -172,6 +183,25 @@ internal static class Helpers
             typeof(float),
             typeof(double),
             typeof(decimal),
+            typeof(nint),
+            typeof(nuint)
+        };
+
+        return numerics.Contains(type);
+    }
+
+    public static bool IsIntegerType(Type type)
+    {
+        Type[] numerics =
+        {
+            typeof(byte),
+            typeof(sbyte),
+            typeof(short),
+            typeof(ushort),
+            typeof(int),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
             typeof(nint),
             typeof(nuint)
         };

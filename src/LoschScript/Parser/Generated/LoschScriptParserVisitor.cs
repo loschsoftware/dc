@@ -131,6 +131,20 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBitwise_complement_expression([NotNull] LoschScriptParser.Bitwise_complement_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>until_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitUntil_loop([NotNull] LoschScriptParser.Until_loopContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>while_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitWhile_loop([NotNull] LoschScriptParser.While_loopContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>xor_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -172,6 +186,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLogical_or_expression([NotNull] LoschScriptParser.Logical_or_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>array_or_list_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitArray_or_list_expression([NotNull] LoschScriptParser.Array_or_list_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>block_postfix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -215,6 +236,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>for_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFor_loop([NotNull] LoschScriptParser.For_loopContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>remainder_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -249,6 +277,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitPower_expression([NotNull] LoschScriptParser.Power_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>dictionary_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -291,6 +326,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>tuple_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>unary_plus_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
