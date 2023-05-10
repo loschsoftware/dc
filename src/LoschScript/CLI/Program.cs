@@ -34,6 +34,8 @@ internal class Program
                 Console.WriteLine();
             }
 
+            Console.WriteLine($"Compilation failed with {messages.Count} error{(messages.Count == 1 ? "" : "s")}.");
+
             return -1;
         }
     }
