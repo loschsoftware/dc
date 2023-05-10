@@ -2,10 +2,12 @@
 using Antlr4.Runtime.Tree;
 using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
+using LoschScript.Meta;
 using LoschScript.Parser;
 using LoschScript.Validation;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace LoschScript.CodeGeneration;
 
@@ -26,7 +28,8 @@ internal static class FileCompiler
         parser.RemoveErrorListeners();
         parser.AddErrorListener(new SyntaxErrorListener());
 
-        ReferenceValidation.ValidateReferences(config.References);
+        Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
+        Context.ReferencedAssemblies.AddRange(refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath)));
 
         IParseTree compilationUnit = parser.compilation_unit();
         Visitor v = new();

@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.Remoting.Contexts;
 using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
@@ -135,7 +134,10 @@ internal static class Helpers
                 if (type != null)
                     goto FoundType;
 
-                List<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetType(n) != null).ToList();
+                List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+                allAssemblies.AddRange(Context.ReferencedAssemblies);
+
+                List<Assembly> assemblies = allAssemblies.Where(a => a.GetType(n) != null).ToList();
                 if (assemblies.Any())
                     return assemblies.First().GetType(n);
 
