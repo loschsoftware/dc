@@ -745,7 +745,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
 
-        return t;
+        return m.ReturnType;
     }
 
     public override Type VisitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context)
