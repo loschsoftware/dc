@@ -7,20 +7,36 @@ namespace LoschScript.CLI;
 
 internal class Program
 {
-    static int Main(string[] args) => args switch
+    static int Main(string[] args)
     {
-        ["config"] => Helpers.BuildLSConfig(),
-        ["build"] => Helpers.CompileAll(),
-        ["interactive" or "repl"] => Helpers.StartReplSession(),
-        ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
-        ["make" or "new", ..] => LSTemplates.CreateStructure(args),
-        ["watch" or "auto"] => WatchForFileChanges(),
-        ["call", ..] => Helpers.CallMethod(args),
-        ["-watch-indefinetly"] => WatchIndefinetly(),
-        ["quit"] => QuitWatching(),
-        [] or["help" or "?"] => DisplayHelpMessage(),
-        _ => Helpers.HandleArgs(args)
-    };
+        try
+        {
+            return args switch
+            {
+                ["config"] => Helpers.BuildLSConfig(),
+                ["build"] => Helpers.CompileAll(),
+                ["interactive" or "repl"] => Helpers.StartReplSession(),
+                ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
+                ["make" or "new", ..] => LSTemplates.CreateStructure(args),
+                ["watch" or "auto"] => WatchForFileChanges(),
+                ["call", ..] => Helpers.CallMethod(args),
+                ["-watch-indefinetly"] => WatchIndefinetly(),
+                ["quit"] => QuitWatching(),
+                [] or ["help" or "?"] => DisplayHelpMessage(),
+                _ => Helpers.HandleArgs(args)
+            };
+        }
+        catch (Exception ex)
+        {
+            if (messages.Count == 0)
+            {
+                EmitErrorMessage(0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
+                Console.WriteLine();
+            }
+
+            return -1;
+        }
+    }
 
     static Process watchProcess = null;
 

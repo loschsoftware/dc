@@ -52,37 +52,25 @@ public static class Compiler
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
     public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, LSConfig config = null)
     {
-        try
-        {
-            LogOut.WriteLine("Compiling files...");
+        LogOut.WriteLine("Compiling files...");
 
-            Context = new();
+        Context = new();
 
-            string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
+        string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
-            AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
-            AssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndSave);
+        AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
+        AssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndSave);
 
-            ModuleBuilder mb = ab.DefineDynamicModule(asmFileName, asmFileName, config.CreatePdb);
+        ModuleBuilder mb = ab.DefineDynamicModule(asmFileName, asmFileName, config.CreatePdb);
 
-            Context.Assembly = ab;
-            Context.Module = mb;
+        Context.Assembly = ab;
+        Context.Module = mb;
 
-            List<ErrorInfo[]> errors = new();
+        List<ErrorInfo[]> errors = new();
 
-            foreach (string file in sourceFiles)
-                errors.Add(FileCompiler.CompileSingleFile(file, config ?? new()));
+        foreach (string file in sourceFiles)
+            errors.Add(FileCompiler.CompileSingleFile(file, config ?? new()));
 
-            return errors;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine();
-
-            if (messages.Count == 0)
-                EmitErrorMessage(0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
-
-            return new List<ErrorInfo[]>() { messages.ToArray() };
-        }
+        return errors;
     }
 }
