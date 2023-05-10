@@ -12,7 +12,7 @@ namespace LoschScript.Errors;
 /// </summary>
 public static class ErrorWriter
 {
-    private static readonly List<ErrorInfo> messages = new();
+    internal static readonly List<ErrorInfo> messages = new();
 
     /// <summary>
     /// The output text writer used for error messages.

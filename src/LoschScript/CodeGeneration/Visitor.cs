@@ -1474,4 +1474,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         // TODO: Implement the other types
         return typeof(object);
     }
+
+    public override Type VisitBox_expression([NotNull] LoschScriptParser.Box_expressionContext context)
+    {
+        Visit(context.expression());
+        CurrentMethod.IL.Emit(OpCodes.Box);
+        return typeof(object);
+    }
 }

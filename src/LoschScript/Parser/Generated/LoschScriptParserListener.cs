@@ -378,6 +378,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>box_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBox_expression([NotNull] LoschScriptParser.Box_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>box_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBox_expression([NotNull] LoschScriptParser.Box_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>for_loop</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

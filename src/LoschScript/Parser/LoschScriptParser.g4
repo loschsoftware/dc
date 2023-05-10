@@ -69,6 +69,7 @@ expression
     | expression assignment_operator expression #assignment
     | expression Dot Identifier arglist? #member_access_expression
     | expression Dot Identifier #dotted_expression
+    | Double_Tilde expression #box_expression // ONLY TEMPORARY; REMOVE ONCE CASTING IS AVAILABLE
     | range #range_expression
     | expression At_Sign expression #index_expression
     | attribute+ expression #attributed_expression

@@ -191,6 +191,7 @@ Percent_Equals: '%=';
 Equals: '=';
 
 Tilde: '~';
+Double_Tilde: '~~';
 Tilde_Equals: '~=';
 Double_Less_Than: '<<';
 Double_Less_Than_Equals: '<<=';
