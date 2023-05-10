@@ -16,6 +16,8 @@ internal class ProgramContext
 
     public List<string> GlobalTypeImports { get; } = new();
 
+    public List<Assembly> ReferencedAssemblies { get; } = new();
+
     public List<(string Name, string Alias)> GlobalAliases { get; } = new();
 
     public AssemblyBuilder Assembly { get; set; }

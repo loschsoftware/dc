@@ -21,5 +21,7 @@ internal class MethodContext
 
     public int LocalIndex { get; set; } = -1;
 
+    public List<(string Name, LocalBuilder Builder, bool IsConstant, int Index)> Locals { get; } = new();
+
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 }

@@ -122,6 +122,7 @@ Internal: 'internal';
 Static: 'static';
 Protected: 'protected';
 Sealed: 'sealed';
+Partial: 'partial';
 
 Infix: 'infix';
 Inline: 'inline';

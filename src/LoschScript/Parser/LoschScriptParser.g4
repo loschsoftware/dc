@@ -39,7 +39,10 @@ code_block
     ;
 
 expression
-    : expression Double_Asterisk expression #power_expression
+    : full_identifier arglist? #full_identifier_member_access_expression
+    | full_identifier #full_identifier_expression
+    | Identifier #identifier_expression
+    | expression Double_Asterisk expression #power_expression
     | Exclamation_Mark expression #logical_negation_expression
     | expression Asterisk expression #multiply_expression
     | expression Slash expression #divide_expression
@@ -62,12 +65,13 @@ expression
     | Caret Identifier  #typeof_expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_exception
+    | (Var | Val)? Identifier (Colon type_name)? Equals expression #local_declaration
     | expression assignment_operator expression #assignment
     | expression Dot Identifier arglist? #member_access_expression
     | expression Dot Identifier #dotted_expression
     | range #range_expression
     | expression At_Sign expression #index_expression
-    | attribute expression #attributed_expression
+    | attribute+ expression #attributed_expression
     | if_branch elif_branch* else_branch?  #prefix_if_expression
     | expression postfix_if_branch #postfix_if_expression
     | code_block postfix_if_branch #block_postfix_if_expression
@@ -93,7 +97,6 @@ atom
     | character_atom
     | empty_atom
     | wildcard_atom
-    | identifier_atom
     ;
 
 expression_atom
@@ -130,8 +133,8 @@ wildcard_atom
     ;
 
 identifier_atom
-    : Identifier
-    | full_identifier
+    : attribute* Identifier
+    | attribute* full_identifier
     ;
 
 assignment_operator
@@ -148,6 +151,16 @@ assignment_operator
     | Double_Less_Than_Equals
     | Double_Greater_Than_Equals
     | Tilde_Equals
+    ;
+
+type_name
+    : identifier_atom
+    | generic_identifier
+    | union_variable_type
+    ;
+
+union_variable_type
+    : Open_Paren type_name (Bar type_name)+ Close_Paren
     ;
 
 if_branch
@@ -192,4 +205,18 @@ attribute
 
 type_definition
     : Type
+    ;
+
+generic_identifier
+    : identifier_atom Open_Bracket identifier_atom Close_Bracket
+    ;
+
+field_access_modifier
+    : Global Partial?
+    | Local Partial?
+    | Internal Partial?
+    ;
+
+field_declaration
+    : field_access_modifier (Var | Val)? Identifier (Colon type_name)? Equals expression
     ;

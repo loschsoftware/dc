@@ -168,5 +168,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the condition of a conditional expression is not a boolean.
     /// </summary>
-    LS0038_ConditionalExpressionClauseNotBoolean
+    LS0038_ConditionalExpressionClauseNotBoolean,
+    /// <summary>
+    /// Emitted when a type does not include a specified field.
+    /// </summary>
+    LS0039_FieldNotFound
 }

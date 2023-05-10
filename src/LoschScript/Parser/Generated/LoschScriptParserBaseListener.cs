@@ -471,6 +471,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>identifier_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>identifier_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>typeof_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -625,6 +639,34 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>full_identifier_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>full_identifier_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>local_declaration</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLocal_declaration([NotNull] LoschScriptParser.Local_declarationContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>local_declaration</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLocal_declaration([NotNull] LoschScriptParser.Local_declarationContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>tuple_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -750,6 +792,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>full_identifier_member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>full_identifier_member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.atom"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -883,6 +939,30 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAssignment_operator([NotNull] LoschScriptParser.Assignment_operatorContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_name"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterType_name([NotNull] LoschScriptParser.Type_nameContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_name"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitType_name([NotNull] LoschScriptParser.Type_nameContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.union_variable_type"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterUnion_variable_type([NotNull] LoschScriptParser.Union_variable_typeContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.union_variable_type"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitUnion_variable_type([NotNull] LoschScriptParser.Union_variable_typeContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.if_branch"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -1014,6 +1094,42 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType_definition([NotNull] LoschScriptParser.Type_definitionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.generic_identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterGeneric_identifier([NotNull] LoschScriptParser.Generic_identifierContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.generic_identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitGeneric_identifier([NotNull] LoschScriptParser.Generic_identifierContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.field_access_modifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterField_access_modifier([NotNull] LoschScriptParser.Field_access_modifierContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.field_access_modifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitField_access_modifier([NotNull] LoschScriptParser.Field_access_modifierContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.field_declaration"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterField_declaration([NotNull] LoschScriptParser.Field_declarationContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.field_declaration"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitField_declaration([NotNull] LoschScriptParser.Field_declarationContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

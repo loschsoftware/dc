@@ -250,6 +250,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>identifier_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>typeof_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -327,6 +334,20 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>full_identifier_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>local_declaration</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLocal_declaration([NotNull] LoschScriptParser.Local_declarationContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>tuple_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -389,6 +410,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>full_identifier_member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.atom"/>.
 	/// </summary>
@@ -456,6 +484,18 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAssignment_operator([NotNull] LoschScriptParser.Assignment_operatorContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_name"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_name([NotNull] LoschScriptParser.Type_nameContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.union_variable_type"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitUnion_variable_type([NotNull] LoschScriptParser.Union_variable_typeContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.if_branch"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -521,5 +561,23 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitType_definition([NotNull] LoschScriptParser.Type_definitionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.generic_identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitGeneric_identifier([NotNull] LoschScriptParser.Generic_identifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.field_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitField_access_modifier([NotNull] LoschScriptParser.Field_access_modifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.field_declaration"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitField_declaration([NotNull] LoschScriptParser.Field_declarationContext context);
 }
 } // namespace LoschScript.Parser

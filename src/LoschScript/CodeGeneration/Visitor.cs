@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Xml.Linq;
 
 namespace LoschScript.CodeGeneration;
 
@@ -819,17 +820,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(Type);
     }
 
-    public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
+    public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column)
     {
-        Type t = Visit(context.expression());
-
-        if (context.arglist() != null)
+        // Check if it is a method with parameters
+        if (arglist != null)
         {
-            Visit(context.arglist());
-
+            Visit(arglist);
             MethodInfo m = null;
 
-            MethodInfo[] methods = t.GetMethods().Where(m => m.Name == context.Identifier().GetText()).ToArray();
+            MethodInfo[] methods = type.GetMethods().Where(m => m.Name == name).ToArray();
 
             bool success = false;
 
@@ -866,23 +865,23 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             else
             {
                 EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
+                    line,
+                    column,
                     LS0002_MethodNotFound,
-                    $"The type \"{t.Name}\" does not contain a function called \"{context.Identifier().GetText()}\" with the specified argument types.");
+                    $"The type \"{type.Name}\" does not contain a function called \"{name}\" with the specified argument types.");
 
                 return typeof(void);
             }
         }
 
-        MethodInfo parameterlessFunc = t.GetMethod(context.Identifier().GetText(), Array.Empty<Type>());
+        MethodInfo parameterlessFunc = type.GetMethod(name, Array.Empty<Type>());
         if (parameterlessFunc != null)
         {
             CurrentMethod.IL.EmitCall(OpCodes.Call, parameterlessFunc, null);
             return parameterlessFunc.ReturnType;
         }
 
-        FieldInfo f = t.GetField(context.Identifier().GetText());
+        FieldInfo f = type.GetField(name);
         if (f != null)
         {
             CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
@@ -891,13 +890,47 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         else
         {
             EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    LS0002_MethodNotFound,
-                    $"The type \"{t.Name}\" does not contain a field called \"{context.Identifier().GetText()}\".");
+                line,
+                column,
+                LS0039_FieldNotFound,
+                $"The type \"{type.Name}\" does not contain a field called \"{name}\".");
 
             return typeof(void);
         }
+    }
+
+    public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
+    {
+        // Check for local of this name
+        if (CurrentMethod.Locals.Any(l => l.Name == context.Identifier().GetText()))
+        {
+            var local = CurrentMethod.Locals.First(l => l.Name == context.Identifier().GetText());
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
+
+            return local.Builder.LocalType;
+        }
+
+        Type t = Visit(context.expression());
+        return GetMember(t, context.Identifier().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
+    }
+
+    public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
+    {
+        // Check for local of this name
+        if (CurrentMethod.Locals.Any(l => l.Name == context.full_identifier().GetText()))
+        {
+            var local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().GetText());
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
+
+            return local.Builder.LocalType;
+        }
+
+        Type type = Helpers.ResolveTypeName(
+            string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
+            context.Start.Line,
+            context.Start.Column);
+
+        return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
     }
 
     public override Type VisitArglist([NotNull] LoschScriptParser.ArglistContext context)
@@ -918,12 +951,30 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitIdentifier_atom([NotNull] LoschScriptParser.Identifier_atomContext context)
     {
+        if (CurrentMethod != null && CurrentMethod.Locals.Where(l => l.Name == context.Identifier().GetText()).Any())
+        {
+            var local = CurrentMethod.Locals.Where(l => l.Name == context.Identifier().GetText()).First();
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
+
+            return local.Builder.LocalType;
+        }
+
         return Helpers.ResolveTypeName(context.Identifier().GetText(), context.Start.Line, context.Start.Column);
+    }
+
+    public override Type VisitIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context)
+    {
+        return Visit(context.Identifier());
     }
 
     public override Type VisitFull_identifier([NotNull] LoschScriptParser.Full_identifierContext context)
     {
         return Helpers.ResolveTypeName(context.GetText(), context.Start.Line, context.Start.Column);
+    }
+
+    public override Type VisitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context)
+    {
+        return Visit(context.full_identifier());
     }
 
     public override Type VisitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context)
@@ -1395,5 +1446,32 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         CurrentMethod.IL.Emit(OpCodes.Ldc_I4_0);
 
         return typeof(bool);
+    }
+
+    public override Type VisitLocal_declaration([NotNull] LoschScriptParser.Local_declarationContext context)
+    {
+        Type t = Visit(context.expression());
+
+        if (context.type_name() != null)
+            t = Visit(context.type_name());
+
+        LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
+
+        CurrentMethod.LocalIndex++;
+
+        CurrentMethod.Locals.Add((context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex));
+
+        CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
+
+        return t;
+    }
+
+    public override Type VisitType_name([NotNull] LoschScriptParser.Type_nameContext context)
+    {
+        if (context.identifier_atom() != null)
+            return Visit(context.identifier_atom());
+
+        // TODO: Implement the other types
+        return typeof(object);
     }
 }
