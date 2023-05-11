@@ -125,7 +125,7 @@ internal static class Helpers
 
         if (type == null)
         {
-            foreach (string ns in CurrentFile.Imports)
+            foreach (string ns in CurrentFile.Imports.Concat(Context.GlobalImports))
             {
                 string n = $"{ns}.{name}";
 
