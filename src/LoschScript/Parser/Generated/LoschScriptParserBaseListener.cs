@@ -443,20 +443,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>box_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterBox_expression([NotNull] LoschScriptParser.Box_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>box_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitBox_expression([NotNull] LoschScriptParser.Box_expressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>for_loop</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
