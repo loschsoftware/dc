@@ -125,6 +125,15 @@ internal static class Helpers
 
         if (type == null)
         {
+            List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+            allAssemblies.AddRange(Context.ReferencedAssemblies);
+
+            List<Assembly> assemblies = allAssemblies.Where(_a => _a.GetType(name) != null).ToList();
+            if (assemblies.Any())
+            {
+                return assemblies.First().GetType(name);
+            }
+
             foreach (string ns in CurrentFile.Imports.Concat(Context.GlobalImports))
             {
                 string n = $"{ns}.{name}";
@@ -134,12 +143,12 @@ internal static class Helpers
                 if (type != null)
                     goto FoundType;
 
-                List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
-                allAssemblies.AddRange(Context.ReferencedAssemblies);
+                List<Assembly> _allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+                _allAssemblies.AddRange(Context.ReferencedAssemblies);
 
-                List<Assembly> assemblies = allAssemblies.Where(a => a.GetType(n) != null).ToList();
-                if (assemblies.Any())
-                    return assemblies.First().GetType(n);
+                List<Assembly> _assemblies = _allAssemblies.Where(a => a.GetType(n) != null).ToList();
+                if (_assemblies.Any())
+                    return _assemblies.First().GetType(n);
 
                 if (type != null)
                     goto FoundType;

@@ -843,7 +843,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 for (int i = 0; i < _params.Length; i++)
                 {
                     if (_params[i] != _params2[i])
-                        continue;
+                    {
+                        if (Type.GetType(_params[i]) == typeof(object) && Helpers.ResolveTypeName(_params2[i], line, column).IsValueType)
+                            CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column));
+                        else
+                            continue;
+                    }
 
                     success = true;
                 }
@@ -1473,5 +1478,61 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         // TODO: Implement the other types
         return typeof(object);
+    }
+
+    public override Type VisitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context)
+    {
+        List<Type> types = new();
+
+        for (int i = 0; i < context.expression().Length; i++)
+            types.Add(Visit(context.expression()[i]));
+
+        if (types.Count <= 8)
+        {
+            string tupleTypeName = $"System.ValueTuple`{types.Count}[";
+            for (int i = 0; i < types.Count - 1; i++)
+                tupleTypeName += $"[{types[i].FullName}],";
+
+            tupleTypeName += $"[{types.Last().FullName}]]";
+
+            Type tupleType = Type.GetType(tupleTypeName);
+            ConstructorInfo c = tupleType.GetConstructor(types.ToArray());
+            CurrentMethod.IL.Emit(OpCodes.Newobj, c);
+            return tupleType;
+        }
+
+        List<Type> additionalTypes = new();
+
+        // If more than 8 tuple items are specified, split the tuples into multiple ones
+        while (!(types.Count <= 8))
+        {
+            string _tupleTypeName = $"System.ValueTuple`{types.Count}[";
+            for (int i = 0; i < types.Count - 1; i++)
+                _tupleTypeName += $"[{types[i].FullName}],";
+
+            _tupleTypeName += $"[{types.Last().FullName}]]";
+
+            Type ad = Type.GetType(_tupleTypeName);
+
+            additionalTypes.Add(ad);
+
+            ConstructorInfo c1 = ad.GetConstructor(types.Take(8).ToArray());
+            CurrentMethod.IL.Emit(OpCodes.Newobj, c1);
+            types.RemoveRange(0, 8);
+        }
+
+        types.AddRange(additionalTypes);
+
+        string __tupleTypeName = $"System.ValueTuple`{types.Count}[";
+        for (int i = 0; i < types.Count - 1; i++)
+            __tupleTypeName += $"[{types[i].FullName}],";
+
+        __tupleTypeName += $"[{types.Last().FullName}]]";
+
+        Type _tupleType = Type.GetType(__tupleTypeName);
+
+        ConstructorInfo _c = _tupleType.GetConstructor(types.ToArray());
+        CurrentMethod.IL.Emit(OpCodes.Newobj, _c);
+        return _tupleType;
     }
 }
