@@ -1491,6 +1491,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         // This stupid algorithm took AGES to create...
 
         List<Type> _types = types.ToList();
+        List<string> _intermediateTuples = new();
 
         string typeId = $"System.ValueTuple`{Math.Min(_types.Count, 8)}[";
 
@@ -1499,9 +1500,21 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (_types.Count <= 7)
             {
                 for (int i = 0; i < _types.Count - 1; i++)
-                    typeId += $"[{_types[i].AssemblyQualifiedName}],";
+                {
+                    string _middlePart = $"[{_types[i].AssemblyQualifiedName}],";
 
-                typeId += $"[{_types.Last().AssemblyQualifiedName}]]";
+                    if (_intermediateTuples.Any())
+                        _intermediateTuples[^1] += _middlePart;
+
+                    typeId += _middlePart;
+                }
+
+                string _endPart = $"[{_types.Last().AssemblyQualifiedName}]]";
+
+                if (_intermediateTuples.Any())
+                    _intermediateTuples[^1] += _endPart;
+
+                typeId += _endPart;
                 break;
             }
 
@@ -1509,13 +1522,26 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             for (int j = 0; j < proper.Length; j++)
                 typeId += $"[{proper[j].AssemblyQualifiedName}],";
 
-            typeId += $"[System.ValueTuple`{Math.Min(_types.Count - 7, 8)}[";
+            string imTupleStart = $"[System.ValueTuple`{Math.Min(_types.Count - 7, 8)}[";
+
+            typeId += imTupleStart;
+            _intermediateTuples.Add(imTupleStart);
 
             _types.RemoveRange(k, 7);
         }
 
         if (types.Count > 7)
             typeId += "]]";
+
+        for (int i = 0; i < _intermediateTuples.Count; i++)
+            _intermediateTuples[i] = _intermediateTuples[i][1..];
+
+        List<Type> imTuples = _intermediateTuples.Select(Type.GetType).ToList();
+        foreach (Type t in imTuples)
+        {
+            ConstructorInfo imConstructor = t.GetConstructor(t.GenericTypeArguments);
+            CurrentMethod.IL.Emit(OpCodes.Newobj, imConstructor);
+        }
 
         Type _tupleType = Type.GetType(typeId);
 
