@@ -19,4 +19,8 @@ public static class stdout
     public static void print(char msg) => Console.Write(msg);
     public static void print(bool msg) => Console.Write(msg);
     public static void print(object msg) => Console.Write(msg);
+
+    public static void printf(string format, params object[] args) => Console.Write(string.Format(format, args));
+
+    public static void printfn(string format, params object[] args) => Console.WriteLine(string.Format(format, args));
 }
