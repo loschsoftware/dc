@@ -965,6 +965,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
 
             type = local.Builder.LocalType;
+
+            if (context.full_identifier().Identifier().Length == 1)
+                return type; 
         }
         else
         {
