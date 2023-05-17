@@ -843,12 +843,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 for (int i = 0; i < _params.Length; i++)
                 {
                     if (_params[i] != _params2[i])
-                    {
-                        if (Type.GetType(_params[i]) == typeof(object) && Helpers.ResolveTypeName(_params2[i], line, column).IsValueType)
-                            CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column));
-                        else
-                            continue;
-                    }
+                        continue;
 
                     success = true;
                 }
@@ -857,6 +852,38 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 {
                     m = possible;
                     break;
+                }
+            }
+
+            // Check again and box if neccessary
+            if (!success)
+            {
+                foreach (MethodInfo possible in methods)
+                {
+                    if (possible.GetParameters().Length != CurrentMethod.ArgumentTypesForNextMethodCall.Count)
+                        continue;
+
+                    string[] _params = possible.GetParameters().Select(p => p.ParameterType.FullName).ToArray();
+                    string[] _params2 = CurrentMethod.ArgumentTypesForNextMethodCall.Select(t => t.FullName).ToArray();
+
+                    for (int i = 0; i < _params.Length; i++)
+                    {
+                        if (_params[i] != _params2[i])
+                        {
+                            if (Type.GetType(_params[i]) == typeof(object))
+                                CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column));
+                            else
+                                continue;
+                        }
+
+                        success = true;
+                    }
+
+                    if (success)
+                    {
+                        m = possible;
+                        break;
+                    }
                 }
             }
 
@@ -921,19 +948,22 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
+        Type type;
         // Check for local of this name
-        if (CurrentMethod.Locals.Any(l => l.Name == context.full_identifier().GetText()))
+        if (CurrentMethod.Locals.Any(l => l.Name == context.full_identifier().Identifier()[0].GetText()))
         {
-            var local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().GetText());
+            var local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().Identifier()[0].GetText());
             CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
 
-            return local.Builder.LocalType;
+            type = local.Builder.LocalType;
         }
-
-        Type type = Helpers.ResolveTypeName(
-            string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
-            context.Start.Line,
-            context.Start.Column);
+        else
+        {
+            type = Helpers.ResolveTypeName(
+                string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
+                context.Start.Line,
+                context.Start.Column);
+        }
 
         return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
     }

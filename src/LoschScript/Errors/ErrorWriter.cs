@@ -44,7 +44,7 @@ public static class ErrorWriter
         Console.ForegroundColor = ConsoleColor.Red;
 
         Console.CursorLeft = 0;
-        ErrorOut.WriteLine($"{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): error {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}\r\n");
+        ErrorOut.WriteLine($"\r\n{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): error {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
         CurrentFile.CompilationFailed = true;
 
         if (addToErrorList)
@@ -72,7 +72,7 @@ public static class ErrorWriter
 
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.CursorLeft = 0;
-        WarnOut.WriteLine($"{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): warning {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}\r\n");
+        WarnOut.WriteLine($"\r\n{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): warning {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
         Console.ForegroundColor = ConsoleColor.Gray;
 
         if (treatAsError)
@@ -97,7 +97,7 @@ public static class ErrorWriter
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.CursorLeft = 0;
-            InfoOut.WriteLine($"{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): information {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}\r\n");
+            InfoOut.WriteLine($"\r\n{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): information {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
