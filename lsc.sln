@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoschScript", "src\LoschScr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoschScript.Configuration", "src\LoschScript.Configuration\LoschScript.Configuration.csproj", "{2363D2F2-6297-4C2B-8887-7EA3BA96BFBA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoschScript.Core", "src\LoschScript.Core\LoschScript.Core.csproj", "{5DD519D2-CB89-4389-BF4F-0E28AD977268}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{2363D2F2-6297-4C2B-8887-7EA3BA96BFBA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2363D2F2-6297-4C2B-8887-7EA3BA96BFBA}.Release|x64.ActiveCfg = Release|Any CPU
 		{2363D2F2-6297-4C2B-8887-7EA3BA96BFBA}.Release|x64.Build.0 = Release|Any CPU
+		{5DD519D2-CB89-4389-BF4F-0E28AD977268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD519D2-CB89-4389-BF4F-0E28AD977268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD519D2-CB89-4389-BF4F-0E28AD977268}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5DD519D2-CB89-4389-BF4F-0E28AD977268}.Debug|x64.Build.0 = Debug|Any CPU
+		{5DD519D2-CB89-4389-BF4F-0E28AD977268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD519D2-CB89-4389-BF4F-0E28AD977268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD519D2-CB89-4389-BF4F-0E28AD977268}.Release|x64.ActiveCfg = Release|Any CPU
+		{5DD519D2-CB89-4389-BF4F-0E28AD977268}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
