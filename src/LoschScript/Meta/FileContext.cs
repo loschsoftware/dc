@@ -26,7 +26,8 @@ internal class FileContext
 
     public List<string> ImportedTypes { get; } = new()
     {
-        "LoschScript.Core.stdout"
+        "LoschScript.Core.stdout",
+        "LoschScript.Core.Value"
     };
 
     public List<(string Name, string Alias)> Aliases { get; } = new();

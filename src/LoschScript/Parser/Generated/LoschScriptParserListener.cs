@@ -210,6 +210,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitUntil_loop([NotNull] LoschScriptParser.Until_loopContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>right_pipe_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterRight_pipe_expression([NotNull] LoschScriptParser.Right_pipe_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>right_pipe_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitRight_pipe_expression([NotNull] LoschScriptParser.Right_pipe_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>while_loop</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -461,6 +473,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitPower_expression([NotNull] LoschScriptParser.Power_expressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>left_pipe_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterLeft_pipe_expression([NotNull] LoschScriptParser.Left_pipe_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>left_pipe_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitLeft_pipe_expression([NotNull] LoschScriptParser.Left_pipe_expressionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>dictionary_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

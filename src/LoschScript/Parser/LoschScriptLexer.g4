@@ -162,6 +162,8 @@ Caret: '^';
 Percent_Caret: '%^';
 
 Bar: '|';
+Bar_GreaterThan: '|>';
+LessThan_Bar: '<|';
 Double_Bar: '||';
 Bar_Equals: '|=';
 Double_Bar_Equals: '||=';
