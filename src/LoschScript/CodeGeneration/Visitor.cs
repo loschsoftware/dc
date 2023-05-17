@@ -5,13 +5,11 @@ using LoschScript.Meta;
 using LoschScript.Parser;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.SymbolStore;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Xml.Linq;
 
 namespace LoschScript.CodeGeneration;
 
@@ -135,6 +133,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         tc.Methods.Add(mc);
 
         Context.Types.Add(tc);
+
+        if (context.expression().Length == 0)
+        {
+            EmitErrorMessage(0, 0, LS0027_EmptyProgram, "The program does not contain any executable code.");
+            return typeof(void);
+        }
 
         foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
             Visit(tree);
