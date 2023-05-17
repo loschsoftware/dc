@@ -842,11 +842,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     continue;
 
                 string[] _params = possible.GetParameters().Select(p => p.ParameterType.FullName).ToArray();
-                string[] _params2 = CurrentMethod.ArgumentTypesForNextMethodCall.Select(t => t.FullName).ToArray();
+                string[] _params2 = CurrentMethod.ArgumentTypesForNextMethodCall.Select(t => t == null ? "" : t.FullName).ToArray();
 
                 for (int i = 0; i < _params.Length; i++)
                 {
-                    if (_params[i] != _params2[i])
+                    if (_params[i] != _params2[i] || _params2[i] != "")
                         continue;
 
                     success = true;
@@ -868,14 +868,19 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                         continue;
 
                     string[] _params = possible.GetParameters().Select(p => p.ParameterType.FullName).ToArray();
-                    string[] _params2 = CurrentMethod.ArgumentTypesForNextMethodCall.Select(t => t.FullName).ToArray();
+                    string[] _params2 = CurrentMethod.ArgumentTypesForNextMethodCall.Select(t => t == null ? "" : t.FullName).ToArray();
 
                     for (int i = 0; i < _params.Length; i++)
                     {
                         if (_params[i] != _params2[i])
                         {
                             if (Type.GetType(_params[i]) == typeof(object))
-                                CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column));
+                            {
+                                if (_params2[i] != "")
+                                {
+                                    CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column));
+                                }
+                            }
                             else
                                 continue;
                         }
@@ -1590,5 +1595,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         ConstructorInfo _c = _tupleType.GetConstructor(_tupleType.GenericTypeArguments);
         CurrentMethod.IL.Emit(OpCodes.Newobj, _c);
         return _tupleType;
+    }
+
+    public override Type VisitEmpty_atom([NotNull] LoschScriptParser.Empty_atomContext context)
+    {
+        CurrentMethod.IL.Emit(OpCodes.Ldnull);
+        return null;
     }
 }
