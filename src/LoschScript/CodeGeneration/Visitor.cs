@@ -963,6 +963,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
         else
         {
+            if (context.full_identifier().Identifier().Length == 1)
+            {
+                Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.Start.Line, context.Start.Column).Type;
+                
+                if (t != null)
+                    return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
+            }
+
             type = Helpers.ResolveTypeName(
                 string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
                 context.Start.Line,

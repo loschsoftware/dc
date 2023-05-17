@@ -119,6 +119,19 @@ internal static class Helpers
         return 0;
     }
 
+    public static (Type Type, MethodInfo[] Methods) ResolveGlobalMethod(string name, int row, int col)
+    {
+        foreach (string type in CurrentFile.ImportedTypes)
+        {
+            Type t = ResolveTypeName(type, row, col);
+
+            if (t.GetMethods().Where(m => m.Name == name).Any())
+                return (t, t.GetMethods().Where(m => m.Name == name).ToArray());
+        }
+
+        return (null, Array.Empty<MethodInfo>());
+    }
+
     public static Type ResolveTypeName(string name, int row, int col)
     {
         Type type = Type.GetType(name);

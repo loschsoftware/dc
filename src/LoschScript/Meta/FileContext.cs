@@ -23,8 +23,11 @@ internal class FileContext
         // Implicit imports
         "LoschScript.Core"
     };
-    
-    public List<string> ImportedTypes { get; } = new();
+
+    public List<string> ImportedTypes { get; } = new()
+    {
+        "LoschScript.Core.stdout"
+    };
 
     public List<(string Name, string Alias)> Aliases { get; } = new();
 
