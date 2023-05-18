@@ -8,6 +8,11 @@ namespace LoschScript.Core;
 public static class stdout
 {
     /// <summary>
+    /// Prints a newline character to the standard output.
+    /// </summary>
+    public static void println() => Console.WriteLine();
+
+    /// <summary>
     /// Prints the specified string followed by a newline character to the standard output.
     /// </summary>
     /// <param name="msg">The string to print.</param>
