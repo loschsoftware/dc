@@ -30,6 +30,7 @@ internal class FileContext
         "LoschScript.Core.stdout",
         "LoschScript.Core.stdin",
         "LoschScript.Core.Value",
+        "LoschScript.Core.Process",
         "LoschScript.Core.Numerics.NumericSequence"
     };
 
