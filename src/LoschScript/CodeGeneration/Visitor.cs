@@ -846,7 +846,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 for (int i = 0; i < _params.Length; i++)
                 {
-                    if (_params[i] != _params2[i] || _params2[i] != "")
+                    if (_params[i] != _params2[i] && _params2[i] != "")
                         continue;
 
                     success = true;
