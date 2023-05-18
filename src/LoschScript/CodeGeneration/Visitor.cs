@@ -824,6 +824,100 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(Type);
     }
 
+    public Type GetConstructor(Type cType, LoschScriptParser.ArglistContext arglist, int line, int column)
+    {
+        if (arglist != null)
+        {
+            Visit(arglist);
+            ConstructorInfo cinf = null;
+
+            ConstructorInfo[] constructors = cType.GetConstructors();
+
+            bool success = false;
+
+            foreach (ConstructorInfo possible in constructors)
+            {
+                ParameterInfo[] param = possible.GetParameters();
+
+                if (param.Length != CurrentMethod.ArgumentTypesForNextMethodCall.Count)
+                    continue;
+
+                for (int i = 0; i < param.Length; i++)
+                {
+                    if (param[i].ParameterType != CurrentMethod.ArgumentTypesForNextMethodCall[i] && CurrentMethod.ArgumentTypesForNextMethodCall[i] != null)
+                        continue;
+
+                    success = true;
+                }
+
+                if (success)
+                {
+                    cinf = possible;
+                    break;
+                }
+            }
+
+            if (!success)
+            {
+                foreach (ConstructorInfo possible in constructors)
+                {
+                    ParameterInfo[] param = possible.GetParameters();
+
+                    if (param.Length != CurrentMethod.ArgumentTypesForNextMethodCall.Count)
+                        continue;
+
+                    for (int i = 0; i < param.Length; i++)
+                    {
+                        if (param[i].ParameterType != CurrentMethod.ArgumentTypesForNextMethodCall[i])
+                        {
+                            if (param[i].ParameterType == typeof(object))
+                            {
+                                if (CurrentMethod.ArgumentTypesForNextMethodCall[i] != null)
+                                    CurrentMethod.IL.Emit(OpCodes.Box, CurrentMethod.ArgumentTypesForNextMethodCall[i]);
+                            }
+                            else
+                                continue;
+
+                            success = true;
+                        }
+
+                        success = true;
+                    }
+
+                    if (success)
+                    {
+                        cinf = possible;
+                        break;
+                    }
+                }
+            }
+
+            if (cinf == null)
+            {
+                EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor with the specified argument types.");
+                return cType;
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Newobj, cinf);
+
+            CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+
+            return cType;
+        }
+
+        ConstructorInfo c = cType.GetConstructor(Type.EmptyTypes);
+
+        if (c == null)
+        {
+            EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not specify a parameterless constructor.");
+            return cType;
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Newobj, c);
+
+        return cType;
+    }
+
     public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column)
     {
         // Check if it is a method with parameters
@@ -965,7 +1059,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
 
             type = local.Builder.LocalType;
-
+            
             if (context.full_identifier().Identifier().Length == 1)
                 return type; 
         }
@@ -973,10 +1067,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             if (context.full_identifier().Identifier().Length == 1)
             {
+                // Global Method (Type Import)
                 Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.Start.Line, context.Start.Column).Type;
                 
                 if (t != null)
                     return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
+
+                // Constructor
+                Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.Start.Line, context.Start.Column);
+                return GetConstructor(cType, context.arglist(), context.Start.Line, context.Start.Column);
             }
 
             type = Helpers.ResolveTypeName(
