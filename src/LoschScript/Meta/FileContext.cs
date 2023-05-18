@@ -26,9 +26,11 @@ internal class FileContext
 
     public List<string> ImportedTypes { get; } = new()
     {
+        // Implicitly imported types ("built-in functions")
         "LoschScript.Core.stdout",
         "LoschScript.Core.stdin",
-        "LoschScript.Core.Value"
+        "LoschScript.Core.Value",
+        "LoschScript.Core.Numerics.NumericSequence"
     };
 
     public List<(string Name, string Alias)> Aliases { get; } = new();
