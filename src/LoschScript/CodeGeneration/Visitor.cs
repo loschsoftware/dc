@@ -1892,7 +1892,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Visit(context.index()[0]);
             Visit(context.index()[1]);
 
-            CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Range).GetConstructor(new Type[] { typeof(Range), typeof(Range) }));
+            CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Range).GetConstructor(new Type[] { typeof(Index), typeof(Index) }));
 
             return typeof(Range);
         }
