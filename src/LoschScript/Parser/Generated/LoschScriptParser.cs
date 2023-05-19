@@ -4633,7 +4633,9 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	public partial class IndexContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Integer_Literal() { return GetToken(LoschScriptParser.Integer_Literal, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public Integer_atomContext integer_atom() {
+			return GetRuleContext<Integer_atomContext>(0);
+		}
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Caret() { return GetToken(LoschScriptParser.Caret, 0); }
 		public IndexContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -4677,7 +4679,7 @@ public partial class LoschScriptParser : Parser {
 			}
 
 			State = 543;
-			Match(Integer_Literal);
+			integer_atom();
 			}
 		}
 		catch (RecognitionException re) {
@@ -5404,7 +5406,7 @@ public partial class LoschScriptParser : Parser {
 		0,0,0,533,535,3,60,30,0,534,533,1,0,0,0,534,535,1,0,0,0,535,536,1,0,0,
 		0,536,538,5,35,0,0,537,539,3,60,30,0,538,537,1,0,0,0,538,539,1,0,0,0,539,
 		59,1,0,0,0,540,542,5,49,0,0,541,540,1,0,0,0,541,542,1,0,0,0,542,543,1,
-		0,0,0,543,544,5,91,0,0,544,61,1,0,0,0,545,546,5,90,0,0,546,548,5,38,0,
+		0,0,0,543,544,3,24,12,0,544,61,1,0,0,0,545,546,5,90,0,0,546,548,5,38,0,
 		0,547,545,1,0,0,0,547,548,1,0,0,0,548,549,1,0,0,0,549,550,3,18,9,0,550,
 		559,1,0,0,0,551,554,5,32,0,0,552,553,5,90,0,0,553,555,5,38,0,0,554,552,
 		1,0,0,0,554,555,1,0,0,0,555,556,1,0,0,0,556,558,3,18,9,0,557,551,1,0,0,

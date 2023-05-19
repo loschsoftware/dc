@@ -184,7 +184,7 @@ range
     ;
 
 index
-    : Caret? Integer_Literal
+    : Caret? integer_atom
     ;
 
 arglist

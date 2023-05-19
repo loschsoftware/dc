@@ -1918,8 +1918,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitIndex([NotNull] LoschScriptParser.IndexContext context)
     {
-        Visit(context.Integer_Literal());
-
+        Visit(context.integer_atom());
+        
         CurrentMethod.IL.Emit(OpCodes.Ldc_I4, context.Caret() == null ? 0 : 1);
 
         CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Index).GetConstructor(new Type[] { typeof(int), typeof(bool) }));
