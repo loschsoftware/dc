@@ -176,5 +176,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the specified name is not assigned to a value.
     /// </summary>
-    LS0040_VariableNotFound
+    LS0040_VariableNotFound,
+    /// <summary>
+    /// Emitted when the types of list or array items are not the same.
+    /// </summary>
+    LS0041_ListItemsHaveDifferentTypes
 }

@@ -186,6 +186,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>array_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitArray_expression([NotNull] LoschScriptParser.Array_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>multiply_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -199,13 +206,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLogical_or_expression([NotNull] LoschScriptParser.Logical_or_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>array_or_list_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitArray_or_list_expression([NotNull] LoschScriptParser.Array_or_list_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>block_postfix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

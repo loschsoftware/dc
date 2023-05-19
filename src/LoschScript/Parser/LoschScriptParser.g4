@@ -85,7 +85,7 @@ expression
     | At_Sign expression Equals (code_block | expression) #while_loop
     | Exclamation_At expression Equals (code_block | expression) #until_loop
     | At_Sign expression (Arrow_Right expression)* Equals (code_block | expression) #for_loop
-    | Open_Bracket (expression (Comma expression)*)? Close_Bracket #array_or_list_expression
+    | Open_Bracket (expression (Comma expression)*)? Close_Bracket #array_expression
     | Open_Paren expression (Comma expression)+ Close_Paren #tuple_expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
     | atom #atom_expression

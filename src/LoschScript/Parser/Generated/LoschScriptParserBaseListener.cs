@@ -343,6 +343,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>array_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterArray_expression([NotNull] LoschScriptParser.Array_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>array_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitArray_expression([NotNull] LoschScriptParser.Array_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>multiply_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -370,20 +384,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLogical_or_expression([NotNull] LoschScriptParser.Logical_or_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>array_or_list_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterArray_or_list_expression([NotNull] LoschScriptParser.Array_or_list_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>array_or_list_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitArray_or_list_expression([NotNull] LoschScriptParser.Array_or_list_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>block_postfix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

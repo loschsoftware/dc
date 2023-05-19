@@ -1838,6 +1838,33 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return _tupleType;
     }
 
+    public override Type VisitArray_expression([NotNull] LoschScriptParser.Array_expressionContext context)
+    {
+        Type arrayType = Visit(context.expression()[0]);
+        CurrentMethod.IL.Emit(OpCodes.Pop);
+
+        CurrentMethod.IL.Emit(OpCodes.Ldc_I4, context.expression().Length);
+        CurrentMethod.IL.Emit(OpCodes.Newarr, arrayType);
+
+        int index = 0;
+        foreach (IParseTree tree in context.expression())
+        {
+            CurrentMethod.IL.Emit(OpCodes.Dup);
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, index++);
+            Type t = Visit(tree);
+
+            if (t != arrayType)
+            {
+                EmitErrorMessage(context.Start.Line, context.Start.Column, LS0041_ListItemsHaveDifferentTypes, "An array or list can only contain one type of value.");
+                return arrayType.MakeArrayType();
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Stelem, t);
+        }
+
+        return arrayType.MakeArrayType();
+    }
+
     public override Type VisitEmpty_atom([NotNull] LoschScriptParser.Empty_atomContext context)
     {
         CurrentMethod.IL.Emit(OpCodes.Ldnull);
