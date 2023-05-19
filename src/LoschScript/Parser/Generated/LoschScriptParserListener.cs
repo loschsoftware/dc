@@ -912,6 +912,16 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitRange([NotNull] LoschScriptParser.RangeContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.index"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterIndex([NotNull] LoschScriptParser.IndexContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.index"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitIndex([NotNull] LoschScriptParser.IndexContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.arglist"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

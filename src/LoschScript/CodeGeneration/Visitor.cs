@@ -1843,4 +1843,86 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         CurrentMethod.IL.Emit(OpCodes.Ldnull);
         return null;
     }
+
+    public override Type VisitIndex_expression([NotNull] LoschScriptParser.Index_expressionContext context)
+    {
+        Type t1 = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+
+        if (t1 == typeof(string) && t2 == typeof(Range))
+        {
+            // TODO: Implement the conversion from Range to two ints
+            CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(string).GetMethod("Substring", new Type[] { typeof(int), typeof(int) }), null);
+            return typeof(string);
+        }
+
+        MethodInfo getChars = t1.GetMethod("get_Chars", new Type[] { t2 });
+        if (getChars != null && t2 == typeof(int))
+        {
+            CurrentMethod.IL.EmitCall(OpCodes.Callvirt, getChars, null);
+            return typeof(char);
+        }
+
+        MethodInfo indexer = t1.GetMethod("get_Item", new Type[] { t2 });
+        if (indexer != null)
+        {
+            CurrentMethod.IL.EmitCall(OpCodes.Call, indexer, null);
+            return indexer.ReturnType;
+        }
+
+        // Array Index
+        if (t2 == typeof(int))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldelem, t1.GetEnumeratedType());
+            return t1.GetEnumeratedType();
+        }
+
+        return t1;
+    }
+
+    public override Type VisitRange_expression([NotNull] LoschScriptParser.Range_expressionContext context)
+    {
+        return Visit(context.range());
+    }
+
+    public override Type VisitRange([NotNull] LoschScriptParser.RangeContext context)
+    {
+        if (context.index().Length == 2)
+        {
+            Visit(context.index()[0]);
+            Visit(context.index()[1]);
+
+            CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Range).GetConstructor(new Type[] { typeof(Range), typeof(Range) }));
+
+            return typeof(Range);
+        }
+
+        if (context.index().Length == 0)
+        {
+            CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("get_All", Type.EmptyTypes), null);
+            return typeof(Range);
+        }
+
+        if (context.GetText().EndsWith(".."))
+        {
+            Visit(context.index()[0]);
+            CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("StartAt", new Type[] { typeof(Index) }), null);
+            return typeof(Range);
+        }
+
+        Visit(context.index()[0]);
+        CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("EndAt", new Type[] { typeof(Index) }), null);
+
+        return typeof(Range);
+    }
+
+    public override Type VisitIndex([NotNull] LoschScriptParser.IndexContext context)
+    {
+        Visit(context.Integer_Literal());
+
+        CurrentMethod.IL.Emit(OpCodes.Ldc_I4, context.Caret() == null ? 0 : 1);
+
+        CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Index).GetConstructor(new Type[] { typeof(int), typeof(bool) }));
+        return typeof(Index);
+    }
 }

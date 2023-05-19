@@ -551,6 +551,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitRange([NotNull] LoschScriptParser.RangeContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.index"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIndex([NotNull] LoschScriptParser.IndexContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.arglist"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

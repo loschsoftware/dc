@@ -4,6 +4,7 @@ using LoschScript.Errors;
 using LoschScript.Meta;
 using System;
 using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -243,6 +244,11 @@ internal static class Helpers
 
         return floats.Contains(type);
     }
+
+    public static Type GetEnumeratedType(this Type type) =>
+        (type?.GetElementType() ?? (typeof(IEnumerable).IsAssignableFrom(type)
+            ? type.GenericTypeArguments.FirstOrDefault()
+            : null))!;
 
     public static int CallMethod(string[] args)
     {

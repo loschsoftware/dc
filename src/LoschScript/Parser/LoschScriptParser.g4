@@ -65,7 +65,6 @@ expression
     | expression Caret expression #xor_expression
     | Minus expression #unary_negation_expression
     | Plus expression #unary_plus_expression
-    | expression At_Sign export_directive #index_expression
     | Caret Identifier  #typeof_expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_exception
@@ -181,7 +180,11 @@ postfix_unless_branch
     ;
 
 range
-    : Integer_Literal Double_Dot Caret? Integer_Literal
+    : index? Double_Dot index?
+    ;
+
+index
+    : Caret? Integer_Literal
     ;
 
 arglist
