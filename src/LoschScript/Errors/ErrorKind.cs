@@ -172,5 +172,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a type does not include a specified field.
     /// </summary>
-    LS0039_FieldNotFound
+    LS0039_FieldNotFound,
+    /// <summary>
+    /// Emitted when the specified name is not assigned to a value.
+    /// </summary>
+    LS0040_VariableNotFound
 }

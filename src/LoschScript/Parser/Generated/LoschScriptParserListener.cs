@@ -508,18 +508,6 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>assignment</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterAssignment([NotNull] LoschScriptParser.AssignmentContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>assignment</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitAssignment([NotNull] LoschScriptParser.AssignmentContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>prefix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -592,17 +580,17 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>local_declaration</c>
+	/// Enter a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterLocal_declaration([NotNull] LoschScriptParser.Local_declarationContext context);
+	void EnterLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>local_declaration</c>
+	/// Exit a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitLocal_declaration([NotNull] LoschScriptParser.Local_declarationContext context);
+	void ExitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>tuple_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -823,16 +811,6 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitIdentifier_atom([NotNull] LoschScriptParser.Identifier_atomContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="LoschScriptParser.assignment_operator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterAssignment_operator([NotNull] LoschScriptParser.Assignment_operatorContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="LoschScriptParser.assignment_operator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitAssignment_operator([NotNull] LoschScriptParser.Assignment_operatorContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_name"/>.
 	/// </summary>

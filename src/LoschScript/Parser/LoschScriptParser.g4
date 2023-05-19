@@ -69,8 +69,7 @@ expression
     | Caret Identifier  #typeof_expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_exception
-    | (Var | Val)? Identifier (Colon type_name)? Equals expression #local_declaration
-    | expression assignment_operator expression #assignment
+    | (Var | Val)? Identifier (Colon type_name)? Equals expression #local_declaration_or_assignment
     | expression Dot Identifier arglist? #member_access_expression
     | expression Bar_GreaterThan full_identifier #right_pipe_expression
     | full_identifier LessThan_Bar expression #left_pipe_expression
@@ -141,22 +140,6 @@ wildcard_atom
 identifier_atom
     : attribute* Identifier
     | attribute* full_identifier
-    ;
-
-assignment_operator
-    : Plus_Equals
-    | Minus_Equals
-    | Asterisk_Equals
-    | Slash_Equals
-    | Percent_Equals
-    | Dot_Equals
-    | Bar_Equals
-    | Double_Bar_Equals
-    | Ampersand_Equals
-    | Double_Ampersand_Equals
-    | Double_Less_Than_Equals
-    | Double_Greater_Than_Equals
-    | Tilde_Equals
     ;
 
 type_name

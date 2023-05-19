@@ -312,13 +312,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>assignment</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitAssignment([NotNull] LoschScriptParser.AssignmentContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>prefix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -361,12 +354,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>local_declaration</c>
+	/// Visit a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitLocal_declaration([NotNull] LoschScriptParser.Local_declarationContext context);
+	Result VisitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>tuple_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -497,12 +490,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitIdentifier_atom([NotNull] LoschScriptParser.Identifier_atomContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="LoschScriptParser.assignment_operator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitAssignment_operator([NotNull] LoschScriptParser.Assignment_operatorContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_name"/>.
 	/// </summary>

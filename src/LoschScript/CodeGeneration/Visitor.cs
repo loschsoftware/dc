@@ -824,7 +824,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(Type);
     }
 
-    public Type GetConstructor(Type cType, LoschScriptParser.ArglistContext arglist, int line, int column)
+    public Type GetConstructorOrCast(Type cType, LoschScriptParser.ArglistContext arglist, int line, int column)
     {
         if (arglist != null)
         {
@@ -894,7 +894,89 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (cinf == null)
             {
-                EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor with the specified argument types.");
+                if (CurrentMethod.ArgumentTypesForNextMethodCall.Count != 1)
+                {
+                    EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor with the specified argument types.");
+                    return cType;
+                }
+
+                string aqn = cType.AssemblyQualifiedName;
+
+                if (aqn == typeof(object).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, CurrentMethod.ArgumentTypesForNextMethodCall[0]);
+                    return cType;
+                }
+                
+                if (aqn == typeof(int).AssemblyQualifiedName || aqn == typeof(uint).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_I4);
+                    return cType;
+                }
+
+                if (aqn == typeof(long).AssemblyQualifiedName || aqn == typeof(ulong).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_I8);
+                    return cType;
+                }
+
+                if (aqn == typeof(nint).AssemblyQualifiedName || aqn == typeof(nuint).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_I);
+                    return cType;
+                }
+
+                if (aqn == typeof(byte).AssemblyQualifiedName || aqn == typeof(sbyte).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_I1);
+                    return cType;
+                }
+
+                if (aqn == typeof(short).AssemblyQualifiedName || aqn == typeof(ushort).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_I2);
+                    return cType;
+                }
+
+                if (aqn == typeof(float).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_R4);
+                    return cType;
+                }
+
+                if (aqn == typeof(double).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+                    return cType;
+                }
+
+                if (aqn == typeof(bool).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_I4);
+                    return cType;
+                }
+
+                if (aqn == typeof(char).AssemblyQualifiedName)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_I4);
+                    return cType;
+                }
+
+                var mImplicit = cType.GetMethod("op_Implicit", CurrentMethod.ArgumentTypesForNextMethodCall.ToArray());
+                var mExplicit = cType.GetMethod("op_Explicit", CurrentMethod.ArgumentTypesForNextMethodCall.ToArray());
+
+                if (mImplicit != null)
+                {
+                    CurrentMethod.IL.EmitCall(OpCodes.Call, mImplicit, null);
+                    return cType;
+                }
+
+                if (mExplicit != null)
+                {
+                    CurrentMethod.IL.EmitCall(OpCodes.Call, mExplicit, null);
+                    return cType;
+                }
+
                 return cType;
             }
 
@@ -1059,9 +1141,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
 
             type = local.Builder.LocalType;
-            
+
             if (context.full_identifier().Identifier().Length == 1)
-                return type; 
+                return type;
         }
         else
         {
@@ -1069,13 +1151,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             {
                 // Global Method (Type Import)
                 Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.Start.Line, context.Start.Column).Type;
-                
+
                 if (t != null)
                     return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
 
                 // Constructor
                 Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.Start.Line, context.Start.Column);
-                return GetConstructor(cType, context.arglist(), context.Start.Line, context.Start.Column);
+                return GetConstructorOrCast(cType, context.arglist(), context.Start.Line, context.Start.Column);
             }
 
             type = Helpers.ResolveTypeName(
@@ -1602,12 +1684,51 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(bool);
     }
 
-    public override Type VisitLocal_declaration([NotNull] LoschScriptParser.Local_declarationContext context)
+    public override Type VisitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context)
     {
+        if (CurrentMethod.Locals.Any(e => e.Name == context.Identifier().GetText()))
+        {
+            var local = CurrentMethod.Locals.Where(e => e.Name == context.Identifier().GetText()).First();
+
+            if (local.IsConstant)
+            {
+                EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    LS0018_ImmutableValueReassignment,
+                    $"'{local.Name}' is immutable and cannot be changed.");
+
+                return local.Builder.LocalType;
+            }
+
+            Type type = Visit(context.expression());
+
+            if (type != local.Builder.LocalType)
+            {
+                EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    LS0006_VariableTypeChanged,
+                    $"The type of the new value of '{local.Name}' does not match the type of the old value.");
+
+                return type;
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Stloc, local.Index);
+
+            return local.Builder.LocalType;
+        }
+
         Type t = Visit(context.expression());
 
         if (context.type_name() != null)
-            t = Visit(context.type_name());
+        {
+            Type t2 = Visit(context.type_name());
+
+            // TODO: Check if types are compatible and possibly call op_Implicit / op_Explicit...
+
+            t = t2;
+        }
 
         LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
 
