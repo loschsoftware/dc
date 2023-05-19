@@ -8,6 +8,31 @@ namespace LoschScript.Core;
 public static class stdout
 {
     /// <summary>
+    /// Formats the specified string using the provided formatting arguments.
+    /// </summary>
+    /// <param name="format">The string to format.</param>
+    /// <param name="args">The formatting arguments.</param>
+    /// <returns>The formatted string.</returns>
+    public static string fmt(string format, params object[] args) => string.Format(format, args);
+
+    /// <summary>
+    /// Formats the specified string using the provided formatting argument.
+    /// </summary>
+    /// <param name="format">The string to format.</param>
+    /// <param name="arg1">The formatting argument.</param>
+    /// <returns>The formatted string.</returns>
+    public static string fmt(string format, object arg1) => string.Format(format, arg1);
+
+    /// <summary>
+    /// Formats the specified string using the provided formatting arguments.
+    /// </summary>
+    /// <param name="format">The string to format.</param>
+    /// <param name="arg1">The first formatting argument.</param>
+    /// <param name="arg2">The second formatting argument.</param>
+    /// <returns>The formatted string.</returns>
+    public static string fmt(string format, object arg1, object arg2) => string.Format(format, arg1, arg2);
+
+    /// <summary>
     /// Prints a newline character to the standard output.
     /// </summary>
     public static void println() => Console.WriteLine();
