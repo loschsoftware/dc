@@ -1855,7 +1855,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (t != arrayType)
             {
-                EmitErrorMessage(context.Start.Line, context.Start.Column, LS0041_ListItemsHaveDifferentTypes, "An array or list can only contain one type of value.");
+                EmitErrorMessage(context.expression()[index - 1].Start.Line, context.expression()[index - 1].Start.Column, LS0041_ListItemsHaveDifferentTypes, "An array or list can only contain one type of value.");
                 return arrayType.MakeArrayType();
             }
 
