@@ -897,6 +897,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 if (CurrentMethod.ArgumentTypesForNextMethodCall.Count != 1)
                 {
                     EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor with the specified argument types.");
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
@@ -905,60 +906,70 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 if (aqn == typeof(object).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Box, CurrentMethod.ArgumentTypesForNextMethodCall[0]);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
                 
                 if (aqn == typeof(int).AssemblyQualifiedName || aqn == typeof(uint).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_I4);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (aqn == typeof(long).AssemblyQualifiedName || aqn == typeof(ulong).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_I8);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (aqn == typeof(nint).AssemblyQualifiedName || aqn == typeof(nuint).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_I);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (aqn == typeof(byte).AssemblyQualifiedName || aqn == typeof(sbyte).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_I1);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (aqn == typeof(short).AssemblyQualifiedName || aqn == typeof(ushort).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_I2);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (aqn == typeof(float).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_R4);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (aqn == typeof(double).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (aqn == typeof(bool).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_I4);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (aqn == typeof(char).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_I4);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
@@ -968,12 +979,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 if (mImplicit != null)
                 {
                     CurrentMethod.IL.EmitCall(OpCodes.Call, mImplicit, null);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
                 if (mExplicit != null)
                 {
                     CurrentMethod.IL.EmitCall(OpCodes.Call, mExplicit, null);
+                    CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
 
