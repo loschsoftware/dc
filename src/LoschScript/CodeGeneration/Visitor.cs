@@ -909,7 +909,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
-                
+
                 if (aqn == typeof(int).AssemblyQualifiedName || aqn == typeof(uint).AssemblyQualifiedName)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_I4);
@@ -990,11 +990,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     return cType;
                 }
 
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+
                 return cType;
             }
 
             CurrentMethod.IL.Emit(OpCodes.Newobj, cinf);
-
+            EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor or conversion with the specified argument types.");
             CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
 
             return cType;
@@ -1005,10 +1007,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (c == null)
         {
             EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not specify a parameterless constructor.");
+            CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
             return cType;
         }
 
         CurrentMethod.IL.Emit(OpCodes.Newobj, c);
+
+        CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
 
         return cType;
     }
