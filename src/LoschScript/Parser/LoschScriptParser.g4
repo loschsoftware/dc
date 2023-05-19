@@ -46,6 +46,7 @@ expression
     : full_identifier arglist? #full_identifier_member_access_expression
     | full_identifier #full_identifier_expression
     | Identifier #identifier_expression
+    | expression At_Sign expression Equals expression #array_element_assignment
     | expression Double_Asterisk expression #power_expression
     | Exclamation_Mark expression #logical_negation_expression
     | expression Asterisk expression #multiply_expression

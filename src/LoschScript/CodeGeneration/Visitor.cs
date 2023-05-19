@@ -1952,4 +1952,30 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Index).GetConstructor(new Type[] { typeof(int), typeof(bool) }));
         return typeof(Index);
     }
+
+    public override Type VisitArray_element_assignment([NotNull] LoschScriptParser.Array_element_assignmentContext context)
+    {
+        Type arrayType = Visit(context.expression()[0]);
+
+        Type index = Visit(context.expression()[1]);
+
+        if (index == typeof(int))
+        {
+            Type t = Visit(context.expression()[2]);
+
+            if (t != arrayType.GetEnumeratedType())
+            {
+                EmitErrorMessage(context.expression()[2].Start.Line, context.expression()[2].Start.Column, LS0041_ListItemsHaveDifferentTypes, "The type of the new value of the specified array item does not match the type of the old one.");
+                return t;
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Stelem, t);
+
+            return t;
+        }
+
+        EmitErrorMessage(context.expression()[1].Start.Line, context.expression()[1].Start.Column, LS0042_ArrayElementAssignmentIndexExpressionNotInteger, "The index expression has to be of type Int32.");
+
+        return arrayType.GetEnumeratedType();
+    }
 }

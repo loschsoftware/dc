@@ -180,5 +180,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the types of list or array items are not the same.
     /// </summary>
-    LS0041_ListItemsHaveDifferentTypes
+    LS0041_ListItemsHaveDifferentTypes,
+    /// <summary>
+    /// Emitted when the index expression of an array element assignment expression is not an integer.
+    /// </summary>
+    LS0042_ArrayElementAssignmentIndexExpressionNotInteger
 }

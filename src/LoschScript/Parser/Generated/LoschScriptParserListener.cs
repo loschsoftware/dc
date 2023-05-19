@@ -664,6 +664,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitDivide_expression([NotNull] LoschScriptParser.Divide_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>array_element_assignment</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterArray_element_assignment([NotNull] LoschScriptParser.Array_element_assignmentContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>array_element_assignment</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitArray_element_assignment([NotNull] LoschScriptParser.Array_element_assignmentContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>logical_and_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
