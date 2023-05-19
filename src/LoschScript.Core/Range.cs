@@ -3,6 +3,8 @@
 
 using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("lsc")]
+
 namespace System
 {
     /// <summary>Represent a type can be used to index a collection either from the start or the end.</summary>
