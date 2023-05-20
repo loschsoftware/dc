@@ -1978,4 +1978,50 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         return arrayType.GetEnumeratedType();
     }
+
+    public override Type VisitWhile_loop([NotNull] LoschScriptParser.While_loopContext context)
+    {
+        Type t = Visit(context.expression().First());
+        Type tReturn = null;
+
+        if (t == typeof(int))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Pop);
+
+            Label loop = CurrentMethod.IL.DefineLabel();
+            Label start = CurrentMethod.IL.DefineLabel();
+
+            LocalBuilder lb = CurrentMethod.IL.DeclareLocal(typeof(int));
+            CurrentMethod.Locals.Add((GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++));
+
+            CurrentMethod.IL.Emit(OpCodes.Br, loop);
+
+            CurrentMethod.IL.MarkLabel(start);
+
+            if (context.code_block() == null)
+                tReturn = Visit(context.expression().Last());
+            else
+            {
+                foreach (IParseTree tree in context.code_block().expression()[..^1])
+                    Visit(tree);
+
+                tReturn = Visit(context.code_block().expression().Last());
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_1);
+            CurrentMethod.IL.Emit(OpCodes.Add);
+            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
+
+            CurrentMethod.IL.MarkLabel(loop);
+
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
+            Visit(context.expression().First());
+            CurrentMethod.IL.Emit(OpCodes.Blt, start);
+
+            return tReturn;
+        }
+
+        return tReturn;
+    }
 }

@@ -11,6 +11,11 @@ internal class MethodContext
         CurrentMethod = this;
     }
 
+    public static string GetThrowawayCounterVariableName(int index)
+    {
+        return $"<>g_Index{index}";
+    }
+
     public static MethodContext CurrentMethod { get; set; }
 
     public ILGenerator IL { get; set; }
@@ -22,6 +27,8 @@ internal class MethodContext
     public int LocalIndex { get; set; } = -1;
 
     public List<(string Name, LocalBuilder Builder, bool IsConstant, int Index)> Locals { get; } = new();
+
+    public int ThrowawayCounterVariableIndex { get; set; } = 0;
 
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 }
