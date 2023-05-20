@@ -2,6 +2,7 @@
 using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Meta;
+using LoschScript.Parser;
 using System;
 using System.CodeDom;
 using System.Collections;

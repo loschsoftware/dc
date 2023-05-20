@@ -16,6 +16,11 @@ internal class MethodContext
         return $"<>g_Index{index}";
     }
 
+    public static string GetLoopArrayReturnValueVariableName(int index)
+    {
+        return $"<>g_LoopArray{index}";
+    }
+
     public static MethodContext CurrentMethod { get; set; }
 
     public ILGenerator IL { get; set; }
@@ -29,6 +34,8 @@ internal class MethodContext
     public List<(string Name, LocalBuilder Builder, bool IsConstant, int Index)> Locals { get; } = new();
 
     public int ThrowawayCounterVariableIndex { get; set; } = 0;
+    
+    public int LoopArrayReturnValueIndex { get; set; } = 0;
 
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 }
