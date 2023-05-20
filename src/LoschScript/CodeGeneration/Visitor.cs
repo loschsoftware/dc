@@ -1984,6 +1984,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type t = Visit(context.expression().First());
         Type tReturn = null;
 
+        if (context.code_block() == null)
+        {
+            tReturn = Visit(context.expression().Last());
+            CurrentMethod.IL.Emit(OpCodes.Pop);
+        }
+        else
+        {
+            tReturn = Visit(context.code_block().expression().Last());
+            CurrentMethod.IL.Emit(OpCodes.Pop);
+        }
+
         if (t == typeof(int))
         {
             if (tReturn != typeof(void))
