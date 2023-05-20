@@ -1946,7 +1946,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitIndex([NotNull] LoschScriptParser.IndexContext context)
     {
         Visit(context.integer_atom());
-        
+
         CurrentMethod.IL.Emit(OpCodes.Ldc_I4, context.Caret() == null ? 0 : 1);
 
         CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Index).GetConstructor(new Type[] { typeof(int), typeof(bool) }));
@@ -2008,20 +2008,53 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 tReturn = Visit(context.code_block().expression().Last());
             }
 
-            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_1);
             CurrentMethod.IL.Emit(OpCodes.Add);
-            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
+            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
             CurrentMethod.IL.MarkLabel(loop);
 
-            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
             Visit(context.expression().First());
             CurrentMethod.IL.Emit(OpCodes.Blt, start);
 
             return tReturn;
         }
 
+        if (t == typeof(bool))
+        {
+            return tReturn;
+        }
+
+        EmitWarningMessage(
+            context.expression().First().Start.Line,
+            context.expression().First().Start.Column,
+            LS0043_PossiblyUnintentionalInfiniteLoop,
+            "The condition of the while loop is not a boolean. This loop will run indefinetly.");
+
+        CurrentMethod.IL.Emit(OpCodes.Pop);
+
+        Label infiniteLoop = CurrentMethod.IL.DefineLabel();
+        CurrentMethod.IL.MarkLabel(infiniteLoop);
+
+        if (context.code_block() == null)
+            tReturn = Visit(context.expression().Last());
+        else
+        {
+            foreach (IParseTree tree in context.code_block().expression()[..^1])
+                Visit(tree);
+
+            tReturn = Visit(context.code_block().expression().Last());
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Br, infiniteLoop);
+
         return tReturn;
+    }
+
+    public override Type VisitFor_loop([NotNull] LoschScriptParser.For_loopContext context)
+    {
+        return base.VisitFor_loop(context);
     }
 }
