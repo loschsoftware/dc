@@ -1984,34 +1984,18 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type t = Visit(context.expression().First());
         Type tReturn = null;
 
-        if (context.code_block() == null)
-        {
-            tReturn = Visit(context.expression().Last());
-            CurrentMethod.IL.Emit(OpCodes.Pop);
-        }
-        else
-        {
-            tReturn = Visit(context.code_block().expression().Last());
-            CurrentMethod.IL.Emit(OpCodes.Pop);
-        }
-
         if (t == typeof(int))
         {
-            if (tReturn != typeof(void))
-            {
-                // Build the array of return values
-                // (A for loop returns an array containing the return
-                // values of every iteration of the loop)
-                // The length of the array is already on the stack
-                CurrentMethod.IL.Emit(OpCodes.Newarr, tReturn);
+            // Build the array of return values
+            // (A for loop returns an array containing the return
+            // values of every iteration of the loop)
+            // The length of the array is already on the stack
+            CurrentMethod.IL.Emit(OpCodes.Newarr, typeof(object));
 
-                // A local that saves the returning array
-                LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(tReturn.MakeArrayType());
+            // A local that saves the returning array
+            LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(typeof(object).MakeArrayType());
 
-                CurrentMethod.Locals.Add((GetThrowawayCounterVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
-            }
-            else
-                CurrentMethod.IL.Emit(OpCodes.Pop);
+            CurrentMethod.Locals.Add((GetThrowawayCounterVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
 
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
@@ -2025,40 +2009,36 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (context.code_block() == null)
             {
-                if (tReturn != typeof(void))
-                {
-                    // Save the return value of the current iteration to the returning array
+                // Save the return value of the current iteration to the returning array
 
-                    // Array
-                    CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
-                    // Index
-                    CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
-                }
+                // Array
+                CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+                // Index
+                CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
                 tReturn = Visit(context.expression().Last());
 
-                if (tReturn != typeof(void))
-                    CurrentMethod.IL.Emit(OpCodes.Stelem, tReturn);
+                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
+
+                CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
             }
             else
             {
                 foreach (IParseTree tree in context.code_block().expression()[..^1])
                     Visit(tree);
 
-                if (tReturn != typeof(void))
-                {
-                    // Save the return value of the current iteration to the returning array
+                // Save the return value of the current iteration to the returning array
 
-                    // Array
-                    CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
-                    // Index
-                    CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
-                }
+                // Array
+                CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+                // Index
+                CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
                 tReturn = Visit(context.code_block().expression().Last());
 
-                if (tReturn != typeof(void))
-                    CurrentMethod.IL.Emit(OpCodes.Stelem, tReturn);
+                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
+
+                CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
             }
 
             CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
@@ -2072,11 +2052,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Visit(context.expression().First());
             CurrentMethod.IL.Emit(OpCodes.Blt, start);
 
-            if (tReturn != typeof(void))
-                CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
-
-            if (tReturn == typeof(void))
-                return typeof(void);
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
             return tReturn.MakeArrayType();
         }
