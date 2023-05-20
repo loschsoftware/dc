@@ -28,6 +28,24 @@ public static class NumericSequence
     }
 
     /// <summary>
+    /// Formats the specified boxed integer array as a string.
+    /// </summary>
+    /// <param name="array">The array to format.</param>
+    /// <returns>The formatted string.</returns>
+    public static string formatArray(object[] array)
+    {
+        StringBuilder sb = new();
+        sb.Append("[ ");
+
+        foreach (int i in array)
+            sb.Append($"{i}, ");
+
+        sb.Append(" ]");
+
+        return sb.ToString();
+    }
+
+    /// <summary>
     /// Creates a sequence of numbers ranging from 0 to the specified end.
     /// </summary>
     /// <param name="end">The last number of the sequence.</param>
