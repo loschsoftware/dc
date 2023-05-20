@@ -2061,7 +2061,31 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (t == typeof(bool))
         {
-            return typeof(object[]);
+            CurrentMethod.IL.Emit(OpCodes.Pop);
+
+            Label loop = CurrentMethod.IL.DefineLabel();
+            Label start = CurrentMethod.IL.DefineLabel();
+
+            CurrentMethod.IL.Emit(OpCodes.Br, loop);
+
+            CurrentMethod.IL.MarkLabel(start);
+
+            if (context.code_block() == null)
+                tReturn = Visit(context.expression().Last());
+            else
+            {
+                foreach (IParseTree tree in context.code_block().expression()[..^1])
+                    Visit(tree);
+
+                tReturn = Visit(context.code_block().expression().Last());
+            }
+
+            CurrentMethod.IL.MarkLabel(loop);
+
+            Visit(context.expression().First());
+            CurrentMethod.IL.Emit(OpCodes.Brtrue, start);
+
+            return typeof(void);
         }
 
         EmitWarningMessage(
