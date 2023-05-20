@@ -2063,6 +2063,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             CurrentMethod.IL.Emit(OpCodes.Pop);
 
+            CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes));
+
+            // A local that saves the returning list
+            LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(typeof(object).MakeArrayType());
+
+            CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
+
+            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
 
@@ -2071,13 +2080,23 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.IL.MarkLabel(start);
 
             if (context.code_block() == null)
+            {
+                CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
                 tReturn = Visit(context.expression().Last());
+                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
+
+                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add", new Type[] { typeof(object) }), null);
+            }
             else
             {
                 foreach (IParseTree tree in context.code_block().expression()[..^1])
                     Visit(tree);
 
+                CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
                 tReturn = Visit(context.code_block().expression().Last());
+                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
+
+                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add", new Type[] { typeof(object) }), null);
             }
 
             CurrentMethod.IL.MarkLabel(loop);
@@ -2085,7 +2104,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Visit(context.expression().First());
             CurrentMethod.IL.Emit(OpCodes.Brtrue, start);
 
-            return typeof(void);
+            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+
+            return typeof(List<object>);
         }
 
         EmitWarningMessage(
