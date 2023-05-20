@@ -993,5 +993,15 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitField_declaration([NotNull] LoschScriptParser.Field_declarationContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.placeholder"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPlaceholder([NotNull] LoschScriptParser.PlaceholderContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.placeholder"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPlaceholder([NotNull] LoschScriptParser.PlaceholderContext context);
 }
 } // namespace LoschScript.Parser

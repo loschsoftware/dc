@@ -38,8 +38,8 @@ full_identifier
     ;
 
 code_block
-    : NewLine+ INDENT (NewLine | expression)* DEDENT NewLine*
-    | NewLine* Open_Brace (NewLine | expression)* Close_Brace NewLine*
+    : NewLine+ INDENT ((NewLine | expression)* | placeholder) DEDENT NewLine*
+    | NewLine* Open_Brace ((NewLine | expression)* | placeholder) Close_Brace NewLine*
     ;
 
 expression
@@ -212,4 +212,8 @@ field_access_modifier
 
 field_declaration
     : field_access_modifier (Var | Val)? Identifier (Colon type_name)? Equals expression
+    ;
+
+placeholder
+    : Dot
     ;

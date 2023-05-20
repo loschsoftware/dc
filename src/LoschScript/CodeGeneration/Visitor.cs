@@ -2094,4 +2094,10 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         return base.VisitFor_loop(context);
     }
+
+    public override Type VisitPlaceholder([NotNull] LoschScriptParser.PlaceholderContext context)
+    {
+        CurrentMethod.IL.Emit(OpCodes.Nop);
+        return null;
+    }
 }

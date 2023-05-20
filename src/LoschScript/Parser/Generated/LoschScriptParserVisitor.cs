@@ -599,5 +599,11 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitField_declaration([NotNull] LoschScriptParser.Field_declarationContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.placeholder"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPlaceholder([NotNull] LoschScriptParser.PlaceholderContext context);
 }
 } // namespace LoschScript.Parser
