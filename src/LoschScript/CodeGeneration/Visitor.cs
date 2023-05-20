@@ -1997,6 +1997,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
 
+            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
 
@@ -2054,12 +2056,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
-            return tReturn.MakeArrayType();
+            return typeof(object[]);
         }
 
         if (t == typeof(bool))
         {
-            return tReturn;
+            return typeof(object[]);
         }
 
         EmitWarningMessage(
@@ -2085,10 +2087,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         CurrentMethod.IL.Emit(OpCodes.Br, infiniteLoop);
 
-        if (tReturn == typeof(void))
-            return typeof(void);
-
-        return tReturn.MakeArrayType();
+        return typeof(object[]);
     }
 
     public override Type VisitFor_loop([NotNull] LoschScriptParser.For_loopContext context)
