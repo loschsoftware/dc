@@ -39,8 +39,10 @@ public static class NumericSequence
         StringBuilder sb = new();
         sb.Append("[ ");
 
-        foreach (int i in array)
+        foreach (int i in array[..^1])
             sb.Append($"{i}, ");
+
+        sb.Append($"{array.Last()}");
 
         sb.Append(" ]");
 
