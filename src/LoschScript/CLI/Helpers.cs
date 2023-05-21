@@ -43,6 +43,13 @@ internal static class Helpers
 
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
+        Context.Assembly.DefineVersionInfoResource(
+            Context.Configuration.Product,
+            Context.Configuration.Version,
+            Context.Configuration.Company,
+            Context.Configuration.Copyright,
+            Context.Configuration.Trademark);
+
         Context.Assembly.Save(assembly);
 
         if (File.Exists(Context.Configuration.ApplicationIcon))

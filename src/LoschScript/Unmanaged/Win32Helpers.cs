@@ -25,7 +25,7 @@ internal static class Win32Helpers
 
         fixed (byte* pData = data)
         {
-            b = UpdateResource(hUpdate, (IntPtr)3, (IntPtr)1, 0, (IntPtr)pData, (uint)data.Length);
+            b = UpdateResource(hUpdate, (IntPtr)14, (IntPtr)1, 0, (IntPtr)pData, (uint)data.Length);
         }
 
         EndUpdateResource(hUpdate, false);
