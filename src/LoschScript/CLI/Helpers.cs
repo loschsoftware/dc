@@ -64,7 +64,9 @@ internal static class Helpers
             return 0;
         }
 
-        Console.WriteLine($"\r\nCompilation failed with {errors.Select(e => e.Length).Sum()} errors.");
+        int count = errors.Select(e => e.Length).Sum();
+
+        Console.WriteLine($"\r\nCompilation failed with {count} error{(count > 1 ? "s" : "")}.");
         return -1;
     }
 
