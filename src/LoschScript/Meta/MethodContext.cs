@@ -16,6 +16,11 @@ internal class MethodContext
         return $"<>g_Index{index}";
     }
 
+    public static string GetThrowawayWhileLoopVariableName(int index)
+    {
+        return $"<>g_Conditon{index}";
+    }
+
     public static string GetLoopArrayReturnValueVariableName(int index)
     {
         return $"<>g_LoopArray{index}";
@@ -36,6 +41,8 @@ internal class MethodContext
     public int ThrowawayCounterVariableIndex { get; set; } = 0;
     
     public int LoopArrayReturnValueIndex { get; set; } = 0;
+    
+    public int ThrowawayWhileLoopVariableIndex { get; set; } = 0;
 
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 }
