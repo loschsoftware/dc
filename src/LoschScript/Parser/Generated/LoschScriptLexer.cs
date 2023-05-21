@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\source\repos\loschsoftware\lsc\src\LoschScript\Parser\LoschScriptLexer.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\Source\Repos\lsc\src\LoschScript\Parser\LoschScriptLexer.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162

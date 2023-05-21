@@ -3,6 +3,7 @@ using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Meta;
 using LoschScript.Parser;
+using LoschScript.Unmanaged;
 using System;
 using System.CodeDom;
 using System.Collections;
@@ -42,7 +43,13 @@ internal static class Helpers
 
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
-        ProgramContext.Context.Assembly.Save(assembly);
+        Context.Assembly.Save(assembly);
+
+        if (File.Exists(Context.Configuration.ApplicationIcon))
+        {
+            if (!Win32Helpers.SetIcon(assembly, Context.Configuration.ApplicationIcon))
+                EmitWarningMessage(0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
+        }
 
         if (errors.Select(e => e.Length).Sum() == 0)
         {
