@@ -29,7 +29,10 @@ internal static class FileCompiler
         parser.AddErrorListener(new SyntaxErrorListener());
 
         Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
-        Context.ReferencedAssemblies.AddRange(refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath)));
+        var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
+
+        if (refsToAdd != null)
+            Context.ReferencedAssemblies.AddRange(refsToAdd);
 
         IParseTree compilationUnit = parser.compilation_unit();
         Visitor v = new();
