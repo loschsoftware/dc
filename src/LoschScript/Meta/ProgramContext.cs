@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Losch.LoschScript.Configuration;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -28,4 +29,6 @@ internal class ProgramContext
     public FileContext GetFile(string path) => Files.Where(f => f.Path == path).First();
 
     public TypeContext GetType(string name) => Types.Where(t => t.FullName == name).First();
+
+    public LSConfig Configuration { get; set; }
 }

@@ -54,7 +54,10 @@ public static class Compiler
     {
         LogOut.WriteLine("Compiling files...");
 
+        LSConfig cfg = config ?? new();
+
         Context = new();
+        Context.Configuration = cfg;
 
         string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
@@ -69,7 +72,7 @@ public static class Compiler
         List<ErrorInfo[]> errors = new();
 
         foreach (string file in sourceFiles)
-            errors.Add(FileCompiler.CompileSingleFile(file, config ?? new()));
+            errors.Add(FileCompiler.CompileSingleFile(file, cfg));
 
         return errors;
     }

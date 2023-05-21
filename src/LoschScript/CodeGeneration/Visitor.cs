@@ -147,7 +147,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type ret = Visit(context.expression().Last());
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
-        Context.Assembly.SetEntryPoint(mb);
+
+        if (Context.Configuration.ApplicationType != Losch.LoschScript.Configuration.ApplicationType.Library)
+            Context.Assembly.SetEntryPoint(mb);
 
         tb.CreateType();
         return ret;
