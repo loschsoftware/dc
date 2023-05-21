@@ -38,7 +38,7 @@ internal static class FileCompiler
         Visitor v = new();
         v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
 
-        LogOut.WriteLine($"\r\nCompilation of source file '{path}' {(CurrentFile.Errors.Any() ? "failed" : "successful")}.");
+        //LogOut.WriteLine($"\r\nCompilation of source file '{path}' {(CurrentFile.Errors.Any() ? "failed" : "successful")}.");
         return CurrentFile.Errors.ToArray();
     }
 }
