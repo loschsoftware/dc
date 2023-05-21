@@ -42,7 +42,7 @@ public sealed class LSConfig
     public string BuildOutputDirectory { get; set; }
 
     [XmlElement("EmitPdb")]
-    public bool CreatePdb { get; set; } = false;
+    public bool CreatePdb { get; set; }
 
     [XmlElement("IgnoreMessages")]
     public bool IgnoreMessages { get; set; }
@@ -54,7 +54,10 @@ public sealed class LSConfig
     public bool TreatWarningsAsErrors { get; set; }
 
     [XmlElement("IlOptimizations")]
-    public bool IlOptimizations { get; set; } = true;
+    public bool IlOptimizations { get; set; }
+
+    [XmlElement("MeasureElapsedTime")]
+    public bool MeasureElapsedTime { get; set; }
 
     [XmlElement("Configuration")]
     public Configuration Configuration { get; set; }

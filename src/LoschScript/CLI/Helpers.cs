@@ -68,7 +68,7 @@ internal static class Helpers
         {
             Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
 
-            if (args.Any(a => a == "-elapsed"))
+            if (args.Any(a => a == "-elapsed") || Context.Configuration.MeasureElapsedTime)
                 Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
 
             return 0;
@@ -78,7 +78,7 @@ internal static class Helpers
 
         Console.WriteLine($"\r\nCompilation failed with {count} error{(count > 1 ? "s" : "")}.");
 
-        if (args.Any(a => a == "-elapsed"))
+        if (args.Any(a => a == "-elapsed") || Context.Configuration.MeasureElapsedTime)
             Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
 
         return -1;
