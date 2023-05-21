@@ -136,7 +136,7 @@ public static class ErrorWriter
 
         if (Context.Configuration.TreatWarningsAsErrors)
         {
-            EmitErrorMessage(err, treatAsError);
+            EmitErrorMessage(err);
             return;
         }
 
