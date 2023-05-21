@@ -90,7 +90,20 @@ internal static class Helpers
 
         if (errors.Select(e => e.Length).Sum() == 0)
         {
-            ProgramContext.Context.Assembly.Save(assembly);
+            Context.Assembly.DefineVersionInfoResource(
+            Context.Configuration.Product,
+            Context.Configuration.Version,
+            Context.Configuration.Company,
+            Context.Configuration.Copyright,
+            Context.Configuration.Trademark);
+
+            Context.Assembly.Save(assembly);
+
+            if (File.Exists(Context.Configuration.ApplicationIcon))
+            {
+                if (!Win32Helpers.SetIcon(assembly, Context.Configuration.ApplicationIcon))
+                    EmitWarningMessage(0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
+            }
 
             Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
             return 0;
