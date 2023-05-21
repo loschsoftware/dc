@@ -56,6 +56,9 @@ public sealed class LSConfig
     [XmlElement("IlOptimizations")]
     public bool IlOptimizations { get; set; } = true;
 
+    [XmlElement("Configuration")]
+    public Configuration Configuration { get; set; }
+
     [XmlElement("VersionInformation")]
     public VersionInformation VersionInformation { get; set; }
 
@@ -69,4 +72,11 @@ public enum ApplicationType
     Console,
     WinExe,
     Library
+}
+
+[Serializable]
+public enum Configuration
+{
+    Debug,
+    Release
 }

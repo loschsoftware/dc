@@ -1752,6 +1752,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
 
+        if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
+            lb.SetLocalSymInfo(context.Identifier().GetText());
+
         CurrentMethod.LocalIndex++;
 
         CurrentMethod.Locals.Add((context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex));
@@ -2001,11 +2004,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
+            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
+                returnBuilder.SetLocalSymInfo(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
+
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
 
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(typeof(int));
             CurrentMethod.Locals.Add((GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++));
+
+            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
+                lb.SetLocalSymInfo((GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)));
 
             CurrentMethod.IL.Emit(OpCodes.Br, loop);
 
@@ -2073,6 +2082,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
 
             CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+
+            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
+                returnBuilder.SetLocalSymInfo(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
 
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
