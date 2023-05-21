@@ -43,7 +43,9 @@ code_block
     ;
 
 expression
-    : Identifier #identifier_expression
+    : full_identifier arglist? #full_identifier_member_access_expression
+    | full_identifier #full_identifier_expression
+    | Identifier #identifier_expression
     | expression At_Sign expression Equals expression #array_element_assignment
     | expression Double_Asterisk expression #power_expression
     | Exclamation_Mark expression #logical_negation_expression
@@ -64,8 +66,6 @@ expression
     | expression Caret expression #xor_expression
     | Minus expression #unary_negation_expression
     | Plus expression #unary_plus_expression
-    | full_identifier arglist? #full_identifier_member_access_expression
-    | full_identifier #full_identifier_expression
     | Caret Identifier  #typeof_expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_exception
