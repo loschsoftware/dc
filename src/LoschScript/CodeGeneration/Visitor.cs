@@ -1984,16 +1984,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type t = Visit(context.expression().First());
         Type tReturn = null;
 
-        LocalBuilder conditionBuilder = CurrentMethod.IL.DeclareLocal(t);
-        
-        CurrentMethod.Locals.Add((GetThrowawayWhileLoopVariableName(CurrentMethod.ThrowawayWhileLoopVariableIndex++), conditionBuilder, false, CurrentMethod.LocalIndex++));
-
-        CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayWhileLoopVariableName(CurrentMethod.ThrowawayWhileLoopVariableIndex - 1)).First().Index + 1);
-
         if (t == typeof(int))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayWhileLoopVariableName(CurrentMethod.ThrowawayWhileLoopVariableIndex - 1)).First().Index + 1);
-
             // Build the array of return values
             // (A for loop returns an array containing the return
             // values of every iteration of the loop)
@@ -2069,6 +2061,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (t == typeof(bool))
         {
+            CurrentMethod.IL.Emit(OpCodes.Pop);
+
             CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes));
 
             // A local that saves the returning list
@@ -2107,7 +2101,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.IL.MarkLabel(loop);
 
-            CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayWhileLoopVariableName(CurrentMethod.ThrowawayWhileLoopVariableIndex - 1)).First().Index + 1);
+            Visit(context.expression().First());
             CurrentMethod.IL.Emit(OpCodes.Brtrue, start);
 
             CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
@@ -2120,6 +2114,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             context.expression().First().Start.Column,
             LS0043_PossiblyUnintentionalInfiniteLoop,
             "The condition of the while loop is not a boolean. This loop will run indefinetly.");
+
+        CurrentMethod.IL.Emit(OpCodes.Pop);
 
         Label infiniteLoop = CurrentMethod.IL.DefineLabel();
         CurrentMethod.IL.MarkLabel(infiniteLoop);
