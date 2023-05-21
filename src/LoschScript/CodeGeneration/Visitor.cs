@@ -325,31 +325,31 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return t;
     }
 
-    public override Type VisitUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context)
-    {
-        Type t = Visit(context.expression());
+    //public override Type VisitUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context)
+    //{
+    //    Type t = Visit(context.expression());
 
-        if (Helpers.IsNumericType(t))
-            return t;
+    //    if (Helpers.IsNumericType(t))
+    //        return t;
 
-        MethodInfo op = t.GetMethod("op_UnaryPlus", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
+    //    MethodInfo op = t.GetMethod("op_UnaryPlus", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
 
-        if (op == null)
-        {
-            EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    LS0036_ArithmeticError,
-                    $"The type '{t.Name}' does not implement the unary plus operation.",
-                    Path.GetFileName(CurrentFile.Path));
+    //    if (op == null)
+    //    {
+    //        EmitErrorMessage(
+    //                context.Start.Line,
+    //                context.Start.Column,
+    //                LS0036_ArithmeticError,
+    //                $"The type '{t.Name}' does not implement the unary plus operation.",
+    //                Path.GetFileName(CurrentFile.Path));
 
-            return t;
-        }
+    //        return t;
+    //    }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+    //    CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
-        return t;
-    }
+    //    return t;
+    //}
 
     public override Type VisitLogical_negation_expression([NotNull] LoschScriptParser.Logical_negation_expressionContext context)
     {

@@ -65,7 +65,6 @@ expression
     | expression Double_Bar expression #logical_or_expression
     | expression Caret expression #xor_expression
     | Minus expression #unary_negation_expression
-    | Plus expression #unary_plus_expression
     | Caret Identifier  #typeof_expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_exception
@@ -91,6 +90,7 @@ expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
     | atom #atom_expression
     | expression NewLine #newlined_expression
+    // | Plus expression #unary_plus_expression
     ;
 
 atom

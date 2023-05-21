@@ -707,20 +707,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>unary_plus_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>unary_plus_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>or_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>

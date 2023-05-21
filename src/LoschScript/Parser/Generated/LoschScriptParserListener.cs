@@ -604,18 +604,6 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>unary_plus_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>unary_plus_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>or_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

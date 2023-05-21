@@ -368,13 +368,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>unary_plus_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>or_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
