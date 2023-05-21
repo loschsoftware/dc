@@ -125,14 +125,22 @@ public static class ErrorWriter
     /// </summary>
     public static void EmitWarningMessage(int ln = 0, int col = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false)
     {
-        EmitWarningMessage(new ErrorInfo()
+        ErrorInfo err = new()
         {
             CodePosition = (ln, col),
             //CodeEndPosition = (line.lnEnd, column.colEnd),
             ErrorCode = errorType,
             ErrorMessage = msg,
             File = file ?? CurrentFile.Path
-        }, treatAsError);
+        };
+
+        if (Context.Configuration.TreatWarningsAsErrors)
+        {
+            EmitErrorMessage(err, treatAsError);
+            return;
+        }
+
+        EmitWarningMessage(err, treatAsError);
     }
 
     /// <summary>
