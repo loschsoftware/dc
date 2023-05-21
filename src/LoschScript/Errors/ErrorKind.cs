@@ -188,5 +188,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the compiler thinks an infinite loop could be unintentional.
     /// </summary>
-    LS0043_PossiblyUnintentionalInfiniteLoop
+    LS0043_PossiblyUnintentionalInfiniteLoop,
+    /// <summary>
+    /// Emitted when an update to LSC is available. This is an information message, not an error.
+    /// </summary>
+    LS0044_LscUpdateAvailable
 }
