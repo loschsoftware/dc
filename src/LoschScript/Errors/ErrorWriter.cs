@@ -125,6 +125,9 @@ public static class ErrorWriter
     /// </summary>
     public static void EmitWarningMessage(int ln = 0, int col = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false)
     {
+        if (Context.Configuration.IgnoreWarnings)
+            return;
+
         ErrorInfo err = new()
         {
             CodePosition = (ln, col),
@@ -148,6 +151,9 @@ public static class ErrorWriter
     /// </summary>
     public static void EmitMessage(int ln = 0, int col = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null)
     {
+        if (Context.Configuration.IgnoreMessages)
+            return;
+
         EmitMessage(new ErrorInfo()
         {
             CodePosition = (ln, col),
