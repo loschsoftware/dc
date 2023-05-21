@@ -9,6 +9,7 @@ using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,6 +22,9 @@ internal static class Helpers
 {
     public static int HandleArgs(string[] args)
     {
+        Stopwatch sw = new();
+        sw.Start();
+
         LSConfig config = null;
 
         if (File.Exists("lsconfig.xml"))
@@ -58,15 +62,25 @@ internal static class Helpers
                 EmitWarningMessage(0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
         }
 
+        sw.Stop();
+
         if (errors.Select(e => e.Length).Sum() == 0)
         {
             Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
+
+            if (args.Any(a => a == "--elapsed"))
+                Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
+
             return 0;
         }
 
         int count = errors.Select(e => e.Length).Sum();
 
         Console.WriteLine($"\r\nCompilation failed with {count} error{(count > 1 ? "s" : "")}.");
+
+        if (args.Any(a => a == "--elapsed"))
+            Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
+
         return -1;
     }
 
