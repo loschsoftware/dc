@@ -278,6 +278,20 @@ internal static class Helpers
         return numerics.Contains(type);
     }
 
+    public static bool IsUnsignedIntegerType(Type type)
+    {
+        Type[] numerics =
+        {
+            typeof(byte),
+            typeof(ushort),
+            typeof(uint),
+            typeof(ulong),
+            typeof(nuint)
+        };
+
+        return numerics.Contains(type);
+    }
+
     public static bool IsFloatingPointType(Type type)
     {
         Type[] floats =

@@ -253,12 +253,10 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Visit(context.expression()[1]);
             }
 
-            CurrentMethod.IL.Emit(context.op.Text switch
-            {
-                // Looks weird, but is the correct logic
-                "<" or ">=" => OpCodes.Clt,
-                _ => OpCodes.Cgt,
-            });
+            if (context.op.Text == "<" || context.op.Text == ">=")
+                EmitClt(CurrentMethod.IL, t);
+            else
+                EmitCgt(CurrentMethod.IL, t);
 
             if (context.op.Text == "<=" || context.op.Text == ">=")
             {
@@ -550,7 +548,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t))
         {
-            CurrentMethod.IL.Emit(OpCodes.Mul);
+            EmitMul(CurrentMethod.IL, t);
             return t;
         }
 
@@ -580,7 +578,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t))
         {
-            CurrentMethod.IL.Emit(OpCodes.Div);
+            EmitDiv(CurrentMethod.IL, t);
             return t;
         }
 
@@ -610,7 +608,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t) && Helpers.IsNumericType(t2))
         {
-            CurrentMethod.IL.Emit(OpCodes.Add);
+            EmitAdd(CurrentMethod.IL, t);
             return t;
         }
 
@@ -673,7 +671,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t))
         {
-            CurrentMethod.IL.Emit(OpCodes.Sub);
+            EmitSub(CurrentMethod.IL, t);
             return t;
         }
 
@@ -703,7 +701,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t))
         {
-            CurrentMethod.IL.Emit(OpCodes.Rem);
+            EmitRem(CurrentMethod.IL, t);
             return t;
         }
 
@@ -792,7 +790,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsIntegerType(t))
         {
-            CurrentMethod.IL.Emit(OpCodes.Shr);
+            EmitShr(CurrentMethod.IL, t);
             return t;
         }
 
