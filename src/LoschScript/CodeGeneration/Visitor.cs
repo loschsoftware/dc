@@ -1164,7 +1164,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             var local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().Identifier()[0].GetText());
 
-            EmitLdlocOrLdloca(CurrentMethod.IL, local.Builder.LocalType, local.Index);
+            if (context.full_identifier().Identifier().Length > 1)
+                EmitLdloca(CurrentMethod.IL, local.Index); // Calling an instance method
+            else
+                EmitLdloc(CurrentMethod.IL, local.Index);
+
 
             type = local.Builder.LocalType;
 
@@ -1579,13 +1583,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         string text = context.GetText();
 
-        if (text.EndsWith("sb"))
+        if (text.EndsWith("sb", StringComparison.OrdinalIgnoreCase))
         {
             EmitLdcI4(CurrentMethod.IL, sbyte.Parse(text[0..^2].Replace("'", "")));
             return typeof(sbyte);
         }
 
-        if (text.EndsWith("b"))
+        if (text.EndsWith("b", StringComparison.OrdinalIgnoreCase))
         {
             text += "0";
 
@@ -1593,13 +1597,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(byte);
         }
 
-        if (text.EndsWith("us"))
+        if (text.EndsWith("us", StringComparison.OrdinalIgnoreCase))
         {
             EmitLdcI4(CurrentMethod.IL, ushort.Parse(text[0..^2].Replace("'", "")));
             return typeof(ushort);
         }
 
-        if (text.EndsWith("s"))
+        if (text.EndsWith("s", StringComparison.OrdinalIgnoreCase))
         {
             text += "0";
 
@@ -1607,13 +1611,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(short);
         }
 
-        if (text.EndsWith("ul"))
+        if (text.EndsWith("ul", StringComparison.OrdinalIgnoreCase))
         {
             CurrentMethod.IL.Emit(OpCodes.Ldc_I8, ulong.Parse(text[0..^2].Replace("'", "")));
             return typeof(ulong);
         }
 
-        if (text.EndsWith("u"))
+        if (text.EndsWith("u", StringComparison.OrdinalIgnoreCase))
         {
             text += "0";
 
@@ -1621,7 +1625,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(uint);
         }
 
-        if (text.EndsWith("l"))
+        if (text.EndsWith("l", StringComparison.OrdinalIgnoreCase))
         {
             text += "0";
 
@@ -1629,13 +1633,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(long);
         }
 
-        if (text.EndsWith("un"))
+        if (text.EndsWith("un", StringComparison.OrdinalIgnoreCase))
         {
             EmitLdcI4(CurrentMethod.IL, int.Parse(text[0..^2].Replace("'", "")));
             return typeof(nuint);
         }
 
-        if (text.EndsWith("n"))
+        if (text.EndsWith("n", StringComparison.OrdinalIgnoreCase))
         {
             text += "0";
 

@@ -115,12 +115,4 @@ internal static class EmitHelpers
         else
             generator.Emit(OpCodes.Ldloca, index);
     }
-
-    public static void EmitLdlocOrLdloca(ILGenerator generator, Type type, int index)
-    {
-        if (type.IsValueType)
-            EmitLdloca(generator, index);
-        else
-            EmitLdloc(generator, index);
-    }
 }
