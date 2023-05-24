@@ -141,6 +141,8 @@ internal class Program
         LogOut.WriteLine("Specifies the output assembly name, ignoring lsconfig.xml.");
         LogOut.Write("-optimize".PadRight(25).PadRight(50));
         LogOut.WriteLine("Applies IL optimizations to the assembly, ignoring lsconfig.xml.");
+        LogOut.Write("-ilout".PadRight(25).PadRight(50));
+        LogOut.WriteLine("Saves the generated CIL code to the disk in a human-readable format.");
         LogOut.WriteLine();
 
         Console.ForegroundColor = ConsoleColor.Yellow;

@@ -4,6 +4,7 @@ using LoschScript.Errors;
 using LoschScript.Meta;
 using LoschScript.Parser;
 using LoschScript.Unmanaged;
+using Microsoft.Build.Utilities;
 using System;
 using System.CodeDom;
 using System.Collections;
@@ -14,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Security.Cryptography.Xml;
 using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
@@ -63,6 +65,23 @@ internal static class Helpers
         }
 
         sw.Stop();
+
+        if (args.Any(a => a == "-ilout"))
+        {
+            string ildasm = ToolLocationHelper.GetPathToDotNetFrameworkSdkFile("ildasm.exe");
+
+            DirectoryInfo dir = Directory.CreateDirectory("cil");
+
+            ProcessStartInfo psi = new()
+            {
+                FileName = ildasm,
+                Arguments = $"{assembly} /out={Path.Combine(dir.FullName, Path.GetFileNameWithoutExtension(assembly) + ".il")}",
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+
+            Process.Start(psi);
+        }
 
         if (errors.Select(e => e.Length).Sum() == 0)
         {
