@@ -4,3 +4,4 @@ global using static LoschScript.Meta.MethodContext;
 global using static LoschScript.Errors.ErrorWriter;
 global using static LoschScript.Errors.ErrorKind;
 global using static LoschScript.CodeGeneration.Compiler;
+global using static LoschScript.CodeGeneration.EmitHelpers;

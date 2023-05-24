@@ -619,7 +619,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (t2 != typeof(string))
             {
                 CurrentMethod.IL.DeclareLocal(t2);
-                CurrentMethod.IL.Emit(OpCodes.Stloc, ++CurrentMethod.LocalIndex);
+                EmitStloc(CurrentMethod.IL, ++CurrentMethod.LocalIndex);
                 CurrentMethod.IL.Emit(OpCodes.Ldloca, CurrentMethod.LocalIndex);
 
                 MethodInfo toString = t2.GetMethod("ToString", Array.Empty<Type>());
@@ -632,7 +632,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
                 CurrentMethod.IL.DeclareLocal(t);
-                CurrentMethod.IL.Emit(OpCodes.Stloc, ++CurrentMethod.LocalIndex);
+                EmitStloc(CurrentMethod.IL, ++CurrentMethod.LocalIndex);
                 CurrentMethod.IL.Emit(OpCodes.Ldloca, CurrentMethod.LocalIndex);
 
                 MethodInfo toString = t.GetMethod("ToString", Array.Empty<Type>());
@@ -1166,10 +1166,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             var local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().Identifier()[0].GetText());
 
-            if (local.Builder.LocalType.IsValueType)
-                CurrentMethod.IL.Emit(OpCodes.Ldloca, local.Index);
-            else
-                CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
+            EmitLdlocOrLdloca(CurrentMethod.IL, local.Builder.LocalType, local.Index);
 
             type = local.Builder.LocalType;
 
@@ -1745,7 +1742,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 return type;
             }
 
-            CurrentMethod.IL.Emit(OpCodes.Stloc, local.Index);
+            EmitStloc(CurrentMethod.IL, local.Index);
 
             return local.Builder.LocalType;
         }
@@ -1770,7 +1767,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         CurrentMethod.Locals.Add((context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex));
 
-        CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
+        EmitStloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
 
         return t;
     }
@@ -2013,7 +2010,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
 
-            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
             if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
                 returnBuilder.SetLocalSymInfo(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
@@ -2068,7 +2065,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_1);
             CurrentMethod.IL.Emit(OpCodes.Add);
-            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+
 
             CurrentMethod.IL.MarkLabel(loop);
 
@@ -2092,7 +2090,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
 
-            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
             if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
                 returnBuilder.SetLocalSymInfo(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
