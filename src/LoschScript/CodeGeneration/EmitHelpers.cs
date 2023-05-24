@@ -79,7 +79,7 @@ internal static class EmitHelpers
     public static void EmitLdcI4(ILGenerator il, int value)
     {
         if (value >= -128 && value <= 127)
-            il.Emit(OpCodes.Ldc_I4_S, value);
+            il.Emit(OpCodes.Ldc_I4_S, (byte)value);
         else
             il.Emit(OpCodes.Ldc_I4, value);
     }
@@ -87,7 +87,7 @@ internal static class EmitHelpers
     public static void EmitLdcI4(ILGenerator il, uint value)
     {
         if (value <= 127)
-            il.Emit(OpCodes.Ldc_I4_S, value);
+            il.Emit(OpCodes.Ldc_I4_S, (byte)value);
         else
             il.Emit(OpCodes.Ldc_I4, value);
     }
@@ -95,7 +95,7 @@ internal static class EmitHelpers
     public static void EmitStloc(ILGenerator generator, int index)
     {
         if (index <= 255)
-            generator.Emit(OpCodes.Stloc_S, index);
+            generator.Emit(OpCodes.Stloc_S, (byte)index);
         else
             generator.Emit(OpCodes.Stloc, index);
     }
@@ -103,7 +103,7 @@ internal static class EmitHelpers
     public static void EmitLdloc(ILGenerator generator, int index)
     {
         if (index <= 255)
-            generator.Emit(OpCodes.Ldloc_S, index);
+            generator.Emit(OpCodes.Ldloc_S, (byte)index);
         else
             generator.Emit(OpCodes.Ldloc, index);
     }
@@ -111,7 +111,7 @@ internal static class EmitHelpers
     public static void EmitLdloca(ILGenerator generator, int index)
     {
         if (index <= 255)
-            generator.Emit(OpCodes.Ldloca_S, index);
+            generator.Emit(OpCodes.Ldloca_S, (byte)index);
         else
             generator.Emit(OpCodes.Ldloca, index);
     }
