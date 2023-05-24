@@ -5,6 +5,22 @@ namespace LoschScript.CodeGeneration;
 
 internal static class EmitHelpers
 {
+    public static void EmitLdcI4(ILGenerator il, int value)
+    {
+        if (value >= -128 && value <= 127)
+            il.Emit(OpCodes.Ldc_I4_S, value);
+        else
+            il.Emit(OpCodes.Ldc_I4, value);
+    }
+
+    public static void EmitLdcI4(ILGenerator il, uint value)
+    {
+        if (value <= 127)
+            il.Emit(OpCodes.Ldc_I4_S, value);
+        else
+            il.Emit(OpCodes.Ldc_I4, value);
+    }
+
     public static void EmitStloc(ILGenerator generator, int index)
     {
         if (index <= 255)

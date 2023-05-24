@@ -1583,7 +1583,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (text.EndsWith("sb"))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, sbyte.Parse(text[0..^2].Replace("'", "")));
+            EmitLdcI4(CurrentMethod.IL, sbyte.Parse(text[0..^2].Replace("'", "")));
             return typeof(sbyte);
         }
 
@@ -1591,13 +1591,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             text += "0";
 
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, byte.Parse(text[0..^2].Replace("'", "")));
+            EmitLdcI4(CurrentMethod.IL, byte.Parse(text[0..^2].Replace("'", "")));
             return typeof(byte);
         }
 
         if (text.EndsWith("us"))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, ushort.Parse(text[0..^2].Replace("'", "")));
+            EmitLdcI4(CurrentMethod.IL, ushort.Parse(text[0..^2].Replace("'", "")));
             return typeof(ushort);
         }
 
@@ -1605,7 +1605,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             text += "0";
 
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, short.Parse(text[0..^2].Replace("'", "")));
+            EmitLdcI4(CurrentMethod.IL, short.Parse(text[0..^2].Replace("'", "")));
             return typeof(short);
         }
 
@@ -1619,7 +1619,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             text += "0";
 
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, uint.Parse(text[0..^2].Replace("'", "")));
+            EmitLdcI4(CurrentMethod.IL, uint.Parse(text[0..^2].Replace("'", "")));
             return typeof(uint);
         }
 
@@ -1633,7 +1633,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (text.EndsWith("un"))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, int.Parse(text[0..^2].Replace("'", "")));
+            EmitLdcI4(CurrentMethod.IL, int.Parse(text[0..^2].Replace("'", "")));
             return typeof(nuint);
         }
 
@@ -1641,13 +1641,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             text += "0";
 
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, int.Parse(text[0..^2].Replace("'", "")));
+            EmitLdcI4(CurrentMethod.IL, int.Parse(text[0..^2].Replace("'", "")));
             return typeof(nint);
         }
 
         text += "00";
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_I4, int.Parse(text[0..^2].Replace("'", "")));
+        EmitLdcI4(CurrentMethod.IL, int.Parse(text[0..^2].Replace("'", "")));
         return typeof(int);
     }
 
@@ -1703,11 +1703,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         if (context.True() != null)
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_1);
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 1);
             return typeof(bool);
         }
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_I4_0);
+        CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 0);
 
         return typeof(bool);
     }
