@@ -187,7 +187,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (context.op.Text == "!=")
             {
-                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_0);
+                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 0);
                 CurrentMethod.IL.Emit(OpCodes.Ceq);
             }
 
@@ -262,7 +262,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (context.op.Text == "<=" || context.op.Text == ">=")
             {
-                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_0);
+                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 0);
                 CurrentMethod.IL.Emit(OpCodes.Ceq);
             }
 
@@ -357,7 +357,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (t == typeof(bool))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_0);
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 0);
             CurrentMethod.IL.Emit(OpCodes.Ceq);
 
             return t;
@@ -1856,14 +1856,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type arrayType = Visit(context.expression()[0]);
         CurrentMethod.IL.Emit(OpCodes.Pop);
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_I4, context.expression().Length);
+        EmitLdcI4(CurrentMethod.IL, context.expression().Length);
         CurrentMethod.IL.Emit(OpCodes.Newarr, arrayType);
 
         int index = 0;
         foreach (IParseTree tree in context.expression())
         {
             CurrentMethod.IL.Emit(OpCodes.Dup);
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4, index++);
+            EmitLdcI4(CurrentMethod.IL, index++);
             Type t = Visit(tree);
 
             if (t != arrayType)
@@ -1960,7 +1960,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         Visit(context.integer_atom());
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_I4, context.Caret() == null ? 0 : 1);
+        CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, context.Caret() == null ? 0 : 1);
 
         CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Index).GetConstructor(new Type[] { typeof(int), typeof(bool) }));
         return typeof(Index);
@@ -2063,7 +2063,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
 
             CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_1);
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 1);
             CurrentMethod.IL.Emit(OpCodes.Add);
             EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
