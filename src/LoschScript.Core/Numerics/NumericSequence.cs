@@ -50,6 +50,20 @@ public static class NumericSequence
     }
 
     /// <summary>
+    /// Computes the sum of an array of integers.
+    /// </summary>
+    /// <param name="array">The array of which to compute the sum.</param>
+    /// <returns>The sum of the array elements.</returns>
+    public static int sum(int[] array) => array.Sum();
+
+    /// <summary>
+    /// Computes the product of all array elements.
+    /// </summary>
+    /// <param name="array">The array of which to compute the product.</param>
+    /// <returns>The product of the array elements.</returns>
+    public static int product(int[] array) => array.Aggregate(1, (a, b) => a * b);
+
+    /// <summary>
     /// Creates a sequence of numbers ranging from 0 to the specified end.
     /// </summary>
     /// <param name="end">The last number of the sequence.</param>
