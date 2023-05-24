@@ -1153,6 +1153,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
 
         Type t = Visit(context.expression());
+
+        if (t.IsValueType)
+        {
+            CurrentMethod.IL.DeclareLocal(t);
+            CurrentMethod.LocalIndex++;
+            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
+            EmitLdloca(CurrentMethod.IL, CurrentMethod.LocalIndex);
+        }
+
         return GetMember(t, context.Identifier().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
     }
 
