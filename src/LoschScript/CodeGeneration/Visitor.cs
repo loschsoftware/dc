@@ -1613,7 +1613,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (text.EndsWith("ul", StringComparison.OrdinalIgnoreCase))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I8, ulong.Parse(text[0..^2].Replace("'", "")));
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I8, long.Parse(text[0..^2].Replace("'", "")));
             return typeof(ulong);
         }
 
