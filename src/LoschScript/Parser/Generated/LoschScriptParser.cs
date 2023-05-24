@@ -2573,24 +2573,24 @@ public partial class LoschScriptParser : Parser {
 				break;
 			case 4:
 				{
-				_localctx = new Logical_negation_expressionContext(_localctx);
+				_localctx = new Bitwise_complement_expressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
 				State = 233;
-				Match(Exclamation_Mark);
+				Match(Tilde);
 				State = 234;
-				expression(42);
+				expression(44);
 				}
 				break;
 			case 5:
 				{
-				_localctx = new Bitwise_complement_expressionContext(_localctx);
+				_localctx = new Logical_negation_expressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
 				State = 235;
-				Match(Tilde);
+				Match(Exclamation_Mark);
 				State = 236;
-				expression(34);
+				expression(41);
 				}
 				break;
 			case 6:
@@ -3061,7 +3061,7 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Array_element_assignmentContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 365;
-						if (!(Precpred(Context, 44))) throw new FailedPredicateException(this, "Precpred(Context, 44)");
+						if (!(Precpred(Context, 43))) throw new FailedPredicateException(this, "Precpred(Context, 43)");
 						State = 366;
 						Match(At_Sign);
 						State = 367;
@@ -3069,7 +3069,7 @@ public partial class LoschScriptParser : Parser {
 						State = 368;
 						Match(Equals);
 						State = 369;
-						expression(45);
+						expression(44);
 						}
 						break;
 					case 2:
@@ -3077,11 +3077,11 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Power_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 371;
-						if (!(Precpred(Context, 43))) throw new FailedPredicateException(this, "Precpred(Context, 43)");
+						if (!(Precpred(Context, 42))) throw new FailedPredicateException(this, "Precpred(Context, 42)");
 						State = 372;
 						Match(Double_Asterisk);
 						State = 373;
-						expression(44);
+						expression(43);
 						}
 						break;
 					case 3:
@@ -3089,11 +3089,11 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Multiply_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 374;
-						if (!(Precpred(Context, 41))) throw new FailedPredicateException(this, "Precpred(Context, 41)");
+						if (!(Precpred(Context, 40))) throw new FailedPredicateException(this, "Precpred(Context, 40)");
 						State = 375;
 						Match(Asterisk);
 						State = 376;
-						expression(42);
+						expression(41);
 						}
 						break;
 					case 4:
@@ -3101,11 +3101,11 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Divide_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 377;
-						if (!(Precpred(Context, 40))) throw new FailedPredicateException(this, "Precpred(Context, 40)");
+						if (!(Precpred(Context, 39))) throw new FailedPredicateException(this, "Precpred(Context, 39)");
 						State = 378;
 						Match(Slash);
 						State = 379;
-						expression(41);
+						expression(40);
 						}
 						break;
 					case 5:
@@ -3113,11 +3113,11 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Remainder_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 380;
-						if (!(Precpred(Context, 39))) throw new FailedPredicateException(this, "Precpred(Context, 39)");
+						if (!(Precpred(Context, 38))) throw new FailedPredicateException(this, "Precpred(Context, 38)");
 						State = 381;
 						Match(Percent);
 						State = 382;
-						expression(40);
+						expression(39);
 						}
 						break;
 					case 6:
@@ -3125,11 +3125,11 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Addition_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 383;
-						if (!(Precpred(Context, 38))) throw new FailedPredicateException(this, "Precpred(Context, 38)");
+						if (!(Precpred(Context, 37))) throw new FailedPredicateException(this, "Precpred(Context, 37)");
 						State = 384;
 						Match(Plus);
 						State = 385;
-						expression(39);
+						expression(38);
 						}
 						break;
 					case 7:
@@ -3137,11 +3137,11 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Subtraction_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 386;
-						if (!(Precpred(Context, 37))) throw new FailedPredicateException(this, "Precpred(Context, 37)");
+						if (!(Precpred(Context, 36))) throw new FailedPredicateException(this, "Precpred(Context, 36)");
 						State = 387;
 						Match(Minus);
 						State = 388;
-						expression(38);
+						expression(37);
 						}
 						break;
 					case 8:
@@ -3149,11 +3149,11 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Left_shift_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 389;
-						if (!(Precpred(Context, 36))) throw new FailedPredicateException(this, "Precpred(Context, 36)");
+						if (!(Precpred(Context, 35))) throw new FailedPredicateException(this, "Precpred(Context, 35)");
 						State = 390;
 						Match(Double_Less_Than);
 						State = 391;
-						expression(37);
+						expression(36);
 						}
 						break;
 					case 9:
@@ -3161,11 +3161,11 @@ public partial class LoschScriptParser : Parser {
 						_localctx = new Right_shift_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 392;
-						if (!(Precpred(Context, 35))) throw new FailedPredicateException(this, "Precpred(Context, 35)");
+						if (!(Precpred(Context, 34))) throw new FailedPredicateException(this, "Precpred(Context, 34)");
 						State = 393;
 						Match(Double_Greater_Than);
 						State = 394;
-						expression(36);
+						expression(35);
 						}
 						break;
 					case 10:
@@ -5332,15 +5332,15 @@ public partial class LoschScriptParser : Parser {
 	}
 	private bool expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
-		case 0: return Precpred(Context, 44);
-		case 1: return Precpred(Context, 43);
-		case 2: return Precpred(Context, 41);
-		case 3: return Precpred(Context, 40);
-		case 4: return Precpred(Context, 39);
-		case 5: return Precpred(Context, 38);
-		case 6: return Precpred(Context, 37);
-		case 7: return Precpred(Context, 36);
-		case 8: return Precpred(Context, 35);
+		case 0: return Precpred(Context, 43);
+		case 1: return Precpred(Context, 42);
+		case 2: return Precpred(Context, 40);
+		case 3: return Precpred(Context, 39);
+		case 4: return Precpred(Context, 38);
+		case 5: return Precpred(Context, 37);
+		case 6: return Precpred(Context, 36);
+		case 7: return Precpred(Context, 35);
+		case 8: return Precpred(Context, 34);
 		case 9: return Precpred(Context, 33);
 		case 10: return Precpred(Context, 32);
 		case 11: return Precpred(Context, 31);
@@ -5458,8 +5458,8 @@ public partial class LoschScriptParser : Parser {
 		218,1,0,0,0,220,223,1,0,0,0,221,219,1,0,0,0,221,222,1,0,0,0,222,225,1,
 		0,0,0,223,221,1,0,0,0,224,178,1,0,0,0,224,203,1,0,0,0,225,17,1,0,0,0,226,
 		227,6,9,-1,0,227,229,3,14,7,0,228,230,3,62,31,0,229,228,1,0,0,0,229,230,
-		1,0,0,0,230,364,1,0,0,0,231,364,3,14,7,0,232,364,5,90,0,0,233,234,5,43,
-		0,0,234,364,3,18,9,42,235,236,5,80,0,0,236,364,3,18,9,34,237,238,5,69,
+		1,0,0,0,230,364,1,0,0,0,231,364,3,14,7,0,232,364,5,90,0,0,233,234,5,80,
+		0,0,234,364,3,18,9,44,235,236,5,43,0,0,236,364,3,18,9,41,237,238,5,69,
 		0,0,238,364,3,18,9,26,239,240,5,49,0,0,240,364,5,90,0,0,241,242,5,50,0,
 		0,242,364,3,18,9,24,243,245,7,0,0,0,244,243,1,0,0,0,244,245,1,0,0,0,245,
 		246,1,0,0,0,246,249,5,90,0,0,247,248,5,38,0,0,248,250,3,40,20,0,249,247,
@@ -5498,14 +5498,14 @@ public partial class LoschScriptParser : Parser {
 		0,0,0,363,253,1,0,0,0,363,257,1,0,0,0,363,259,1,0,0,0,363,265,1,0,0,0,
 		363,275,1,0,0,0,363,278,1,0,0,0,363,288,1,0,0,0,363,291,1,0,0,0,363,298,
 		1,0,0,0,363,305,1,0,0,0,363,319,1,0,0,0,363,331,1,0,0,0,363,341,1,0,0,
-		0,363,362,1,0,0,0,364,442,1,0,0,0,365,366,10,44,0,0,366,367,5,46,0,0,367,
-		368,3,18,9,0,368,369,5,79,0,0,369,370,3,18,9,45,370,441,1,0,0,0,371,372,
-		10,43,0,0,372,373,5,73,0,0,373,441,3,18,9,44,374,375,10,41,0,0,375,376,
-		5,71,0,0,376,441,3,18,9,42,377,378,10,40,0,0,378,379,5,75,0,0,379,441,
-		3,18,9,41,380,381,10,39,0,0,381,382,5,77,0,0,382,441,3,18,9,40,383,384,
-		10,38,0,0,384,385,5,67,0,0,385,441,3,18,9,39,386,387,10,37,0,0,387,388,
-		5,69,0,0,388,441,3,18,9,38,389,390,10,36,0,0,390,391,5,83,0,0,391,441,
-		3,18,9,37,392,393,10,35,0,0,393,394,5,85,0,0,394,441,3,18,9,36,395,396,
+		0,363,362,1,0,0,0,364,442,1,0,0,0,365,366,10,43,0,0,366,367,5,46,0,0,367,
+		368,3,18,9,0,368,369,5,79,0,0,369,370,3,18,9,44,370,441,1,0,0,0,371,372,
+		10,42,0,0,372,373,5,73,0,0,373,441,3,18,9,43,374,375,10,40,0,0,375,376,
+		5,71,0,0,376,441,3,18,9,41,377,378,10,39,0,0,378,379,5,75,0,0,379,441,
+		3,18,9,40,380,381,10,38,0,0,381,382,5,77,0,0,382,441,3,18,9,39,383,384,
+		10,37,0,0,384,385,5,67,0,0,385,441,3,18,9,38,386,387,10,36,0,0,387,388,
+		5,69,0,0,388,441,3,18,9,37,389,390,10,35,0,0,390,391,5,83,0,0,391,441,
+		3,18,9,36,392,393,10,34,0,0,393,394,5,85,0,0,394,441,3,18,9,35,395,396,
 		10,33,0,0,396,397,7,1,0,0,397,441,3,18,9,34,398,399,10,32,0,0,399,400,
 		7,2,0,0,400,441,3,18,9,33,401,402,10,31,0,0,402,403,5,57,0,0,403,441,3,
 		18,9,32,404,405,10,30,0,0,405,406,5,58,0,0,406,441,3,18,9,31,407,408,10,
