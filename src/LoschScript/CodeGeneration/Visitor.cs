@@ -1118,6 +1118,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return parameterlessFunc.ReturnType;
         }
 
+        MethodInfo property = type.GetMethod($"get_{name}");
+        if (property != null)
+        {
+            CurrentMethod.IL.EmitCall(OpCodes.Call, property, null);
+            return property.ReturnType;
+        }
+
         FieldInfo f = type.GetField(name);
         if (f != null)
         {
@@ -1130,7 +1137,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 line,
                 column,
                 LS0039_FieldNotFound,
-                $"The type \"{type.Name}\" does not contain a field called \"{name}\".");
+                $"The type \"{type.Name}\" does not contain a field or property called \"{name}\".");
 
             return typeof(void);
         }
