@@ -229,7 +229,7 @@ internal static class Helpers
                 row,
                 col,
                 LS0009_TypeNotFound,
-                $"The type \"{name}\" could not be found.");
+                $"The name \"{name}\" could not be resolved.");
         }
 
         return type;
