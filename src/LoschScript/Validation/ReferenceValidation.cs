@@ -9,7 +9,7 @@ internal class ReferenceValidation
     public static Reference[] ValidateReferences(Reference[] references)
     {
         if (references == null)
-            return references;
+            return new Reference[] { };
 
         List<Reference> valid = new();
 

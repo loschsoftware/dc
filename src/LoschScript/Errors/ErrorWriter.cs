@@ -12,6 +12,11 @@ namespace LoschScript.Errors;
 /// </summary>
 public static class ErrorWriter
 {
+    static ErrorWriter()
+    {
+        CurrentFile ??= new("");
+    }
+
     internal static readonly List<ErrorInfo> messages = new();
 
     /// <summary>

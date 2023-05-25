@@ -1,21 +1,17 @@
-﻿using Antlr4.Runtime.Misc;
-using Losch.LoschScript.Configuration;
+﻿using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Meta;
-using LoschScript.Parser;
+using LoschScript.Shell;
 using LoschScript.Unmanaged;
 using Microsoft.Build.Utilities;
 using System;
-using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Security.Cryptography.Xml;
 using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
@@ -180,6 +176,7 @@ internal static class Helpers
 
     public static int StartReplSession()
     {
+        LShell.Start();
         return 0;
     }
 
