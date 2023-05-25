@@ -1116,14 +1116,22 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         MethodInfo parameterlessFunc = type.GetMethod(name, Array.Empty<Type>());
         if (parameterlessFunc != null)
         {
-            CurrentMethod.IL.EmitCall(OpCodes.Call, parameterlessFunc, null);
+            if (parameterlessFunc.IsStatic || type.IsValueType)
+                CurrentMethod.IL.EmitCall(OpCodes.Call, parameterlessFunc, null);
+            else
+                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, parameterlessFunc, null);
+
             return parameterlessFunc.ReturnType;
         }
 
         MethodInfo property = type.GetMethod($"get_{name}");
         if (property != null)
         {
-            CurrentMethod.IL.EmitCall(OpCodes.Call, property, null);
+            if (property.IsStatic || type.IsValueType)
+                CurrentMethod.IL.EmitCall(OpCodes.Call, property, null);
+            else
+                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, property, null);
+
             return property.ReturnType;
         }
 
