@@ -1094,7 +1094,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (m != null)
             {
-                CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
+                if (m.IsStatic || type.IsValueType)
+                    CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
+                else
+                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
+
                 return m.ReturnType;
             }
             else
@@ -1917,7 +1921,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         MethodInfo indexer = t1.GetMethod("get_Item", new Type[] { t2 });
         if (indexer != null)
         {
-            CurrentMethod.IL.EmitCall(OpCodes.Call, indexer, null);
+            CurrentMethod.IL.EmitCall(OpCodes.Callvirt, indexer, null);
             return indexer.ReturnType;
         }
 
