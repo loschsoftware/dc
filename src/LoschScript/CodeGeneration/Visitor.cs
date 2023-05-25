@@ -1177,11 +1177,10 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             var local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().Identifier()[0].GetText());
 
-            if (context.full_identifier().Identifier().Length > 1)
-                EmitLdloca(CurrentMethod.IL, local.Index); // Calling an instance method
+            if (local.Builder.LocalType.IsValueType)
+                EmitLdloca(CurrentMethod.IL, local.Index);
             else
                 EmitLdloc(CurrentMethod.IL, local.Index);
-
 
             type = local.Builder.LocalType;
 
