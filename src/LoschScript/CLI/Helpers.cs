@@ -19,7 +19,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
@@ -28,6 +27,10 @@ internal static class Helpers
 {
     public static int EmitFragments(string[] args)
     {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Warning: 'emit-fragments' does not emit fragments for types. To emit all fragments, use the '-fragments' switch and compile the files normally.\r\n");
+        Console.ForegroundColor = ConsoleColor.Gray;
+
         Stopwatch sw = new();
         sw.Start();
 
