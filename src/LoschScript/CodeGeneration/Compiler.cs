@@ -1,5 +1,6 @@
 ﻿using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
+using LoschScript.Text.FragmentStore;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -4,6 +4,7 @@ using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Meta;
 using LoschScript.Parser;
+using LoschScript.Text.FragmentStore;
 using LoschScript.Validation;
 using System.IO;
 using System.Linq;
@@ -38,7 +39,12 @@ internal static class FileCompiler
         Visitor v = new();
         v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
 
-        //LogOut.WriteLine($"\r\nCompilation of source file '{path}' {(CurrentFile.Errors.Any() ? "failed" : "successful")}.");
+        FragmentList.Files.Add(new()
+        {
+            FilePath = path,
+            Fragments = CurrentFile.Fragments
+        });
+
         return CurrentFile.Errors.ToArray();
     }
 }
