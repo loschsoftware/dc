@@ -1,4 +1,5 @@
 ﻿using Losch.LoschScript.Configuration;
+using LoschScript.Text.FragmentStore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;

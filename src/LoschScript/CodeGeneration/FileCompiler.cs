@@ -45,13 +45,17 @@ internal static class FileCompiler
         {
             FragmentBuilder builder = new();
             ParseTreeWalker.Default?.Walk(builder, compilationUnit);
-        }
 
-        FragmentList.Files.Add(new()
-        {
-            FilePath = path,
-            Fragments = CurrentFile.Fragments
-        });
+            string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "LoschScript", "Fragments")).FullName;
+
+            FileFragment ffrag = new()
+            {
+                FilePath = path,
+                Fragments = CurrentFile.Fragments
+            };
+
+            FragmentSerializer.Serialize(Path.Combine(dir, $"{Path.GetFileName(path)}.xml"), ffrag);
+        }
 
         return CurrentFile.Errors.ToArray();
     }

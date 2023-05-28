@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LoschScript.Text.FragmentStore;
 
 /// <summary>
 /// Represents a list of fragments belonging to a file.
 /// </summary>
+[Serializable]
 public struct FileFragment
 {
     /// <summary>
