@@ -20,7 +20,6 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Xml.Serialization;
-using File = System.IO.File;
 
 namespace LoschScript.CLI;
 
@@ -44,6 +43,8 @@ internal static class Helpers
             FragmentBuilder builder = new();
             ParseTreeWalker.Default?.Walk(builder, compilationUnit);
         }
+
+        Console.WriteLine("Fragment emission successful.");
 
         return 0;
     }

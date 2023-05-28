@@ -5,3 +5,8 @@ global using static LoschScript.Errors.ErrorWriter;
 global using static LoschScript.Errors.ErrorKind;
 global using static LoschScript.CodeGeneration.Compiler;
 global using static LoschScript.CodeGeneration.EmitHelpers;
+global using File = System.IO.File;
+global using Directory = System.IO.Directory;
+global using DirectoryInfo = System.IO.DirectoryInfo;
+global using SearchOption = System.IO.SearchOption;
+global using Path = System.IO.Path;
