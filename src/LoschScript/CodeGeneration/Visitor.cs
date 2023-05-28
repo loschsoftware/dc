@@ -1209,6 +1209,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 return type;
             }
 
+            if (local.Builder.LocalType.IsValueType)
+                EmitLdloca(CurrentMethod.IL, local.Index);
+            else
+                EmitLdloc(CurrentMethod.IL, local.Index);
+        }
+        else
+        {
             CurrentFile.Fragments.Add(new()
             {
                 Line = context.full_identifier().Identifier().Last().Symbol.Line,
@@ -1217,13 +1224,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Color = Color.Function
             });
 
-            if (local.Builder.LocalType.IsValueType)
-                EmitLdloca(CurrentMethod.IL, local.Index);
-            else
-                EmitLdloc(CurrentMethod.IL, local.Index);
-        }
-        else
-        {
             if (context.full_identifier().Identifier().Length == 1)
             {
                 // Global Method (Type Import)
