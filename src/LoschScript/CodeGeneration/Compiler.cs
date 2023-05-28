@@ -50,8 +50,9 @@ public static class Compiler
     /// </summary>
     /// <param name="sourceFiles">An array of paths to the files to compile.</param>
     /// <param name="config">Optional configuration for the compiler.</param>
+    /// <param name="emitFragmentInfo">Decides wheter to emit syntax highlighting fragments.</param>
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
-    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, LSConfig config = null)
+    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, LSConfig config = null, bool emitFragmentInfo = false)
     {
         LogOut.WriteLine("Compiling files...");
 
@@ -73,7 +74,7 @@ public static class Compiler
         List<ErrorInfo[]> errors = new();
 
         foreach (string file in sourceFiles)
-            errors.Add(FileCompiler.CompileSingleFile(file, cfg));
+            errors.Add(FileCompiler.CompileSingleFile(file, cfg, emitFragmentInfo));
 
         return errors;
     }

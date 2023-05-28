@@ -14,13 +14,14 @@ internal class Program
             return args switch
             {
                 ["config"] => Helpers.BuildLSConfig(),
-                ["build"] => Helpers.CompileAll(),
+                ["build", ..] => Helpers.CompileAll(args[1..]),
                 ["interactive" or "repl"] => Helpers.StartReplSession(),
                 ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
                 ["make" or "new", ..] => LSTemplates.CreateStructure(args),
                 ["watch" or "auto"] => WatchForFileChanges(),
                 ["call", ..] => Helpers.CallMethod(args),
                 ["-watch-indefinetly"] => WatchIndefinetly(),
+                ["-generate-fragments"] => Helpers.EmitFragments(args),
                 ["quit"] => QuitWatching(),
                 [] or ["help" or "?"] => DisplayHelpMessage(),
                 _ => Helpers.HandleArgs(args)

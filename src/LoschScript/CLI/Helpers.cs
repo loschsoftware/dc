@@ -1,10 +1,16 @@
-﻿using Losch.LoschScript.Configuration;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
+using Losch.LoschScript.Configuration;
+using LoschScript.CodeGeneration.SymbolEmission;
 using LoschScript.Errors;
 using LoschScript.Meta;
+using LoschScript.Parser;
 using LoschScript.Shell;
+using LoschScript.Text;
 using LoschScript.Text.Tooltips;
 using LoschScript.Unmanaged;
 using Microsoft.Build.Utilities;
+using Microsoft.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,11 +20,34 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Xml.Serialization;
+using File = System.IO.File;
 
 namespace LoschScript.CLI;
 
 internal static class Helpers
 {
+    public static int EmitFragments(string[] args)
+    {
+        foreach (string path in args.Where(File.Exists))
+        {
+            string source = File.ReadAllText(path);
+
+            ICharStream charStream = CharStreams.fromString(source);
+            ITokenSource lexer = new LoschScriptLexer(charStream);
+            ITokenStream tokens = new CommonTokenStream(lexer);
+
+            LoschScriptParser parser = new(tokens);
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(new SyntaxErrorListener());
+
+            IParseTree compilationUnit = parser.compilation_unit();
+            FragmentBuilder builder = new();
+            ParseTreeWalker.Default?.Walk(builder, compilationUnit);
+        }
+
+        return 0;
+    }
+
     public static int HandleArgs(string[] args)
     {
         Stopwatch sw = new();
@@ -44,7 +73,7 @@ internal static class Helpers
 
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
-        IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
+        IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config, args.Any(a => a == "-fragments"));
 
         Context.Assembly.DefineVersionInfoResource(
             Context.Configuration.Product,
@@ -80,6 +109,15 @@ internal static class Helpers
             Process.Start(psi);
         }
 
+        if (args.Any(a => a == "-viewfrags"))
+        {
+            Console.WriteLine();
+            Console.WriteLine("Fragments:");
+
+            foreach (Fragment frag in CurrentFile.Fragments)
+                Console.WriteLine($"Line: {frag.Line}, Column: {frag.Column}, Length: {frag.Length}, Color: {frag.Color}");
+        }
+
         if (errors.Select(e => e.Length).Sum() == 0)
         {
             Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
@@ -100,51 +138,10 @@ internal static class Helpers
         return -1;
     }
 
-    public static int CompileAll()
+    public static int CompileAll(string[] args)
     {
         string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ls", SearchOption.AllDirectories).ToArray();
-
-        LSConfig config = null;
-
-        if (File.Exists("lsconfig.xml"))
-        {
-            XmlSerializer xmls = new(typeof(LSConfig));
-            using StreamReader sr = new("lsconfig.xml");
-            config = (LSConfig)xmls.Deserialize(sr);
-        }
-
-        config ??= new();
-        config.AssemblyName ??= Path.GetFileNameWithoutExtension(filesToCompile.Where(File.Exists).First());
-
-        string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
-
-        IEnumerable<ErrorInfo[]> errors = CompileSource(filesToCompile, config);
-
-        if (errors.Select(e => e.Length).Sum() == 0)
-        {
-            Context.Assembly.DefineVersionInfoResource(
-            Context.Configuration.Product,
-            Context.Configuration.Version,
-            Context.Configuration.Company,
-            Context.Configuration.Copyright,
-            Context.Configuration.Trademark);
-
-            Context.Assembly.Save(assembly);
-
-            if (File.Exists(Context.Configuration.ApplicationIcon))
-            {
-                if (!Win32Helpers.SetIcon(assembly, Context.Configuration.ApplicationIcon))
-                    EmitWarningMessage(0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
-            }
-
-            Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
-            return 0;
-        }
-
-        int count = errors.Select(e => e.Length).Sum();
-
-        Console.WriteLine($"\r\nCompilation failed with {count} error{(count > 1 ? "s" : "")}.");
-        return -1;
+        return HandleArgs(filesToCompile.Concat(args).ToArray());
     }
 
     public static int InterpretFiles(string[] args)
