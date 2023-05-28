@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace LoschScript.Text.Tooltips;

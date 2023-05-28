@@ -1,8 +1,11 @@
-﻿namespace LoschScript.Text;
+﻿using System;
+
+namespace LoschScript.Text;
 
 /// <summary>
 /// A list of color types commonly used by an editor. In LSEdit, these correspond to the colors of the current editor theme.
 /// </summary>
+[Serializable]
 public enum Color : byte
 {
     /// <summary>

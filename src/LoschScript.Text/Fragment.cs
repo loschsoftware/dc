@@ -6,6 +6,7 @@ namespace LoschScript.Text;
 /// <summary>
 /// Represents a fragment of text in an editor. Used for context-specific syntax highlighting.
 /// </summary>
+[Serializable]
 public struct Fragment : IEquatable<Fragment>
 {
     /// <summary>

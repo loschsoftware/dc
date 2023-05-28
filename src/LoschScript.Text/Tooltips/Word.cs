@@ -1,8 +1,11 @@
-﻿namespace LoschScript.Text.Tooltips;
+﻿using System;
+
+namespace LoschScript.Text.Tooltips;
 
 /// <summary>
 /// Represents a word as a <see cref="LoschScript.Text.Fragment"/> combined with a string of text.
 /// </summary>
+[Serializable]
 public struct Word
 {
     /// <summary>
