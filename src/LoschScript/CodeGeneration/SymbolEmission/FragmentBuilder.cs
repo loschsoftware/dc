@@ -31,6 +31,19 @@ internal class FragmentBuilder : LoschScriptParserBaseListener
 
     public override void EnterFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
+        if (context.full_identifier().Identifier().Length == 1)
+        {
+            CurrentFile.Fragments.Add(new()
+            {
+                Line = context.full_identifier().Identifier().Last().Symbol.Line,
+                Column = context.full_identifier().Identifier().Last().Symbol.Column,
+                Length = context.full_identifier().Identifier().Last().GetText().Length,
+                Color = Color.LocalValue
+            });
+
+            return;
+        }
+
         CurrentFile.Fragments.Add(new()
         {
             Line = context.full_identifier().Identifier().Last().Symbol.Line,

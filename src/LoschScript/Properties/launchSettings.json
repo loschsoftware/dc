@@ -1,6 +1,10 @@
 {
   "profiles": {
-    "LoschScript": {
+    "emit-fragments": {
+      "commandName": "Project",
+      "commandLineArgs": "emit-fragments code.txt"
+    },
+    "default": {
       "commandName": "Project",
       "commandLineArgs": "code.txt"
     }
