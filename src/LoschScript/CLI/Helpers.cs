@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
@@ -27,6 +28,9 @@ internal static class Helpers
 {
     public static int EmitFragments(string[] args)
     {
+        Stopwatch sw = new();
+        sw.Start();
+
         foreach (string path in args.Where(File.Exists))
         {
             Context = new();
@@ -52,6 +56,11 @@ internal static class Helpers
 
         foreach (Fragment frag in CurrentFile.Fragments)
             Console.WriteLine($"Line: {frag.Line}, Column: {frag.Column}, Length: {frag.Length}, Color: {frag.Color}");
+
+        sw.Stop();
+
+        if (args.Any(a => a == "-elapsed"))
+            Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds}ms");
 
         return 0;
     }
