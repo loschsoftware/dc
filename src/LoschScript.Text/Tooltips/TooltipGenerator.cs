@@ -70,7 +70,12 @@ public static class TooltipGenerator
         Text = $"{text}"
     };
 
-    internal static Color ColorForType(TypeInfo type)
+    /// <summary>
+    /// Returns the appropriate <see cref="Color"/> for the specified type.
+    /// </summary>
+    /// <param name="type">The type to get a color for.</param>
+    /// <returns>The appropriate color.</returns>
+    public static Color ColorForType(TypeInfo type)
     {
         if (type.IsInterface)
             return Color.TemplateType;
