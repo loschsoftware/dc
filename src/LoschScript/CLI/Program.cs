@@ -20,7 +20,7 @@ internal class Program
                 ["make" or "new", ..] => LSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => WatchForFileChanges(args),
                 ["call", ..] => Helpers.CallMethod(args),
-                ["-watch-indefinetly"] => WatchIndefinetly(),
+                ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
                 ["emit-fragments", ..] => Helpers.EmitFragments(args),
                 ["quit"] => QuitWatching(),
                 [] or ["help" or "?"] => DisplayHelpMessage(),
