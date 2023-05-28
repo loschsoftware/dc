@@ -18,7 +18,7 @@ internal class Program
                 ["interactive" or "repl"] => Helpers.StartReplSession(),
                 ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
                 ["make" or "new", ..] => LSTemplates.CreateStructure(args),
-                ["watch" or "auto"] => WatchForFileChanges(),
+                ["watch" or "auto", ..] => WatchForFileChanges(args),
                 ["call", ..] => Helpers.CallMethod(args),
                 ["-watch-indefinetly"] => WatchIndefinetly(),
                 ["emit-fragments", ..] => Helpers.EmitFragments(args),
@@ -43,8 +43,10 @@ internal class Program
 
     static Process watchProcess = null;
 
-    static int WatchForFileChanges()
+    static int WatchForFileChanges(string[] args)
     {
+        string _args = string.Join(" ", args);
+
         LogOut.Write("Watching file changes. Use ");
 
         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -55,7 +57,7 @@ internal class Program
 
         watchProcess = new Process();
         watchProcess.StartInfo.FileName = "lsc.exe";
-        watchProcess.StartInfo.Arguments = "build";
+        watchProcess.StartInfo.Arguments = $"build {_args}";
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;
         watchProcess.Start();
@@ -84,7 +86,7 @@ internal class Program
         return 0;
     }
 
-    static int WatchIndefinetly()
+    static int WatchIndefinetly(string args)
     {
         while (true)
         {
@@ -94,15 +96,17 @@ internal class Program
                 IncludeSubdirectories = true
             };
 
+            string cmd = $"build {args}";
+
             watcher.Changed += Compile;
             watcher.Created += Compile;
             watcher.Deleted += Compile;
 
-            static void Compile(object sender, FileSystemEventArgs e)
+            void Compile(object sender, FileSystemEventArgs e)
             {
                 var buildProcess = new Process();
                 buildProcess.StartInfo.FileName = "lsc.exe";
-                buildProcess.StartInfo.Arguments = "build";
+                buildProcess.StartInfo.Arguments = cmd;
                 buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 buildProcess.Start();
                 buildProcess.WaitForExit();
