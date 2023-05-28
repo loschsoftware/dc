@@ -3,6 +3,7 @@ using Antlr4.Runtime.Tree;
 using LoschScript.CLI;
 using LoschScript.Meta;
 using LoschScript.Parser;
+using LoschScript.Text;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -1155,6 +1156,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
     {
+        CurrentFile.Fragments.Add(new()
+        {
+            Line = context.Identifier().Symbol.Line,
+            Column = context.Identifier().Symbol.Column,
+            Length = context.Identifier().GetText().Length,
+            Color = Color.Function
+        });
+
         // Check for local of this name
         if (CurrentMethod.Locals.Any(l => l.Name == context.Identifier().GetText()))
         {
@@ -1179,6 +1188,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
+        CurrentFile.Fragments.Add(new()
+        {
+            Line = context.full_identifier().Identifier().Last().Symbol.Line,
+            Column = context.full_identifier().Identifier().Last().Symbol.Column,
+            Length = context.full_identifier().Identifier().Last().GetText().Length,
+            Color = Color.Function
+        });
+
         Type type;
         // Check for local of this name
         if (CurrentMethod.Locals.Any(l => l.Name == context.full_identifier().Identifier()[0].GetText()))
@@ -1738,6 +1755,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context)
     {
+        CurrentFile.Fragments.Add(new()
+        {
+            Line = context.Identifier().Symbol.Line,
+            Column = context.Identifier().Symbol.Column,
+            Length = context.Identifier().GetText().Length,
+            Color = context.Var() == null ? Color.LocalValue : Color.LocalVariable
+        });
+
         if (CurrentMethod.Locals.Any(e => e.Name == context.Identifier().GetText()))
         {
             var local = CurrentMethod.Locals.Where(e => e.Name == context.Identifier().GetText()).First();

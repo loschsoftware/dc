@@ -1,4 +1,5 @@
 ﻿using LoschScript.Errors;
+using LoschScript.Text;
 using System;
 using System.Collections.Generic;
 
@@ -17,6 +18,8 @@ internal class FileContext
     public TypeRegistry AvailableTypes { get; }
 
     public string Path { get; }
+
+    public List<Fragment> Fragments { get; } = new();
 
     public List<string> Imports { get; } = new()
     {

@@ -2,6 +2,7 @@
 using LoschScript.Errors;
 using LoschScript.Meta;
 using LoschScript.Shell;
+using LoschScript.Text.Tooltips;
 using LoschScript.Unmanaged;
 using Microsoft.Build.Utilities;
 using System;
@@ -246,6 +247,16 @@ internal static class Helpers
                 col,
                 LS0009_TypeNotFound,
                 $"The name '{name}' could not be resolved.");
+        }
+        else
+        {
+            CurrentFile.Fragments.Add(new()
+            {
+                Line = row,
+                Column = col,
+                Length = name.Length,
+                Color = TooltipGenerator.ColorForType(type.GetTypeInfo())
+            });
         }
 
         return type;

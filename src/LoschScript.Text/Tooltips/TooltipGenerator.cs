@@ -70,7 +70,7 @@ public static class TooltipGenerator
         Text = $"{text}"
     };
 
-    private static Color ColorForType(TypeInfo type)
+    internal static Color ColorForType(TypeInfo type)
     {
         if (type.IsInterface)
             return Color.TemplateType;
