@@ -2,7 +2,7 @@
   "profiles": {
     "LoschScript": {
       "commandName": "Project",
-      "commandLineArgs": "code.txt -fragments"
+      "commandLineArgs": "code.txt"
     }
   }
 }

@@ -29,6 +29,10 @@ internal static class Helpers
     {
         foreach (string path in args.Where(File.Exists))
         {
+            Context = new();
+            Context.Files.Add(new(path));
+            CurrentFile = Context.GetFile(path);
+
             string source = File.ReadAllText(path);
 
             ICharStream charStream = CharStreams.fromString(source);
@@ -44,7 +48,10 @@ internal static class Helpers
             ParseTreeWalker.Default?.Walk(builder, compilationUnit);
         }
 
-        Console.WriteLine("Fragment emission successful.");
+        Console.WriteLine("Fragments:");
+
+        foreach (Fragment frag in CurrentFile.Fragments)
+            Console.WriteLine($"Line: {frag.Line}, Column: {frag.Column}, Length: {frag.Length}, Color: {frag.Color}");
 
         return 0;
     }
