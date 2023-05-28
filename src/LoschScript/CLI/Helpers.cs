@@ -1,10 +1,6 @@
-﻿using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
-using Losch.LoschScript.Configuration;
-using LoschScript.CodeGeneration.SymbolEmission;
+﻿using Losch.LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Meta;
-using LoschScript.Parser;
 using LoschScript.Shell;
 using LoschScript.Text;
 using LoschScript.Text.Tooltips;
@@ -25,49 +21,6 @@ namespace LoschScript.CLI;
 
 internal static class Helpers
 {
-    public static int EmitFragments(string[] args)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Warning: 'emit-fragments' does not emit fragments for types. To emit all fragments, use the '-fragments' switch and compile the files normally.\r\n");
-        Console.ForegroundColor = ConsoleColor.Gray;
-
-        Stopwatch sw = new();
-        sw.Start();
-
-        foreach (string path in args.Where(File.Exists))
-        {
-            Context = new();
-            Context.Files.Add(new(path));
-            CurrentFile = Context.GetFile(path);
-
-            string source = File.ReadAllText(path);
-
-            ICharStream charStream = CharStreams.fromString(source);
-            ITokenSource lexer = new LoschScriptLexer(charStream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
-
-            LoschScriptParser parser = new(tokens);
-            parser.RemoveErrorListeners();
-            parser.AddErrorListener(new SyntaxErrorListener());
-
-            IParseTree compilationUnit = parser.compilation_unit();
-            FragmentBuilder builder = new();
-            ParseTreeWalker.Default?.Walk(builder, compilationUnit);
-        }
-
-        Console.WriteLine("Fragments:");
-
-        foreach (Fragment frag in CurrentFile.Fragments)
-            Console.WriteLine($"Line: {frag.Line}, Column: {frag.Column}, Length: {frag.Length}, Color: {frag.Color}");
-
-        sw.Stop();
-
-        if (args.Any(a => a == "-elapsed"))
-            Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds}ms");
-
-        return 0;
-    }
-
     public static int HandleArgs(string[] args)
     {
         Stopwatch sw = new();

@@ -1,14 +1,11 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Losch.LoschScript.Configuration;
-using LoschScript.CodeGeneration.SymbolEmission;
 using LoschScript.Errors;
-using LoschScript.Meta;
 using LoschScript.Parser;
 using LoschScript.Text.FragmentStore;
 using LoschScript.Validation;
 using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -43,9 +40,6 @@ internal static class FileCompiler
 
         if (emitFragmentInfo)
         {
-            FragmentBuilder builder = new();
-            ParseTreeWalker.Default?.Walk(builder, compilationUnit);
-
             string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "LoschScript", "Fragments")).FullName;
 
             FileFragment ffrag = new()
