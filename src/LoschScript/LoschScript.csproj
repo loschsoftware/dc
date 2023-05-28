@@ -23,6 +23,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\LoschScript.Configuration\LoschScript.Configuration.csproj" />
 		<ProjectReference Include="..\LoschScript.Core\LoschScript.Core.csproj" />
+		<ProjectReference Include="..\LoschScript.Text\LoschScript.Text.csproj" />
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
