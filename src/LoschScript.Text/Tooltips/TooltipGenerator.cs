@@ -13,10 +13,11 @@ public static class TooltipGenerator
     /// Generates a tooltip for a type.
     /// </summary>
     /// <param name="type">The type to generate a tooltip for.</param>
+    /// <param name="showBaseType">Wheter to include the base type in the tooltip.</param>
     /// <param name="omitNamespace">If <see langword="true"/>, omits the namespace of the type from the tooltip.</param>
     /// <param name="doc">Optional XML documentation of the type.</param>
     /// <returns>Returns the generated tooltip.</returns>
-    public static Tooltip Type(TypeInfo type, bool omitNamespace = false, Tooltip doc = null)
+    public static Tooltip Type(TypeInfo type, bool showBaseType, bool omitNamespace = false, Tooltip doc = null)
     {
         ObservableCollection<Word> words = new();
 
@@ -48,6 +49,12 @@ public static class TooltipGenerator
             words.Add(BuildWord($"T{i + 1}", Color.TypeParameter));
 
             words.Add(BuildWord("]"));
+        }
+
+        if (showBaseType)
+        {
+            foreach (Word word in Type(type.BaseType.GetTypeInfo(), false, omitNamespace).Words)
+                words.Add(word);
         }
 
         if (doc != null)
