@@ -21,6 +21,7 @@ internal class Program
                 ["watch" or "auto", ..] => WatchForFileChanges(args),
                 ["call", ..] => Helpers.CallMethod(args),
                 ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
+                ["-viewfrags", ..] => Helpers.ViewFragments(args),
                 ["quit"] => QuitWatching(),
                 [] or ["help" or "?"] => DisplayHelpMessage(),
                 _ => Helpers.HandleArgs(args)

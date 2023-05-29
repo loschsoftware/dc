@@ -22,9 +22,8 @@ public static class FileCompiler
     /// </summary>
     /// <param name="path">The path to the file to compile.</param>
     /// <param name="config">The compiler configuration.</param>
-    /// <param name="emitFragmentInfo">Wheter to emit fragments.</param>
     /// <returns>An array of compilation errors that occured during the compilation. If no errors occured, this is an empty array.</returns>
-    public static ErrorInfo[] CompileSingleFile(string path, LSConfig config, bool emitFragmentInfo = false)
+    public static ErrorInfo[] CompileSingleFile(string path, LSConfig config)
     {
         Context.Files.Add(new(path));
         CurrentFile = Context.GetFile(path);
@@ -48,19 +47,6 @@ public static class FileCompiler
         IParseTree compilationUnit = parser.compilation_unit();
         Visitor v = new();
         v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
-
-        if (emitFragmentInfo)
-        {
-            string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "LoschScript", "Fragments")).FullName;
-
-            FileFragment ffrag = new()
-            {
-                FilePath = path,
-                Fragments = CurrentFile.Fragments
-            };
-
-            FragmentSerializer.Serialize(Path.Combine(dir, $"{Path.GetFileName(path)}.xml"), ffrag);
-        }
 
         return CurrentFile.Errors.ToArray();
     }

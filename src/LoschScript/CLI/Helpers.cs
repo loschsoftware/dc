@@ -1,4 +1,5 @@
 ﻿using Losch.LoschScript.Configuration;
+using LoschScript.CodeGeneration;
 using LoschScript.Errors;
 using LoschScript.Meta;
 using LoschScript.Shell;
@@ -21,6 +22,33 @@ namespace LoschScript.CLI;
 
 internal static class Helpers
 {
+    public static int ViewFragments(string[] args)
+    {
+        LSConfig cfg = new();
+
+        if (File.Exists("lsconfig.xml"))
+        {
+            using StreamReader sr = new("lsconfig.xml");
+            XmlSerializer xmls = new(typeof(LSConfig));
+            cfg = (LSConfig)xmls.Deserialize(sr);
+        }
+
+        foreach (string file in args.Where(File.Exists))
+        {
+            Console.WriteLine($"File: {Path.GetFileName(file)}");
+
+            FileCompiler.GetFragments(File.ReadAllText(file), cfg);
+
+            Console.WriteLine();
+            Console.WriteLine("Fragments:");
+
+            foreach (Fragment frag in CurrentFile.Fragments)
+                Console.WriteLine($"Line: {frag.Line}, Column: {frag.Column}, Length: {frag.Length}, Color: {frag.Color}");
+        }
+
+        return 0;
+    }
+
     public static int HandleArgs(string[] args)
     {
         Stopwatch sw = new();
@@ -46,7 +74,7 @@ internal static class Helpers
 
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
-        IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config, args.Any(a => a == "-fragments"));
+        IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
         Context.Assembly.DefineVersionInfoResource(
             Context.Configuration.Product,
@@ -80,15 +108,6 @@ internal static class Helpers
             };
 
             Process.Start(psi);
-        }
-
-        if (args.Any(a => a == "-viewfrags"))
-        {
-            Console.WriteLine();
-            Console.WriteLine("Fragments:");
-
-            foreach (Fragment frag in CurrentFile.Fragments)
-                Console.WriteLine($"Line: {frag.Line}, Column: {frag.Column}, Length: {frag.Length}, Color: {frag.Color}");
         }
 
         if (errors.Select(e => e.Length).Sum() == 0)
@@ -176,7 +195,17 @@ internal static class Helpers
             List<Assembly> assemblies = allAssemblies.Where(_a => _a.GetType(name) != null).ToList();
             if (assemblies.Any())
             {
-                return assemblies.First().GetType(name);
+                type = assemblies.First().GetType(name);
+
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = name.Length,
+                    Color = TooltipGenerator.ColorForType(type.GetTypeInfo())
+                });
+
+                return type;
             }
 
             foreach (string ns in CurrentFile.Imports.Concat(Context.GlobalImports))
