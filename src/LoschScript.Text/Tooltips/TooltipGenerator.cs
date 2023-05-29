@@ -53,6 +53,8 @@ public static class TooltipGenerator
 
         if (showBaseType)
         {
+            words.Add(BuildWord(" : ", Color.Default));
+
             foreach (Word word in Type(type.BaseType.GetTypeInfo(), false, omitNamespace).Words)
                 words.Add(word);
         }
