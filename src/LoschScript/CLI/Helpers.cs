@@ -358,4 +358,14 @@ internal static class Helpers
             return 0;
         }
     }
+
+    public static void SetEntryPoint(AssemblyBuilder ab, MethodInfo m)
+    {
+        ab.SetEntryPoint(m);
+    }
+
+    public static void SetLocalSymInfo(LocalBuilder lb, string name)
+    {
+        lb.SetLocalSymInfo(name);
+    }
 }

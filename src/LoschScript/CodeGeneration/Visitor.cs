@@ -7,7 +7,6 @@ using LoschScript.Text;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -16,6 +15,13 @@ namespace LoschScript.CodeGeneration;
 
 internal class Visitor : LoschScriptParserBaseVisitor<Type>
 {
+    private readonly bool createAssembly = false;
+
+    public Visitor(bool createAssembly = true)
+    {
+        this.createAssembly = createAssembly;
+    }
+
     public override Type VisitCompilation_unit([NotNull] LoschScriptParser.Compilation_unitContext context)
     {
         foreach (IParseTree tree in context.import_directive())
@@ -112,6 +118,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context)
     {
+        // Create throwaway assembly
+        if (!createAssembly)
+        {
+            Context.Assembly = AssemblyBuilder.DefineDynamicAssembly(new("throwaway"), AssemblyBuilderAccess.Run);
+            Context.Module = Context.Assembly.DefineDynamicModule("throwaway");
+        }
+
         TypeBuilder tb = Context.Module.DefineType($"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}Program");
 
         TypeContext tc = new()
@@ -149,8 +162,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
 
-        if (Context.Configuration.ApplicationType != Losch.LoschScript.Configuration.ApplicationType.Library)
-            Context.Assembly.SetEntryPoint(mb);
+        if (Context.Configuration.ApplicationType != Losch.LoschScript.Configuration.ApplicationType.Library && createAssembly)
+            Helpers.SetEntryPoint(Context.Assembly, mb);
 
         tb.CreateType();
         return ret;
@@ -1817,8 +1830,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
 
-        if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
-            lb.SetLocalSymInfo(context.Identifier().GetText());
+        if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug && createAssembly)
+            Helpers.SetLocalSymInfo(lb, context.Identifier().GetText());
 
         CurrentMethod.LocalIndex++;
 
@@ -2069,8 +2082,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
-            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
-                returnBuilder.SetLocalSymInfo(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
+            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug && createAssembly)
+                Helpers.SetLocalSymInfo(returnBuilder, GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
 
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
@@ -2078,8 +2091,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(typeof(int));
             CurrentMethod.Locals.Add((GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++));
 
-            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
-                lb.SetLocalSymInfo((GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)));
+            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug && createAssembly)
+                Helpers.SetLocalSymInfo(lb, (GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)));
 
             CurrentMethod.IL.Emit(OpCodes.Br, loop);
 
@@ -2149,8 +2162,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
-            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug)
-                returnBuilder.SetLocalSymInfo(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
+            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug && createAssembly)
+                Helpers.SetLocalSymInfo(returnBuilder, GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
 
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
