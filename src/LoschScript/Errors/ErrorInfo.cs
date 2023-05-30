@@ -26,9 +26,9 @@ public class ErrorInfo
     public (int, int) CodePosition { get; set; }
 
     /// <summary>
-    /// The end position of the error in the file. The first tuple item represents the row, the second the column of the error.
+    /// The length of the error.
     /// </summary>
-    public (int, int) CodeEndPosition { get; set; }
+    public int Length { get; set; }
 
     /// <summary>
     /// Converts the error into a human-readable format.

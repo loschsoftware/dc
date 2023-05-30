@@ -88,7 +88,7 @@ internal static class Helpers
         if (File.Exists(Context.Configuration.ApplicationIcon))
         {
             if (!Win32Helpers.SetIcon(assembly, Context.Configuration.ApplicationIcon))
-                EmitWarningMessage(0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
+                EmitWarningMessage(0, 0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
         }
 
         sw.Stop();
@@ -170,11 +170,11 @@ internal static class Helpers
         return 0;
     }
 
-    public static (Type Type, MethodInfo[] Methods) ResolveGlobalMethod(string name, int row, int col)
+    public static (Type Type, MethodInfo[] Methods) ResolveGlobalMethod(string name, int row, int col, int len)
     {
         foreach (string type in CurrentFile.ImportedTypes)
         {
-            Type t = ResolveTypeName(type, row, col);
+            Type t = ResolveTypeName(type, row, col, len);
 
             if (t.GetMethods().Where(m => m.Name == name).Any())
                 return (t, t.GetMethods().Where(m => m.Name == name).ToArray());
@@ -183,7 +183,7 @@ internal static class Helpers
         return (null, Array.Empty<MethodInfo>());
     }
 
-    public static Type ResolveTypeName(string name, int row, int col)
+    public static Type ResolveTypeName(string name, int row, int col, int len)
     {
         Type type = Type.GetType(name);
 
@@ -244,6 +244,7 @@ internal static class Helpers
             EmitErrorMessage(
                 row,
                 col,
+                len,
                 LS0009_TypeNotFound,
                 $"The name '{name}' could not be resolved.");
         }

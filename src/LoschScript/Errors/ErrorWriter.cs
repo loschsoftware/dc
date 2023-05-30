@@ -134,12 +134,12 @@ public static class ErrorWriter
     /// Writes an error message using <see cref="ErrorOut"/>.
     /// </summary>
     /// <remarks>If <paramref name="file"/> is null, will assume <see cref="FileContext.Path"/>.</remarks>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool addToErrorList = true)
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool addToErrorList = true)
     {
         EmitErrorMessage(new ErrorInfo()
         {
             CodePosition = (ln, col),
-            //CodeEndPosition = (line.lnEnd, column.colEnd),
+            Length = length,
             ErrorCode = errorType,
             ErrorMessage = msg,
             File = file ?? Path.GetFileName(CurrentFile.Path)
@@ -149,7 +149,7 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a warning message using <see cref="WarnOut"/>.
     /// </summary>
-    public static void EmitWarningMessage(int ln = 0, int col = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false)
+    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false)
     {
         if (Context.Configuration.IgnoreWarnings)
             return;
@@ -157,7 +157,7 @@ public static class ErrorWriter
         ErrorInfo err = new()
         {
             CodePosition = (ln, col),
-            //CodeEndPosition = (line.lnEnd, column.colEnd),
+            Length = length,
             ErrorCode = errorType,
             ErrorMessage = msg,
             File = file ?? CurrentFile.Path
@@ -175,7 +175,7 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a message using <see cref="InfoOut"/>.
     /// </summary>
-    public static void EmitMessage(int ln = 0, int col = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null)
+    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null)
     {
         if (Context.Configuration.IgnoreMessages)
             return;
@@ -183,7 +183,7 @@ public static class ErrorWriter
         EmitMessage(new ErrorInfo()
         {
             CodePosition = (ln, col),
-            //CodeEndPosition = (line.lnEnd, column.colEnd),
+            Length = length,
             ErrorCode = errorType,
             ErrorMessage = msg,
             File = file ?? CurrentFile.Path

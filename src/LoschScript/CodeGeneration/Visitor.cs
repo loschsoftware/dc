@@ -150,7 +150,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (context.expression().Length == 0)
         {
-            EmitErrorMessage(0, 0, LS0027_EmptyProgram, "The program does not contain any executable code.");
+            EmitErrorMessage(0, 0, context.GetText().Length, LS0027_EmptyProgram, "The program does not contain any executable code.");
             return typeof(void);
         }
 
@@ -216,8 +216,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (op == null)
             {
                 EmitErrorMessage(
-                        context.Start.Line,
-                        context.Start.Column,
+                        context.op.Line,
+                        context.op.Column,
+                        context.op.Text.Length,
                         LS0036_ArithmeticError,
                         $"The type '{t.Name}' does not implement the equality operation.",
                         Path.GetFileName(CurrentFile.Path));
@@ -234,8 +235,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (op == null)
             {
                 EmitErrorMessage(
-                        context.Start.Line,
-                        context.Start.Column,
+                        context.op.Line,
+                        context.op.Column,
+                        context.op.Text.Length,
                         LS0036_ArithmeticError,
                         $"The type '{t.Name}' does not implement the inequality operation.",
                         Path.GetFileName(CurrentFile.Path));
@@ -294,8 +296,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
+                    context.op.Line,
+                    context.op.Column,
+                    context.op.Text.Length,
                     LS0036_ArithmeticError,
                     $"The type '{t.Name}' does not implement this comparison operation.",
                     Path.GetFileName(CurrentFile.Path));
@@ -323,8 +326,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
+                    context.Minus().Symbol.Line,
+                        context.Minus().Symbol.Column,
+                        context.Minus().GetText().Length,
                     LS0036_ArithmeticError,
                     $"The type '{t.Name}' does not implement the unary negation operation.",
                     Path.GetFileName(CurrentFile.Path));
@@ -380,8 +384,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Exclamation_Mark().Symbol.Line,
+                context.Exclamation_Mark().Symbol.Column,
+                context.Exclamation_Mark().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement the logical negation operation.",
                 Path.GetFileName(CurrentFile.Path));
@@ -406,8 +411,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
 
         EmitErrorMessage(
-            context.Start.Line,
-            context.Start.Column,
+            context.Double_Ampersand().Symbol.Line,
+            context.Double_Ampersand().Symbol.Column,
+            context.Double_Ampersand().GetText().Length,
             LS0002_MethodNotFound,
             $"The logical and operation is only supported by boolean types.",
             Path.GetFileName(CurrentFile.Path));
@@ -427,8 +433,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
 
         EmitErrorMessage(
-            context.Start.Line,
-            context.Start.Column,
+            context.Double_Bar().Symbol.Line,
+            context.Double_Bar().Symbol.Column,
+            context.Double_Bar().GetText().Length,
             LS0002_MethodNotFound,
             $"The logical or operation is only supported by boolean types.",
             Path.GetFileName(CurrentFile.Path));
@@ -452,8 +459,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Bar().Symbol.Line,
+                context.Bar().Symbol.Column,
+                context.Bar().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a bitwise or operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -482,8 +490,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Ampersand().Symbol.Line,
+                context.Ampersand().Symbol.Column,
+                context.Ampersand().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a bitwise and operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -512,8 +521,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Caret().Symbol.Line,
+                context.Caret().Symbol.Column,
+                context.Caret().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement an exclusive or operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -541,8 +551,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Tilde().Symbol.Line,
+                context.Tilde().Symbol.Column,
+                context.Tilde().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a complement operation.",
                 Path.GetFileName(CurrentFile.Path));
@@ -571,8 +582,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Asterisk().Symbol.Line,
+                context.Asterisk().Symbol.Column,
+                context.Asterisk().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a multiplication operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -601,8 +613,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Slash().Symbol.Line,
+                context.Slash().Symbol.Column,
+                context.Slash().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a division operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -664,8 +677,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Plus().Symbol.Line,
+                context.Plus().Symbol.Column,
+                context.Plus().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement an addition operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -694,8 +708,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Minus().Symbol.Line,
+                context.Minus().Symbol.Column,
+                context.Minus().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a subtraction operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -724,8 +739,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Percent().Symbol.Line,
+                context.Percent().Symbol.Column,
+                context.Percent().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a remainder operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -753,8 +769,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (m == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Double_Asterisk().Symbol.Line,
+                context.Double_Asterisk().Symbol.Column,
+                context.Double_Asterisk().GetText().Length,
                 LS0036_ArithmeticError,
                 $"The power operation is not supported by the types '{t.Name}' and '{t2.Name}'.",
                 Path.GetFileName(CurrentFile.Path));
@@ -783,8 +800,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Double_Less_Than().Symbol.Line,
+                context.Double_Less_Than().Symbol.Column,
+                context.Double_Less_Than().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a left shift operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -813,8 +831,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (op == null)
         {
             EmitErrorMessage(
-                context.Start.Line,
-                context.Start.Column,
+                context.Double_Greater_Than().Symbol.Line,
+                context.Double_Greater_Than().Symbol.Column,
+                context.Double_Greater_Than().GetText().Length,
                 LS0002_MethodNotFound,
                 $"The type '{t.Name}' does not implement a right shift operation with the specified parameter types.",
                 Path.GetFileName(CurrentFile.Path));
@@ -829,7 +848,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context)
     {
-        Type t = Helpers.ResolveTypeName(context.Identifier().ToString(), context.Start.Line, context.Start.Column);
+        Type t = Helpers.ResolveTypeName(context.Identifier().ToString(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
         CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
 
         MethodInfo typeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
@@ -838,7 +857,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(Type);
     }
 
-    public Type GetConstructorOrCast(Type cType, LoschScriptParser.ArglistContext arglist, int line, int column)
+    public Type GetConstructorOrCast(Type cType, LoschScriptParser.ArglistContext arglist, int line, int column, int length)
     {
         if (arglist != null)
         {
@@ -910,7 +929,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             {
                 if (CurrentMethod.ArgumentTypesForNextMethodCall.Count != 1)
                 {
-                    EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor with the specified argument types.");
+                    EmitErrorMessage(line, column, length, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor with the specified argument types.");
                     CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                     return cType;
                 }
@@ -1010,7 +1029,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
 
             CurrentMethod.IL.Emit(OpCodes.Newobj, cinf);
-            EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor or conversion with the specified argument types.");
+            EmitErrorMessage(line, column, length, LS0002_MethodNotFound, $"The type '{cType.Name}' does not contain a constructor or conversion with the specified argument types.");
             CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
 
             return cType;
@@ -1020,7 +1039,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (c == null)
         {
-            EmitErrorMessage(line, column, LS0002_MethodNotFound, $"The type '{cType.Name}' does not specify a parameterless constructor.");
+            EmitErrorMessage(line, column, length, LS0002_MethodNotFound, $"The type '{cType.Name}' does not specify a parameterless constructor.");
             CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
             return cType;
         }
@@ -1032,7 +1051,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return cType;
     }
 
-    public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column)
+    public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length)
     {
         // Check if it is a method with parameters
         if (arglist != null)
@@ -1086,7 +1105,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                             {
                                 if (_params2[i] != "")
                                 {
-                                    CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column));
+                                    CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column, length));
                                 }
                             }
                             else
@@ -1120,6 +1139,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 EmitErrorMessage(
                     line,
                     column,
+                    length,
                     LS0002_MethodNotFound,
                     $"The type \"{type.Name}\" does not contain a function called \"{name}\" with the specified argument types.");
 
@@ -1160,6 +1180,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                 line,
                 column,
+                length,
                 LS0039_FieldNotFound,
                 $"The type \"{type.Name}\" does not contain a field or property called \"{name}\".");
 
@@ -1196,7 +1217,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitLdloca(CurrentMethod.IL, CurrentMethod.LocalIndex);
         }
 
-        return GetMember(t, context.Identifier().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
+        return GetMember(t, context.Identifier().GetText(), context.arglist(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
     }
 
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
@@ -1240,23 +1261,22 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (context.full_identifier().Identifier().Length == 1)
             {
                 // Global Method (Type Import)
-                Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.Start.Line, context.Start.Column).Type;
+                Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length).Type;
 
                 if (t != null)
-                    return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
+                    return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
 
                 // Constructor
-                Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.Start.Line, context.Start.Column);
-                return GetConstructorOrCast(cType, context.arglist(), context.Start.Line, context.Start.Column);
+                Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
+                return GetConstructorOrCast(cType, context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
             }
 
             type = Helpers.ResolveTypeName(
                 string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
-                context.Start.Line,
-                context.Start.Column);
+                context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
         }
 
-        return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.Start.Line, context.Start.Column);
+        return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
     }
 
     public override Type VisitArglist([NotNull] LoschScriptParser.ArglistContext context)
@@ -1285,7 +1305,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return local.Builder.LocalType;
         }
 
-        return Helpers.ResolveTypeName(context.Identifier().GetText(), context.Start.Line, context.Start.Column);
+        return Helpers.ResolveTypeName(context.Identifier().GetText(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
     }
 
     public override Type VisitIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context)
@@ -1295,7 +1315,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitFull_identifier([NotNull] LoschScriptParser.Full_identifierContext context)
     {
-        return Helpers.ResolveTypeName(context.GetText(), context.Start.Line, context.Start.Column);
+        return Helpers.ResolveTypeName(context.GetText(), context.Identifier().Last().Symbol.Line, context.Identifier().Last().Symbol.Column, context.Identifier().Last().GetText().Length);
     }
 
     public override Type VisitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context)
@@ -1320,6 +1340,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                     context.Start.Line,
                     context.Start.Column,
+                    context.Start.Text.Length,
                     LS0038_ConditionalExpressionClauseNotBoolean,
                     $"The condition of a conditional expression has to be a boolean.");
         }
@@ -1348,6 +1369,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     EmitErrorMessage(
                             context.Start.Line,
                             context.Start.Column,
+                            context.Start.Text.Length,
                             LS0038_ConditionalExpressionClauseNotBoolean,
                             $"The condition of a conditional expression has to be a boolean.");
                 }
@@ -1390,6 +1412,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                     context.Start.Line,
                     context.Start.Column,
+                    context.GetText().Length,
                     LS0037_BranchExpressionTypesUnequal,
                     $"The return types of the branches of the conditional expression do not match.");
 
@@ -1412,6 +1435,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                     context.Start.Line,
                     context.Start.Column,
+                    context.Start.Text.Length,
                     LS0038_ConditionalExpressionClauseNotBoolean,
                     $"The condition of a conditional expression has to be a boolean.");
         }
@@ -1441,6 +1465,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                     context.Start.Line,
                     context.Start.Column,
+                    context.Start.Text.Length,
                     LS0038_ConditionalExpressionClauseNotBoolean,
                     $"The condition of a conditional expression has to be a boolean.");
         }
@@ -1475,6 +1500,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                     context.Start.Line,
                     context.Start.Column,
+                    context.Start.Text.Length,
                     LS0038_ConditionalExpressionClauseNotBoolean,
                     $"The condition of a conditional expression has to be a boolean.");
         }
@@ -1503,6 +1529,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     EmitErrorMessage(
                             context.Start.Line,
                             context.Start.Column,
+                            context.Start.Text.Length,
                             LS0038_ConditionalExpressionClauseNotBoolean,
                             $"The condition of a conditional expression has to be a boolean.");
                 }
@@ -1545,6 +1572,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                     context.Start.Line,
                     context.Start.Column,
+                    context.GetText().Length,
                     LS0037_BranchExpressionTypesUnequal,
                     $"The return types of the branches of the conditional expression do not match.");
 
@@ -1567,6 +1595,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                     context.Start.Line,
                     context.Start.Column,
+                    context.Start.Text.Length,
                     LS0038_ConditionalExpressionClauseNotBoolean,
                     $"The condition of a conditional expression has to be a boolean.");
         }
@@ -1596,6 +1625,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitErrorMessage(
                     context.Start.Line,
                     context.Start.Column,
+                    context.Start.Text.Length,
                     LS0038_ConditionalExpressionClauseNotBoolean,
                     $"The condition of a conditional expression has to be a boolean.");
         }
@@ -1791,8 +1821,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (local.IsConstant)
             {
                 EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
+                    context.Equals().Symbol.Line,
+                    context.Equals().Symbol.Column,
+                    context.Equals().GetText().Length,
                     LS0018_ImmutableValueReassignment,
                     $"'{local.Name}' is immutable and cannot be changed.");
 
@@ -1804,8 +1835,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (type != local.Builder.LocalType)
             {
                 EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
+                    context.Equals().Symbol.Line,
+                    context.Equals().Symbol.Column,
+                    context.Equals().GetText().Length,
                     LS0006_VariableTypeChanged,
                     $"The type of the new value of '{local.Name}' does not match the type of the old value.");
 
@@ -1938,7 +1970,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (t != arrayType)
             {
-                EmitErrorMessage(context.expression()[index - 1].Start.Line, context.expression()[index - 1].Start.Column, LS0041_ListItemsHaveDifferentTypes, "An array or list can only contain one type of value.");
+                EmitErrorMessage(context.expression()[index - 1].Start.Line, context.expression()[index - 1].Start.Column, context.expression()[index - 1].Start.Text.Length, LS0041_ListItemsHaveDifferentTypes, "An array or list can only contain one type of value.");
                 return arrayType.MakeArrayType();
             }
 
@@ -2048,7 +2080,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (t != arrayType.GetEnumeratedType())
             {
-                EmitErrorMessage(context.expression()[2].Start.Line, context.expression()[2].Start.Column, LS0041_ListItemsHaveDifferentTypes, "The type of the new value of the specified array item does not match the type of the old one.");
+                EmitErrorMessage(context.expression()[2].Start.Line, context.expression()[2].Start.Column, context.expression()[2].Start.Text.Length, LS0041_ListItemsHaveDifferentTypes, "The type of the new value of the specified array item does not match the type of the old one.");
                 return t;
             }
 
@@ -2057,7 +2089,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
         }
 
-        EmitErrorMessage(context.expression()[1].Start.Line, context.expression()[1].Start.Column, LS0042_ArrayElementAssignmentIndexExpressionNotInteger, "The index expression has to be of type Int32.");
+        EmitErrorMessage(context.expression()[1].Start.Line, context.expression()[1].Start.Column, context.expression()[1].Start.Text.Length, LS0042_ArrayElementAssignmentIndexExpressionNotInteger, "The index expression has to be of type Int32.");
 
         return arrayType.GetEnumeratedType();
     }
@@ -2205,6 +2237,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         EmitWarningMessage(
             context.expression().First().Start.Line,
             context.expression().First().Start.Column,
+            context.expression().First().Start.Text.Length,
             LS0043_PossiblyUnintentionalInfiniteLoop,
             "The condition of the while loop is not a boolean. This loop will run indefinetly.");
 

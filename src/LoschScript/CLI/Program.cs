@@ -31,7 +31,7 @@ internal class Program
         {
             if (messages.Count == 0)
             {
-                EmitErrorMessage(0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
+                EmitErrorMessage(0, 0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
                 Console.WriteLine();
             }
 
