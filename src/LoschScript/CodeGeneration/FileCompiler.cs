@@ -6,6 +6,7 @@ using LoschScript.Parser;
 using LoschScript.Text.FragmentStore;
 using LoschScript.Validation;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
@@ -49,6 +50,49 @@ public static class FileCompiler
         v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
 
         return CurrentFile.Errors.ToArray();
+    }
+
+    /// <summary>
+    /// Checks a string of source code for errors.
+    /// </summary>
+    /// <param name="source">A string of source code.</param>
+    /// <param name="config">The compiler configuration.</param>
+    /// <returns>A list of errors.</returns>
+    public static List<ErrorInfo> GetErrors(string source, LSConfig config)
+    {
+        try
+        {
+            Context = new();
+            CurrentFile = new("");
+
+            Context.Configuration = config;
+
+            ICharStream charStream = CharStreams.fromString(source);
+            ITokenSource lexer = new LoschScriptLexer(charStream);
+            ITokenStream tokens = new CommonTokenStream(lexer);
+
+            LoschScriptParser parser = new(tokens);
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(new SyntaxErrorListener());
+
+            Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
+            var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
+
+            if (refsToAdd != null)
+                Context.ReferencedAssemblies.AddRange(refsToAdd);
+
+            IParseTree compilationUnit = parser.compilation_unit();
+            Visitor v = new(false);
+            v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
+
+            return CurrentFile.Errors;
+        }
+        catch (Exception ex)
+        {
+            File.AppendAllText("exception.txt", ex.ToString());
+
+            return new();
+        }
     }
 
     /// <summary>
