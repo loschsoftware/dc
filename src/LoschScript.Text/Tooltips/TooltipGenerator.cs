@@ -183,19 +183,25 @@ public static class TooltipGenerator
             if (type.ImplementedInterfaces.Count() == 1)
                 words.Add(BuildWord(", "));
 
-            foreach (Type t in type.ImplementedInterfaces.ToArray()[..^1])
+            if (type.ImplementedInterfaces.Count() > 0)
             {
-                words.Add(BuildWord(", "));
+                foreach (Type t in type.ImplementedInterfaces.ToArray()[..^1])
+                {
+                    words.Add(BuildWord(", "));
 
-                foreach (Word word in Type(t.GetTypeInfo(), false, omitNamespace, true).Words)
-                    words.Add(word);
+                    foreach (Word word in Type(t.GetTypeInfo(), false, omitNamespace, true).Words)
+                        words.Add(word);
+                }
             }
 
             if (type.ImplementedInterfaces.Count() > 1)
                 words.Add(BuildWord(", "));
 
-            foreach (Word word in Type(type.ImplementedInterfaces.Last().GetTypeInfo(), false, omitNamespace, true).Words)
-                words.Add(word);
+            if (type.ImplementedInterfaces.Count() > 0)
+            {
+                foreach (Word word in Type(type.ImplementedInterfaces.Last().GetTypeInfo(), false, omitNamespace, true).Words)
+                    words.Add(word);
+            }
         }
 
         if (doc != null)
