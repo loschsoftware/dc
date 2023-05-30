@@ -53,55 +53,12 @@ public static class FileCompiler
     }
 
     /// <summary>
-    /// Checks a string of source code for errors.
-    /// </summary>
-    /// <param name="source">A string of source code.</param>
-    /// <param name="config">The compiler configuration.</param>
-    /// <returns>A list of errors.</returns>
-    public static List<ErrorInfo> GetErrors(string source, LSConfig config)
-    {
-        try
-        {
-            Context = new();
-            CurrentFile = new("");
-
-            Context.Configuration = config;
-
-            ICharStream charStream = CharStreams.fromString(source);
-            ITokenSource lexer = new LoschScriptLexer(charStream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
-
-            LoschScriptParser parser = new(tokens);
-            parser.RemoveErrorListeners();
-            parser.AddErrorListener(new SyntaxErrorListener());
-
-            Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
-            var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
-
-            if (refsToAdd != null)
-                Context.ReferencedAssemblies.AddRange(refsToAdd);
-
-            IParseTree compilationUnit = parser.compilation_unit();
-            Visitor v = new(false);
-            v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
-
-            return CurrentFile.Errors;
-        }
-        catch (Exception ex)
-        {
-            File.AppendAllText("exception.txt", ex.ToString());
-
-            return new();
-        }
-    }
-
-    /// <summary>
     /// Emits fragments for a string of LoschScript source code.
     /// </summary>
     /// <param name="source">The source code to emit fragments for.</param>
     /// <param name="config">The compiler configuration.</param>
     /// <returns>Returns a <see cref="FileFragment"/> object containing the fragments of the source file. The <see cref="FileFragment.FilePath"/> property is set to an empty string.</returns>
-    public static FileFragment GetFragments(string source, LSConfig config)
+    public static (FileFragment Fragments, List<ErrorInfo> Errors) GetEditorInfo(string source, LSConfig config)
     {
         try
         {
@@ -136,16 +93,13 @@ public static class FileCompiler
 
             ffrag.Fragments.AddRange(CurrentFile.Fragments);
 
-            return ffrag;
+            return (ffrag, CurrentFile.Errors);
         }
         catch (Exception ex)
         {
             File.AppendAllText("exception.txt", ex.ToString());
 
-            return new()
-            {
-                Fragments = new()
-            };
+            return (new() { Fragments = new() }, CurrentFile.Errors);
         }
     }
 }

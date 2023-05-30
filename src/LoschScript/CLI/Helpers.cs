@@ -37,7 +37,7 @@ internal static class Helpers
         {
             Console.WriteLine($"File: {Path.GetFileName(file)}");
 
-            FileCompiler.GetFragments(File.ReadAllText(file), cfg);
+            FileCompiler.GetEditorInfo(File.ReadAllText(file), cfg);
 
             Console.WriteLine();
             Console.WriteLine("Fragments:");

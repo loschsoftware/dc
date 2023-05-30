@@ -63,6 +63,7 @@ public static class ErrorWriter
         }
         catch (IOException)
         {
+            CurrentFile.Errors.Add(error);
             return;
         }
     }
@@ -99,6 +100,7 @@ public static class ErrorWriter
         }
         catch (IOException)
         {
+            CurrentFile.Errors.Add(error);
             return;
         }
     }
@@ -126,6 +128,7 @@ public static class ErrorWriter
         }
         catch (IOException)
         {
+            CurrentFile.Errors.Add(error);
             return;
         }
     }
@@ -142,7 +145,8 @@ public static class ErrorWriter
             Length = length,
             ErrorCode = errorType,
             ErrorMessage = msg,
-            File = file ?? Path.GetFileName(CurrentFile.Path)
+            File = file ?? Path.GetFileName(CurrentFile.Path),
+            Severity = Severity.Error
         }, addToErrorList);
     }
 
@@ -160,7 +164,8 @@ public static class ErrorWriter
             Length = length,
             ErrorCode = errorType,
             ErrorMessage = msg,
-            File = file ?? CurrentFile.Path
+            File = file ?? CurrentFile.Path,
+            Severity = Severity.Warning
         };
 
         if (Context.Configuration.TreatWarningsAsErrors)
@@ -186,7 +191,8 @@ public static class ErrorWriter
             Length = length,
             ErrorCode = errorType,
             ErrorMessage = msg,
-            File = file ?? CurrentFile.Path
+            File = file ?? CurrentFile.Path,
+            Severity = Severity.Information
         });
     }
 }

@@ -31,8 +31,32 @@ public class ErrorInfo
     public int Length { get; set; }
 
     /// <summary>
+    /// The severity of the error.
+    /// </summary>
+    public Severity Severity { get; set; }
+
+    /// <summary>
     /// Converts the error into a human-readable format.
     /// </summary>
     /// <returns>A friendly representation of the error.</returns>
     public override string ToString() => $"{File} ({CodePosition.Item1},{CodePosition.Item2}): error {ErrorCode.ToString().Split('_')[0]}: {ErrorMessage}\r\n";
+}
+
+/// <summary>
+/// Specifies the severity of an error.
+/// </summary>
+public enum Severity
+{
+    /// <summary>
+    /// An informative message.
+    /// </summary>
+    Information,
+    /// <summary>
+    /// A warning message.
+    /// </summary>
+    Warning,
+    /// <summary>
+    /// An error message.
+    /// </summary>
+    Error
 }

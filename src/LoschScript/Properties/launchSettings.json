@@ -2,7 +2,7 @@
   "profiles": {
     "emit-fragments": {
       "commandName": "Project",
-      "commandLineArgs": "code.txt -fragments"
+      "commandLineArgs": "-viewfrags code.ls"
     },
     "default": {
       "commandName": "Project",
