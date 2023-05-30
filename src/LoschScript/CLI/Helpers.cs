@@ -202,7 +202,8 @@ internal static class Helpers
                     Line = row,
                     Column = col,
                     Length = name.Length,
-                    Color = TooltipGenerator.ColorForType(type.GetTypeInfo())
+                    Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+                    ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
                 });
 
                 return type;
@@ -255,7 +256,8 @@ internal static class Helpers
                 Line = row,
                 Column = col,
                 Length = name.Length,
-                Color = TooltipGenerator.ColorForType(type.GetTypeInfo())
+                Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+                ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
             });
         }
 

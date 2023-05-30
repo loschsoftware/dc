@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoschScript.Text.Tooltips;
+using System;
 using System.Collections.Generic;
 
 namespace LoschScript.Text;
@@ -33,6 +34,11 @@ public struct Fragment : IEquatable<Fragment>
     /// If the desired color is not contained in the <see cref="LoschScript.Text.Color"/> enumeration, this property is used to set a specific color.
     /// </summary>
     public string SpecialColor { get; set; }
+
+    /// <summary>
+    /// A tooltip corresponding to the fragment.
+    /// </summary>
+    public Tooltip ToolTip { get; set; }
 
     /// <summary>
     /// Creates a new instance of the <see cref="Fragment"/> class.

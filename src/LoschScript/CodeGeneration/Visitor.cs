@@ -4,6 +4,7 @@ using LoschScript.CLI;
 using LoschScript.Meta;
 using LoschScript.Parser;
 using LoschScript.Text;
+using LoschScript.Text.Tooltips;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -1132,6 +1133,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 else
                     CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
 
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = line,
+                    Column = column,
+                    Length = length,
+                    Color = Color.Function,
+                    ToolTip = TooltipGenerator.Function(m)
+                });
+
                 return m.ReturnType;
             }
             else
@@ -1155,6 +1165,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             else
                 CurrentMethod.IL.EmitCall(OpCodes.Callvirt, parameterlessFunc, null);
 
+            CurrentFile.Fragments.Add(new()
+            {
+                Line = line,
+                Column = column,
+                Length = length,
+                Color = Color.Function,
+                ToolTip = TooltipGenerator.Function(parameterlessFunc)
+            });
+
             return parameterlessFunc.ReturnType;
         }
 
@@ -1166,6 +1185,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             else
                 CurrentMethod.IL.EmitCall(OpCodes.Callvirt, property, null);
 
+            CurrentFile.Fragments.Add(new()
+            {
+                Line = line,
+                Column = column,
+                Length = length,
+                Color = Color.Property,
+                ToolTip = TooltipGenerator.Property(type.GetProperty(name))
+            });
+
             return property.ReturnType;
         }
 
@@ -1173,6 +1201,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (f != null)
         {
             CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
+
+            CurrentFile.Fragments.Add(new()
+            {
+                Line = line,
+                Column = column,
+                Length = length,
+                Color = Color.Field,
+                ToolTip = TooltipGenerator.Field(f)
+            });
+
             return f.FieldType;
         }
         else
@@ -1190,14 +1228,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
     {
-        CurrentFile.Fragments.Add(new()
-        {
-            Line = context.Identifier().Symbol.Line,
-            Column = context.Identifier().Symbol.Column,
-            Length = context.Identifier().GetText().Length,
-            Color = Color.Function
-        });
-
         // Check for local of this name
         if (CurrentMethod.Locals.Any(l => l.Name == context.Identifier().GetText()))
         {
@@ -1236,7 +1266,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     Line = context.full_identifier().Identifier().Last().Symbol.Line,
                     Column = context.full_identifier().Identifier().Last().Symbol.Column,
                     Length = context.full_identifier().Identifier().Last().GetText().Length,
-                    Color = Color.LocalValue
+                    Color = Color.LocalValue,
+                    ToolTip = TooltipGenerator.Local(local.Name, !local.IsConstant, local.Builder)
                 });
 
                 EmitLdloc(CurrentMethod.IL, local.Index);
@@ -1250,14 +1281,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
         else
         {
-            CurrentFile.Fragments.Add(new()
-            {
-                Line = context.full_identifier().Identifier().Last().Symbol.Line,
-                Column = context.full_identifier().Identifier().Last().Symbol.Column,
-                Length = context.full_identifier().Identifier().Last().GetText().Length,
-                Color = Color.Function
-            });
-
             if (context.full_identifier().Identifier().Length == 1)
             {
                 // Global Method (Type Import)
@@ -1806,14 +1829,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context)
     {
-        CurrentFile.Fragments.Add(new()
-        {
-            Line = context.Identifier().Symbol.Line,
-            Column = context.Identifier().Symbol.Column,
-            Length = context.Identifier().GetText().Length,
-            Color = context.Var() == null ? Color.LocalValue : Color.LocalVariable
-        });
-
         if (CurrentMethod.Locals.Any(e => e.Name == context.Identifier().GetText()))
         {
             var local = CurrentMethod.Locals.Where(e => e.Name == context.Identifier().GetText()).First();
@@ -1861,6 +1876,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
 
         LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
+
+        CurrentFile.Fragments.Add(new()
+        {
+            Line = context.Identifier().Symbol.Line,
+            Column = context.Identifier().Symbol.Column,
+            Length = context.Identifier().GetText().Length,
+            Color = context.Var() == null ? Color.LocalValue : Color.LocalVariable,
+            ToolTip = TooltipGenerator.Local(context.Identifier().GetText(), context.Var() != null, lb)
+        });
 
         if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug && createAssembly)
             Helpers.SetLocalSymInfo(lb, context.Identifier().GetText());

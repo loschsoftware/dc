@@ -24,6 +24,11 @@ public class Tooltip
     }
 
     /// <summary>
+    /// The resource name of the icon associated with the tooltip. Used by LSEdit.
+    /// </summary>
+    public string IconResourceName { get; set; }
+
+    /// <summary>
     /// The raw text of the current tooltip without styling information.
     /// </summary>
     public string RawText { get; private set; }
