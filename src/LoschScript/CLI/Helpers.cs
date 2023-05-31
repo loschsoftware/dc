@@ -226,7 +226,10 @@ internal static class Helpers
 
                 List<Assembly> _assemblies = _allAssemblies.Where(a => a.GetType(n) != null).ToList();
                 if (_assemblies.Any())
-                    return _assemblies.First().GetType(n);
+                {
+                    type = _assemblies.First().GetType(n);
+                    goto FoundType;
+                }
 
                 if (type != null)
                     goto FoundType;
