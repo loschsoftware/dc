@@ -1296,7 +1296,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             type = Helpers.ResolveTypeName(
                 string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
-                context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length,
+                context.full_identifier().Identifier()[^2].Symbol.Line, context.full_identifier().Identifier()[^2].Symbol.Column, context.full_identifier().Identifier()[^2].GetText().Length,
                 false);
         }
 
