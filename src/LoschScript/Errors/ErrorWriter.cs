@@ -1,7 +1,9 @@
 ﻿using Losch.LoschScript.Configuration;
 using LoschScript.Meta;
+using LoschScript.Text.Tooltips;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -139,6 +141,14 @@ public static class ErrorWriter
     /// <remarks>If <paramref name="file"/> is null, will assume <see cref="FileContext.Path"/>.</remarks>
     public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool addToErrorList = true)
     {
+        ObservableCollection<Word> words = new()
+        {
+            new()
+            {
+                Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
+            }
+        };
+
         EmitErrorMessage(new ErrorInfo()
         {
             CodePosition = (ln, col),
@@ -146,7 +156,12 @@ public static class ErrorWriter
             ErrorCode = errorType,
             ErrorMessage = msg,
             File = file ?? Path.GetFileName(CurrentFile.Path),
-            Severity = Severity.Error
+            Severity = Severity.Error,
+            ToolTip = new()
+            {
+                IconResourceName = "CodeErrorRule",
+                Words = words
+            }
         }, addToErrorList);
     }
 
@@ -155,6 +170,14 @@ public static class ErrorWriter
     /// </summary>
     public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false)
     {
+        ObservableCollection<Word> words = new()
+        {
+            new()
+            {
+                Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
+            }
+        };
+
         if (Context.Configuration.IgnoreWarnings)
             return;
 
@@ -165,7 +188,12 @@ public static class ErrorWriter
             ErrorCode = errorType,
             ErrorMessage = msg,
             File = file ?? CurrentFile.Path,
-            Severity = Severity.Warning
+            Severity = Severity.Warning,
+            ToolTip = new()
+            {
+                Words = words,
+                IconResourceName = Context.Configuration.TreatWarningsAsErrors ? "CodeErrorRule" : "CodeWarningRule"
+            }
         };
 
         if (Context.Configuration.TreatWarningsAsErrors)
@@ -182,6 +210,14 @@ public static class ErrorWriter
     /// </summary>
     public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null)
     {
+        ObservableCollection<Word> words = new()
+        {
+            new()
+            {
+                Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
+            }
+        };
+
         if (Context.Configuration.IgnoreMessages)
             return;
 
@@ -192,7 +228,12 @@ public static class ErrorWriter
             ErrorCode = errorType,
             ErrorMessage = msg,
             File = file ?? CurrentFile.Path,
-            Severity = Severity.Information
+            Severity = Severity.Information,
+            ToolTip = new()
+            {
+                Words = words,
+                IconResourceName = "CodeInformation"
+            }
         });
     }
 }

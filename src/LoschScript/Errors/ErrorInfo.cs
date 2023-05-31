@@ -1,4 +1,6 @@
-﻿namespace LoschScript.Errors;
+﻿using LoschScript.Text.Tooltips;
+
+namespace LoschScript.Errors;
 
 /// <summary>
 /// Represents an error in the code.
@@ -34,6 +36,11 @@ public class ErrorInfo
     /// The severity of the error.
     /// </summary>
     public Severity Severity { get; set; }
+
+    /// <summary>
+    /// A tooltip representing the error in an editor.
+    /// </summary>
+    public Tooltip ToolTip { get; set; }
 
     /// <summary>
     /// Converts the error into a human-readable format.
