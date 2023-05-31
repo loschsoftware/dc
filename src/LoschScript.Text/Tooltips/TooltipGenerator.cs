@@ -175,7 +175,7 @@ public static class TooltipGenerator
 
         if (showBaseType && type.BaseType != null)
         {
-            words.Add(BuildWord(" : ", Color.Default));
+            words.Add(BuildWord(": ", Color.Default));
 
             foreach (Word word in Type(type.BaseType.GetTypeInfo(), false, omitNamespace, true).Words)
                 words.Add(word);

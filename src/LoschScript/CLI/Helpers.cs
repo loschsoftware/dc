@@ -174,7 +174,7 @@ internal static class Helpers
     {
         foreach (string type in CurrentFile.ImportedTypes)
         {
-            Type t = ResolveTypeName(type, row, col, len);
+            Type t = ResolveTypeName(type, row, col, len, true);
 
             if (t.GetMethods().Where(m => m.Name == name).Any())
                 return (t, t.GetMethods().Where(m => m.Name == name).ToArray());
@@ -183,7 +183,7 @@ internal static class Helpers
         return (null, Array.Empty<MethodInfo>());
     }
 
-    public static Type ResolveTypeName(string name, int row, int col, int len)
+    public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false)
     {
         Type type = Type.GetType(name);
 
@@ -197,14 +197,17 @@ internal static class Helpers
             {
                 type = assemblies.First().GetType(name);
 
-                CurrentFile.Fragments.Add(new()
+                if (!noEmitFragments)
                 {
-                    Line = row,
-                    Column = col,
-                    Length = name.Length,
-                    Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
-                    ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
-                });
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = name.Length,
+                        Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+                        ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
+                    });
+                }
 
                 return type;
             }
@@ -251,14 +254,17 @@ internal static class Helpers
         }
         else
         {
-            CurrentFile.Fragments.Add(new()
+            if (!noEmitFragments)
             {
-                Line = row,
-                Column = col,
-                Length = name.Length,
-                Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
-                ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
-            });
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = name.Length,
+                    Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+                    ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
+                });
+            }
         }
 
         return type;
