@@ -1259,17 +1259,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             var local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().Identifier()[0].GetText());
             type = local.Builder.LocalType;
 
+            CurrentFile.Fragments.Add(new()
+            {
+                Line = context.full_identifier().Identifier()[0].Symbol.Line,
+                Column = context.full_identifier().Identifier()[0].Symbol.Column,
+                Length = context.full_identifier().Identifier()[0].GetText().Length,
+                Color = Color.LocalValue,
+                ToolTip = TooltipGenerator.Local(local.Name, !local.IsConstant, local.Builder)
+            });
+
             if (context.full_identifier().Identifier().Length == 1)
             {
-                CurrentFile.Fragments.Add(new()
-                {
-                    Line = context.full_identifier().Identifier().Last().Symbol.Line,
-                    Column = context.full_identifier().Identifier().Last().Symbol.Column,
-                    Length = context.full_identifier().Identifier().Last().GetText().Length,
-                    Color = Color.LocalValue,
-                    ToolTip = TooltipGenerator.Local(local.Name, !local.IsConstant, local.Builder)
-                });
-
                 EmitLdloc(CurrentMethod.IL, local.Index);
                 return type;
             }
