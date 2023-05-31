@@ -95,27 +95,28 @@ public static class TooltipGenerator
         };
 
         if (method.GetParameters().Length > 0)
+        {
             words.Add(BuildWord("("));
 
-        foreach (ParameterInfo param in method.GetParameters()[..^1])
-        {
-            words.Add(BuildWord(param.Name, Color.LocalValue));
+            foreach (ParameterInfo param in method.GetParameters()[..^1])
+            {
+                words.Add(BuildWord(param.Name, Color.LocalValue));
+                words.Add(BuildWord(": "));
+
+                foreach (Word word in Type(param.ParameterType.GetTypeInfo(), false, true, true).Words)
+                    words.Add(word);
+
+                words.Add(BuildWord(", "));
+            }
+
+            words.Add(BuildWord(method.GetParameters()[0].Name, Color.LocalValue));
             words.Add(BuildWord(": "));
 
-            foreach (Word word in Type(param.ParameterType.GetTypeInfo(), false, true, true).Words)
+            foreach (Word word in Type(method.GetParameters()[0].ParameterType.GetTypeInfo(), false, true, true).Words)
                 words.Add(word);
 
-            words.Add(BuildWord(", "));
-        }
-
-        words.Add(BuildWord(method.GetParameters()[0].Name, Color.LocalValue));
-        words.Add(BuildWord(": "));
-
-        foreach (Word word in Type(method.GetParameters()[0].ParameterType.GetTypeInfo(), false, true, true).Words)
-            words.Add(word);
-
-        if (method.GetParameters().Length > 0)
             words.Add(BuildWord(")"));
+        }
 
         words.Add(BuildWord(": "));
         foreach (Word word in Type(method.ReturnType.GetTypeInfo(), false, true, true).Words)
