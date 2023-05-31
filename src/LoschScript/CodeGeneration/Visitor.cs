@@ -1106,7 +1106,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                             {
                                 if (_params2[i] != "")
                                 {
-                                    CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column, length));
+                                    CurrentMethod.IL.Emit(OpCodes.Box, Helpers.ResolveTypeName(_params2[i], line, column, length, true));
                                 }
                             }
                             else
@@ -1296,7 +1296,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             type = Helpers.ResolveTypeName(
                 string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
-                context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
+                context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length,
+                true);
         }
 
         return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
