@@ -33,6 +33,9 @@ internal static class Helpers
             cfg = (LSConfig)xmls.Deserialize(sr);
         }
 
+        Stopwatch sw = new();
+        sw.Start();
+
         foreach (string file in args.Where(File.Exists))
         {
             Console.WriteLine($"File: {Path.GetFileName(file)}");
@@ -45,6 +48,9 @@ internal static class Helpers
             foreach (Fragment frag in CurrentFile.Fragments)
                 Console.WriteLine($"Line: {frag.Line}, Column: {frag.Column}, Length: {frag.Length}, Color: {frag.Color}");
         }
+
+        sw.Stop();
+        Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
 
         return 0;
     }
