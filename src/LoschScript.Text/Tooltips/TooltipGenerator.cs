@@ -193,11 +193,10 @@ public static class TooltipGenerator
 
                     foreach (Word word in Type(t.GetTypeInfo(), false, omitNamespace, true).Words)
                         words.Add(word);
+
+                    words.Add(BuildWord(", "));
                 }
             }
-
-            if (type.ImplementedInterfaces.Count() > 1)
-                words.Add(BuildWord(", "));
 
             if (type.ImplementedInterfaces.Count() > 0)
             {
