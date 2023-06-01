@@ -103,5 +103,9 @@ public enum Color : byte
     /// <summary>
     /// The color of parentheses at nesting depth 5. At depth 6, the color will restart from <see cref="ParenLevel1"/>.
     /// </summary>
-    ParenLevel5
+    ParenLevel5,
+    /// <summary>
+    /// An escape sequence in a string.
+    /// </summary>
+    StringEscapeSequence
 }

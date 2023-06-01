@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text.RegularExpressions;
 
 namespace LoschScript.CodeGeneration;
 
@@ -1782,10 +1783,38 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitString_atom([NotNull] LoschScriptParser.String_atomContext context)
     {
+        string text = context.GetText()[1..^1];
+
         if (context.Verbatim_String_Literal() != null)
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldstr, context.GetText()[2..^1]);
+            string verbatimText = text[1..];
+
+            Regex doubleQuote = new(@"""""");
+            foreach (Match match in doubleQuote.Matches(verbatimText))
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Color = Color.StringEscapeSequence,
+                    Length = match.Length,
+                    Line = context.Start.Line,
+                    Column = context.Start.Column + match.Index + 1,
+                });
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Ldstr, verbatimText);
             return typeof(string);
+        }
+
+        Regex escapeSequenceRegex = new(@"\^(?:['""^0abfnrtv]|[0-9A-Fa-f]{1,4})");
+        foreach (Match match in escapeSequenceRegex.Matches(text))
+        {
+            CurrentFile.Fragments.Add(new()
+            {
+                Color = Color.StringEscapeSequence,
+                Length = match.Length,
+                Line = context.Start.Line,
+                Column = context.Start.Column + match.Index + 1,
+            });
         }
 
         string rawText = context.GetText()[1..^1]
