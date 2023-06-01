@@ -149,7 +149,7 @@ public static class TooltipGenerator
                 words.Add(BuildWord("module ", Color.Word));
             else
             {
-                if (type.IsSealed)
+                if (type.IsSealed && !type.IsValueType)
                     words.Add(BuildWord("sealed ", Color.Word));
 
                 if (type.IsAbstract)
@@ -166,9 +166,17 @@ public static class TooltipGenerator
         {
             words.Add(BuildWord("["));
 
-            foreach (Type param in type.GenericTypeArguments)
+            if (type.GenericTypeArguments.Length > 1)
             {
-                foreach (Word word in Type(param.GetTypeInfo(), false, omitNamespace, true).Words)
+                foreach (Type param in type.GenericTypeArguments[..^1])
+                {
+                    foreach (Word word in Type(param.GetTypeInfo(), false, omitNamespace, true).Words)
+                        words.Add(word);
+
+                    words.Add(BuildWord(", "));
+                }
+
+                foreach (Word word in Type(type.GenericTypeArguments.Last().GetTypeInfo(), false, omitNamespace, true).Words)
                     words.Add(word);
             }
 
@@ -179,11 +187,14 @@ public static class TooltipGenerator
         {
             words.Add(BuildWord(": ", Color.Default));
 
-            foreach (Word word in Type(type.BaseType.GetTypeInfo(), false, omitNamespace, true).Words)
-                words.Add(word);
+            if (!type.IsValueType)
+            {
+                foreach (Word word in Type(type.BaseType.GetTypeInfo(), false, omitNamespace, true).Words)
+                    words.Add(word);
 
-            if (type.ImplementedInterfaces.Count() == 1)
-                words.Add(BuildWord(", "));
+                if (type.ImplementedInterfaces.Count() == 1)
+                    words.Add(BuildWord(", "));
+            }
 
             if (type.ImplementedInterfaces.Count() > 0)
             {
@@ -193,8 +204,6 @@ public static class TooltipGenerator
 
                     foreach (Word word in Type(t.GetTypeInfo(), false, omitNamespace, true).Words)
                         words.Add(word);
-
-                    words.Add(BuildWord(", "));
                 }
             }
 
