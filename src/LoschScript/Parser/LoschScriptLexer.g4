@@ -112,8 +112,8 @@ Hex_Integer_Literal: (Minus | Plus)? '0' [xX] ('\''* HexDigit)+ Integer_Suffix?;
 Binary_Integer_Literal: (Minus | Plus)? '0' [bB] ('\''* [01])+ Integer_Suffix?;
 Real_Literal: (Minus | Plus)? ([0-9] ('\''* [0-9])*)? '.' [0-9] ('\''* [0-9])* ExponentPart? [sdm]? | [0-9] ('\''* [0-9])* ([sdm] | ExponentPart [sdm]?);
 
-Character_Literal: '\'' (~['\\\r\n\u0085\u2028\u2029] | CommonCharacter) '\'';
-String_Literal: '"' (~["\\\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
+Character_Literal: '\'' (~['\r\n\u0085\u2028\u2029] | CommonCharacter) '\'';
+String_Literal: '"' (~["\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
 Verbatim_String_Literal: '^"' (~'"' | '""')* '"';
 
 fragment Integer_Suffix: [sS][bB] | [bB] | [sS] | [uU][sS] | [uU] | [lL] | [uU][lL] | [nN] | [uU][nN];
