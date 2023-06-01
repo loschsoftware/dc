@@ -252,7 +252,7 @@ public static class TooltipGenerator
         {
             Color.TemplateType => "Interface",
             Color.Module => "Module",
-            Color.ValueType => "Structure",
+            Color.ValueType => "ValueType",
             _ => "Class"
         };
 
