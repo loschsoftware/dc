@@ -166,10 +166,11 @@ public static class TooltipGenerator
         {
             words.Add(BuildWord("["));
 
-            int i = 0;
-            for (; i < type.GenericTypeArguments.Length - 1; ++i, words.Add(BuildWord($"T{i}, ", Color.TypeParameter))) { }
-
-            words.Add(BuildWord($"T{i + 1}", Color.TypeParameter));
+            foreach (Type param in type.GenericTypeArguments)
+            {
+                foreach (Word word in Type(param.GetTypeInfo(), false, omitNamespace, true).Words)
+                    words.Add(word);
+            }
 
             words.Add(BuildWord("]"));
         }
@@ -251,7 +252,7 @@ public static class TooltipGenerator
         {
             Color.TemplateType => "Interface",
             Color.Module => "Module",
-            Color.ValueType => "Struct",
+            Color.ValueType => "Structure",
             _ => "Class"
         };
 
