@@ -175,10 +175,10 @@ public static class TooltipGenerator
 
                     words.Add(BuildWord(", "));
                 }
-
-                foreach (Word word in Type(type.GenericTypeArguments.Last().GetTypeInfo(), false, omitNamespace, true).Words)
-                    words.Add(word);
             }
+
+            foreach (Word word in Type(type.GenericTypeArguments.Last().GetTypeInfo(), false, omitNamespace, true).Words)
+                words.Add(word);
 
             words.Add(BuildWord("]"));
         }
@@ -187,23 +187,23 @@ public static class TooltipGenerator
         {
             words.Add(BuildWord(": ", Color.Default));
 
-            if (!type.IsValueType)
+            if (type.BaseType != typeof(ValueType) && type.BaseType != typeof(object))
             {
                 foreach (Word word in Type(type.BaseType.GetTypeInfo(), false, omitNamespace, true).Words)
                     words.Add(word);
 
-                if (type.ImplementedInterfaces.Count() == 1)
+                if (type.ImplementedInterfaces.Count() >= 1)
                     words.Add(BuildWord(", "));
             }
 
-            if (type.ImplementedInterfaces.Count() > 0)
+            if (type.ImplementedInterfaces.Count() > 1)
             {
                 foreach (Type t in type.ImplementedInterfaces.ToArray()[..^1])
                 {
-                    words.Add(BuildWord(", "));
-
                     foreach (Word word in Type(t.GetTypeInfo(), false, omitNamespace, true).Words)
                         words.Add(word);
+
+                    words.Add(BuildWord(", "));
                 }
             }
 
