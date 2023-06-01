@@ -115,4 +115,70 @@ internal static class EmitHelpers
         else
             generator.Emit(OpCodes.Ldloca, index);
     }
+
+    public static void EmitConst(ILGenerator il, object value)
+    {
+        if (value == null)
+            return;
+
+        if (value is sbyte or byte or short or ushort or int or char)
+        {
+            EmitLdcI4(il, (int)value);
+            return;
+        }
+
+        if (value is uint i)
+        {
+            EmitLdcI4(il, i);
+            return;
+        }
+
+        if (value is long l)
+        {
+            il.Emit(OpCodes.Ldc_I8, l);
+            return;
+        }
+
+        if (value is ulong u)
+        {
+            il.Emit(OpCodes.Ldc_I8, u); // Nobody's gonna know
+            return;
+        }
+
+        if (value is float f)
+        {
+            il.Emit(OpCodes.Ldc_R4, f);
+            return;
+        }
+
+        if (value is double d)
+        {
+            il.Emit(OpCodes.Ldc_R8, d);
+            return;
+        }
+
+        if (value is decimal dec)
+        {
+            il.Emit(OpCodes.Ldc_R8, (double)dec); // Who uses decimal anyway
+            return;
+        }
+
+        if (value is bool b)
+        {
+            il.Emit(OpCodes.Ldc_I4_S, b ? (byte)1 : (byte)0);
+            return;
+        }
+
+        if (value is string s)
+        {
+            il.Emit(OpCodes.Ldstr, s);
+            return;
+        }
+
+        if (value.GetType().IsEnum)
+        {
+            EmitLdcI4(il, (int)value);
+            return;
+        }
+    }
 }

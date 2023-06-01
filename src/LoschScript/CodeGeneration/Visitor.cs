@@ -1200,7 +1200,20 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         FieldInfo f = type.GetField(name);
         if (f != null)
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
+            try
+            {
+                // Constant
+                EmitConst(CurrentMethod.IL, f.GetRawConstantValue());
+            }
+            catch (Exception)
+            {
+                // Not a constant
+
+                if (f.IsStatic)
+                    CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
+                else
+                    CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
+            }
 
             CurrentFile.Fragments.Add(new()
             {
