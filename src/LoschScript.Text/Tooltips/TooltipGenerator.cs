@@ -185,7 +185,8 @@ public static class TooltipGenerator
 
         if (showBaseType && type.BaseType != null)
         {
-            words.Add(BuildWord(": ", Color.Default));
+            if (type.BaseType != typeof(ValueType) && type.BaseType != typeof(object) && type.ImplementedInterfaces.Count() > 0)
+                words.Add(BuildWord(": ", Color.Default));
 
             if (type.BaseType != typeof(ValueType) && type.BaseType != typeof(object))
             {
