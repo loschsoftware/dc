@@ -48,6 +48,7 @@ Double_Dot: '..';
 Double_Dot_Question_Mark: '..?';
 Dot_Equals: '.=';
 Colon: ':';
+Semicolon: ';';
 Underscore: '_';
 Single_Quote: '\'';
 Double_Quote: '"';

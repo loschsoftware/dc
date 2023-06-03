@@ -34,7 +34,8 @@ internal class FileContext
         "LoschScript.Core.stdin",
         "LoschScript.Core.Value",
         "LoschScript.Core.Process",
-        "LoschScript.Core.Numerics.NumericSequence"
+        "LoschScript.Core.Numerics.NumericSequence",
+        "LoschScript.Core.CompilerServices.CG"
     };
 
     public List<(string Name, string Alias)> Aliases { get; } = new();

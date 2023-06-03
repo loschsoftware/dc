@@ -192,5 +192,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an update to LSC is available. This is an information message, not an error.
     /// </summary>
-    LS0044_LscUpdateAvailable
+    LS0044_LscUpdateAvailable,
+    /// <summary>
+    /// Emitted when an inline IL instruction has an invalid opcode.
+    /// </summary>
+    LS0045_InlineILInvalidOpCode,
+    /// <summary>
+    /// Emitted when an inline IL instruction has an invalid operand.
+    /// </summary>
+    LS0046_InlineILInvalidOperand
 }

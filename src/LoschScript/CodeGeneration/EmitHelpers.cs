@@ -1,6 +1,9 @@
 ﻿using LoschScript.CLI;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace LoschScript.CodeGeneration;
 
@@ -180,5 +183,58 @@ internal static class EmitHelpers
             EmitLdcI4(il, (int)value);
             return;
         }
+    }
+    
+    // Very rudimentary and almost useless - fix ASAP
+    public static void EmitInlineIL(ILGenerator generator, string instruction, int line = 0, int column = 0, int length = 0)
+    {
+        string rawOpcode = instruction.Split(' ')[0].TrimEnd('\r', '\n');
+
+        string opcodeString = rawOpcode.Replace(".", "_");
+
+        if (opcodeString.EndsWith("_"))
+            opcodeString = opcodeString[..^1];
+
+        string operandString = instruction.Split(' ')[1];
+        operandString = operandString.TrimEnd('\r', '\n');
+
+        FieldInfo opcodeField = typeof(OpCodes).GetField(opcodeString, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static);
+
+        if (opcodeField == null)
+        {
+            EmitErrorMessage(
+                line,
+                column,
+                length,
+                LS0045_InlineILInvalidOpCode,
+                $"'{rawOpcode}' is not a valid IL opcode."
+                );
+            return;
+        }
+
+        if (byte.TryParse(operandString, out byte argI1))
+            generator.Emit((OpCode)opcodeField.GetValue(null), argI1);
+
+        else if (int.TryParse(operandString, out int argI4))
+            generator.Emit((OpCode)opcodeField.GetValue(null), argI4);
+
+        else if (double.TryParse(operandString, out double argR8))
+            generator.Emit((OpCode)opcodeField.GetValue(null), argR8);
+
+        else if (operandString.StartsWith("\"") && operandString.EndsWith("\""))
+            generator.Emit((OpCode)opcodeField.GetValue(null), operandString[1..^1]);
+
+        else if (CurrentMethod.Locals.Any(l => l.Name == operandString))
+        {
+            int index = CurrentMethod.Locals.Where(l => l.Name == operandString).First().Index;
+
+            if (index <= 255)
+                generator.Emit((OpCode)opcodeField.GetValue(null), (byte)index);
+            else
+                generator.Emit((OpCode)opcodeField.GetValue(null), index);
+        }
+
+        else
+            generator.Emit((OpCode)opcodeField.GetValue(null));
     }
 }

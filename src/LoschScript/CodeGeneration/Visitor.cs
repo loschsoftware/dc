@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using LoschScript.CLI;
+using LoschScript.Core.CompilerServices;
 using LoschScript.Meta;
 using LoschScript.Parser;
 using LoschScript.Text;
@@ -156,11 +157,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
-            Visit(tree);
+        foreach (IParseTree child in context.children.Take(context.children.Count - 1))
+            Visit(child);
 
         // Last expression is like return statement
-        Type ret = Visit(context.expression().Last());
+        Type ret = Visit(context.children.Last());
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
 
@@ -1055,6 +1056,37 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length)
     {
+        // Special function for emitting IL instructions from LoschScript
+        if (type == typeof(CG) && name == "il")
+        {
+            CurrentFile.Fragments.Add(new()
+            {
+                Line = line,
+                Column = column,
+                Length = length,
+                Color = Color.Function,
+                ToolTip = TooltipGenerator.Function(typeof(CG).GetMethod("il"))
+            });
+
+            if (arglist.expression().Length != 1)
+            {
+                EmitErrorMessage(
+                    line,
+                    column,
+                    length,
+                    LS0002_MethodNotFound,
+                    $"Invalid number of arguments for special function 'il'. Expected 1 argument."
+                    );
+
+                return typeof(void);
+            }
+
+            string arg = arglist.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+            EmitInlineIL(CurrentMethod.IL, arg);
+
+            return typeof(void);
+        }
+
         // Check if it is a method with parameters
         if (arglist != null)
         {
@@ -1129,11 +1161,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (m != null)
             {
-                if (m.IsStatic || type.IsValueType)
-                    CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
-                else
-                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
-
                 CurrentFile.Fragments.Add(new()
                 {
                     Line = line,
@@ -1142,6 +1169,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     Color = Color.Function,
                     ToolTip = TooltipGenerator.Function(m)
                 });
+
+                if (m.IsStatic || type.IsValueType)
+                    CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
+                else
+                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
 
                 return m.ReturnType;
             }
