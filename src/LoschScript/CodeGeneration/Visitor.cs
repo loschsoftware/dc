@@ -1082,7 +1082,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
 
             string arg = arglist.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
-            EmitInlineIL(CurrentMethod.IL, arg);
+            EmitInlineIL(CurrentMethod.IL, arg, arglist.expression()[0].Start.Line, arglist.expression()[0].Start.Column + 1, arglist.expression()[0].GetText().Length);
 
             return typeof(void);
         }
