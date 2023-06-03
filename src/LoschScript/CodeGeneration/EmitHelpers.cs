@@ -188,6 +188,9 @@ internal static class EmitHelpers
     // Very rudimentary and almost useless - fix ASAP
     public static void EmitInlineIL(ILGenerator generator, string instruction, int line = 0, int column = 0, int length = 0)
     {
+        if (!instruction.Contains(' '))
+            instruction += " ";
+
         string rawOpcode = instruction.Split(' ')[0].TrimEnd('\r', '\n');
 
         string opcodeString = rawOpcode.Replace(".", "_");
