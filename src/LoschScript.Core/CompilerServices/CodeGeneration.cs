@@ -1,4 +1,4 @@
-﻿namespace LoschScript.Core.CompilerServices;
+﻿namespace LoschScript.CompilerServices;
 
 /// <summary>
 /// Provides special functions for interacting with the LoschScript code generator.

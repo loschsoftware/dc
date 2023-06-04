@@ -4,5 +4,6 @@
 		<LangVersion>11</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Platforms>AnyCPU;x64</Platforms>
+		<RootNamespace>LoschScript</RootNamespace>
 	</PropertyGroup>
 </Project>

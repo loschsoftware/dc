@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LoschScript.Core.Scripting;
+namespace LoschScript.Scripting;
 
 /// <summary>
 /// Provides functionality for running embedded LoschScript scripts.

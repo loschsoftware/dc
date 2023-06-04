@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace LoschScript.Core.Scripting;
+namespace LoschScript.Scripting;
 
 /// <summary>
 /// Represents a script, which is a LoschScript program embedded inside a host application.
