@@ -7,7 +7,7 @@ namespace LoschScript.Runtime;
 /// <summary>
 /// Represents a union value, which can be of multiple types.
 /// </summary>
-public struct UnionValue : IEquatable<UnionValue>
+public struct UnionValue : IEquatable<UnionValue>, IDisposable
 {
     /// <summary>
     /// Creates a new instance of the <see cref="UnionValue"/> structure.
@@ -45,6 +45,20 @@ public struct UnionValue : IEquatable<UnionValue>
     }
 
     /// <summary>
+    /// Tries to set the value of the variable to the specified object.
+    /// </summary>
+    /// <param name="value">The new value.</param>
+    /// <returns>Returns <see langword="true"/> if the operation was successful.</returns>
+    public bool TrySetValue(object value)
+    {
+        if (!AllowedTypes.Contains(value.GetType()))
+            return false;
+
+        Value = value;
+        return true;
+    }
+
+    /// <summary>
     /// Formats the union value as a string.
     /// </summary>
     /// <returns>The string representation of the union value.</returns>
@@ -78,6 +92,15 @@ public struct UnionValue : IEquatable<UnionValue>
     /// <param name="obj">The object to compare.</param>
     /// <returns>true, if the specified object is equal to the current instance.</returns>
     public override bool Equals(object obj) => base.Equals(obj);
+
+    /// <summary>
+    /// If the current value is disposable, disposes it.
+    /// </summary>
+    public void Dispose()
+    {
+        if (Value is IDisposable d)
+            d.Dispose();
+    }
 
     /// <summary>
     /// Compares two instances of <see cref="UnionValue"/>.
