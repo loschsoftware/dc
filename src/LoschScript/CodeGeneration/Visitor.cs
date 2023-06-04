@@ -2240,9 +2240,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 tReturn = Visit(context.expression().Last());
 
-                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
-
-                CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
+                if (tReturn == typeof(void))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Ldnull);
+                    CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
+                }
+                else
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
+                    CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
+                }
             }
             else
             {
@@ -2258,9 +2265,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 tReturn = Visit(context.code_block().expression().Last());
 
-                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
-
-                CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
+                if (tReturn == typeof(void))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Ldnull);
+                    CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
+                }
+                else
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
+                    CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
+                }
             }
 
             CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
