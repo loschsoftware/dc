@@ -1057,7 +1057,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length)
     {
         // Special function for emitting IL instructions from LoschScript
-        if (type == typeof(CG) && name == "il")
+        if (type == typeof(Core.CompilerServices.CodeGeneration) && name == "il")
         {
             CurrentFile.Fragments.Add(new()
             {
@@ -1065,7 +1065,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Column = column,
                 Length = length,
                 Color = Color.Function,
-                ToolTip = TooltipGenerator.Function(typeof(CG).GetMethod("il"))
+                ToolTip = TooltipGenerator.Function(typeof(Core.CompilerServices.CodeGeneration).GetMethod("il"))
             });
 
             if (arglist.expression().Length != 1)
