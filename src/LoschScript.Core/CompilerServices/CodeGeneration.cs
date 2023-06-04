@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides special functions for interacting with the LoschScript code generator.
 /// </summary>
-public static class CG
+public static class CodeGeneration
 {
     /// <summary>
     /// Emits an IL instruction.
