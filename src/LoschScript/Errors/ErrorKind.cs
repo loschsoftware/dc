@@ -204,5 +204,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when there are duplicate types in a union type.
     /// </summary>
-    LS0047_UnionTypeDuplicate
+    LS0047_UnionTypeDuplicate,
+    /// <summary>
+    /// Emitted when a specified source file could not be found.
+    /// </summary>
+    LS0048_SourceFileNotFound
 }

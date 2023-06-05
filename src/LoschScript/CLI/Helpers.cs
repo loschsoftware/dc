@@ -76,7 +76,20 @@ internal static class Helpers
             GlobalConfig.AdvancedDiagnostics = true;
 
         if (args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Where(f => !File.Exists(f)).Any())
-            LogOut.WriteLine($"Skipping non-existent files.{Environment.NewLine}");
+        {
+            foreach (string file in args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Where(f => !File.Exists(f)))
+            {
+                EmitErrorMessage(
+                    0,
+                    0,
+                    0,
+                    LS0048_SourceFileNotFound,
+                    $"The source file '{Path.GetFileName(file)}' could not be found.",
+                    Path.GetFileName(file));
+            }
+
+            return -1;
+        }
 
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
