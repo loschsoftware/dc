@@ -2,6 +2,7 @@
 using LoschScript.CodeGeneration;
 using LoschScript.Errors;
 using LoschScript.Meta;
+using LoschScript.Parser;
 using LoschScript.Shell;
 using LoschScript.Text;
 using LoschScript.Text.Tooltips;

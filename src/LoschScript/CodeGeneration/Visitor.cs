@@ -1054,7 +1054,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return cType;
     }
 
-    public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length)
+    public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length, int local = 0)
     {
         // Special function for emitting IL instructions from LoschScript
         if (type == typeof(CompilerServices.CodeGeneration) && name == "il")
@@ -1194,7 +1194,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (parameterlessFunc != null)
         {
             if (parameterlessFunc.IsStatic || type.IsValueType)
+            {
+                if (parameterlessFunc.DeclaringType == typeof(object))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Pop);
+                    CurrentMethod.IL.Emit(OpCodes.Ldloc, local);
+                    CurrentMethod.IL.Emit(OpCodes.Box, CurrentMethod.Locals.Where(l => l.Index == local).First().Builder.LocalType);
+                }
+
                 CurrentMethod.IL.EmitCall(OpCodes.Call, parameterlessFunc, null);
+            }
             else
                 CurrentMethod.IL.EmitCall(OpCodes.Callvirt, parameterlessFunc, null);
 
@@ -1299,10 +1308,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
         Type type;
+        var local = CurrentMethod.Locals.First();
+
         // Check for local of this name
         if (CurrentMethod.Locals.Any(l => l.Name == context.full_identifier().Identifier()[0].GetText()))
         {
-            var local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().Identifier()[0].GetText());
+            local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().Identifier()[0].GetText());
             type = local.Builder.LocalType;
 
             CurrentFile.Fragments.Add(new()
@@ -1343,7 +1354,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length).Type;
 
                 if (t != null)
-                    return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
+                    return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, local.Index);
 
                 // Constructor
                 Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
@@ -1356,7 +1367,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 false);
         }
 
-        return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
+        return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, local.Index);
     }
 
     public override Type VisitArglist([NotNull] LoschScriptParser.ArglistContext context)
