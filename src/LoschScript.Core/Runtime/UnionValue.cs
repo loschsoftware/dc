@@ -37,6 +37,9 @@ public struct UnionValue : IEquatable<UnionValue>, IDisposable
 
         set
         {
+            if (value == null)
+                return;
+            
             if (!AllowedTypes.Contains(value.GetType()))
                 throw new InvalidOperationException($"A value of type '{value.GetType()}' is not supported by the union type.");
 
@@ -65,6 +68,11 @@ public struct UnionValue : IEquatable<UnionValue>, IDisposable
     public override string ToString()
     {
         return Value.ToString();
+    }
+
+    internal string ToTypeString()
+    {
+        return string.Join(" | ", AllowedTypes.Select(t => t.ToString()));
     }
 
     /// <summary>

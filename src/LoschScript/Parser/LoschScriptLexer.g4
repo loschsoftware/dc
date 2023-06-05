@@ -36,7 +36,9 @@ False: 'false';
 Of: 'of';
 
 Open_Paren: '(';
+Double_Open_Paren: '((';
 Close_Paren: ')';
+Double_Close_Paren: '))';
 Open_Bracket: '[';
 Close_Bracket: ']';
 Open_Brace: '{';

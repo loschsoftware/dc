@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoschScript.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
@@ -21,6 +22,8 @@ internal class MethodContext
         return $"<>g_LoopArray{index}";
     }
 
+    public static string GetTempVariableName(int index) => $"<>g_Temp{index}";
+
     public static MethodContext CurrentMethod { get; set; }
 
     public ILGenerator IL { get; set; }
@@ -31,11 +34,15 @@ internal class MethodContext
 
     public int LocalIndex { get; set; } = -1;
 
-    public List<(string Name, LocalBuilder Builder, bool IsConstant, int Index)> Locals { get; } = new();
+    public List<(string Name, LocalBuilder Builder, bool IsConstant, int Index, UnionValue Union)> Locals { get; } = new();
+    
+    public UnionValue CurrentUnion { get; set; } = new(null, typeof(object));
 
     public int ThrowawayCounterVariableIndex { get; set; } = 0;
     
     public int LoopArrayReturnValueIndex { get; set; } = 0;
+
+    public int TempValueIndex { get; set; } = 0;
 
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 }

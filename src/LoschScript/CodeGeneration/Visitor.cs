@@ -1,9 +1,9 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using LoschScript.CLI;
-using LoschScript.Core.CompilerServices;
 using LoschScript.Meta;
 using LoschScript.Parser;
+using LoschScript.Runtime;
 using LoschScript.Text;
 using LoschScript.Text.Tooltips;
 using System;
@@ -204,7 +204,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (context.op.Text == "!=")
             {
-                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 0);
+                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
                 CurrentMethod.IL.Emit(OpCodes.Ceq);
             }
 
@@ -279,7 +279,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (context.op.Text == "<=" || context.op.Text == ">=")
             {
-                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 0);
+                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
                 CurrentMethod.IL.Emit(OpCodes.Ceq);
             }
 
@@ -376,7 +376,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (t == typeof(bool))
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 0);
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
             CurrentMethod.IL.Emit(OpCodes.Ceq);
 
             return t;
@@ -1057,7 +1057,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length)
     {
         // Special function for emitting IL instructions from LoschScript
-        if (type == typeof(Core.CompilerServices.CodeGeneration) && name == "il")
+        if (type == typeof(CompilerServices.CodeGeneration) && name == "il")
         {
             CurrentFile.Fragments.Add(new()
             {
@@ -1065,7 +1065,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Column = column,
                 Length = length,
                 Color = Color.Function,
-                ToolTip = TooltipGenerator.Function(typeof(Core.CompilerServices.CodeGeneration).GetMethod("il"))
+                ToolTip = TooltipGenerator.Function(typeof(CompilerServices.CodeGeneration).GetMethod("il"))
             });
 
             if (arglist.expression().Length != 1)
@@ -1316,6 +1316,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (context.full_identifier().Identifier().Length == 1)
             {
+                if (type == typeof(UnionValue))
+                {
+                    EmitLdloca(CurrentMethod.IL, local.Index);
+
+                    MethodInfo getter = type.GetMethod("get_Value");
+                    CurrentMethod.IL.EmitCall(OpCodes.Call, getter, null);
+
+                    return typeof(object);
+                }
+
                 EmitLdloc(CurrentMethod.IL, local.Index);
                 return type;
             }
@@ -1893,11 +1903,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         if (context.True() != null)
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 1);
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)1);
             return typeof(bool);
         }
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 0);
+        CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
 
         return typeof(bool);
     }
@@ -1922,8 +1932,39 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             Type type = Visit(context.expression());
 
+            LocalBuilder tempLocalBuilder = CurrentMethod.IL.DeclareLocal(type);
+            tempLocalBuilder.SetLocalSymInfo(GetTempVariableName(CurrentMethod.TempValueIndex++));
+            CurrentMethod.Locals.Add((GetTempVariableName(CurrentMethod.TempValueIndex), tempLocalBuilder, true, CurrentMethod.LocalIndex++, new(null, type)));
+
+            EmitStloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
+
             if (type != local.Builder.LocalType)
             {
+                if (local.Builder.LocalType == typeof(UnionValue))
+                {
+                    if (local.Union.AllowedTypes.Contains(type))
+                    {
+                        EmitLdloca(CurrentMethod.IL, local.Index);
+
+                        EmitLdloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
+                        CurrentMethod.IL.Emit(OpCodes.Box, type);
+
+                        MethodInfo m = typeof(UnionValue).GetMethod("set_Value", new Type[] { typeof(object) });
+                        CurrentMethod.IL.Emit(OpCodes.Call, m);
+
+                        return local.Union.GetType();
+                    }
+
+                    EmitErrorMessage(
+                        context.Equals().Symbol.Line,
+                        context.Equals().Symbol.Column,
+                        context.Equals().GetText().Length,
+                        LS0019_GenericValueTypeInvalid,
+                        $"Values of type '{type}' are not supported by union type '{local.Union.ToTypeString()}'.");
+
+                    return local.Union.GetType();
+                }
+
                 EmitErrorMessage(
                     context.Equals().Symbol.Line,
                     context.Equals().Symbol.Column,
@@ -1934,12 +1975,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 return type;
             }
 
+            EmitLdloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
+
             EmitStloc(CurrentMethod.IL, local.Index);
 
             return local.Builder.LocalType;
         }
 
         Type t = Visit(context.expression());
+
+        Type t1 = t;
 
         if (context.type_name() != null)
         {
@@ -1966,7 +2011,36 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         CurrentMethod.LocalIndex++;
 
-        CurrentMethod.Locals.Add((context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex));
+        CurrentMethod.Locals.Add((context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex, CurrentMethod.CurrentUnion));
+
+        if (t == typeof(UnionValue))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Box, t1);
+
+            ConstructorInfo constructor = t.GetConstructor(new Type[] { typeof(object), typeof(Type[]) });
+
+            UnionValue union = CurrentMethod.CurrentUnion;
+
+            EmitLdcI4(CurrentMethod.IL, union.AllowedTypes.Length);
+            CurrentMethod.IL.Emit(OpCodes.Newarr, typeof(Type));
+            CurrentMethod.IL.Emit(OpCodes.Dup);
+
+            for (int i = 0; i < union.AllowedTypes.Length; i++)
+            {
+                EmitLdcI4(CurrentMethod.IL, i);
+                CurrentMethod.IL.Emit(OpCodes.Ldtoken, union.AllowedTypes[i]);
+
+                MethodInfo getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
+                CurrentMethod.IL.Emit(OpCodes.Call, getTypeFromHandle);
+                CurrentMethod.IL.Emit(OpCodes.Stelem_Ref);
+
+                CurrentMethod.IL.Emit(OpCodes.Dup);
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Pop);
+
+            CurrentMethod.IL.Emit(OpCodes.Newobj, constructor);
+        }
 
         EmitStloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
 
@@ -1977,6 +2051,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         if (context.identifier_atom() != null)
             return Visit(context.identifier_atom());
+
+        if (context.Bar() != null)
+        {
+            UnionValue union = new(null, context.type_name().Select(VisitType_name).ToArray());
+            CurrentMethod.CurrentUnion = union;
+
+            return union.GetType();
+        }
 
         // TODO: Implement the other types
         return typeof(object);
@@ -2161,7 +2243,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         Visit(context.integer_atom());
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, context.Caret() == null ? 0 : 1);
+        EmitLdcI4(CurrentMethod.IL, context.Caret() == null ? 0 : 1);
 
         CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Index).GetConstructor(new Type[] { typeof(int), typeof(bool) }));
         return typeof(Index);
@@ -2209,7 +2291,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             // A local that saves the returning array
             LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(typeof(object).MakeArrayType());
 
-            CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
+            CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++, new(null, typeof(int))));
 
             EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
@@ -2220,7 +2302,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Label start = CurrentMethod.IL.DefineLabel();
 
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(typeof(int));
-            CurrentMethod.Locals.Add((GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++));
+            CurrentMethod.Locals.Add((GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++, new(null, typeof(int))));
 
             if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug && createAssembly)
                 Helpers.SetLocalSymInfo(lb, (GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)));
@@ -2278,7 +2360,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
 
             CurrentMethod.IL.Emit(OpCodes.Ldloc, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, 1);
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)1);
             CurrentMethod.IL.Emit(OpCodes.Add);
             EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
@@ -2303,7 +2385,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             // A local that saves the returning list
             LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(typeof(List<object>));
 
-            CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
+            CurrentMethod.Locals.Add((GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++, new(null, typeof(List<string>))));
 
             EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 

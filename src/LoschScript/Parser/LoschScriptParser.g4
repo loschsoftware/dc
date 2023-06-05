@@ -138,13 +138,14 @@ identifier_atom
     ;
 
 type_name
-    : identifier_atom
+    : Open_Paren type_name (Bar type_name)+ Close_Paren
     | generic_identifier
-    | union_variable_type
+    | identifier_atom
+    | param_list_type
     ;
 
-union_variable_type
-    : Open_Paren type_name (Bar type_name)+ Close_Paren
+param_list_type
+    : Double_Open_Paren type_name (Comma type_name)* Double_Close_Paren
     ;
 
 if_branch

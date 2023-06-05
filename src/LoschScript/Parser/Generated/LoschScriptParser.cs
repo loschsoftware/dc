@@ -40,23 +40,24 @@ public partial class LoschScriptParser : Parser {
 		Ws=1, NewLine=2, Single_Line_Comment=3, Delimited_Comment=4, Import=5, 
 		Export=6, Assembly=7, Type=8, Module=9, Global=10, Local=11, Internal=12, 
 		Static=13, Protected=14, Sealed=15, Partial=16, Infix=17, Inline=18, Var=19, 
-		Val=20, True=21, False=22, Of=23, Open_Paren=24, Close_Paren=25, Open_Bracket=26, 
-		Close_Bracket=27, Open_Brace=28, Close_Brace=29, Comma=30, Double_Comma=31, 
-		Dot=32, Double_Dot=33, Double_Dot_Question_Mark=34, Dot_Equals=35, Colon=36, 
-		Semicolon=37, Underscore=38, Single_Quote=39, Double_Quote=40, Question_Mark=41, 
-		Exclamation_Mark=42, Exclamation_Question=43, Exclamation_Colon=44, At_Sign=45, 
-		Exclamation_At=46, Dollar_Sign=47, Caret=48, Percent_Caret=49, Bar=50, 
-		Bar_GreaterThan=51, LessThan_Bar=52, Double_Bar=53, Bar_Equals=54, Double_Bar_Equals=55, 
-		Ampersand=56, Double_Ampersand=57, Double_Ampersand_Equals=58, Ampersand_Equals=59, 
-		Less_Than=60, Greater_Than=61, Less_Equals=62, Greater_Equals=63, Double_Equals=64, 
-		Exclamation_Equals=65, Plus=66, Plus_Equals=67, Minus=68, Minus_Equals=69, 
-		Asterisk=70, Asterisk_Equals=71, Double_Asterisk=72, Double_Asterisk_Equals=73, 
-		Slash=74, Slash_Equals=75, Percent=76, Percent_Equals=77, Equals=78, Tilde=79, 
-		Double_Tilde=80, Tilde_Equals=81, Double_Less_Than=82, Double_Less_Than_Equals=83, 
-		Double_Greater_Than=84, Double_Greater_Than_Equals=85, Arrow_Right=86, 
-		Arrow_Left=87, Double_Backtick=88, Identifier=89, Integer_Literal=90, 
-		Hex_Integer_Literal=91, Binary_Integer_Literal=92, Real_Literal=93, Character_Literal=94, 
-		String_Literal=95, Verbatim_String_Literal=96;
+		Val=20, True=21, False=22, Of=23, Open_Paren=24, Double_Open_Paren=25, 
+		Close_Paren=26, Double_Close_Paren=27, Open_Bracket=28, Close_Bracket=29, 
+		Open_Brace=30, Close_Brace=31, Comma=32, Double_Comma=33, Dot=34, Double_Dot=35, 
+		Double_Dot_Question_Mark=36, Dot_Equals=37, Colon=38, Semicolon=39, Underscore=40, 
+		Single_Quote=41, Double_Quote=42, Question_Mark=43, Exclamation_Mark=44, 
+		Exclamation_Question=45, Exclamation_Colon=46, At_Sign=47, Exclamation_At=48, 
+		Dollar_Sign=49, Caret=50, Percent_Caret=51, Bar=52, Bar_GreaterThan=53, 
+		LessThan_Bar=54, Double_Bar=55, Bar_Equals=56, Double_Bar_Equals=57, Ampersand=58, 
+		Double_Ampersand=59, Double_Ampersand_Equals=60, Ampersand_Equals=61, 
+		Less_Than=62, Greater_Than=63, Less_Equals=64, Greater_Equals=65, Double_Equals=66, 
+		Exclamation_Equals=67, Plus=68, Plus_Equals=69, Minus=70, Minus_Equals=71, 
+		Asterisk=72, Asterisk_Equals=73, Double_Asterisk=74, Double_Asterisk_Equals=75, 
+		Slash=76, Slash_Equals=77, Percent=78, Percent_Equals=79, Equals=80, Tilde=81, 
+		Double_Tilde=82, Tilde_Equals=83, Double_Less_Than=84, Double_Less_Than_Equals=85, 
+		Double_Greater_Than=86, Double_Greater_Than_Equals=87, Arrow_Right=88, 
+		Arrow_Left=89, Double_Backtick=90, Identifier=91, Integer_Literal=92, 
+		Hex_Integer_Literal=93, Binary_Integer_Literal=94, Real_Literal=95, Character_Literal=96, 
+		String_Literal=97, Verbatim_String_Literal=98;
 	public const int
 		RULE_compilation_unit = 0, RULE_file_body = 1, RULE_top_level_statements = 2, 
 		RULE_full_program = 3, RULE_import_directive = 4, RULE_export_directive = 5, 
@@ -64,18 +65,18 @@ public partial class LoschScriptParser : Parser {
 		RULE_expression_atom = 10, RULE_integer_atom = 11, RULE_real_atom = 12, 
 		RULE_boolean_atom = 13, RULE_string_atom = 14, RULE_character_atom = 15, 
 		RULE_empty_atom = 16, RULE_wildcard_atom = 17, RULE_identifier_atom = 18, 
-		RULE_type_name = 19, RULE_union_variable_type = 20, RULE_if_branch = 21, 
-		RULE_postfix_if_branch = 22, RULE_elif_branch = 23, RULE_else_branch = 24, 
-		RULE_unless_branch = 25, RULE_else_unless_branch = 26, RULE_postfix_unless_branch = 27, 
-		RULE_range = 28, RULE_index = 29, RULE_arglist = 30, RULE_attribute = 31, 
-		RULE_type_definition = 32, RULE_generic_identifier = 33, RULE_field_access_modifier = 34, 
-		RULE_field_declaration = 35, RULE_placeholder = 36;
+		RULE_type_name = 19, RULE_param_list_type = 20, RULE_if_branch = 21, RULE_postfix_if_branch = 22, 
+		RULE_elif_branch = 23, RULE_else_branch = 24, RULE_unless_branch = 25, 
+		RULE_else_unless_branch = 26, RULE_postfix_unless_branch = 27, RULE_range = 28, 
+		RULE_index = 29, RULE_arglist = 30, RULE_attribute = 31, RULE_type_definition = 32, 
+		RULE_generic_identifier = 33, RULE_field_access_modifier = 34, RULE_field_declaration = 35, 
+		RULE_placeholder = 36;
 	public static readonly string[] ruleNames = {
 		"compilation_unit", "file_body", "top_level_statements", "full_program", 
 		"import_directive", "export_directive", "full_identifier", "code_block", 
 		"expression", "atom", "expression_atom", "integer_atom", "real_atom", 
 		"boolean_atom", "string_atom", "character_atom", "empty_atom", "wildcard_atom", 
-		"identifier_atom", "type_name", "union_variable_type", "if_branch", "postfix_if_branch", 
+		"identifier_atom", "type_name", "param_list_type", "if_branch", "postfix_if_branch", 
 		"elif_branch", "else_branch", "unless_branch", "else_unless_branch", "postfix_unless_branch", 
 		"range", "index", "arglist", "attribute", "type_definition", "generic_identifier", 
 		"field_access_modifier", "field_declaration", "placeholder"
@@ -85,34 +86,36 @@ public partial class LoschScriptParser : Parser {
 		null, null, null, null, null, "'import'", "'export'", "'assembly'", "'type'", 
 		"'module'", "'global'", "'local'", "'internal'", "'static'", "'protected'", 
 		"'sealed'", "'partial'", "'infix'", "'inline'", "'var'", "'val'", "'true'", 
-		"'false'", "'of'", "'('", "')'", "'['", "']'", "'{'", "'}'", "','", "',,'", 
-		"'.'", "'..'", "'..?'", "'.='", "':'", "';'", "'_'", "'''", "'\"'", "'?'", 
-		"'!'", "'!?'", "'!:'", "'@'", "'!@'", "'$'", "'^'", "'%^'", "'|'", "'|>'", 
-		"'<|'", "'||'", "'|='", "'||='", "'&'", "'&&'", "'&&='", "'&='", "'<'", 
-		"'>'", "'<='", "'>='", "'=='", "'!='", "'+'", "'+='", "'-'", "'-='", "'*'", 
-		"'*='", "'**'", "'**='", "'/'", "'/='", "'%'", "'%='", "'='", "'~'", "'~~'", 
-		"'~='", "'<<'", "'<<='", "'>>'", "'>>='", "'->'", "'<-'", "'``'"
+		"'false'", "'of'", "'('", "'(('", "')'", "'))'", "'['", "']'", "'{'", 
+		"'}'", "','", "',,'", "'.'", "'..'", "'..?'", "'.='", "':'", "';'", "'_'", 
+		"'''", "'\"'", "'?'", "'!'", "'!?'", "'!:'", "'@'", "'!@'", "'$'", "'^'", 
+		"'%^'", "'|'", "'|>'", "'<|'", "'||'", "'|='", "'||='", "'&'", "'&&'", 
+		"'&&='", "'&='", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'+'", 
+		"'+='", "'-'", "'-='", "'*'", "'*='", "'**'", "'**='", "'/'", "'/='", 
+		"'%'", "'%='", "'='", "'~'", "'~~'", "'~='", "'<<'", "'<<='", "'>>'", 
+		"'>>='", "'->'", "'<-'", "'``'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, "Ws", "NewLine", "Single_Line_Comment", "Delimited_Comment", "Import", 
 		"Export", "Assembly", "Type", "Module", "Global", "Local", "Internal", 
 		"Static", "Protected", "Sealed", "Partial", "Infix", "Inline", "Var", 
-		"Val", "True", "False", "Of", "Open_Paren", "Close_Paren", "Open_Bracket", 
-		"Close_Bracket", "Open_Brace", "Close_Brace", "Comma", "Double_Comma", 
-		"Dot", "Double_Dot", "Double_Dot_Question_Mark", "Dot_Equals", "Colon", 
-		"Semicolon", "Underscore", "Single_Quote", "Double_Quote", "Question_Mark", 
-		"Exclamation_Mark", "Exclamation_Question", "Exclamation_Colon", "At_Sign", 
-		"Exclamation_At", "Dollar_Sign", "Caret", "Percent_Caret", "Bar", "Bar_GreaterThan", 
-		"LessThan_Bar", "Double_Bar", "Bar_Equals", "Double_Bar_Equals", "Ampersand", 
-		"Double_Ampersand", "Double_Ampersand_Equals", "Ampersand_Equals", "Less_Than", 
-		"Greater_Than", "Less_Equals", "Greater_Equals", "Double_Equals", "Exclamation_Equals", 
-		"Plus", "Plus_Equals", "Minus", "Minus_Equals", "Asterisk", "Asterisk_Equals", 
-		"Double_Asterisk", "Double_Asterisk_Equals", "Slash", "Slash_Equals", 
-		"Percent", "Percent_Equals", "Equals", "Tilde", "Double_Tilde", "Tilde_Equals", 
-		"Double_Less_Than", "Double_Less_Than_Equals", "Double_Greater_Than", 
-		"Double_Greater_Than_Equals", "Arrow_Right", "Arrow_Left", "Double_Backtick", 
-		"Identifier", "Integer_Literal", "Hex_Integer_Literal", "Binary_Integer_Literal", 
-		"Real_Literal", "Character_Literal", "String_Literal", "Verbatim_String_Literal"
+		"Val", "True", "False", "Of", "Open_Paren", "Double_Open_Paren", "Close_Paren", 
+		"Double_Close_Paren", "Open_Bracket", "Close_Bracket", "Open_Brace", "Close_Brace", 
+		"Comma", "Double_Comma", "Dot", "Double_Dot", "Double_Dot_Question_Mark", 
+		"Dot_Equals", "Colon", "Semicolon", "Underscore", "Single_Quote", "Double_Quote", 
+		"Question_Mark", "Exclamation_Mark", "Exclamation_Question", "Exclamation_Colon", 
+		"At_Sign", "Exclamation_At", "Dollar_Sign", "Caret", "Percent_Caret", 
+		"Bar", "Bar_GreaterThan", "LessThan_Bar", "Double_Bar", "Bar_Equals", 
+		"Double_Bar_Equals", "Ampersand", "Double_Ampersand", "Double_Ampersand_Equals", 
+		"Ampersand_Equals", "Less_Than", "Greater_Than", "Less_Equals", "Greater_Equals", 
+		"Double_Equals", "Exclamation_Equals", "Plus", "Plus_Equals", "Minus", 
+		"Minus_Equals", "Asterisk", "Asterisk_Equals", "Double_Asterisk", "Double_Asterisk_Equals", 
+		"Slash", "Slash_Equals", "Percent", "Percent_Equals", "Equals", "Tilde", 
+		"Double_Tilde", "Tilde_Equals", "Double_Less_Than", "Double_Less_Than_Equals", 
+		"Double_Greater_Than", "Double_Greater_Than_Equals", "Arrow_Right", "Arrow_Left", 
+		"Double_Backtick", "Identifier", "Integer_Literal", "Hex_Integer_Literal", 
+		"Binary_Integer_Literal", "Real_Literal", "Character_Literal", "String_Literal", 
+		"Verbatim_String_Literal"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -408,7 +411,7 @@ public partial class LoschScriptParser : Parser {
 			State = 101;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 1153887159644061700L) != 0) || ((((_la - 68)) & ~0x3f) == 0 && ((1L << (_la - 68)) & 509609985L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 4615548638502322180L) != 0) || ((((_la - 70)) & ~0x3f) == 0 && ((1L << (_la - 70)) & 509609985L) != 0)) {
 				{
 				State = 99;
 				ErrorHandler.Sync(this);
@@ -998,7 +1001,7 @@ public partial class LoschScriptParser : Parser {
 				State = 168;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 1153887159644061700L) != 0) || ((((_la - 68)) & ~0x3f) == 0 && ((1L << (_la - 68)) & 509609985L) != 0)) {
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 4615548638502322180L) != 0) || ((((_la - 70)) & ~0x3f) == 0 && ((1L << (_la - 70)) & 509609985L) != 0)) {
 					{
 					State = 166;
 					ErrorHandler.Sync(this);
@@ -2735,7 +2738,7 @@ public partial class LoschScriptParser : Parser {
 				State = 278;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 1153887159644061696L) != 0) || ((((_la - 68)) & ~0x3f) == 0 && ((1L << (_la - 68)) & 509609985L) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 4615548638502322176L) != 0) || ((((_la - 70)) & ~0x3f) == 0 && ((1L << (_la - 70)) & 509609985L) != 0)) {
 					{
 					State = 270;
 					expression(0);
@@ -3008,7 +3011,7 @@ public partial class LoschScriptParser : Parser {
 						State = 349;
 						((Comparison_expressionContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
-						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & -1152921504606846976L) != 0)) ) {
+						if ( !(((((_la - 62)) & ~0x3f) == 0 && ((1L << (_la - 62)) & 15L) != 0)) ) {
 							((Comparison_expressionContext)_localctx).op = ErrorHandler.RecoverInline(this);
 						}
 						else {
@@ -3828,14 +3831,26 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	public partial class Type_nameContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public Identifier_atomContext identifier_atom() {
-			return GetRuleContext<Identifier_atomContext>(0);
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Open_Paren() { return GetToken(LoschScriptParser.Open_Paren, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public Type_nameContext[] type_name() {
+			return GetRuleContexts<Type_nameContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Type_nameContext type_name(int i) {
+			return GetRuleContext<Type_nameContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Close_Paren() { return GetToken(LoschScriptParser.Close_Paren, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Bar() { return GetTokens(LoschScriptParser.Bar); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Bar(int i) {
+			return GetToken(LoschScriptParser.Bar, i);
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public Generic_identifierContext generic_identifier() {
 			return GetRuleContext<Generic_identifierContext>(0);
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public Union_variable_typeContext union_variable_type() {
-			return GetRuleContext<Union_variable_typeContext>(0);
+		[System.Diagnostics.DebuggerNonUserCode] public Identifier_atomContext identifier_atom() {
+			return GetRuleContext<Identifier_atomContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Param_list_typeContext param_list_type() {
+			return GetRuleContext<Param_list_typeContext>(0);
 		}
 		public Type_nameContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -3864,29 +3879,57 @@ public partial class LoschScriptParser : Parser {
 	public Type_nameContext type_name() {
 		Type_nameContext _localctx = new Type_nameContext(Context, State);
 		EnterRule(_localctx, 38, RULE_type_name);
+		int _la;
 		try {
-			State = 443;
+			State = 453;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,44,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,45,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
 				State = 440;
-				identifier_atom();
+				Match(Open_Paren);
+				State = 441;
+				type_name();
+				State = 444;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+				do {
+					{
+					{
+					State = 442;
+					Match(Bar);
+					State = 443;
+					type_name();
+					}
+					}
+					State = 446;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.LA(1);
+				} while ( _la==Bar );
+				State = 448;
+				Match(Close_Paren);
 				}
 				break;
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 441;
+				State = 450;
 				generic_identifier();
 				}
 				break;
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 442;
-				union_variable_type();
+				State = 451;
+				identifier_atom();
+				}
+				break;
+			case 4:
+				EnterOuterAlt(_localctx, 4);
+				{
+				State = 452;
+				param_list_type();
 				}
 				break;
 			}
@@ -3902,72 +3945,72 @@ public partial class LoschScriptParser : Parser {
 		return _localctx;
 	}
 
-	public partial class Union_variable_typeContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Open_Paren() { return GetToken(LoschScriptParser.Open_Paren, 0); }
+	public partial class Param_list_typeContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Open_Paren() { return GetToken(LoschScriptParser.Double_Open_Paren, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public Type_nameContext[] type_name() {
 			return GetRuleContexts<Type_nameContext>();
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public Type_nameContext type_name(int i) {
 			return GetRuleContext<Type_nameContext>(i);
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Close_Paren() { return GetToken(LoschScriptParser.Close_Paren, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Bar() { return GetTokens(LoschScriptParser.Bar); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Bar(int i) {
-			return GetToken(LoschScriptParser.Bar, i);
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Close_Paren() { return GetToken(LoschScriptParser.Double_Close_Paren, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Comma() { return GetTokens(LoschScriptParser.Comma); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Comma(int i) {
+			return GetToken(LoschScriptParser.Comma, i);
 		}
-		public Union_variable_typeContext(ParserRuleContext parent, int invokingState)
+		public Param_list_typeContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
-		public override int RuleIndex { get { return RULE_union_variable_type; } }
+		public override int RuleIndex { get { return RULE_param_list_type; } }
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void EnterRule(IParseTreeListener listener) {
 			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterUnion_variable_type(this);
+			if (typedListener != null) typedListener.EnterParam_list_type(this);
 		}
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void ExitRule(IParseTreeListener listener) {
 			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitUnion_variable_type(this);
+			if (typedListener != null) typedListener.ExitParam_list_type(this);
 		}
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitUnion_variable_type(this);
+			if (typedVisitor != null) return typedVisitor.VisitParam_list_type(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
 
 	[RuleVersion(0)]
-	public Union_variable_typeContext union_variable_type() {
-		Union_variable_typeContext _localctx = new Union_variable_typeContext(Context, State);
-		EnterRule(_localctx, 40, RULE_union_variable_type);
+	public Param_list_typeContext param_list_type() {
+		Param_list_typeContext _localctx = new Param_list_typeContext(Context, State);
+		EnterRule(_localctx, 40, RULE_param_list_type);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 445;
-			Match(Open_Paren);
-			State = 446;
+			State = 455;
+			Match(Double_Open_Paren);
+			State = 456;
 			type_name();
-			State = 449;
+			State = 461;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			do {
+			while (_la==Comma) {
 				{
 				{
-				State = 447;
-				Match(Bar);
-				State = 448;
+				State = 457;
+				Match(Comma);
+				State = 458;
 				type_name();
 				}
 				}
-				State = 451;
+				State = 463;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-			} while ( _la==Bar );
-			State = 453;
-			Match(Close_Paren);
+			}
+			State = 464;
+			Match(Double_Close_Paren);
 			}
 		}
 		catch (RecognitionException re) {
@@ -4023,24 +4066,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 455;
+			State = 466;
 			Match(Question_Mark);
-			State = 456;
+			State = 467;
 			expression(0);
-			State = 457;
+			State = 468;
 			Match(Equals);
-			State = 460;
+			State = 471;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,46,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,47,Context) ) {
 			case 1:
 				{
-				State = 458;
+				State = 469;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 459;
+				State = 470;
 				expression(0);
 				}
 				break;
@@ -4093,9 +4136,9 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 462;
+			State = 473;
 			Match(Question_Mark);
-			State = 463;
+			State = 474;
 			expression(0);
 			}
 		}
@@ -4152,24 +4195,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 465;
+			State = 476;
 			Match(Colon);
-			State = 466;
+			State = 477;
 			expression(0);
-			State = 467;
+			State = 478;
 			Match(Equals);
-			State = 470;
+			State = 481;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,47,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,48,Context) ) {
 			case 1:
 				{
-				State = 468;
+				State = 479;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 469;
+				State = 480;
 				expression(0);
 				}
 				break;
@@ -4226,22 +4269,22 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 472;
+			State = 483;
 			Match(Colon);
-			State = 473;
+			State = 484;
 			Match(Equals);
-			State = 476;
+			State = 487;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,48,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,49,Context) ) {
 			case 1:
 				{
-				State = 474;
+				State = 485;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 475;
+				State = 486;
 				expression(0);
 				}
 				break;
@@ -4301,24 +4344,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 478;
+			State = 489;
 			Match(Exclamation_Question);
-			State = 479;
+			State = 490;
 			expression(0);
-			State = 480;
+			State = 491;
 			Match(Equals);
-			State = 483;
+			State = 494;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,49,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,50,Context) ) {
 			case 1:
 				{
-				State = 481;
+				State = 492;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 482;
+				State = 493;
 				expression(0);
 				}
 				break;
@@ -4378,24 +4421,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 485;
+			State = 496;
 			Match(Exclamation_Colon);
-			State = 486;
+			State = 497;
 			expression(0);
-			State = 487;
+			State = 498;
 			Match(Equals);
-			State = 490;
+			State = 501;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,50,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,51,Context) ) {
 			case 1:
 				{
-				State = 488;
+				State = 499;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 489;
+				State = 500;
 				expression(0);
 				}
 				break;
@@ -4448,9 +4491,9 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 492;
+			State = 503;
 			Match(Exclamation_Question);
-			State = 493;
+			State = 504;
 			expression(0);
 			}
 		}
@@ -4504,24 +4547,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 496;
+			State = 507;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Caret || _la==Integer_Literal) {
 				{
-				State = 495;
+				State = 506;
 				index();
 				}
 			}
 
-			State = 498;
+			State = 509;
 			Match(Double_Dot);
-			State = 500;
+			State = 511;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,52,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,53,Context) ) {
 			case 1:
 				{
-				State = 499;
+				State = 510;
 				index();
 				}
 				break;
@@ -4575,17 +4618,17 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 503;
+			State = 514;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Caret) {
 				{
-				State = 502;
+				State = 513;
 				Match(Caret);
 				}
 			}
 
-			State = 505;
+			State = 516;
 			integer_atom();
 			}
 		}
@@ -4652,59 +4695,59 @@ public partial class LoschScriptParser : Parser {
 			EnterOuterAlt(_localctx, 1);
 			{
 			{
-			State = 509;
+			State = 520;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,54,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,55,Context) ) {
 			case 1:
 				{
-				State = 507;
+				State = 518;
 				Match(Identifier);
-				State = 508;
+				State = 519;
 				Match(Colon);
 				}
 				break;
 			}
-			State = 511;
+			State = 522;
 			expression(0);
 			}
-			State = 521;
+			State = 532;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,56,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,57,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
-					State = 513;
+					State = 524;
 					Match(Comma);
 					{
-					State = 516;
+					State = 527;
 					ErrorHandler.Sync(this);
-					switch ( Interpreter.AdaptivePredict(TokenStream,55,Context) ) {
+					switch ( Interpreter.AdaptivePredict(TokenStream,56,Context) ) {
 					case 1:
 						{
-						State = 514;
+						State = 525;
 						Match(Identifier);
-						State = 515;
+						State = 526;
 						Match(Colon);
 						}
 						break;
 					}
-					State = 518;
+					State = 529;
 					expression(0);
 					}
 					}
 					} 
 				}
-				State = 523;
+				State = 534;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,56,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,57,Context);
 			}
-			State = 525;
+			State = 536;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,57,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,58,Context) ) {
 			case 1:
 				{
-				State = 524;
+				State = 535;
 				Match(Double_Comma);
 				}
 				break;
@@ -4761,13 +4804,13 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 527;
+			State = 538;
 			Match(Less_Than);
-			State = 528;
+			State = 539;
 			full_identifier();
-			State = 529;
+			State = 540;
 			arglist();
-			State = 530;
+			State = 541;
 			Match(Greater_Than);
 			}
 		}
@@ -4814,7 +4857,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 532;
+			State = 543;
 			Match(Type);
 			}
 		}
@@ -4868,13 +4911,13 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 534;
+			State = 545;
 			identifier_atom();
-			State = 535;
+			State = 546;
 			Match(Open_Bracket);
-			State = 536;
+			State = 547;
 			identifier_atom();
-			State = 537;
+			State = 548;
 			Match(Close_Bracket);
 			}
 		}
@@ -4923,20 +4966,20 @@ public partial class LoschScriptParser : Parser {
 		EnterRule(_localctx, 68, RULE_field_access_modifier);
 		int _la;
 		try {
-			State = 551;
+			State = 562;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case Global:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 539;
+				State = 550;
 				Match(Global);
-				State = 541;
+				State = 552;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Partial) {
 					{
-					State = 540;
+					State = 551;
 					Match(Partial);
 					}
 				}
@@ -4946,14 +4989,14 @@ public partial class LoschScriptParser : Parser {
 			case Local:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 543;
+				State = 554;
 				Match(Local);
-				State = 545;
+				State = 556;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Partial) {
 					{
-					State = 544;
+					State = 555;
 					Match(Partial);
 					}
 				}
@@ -4963,14 +5006,14 @@ public partial class LoschScriptParser : Parser {
 			case Internal:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 547;
+				State = 558;
 				Match(Internal);
-				State = 549;
+				State = 560;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Partial) {
 					{
-					State = 548;
+					State = 559;
 					Match(Partial);
 					}
 				}
@@ -5038,14 +5081,14 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 553;
+			State = 564;
 			field_access_modifier();
-			State = 555;
+			State = 566;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Var || _la==Val) {
 				{
-				State = 554;
+				State = 565;
 				_la = TokenStream.LA(1);
 				if ( !(_la==Var || _la==Val) ) {
 				ErrorHandler.RecoverInline(this);
@@ -5057,23 +5100,23 @@ public partial class LoschScriptParser : Parser {
 				}
 			}
 
-			State = 557;
+			State = 568;
 			Match(Identifier);
-			State = 560;
+			State = 571;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Colon) {
 				{
-				State = 558;
+				State = 569;
 				Match(Colon);
-				State = 559;
+				State = 570;
 				type_name();
 				}
 			}
 
-			State = 562;
+			State = 573;
 			Match(Equals);
-			State = 563;
+			State = 574;
 			expression(0);
 			}
 		}
@@ -5120,7 +5163,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 565;
+			State = 576;
 			Match(Dot);
 			}
 		}
@@ -5172,7 +5215,7 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,96,568,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
+		4,1,98,579,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
 		7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,
 		2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,21,
 		2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,2,27,7,27,2,28,7,28,
@@ -5202,63 +5245,64 @@ public partial class LoschScriptParser : Parser {
 		1,9,1,9,1,9,1,9,1,9,1,9,3,9,404,8,9,1,10,1,10,1,10,1,10,1,11,1,11,1,12,
 		1,12,1,13,1,13,1,14,1,14,1,15,1,15,1,16,1,16,1,16,1,17,1,17,1,18,5,18,
 		426,8,18,10,18,12,18,429,9,18,1,18,1,18,5,18,433,8,18,10,18,12,18,436,
-		9,18,1,18,3,18,439,8,18,1,19,1,19,1,19,3,19,444,8,19,1,20,1,20,1,20,1,
-		20,4,20,450,8,20,11,20,12,20,451,1,20,1,20,1,21,1,21,1,21,1,21,1,21,3,
-		21,461,8,21,1,22,1,22,1,22,1,23,1,23,1,23,1,23,1,23,3,23,471,8,23,1,24,
-		1,24,1,24,1,24,3,24,477,8,24,1,25,1,25,1,25,1,25,1,25,3,25,484,8,25,1,
-		26,1,26,1,26,1,26,1,26,3,26,491,8,26,1,27,1,27,1,27,1,28,3,28,497,8,28,
-		1,28,1,28,3,28,501,8,28,1,29,3,29,504,8,29,1,29,1,29,1,30,1,30,3,30,510,
-		8,30,1,30,1,30,1,30,1,30,1,30,3,30,517,8,30,1,30,5,30,520,8,30,10,30,12,
-		30,523,9,30,1,30,3,30,526,8,30,1,31,1,31,1,31,1,31,1,31,1,32,1,32,1,33,
-		1,33,1,33,1,33,1,33,1,34,1,34,3,34,542,8,34,1,34,1,34,3,34,546,8,34,1,
-		34,1,34,3,34,550,8,34,3,34,552,8,34,1,35,1,35,3,35,556,8,35,1,35,1,35,
-		1,35,3,35,561,8,35,1,35,1,35,1,35,1,36,1,36,1,36,0,1,16,37,0,2,4,6,8,10,
-		12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,
-		60,62,64,66,68,70,72,0,5,1,0,19,20,1,0,64,65,1,0,60,63,1,0,21,22,1,0,95,
-		96,646,0,78,1,0,0,0,2,95,1,0,0,0,4,101,1,0,0,0,6,105,1,0,0,0,8,150,1,0,
-		0,0,10,152,1,0,0,0,12,155,1,0,0,0,14,163,1,0,0,0,16,313,1,0,0,0,18,403,
-		1,0,0,0,20,405,1,0,0,0,22,409,1,0,0,0,24,411,1,0,0,0,26,413,1,0,0,0,28,
-		415,1,0,0,0,30,417,1,0,0,0,32,419,1,0,0,0,34,422,1,0,0,0,36,438,1,0,0,
-		0,38,443,1,0,0,0,40,445,1,0,0,0,42,455,1,0,0,0,44,462,1,0,0,0,46,465,1,
-		0,0,0,48,472,1,0,0,0,50,478,1,0,0,0,52,485,1,0,0,0,54,492,1,0,0,0,56,496,
-		1,0,0,0,58,503,1,0,0,0,60,509,1,0,0,0,62,527,1,0,0,0,64,532,1,0,0,0,66,
-		534,1,0,0,0,68,551,1,0,0,0,70,553,1,0,0,0,72,565,1,0,0,0,74,77,3,8,4,0,
-		75,77,5,2,0,0,76,74,1,0,0,0,76,75,1,0,0,0,77,80,1,0,0,0,78,76,1,0,0,0,
-		78,79,1,0,0,0,79,88,1,0,0,0,80,78,1,0,0,0,81,85,3,10,5,0,82,84,5,2,0,0,
-		83,82,1,0,0,0,84,87,1,0,0,0,85,83,1,0,0,0,85,86,1,0,0,0,86,89,1,0,0,0,
-		87,85,1,0,0,0,88,81,1,0,0,0,88,89,1,0,0,0,89,90,1,0,0,0,90,91,3,2,1,0,
-		91,92,5,0,0,1,92,1,1,0,0,0,93,96,3,4,2,0,94,96,3,6,3,0,95,93,1,0,0,0,95,
-		94,1,0,0,0,96,3,1,0,0,0,97,100,3,16,8,0,98,100,5,2,0,0,99,97,1,0,0,0,99,
-		98,1,0,0,0,100,103,1,0,0,0,101,99,1,0,0,0,101,102,1,0,0,0,102,5,1,0,0,
-		0,103,101,1,0,0,0,104,106,3,64,32,0,105,104,1,0,0,0,106,107,1,0,0,0,107,
-		105,1,0,0,0,107,108,1,0,0,0,108,7,1,0,0,0,109,111,5,42,0,0,110,109,1,0,
-		0,0,110,111,1,0,0,0,111,112,1,0,0,0,112,113,5,5,0,0,113,118,3,12,6,0,114,
-		115,5,30,0,0,115,117,3,12,6,0,116,114,1,0,0,0,117,120,1,0,0,0,118,116,
-		1,0,0,0,118,119,1,0,0,0,119,151,1,0,0,0,120,118,1,0,0,0,121,123,5,42,0,
-		0,122,121,1,0,0,0,122,123,1,0,0,0,123,124,1,0,0,0,124,125,5,5,0,0,125,
-		126,5,8,0,0,126,131,3,12,6,0,127,128,5,30,0,0,128,130,3,12,6,0,129,127,
-		1,0,0,0,130,133,1,0,0,0,131,129,1,0,0,0,131,132,1,0,0,0,132,151,1,0,0,
-		0,133,131,1,0,0,0,134,136,5,42,0,0,135,134,1,0,0,0,135,136,1,0,0,0,136,
-		137,1,0,0,0,137,138,5,5,0,0,138,139,5,89,0,0,139,140,5,78,0,0,140,147,
-		3,12,6,0,141,142,5,30,0,0,142,143,5,89,0,0,143,144,5,78,0,0,144,146,3,
-		12,6,0,145,141,1,0,0,0,146,149,1,0,0,0,147,145,1,0,0,0,147,148,1,0,0,0,
-		148,151,1,0,0,0,149,147,1,0,0,0,150,110,1,0,0,0,150,122,1,0,0,0,150,135,
-		1,0,0,0,151,9,1,0,0,0,152,153,5,6,0,0,153,154,3,12,6,0,154,11,1,0,0,0,
-		155,160,5,89,0,0,156,157,5,32,0,0,157,159,5,89,0,0,158,156,1,0,0,0,159,
-		162,1,0,0,0,160,158,1,0,0,0,160,161,1,0,0,0,161,13,1,0,0,0,162,160,1,0,
-		0,0,163,172,5,28,0,0,164,167,5,2,0,0,165,167,3,16,8,0,166,164,1,0,0,0,
-		166,165,1,0,0,0,167,170,1,0,0,0,168,166,1,0,0,0,168,169,1,0,0,0,169,173,
-		1,0,0,0,170,168,1,0,0,0,171,173,3,72,36,0,172,168,1,0,0,0,172,171,1,0,
-		0,0,173,174,1,0,0,0,174,175,5,29,0,0,175,15,1,0,0,0,176,177,6,8,-1,0,177,
-		179,3,12,6,0,178,180,3,60,30,0,179,178,1,0,0,0,179,180,1,0,0,0,180,314,
-		1,0,0,0,181,314,3,12,6,0,182,314,5,89,0,0,183,184,5,79,0,0,184,314,3,16,
-		8,44,185,186,5,42,0,0,186,314,3,16,8,41,187,188,5,68,0,0,188,314,3,16,
-		8,26,189,190,5,48,0,0,190,314,5,89,0,0,191,192,5,49,0,0,192,314,3,16,8,
-		24,193,195,7,0,0,0,194,193,1,0,0,0,194,195,1,0,0,0,195,196,1,0,0,0,196,
-		199,5,89,0,0,197,198,5,36,0,0,198,200,3,38,19,0,199,197,1,0,0,0,199,200,
-		1,0,0,0,200,201,1,0,0,0,201,202,5,78,0,0,202,314,3,16,8,22,203,204,3,12,
-		6,0,204,205,5,52,0,0,205,206,3,16,8,19,206,314,1,0,0,0,207,314,3,56,28,
-		0,208,210,3,62,31,0,209,208,1,0,0,0,210,211,1,0,0,0,211,209,1,0,0,0,211,
+		9,18,1,18,3,18,439,8,18,1,19,1,19,1,19,1,19,4,19,445,8,19,11,19,12,19,
+		446,1,19,1,19,1,19,1,19,1,19,3,19,454,8,19,1,20,1,20,1,20,1,20,5,20,460,
+		8,20,10,20,12,20,463,9,20,1,20,1,20,1,21,1,21,1,21,1,21,1,21,3,21,472,
+		8,21,1,22,1,22,1,22,1,23,1,23,1,23,1,23,1,23,3,23,482,8,23,1,24,1,24,1,
+		24,1,24,3,24,488,8,24,1,25,1,25,1,25,1,25,1,25,3,25,495,8,25,1,26,1,26,
+		1,26,1,26,1,26,3,26,502,8,26,1,27,1,27,1,27,1,28,3,28,508,8,28,1,28,1,
+		28,3,28,512,8,28,1,29,3,29,515,8,29,1,29,1,29,1,30,1,30,3,30,521,8,30,
+		1,30,1,30,1,30,1,30,1,30,3,30,528,8,30,1,30,5,30,531,8,30,10,30,12,30,
+		534,9,30,1,30,3,30,537,8,30,1,31,1,31,1,31,1,31,1,31,1,32,1,32,1,33,1,
+		33,1,33,1,33,1,33,1,34,1,34,3,34,553,8,34,1,34,1,34,3,34,557,8,34,1,34,
+		1,34,3,34,561,8,34,3,34,563,8,34,1,35,1,35,3,35,567,8,35,1,35,1,35,1,35,
+		3,35,572,8,35,1,35,1,35,1,35,1,36,1,36,1,36,0,1,16,37,0,2,4,6,8,10,12,
+		14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,
+		62,64,66,68,70,72,0,5,1,0,19,20,1,0,66,67,1,0,62,65,1,0,21,22,1,0,97,98,
+		659,0,78,1,0,0,0,2,95,1,0,0,0,4,101,1,0,0,0,6,105,1,0,0,0,8,150,1,0,0,
+		0,10,152,1,0,0,0,12,155,1,0,0,0,14,163,1,0,0,0,16,313,1,0,0,0,18,403,1,
+		0,0,0,20,405,1,0,0,0,22,409,1,0,0,0,24,411,1,0,0,0,26,413,1,0,0,0,28,415,
+		1,0,0,0,30,417,1,0,0,0,32,419,1,0,0,0,34,422,1,0,0,0,36,438,1,0,0,0,38,
+		453,1,0,0,0,40,455,1,0,0,0,42,466,1,0,0,0,44,473,1,0,0,0,46,476,1,0,0,
+		0,48,483,1,0,0,0,50,489,1,0,0,0,52,496,1,0,0,0,54,503,1,0,0,0,56,507,1,
+		0,0,0,58,514,1,0,0,0,60,520,1,0,0,0,62,538,1,0,0,0,64,543,1,0,0,0,66,545,
+		1,0,0,0,68,562,1,0,0,0,70,564,1,0,0,0,72,576,1,0,0,0,74,77,3,8,4,0,75,
+		77,5,2,0,0,76,74,1,0,0,0,76,75,1,0,0,0,77,80,1,0,0,0,78,76,1,0,0,0,78,
+		79,1,0,0,0,79,88,1,0,0,0,80,78,1,0,0,0,81,85,3,10,5,0,82,84,5,2,0,0,83,
+		82,1,0,0,0,84,87,1,0,0,0,85,83,1,0,0,0,85,86,1,0,0,0,86,89,1,0,0,0,87,
+		85,1,0,0,0,88,81,1,0,0,0,88,89,1,0,0,0,89,90,1,0,0,0,90,91,3,2,1,0,91,
+		92,5,0,0,1,92,1,1,0,0,0,93,96,3,4,2,0,94,96,3,6,3,0,95,93,1,0,0,0,95,94,
+		1,0,0,0,96,3,1,0,0,0,97,100,3,16,8,0,98,100,5,2,0,0,99,97,1,0,0,0,99,98,
+		1,0,0,0,100,103,1,0,0,0,101,99,1,0,0,0,101,102,1,0,0,0,102,5,1,0,0,0,103,
+		101,1,0,0,0,104,106,3,64,32,0,105,104,1,0,0,0,106,107,1,0,0,0,107,105,
+		1,0,0,0,107,108,1,0,0,0,108,7,1,0,0,0,109,111,5,44,0,0,110,109,1,0,0,0,
+		110,111,1,0,0,0,111,112,1,0,0,0,112,113,5,5,0,0,113,118,3,12,6,0,114,115,
+		5,32,0,0,115,117,3,12,6,0,116,114,1,0,0,0,117,120,1,0,0,0,118,116,1,0,
+		0,0,118,119,1,0,0,0,119,151,1,0,0,0,120,118,1,0,0,0,121,123,5,44,0,0,122,
+		121,1,0,0,0,122,123,1,0,0,0,123,124,1,0,0,0,124,125,5,5,0,0,125,126,5,
+		8,0,0,126,131,3,12,6,0,127,128,5,32,0,0,128,130,3,12,6,0,129,127,1,0,0,
+		0,130,133,1,0,0,0,131,129,1,0,0,0,131,132,1,0,0,0,132,151,1,0,0,0,133,
+		131,1,0,0,0,134,136,5,44,0,0,135,134,1,0,0,0,135,136,1,0,0,0,136,137,1,
+		0,0,0,137,138,5,5,0,0,138,139,5,91,0,0,139,140,5,80,0,0,140,147,3,12,6,
+		0,141,142,5,32,0,0,142,143,5,91,0,0,143,144,5,80,0,0,144,146,3,12,6,0,
+		145,141,1,0,0,0,146,149,1,0,0,0,147,145,1,0,0,0,147,148,1,0,0,0,148,151,
+		1,0,0,0,149,147,1,0,0,0,150,110,1,0,0,0,150,122,1,0,0,0,150,135,1,0,0,
+		0,151,9,1,0,0,0,152,153,5,6,0,0,153,154,3,12,6,0,154,11,1,0,0,0,155,160,
+		5,91,0,0,156,157,5,34,0,0,157,159,5,91,0,0,158,156,1,0,0,0,159,162,1,0,
+		0,0,160,158,1,0,0,0,160,161,1,0,0,0,161,13,1,0,0,0,162,160,1,0,0,0,163,
+		172,5,30,0,0,164,167,5,2,0,0,165,167,3,16,8,0,166,164,1,0,0,0,166,165,
+		1,0,0,0,167,170,1,0,0,0,168,166,1,0,0,0,168,169,1,0,0,0,169,173,1,0,0,
+		0,170,168,1,0,0,0,171,173,3,72,36,0,172,168,1,0,0,0,172,171,1,0,0,0,173,
+		174,1,0,0,0,174,175,5,31,0,0,175,15,1,0,0,0,176,177,6,8,-1,0,177,179,3,
+		12,6,0,178,180,3,60,30,0,179,178,1,0,0,0,179,180,1,0,0,0,180,314,1,0,0,
+		0,181,314,3,12,6,0,182,314,5,91,0,0,183,184,5,81,0,0,184,314,3,16,8,44,
+		185,186,5,44,0,0,186,314,3,16,8,41,187,188,5,70,0,0,188,314,3,16,8,26,
+		189,190,5,50,0,0,190,314,5,91,0,0,191,192,5,51,0,0,192,314,3,16,8,24,193,
+		195,7,0,0,0,194,193,1,0,0,0,194,195,1,0,0,0,195,196,1,0,0,0,196,199,5,
+		91,0,0,197,198,5,38,0,0,198,200,3,38,19,0,199,197,1,0,0,0,199,200,1,0,
+		0,0,200,201,1,0,0,0,201,202,5,80,0,0,202,314,3,16,8,22,203,204,3,12,6,
+		0,204,205,5,54,0,0,205,206,3,16,8,19,206,314,1,0,0,0,207,314,3,56,28,0,
+		208,210,3,62,31,0,209,208,1,0,0,0,210,211,1,0,0,0,211,209,1,0,0,0,211,
 		212,1,0,0,0,212,213,1,0,0,0,213,214,3,16,8,15,214,314,1,0,0,0,215,219,
 		3,42,21,0,216,218,3,46,23,0,217,216,1,0,0,0,218,221,1,0,0,0,219,217,1,
 		0,0,0,219,220,1,0,0,0,220,223,1,0,0,0,221,219,1,0,0,0,222,224,3,48,24,
@@ -5267,48 +5311,48 @@ public partial class LoschScriptParser : Parser {
 		229,1,0,0,0,231,234,1,0,0,0,232,230,1,0,0,0,232,233,1,0,0,0,233,236,1,
 		0,0,0,234,232,1,0,0,0,235,237,3,48,24,0,236,235,1,0,0,0,236,237,1,0,0,
 		0,237,314,1,0,0,0,238,239,3,14,7,0,239,240,3,54,27,0,240,314,1,0,0,0,241,
-		242,5,45,0,0,242,243,3,16,8,0,243,246,5,78,0,0,244,247,3,14,7,0,245,247,
-		3,16,8,0,246,244,1,0,0,0,246,245,1,0,0,0,247,314,1,0,0,0,248,249,5,46,
-		0,0,249,250,3,16,8,0,250,253,5,78,0,0,251,254,3,14,7,0,252,254,3,16,8,
-		0,253,251,1,0,0,0,253,252,1,0,0,0,254,314,1,0,0,0,255,256,5,45,0,0,256,
-		261,3,16,8,0,257,258,5,86,0,0,258,260,3,16,8,0,259,257,1,0,0,0,260,263,
+		242,5,47,0,0,242,243,3,16,8,0,243,246,5,80,0,0,244,247,3,14,7,0,245,247,
+		3,16,8,0,246,244,1,0,0,0,246,245,1,0,0,0,247,314,1,0,0,0,248,249,5,48,
+		0,0,249,250,3,16,8,0,250,253,5,80,0,0,251,254,3,14,7,0,252,254,3,16,8,
+		0,253,251,1,0,0,0,253,252,1,0,0,0,254,314,1,0,0,0,255,256,5,47,0,0,256,
+		261,3,16,8,0,257,258,5,88,0,0,258,260,3,16,8,0,259,257,1,0,0,0,260,263,
 		1,0,0,0,261,259,1,0,0,0,261,262,1,0,0,0,262,264,1,0,0,0,263,261,1,0,0,
-		0,264,267,5,78,0,0,265,268,3,14,7,0,266,268,3,16,8,0,267,265,1,0,0,0,267,
-		266,1,0,0,0,268,314,1,0,0,0,269,278,5,26,0,0,270,275,3,16,8,0,271,272,
-		5,30,0,0,272,274,3,16,8,0,273,271,1,0,0,0,274,277,1,0,0,0,275,273,1,0,
+		0,264,267,5,80,0,0,265,268,3,14,7,0,266,268,3,16,8,0,267,265,1,0,0,0,267,
+		266,1,0,0,0,268,314,1,0,0,0,269,278,5,28,0,0,270,275,3,16,8,0,271,272,
+		5,32,0,0,272,274,3,16,8,0,273,271,1,0,0,0,274,277,1,0,0,0,275,273,1,0,
 		0,0,275,276,1,0,0,0,276,279,1,0,0,0,277,275,1,0,0,0,278,270,1,0,0,0,278,
-		279,1,0,0,0,279,280,1,0,0,0,280,314,5,27,0,0,281,282,5,24,0,0,282,285,
-		3,16,8,0,283,284,5,30,0,0,284,286,3,16,8,0,285,283,1,0,0,0,286,287,1,0,
-		0,0,287,285,1,0,0,0,287,288,1,0,0,0,288,289,1,0,0,0,289,290,5,25,0,0,290,
-		314,1,0,0,0,291,309,5,26,0,0,292,293,5,26,0,0,293,294,3,16,8,0,294,295,
-		5,30,0,0,295,296,3,16,8,0,296,306,5,27,0,0,297,298,5,30,0,0,298,299,5,
-		26,0,0,299,300,3,16,8,0,300,301,5,30,0,0,301,302,3,16,8,0,302,303,5,27,
+		279,1,0,0,0,279,280,1,0,0,0,280,314,5,29,0,0,281,282,5,24,0,0,282,285,
+		3,16,8,0,283,284,5,32,0,0,284,286,3,16,8,0,285,283,1,0,0,0,286,287,1,0,
+		0,0,287,285,1,0,0,0,287,288,1,0,0,0,288,289,1,0,0,0,289,290,5,26,0,0,290,
+		314,1,0,0,0,291,309,5,28,0,0,292,293,5,28,0,0,293,294,3,16,8,0,294,295,
+		5,32,0,0,295,296,3,16,8,0,296,306,5,29,0,0,297,298,5,32,0,0,298,299,5,
+		28,0,0,299,300,3,16,8,0,300,301,5,32,0,0,301,302,3,16,8,0,302,303,5,29,
 		0,0,303,305,1,0,0,0,304,297,1,0,0,0,305,308,1,0,0,0,306,304,1,0,0,0,306,
 		307,1,0,0,0,307,310,1,0,0,0,308,306,1,0,0,0,309,292,1,0,0,0,309,310,1,
-		0,0,0,310,311,1,0,0,0,311,314,5,27,0,0,312,314,3,18,9,0,313,176,1,0,0,
+		0,0,0,310,311,1,0,0,0,311,314,5,29,0,0,312,314,3,18,9,0,313,176,1,0,0,
 		0,313,181,1,0,0,0,313,182,1,0,0,0,313,183,1,0,0,0,313,185,1,0,0,0,313,
 		187,1,0,0,0,313,189,1,0,0,0,313,191,1,0,0,0,313,194,1,0,0,0,313,203,1,
 		0,0,0,313,207,1,0,0,0,313,209,1,0,0,0,313,215,1,0,0,0,313,225,1,0,0,0,
 		313,228,1,0,0,0,313,238,1,0,0,0,313,241,1,0,0,0,313,248,1,0,0,0,313,255,
 		1,0,0,0,313,269,1,0,0,0,313,281,1,0,0,0,313,291,1,0,0,0,313,312,1,0,0,
-		0,314,392,1,0,0,0,315,316,10,43,0,0,316,317,5,45,0,0,317,318,3,16,8,0,
-		318,319,5,78,0,0,319,320,3,16,8,44,320,391,1,0,0,0,321,322,10,42,0,0,322,
-		323,5,72,0,0,323,391,3,16,8,43,324,325,10,40,0,0,325,326,5,70,0,0,326,
-		391,3,16,8,41,327,328,10,39,0,0,328,329,5,74,0,0,329,391,3,16,8,40,330,
-		331,10,38,0,0,331,332,5,76,0,0,332,391,3,16,8,39,333,334,10,37,0,0,334,
-		335,5,66,0,0,335,391,3,16,8,38,336,337,10,36,0,0,337,338,5,68,0,0,338,
-		391,3,16,8,37,339,340,10,35,0,0,340,341,5,82,0,0,341,391,3,16,8,36,342,
-		343,10,34,0,0,343,344,5,84,0,0,344,391,3,16,8,35,345,346,10,33,0,0,346,
+		0,314,392,1,0,0,0,315,316,10,43,0,0,316,317,5,47,0,0,317,318,3,16,8,0,
+		318,319,5,80,0,0,319,320,3,16,8,44,320,391,1,0,0,0,321,322,10,42,0,0,322,
+		323,5,74,0,0,323,391,3,16,8,43,324,325,10,40,0,0,325,326,5,72,0,0,326,
+		391,3,16,8,41,327,328,10,39,0,0,328,329,5,76,0,0,329,391,3,16,8,40,330,
+		331,10,38,0,0,331,332,5,78,0,0,332,391,3,16,8,39,333,334,10,37,0,0,334,
+		335,5,68,0,0,335,391,3,16,8,38,336,337,10,36,0,0,337,338,5,70,0,0,338,
+		391,3,16,8,37,339,340,10,35,0,0,340,341,5,84,0,0,341,391,3,16,8,36,342,
+		343,10,34,0,0,343,344,5,86,0,0,344,391,3,16,8,35,345,346,10,33,0,0,346,
 		347,7,1,0,0,347,391,3,16,8,34,348,349,10,32,0,0,349,350,7,2,0,0,350,391,
-		3,16,8,33,351,352,10,31,0,0,352,353,5,56,0,0,353,391,3,16,8,32,354,355,
-		10,30,0,0,355,356,5,57,0,0,356,391,3,16,8,31,357,358,10,29,0,0,358,359,
-		5,50,0,0,359,391,3,16,8,30,360,361,10,28,0,0,361,362,5,53,0,0,362,391,
-		3,16,8,29,363,364,10,27,0,0,364,365,5,48,0,0,365,391,3,16,8,28,366,367,
-		10,23,0,0,367,368,5,34,0,0,368,391,3,16,8,24,369,370,10,16,0,0,370,371,
-		5,45,0,0,371,391,3,16,8,17,372,373,10,21,0,0,373,374,5,32,0,0,374,376,
-		5,89,0,0,375,377,3,60,30,0,376,375,1,0,0,0,376,377,1,0,0,0,377,391,1,0,
-		0,0,378,379,10,20,0,0,379,380,5,51,0,0,380,391,3,12,6,0,381,382,10,18,
-		0,0,382,383,5,32,0,0,383,391,5,89,0,0,384,385,10,13,0,0,385,391,3,44,22,
+		3,16,8,33,351,352,10,31,0,0,352,353,5,58,0,0,353,391,3,16,8,32,354,355,
+		10,30,0,0,355,356,5,59,0,0,356,391,3,16,8,31,357,358,10,29,0,0,358,359,
+		5,52,0,0,359,391,3,16,8,30,360,361,10,28,0,0,361,362,5,55,0,0,362,391,
+		3,16,8,29,363,364,10,27,0,0,364,365,5,50,0,0,365,391,3,16,8,28,366,367,
+		10,23,0,0,367,368,5,36,0,0,368,391,3,16,8,24,369,370,10,16,0,0,370,371,
+		5,47,0,0,371,391,3,16,8,17,372,373,10,21,0,0,373,374,5,34,0,0,374,376,
+		5,91,0,0,375,377,3,60,30,0,376,375,1,0,0,0,376,377,1,0,0,0,377,391,1,0,
+		0,0,378,379,10,20,0,0,379,380,5,53,0,0,380,391,3,12,6,0,381,382,10,18,
+		0,0,382,383,5,34,0,0,383,391,5,91,0,0,384,385,10,13,0,0,385,391,3,44,22,
 		0,386,387,10,10,0,0,387,391,3,54,27,0,388,389,10,1,0,0,389,391,5,2,0,0,
 		390,315,1,0,0,0,390,321,1,0,0,0,390,324,1,0,0,0,390,327,1,0,0,0,390,330,
 		1,0,0,0,390,333,1,0,0,0,390,336,1,0,0,0,390,339,1,0,0,0,390,342,1,0,0,
@@ -5321,53 +5365,56 @@ public partial class LoschScriptParser : Parser {
 		15,0,401,404,3,32,16,0,402,404,3,34,17,0,403,395,1,0,0,0,403,396,1,0,0,
 		0,403,397,1,0,0,0,403,398,1,0,0,0,403,399,1,0,0,0,403,400,1,0,0,0,403,
 		401,1,0,0,0,403,402,1,0,0,0,404,19,1,0,0,0,405,406,5,24,0,0,406,407,3,
-		16,8,0,407,408,5,25,0,0,408,21,1,0,0,0,409,410,5,90,0,0,410,23,1,0,0,0,
-		411,412,5,93,0,0,412,25,1,0,0,0,413,414,7,3,0,0,414,27,1,0,0,0,415,416,
-		7,4,0,0,416,29,1,0,0,0,417,418,5,94,0,0,418,31,1,0,0,0,419,420,5,24,0,
-		0,420,421,5,25,0,0,421,33,1,0,0,0,422,423,5,38,0,0,423,35,1,0,0,0,424,
+		16,8,0,407,408,5,26,0,0,408,21,1,0,0,0,409,410,5,92,0,0,410,23,1,0,0,0,
+		411,412,5,95,0,0,412,25,1,0,0,0,413,414,7,3,0,0,414,27,1,0,0,0,415,416,
+		7,4,0,0,416,29,1,0,0,0,417,418,5,96,0,0,418,31,1,0,0,0,419,420,5,24,0,
+		0,420,421,5,26,0,0,421,33,1,0,0,0,422,423,5,40,0,0,423,35,1,0,0,0,424,
 		426,3,62,31,0,425,424,1,0,0,0,426,429,1,0,0,0,427,425,1,0,0,0,427,428,
-		1,0,0,0,428,430,1,0,0,0,429,427,1,0,0,0,430,439,5,89,0,0,431,433,3,62,
+		1,0,0,0,428,430,1,0,0,0,429,427,1,0,0,0,430,439,5,91,0,0,431,433,3,62,
 		31,0,432,431,1,0,0,0,433,436,1,0,0,0,434,432,1,0,0,0,434,435,1,0,0,0,435,
 		437,1,0,0,0,436,434,1,0,0,0,437,439,3,12,6,0,438,427,1,0,0,0,438,434,1,
-		0,0,0,439,37,1,0,0,0,440,444,3,36,18,0,441,444,3,66,33,0,442,444,3,40,
-		20,0,443,440,1,0,0,0,443,441,1,0,0,0,443,442,1,0,0,0,444,39,1,0,0,0,445,
-		446,5,24,0,0,446,449,3,38,19,0,447,448,5,50,0,0,448,450,3,38,19,0,449,
-		447,1,0,0,0,450,451,1,0,0,0,451,449,1,0,0,0,451,452,1,0,0,0,452,453,1,
-		0,0,0,453,454,5,25,0,0,454,41,1,0,0,0,455,456,5,41,0,0,456,457,3,16,8,
-		0,457,460,5,78,0,0,458,461,3,14,7,0,459,461,3,16,8,0,460,458,1,0,0,0,460,
-		459,1,0,0,0,461,43,1,0,0,0,462,463,5,41,0,0,463,464,3,16,8,0,464,45,1,
-		0,0,0,465,466,5,36,0,0,466,467,3,16,8,0,467,470,5,78,0,0,468,471,3,14,
-		7,0,469,471,3,16,8,0,470,468,1,0,0,0,470,469,1,0,0,0,471,47,1,0,0,0,472,
-		473,5,36,0,0,473,476,5,78,0,0,474,477,3,14,7,0,475,477,3,16,8,0,476,474,
-		1,0,0,0,476,475,1,0,0,0,477,49,1,0,0,0,478,479,5,43,0,0,479,480,3,16,8,
-		0,480,483,5,78,0,0,481,484,3,14,7,0,482,484,3,16,8,0,483,481,1,0,0,0,483,
-		482,1,0,0,0,484,51,1,0,0,0,485,486,5,44,0,0,486,487,3,16,8,0,487,490,5,
-		78,0,0,488,491,3,14,7,0,489,491,3,16,8,0,490,488,1,0,0,0,490,489,1,0,0,
-		0,491,53,1,0,0,0,492,493,5,43,0,0,493,494,3,16,8,0,494,55,1,0,0,0,495,
-		497,3,58,29,0,496,495,1,0,0,0,496,497,1,0,0,0,497,498,1,0,0,0,498,500,
-		5,33,0,0,499,501,3,58,29,0,500,499,1,0,0,0,500,501,1,0,0,0,501,57,1,0,
-		0,0,502,504,5,48,0,0,503,502,1,0,0,0,503,504,1,0,0,0,504,505,1,0,0,0,505,
-		506,3,22,11,0,506,59,1,0,0,0,507,508,5,89,0,0,508,510,5,36,0,0,509,507,
-		1,0,0,0,509,510,1,0,0,0,510,511,1,0,0,0,511,512,3,16,8,0,512,521,1,0,0,
-		0,513,516,5,30,0,0,514,515,5,89,0,0,515,517,5,36,0,0,516,514,1,0,0,0,516,
-		517,1,0,0,0,517,518,1,0,0,0,518,520,3,16,8,0,519,513,1,0,0,0,520,523,1,
-		0,0,0,521,519,1,0,0,0,521,522,1,0,0,0,522,525,1,0,0,0,523,521,1,0,0,0,
-		524,526,5,31,0,0,525,524,1,0,0,0,525,526,1,0,0,0,526,61,1,0,0,0,527,528,
-		5,60,0,0,528,529,3,12,6,0,529,530,3,60,30,0,530,531,5,61,0,0,531,63,1,
-		0,0,0,532,533,5,8,0,0,533,65,1,0,0,0,534,535,3,36,18,0,535,536,5,26,0,
-		0,536,537,3,36,18,0,537,538,5,27,0,0,538,67,1,0,0,0,539,541,5,10,0,0,540,
-		542,5,16,0,0,541,540,1,0,0,0,541,542,1,0,0,0,542,552,1,0,0,0,543,545,5,
-		11,0,0,544,546,5,16,0,0,545,544,1,0,0,0,545,546,1,0,0,0,546,552,1,0,0,
-		0,547,549,5,12,0,0,548,550,5,16,0,0,549,548,1,0,0,0,549,550,1,0,0,0,550,
-		552,1,0,0,0,551,539,1,0,0,0,551,543,1,0,0,0,551,547,1,0,0,0,552,69,1,0,
-		0,0,553,555,3,68,34,0,554,556,7,0,0,0,555,554,1,0,0,0,555,556,1,0,0,0,
-		556,557,1,0,0,0,557,560,5,89,0,0,558,559,5,36,0,0,559,561,3,38,19,0,560,
-		558,1,0,0,0,560,561,1,0,0,0,561,562,1,0,0,0,562,563,5,78,0,0,563,564,3,
-		16,8,0,564,71,1,0,0,0,565,566,5,32,0,0,566,73,1,0,0,0,64,76,78,85,88,95,
+		0,0,0,439,37,1,0,0,0,440,441,5,24,0,0,441,444,3,38,19,0,442,443,5,52,0,
+		0,443,445,3,38,19,0,444,442,1,0,0,0,445,446,1,0,0,0,446,444,1,0,0,0,446,
+		447,1,0,0,0,447,448,1,0,0,0,448,449,5,26,0,0,449,454,1,0,0,0,450,454,3,
+		66,33,0,451,454,3,36,18,0,452,454,3,40,20,0,453,440,1,0,0,0,453,450,1,
+		0,0,0,453,451,1,0,0,0,453,452,1,0,0,0,454,39,1,0,0,0,455,456,5,25,0,0,
+		456,461,3,38,19,0,457,458,5,32,0,0,458,460,3,38,19,0,459,457,1,0,0,0,460,
+		463,1,0,0,0,461,459,1,0,0,0,461,462,1,0,0,0,462,464,1,0,0,0,463,461,1,
+		0,0,0,464,465,5,27,0,0,465,41,1,0,0,0,466,467,5,43,0,0,467,468,3,16,8,
+		0,468,471,5,80,0,0,469,472,3,14,7,0,470,472,3,16,8,0,471,469,1,0,0,0,471,
+		470,1,0,0,0,472,43,1,0,0,0,473,474,5,43,0,0,474,475,3,16,8,0,475,45,1,
+		0,0,0,476,477,5,38,0,0,477,478,3,16,8,0,478,481,5,80,0,0,479,482,3,14,
+		7,0,480,482,3,16,8,0,481,479,1,0,0,0,481,480,1,0,0,0,482,47,1,0,0,0,483,
+		484,5,38,0,0,484,487,5,80,0,0,485,488,3,14,7,0,486,488,3,16,8,0,487,485,
+		1,0,0,0,487,486,1,0,0,0,488,49,1,0,0,0,489,490,5,45,0,0,490,491,3,16,8,
+		0,491,494,5,80,0,0,492,495,3,14,7,0,493,495,3,16,8,0,494,492,1,0,0,0,494,
+		493,1,0,0,0,495,51,1,0,0,0,496,497,5,46,0,0,497,498,3,16,8,0,498,501,5,
+		80,0,0,499,502,3,14,7,0,500,502,3,16,8,0,501,499,1,0,0,0,501,500,1,0,0,
+		0,502,53,1,0,0,0,503,504,5,45,0,0,504,505,3,16,8,0,505,55,1,0,0,0,506,
+		508,3,58,29,0,507,506,1,0,0,0,507,508,1,0,0,0,508,509,1,0,0,0,509,511,
+		5,35,0,0,510,512,3,58,29,0,511,510,1,0,0,0,511,512,1,0,0,0,512,57,1,0,
+		0,0,513,515,5,50,0,0,514,513,1,0,0,0,514,515,1,0,0,0,515,516,1,0,0,0,516,
+		517,3,22,11,0,517,59,1,0,0,0,518,519,5,91,0,0,519,521,5,38,0,0,520,518,
+		1,0,0,0,520,521,1,0,0,0,521,522,1,0,0,0,522,523,3,16,8,0,523,532,1,0,0,
+		0,524,527,5,32,0,0,525,526,5,91,0,0,526,528,5,38,0,0,527,525,1,0,0,0,527,
+		528,1,0,0,0,528,529,1,0,0,0,529,531,3,16,8,0,530,524,1,0,0,0,531,534,1,
+		0,0,0,532,530,1,0,0,0,532,533,1,0,0,0,533,536,1,0,0,0,534,532,1,0,0,0,
+		535,537,5,33,0,0,536,535,1,0,0,0,536,537,1,0,0,0,537,61,1,0,0,0,538,539,
+		5,62,0,0,539,540,3,12,6,0,540,541,3,60,30,0,541,542,5,63,0,0,542,63,1,
+		0,0,0,543,544,5,8,0,0,544,65,1,0,0,0,545,546,3,36,18,0,546,547,5,28,0,
+		0,547,548,3,36,18,0,548,549,5,29,0,0,549,67,1,0,0,0,550,552,5,10,0,0,551,
+		553,5,16,0,0,552,551,1,0,0,0,552,553,1,0,0,0,553,563,1,0,0,0,554,556,5,
+		11,0,0,555,557,5,16,0,0,556,555,1,0,0,0,556,557,1,0,0,0,557,563,1,0,0,
+		0,558,560,5,12,0,0,559,561,5,16,0,0,560,559,1,0,0,0,560,561,1,0,0,0,561,
+		563,1,0,0,0,562,550,1,0,0,0,562,554,1,0,0,0,562,558,1,0,0,0,563,69,1,0,
+		0,0,564,566,3,68,34,0,565,567,7,0,0,0,566,565,1,0,0,0,566,567,1,0,0,0,
+		567,568,1,0,0,0,568,571,5,91,0,0,569,570,5,38,0,0,570,572,3,38,19,0,571,
+		569,1,0,0,0,571,572,1,0,0,0,572,573,1,0,0,0,573,574,5,80,0,0,574,575,3,
+		16,8,0,575,71,1,0,0,0,576,577,5,34,0,0,577,73,1,0,0,0,65,76,78,85,88,95,
 		99,101,107,110,118,122,131,135,147,150,160,166,168,172,179,194,199,211,
 		219,223,232,236,246,253,261,267,275,278,287,306,309,313,376,390,392,403,
-		427,434,438,443,451,460,470,476,483,490,496,500,503,509,516,521,525,541,
-		545,549,551,555,560
+		427,434,438,446,453,461,471,481,487,494,501,507,511,514,520,527,532,536,
+		552,556,560,562,566,571
 	};
 
 	public static readonly ATN _ATN =

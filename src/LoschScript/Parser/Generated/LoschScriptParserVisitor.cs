@@ -491,11 +491,11 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType_name([NotNull] LoschScriptParser.Type_nameContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="LoschScriptParser.union_variable_type"/>.
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.param_list_type"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitUnion_variable_type([NotNull] LoschScriptParser.Union_variable_typeContext context);
+	Result VisitParam_list_type([NotNull] LoschScriptParser.Param_list_typeContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.if_branch"/>.
 	/// </summary>
