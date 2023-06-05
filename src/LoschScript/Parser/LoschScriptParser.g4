@@ -145,7 +145,7 @@ type_name
     ;
 
 param_list_type
-    : Double_Open_Paren type_name (Comma type_name)* Double_Close_Paren
+    : Open_Paren_Bar type_name (Comma type_name)* Bar_Close_Paren
     ;
 
 if_branch

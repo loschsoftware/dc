@@ -1308,7 +1308,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
         Type type;
-        var local = CurrentMethod.Locals.First();
+
+        (string Name, LocalBuilder Builder, bool IsConstant, int Index, UnionValue Union) local = default;
 
         // Check for local of this name
         if (CurrentMethod.Locals.Any(l => l.Name == context.full_identifier().Identifier()[0].GetText()))

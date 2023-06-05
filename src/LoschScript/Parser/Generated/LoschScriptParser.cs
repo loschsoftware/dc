@@ -40,24 +40,23 @@ public partial class LoschScriptParser : Parser {
 		Ws=1, NewLine=2, Single_Line_Comment=3, Delimited_Comment=4, Import=5, 
 		Export=6, Assembly=7, Type=8, Module=9, Global=10, Local=11, Internal=12, 
 		Static=13, Protected=14, Sealed=15, Partial=16, Infix=17, Inline=18, Var=19, 
-		Val=20, True=21, False=22, Of=23, Open_Paren=24, Double_Open_Paren=25, 
-		Close_Paren=26, Double_Close_Paren=27, Open_Bracket=28, Close_Bracket=29, 
-		Open_Brace=30, Close_Brace=31, Comma=32, Double_Comma=33, Dot=34, Double_Dot=35, 
-		Double_Dot_Question_Mark=36, Dot_Equals=37, Colon=38, Semicolon=39, Underscore=40, 
-		Single_Quote=41, Double_Quote=42, Question_Mark=43, Exclamation_Mark=44, 
-		Exclamation_Question=45, Exclamation_Colon=46, At_Sign=47, Exclamation_At=48, 
-		Dollar_Sign=49, Caret=50, Percent_Caret=51, Bar=52, Bar_GreaterThan=53, 
-		LessThan_Bar=54, Double_Bar=55, Bar_Equals=56, Double_Bar_Equals=57, Ampersand=58, 
-		Double_Ampersand=59, Double_Ampersand_Equals=60, Ampersand_Equals=61, 
-		Less_Than=62, Greater_Than=63, Less_Equals=64, Greater_Equals=65, Double_Equals=66, 
-		Exclamation_Equals=67, Plus=68, Plus_Equals=69, Minus=70, Minus_Equals=71, 
-		Asterisk=72, Asterisk_Equals=73, Double_Asterisk=74, Double_Asterisk_Equals=75, 
-		Slash=76, Slash_Equals=77, Percent=78, Percent_Equals=79, Equals=80, Tilde=81, 
-		Double_Tilde=82, Tilde_Equals=83, Double_Less_Than=84, Double_Less_Than_Equals=85, 
-		Double_Greater_Than=86, Double_Greater_Than_Equals=87, Arrow_Right=88, 
-		Arrow_Left=89, Double_Backtick=90, Identifier=91, Integer_Literal=92, 
-		Hex_Integer_Literal=93, Binary_Integer_Literal=94, Real_Literal=95, Character_Literal=96, 
-		String_Literal=97, Verbatim_String_Literal=98;
+		Val=20, True=21, False=22, Of=23, Open_Paren=24, Close_Paren=25, Open_Paren_Bar=26, 
+		Bar_Close_Paren=27, Open_Bracket=28, Close_Bracket=29, Open_Brace=30, 
+		Close_Brace=31, Comma=32, Double_Comma=33, Dot=34, Double_Dot=35, Double_Dot_Question_Mark=36, 
+		Dot_Equals=37, Colon=38, Semicolon=39, Underscore=40, Single_Quote=41, 
+		Double_Quote=42, Question_Mark=43, Exclamation_Mark=44, Exclamation_Question=45, 
+		Exclamation_Colon=46, At_Sign=47, Exclamation_At=48, Dollar_Sign=49, Caret=50, 
+		Percent_Caret=51, Bar=52, Bar_GreaterThan=53, LessThan_Bar=54, Double_Bar=55, 
+		Bar_Equals=56, Double_Bar_Equals=57, Ampersand=58, Double_Ampersand=59, 
+		Double_Ampersand_Equals=60, Ampersand_Equals=61, Less_Than=62, Greater_Than=63, 
+		Less_Equals=64, Greater_Equals=65, Double_Equals=66, Exclamation_Equals=67, 
+		Plus=68, Plus_Equals=69, Minus=70, Minus_Equals=71, Asterisk=72, Asterisk_Equals=73, 
+		Double_Asterisk=74, Double_Asterisk_Equals=75, Slash=76, Slash_Equals=77, 
+		Percent=78, Percent_Equals=79, Equals=80, Tilde=81, Double_Tilde=82, Tilde_Equals=83, 
+		Double_Less_Than=84, Double_Less_Than_Equals=85, Double_Greater_Than=86, 
+		Double_Greater_Than_Equals=87, Arrow_Right=88, Arrow_Left=89, Double_Backtick=90, 
+		Identifier=91, Integer_Literal=92, Hex_Integer_Literal=93, Binary_Integer_Literal=94, 
+		Real_Literal=95, Character_Literal=96, String_Literal=97, Verbatim_String_Literal=98;
 	public const int
 		RULE_compilation_unit = 0, RULE_file_body = 1, RULE_top_level_statements = 2, 
 		RULE_full_program = 3, RULE_import_directive = 4, RULE_export_directive = 5, 
@@ -86,7 +85,7 @@ public partial class LoschScriptParser : Parser {
 		null, null, null, null, null, "'import'", "'export'", "'assembly'", "'type'", 
 		"'module'", "'global'", "'local'", "'internal'", "'static'", "'protected'", 
 		"'sealed'", "'partial'", "'infix'", "'inline'", "'var'", "'val'", "'true'", 
-		"'false'", "'of'", "'('", "'(('", "')'", "'))'", "'['", "']'", "'{'", 
+		"'false'", "'of'", "'('", "')'", "'(|'", "'|)'", "'['", "']'", "'{'", 
 		"'}'", "','", "',,'", "'.'", "'..'", "'..?'", "'.='", "':'", "';'", "'_'", 
 		"'''", "'\"'", "'?'", "'!'", "'!?'", "'!:'", "'@'", "'!@'", "'$'", "'^'", 
 		"'%^'", "'|'", "'|>'", "'<|'", "'||'", "'|='", "'||='", "'&'", "'&&'", 
@@ -99,8 +98,8 @@ public partial class LoschScriptParser : Parser {
 		null, "Ws", "NewLine", "Single_Line_Comment", "Delimited_Comment", "Import", 
 		"Export", "Assembly", "Type", "Module", "Global", "Local", "Internal", 
 		"Static", "Protected", "Sealed", "Partial", "Infix", "Inline", "Var", 
-		"Val", "True", "False", "Of", "Open_Paren", "Double_Open_Paren", "Close_Paren", 
-		"Double_Close_Paren", "Open_Bracket", "Close_Bracket", "Open_Brace", "Close_Brace", 
+		"Val", "True", "False", "Of", "Open_Paren", "Close_Paren", "Open_Paren_Bar", 
+		"Bar_Close_Paren", "Open_Bracket", "Close_Bracket", "Open_Brace", "Close_Brace", 
 		"Comma", "Double_Comma", "Dot", "Double_Dot", "Double_Dot_Question_Mark", 
 		"Dot_Equals", "Colon", "Semicolon", "Underscore", "Single_Quote", "Double_Quote", 
 		"Question_Mark", "Exclamation_Mark", "Exclamation_Question", "Exclamation_Colon", 
@@ -3946,14 +3945,14 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	public partial class Param_list_typeContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Open_Paren() { return GetToken(LoschScriptParser.Double_Open_Paren, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Open_Paren_Bar() { return GetToken(LoschScriptParser.Open_Paren_Bar, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public Type_nameContext[] type_name() {
 			return GetRuleContexts<Type_nameContext>();
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public Type_nameContext type_name(int i) {
 			return GetRuleContext<Type_nameContext>(i);
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Close_Paren() { return GetToken(LoschScriptParser.Double_Close_Paren, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Bar_Close_Paren() { return GetToken(LoschScriptParser.Bar_Close_Paren, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Comma() { return GetTokens(LoschScriptParser.Comma); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Comma(int i) {
 			return GetToken(LoschScriptParser.Comma, i);
@@ -3990,7 +3989,7 @@ public partial class LoschScriptParser : Parser {
 			EnterOuterAlt(_localctx, 1);
 			{
 			State = 455;
-			Match(Double_Open_Paren);
+			Match(Open_Paren_Bar);
 			State = 456;
 			type_name();
 			State = 461;
@@ -4010,7 +4009,7 @@ public partial class LoschScriptParser : Parser {
 				_la = TokenStream.LA(1);
 			}
 			State = 464;
-			Match(Double_Close_Paren);
+			Match(Bar_Close_Paren);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5323,7 +5322,7 @@ public partial class LoschScriptParser : Parser {
 		0,0,275,276,1,0,0,0,276,279,1,0,0,0,277,275,1,0,0,0,278,270,1,0,0,0,278,
 		279,1,0,0,0,279,280,1,0,0,0,280,314,5,29,0,0,281,282,5,24,0,0,282,285,
 		3,16,8,0,283,284,5,32,0,0,284,286,3,16,8,0,285,283,1,0,0,0,286,287,1,0,
-		0,0,287,285,1,0,0,0,287,288,1,0,0,0,288,289,1,0,0,0,289,290,5,26,0,0,290,
+		0,0,287,285,1,0,0,0,287,288,1,0,0,0,288,289,1,0,0,0,289,290,5,25,0,0,290,
 		314,1,0,0,0,291,309,5,28,0,0,292,293,5,28,0,0,293,294,3,16,8,0,294,295,
 		5,32,0,0,295,296,3,16,8,0,296,306,5,29,0,0,297,298,5,32,0,0,298,299,5,
 		28,0,0,299,300,3,16,8,0,300,301,5,32,0,0,301,302,3,16,8,0,302,303,5,29,
@@ -5365,19 +5364,19 @@ public partial class LoschScriptParser : Parser {
 		15,0,401,404,3,32,16,0,402,404,3,34,17,0,403,395,1,0,0,0,403,396,1,0,0,
 		0,403,397,1,0,0,0,403,398,1,0,0,0,403,399,1,0,0,0,403,400,1,0,0,0,403,
 		401,1,0,0,0,403,402,1,0,0,0,404,19,1,0,0,0,405,406,5,24,0,0,406,407,3,
-		16,8,0,407,408,5,26,0,0,408,21,1,0,0,0,409,410,5,92,0,0,410,23,1,0,0,0,
+		16,8,0,407,408,5,25,0,0,408,21,1,0,0,0,409,410,5,92,0,0,410,23,1,0,0,0,
 		411,412,5,95,0,0,412,25,1,0,0,0,413,414,7,3,0,0,414,27,1,0,0,0,415,416,
 		7,4,0,0,416,29,1,0,0,0,417,418,5,96,0,0,418,31,1,0,0,0,419,420,5,24,0,
-		0,420,421,5,26,0,0,421,33,1,0,0,0,422,423,5,40,0,0,423,35,1,0,0,0,424,
+		0,420,421,5,25,0,0,421,33,1,0,0,0,422,423,5,40,0,0,423,35,1,0,0,0,424,
 		426,3,62,31,0,425,424,1,0,0,0,426,429,1,0,0,0,427,425,1,0,0,0,427,428,
 		1,0,0,0,428,430,1,0,0,0,429,427,1,0,0,0,430,439,5,91,0,0,431,433,3,62,
 		31,0,432,431,1,0,0,0,433,436,1,0,0,0,434,432,1,0,0,0,434,435,1,0,0,0,435,
 		437,1,0,0,0,436,434,1,0,0,0,437,439,3,12,6,0,438,427,1,0,0,0,438,434,1,
 		0,0,0,439,37,1,0,0,0,440,441,5,24,0,0,441,444,3,38,19,0,442,443,5,52,0,
 		0,443,445,3,38,19,0,444,442,1,0,0,0,445,446,1,0,0,0,446,444,1,0,0,0,446,
-		447,1,0,0,0,447,448,1,0,0,0,448,449,5,26,0,0,449,454,1,0,0,0,450,454,3,
+		447,1,0,0,0,447,448,1,0,0,0,448,449,5,25,0,0,449,454,1,0,0,0,450,454,3,
 		66,33,0,451,454,3,36,18,0,452,454,3,40,20,0,453,440,1,0,0,0,453,450,1,
-		0,0,0,453,451,1,0,0,0,453,452,1,0,0,0,454,39,1,0,0,0,455,456,5,25,0,0,
+		0,0,0,453,451,1,0,0,0,453,452,1,0,0,0,454,39,1,0,0,0,455,456,5,26,0,0,
 		456,461,3,38,19,0,457,458,5,32,0,0,458,460,3,38,19,0,459,457,1,0,0,0,460,
 		463,1,0,0,0,461,459,1,0,0,0,461,462,1,0,0,0,462,464,1,0,0,0,463,461,1,
 		0,0,0,464,465,5,27,0,0,465,41,1,0,0,0,466,467,5,43,0,0,467,468,3,16,8,
