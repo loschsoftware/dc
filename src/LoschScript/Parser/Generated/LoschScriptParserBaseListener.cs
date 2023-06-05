@@ -953,6 +953,18 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType_name([NotNull] LoschScriptParser.Type_nameContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.builtin_type_alias"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterBuiltin_type_alias([NotNull] LoschScriptParser.Builtin_type_aliasContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.builtin_type_alias"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitBuiltin_type_alias([NotNull] LoschScriptParser.Builtin_type_aliasContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.param_list_type"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

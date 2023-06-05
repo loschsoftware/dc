@@ -491,6 +491,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType_name([NotNull] LoschScriptParser.Type_nameContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.builtin_type_alias"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBuiltin_type_alias([NotNull] LoschScriptParser.Builtin_type_aliasContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.param_list_type"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

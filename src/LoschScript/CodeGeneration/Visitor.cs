@@ -1507,8 +1507,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     context.GetText().Length,
                     LS0037_BranchExpressionTypesUnequal,
                     $"The return types of the branches of the conditional expression do not match.");
-
-            return t;
         }
 
         return t;
@@ -1667,8 +1665,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     context.GetText().Length,
                     LS0037_BranchExpressionTypesUnequal,
                     $"The return types of the branches of the conditional expression do not match.");
-
-            return t;
         }
 
         return t;
@@ -2063,6 +2059,36 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         if (context.identifier_atom() != null)
             return Visit(context.identifier_atom());
+
+        if (context.builtin_type_alias() != null)
+        {
+            string dotNetTypeName = $"System.{context.GetText() switch
+            {
+                "int8" => "SByte",
+                "uint8" => "Byte",
+                "int16" => "Int16",
+                "uint16" => "UInt16",
+                "int32" => "Int32",
+                "uint32" => "UInt32",
+                "int64" => "Int64",
+                "uint64" => "UInt64",
+                "float32" => "Single",
+                "float64" => "Double",
+                "decimal" => "Decimal",
+                "native" => "IntPtr",
+                "unative" => "UIntPtr",
+                "bool" => "Boolean",
+                "string" => "String",
+                "char" => "Char",
+                _ => "Object"
+            }}";
+
+            return Helpers.ResolveTypeName(
+                dotNetTypeName,
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length);
+        }
 
         if (context.Bar() != null)
         {

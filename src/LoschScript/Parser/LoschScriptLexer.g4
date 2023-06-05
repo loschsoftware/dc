@@ -16,24 +16,51 @@ Assembly: 'assembly';
 
 Type: 'type';
 Module: 'module';
+Template: 'template';
 Global: 'global';
 Local: 'local';
 Internal: 'internal';
 Static: 'static';
 Protected: 'protected';
-Sealed: 'sealed';
 Partial: 'partial';
+Open: 'open';
+Closed: 'closed';
+Auto: 'auto';
+Virtual: 'virtual';
+Extern: 'extern';
+
+Int8: 'int8';
+UInt8: 'uint8';
+Int16: 'int16';
+UInt16: 'uint16';
+Int32: 'int32';
+UInt32: 'uint32';
+Int64: 'int64';
+UInt64: 'uint64';
+Native: 'native';
+UNative: 'unative';
+Float32: 'float32';
+Float64: 'float64';
+Decimal: 'decimal';
+Bool: 'bool';
+String: 'string';
+Char: 'char';
+Dynamic: 'dynamic';
+Object: 'object';
 
 Infix: 'infix';
 Inline: 'inline';
 
 Var: 'var';
 Val: 'val';
+Const: 'const';
+Base: 'base';
+Override: 'override';
+
+Raise: 'raise';
 
 True: 'true';
 False: 'false';
-
-Of: 'of';
 
 Open_Paren: '(';
 Close_Paren: ')';

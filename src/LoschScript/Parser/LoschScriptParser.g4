@@ -142,6 +142,11 @@ type_name
     | generic_identifier
     | identifier_atom
     | param_list_type
+    | builtin_type_alias
+    ;
+
+builtin_type_alias
+    : Int8 | UInt8 | Int16 | UInt16 | Int32 | UInt32 | Int64 | UInt64 | Native | UNative | Float32 | Float64 | Decimal | Char | String | Bool | Object
     ;
 
 param_list_type
