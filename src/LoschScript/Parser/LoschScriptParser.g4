@@ -138,11 +138,11 @@ identifier_atom
     ;
 
 type_name
-    : Open_Paren type_name (Bar type_name)+ Close_Paren
+    : builtin_type_alias
+    | Open_Paren type_name (Bar type_name)+ Close_Paren
     | generic_identifier
     | identifier_atom
     | param_list_type
-    | builtin_type_alias
     ;
 
 builtin_type_alias
