@@ -200,5 +200,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an inline IL instruction has an invalid operand.
     /// </summary>
-    LS0046_InlineILInvalidOperand
+    LS0046_InlineILInvalidOperand,
+    /// <summary>
+    /// Emitted when there are duplicate types in a union type.
+    /// </summary>
+    LS0047_UnionTypeDuplicate
 }

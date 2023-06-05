@@ -2057,6 +2057,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             UnionValue union = new(null, context.type_name().Select(VisitType_name).ToArray());
             CurrentMethod.CurrentUnion = union;
 
+            if (union.AllowedTypes.Distinct().Count() < union.AllowedTypes.Length)
+            {
+                EmitWarningMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.GetText().Length,
+                    LS0047_UnionTypeDuplicate,
+                    "The union type contains duplicate cases.");
+            }
+
             return union.GetType();
         }
 
