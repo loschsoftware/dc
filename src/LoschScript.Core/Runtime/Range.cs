@@ -1,20 +1,12 @@
-﻿// https://github.com/dotnet/runtime/blob/419e949d258ecee4c40a460fb09c66d974229623/src/libraries/System.Private.CoreLib/src/System/Index.cs
-// https://github.com/dotnet/runtime/blob/419e949d258ecee4c40a460fb09c66d974229623/src/libraries/System.Private.CoreLib/src/System/Range.cs
-
+﻿using System;
 using System.Runtime.CompilerServices;
+using LoschScript.Runtime;
 
 [assembly: InternalsVisibleTo("lsc")]
 
 namespace System
 {
     /// <summary>Represent a type can be used to index a collection either from the start or the end.</summary>
-    /// <remarks>
-    /// Index is used by the C# compiler to support the new index syntax
-    /// <code>
-    /// int[] someArray = new int[5] { 1, 2, 3, 4, 5 } ;
-    /// int lastElement = someArray[^1]; // lastElement = 5
-    /// </code>
-    /// </remarks>
     public readonly struct Index : IEquatable<Index>
     {
         private readonly int _value;
@@ -121,7 +113,7 @@ namespace System
 
         /// <summary>Indicates whether the current Index object is equal to another object of the same type.</summary>
         /// <param name="value">An object to compare with this object</param>
-        public override bool Equals(object? value) => value is Index && _value == ((Index)value)._value;
+        public override bool Equals(object value) => value is Index && _value == ((Index)value)._value;
 
         /// <summary>Indicates whether the current Index object is equal to another Index object.</summary>
         /// <param name="other">An object to compare with this object</param>
@@ -144,14 +136,6 @@ namespace System
     }
 
     /// <summary>Represent a range has start and end indexes.</summary>
-    /// <remarks>
-    /// Range is used by the C# compiler to support the range syntax.
-    /// <code>
-    /// int[] someArray = new int[5] { 1, 2, 3, 4, 5 };
-    /// int[] subArray1 = someArray[0..2]; // { 1, 2 }
-    /// int[] subArray2 = someArray[1..^0]; // { 2, 3, 4, 5 }
-    /// </code>
-    /// </remarks>
     public readonly struct Range : IEquatable<Range>
     {
         /// <summary>Represent the inclusive start index of the Range.</summary>
@@ -171,7 +155,7 @@ namespace System
 
         /// <summary>Indicates whether the current Range object is equal to another object of the same type.</summary>
         /// <param name="value">An object to compare with this object</param>
-        public override bool Equals(object? value) =>
+        public override bool Equals(object value) =>
             value is Range r &&
             r.Start.Equals(Start) &&
             r.End.Equals(End);
