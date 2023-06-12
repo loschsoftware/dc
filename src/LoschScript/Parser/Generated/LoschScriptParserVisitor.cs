@@ -194,6 +194,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitMultiply_expression([NotNull] LoschScriptParser.Multiply_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>loop_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLoop_expression([NotNull] LoschScriptParser.Loop_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>logical_or_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -242,13 +249,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>for_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitFor_loop([NotNull] LoschScriptParser.For_loopContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>remainder_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

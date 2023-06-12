@@ -208,5 +208,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a specified source file could not be found.
     /// </summary>
-    LS0048_SourceFileNotFound
+    LS0048_SourceFileNotFound,
+    /// <summary>
+    /// Emitted when a for loop contains more than 3 expressions.
+    /// </summary>
+    LS0049_InvalidForLoopSyntax
 }

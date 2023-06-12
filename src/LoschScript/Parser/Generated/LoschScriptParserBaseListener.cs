@@ -359,6 +359,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitMultiply_expression([NotNull] LoschScriptParser.Multiply_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>loop_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLoop_expression([NotNull] LoschScriptParser.Loop_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>loop_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLoop_expression([NotNull] LoschScriptParser.Loop_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>logical_or_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -456,20 +470,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>for_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFor_loop([NotNull] LoschScriptParser.For_loopContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>for_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFor_loop([NotNull] LoschScriptParser.For_loopContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>remainder_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
