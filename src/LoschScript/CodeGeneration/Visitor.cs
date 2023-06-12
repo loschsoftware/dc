@@ -2522,25 +2522,20 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitLoop_expression([NotNull] LoschScriptParser.Loop_expressionContext context)
     {
+        if (context.Identifier().Length > 2)
+        {
+            EmitErrorMessage(
+                context.Identifier()[2].Symbol.Line,
+                context.Identifier()[2].Symbol.Column,
+                context.Identifier()[2].GetText().Length,
+                LS0049_InvalidForLoopSyntax,
+                "The loop syntax is invalid, it can contain at most 3 linked expressions.");
+
+            return null;
+        }
+
         return null;
     }
-
-    //public Type VisitFor_loop(dynamic context)
-    //{
-    //    if (context.Identifier().Length > 2)
-    //    {
-    //        EmitErrorMessage(
-    //            context.expression()[3].Start.Line,
-    //            context.expression()[3].Start.Column,
-    //            context.expression()[3].GetText().Length,
-    //            LS0049_InvalidForLoopSyntax,
-    //            "The loop syntax is invalid, it can contain at most 3 linked expressions.");
-
-    //        return typeof(object[]);
-    //    }
-
-    //    return typeof(object[]);
-    //}
 
     public override Type VisitPlaceholder([NotNull] LoschScriptParser.PlaceholderContext context)
     {
