@@ -212,5 +212,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a for loop contains more than 3 expressions.
     /// </summary>
-    LS0049_InvalidForLoopSyntax
+    LS0049_InvalidForLoopSyntax,
+    /// <summary>
+    /// Emitted when the return value of a top-level program is not an integer.
+    /// </summary>
+    LS0050_ExpectedIntegerReturnValue
 }

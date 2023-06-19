@@ -163,6 +163,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         // Last expression is like return statement
         Type ret = Visit(context.children.Last());
 
+        if (ret != typeof(void) && ret != typeof(int) && ret != null)
+        {
+            EmitErrorMessage(context.expression().Last().Start.Line,
+                context.expression().Last().Start.Column,
+                context.expression().Last().GetText().Length,
+                LS0050_ExpectedIntegerReturnValue,
+                $"Expected expression of type 'int32' or 'void', got type '{ret.FullName}'.\r\n");
+
+            return ret;
+        }
+
         if (ret != typeof(int))
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
 
