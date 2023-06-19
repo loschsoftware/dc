@@ -169,7 +169,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.expression().Last().Start.Column,
                 context.expression().Last().GetText().Length,
                 LS0050_ExpectedIntegerReturnValue,
-                $"Expected expression of type 'int32' or 'void', got type '{ret.FullName}'.\r\n");
+                $"Expected expression of type 'int32' or 'void', but got type '{ret.FullName}'.");
 
             return ret;
         }
