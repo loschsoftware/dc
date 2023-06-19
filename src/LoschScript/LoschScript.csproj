@@ -29,4 +29,14 @@
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
 		<Exec Command="java -jar $(SolutionDir)tools\antlr-4.12.0-complete.jar -visitor -Dlanguage=CSharp -package LoschScript.Parser -o $(ProjectDir)Parser\Generated $(ProjectDir)Parser\LoschScriptLexer.g4 $(ProjectDir)Parser\LoschScriptParser.g4" />
 	</Target>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="copy $(OutDir)lsc.exe ..\..\..\lsedit\tools\assemblies\lsc.exe &amp;
+			copy $(OutDir)lsc.exe.config ..\..\..\lsedit\tools\assemblies\lsc.exe.config &amp;
+			copy $(OutDir)lsc.xml ..\..\..\lsedit\tools\assemblies\lsc.xml &amp;
+			copy $(OutDir)lsconfig.dll ..\..\..\lsedit\tools\assemblies\lsconfig.dll &amp;
+			copy $(OutDir)lsconfig.xml ..\..\..\lsedit\tools\assemblies\lsconfig.xml &amp;
+			copy $(OutDir)lstx.dll ..\..\..\lsedit\tools\assemblies\lstx.dll &amp;
+			copy $(OutDir)lstx.xml ..\..\..\lsedit\tools\assemblies\lstx.xml" />
+	</Target>
 </Project>
