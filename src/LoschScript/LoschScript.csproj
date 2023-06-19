@@ -31,12 +31,6 @@
 	</Target>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="copy $(OutDir)lsc.exe ..\..\..\lsedit\tools\assemblies\lsc.exe &amp;
-			copy $(OutDir)lsc.exe.config ..\..\..\lsedit\tools\assemblies\lsc.exe.config &amp;
-			copy $(OutDir)lsc.xml ..\..\..\lsedit\tools\assemblies\lsc.xml &amp;
-			copy $(OutDir)lsconfig.dll ..\..\..\lsedit\tools\assemblies\lsconfig.dll &amp;
-			copy $(OutDir)lsconfig.xml ..\..\..\lsedit\tools\assemblies\lsconfig.xml &amp;
-			copy $(OutDir)lstx.dll ..\..\..\lsedit\tools\assemblies\lstx.dll &amp;
-			copy $(OutDir)lstx.xml ..\..\..\lsedit\tools\assemblies\lstx.xml" />
+		<Exec Command="copy $(OutDir)lsc.exe ..\..\..\lsedit\tools\assemblies\lsc.exe &amp;&#xD;&#xA;			copy $(OutDir)lsc.exe.config ..\..\..\lsedit\tools\assemblies\lsc.exe.config &amp;&#xD;&#xA;			copy $(OutDir)lsc.xml ..\..\..\lsedit\tools\assemblies\lsc.xml &amp;&#xD;&#xA;			copy $(OutDir)lsconfig.dll ..\..\..\lsedit\tools\assemblies\lsconfig.dll &amp;&#xD;&#xA;			copy $(OutDir)lsconfig.xml ..\..\..\lsedit\tools\assemblies\lsconfig.xml &amp;&#xD;&#xA;			copy $(OutDir)LoschScript.Core.dll ..\..\..\lsedit\tools\assemblies\LoschScript.Core.dll &amp;&#xD;&#xA;			copy $(OutDir)LoschScript.Core.xml ..\..\..\lsedit\tools\assemblies\LoschScript.Core.xml &amp;&#xD;&#xA;			copy $(OutDir)lstx.dll ..\..\..\lsedit\tools\assemblies\lstx.dll &amp;&#xD;&#xA;			copy $(OutDir)lstx.xml ..\..\..\lsedit\tools\assemblies\lstx.xml" />
 	</Target>
 </Project>
