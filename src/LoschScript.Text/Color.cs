@@ -107,5 +107,17 @@ public enum Color : byte
     /// <summary>
     /// An escape sequence in a string.
     /// </summary>
-    StringEscapeSequence
+    StringEscapeSequence,
+    /// <summary>
+    /// An error message.
+    /// </summary>
+    Error,
+    /// <summary>
+    /// A warning message.
+    /// </summary>
+    Warning,
+    /// <summary>
+    /// An information message.
+    /// </summary>
+    Information
 }
