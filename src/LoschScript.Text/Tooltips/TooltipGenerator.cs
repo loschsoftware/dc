@@ -96,7 +96,7 @@ public static class TooltipGenerator
 
         if (method.GetParameters().Length > 0)
         {
-            words.Add(BuildWord("("));
+            words.Add(BuildWord(" ("));
 
             foreach (ParameterInfo param in method.GetParameters()[..^1])
             {
