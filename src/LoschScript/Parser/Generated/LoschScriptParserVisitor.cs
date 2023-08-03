@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\Source\Repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\source\repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -116,13 +116,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitSubtraction_expression([NotNull] LoschScriptParser.Subtraction_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>implementation_query_exception</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitImplementation_query_exception([NotNull] LoschScriptParser.Implementation_query_exceptionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>bitwise_complement_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -424,6 +417,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>implementation_query_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitImplementation_query_expression([NotNull] LoschScriptParser.Implementation_query_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.atom"/>.
 	/// </summary>

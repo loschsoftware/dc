@@ -62,7 +62,7 @@ expression
     | Minus expression #unary_negation_expression
     | Caret Identifier  #typeof_expression
     | Percent_Caret expression #nameof_expression
-    | expression Double_Dot_Question_Mark expression #implementation_query_exception
+    | expression Double_Dot_Question_Mark expression #implementation_query_expression
     | (Var | Val)? Identifier (Colon type_name)? Equals expression #local_declaration_or_assignment
     | expression Dot Identifier arglist? #member_access_expression
     | expression Arrow_Right expression #right_pipe_expression

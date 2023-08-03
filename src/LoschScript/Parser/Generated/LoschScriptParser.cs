@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\Source\Repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\source\repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -1181,32 +1181,6 @@ public partial class LoschScriptParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
-	public partial class Implementation_query_exceptionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Dot_Question_Mark() { return GetToken(LoschScriptParser.Double_Dot_Question_Mark, 0); }
-		public Implementation_query_exceptionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterImplementation_query_exception(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitImplementation_query_exception(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitImplementation_query_exception(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
 	public partial class Bitwise_complement_expressionContext : ExpressionContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Tilde() { return GetToken(LoschScriptParser.Tilde, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
@@ -2343,6 +2317,32 @@ public partial class LoschScriptParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
+	public partial class Implementation_query_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Dot_Question_Mark() { return GetToken(LoschScriptParser.Double_Dot_Question_Mark, 0); }
+		public Implementation_query_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterImplementation_query_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitImplementation_query_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitImplementation_query_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
 
 	[RuleVersion(0)]
 	public ExpressionContext expression() {
@@ -3168,7 +3168,7 @@ public partial class LoschScriptParser : Parser {
 						break;
 					case 17:
 						{
-						_localctx = new Implementation_query_exceptionContext(new ExpressionContext(_parentctx, _parentState));
+						_localctx = new Implementation_query_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 393;
 						if (!(Precpred(Context, 23))) throw new FailedPredicateException(this, "Precpred(Context, 23)");
