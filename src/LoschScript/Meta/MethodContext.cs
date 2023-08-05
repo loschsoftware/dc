@@ -32,9 +32,15 @@ internal class MethodContext
 
     public MethodBuilder Builder { get; set; }
 
+    public ConstructorBuilder ConstructorBuilder { get; set; }
+
     public int LocalIndex { get; set; } = -1;
 
+    public int ParameterIndex { get; set; } = 1;
+
     public List<(string Name, LocalBuilder Builder, bool IsConstant, int Index, UnionValue Union)> Locals { get; } = new();
+
+    public List<(string Name, ParameterBuilder Builder, int Index, UnionValue Union)> Parameters { get; } = new();
     
     public UnionValue CurrentUnion { get; set; } = new(null, typeof(object));
 

@@ -220,12 +220,18 @@ type_access_modifier
     | Internal
     ;
 
+nested_type_access_modifier
+    : type_access_modifier
+    | Local
+    | Protected Internal?
+    ;
+
 type_special_modifier
     : Open
     ;
 
 type
-    : type_access_modifier? type_special_modifier? type_kind Identifier type_parameter_list? inheritance_list? Equals type_block
+    : (type_access_modifier | nested_type_access_modifier)? type_special_modifier? type_kind Identifier type_parameter_list? inheritance_list? Equals type_block
     ;
 
 type_parameter_list
@@ -249,6 +255,7 @@ type_kind
     : Ref? Type
     | Val Type
     | Template
+    | Module
     ;
 
 member_access_modifier
@@ -266,6 +273,7 @@ member_special_modifier
     : Extern
     | Infix
     | Inline
+    | Static
     ;
 
 type_member
@@ -277,8 +285,14 @@ parameter_list
     | parameter (Comma parameter)*
     ;
 
+parameter_modifier
+    : Ampersand // ref
+    | Arrow_Right // in
+    | Arrow_Left // out
+    ;
+
 parameter
-    : attribute? Identifier Double_Dot? (Colon type_name)? parameter_constraint? (Equals expression)?
+    : attribute? parameter_modifier? Identifier Double_Dot? (Colon type_name)? parameter_constraint? (Equals expression)?
     ;
 
 parameter_constraint
@@ -286,5 +300,5 @@ parameter_constraint
     ;
 
 type_block
-    : Open_Brace type_member* Close_Brace
+    : Open_Brace (type_member | type | NewLine)* Close_Brace
     ;

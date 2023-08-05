@@ -599,6 +599,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType_access_modifier([NotNull] LoschScriptParser.Type_access_modifierContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.nested_type_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNested_type_access_modifier([NotNull] LoschScriptParser.Nested_type_access_modifierContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_special_modifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -670,6 +676,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitParameter_list([NotNull] LoschScriptParser.Parameter_listContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.parameter_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitParameter_modifier([NotNull] LoschScriptParser.Parameter_modifierContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.parameter"/>.
 	/// </summary>

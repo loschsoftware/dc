@@ -1169,6 +1169,18 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType_access_modifier([NotNull] LoschScriptParser.Type_access_modifierContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.nested_type_access_modifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterNested_type_access_modifier([NotNull] LoschScriptParser.Nested_type_access_modifierContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.nested_type_access_modifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitNested_type_access_modifier([NotNull] LoschScriptParser.Nested_type_access_modifierContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_special_modifier"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -1312,6 +1324,18 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitParameter_list([NotNull] LoschScriptParser.Parameter_listContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.parameter_modifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterParameter_modifier([NotNull] LoschScriptParser.Parameter_modifierContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.parameter_modifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitParameter_modifier([NotNull] LoschScriptParser.Parameter_modifierContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.parameter"/>.
 	/// <para>The default implementation does nothing.</para>

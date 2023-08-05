@@ -216,5 +216,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the return value of a top-level program is not an integer.
     /// </summary>
-    LS0050_ExpectedIntegerReturnValue
+    LS0050_ExpectedIntegerReturnValue,
+    /// <summary>
+    /// Emitted when the inheritance list of a type contains more than one CLR class.
+    /// </summary>
+    LS0051_MoreThanOneClassInInheritanceList
 }

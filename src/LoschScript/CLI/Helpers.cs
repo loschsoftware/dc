@@ -203,6 +203,20 @@ internal static class Helpers
         return (null, Array.Empty<MethodInfo>());
     }
 
+    public static Type ResolveTypeName(LoschScriptParser.Type_nameContext name, bool noEmitFragments = false)
+    {
+        if (name.identifier_atom() != null)
+        {
+            if (name.identifier_atom().Identifier() != null)
+                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments);
+            
+            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments);
+        }
+
+        // TODO: Implement other kinds of types
+        return null;
+    }
+
     public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false)
     {
         Type type = Type.GetType(name);
@@ -291,6 +305,125 @@ internal static class Helpers
         }
 
         return type;
+    }
+
+    public static MethodAttributes GetMethodAttributes(LoschScriptParser.Member_access_modifierContext accessModifier, LoschScriptParser.Member_oop_modifierContext oopModifier, LoschScriptParser.Member_special_modifierContext[] specialModifiers)
+    {
+        MethodAttributes baseAttributes;
+
+        if (accessModifier == null || accessModifier.Global() != null)
+            baseAttributes = MethodAttributes.Public;
+
+        else if (accessModifier.Internal() != null)
+            baseAttributes = MethodAttributes.Assembly;
+
+        else
+            baseAttributes = MethodAttributes.Private;
+
+        if (oopModifier != null && oopModifier.Virtual() != null)
+            baseAttributes |= MethodAttributes.Virtual;
+
+        foreach (var modifier in specialModifiers)
+        {
+            if (modifier.Static() != null)
+                baseAttributes |= MethodAttributes.Static;
+        }
+
+        return baseAttributes;
+    }
+
+    public static ParameterAttributes GetParameterAttributes(LoschScriptParser.Parameter_modifierContext modifier, bool hasDefault)
+    {
+        ParameterAttributes baseAttributes = ParameterAttributes.None;
+
+        if (modifier != null && modifier.Arrow_Right() != null)
+            baseAttributes = ParameterAttributes.In;
+        else if (modifier != null && modifier.Arrow_Left() != null)
+            baseAttributes = ParameterAttributes.Out;
+
+        if (hasDefault)
+            baseAttributes |= ParameterAttributes.Optional;
+
+        return baseAttributes;
+    }
+
+    public static TypeAttributes GetTypeAttributes(LoschScriptParser.Type_kindContext typeKind, LoschScriptParser.Type_access_modifierContext typeAccess, LoschScriptParser.Nested_type_access_modifierContext nestedTypeAccess, LoschScriptParser.Type_special_modifierContext modifiers, bool isNested)
+    {
+        TypeAttributes baseAttributes = TypeAttributes.Class;
+
+        if (isNested)
+            baseAttributes |= TypeAttributes.NestedPublic;
+        else 
+            baseAttributes |= TypeAttributes.Public;
+
+        if (typeKind.Template() != null)
+            baseAttributes = TypeAttributes.Interface | TypeAttributes.Abstract;
+
+        if (typeKind.Module() != null)
+            baseAttributes |= TypeAttributes.Abstract | TypeAttributes.Sealed;
+
+        else if (modifiers == null || modifiers.Open() == null)
+            baseAttributes |= TypeAttributes.Sealed;
+
+        if (typeAccess != null)
+        {
+            if (typeAccess.Global() != null)
+                baseAttributes |= TypeAttributes.Public;
+            else
+                baseAttributes |= TypeAttributes.NotPublic;
+        }
+        else if (nestedTypeAccess != null)
+        {
+            if (nestedTypeAccess.Local() != null)
+                baseAttributes |= TypeAttributes.NestedPrivate;
+
+            else if (nestedTypeAccess.Protected() != null && nestedTypeAccess.Internal() != null)
+                baseAttributes |= TypeAttributes.NestedFamORAssem;
+
+            else if (nestedTypeAccess.Protected() != null)
+                baseAttributes |= TypeAttributes.NestedFamily;
+
+            else if (nestedTypeAccess.type_access_modifier().Global() != null)
+                baseAttributes |= TypeAttributes.NestedPublic;
+
+            else
+                baseAttributes |= TypeAttributes.NestedAssembly;
+        }
+
+        return baseAttributes;
+    }
+
+    public static List<Type> GetInheritedTypes(LoschScriptParser.Inheritance_listContext context)
+    {
+        List<Type> types = new();
+
+        int classCount = 0;
+
+        foreach (LoschScriptParser.Type_nameContext typeName in context.type_name())
+        {
+            Type t = ResolveTypeName(typeName);
+
+            if (t != null)
+            {
+                types.Add(t);
+
+                if (t.IsClass)
+                    classCount++;
+            }
+
+            if (classCount > 1)
+            {
+                EmitErrorMessage(
+                    typeName.Start.Line,
+                    typeName.Start.Column,
+                    typeName.GetText().Length,
+                    LS0051_MoreThanOneClassInInheritanceList,
+                    "A type can only extend one base type."
+                    );
+            }
+        }
+
+        return types;
     }
 
     public static OpCode GetCallOpCode(Type type) => type.IsValueType ? OpCodes.Call : OpCodes.Callvirt;

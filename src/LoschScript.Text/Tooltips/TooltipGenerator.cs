@@ -149,8 +149,8 @@ public static class TooltipGenerator
                 words.Add(BuildWord("module ", Color.Word));
             else
             {
-                if (type.IsSealed && !type.IsValueType)
-                    words.Add(BuildWord("sealed ", Color.Word));
+                if (!type.IsSealed)
+                    words.Add(BuildWord("open ", Color.Word));
 
                 if (type.IsAbstract)
                     words.Add(BuildWord("abstract ", Color.Word));

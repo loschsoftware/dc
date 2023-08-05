@@ -9,8 +9,8 @@ internal class Program
 {
     static int Main(string[] args)
     {
-        try
-        {
+        //try
+        //{
             return args switch
             {
                 ["config"] => Helpers.BuildLSConfig(),
@@ -26,19 +26,19 @@ internal class Program
                 [] or ["help" or "?"] => DisplayHelpMessage(),
                 _ => Helpers.HandleArgs(args)
             };
-        }
-        catch (Exception ex)
-        {
-            if (messages.Count == 0)
-            {
-                EmitErrorMessage(0, 0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
-                Console.WriteLine();
-            }
+        //}
+        //catch (Exception ex)
+        //{
+        //    if (messages.Count == 0)
+        //    {
+        //        EmitErrorMessage(0, 0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
+        //        Console.WriteLine();
+        //    }
 
-            Console.WriteLine($"Compilation failed with {messages.Count} error{(messages.Count == 1 ? "" : "s")}.");
+        //    Console.WriteLine($"Compilation failed with {messages.Count} error{(messages.Count == 1 ? "" : "s")}.");
 
-            return -1;
-        }
+        //    return -1;
+        //}
     }
 
     static Process watchProcess = null;

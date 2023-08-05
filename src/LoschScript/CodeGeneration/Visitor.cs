@@ -40,6 +40,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitFile_body([NotNull] LoschScriptParser.File_bodyContext context)
     {
+        // Create throwaway assembly
+        if (!createAssembly)
+        {
+            Context.Assembly = AssemblyBuilder.DefineDynamicAssembly(new("throwaway"), AssemblyBuilderAccess.Run);
+            Context.Module = Context.Assembly.DefineDynamicModule("throwaway");
+        }
+
         if (context.top_level_statements() != null)
         {
             Visit(context.top_level_statements());
@@ -61,8 +68,170 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitType([NotNull] LoschScriptParser.TypeContext context)
     {
+        VisitType(context, null);
+        return typeof(void);
+    }
+
+    private void VisitType(LoschScriptParser.TypeContext context, TypeBuilder enclosingType)
+    {
+        Type parent = typeof(object);
+        List<Type> interfaces = new();
+
+        if (context.inheritance_list() != null)
+        {
+            List<Type> inherited = Helpers.GetInheritedTypes(context.inheritance_list());
+
+            foreach (Type type in inherited)
+            {
+                if (type.IsClass)
+                    parent = type;
+                else
+                    interfaces.Add(type);
+            }
+        }
+
+        TypeBuilder tb;
+
+        if (enclosingType == null)
+        {
+            tb = Context.Module.DefineType(
+                $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetText()}",
+                Helpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false),
+                parent);
+        }
+        else
+        {
+            tb = enclosingType.DefineNestedType(
+                context.Identifier().GetText(),
+                Helpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true),
+                parent);
+        }
+
+        foreach (Type _interface in interfaces)
+            tb.AddInterfaceImplementation(_interface);
+
+        TypeContext tc = new()
+        {
+            Builder = tb
+        };
+
+        tc.FilesWhereDefined.Add(CurrentFile.Path);
+
+        foreach (LoschScriptParser.TypeContext nestedType in context.type_block().type())
+            VisitType(nestedType, tb);
+
+        foreach (LoschScriptParser.Type_memberContext member in context.type_block().type_member())
+            Visit(member);
+
+        tb.CreateType();
+
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = TooltipGenerator.ColorForType(tb.CreateTypeInfo()),
+            Line = context.Identifier().Symbol.Line,
+            Column = context.Identifier().Symbol.Column,
+            Length = context.Identifier().GetText().Length,
+            ToolTip = TooltipGenerator.Type(tb.CreateTypeInfo(), true, true)
+        });
+    }
+
+    public override Type VisitType_member([NotNull] LoschScriptParser.Type_memberContext context)
+    {
+        if (context.Identifier().GetText() == TypeContext.Current.Builder.Name)
+        {
+            CallingConventions callingConventions = CallingConventions.HasThis;
+
+            if (context.member_special_modifier().Any(m => m.Static() != null))
+                callingConventions = CallingConventions.Standard;
+
+            var paramTypes = ResolveParameterList(context.parameter_list());
+
+            ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(
+                Helpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()),
+                callingConventions,
+                paramTypes.Select(p => p.Type).ToArray());
+
+            CurrentMethod = new()
+            {
+                ConstructorBuilder = cb,
+                IL = cb.GetILGenerator()
+            };
+
+            CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
+
+            foreach (var param in paramTypes.Select(p => p.Context))
+            {
+                ParameterBuilder pb = cb.DefineParameter(
+                    CurrentMethod.ParameterIndex++,
+                    Helpers.GetParameterAttributes(param.parameter_modifier(), param.Equals() != null),
+                    param.Identifier().GetText());
+
+                CurrentMethod.Parameters.Add((param.Identifier().GetText(), pb, CurrentMethod.ParameterIndex, new()));
+            }
+
+            if (context.code_block() != null)
+                Visit(context.code_block());
+            else
+                Visit(context.expression());
+
+            CurrentMethod.IL.Emit(OpCodes.Ret);
+
+            CurrentFile.Fragments.Add(new()
+            {
+                Color = TooltipGenerator.ColorForType(TypeContext.Current.Builder),
+                Line = context.Identifier().Symbol.Line,
+                Column = context.Identifier().Symbol.Column,
+                Length = context.Identifier().GetText().Length,
+                ToolTip = TooltipGenerator.Type(TypeContext.Current.Builder.CreateTypeInfo(), true, true)
+            });
+        }
 
         return typeof(void);
+    }
+
+    private (Type Type, LoschScriptParser.ParameterContext Context)[] ResolveParameterList(LoschScriptParser.Parameter_listContext paramList)
+    {
+        if (paramList == null)
+            return Array.Empty<(Type, LoschScriptParser.ParameterContext)>();
+
+        List<(Type, LoschScriptParser.ParameterContext)> types = new();
+
+        foreach (var param in paramList.parameter())
+            types.Add((ResolveParameter(param), param));
+
+        return types.ToArray();
+    }
+
+    private Type ResolveParameter(LoschScriptParser.ParameterContext param)
+    {
+        Type t = typeof(object);
+
+        if (param.type_name() != null)
+        {
+            t = Helpers.ResolveTypeName(param.type_name());
+
+            if (t != null )
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Color = TooltipGenerator.ColorForType(t.GetTypeInfo()),
+                    Line = param.type_name().Start.Line,
+                    Column = param.type_name().Start.Column,
+                    Length = param.type_name().GetText().Length,
+                    ToolTip = TooltipGenerator.Type(t.GetTypeInfo(), true, true)
+                });
+            }
+        }
+
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = Color.LocalValue,
+            Line = param.Identifier().Symbol.Line,
+            Column = param.Identifier().Symbol.Column,
+            Length = param.Identifier().GetText().Length,
+        });
+
+        return t;
     }
 
     public override Type VisitBasic_import([NotNull] LoschScriptParser.Basic_importContext context)
@@ -122,13 +291,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context)
     {
-        // Create throwaway assembly
-        if (!createAssembly)
-        {
-            Context.Assembly = AssemblyBuilder.DefineDynamicAssembly(new("throwaway"), AssemblyBuilderAccess.Run);
-            Context.Module = Context.Assembly.DefineDynamicModule("throwaway");
-        }
-
         TypeBuilder tb = Context.Module.DefineType($"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}Program");
 
         TypeContext tc = new()
@@ -1396,6 +1558,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitCode_block([NotNull] LoschScriptParser.Code_blockContext context)
     {
+        if (context.expression().Length == 0)
+            return typeof(void);
+
         foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
             Visit(tree);
 

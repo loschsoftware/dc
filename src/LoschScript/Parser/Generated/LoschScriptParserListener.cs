@@ -992,6 +992,16 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitType_access_modifier([NotNull] LoschScriptParser.Type_access_modifierContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.nested_type_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterNested_type_access_modifier([NotNull] LoschScriptParser.Nested_type_access_modifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.nested_type_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitNested_type_access_modifier([NotNull] LoschScriptParser.Nested_type_access_modifierContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_special_modifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -1111,6 +1121,16 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitParameter_list([NotNull] LoschScriptParser.Parameter_listContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.parameter_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterParameter_modifier([NotNull] LoschScriptParser.Parameter_modifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.parameter_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitParameter_modifier([NotNull] LoschScriptParser.Parameter_modifierContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.parameter"/>.
 	/// </summary>
