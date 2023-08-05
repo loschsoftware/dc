@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\source\repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\Source\Repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -942,16 +942,6 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitAttribute([NotNull] LoschScriptParser.AttributeContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_definition"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterType_definition([NotNull] LoschScriptParser.Type_definitionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_definition"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitType_definition([NotNull] LoschScriptParser.Type_definitionContext context);
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.generic_identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -991,5 +981,165 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitPlaceholder([NotNull] LoschScriptParser.PlaceholderContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_access_modifier([NotNull] LoschScriptParser.Type_access_modifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_access_modifier([NotNull] LoschScriptParser.Type_access_modifierContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_special_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_special_modifier([NotNull] LoschScriptParser.Type_special_modifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_special_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_special_modifier([NotNull] LoschScriptParser.Type_special_modifierContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType([NotNull] LoschScriptParser.TypeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType([NotNull] LoschScriptParser.TypeContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_parameter_list([NotNull] LoschScriptParser.Type_parameter_listContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_parameter_list([NotNull] LoschScriptParser.Type_parameter_listContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_parameter([NotNull] LoschScriptParser.Type_parameterContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_parameter([NotNull] LoschScriptParser.Type_parameterContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_parameter_constraint"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_parameter_constraint([NotNull] LoschScriptParser.Type_parameter_constraintContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_parameter_constraint"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_parameter_constraint([NotNull] LoschScriptParser.Type_parameter_constraintContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.inheritance_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterInheritance_list([NotNull] LoschScriptParser.Inheritance_listContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.inheritance_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitInheritance_list([NotNull] LoschScriptParser.Inheritance_listContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_kind"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_kind([NotNull] LoschScriptParser.Type_kindContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_kind"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_kind([NotNull] LoschScriptParser.Type_kindContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.member_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterMember_access_modifier([NotNull] LoschScriptParser.Member_access_modifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.member_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitMember_access_modifier([NotNull] LoschScriptParser.Member_access_modifierContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.member_oop_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterMember_oop_modifier([NotNull] LoschScriptParser.Member_oop_modifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.member_oop_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitMember_oop_modifier([NotNull] LoschScriptParser.Member_oop_modifierContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.member_special_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterMember_special_modifier([NotNull] LoschScriptParser.Member_special_modifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.member_special_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitMember_special_modifier([NotNull] LoschScriptParser.Member_special_modifierContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_member"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_member([NotNull] LoschScriptParser.Type_memberContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_member"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_member([NotNull] LoschScriptParser.Type_memberContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterParameter_list([NotNull] LoschScriptParser.Parameter_listContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitParameter_list([NotNull] LoschScriptParser.Parameter_listContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterParameter([NotNull] LoschScriptParser.ParameterContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitParameter([NotNull] LoschScriptParser.ParameterContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.parameter_constraint"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterParameter_constraint([NotNull] LoschScriptParser.Parameter_constraintContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.parameter_constraint"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitParameter_constraint([NotNull] LoschScriptParser.Parameter_constraintContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_block([NotNull] LoschScriptParser.Type_blockContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_block([NotNull] LoschScriptParser.Type_blockContext context);
 }
 } // namespace LoschScript.Parser

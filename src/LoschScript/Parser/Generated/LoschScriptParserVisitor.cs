@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\source\repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\Source\Repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -569,12 +569,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAttribute([NotNull] LoschScriptParser.AttributeContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_definition"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitType_definition([NotNull] LoschScriptParser.Type_definitionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.generic_identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -598,5 +592,101 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitPlaceholder([NotNull] LoschScriptParser.PlaceholderContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_access_modifier([NotNull] LoschScriptParser.Type_access_modifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_special_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_special_modifier([NotNull] LoschScriptParser.Type_special_modifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType([NotNull] LoschScriptParser.TypeContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_parameter_list([NotNull] LoschScriptParser.Type_parameter_listContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_parameter([NotNull] LoschScriptParser.Type_parameterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_parameter_constraint"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_parameter_constraint([NotNull] LoschScriptParser.Type_parameter_constraintContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.inheritance_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInheritance_list([NotNull] LoschScriptParser.Inheritance_listContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_kind"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_kind([NotNull] LoschScriptParser.Type_kindContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.member_access_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMember_access_modifier([NotNull] LoschScriptParser.Member_access_modifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.member_oop_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMember_oop_modifier([NotNull] LoschScriptParser.Member_oop_modifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.member_special_modifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMember_special_modifier([NotNull] LoschScriptParser.Member_special_modifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_member"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_member([NotNull] LoschScriptParser.Type_memberContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitParameter_list([NotNull] LoschScriptParser.Parameter_listContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitParameter([NotNull] LoschScriptParser.ParameterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.parameter_constraint"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitParameter_constraint([NotNull] LoschScriptParser.Parameter_constraintContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_block([NotNull] LoschScriptParser.Type_blockContext context);
 }
 } // namespace LoschScript.Parser

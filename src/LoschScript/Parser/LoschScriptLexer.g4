@@ -51,6 +51,7 @@ Object: 'object';
 Infix: 'infix';
 Inline: 'inline';
 
+Ref: 'ref';
 Var: 'var';
 Val: 'val';
 Const: 'const';

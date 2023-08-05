@@ -53,14 +53,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitFull_program([NotNull] LoschScriptParser.Full_programContext context)
     {
-        foreach (IParseTree type in context.type_definition())
+        foreach (IParseTree type in context.type())
             Visit(type);
 
         return typeof(void);
     }
 
-    public override Type VisitType_definition([NotNull] LoschScriptParser.Type_definitionContext context)
+    public override Type VisitType([NotNull] LoschScriptParser.TypeContext context)
     {
+
         return typeof(void);
     }
 

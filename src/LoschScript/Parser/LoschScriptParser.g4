@@ -16,7 +16,7 @@ top_level_statements
     ;
 
 full_program
-    : (type_definition)+
+    : type NewLine* (type | NewLine)*
     ;
 
 import_directive
@@ -194,11 +194,7 @@ arglist
     ;
 
 attribute
-    : Less_Than full_identifier arglist Greater_Than
-    ;
-
-type_definition
-    : Type
+    : Less_Than type_name arglist Greater_Than
     ;
 
 generic_identifier
@@ -217,4 +213,78 @@ field_declaration
 
 placeholder
     : Dot
+    ;
+
+type_access_modifier
+    : Global
+    | Internal
+    ;
+
+type_special_modifier
+    : Open
+    ;
+
+type
+    : type_access_modifier? type_special_modifier? type_kind Identifier type_parameter_list? inheritance_list? Equals type_block
+    ;
+
+type_parameter_list
+    : Open_Bracket type_parameter (Comma type_parameter)* Close_Bracket
+    ;
+
+type_parameter
+    : Identifier (Colon type_parameter_constraint)?
+    ;
+
+type_parameter_constraint
+    : type_kind
+    | type_name
+    ;
+
+inheritance_list
+    : Colon type_name (Comma type_name)*
+    ;
+
+type_kind
+    : Ref? Type
+    | Val Type
+    | Template
+    ;
+
+member_access_modifier
+    : Global
+    | Local
+    | Internal
+    | Protected
+    ;
+
+member_oop_modifier
+    : Virtual
+    ;
+
+member_special_modifier
+    : Extern
+    | Infix
+    | Inline
+    ;
+
+type_member
+    : attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? parameter_list? Equals (expression | code_block)
+    ;
+
+parameter_list
+    : Open_Paren (parameter (Comma parameter)*)? Close_Paren
+    | parameter (Comma parameter)*
+    ;
+
+parameter
+    : attribute? Identifier Double_Dot? (Colon type_name)? parameter_constraint? (Equals expression)?
+    ;
+
+parameter_constraint
+    : Question_Mark? Open_Brace expression Close_Brace
+    ;
+
+type_block
+    : Open_Brace type_member* Close_Brace
     ;
