@@ -121,7 +121,7 @@ public static class TooltipGenerator
         return new()
         {
             Words = words,
-            IconResourceName = ResourceNameForType(type.GetTypeInfo())
+            IconResourceName = "Method"
         };
     }
 
@@ -164,7 +164,7 @@ public static class TooltipGenerator
         return new()
         {
             Words = words,
-            IconResourceName = ResourceNameForType(ctor.DeclaringType.GetTypeInfo())
+            IconResourceName = "Method"
         };
     }
 
