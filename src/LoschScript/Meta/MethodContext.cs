@@ -36,11 +36,11 @@ internal class MethodContext
 
     public int LocalIndex { get; set; } = -1;
 
-    public int ParameterIndex { get; set; } = 1;
+    public int ParameterIndex { get; set; } = 0;
 
     public List<(string Name, LocalBuilder Builder, bool IsConstant, int Index, UnionValue Union)> Locals { get; } = new();
 
-    public List<(string Name, ParameterBuilder Builder, int Index, UnionValue Union)> Parameters { get; } = new();
+    public List<(string Name, Type Type, ParameterBuilder Builder, int Index, UnionValue Union)> Parameters { get; } = new();
     
     public UnionValue CurrentUnion { get; set; } = new(null, typeof(object));
 

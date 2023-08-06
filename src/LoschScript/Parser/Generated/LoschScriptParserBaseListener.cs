@@ -833,6 +833,18 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAtom([NotNull] LoschScriptParser.AtomContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.this_atom"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterThis_atom([NotNull] LoschScriptParser.This_atomContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.this_atom"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitThis_atom([NotNull] LoschScriptParser.This_atomContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.expression_atom"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

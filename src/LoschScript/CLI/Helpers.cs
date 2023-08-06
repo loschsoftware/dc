@@ -209,7 +209,7 @@ internal static class Helpers
         {
             if (name.identifier_atom().Identifier() != null)
                 return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments);
-            
+
             return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments);
         }
 
@@ -307,6 +307,52 @@ internal static class Helpers
         return type;
     }
 
+    public static (int Type, int Index) GetLocalOrParameterIndex(string name)
+    {
+        if (CurrentMethod.Locals.Any(l => l.Name == name))
+            return (0, CurrentMethod.Locals.First(l => l.Name == name).Index);
+
+        else if (CurrentMethod.Parameters.Any(p => p.Name == name))
+            return (1, CurrentMethod.Parameters.First(p => p.Name == name).Index);
+
+        return (-1, -1);
+    }
+
+    public static (bool IsParameter, int Index, Type Type) GetLocalOrParameter(string name)
+    {
+        if (CurrentMethod.Locals.Any(l => l.Name == name))
+            return (false, CurrentMethod.Locals.First(l => l.Name == name).Index, CurrentMethod.Locals.First(l => l.Name == name).Builder.LocalType);
+
+        else if (CurrentMethod.Parameters.Any(p => p.Name == name))
+            return (true, CurrentMethod.Parameters.First(p => p.Name == name).Index, CurrentMethod.Parameters.First(p => p.Name == name).Type);
+
+        return default;
+    }
+
+    public static (bool Result, Type Type) LoadLocalOrParameter(string name)
+    {
+        var index = GetLocalOrParameterIndex(name);
+
+        if (index == (-1, -1))
+            return (false, null);
+
+        CurrentMethod.IL.Emit(index.Type switch
+        {
+            0 => OpCodes.Ldloc,
+            _ => OpCodes.Ldarg
+
+        }, index.Index);
+
+        Type type;
+
+        if (index.Type == 0)
+            type = CurrentMethod.Locals.Where(l => l.Name == name).First().Builder.LocalType;
+        else
+            type = CurrentMethod.Parameters.Where(p => p.Name == name).First().Type;
+
+        return (true, type);
+    }
+
     public static MethodAttributes GetMethodAttributes(LoschScriptParser.Member_access_modifierContext accessModifier, LoschScriptParser.Member_oop_modifierContext oopModifier, LoschScriptParser.Member_special_modifierContext[] specialModifiers)
     {
         MethodAttributes baseAttributes;
@@ -353,7 +399,7 @@ internal static class Helpers
 
         if (isNested)
             baseAttributes |= TypeAttributes.NestedPublic;
-        else 
+        else
             baseAttributes |= TypeAttributes.Public;
 
         if (typeKind.Template() != null)

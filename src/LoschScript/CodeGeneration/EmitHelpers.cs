@@ -111,12 +111,28 @@ internal static class EmitHelpers
             generator.Emit(OpCodes.Ldloc, index);
     }
 
+    public static void EmitLdarg(ILGenerator generator, int index)
+    {
+        if (index <= 255)
+            generator.Emit(OpCodes.Ldarg_S, (byte)index);
+        else
+            generator.Emit(OpCodes.Ldarg, index);
+    }
+
     public static void EmitLdloca(ILGenerator generator, int index)
     {
         if (index <= 255)
             generator.Emit(OpCodes.Ldloca_S, (byte)index);
         else
             generator.Emit(OpCodes.Ldloca, index);
+    }
+
+    public static void EmitLdarga(ILGenerator generator, int index)
+    {
+        if (index <= 255)
+            generator.Emit(OpCodes.Ldarga_S, (byte)index);
+        else
+            generator.Emit(OpCodes.Ldarga, index);
     }
 
     public static void EmitConst(ILGenerator il, object value)

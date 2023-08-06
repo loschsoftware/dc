@@ -712,6 +712,16 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitAtom([NotNull] LoschScriptParser.AtomContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.this_atom"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterThis_atom([NotNull] LoschScriptParser.This_atomContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.this_atom"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitThis_atom([NotNull] LoschScriptParser.This_atomContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.expression_atom"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

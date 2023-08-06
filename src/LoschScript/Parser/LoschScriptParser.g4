@@ -97,6 +97,11 @@ atom
     | character_atom
     | empty_atom
     | wildcard_atom
+    | this_atom
+    ;
+
+this_atom
+    : This
     ;
 
 expression_atom

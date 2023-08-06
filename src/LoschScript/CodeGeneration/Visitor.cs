@@ -159,15 +159,18 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
 
-            foreach (var param in paramTypes.Select(p => p.Context))
+            foreach (var param in paramTypes)
             {
                 ParameterBuilder pb = cb.DefineParameter(
                     CurrentMethod.ParameterIndex++,
-                    Helpers.GetParameterAttributes(param.parameter_modifier(), param.Equals() != null),
-                    param.Identifier().GetText());
+                    Helpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
+                    param.Context.Identifier().GetText());
 
-                CurrentMethod.Parameters.Add((param.Identifier().GetText(), pb, CurrentMethod.ParameterIndex, new()));
+                CurrentMethod.Parameters.Add((param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
             }
+
+            CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
 
             if (context.code_block() != null)
                 Visit(context.code_block());
@@ -188,6 +191,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Length = context.Identifier().GetText().Length,
                 ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params)
             });
+
+            return typeof(void);
         }
 
         return typeof(void);
@@ -1464,14 +1469,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
     {
-        // Check for local of this name
-        if (CurrentMethod.Locals.Any(l => l.Name == context.Identifier().GetText()))
-        {
-            var local = CurrentMethod.Locals.First(l => l.Name == context.Identifier().GetText());
-            CurrentMethod.IL.Emit(OpCodes.Ldloc, local.Index);
+        // Check for local or argument of this name
+        var localOrParam = Helpers.LoadLocalOrParameter(context.Identifier().GetText());
 
-            return local.Builder.LocalType;
-        }
+        if (localOrParam.Result)
+            return localOrParam.Type;
 
         Type t = Visit(context.expression());
 
@@ -1491,12 +1493,23 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type type;
 
         (string Name, LocalBuilder Builder, bool IsConstant, int Index, UnionValue Union) local = default;
+        (string Name, Type Type, ParameterBuilder Builder, int Index, UnionValue Union) param = default;
 
-        // Check for local of this name
-        if (CurrentMethod.Locals.Any(l => l.Name == context.full_identifier().Identifier()[0].GetText()))
+        // Check for local or argument of this name
+        var localOrParam = Helpers.GetLocalOrParameter(context.full_identifier().Identifier()[0].GetText());
+
+        if (localOrParam != default)
         {
-            local = CurrentMethod.Locals.First(l => l.Name == context.full_identifier().Identifier()[0].GetText());
-            type = local.Builder.LocalType;
+            if (localOrParam.IsParameter)
+            {
+                param = CurrentMethod.Parameters.First(p => p.Index == localOrParam.Index);
+                type = param.Type;
+            }
+            else
+            {
+                local = CurrentMethod.Locals.First(l => l.Index == localOrParam.Index);
+                type = local.Builder.LocalType;
+            }
 
             CurrentFile.Fragments.Add(new()
             {
@@ -1504,14 +1517,19 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Column = context.full_identifier().Identifier()[0].Symbol.Column,
                 Length = context.full_identifier().Identifier()[0].GetText().Length,
                 Color = Color.LocalValue,
-                ToolTip = TooltipGenerator.Local(local.Name, !local.IsConstant, local.Builder)
+                ToolTip = local == default ?
+                    TooltipGenerator.Parameter(param.Name, param.Type)
+                    : TooltipGenerator.Local(local.Name, !local.IsConstant, local.Builder)
             });
 
             if (context.full_identifier().Identifier().Length == 1)
             {
                 if (type == typeof(UnionValue))
                 {
-                    EmitLdloca(CurrentMethod.IL, local.Index);
+                    if (local == default)
+                        EmitLdarga(CurrentMethod.IL, param.Index);
+                    else
+                        EmitLdloca(CurrentMethod.IL, local.Index);
 
                     MethodInfo getter = type.GetMethod("get_Value");
                     CurrentMethod.IL.EmitCall(OpCodes.Call, getter, null);
@@ -1519,14 +1537,28 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     return typeof(object);
                 }
 
-                EmitLdloc(CurrentMethod.IL, local.Index);
+                if (local == default)
+                    EmitLdarg(CurrentMethod.IL, param.Index);
+                else
+                    EmitLdloc(CurrentMethod.IL, local.Index);
+
                 return type;
             }
 
-            if (local.Builder.LocalType.IsValueType)
-                EmitLdloca(CurrentMethod.IL, local.Index);
+            if (local == default)
+            {
+                if (param.Type.IsValueType)
+                    EmitLdarga(CurrentMethod.IL, param.Index);
+                else
+                    EmitLdarg(CurrentMethod.IL, param.Index);
+            }
             else
-                EmitLdloc(CurrentMethod.IL, local.Index);
+            {
+                if (local.Builder.LocalType.IsValueType)
+                    EmitLdloca(CurrentMethod.IL, local.Index);
+                else
+                    EmitLdloc(CurrentMethod.IL, local.Index);
+            }
         }
         else
         {
@@ -2106,8 +2138,22 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context)
     {
-        if (CurrentMethod.Locals.Any(e => e.Name == context.Identifier().GetText()))
+        var localOrParam = Helpers.GetLocalOrParameter(context.Identifier().GetText());
+
+        if (localOrParam != default)
         {
+            if (localOrParam.IsParameter)
+            {
+                EmitErrorMessage(
+                    context.Equals().Symbol.Line,
+                    context.Equals().Symbol.Column,
+                    context.Equals().GetText().Length,
+                    LS0018_ImmutableValueReassignment,
+                    $"'{CurrentMethod.Parameters.First(p => p.Index == localOrParam.Index).Name}' is immutable and cannot be changed.");
+
+                return localOrParam.Type;
+            }
+
             var local = CurrentMethod.Locals.Where(e => e.Name == context.Identifier().GetText()).First();
 
             if (local.IsConstant)
@@ -2725,5 +2771,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         CurrentMethod.IL.Emit(OpCodes.Nop);
         return null;
+    }
+
+    public override Type VisitThis_atom([NotNull] LoschScriptParser.This_atomContext context)
+    {
+        CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
+        return TypeContext.Current.Builder;
     }
 }

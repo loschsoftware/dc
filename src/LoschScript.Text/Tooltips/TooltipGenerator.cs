@@ -38,6 +38,30 @@ public static class TooltipGenerator
     }
 
     /// <summary>
+    /// Generates a tooltip for a parameter.
+    /// </summary>
+    /// <param name="name">The name of the parameter.</param>
+    /// <param name="type">The type of the parameter.</param>
+    /// <returns>The generated tooltip.</returns>
+    public static Tooltip Parameter(string name, Type type)
+    {
+        ObservableCollection<Word> words = new()
+        {
+            BuildWord(name, Color.LocalValue),
+            BuildWord(": ")
+        };
+
+        foreach (Word word in Type(type.GetTypeInfo(), false, true, true).Words)
+            words.Add(word);
+
+        return new()
+        {
+            Words = words,
+            IconResourceName = "LocalVariable"
+        };
+    }
+
+    /// <summary>
     /// Generates a tooltip for a property.
     /// </summary>
     /// <param name="property">The property to generate a tooltip for.</param>

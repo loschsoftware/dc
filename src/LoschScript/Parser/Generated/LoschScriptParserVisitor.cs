@@ -431,6 +431,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAtom([NotNull] LoschScriptParser.AtomContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.this_atom"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitThis_atom([NotNull] LoschScriptParser.This_atomContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.expression_atom"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

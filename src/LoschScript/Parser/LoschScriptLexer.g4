@@ -63,6 +63,8 @@ Raise: 'raise';
 True: 'true';
 False: 'false';
 
+This: 'this';
+
 Open_Paren: '(';
 Close_Paren: ')';
 Open_Paren_Bar: '(|';
