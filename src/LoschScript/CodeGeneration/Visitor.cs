@@ -369,6 +369,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         CurrentFile.ExportedNamespace = context.full_identifier().GetText();
 
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = Color.Namespace,
+            Column = context.full_identifier().Start.Column,
+            Line = context.full_identifier().Start.Line,
+            Length = context.full_identifier().GetText().Length,
+            ToolTip = TooltipGenerator.Namespace(context.full_identifier().GetText())
+        });
+
         return typeof(void);
     }
 

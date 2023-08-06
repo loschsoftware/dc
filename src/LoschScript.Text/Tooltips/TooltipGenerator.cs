@@ -242,6 +242,23 @@ public static class TooltipGenerator
     }
 
     /// <summary>
+    /// Generates a tooltip for a namespace.
+    /// </summary>
+    /// <param name="name">The name of the namespace.</param>
+    /// <returns>The generated tooltip.</returns>
+    public static Tooltip Namespace(string name)
+    {
+        return new()
+        {
+            IconResourceName = "Namespace",
+            Words = new()
+            {
+                BuildWord(name, Color.Namespace),
+            }
+        };
+    }
+
+    /// <summary>
     /// Generates a tooltip for a type.
     /// </summary>
     /// <param name="type">The type to generate a tooltip for.</param>
