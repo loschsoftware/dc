@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LoschScript.Parser;
+using System.Collections.Generic;
 using System.Reflection.Emit;
 
 namespace LoschScript.Meta;
@@ -11,6 +12,10 @@ internal class TypeContext
     }
 
     public static TypeContext Current { get; set; }
+
+    public List<(FieldBuilder Field, LoschScriptParser.ExpressionContext Value)> FieldInitializers { get; set; } = new();
+
+    public List<LoschScriptParser.Type_memberContext> Constructors { get; set; } = new();
 
     public string FullName { get; set; }
 

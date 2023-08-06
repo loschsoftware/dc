@@ -126,6 +126,25 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         foreach (LoschScriptParser.Type_memberContext member in context.type_block().type_member())
             Visit(member);
 
+        foreach (var ctor in TypeContext.Current.Constructors)
+            HandleConstructor(ctor);
+
+        if (TypeContext.Current.Constructors.Count == 0 && TypeContext.Current.FieldInitializers.Count > 0)
+        {
+            ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(
+                MethodAttributes.Public,
+                CallingConventions.HasThis,
+                Type.EmptyTypes);
+
+            CurrentMethod = new()
+            {
+                ConstructorBuilder = cb,
+                IL = cb.GetILGenerator()
+            };
+
+            HandleFieldInitializersAndDefaultConstructor();
+        }
+
         tb.CreateType();
 
         CurrentFile.Fragments.Add(new()
@@ -138,62 +157,85 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         });
     }
 
+    private void HandleFieldInitializersAndDefaultConstructor()
+    {
+        foreach (var (field, value) in TypeContext.Current.FieldInitializers)
+        {
+            if (!field.IsStatic)
+                CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
+
+            Visit(value);
+
+            if (field.IsStatic)
+                CurrentMethod.IL.Emit(OpCodes.Stsfld, field);
+            else
+                CurrentMethod.IL.Emit(OpCodes.Stfld, field);
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
+        CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
+    }
+
+    private void HandleConstructor(LoschScriptParser.Type_memberContext context)
+    {
+        CallingConventions callingConventions = CallingConventions.HasThis;
+
+        if (context.member_special_modifier().Any(m => m.Static() != null))
+            callingConventions = CallingConventions.Standard;
+
+        var paramTypes = ResolveParameterList(context.parameter_list());
+
+        ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(
+        Helpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()),
+        callingConventions,
+        paramTypes.Select(p => p.Type).ToArray());
+        CurrentMethod = new()
+        {
+            ConstructorBuilder = cb,
+            IL = cb.GetILGenerator()
+        };
+
+        CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
+
+        foreach (var param in paramTypes)
+        {
+            ParameterBuilder pb = cb.DefineParameter(
+                CurrentMethod.ParameterIndex++,
+                Helpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
+                param.Context.Identifier().GetText());
+
+            CurrentMethod.Parameters.Add((param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
+        }
+
+        HandleFieldInitializersAndDefaultConstructor();
+
+        if (context.code_block() != null)
+            Visit(context.code_block());
+        else
+            Visit(context.expression());
+
+        CurrentMethod.IL.Emit(OpCodes.Ret);
+
+        List<(Type, string)> _params = new();
+        foreach (var param in paramTypes)
+            _params.Add((param.Type, param.Context.Identifier().GetText()));
+
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = TooltipGenerator.ColorForType(TypeContext.Current.Builder),
+            Line = context.Identifier().Symbol.Line,
+            Column = context.Identifier().Symbol.Column,
+            Length = context.Identifier().GetText().Length,
+            ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params)
+        });
+    }
+
     public override Type VisitType_member([NotNull] LoschScriptParser.Type_memberContext context)
     {
         if (context.Identifier().GetText() == TypeContext.Current.Builder.Name)
         {
-            CallingConventions callingConventions = CallingConventions.HasThis;
-
-            if (context.member_special_modifier().Any(m => m.Static() != null))
-                callingConventions = CallingConventions.Standard;
-
-            var paramTypes = ResolveParameterList(context.parameter_list());
-
-            ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(
-                Helpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()),
-                callingConventions,
-                paramTypes.Select(p => p.Type).ToArray());
-
-            CurrentMethod = new()
-            {
-                ConstructorBuilder = cb,
-                IL = cb.GetILGenerator()
-            };
-
-            CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
-
-            foreach (var param in paramTypes)
-            {
-                ParameterBuilder pb = cb.DefineParameter(
-                    CurrentMethod.ParameterIndex++,
-                    Helpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
-                    param.Context.Identifier().GetText());
-
-                CurrentMethod.Parameters.Add((param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
-            }
-
-            CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
-            CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
-
-            if (context.code_block() != null)
-                Visit(context.code_block());
-            else
-                Visit(context.expression());
-
-            CurrentMethod.IL.Emit(OpCodes.Ret);
-
-            List<(Type, string)> _params = new();
-            foreach (var param in paramTypes)
-                _params.Add((param.Type, param.Context.Identifier().GetText()));
-
-            CurrentFile.Fragments.Add(new()
-            {
-                Color = TooltipGenerator.ColorForType(TypeContext.Current.Builder),
-                Line = context.Identifier().Symbol.Line,
-                Column = context.Identifier().Symbol.Column,
-                Length = context.Identifier().GetText().Length,
-                ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params)
-            });
+            // Defer constructors for field initializers
+            TypeContext.Current.Constructors.Add(context);
 
             return typeof(void);
         }
@@ -210,12 +252,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (context.type_name() != null)
             type = Helpers.ResolveTypeName(context.type_name());
 
-        TypeContext.Current.Builder.DefineField(
+        FieldBuilder fb = TypeContext.Current.Builder.DefineField(
             context.Identifier().GetText(),
             type,
             Helpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()));
 
-        // TODO: Field initializers??? No idea how to do that, I need to set all fields in all constructors before the constructor code is called... Is that even possible?
+        if (context.expression() != null)
+            TypeContext.Current.FieldInitializers.Add((fb, context.expression()));
 
         return typeof(void);
     }
