@@ -232,5 +232,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a field is set to a value of the wrong type.
     /// </summary>
-    LS0054_WrongFieldType
+    LS0054_WrongFieldType,
+    /// <summary>
+    /// Emitted when multiple functions are declared as application entry points.
+    /// </summary>
+    LS0055_MultipleEntryPoints
 }

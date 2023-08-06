@@ -33,6 +33,8 @@ internal class ProgramContext
 
     public TypeBuilder BogusType { get; set; }
 
+    public bool EntryPointIsSet { get; set; } = false;
+
     public FileContext GetFile(string path) => Files.Where(f => f.Path == path).First();
 
     public TypeContext GetType(string name) => Types.Where(t => t.FullName == name).First();

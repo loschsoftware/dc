@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using LoschScript.CLI;
+using LoschScript.Core;
 using LoschScript.Meta;
 using LoschScript.Parser;
 using LoschScript.Runtime;
@@ -330,6 +331,24 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Length = context.Identifier().GetText().Length,
                 ToolTip = TooltipGenerator.Function(context.Identifier().GetText(), tReturn, _params.ToArray())
             });
+
+            // TODO: Ignore "Attribute" suffix for attributes
+            if (context.attribute() != null && Helpers.ResolveTypeName(context.attribute().type_name()) == typeof(EntryPointAttribute))
+            {
+                if (Context.EntryPointIsSet)
+                {
+                    EmitErrorMessage(
+                        context.attribute().Start.Line,
+                        context.attribute().Start.Column,
+                        context.attribute().GetText().Length,
+                        LS0055_MultipleEntryPoints,
+                        "Only one function can be declared as an entry point.");
+                }
+
+                Context.EntryPointIsSet = true;
+
+                Context.Assembly.SetEntryPoint(mb);
+            }
 
             return typeof(void);
         }

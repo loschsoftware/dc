@@ -199,7 +199,7 @@ arglist
     ;
 
 attribute
-    : Less_Than type_name arglist Greater_Than
+    : Less_Than type_name arglist? Greater_Than NewLine*
     ;
 
 generic_identifier
