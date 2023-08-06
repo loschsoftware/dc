@@ -176,13 +176,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.IL.Emit(OpCodes.Ret);
 
+            List<(Type, string)> _params = new();
+            foreach (var param in paramTypes)
+                _params.Add((param.Type, param.Context.Identifier().GetText()));
+
             CurrentFile.Fragments.Add(new()
             {
                 Color = TooltipGenerator.ColorForType(TypeContext.Current.Builder),
                 Line = context.Identifier().Symbol.Line,
                 Column = context.Identifier().Symbol.Column,
                 Length = context.Identifier().GetText().Length,
-                ToolTip = TooltipGenerator.Type(TypeContext.Current.Builder.CreateTypeInfo(), true, true)
+                ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params)
             });
         }
 
@@ -210,7 +214,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             t = Helpers.ResolveTypeName(param.type_name());
 
-            if (t != null )
+            if (t != null)
             {
                 CurrentFile.Fragments.Add(new()
                 {

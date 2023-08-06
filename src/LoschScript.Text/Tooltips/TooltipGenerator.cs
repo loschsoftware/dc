@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
@@ -79,6 +80,91 @@ public static class TooltipGenerator
         {
             Words = words,
             IconResourceName = "FieldPublic"
+        };
+    }
+
+    /// <summary>
+    /// Generates a tooltip for a constructor.
+    /// </summary>
+    /// <returns>The generated tooltip.</returns>
+    public static Tooltip Constructor(Type type, List<(Type Type, string Name)> parameters)
+    {
+        ObservableCollection<Word> words = new()
+        {
+            BuildWord(type.Name, ColorForType(type.GetTypeInfo()))
+        };
+
+        if (parameters.Count > 0)
+        {
+            words.Add(BuildWord(" ("));
+
+            foreach ((Type _type, string _name) in parameters.ToArray()[..^1])
+            {
+                words.Add(BuildWord(_name, Color.LocalValue));
+                words.Add(BuildWord(": "));
+
+                foreach (Word word in Type(_type.GetTypeInfo(), false, true, true).Words)
+                    words.Add(word);
+
+                words.Add(BuildWord(", "));
+            }
+
+            words.Add(BuildWord(parameters.Last().Name, Color.LocalValue));
+            words.Add(BuildWord(": "));
+
+            foreach (Word word in Type(parameters.Last().Type.GetTypeInfo(), false, true, true).Words)
+                words.Add(word);
+
+            words.Add(BuildWord(")"));
+        }
+
+        return new()
+        {
+            Words = words,
+            IconResourceName = ResourceNameForType(type.GetTypeInfo())
+        };
+    }
+
+    /// <summary>
+    /// Generates a tooltip for a constructor.
+    /// </summary>
+    /// <param name="ctor">The ConstructorInfo representing the constructor.</param>
+    /// <returns>The generated tooltip.</returns>
+    public static Tooltip Constructor(ConstructorInfo ctor)
+    {
+        ObservableCollection<Word> words = new()
+        {
+            BuildWord(ctor.DeclaringType.Name, ColorForType(ctor.DeclaringType.GetTypeInfo()))
+        };
+
+        if (ctor.GetParameters().Length > 0)
+        {
+            words.Add(BuildWord(" ("));
+
+            foreach (ParameterInfo param in ctor.GetParameters()[..^1])
+            {
+                words.Add(BuildWord(param.Name, Color.LocalValue));
+                words.Add(BuildWord(": "));
+
+                foreach (Word word in Type(param.ParameterType.GetTypeInfo(), false, true, true).Words)
+                    words.Add(word);
+
+                words.Add(BuildWord(", "));
+            }
+
+            words.Add(BuildWord(ctor.GetParameters()[0].Name, Color.LocalValue));
+            words.Add(BuildWord(": "));
+
+            foreach (Word word in Type(ctor.GetParameters()[0].ParameterType.GetTypeInfo(), false, true, true).Words)
+                words.Add(word);
+
+            words.Add(BuildWord(")"));
+        }
+
+        return new()
+        {
+            Words = words,
+            IconResourceName = ResourceNameForType(ctor.DeclaringType.GetTypeInfo())
         };
     }
 
