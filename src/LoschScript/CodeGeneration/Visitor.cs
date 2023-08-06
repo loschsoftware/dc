@@ -345,6 +345,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                         "Only one function can be declared as an entry point.");
                 }
 
+                if (!mb.IsStatic)
+                {
+                    EmitErrorMessage(
+                        context.Identifier().Symbol.Line,
+                        context.Identifier().Symbol.Column,
+                        context.Identifier().GetText().Length,
+                        LS0035_EntryPointNotStatic,
+                        "The application entry point must be static.");
+                }
+
                 Context.EntryPointIsSet = true;
 
                 Context.Assembly.SetEntryPoint(mb);
