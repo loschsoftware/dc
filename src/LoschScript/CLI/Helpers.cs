@@ -352,7 +352,7 @@ internal static class Helpers
 
         return (true, type);
     }
-
+    
     public static void SetupBogusAssembly()
     {
         AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(new("Bogus"), AssemblyBuilderAccess.Run);
@@ -362,9 +362,10 @@ internal static class Helpers
         Context.BogusModule = mb;
     }
 
+    static int bogusCounter = 0;
     public static void CreateFakeMethod()
     {
-        TypeBuilder tb = Context.BogusModule.DefineType($"{new Guid()}");
+        TypeBuilder tb = Context.BogusModule.DefineType($"Bogus{bogusCounter++}");
         Context.BogusType = tb;
 
         MethodBuilder bogus = tb.DefineMethod("x", MethodAttributes.Public);

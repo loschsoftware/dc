@@ -165,7 +165,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (!field.IsStatic)
                 CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
 
-            Visit(value);
+            Type t = Visit(value);
+
+            if (field.FieldType != t)
+            {
+                EmitErrorMessage(
+                    value.Start.Line,
+                    value.Start.Column,
+                    value.GetText().Length,
+                    LS0054_WrongFieldType,
+                    $"Expected expression of type '{field.FieldType.FullName}', but got type '{t.FullName}'.");
+            }
 
             if (field.IsStatic)
                 CurrentMethod.IL.Emit(OpCodes.Stsfld, field);
@@ -310,7 +320,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        Type type = typeof(object); // TODO: Add proper type inference
+        Helpers.CreateFakeMethod();
+
+        Type _type = typeof(object);
+        
+        if (context.expression() != null)
+            _type = Visit(context.expression());
+
+        Type type = _type;
 
         if (context.type_name() != null)
             type = Helpers.ResolveTypeName(context.type_name());

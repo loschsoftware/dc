@@ -228,5 +228,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the return value of a function does not match the function signature.
     /// </summary>
-    LS0053_WrongReturnType
+    LS0053_WrongReturnType,
+    /// <summary>
+    /// Emitted when a field is set to a value of the wrong type.
+    /// </summary>
+    LS0054_WrongFieldType
 }
