@@ -197,6 +197,55 @@ public static class TooltipGenerator
     /// <summary>
     /// Generates a tooltip for a function.
     /// </summary>
+    /// <param name="name"></param>
+    /// <param name="returnType"></param>
+    /// <param name="parameters"></param>
+    /// <returns></returns>
+    public static Tooltip Function(string name, Type returnType, (string Name, Type Type)[] parameters)
+    {
+        ObservableCollection<Word> words = new()
+        {
+            BuildWord(name, Color.Function)
+        };
+
+        if (parameters.Length > 0)
+        {
+            words.Add(BuildWord(" ("));
+
+            foreach ((string _name, Type _type) in parameters[..^1])
+            {
+                words.Add(BuildWord(_name, Color.LocalValue));
+                words.Add(BuildWord(": "));
+
+                foreach (Word word in Type(_type.GetTypeInfo(), false, true, true).Words)
+                    words.Add(word);
+
+                words.Add(BuildWord(", "));
+            }
+
+            words.Add(BuildWord(parameters[0].Name, Color.LocalValue));
+            words.Add(BuildWord(": "));
+
+            foreach (Word word in Type(parameters[0].Type.GetTypeInfo(), false, true, true).Words)
+                words.Add(word);
+
+            words.Add(BuildWord(")"));
+        }
+
+        words.Add(BuildWord(": "));
+        foreach (Word word in Type(returnType.GetTypeInfo(), false, true, true).Words)
+            words.Add(word);
+
+        return new()
+        {
+            Words = words,
+            IconResourceName = "Method"
+        };
+    }
+
+    /// <summary>
+    /// Generates a tooltip for a function.
+    /// </summary>
     /// <param name="method">The MethodInfo representing the function.</param>
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Function(MethodInfo method)

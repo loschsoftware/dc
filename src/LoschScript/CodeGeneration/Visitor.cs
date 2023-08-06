@@ -144,6 +144,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             };
 
             HandleFieldInitializersAndDefaultConstructor();
+            CurrentMethod.IL.Emit(OpCodes.Ret);
         }
 
         tb.CreateType();
@@ -316,6 +317,19 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
 
             CurrentMethod.IL.Emit(OpCodes.Ret);
+
+            List<(string, Type)> _params = new();
+            foreach (var param in CurrentMethod.Parameters)
+                _params.Add((param.Name, param.Type));
+
+            CurrentFile.Fragments.Add(new()
+            {
+                Color = Color.Function,
+                Line = context.Identifier().Symbol.Line,
+                Column = context.Identifier().Symbol.Column,
+                Length = context.Identifier().GetText().Length,
+                ToolTip = TooltipGenerator.Function(context.Identifier().GetText(), tReturn, _params.ToArray())
+            });
 
             return typeof(void);
         }

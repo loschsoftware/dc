@@ -63,18 +63,20 @@ public static class FileCompiler
     /// <returns>Returns a <see cref="FileFragment"/> object containing the fragments of the source file. The <see cref="FileFragment.FilePath"/> property is set to an empty string.</returns>
     public static (FileFragment Fragments, List<ErrorInfo> Errors) GetEditorInfo(string source, LSConfig config)
     {
+        FileFragment ffrag = new()
+        {
+            FilePath = "",
+            Fragments = new()
+        };
+
         try
         {
-            FileFragment ffrag = new()
-            {
-                FilePath = "",
-                Fragments = new()
-            };
-
             Context = new();
             CurrentFile = new("");
 
             Context.Configuration = config;
+
+            Helpers.SetupBogusAssembly();
 
             ICharStream charStream = CharStreams.fromString(source);
             ITokenSource lexer = new LoschScriptLexer(charStream);
@@ -102,7 +104,7 @@ public static class FileCompiler
         {
             File.AppendAllText("exception.txt", ex.ToString());
 
-            return (new() { Fragments = new() }, CurrentFile.Errors);
+            return (ffrag, CurrentFile.Errors);
         }
     }
 }
