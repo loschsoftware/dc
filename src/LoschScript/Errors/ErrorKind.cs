@@ -220,5 +220,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the inheritance list of a type contains more than one CLR class.
     /// </summary>
-    LS0051_MoreThanOneClassInInheritanceList
+    LS0051_MoreThanOneClassInInheritanceList,
+    /// <summary>
+    /// Emitted when a type member has an invalid access modifier.
+    /// </summary>
+    LS0052_InvalidAccessModifier
 }

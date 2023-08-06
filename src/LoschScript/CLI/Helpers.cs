@@ -353,6 +353,47 @@ internal static class Helpers
         return (true, type);
     }
 
+    public static FieldAttributes GetFieldAttributes(LoschScriptParser.Member_access_modifierContext accessModifier, LoschScriptParser.Member_oop_modifierContext oopModifier, LoschScriptParser.Member_special_modifierContext[] specialModifiers)
+    {
+        FieldAttributes baseAttributes;
+
+        if (accessModifier == null || accessModifier.Global() != null)
+            baseAttributes = FieldAttributes.Public;
+
+        else if (accessModifier.Internal() != null)
+            baseAttributes = FieldAttributes.Assembly;
+
+        else
+            baseAttributes = FieldAttributes.Private;
+
+        if (oopModifier != null && oopModifier.Virtual() != null)
+        {
+            EmitErrorMessage(
+                oopModifier.Start.Line,
+                oopModifier.Start.Column,
+                oopModifier.GetText().Length,
+                LS0052_InvalidAccessModifier,
+                "The modifier 'virtual' is not supported by this element.");
+        }
+
+        foreach (var modifier in specialModifiers)
+        {
+            if (modifier.Static() != null)
+                baseAttributes |= FieldAttributes.Static;
+            else
+            {
+                EmitErrorMessage(
+                modifier.Start.Line,
+                modifier.Start.Column,
+                modifier.GetText().Length,
+                LS0052_InvalidAccessModifier,
+                $"The modifier '{modifier.GetText()}' is not supported by this element.");
+            }
+        }
+
+        return baseAttributes;
+    }
+
     public static MethodAttributes GetMethodAttributes(LoschScriptParser.Member_access_modifierContext accessModifier, LoschScriptParser.Member_oop_modifierContext oopModifier, LoschScriptParser.Member_special_modifierContext[] specialModifiers)
     {
         MethodAttributes baseAttributes;

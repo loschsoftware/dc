@@ -77,6 +77,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type parent = typeof(object);
         List<Type> interfaces = new();
 
+        if (context.type_kind().Val() != null)
+            parent = typeof(ValueType);
+
         if (context.inheritance_list() != null)
         {
             List<Type> inherited = Helpers.GetInheritedTypes(context.inheritance_list());
@@ -194,6 +197,25 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             return typeof(void);
         }
+
+        if (context.parameter_list() != null || context.code_block() != null)
+        {
+            // method
+
+            return typeof(void);
+        }
+
+        Type type = typeof(object); // TODO: Add proper type inference
+
+        if (context.type_name() != null)
+            type = Helpers.ResolveTypeName(context.type_name());
+
+        TypeContext.Current.Builder.DefineField(
+            context.Identifier().GetText(),
+            type,
+            Helpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()));
+
+        // TODO: Field initializers??? No idea how to do that, I need to set all fields in all constructors before the constructor code is called... Is that even possible?
 
         return typeof(void);
     }

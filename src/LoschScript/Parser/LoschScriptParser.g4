@@ -282,7 +282,8 @@ member_special_modifier
     ;
 
 type_member
-    : attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? parameter_list? Equals (expression | code_block)
+    : attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? parameter_list? (Colon type_name)? Equals (expression | code_block)
+    | attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? Colon type_name
     ;
 
 parameter_list
