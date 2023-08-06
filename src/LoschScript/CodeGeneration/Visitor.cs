@@ -260,6 +260,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (context.expression() != null)
             TypeContext.Current.FieldInitializers.Add((fb, context.expression()));
 
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = Color.Field,
+            Column = context.Identifier().Symbol.Column,
+            Line = context.Identifier().Symbol.Line,
+            Length = context.Identifier().GetText().Length,
+            ToolTip = TooltipGenerator.Field(fb)
+        });
+
         return typeof(void);
     }
 

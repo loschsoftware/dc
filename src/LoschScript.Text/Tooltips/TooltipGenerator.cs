@@ -91,11 +91,13 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Field(FieldInfo field)
     {
-        ObservableCollection<Word> words = new()
-        {
-            BuildWord(field.Name, Color.Field),
-            BuildWord(": ")
-        };
+        ObservableCollection<Word> words = new();
+
+        if (field.IsStatic)
+            words.Add(BuildWord("static ", Color.Word));
+
+        words.Add(BuildWord(field.Name, Color.Field));
+        words.Add(BuildWord(": "));
 
         foreach (Word word in Type(field.FieldType.GetTypeInfo(), false, true, true).Words)
             words.Add(word);
