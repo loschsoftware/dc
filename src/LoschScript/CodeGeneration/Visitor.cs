@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace LoschScript.CodeGeneration;
 
@@ -189,6 +190,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Helpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()),
         callingConventions,
         paramTypes.Select(p => p.Type).ToArray());
+
         CurrentMethod = new()
         {
             ConstructorBuilder = cb,
@@ -242,7 +244,68 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (context.parameter_list() != null || context.code_block() != null)
         {
-            // method
+            Helpers.CreateFakeMethod();
+
+            Type _tReturn;
+
+            if (context.code_block() != null)
+                _tReturn = Visit(context.code_block());
+            else
+                _tReturn = Visit(context.expression());
+
+            Type tReturn = _tReturn; // TODO: Add proper type inference
+
+            if (context.type_name() != null)
+                tReturn = Helpers.ResolveTypeName(context.type_name());
+
+            CallingConventions callingConventions = CallingConventions.HasThis;
+
+            if (context.member_special_modifier().Any(m => m.Static() != null))
+                callingConventions = CallingConventions.Standard;
+
+            var paramTypes = ResolveParameterList(context.parameter_list());
+
+            MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
+                context.Identifier().GetText(),
+                Helpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()),
+                callingConventions,
+                tReturn,
+                paramTypes.Select(p => p.Type).ToArray());
+
+            CurrentMethod = new()
+            {
+                Builder = mb,
+                IL = mb.GetILGenerator()
+            };
+
+            CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
+
+            foreach (var param in paramTypes)
+            {
+                ParameterBuilder pb = mb.DefineParameter(
+                    CurrentMethod.ParameterIndex++,
+                    Helpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
+                    param.Context.Identifier().GetText());
+
+                CurrentMethod.Parameters.Add((param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
+            }
+
+            if (context.code_block() != null)
+                _tReturn = Visit(context.code_block());
+            else
+                _tReturn = Visit(context.expression());
+
+            if (_tReturn != tReturn)
+            {
+                EmitErrorMessage(
+                    context.code_block() != null ? context.code_block().expression().Last().Start.Line : context.expression().Start.Line,
+                    context.code_block() != null ? context.code_block().expression().Last().Start.Column : context.expression().Start.Column,
+                    context.code_block() != null ? context.code_block().expression().Last().GetText().Length : context.expression().GetText().Length,
+                    LS0053_WrongReturnType,
+                    $"Expected expression of type '{tReturn.FullName}', but got type '{_tReturn.FullName}'.");
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Ret);
 
             return typeof(void);
         }

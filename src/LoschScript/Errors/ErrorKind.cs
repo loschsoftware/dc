@@ -224,5 +224,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a type member has an invalid access modifier.
     /// </summary>
-    LS0052_InvalidAccessModifier
+    LS0052_InvalidAccessModifier,
+    /// <summary>
+    /// Emitted when the return value of a function does not match the function signature.
+    /// </summary>
+    LS0053_WrongReturnType
 }

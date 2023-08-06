@@ -353,6 +353,28 @@ internal static class Helpers
         return (true, type);
     }
 
+    public static void SetupBogusAssembly()
+    {
+        AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(new("Bogus"), AssemblyBuilderAccess.Run);
+        Context.BogusAssembly = ab;
+
+        ModuleBuilder mb = ab.DefineDynamicModule("Bogus");
+        Context.BogusModule = mb;
+    }
+
+    public static void CreateFakeMethod()
+    {
+        TypeBuilder tb = Context.BogusModule.DefineType($"{new Guid()}");
+        Context.BogusType = tb;
+
+        MethodBuilder bogus = tb.DefineMethod("x", MethodAttributes.Public);
+        CurrentMethod = new()
+        {
+            Builder = bogus,
+            IL = bogus.GetILGenerator()
+        };
+    }
+
     public static FieldAttributes GetFieldAttributes(LoschScriptParser.Member_access_modifierContext accessModifier, LoschScriptParser.Member_oop_modifierContext oopModifier, LoschScriptParser.Member_special_modifierContext[] specialModifiers)
     {
         FieldAttributes baseAttributes;

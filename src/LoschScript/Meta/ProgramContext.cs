@@ -25,7 +25,13 @@ internal class ProgramContext
 
     public AssemblyBuilder Assembly { get; set; }
 
+    public AssemblyBuilder BogusAssembly { get; set; }
+
     public ModuleBuilder Module { get; set; }
+
+    public ModuleBuilder BogusModule { get; set; }
+
+    public TypeBuilder BogusType { get; set; }
 
     public FileContext GetFile(string path) => Files.Where(f => f.Path == path).First();
 

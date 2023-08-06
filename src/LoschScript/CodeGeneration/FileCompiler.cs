@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Losch.LoschScript.Configuration;
+using LoschScript.CLI;
 using LoschScript.Errors;
 using LoschScript.Parser;
 using LoschScript.Text.FragmentStore;
@@ -26,6 +27,8 @@ public static class FileCompiler
     /// <returns>An array of compilation errors that occured during the compilation. If no errors occured, this is an empty array.</returns>
     public static ErrorInfo[] CompileSingleFile(string path, LSConfig config)
     {
+        Helpers.SetupBogusAssembly();
+
         Context.Files.Add(new(path));
         CurrentFile = Context.GetFile(path);
 
