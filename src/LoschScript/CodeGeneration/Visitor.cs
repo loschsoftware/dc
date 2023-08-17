@@ -189,6 +189,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
     }
 
+    public override Type VisitBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context)
+    {
+        return Visit(context.code_block());
+    }
+
     private void HandleConstructor(LoschScriptParser.Type_memberContext context)
     {
         CallingConventions callingConventions = CallingConventions.HasThis;
@@ -223,10 +228,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         HandleFieldInitializersAndDefaultConstructor();
 
-        if (context.code_block() != null)
-            Visit(context.code_block());
-        else
-            Visit(context.expression());
+        Visit(context.expression());
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
 
@@ -254,17 +256,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        if (context.parameter_list() != null || context.code_block() != null)
+        Helpers.CreateFakeMethod();
+        Type _tReturn = Visit(context.expression());
+
+        if (context.parameter_list() != null || _tReturn == typeof(void))
         {
-            Helpers.CreateFakeMethod();
-
-            Type _tReturn;
-
-            if (context.code_block() != null)
-                _tReturn = Visit(context.code_block());
-            else
-                _tReturn = Visit(context.expression());
-
             Type tReturn = _tReturn; // TODO: Add proper type inference
 
             if (context.type_name() != null)
@@ -302,17 +298,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 CurrentMethod.Parameters.Add((param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
             }
 
-            if (context.code_block() != null)
-                _tReturn = Visit(context.code_block());
-            else
-                _tReturn = Visit(context.expression());
+            _tReturn = Visit(context.expression());
 
             if (_tReturn != tReturn)
             {
                 EmitErrorMessage(
-                    context.code_block() != null ? context.code_block().expression().Last().Start.Line : context.expression().Start.Line,
-                    context.code_block() != null ? context.code_block().expression().Last().Start.Column : context.expression().Start.Column,
-                    context.code_block() != null ? context.code_block().expression().Last().GetText().Length : context.expression().GetText().Length,
+                    context.expression().Start.Line,
+                    context.expression().Start.Column,
+                    context.expression().GetText().Length,
                     LS0053_WrongReturnType,
                     $"Expected expression of type '{tReturn.FullName}', but got type '{_tReturn.FullName}'.");
             }
@@ -366,7 +359,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Helpers.CreateFakeMethod();
 
         Type _type = typeof(object);
-        
+
         if (context.expression() != null)
             _type = Visit(context.expression());
 
@@ -536,7 +529,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
 
         foreach (IParseTree child in context.children.Take(context.children.Count - 1))
-            Visit(child);
+        {
+            Type _t = Visit(child);
+
+            if (_t != typeof(void) && _t != null)
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+        }
 
         // Last expression is like return statement
         Type ret = Visit(context.children.Last());
@@ -1804,7 +1802,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(void);
 
         foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
-            Visit(tree);
+        {
+            Type _t = Visit(tree);
+
+            if (_t != typeof(void) && _t != null)
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+        }
 
         return Visit(context.expression().Last());
     }

@@ -9,8 +9,10 @@ internal class Program
 {
     static int Main(string[] args)
     {
+#if RELEASE
         try
         {
+#endif
             return args switch
             {
                 ["config"] => Helpers.BuildLSConfig(),
@@ -26,6 +28,7 @@ internal class Program
                 [] or ["help" or "?"] => DisplayHelpMessage(),
                 _ => Helpers.HandleArgs(args)
             };
+#if RELEASE
         }
         catch (Exception ex)
         {
@@ -39,6 +42,7 @@ internal class Program
 
             return -1;
         }
+#endif
     }
 
     static Process watchProcess = null;

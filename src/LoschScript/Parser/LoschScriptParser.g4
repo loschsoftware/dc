@@ -85,6 +85,7 @@ expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
     | atom #atom_expression
     | expression NewLine #newlined_expression
+    | code_block #block_expression
     // | Plus expression #unary_plus_expression
     ;
 
@@ -282,7 +283,7 @@ member_special_modifier
     ;
 
 type_member
-    : attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? parameter_list? (Colon type_name)? Equals (expression | code_block)
+    : attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? parameter_list? (Colon type_name)? Equals expression
     | attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? Colon type_name
     ;
 

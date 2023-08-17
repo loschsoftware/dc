@@ -513,6 +513,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBlock_postfix_if_expression([NotNull] LoschScriptParser.Block_postfix_if_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>block_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>block_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>postfix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
