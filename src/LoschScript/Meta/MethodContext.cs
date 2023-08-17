@@ -51,4 +51,6 @@ internal class MethodContext
     public int TempValueIndex { get; set; } = 0;
 
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
+
+    public bool ShouldPopExpression { get; set; } = true;
 }
