@@ -532,7 +532,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             Type _t = Visit(child);
 
-            if (_t != typeof(void) && _t != null)
+            if (_t != typeof(void))
                 CurrentMethod.IL.Emit(OpCodes.Pop);
         }
 
@@ -550,7 +550,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return ret;
         }
 
-        if (ret != typeof(int))
+        if (ret != typeof(int) && ret != null)
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
@@ -1805,7 +1805,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             Type _t = Visit(tree);
 
-            if (_t != typeof(void) && _t != null)
+            if (_t != typeof(void))
                 CurrentMethod.IL.Emit(OpCodes.Pop);
         }
 
