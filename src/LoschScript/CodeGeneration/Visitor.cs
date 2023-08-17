@@ -532,10 +532,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             Type _t = Visit(child);
 
-            if (_t != typeof(void) && CurrentMethod.ShouldPopExpression)
+            if (_t != typeof(void))
                 CurrentMethod.IL.Emit(OpCodes.Pop);
-
-            CurrentMethod.ShouldPopExpression = true;
         }
 
         // Last expression is like return statement
@@ -1807,10 +1805,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             Type _t = Visit(tree);
 
-            if (_t != typeof(void) && CurrentMethod.ShouldPopExpression)
+            if (_t != typeof(void))
                 CurrentMethod.IL.Emit(OpCodes.Pop);
-
-            CurrentMethod.ShouldPopExpression = true;
         }
 
         return Visit(context.expression().Last());
@@ -2351,8 +2347,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context)
     {
-        //CurrentMethod.ShouldPopExpression = false;
-
         var localOrParam = Helpers.GetLocalOrParameter(context.Identifier().GetText());
 
         if (localOrParam != default)
