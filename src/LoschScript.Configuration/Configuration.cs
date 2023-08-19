@@ -67,6 +67,9 @@ public sealed class LSConfig
 
     [XmlElement("IncludeDependencies")]
     public bool IncludeDependencies { get; set; }
+
+    [XmlElement("AdvancedErrorMessages")]
+    public bool AdvancedErrorMessages { get; set; }
 }
 
 [Serializable]

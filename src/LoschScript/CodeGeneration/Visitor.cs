@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using LoschScript.CLI;
+using LoschScript.CompilerServices;
 using LoschScript.Core;
 using LoschScript.Meta;
 using LoschScript.Parser;
@@ -1446,36 +1447,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length, int local = 0)
     {
-        // Special function for emitting IL instructions from LoschScript
-        if (type == typeof(CompilerServices.CodeGeneration) && name == "il")
-        {
-            CurrentFile.Fragments.Add(new()
-            {
-                Line = line,
-                Column = column,
-                Length = length,
-                Color = Color.Function,
-                ToolTip = TooltipGenerator.Function(typeof(CompilerServices.CodeGeneration).GetMethod("il"))
-            });
-
-            if (arglist.expression().Length != 1)
-            {
-                EmitErrorMessage(
-                    line,
-                    column,
-                    length,
-                    LS0002_MethodNotFound,
-                    $"Invalid number of arguments for special function 'il'. Expected 1 argument."
-                    );
-
-                return typeof(void);
-            }
-
-            string arg = arglist.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
-            EmitInlineIL(CurrentMethod.IL, arg, arglist.expression()[0].Start.Line, arglist.expression()[0].Start.Column + 1, arglist.expression()[0].GetText().Length);
-
+        // Handle special functions of CodeGeneration class
+        if (type == typeof(CompilerServices.CodeGeneration) && Helpers.HandleSpecialFunction(name, arglist, line, column, length))
             return typeof(void);
-        }
 
         // Check if it is a method with parameters
         if (arglist != null)

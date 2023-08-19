@@ -11,4 +11,11 @@ public static class CodeGeneration
     /// <remarks>This function has no effect on its own, as it is evaluated by the LoschScript compiler at compile time.</remarks>
     /// <param name="instruction">The IL instruction to emit, in human-readable format.</param>
     public static void il(string instruction) { }
+
+    /// <summary>
+    /// Imports a namespace. Used by LoschScript Interactive.
+    /// </summary>
+    /// <remarks>This function has no effect on its own, as it is evaluated by the LoschScript compiler at compile time.</remarks>
+    /// <param name="namespace">The IL instruction to emit, in human-readable format.</param>
+    public static void importNamespace(string @namespace) { }
 }

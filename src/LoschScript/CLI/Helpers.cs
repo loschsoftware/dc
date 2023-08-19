@@ -12,6 +12,7 @@ using Microsoft.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -184,12 +185,6 @@ internal static class Helpers
         return 0;
     }
 
-    public static int StartReplSession()
-    {
-        LShell.Start();
-        return 0;
-    }
-
     public static (Type Type, MethodInfo[] Methods) ResolveGlobalMethod(string name, int row, int col, int len)
     {
         foreach (string type in CurrentFile.ImportedTypes)
@@ -352,7 +347,7 @@ internal static class Helpers
 
         return (true, type);
     }
-    
+
     public static void SetupBogusAssembly()
     {
         AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(new("Bogus"), AssemblyBuilderAccess.Run);
@@ -671,5 +666,61 @@ internal static class Helpers
     public static void SetLocalSymInfo(LocalBuilder lb, string name)
     {
         lb.SetLocalSymInfo(name);
+    }
+
+    public static bool HandleSpecialFunction(string name, LoschScriptParser.ArglistContext args, int line, int column, int length)
+    {
+        if (typeof(CompilerServices.CodeGeneration).GetMethod(name) == null)
+            return false;
+
+        CurrentFile.Fragments.Add(new()
+        {
+            Line = line,
+            Column = column,
+            Length = length,
+            Color = Color.Function,
+            ToolTip = TooltipGenerator.Function(typeof(CompilerServices.CodeGeneration).GetMethod(name))
+        });
+
+        switch (name)
+        {
+            case "il":
+
+                if (args.expression().Length != 1)
+                {
+                    EmitErrorMessage(
+                    line,
+                        column,
+                        length,
+                        LS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function 'il'. Expected 1 argument."
+                        );
+                }
+
+                string arg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+                EmitInlineIL(CurrentMethod.IL, arg, args.expression()[0].Start.Line, args.expression()[0].Start.Column + 1, args.expression()[0].GetText().Length);
+                
+                return true;
+
+            case "importNamespace":
+
+                if (args.expression().Length != 1)
+                {
+                    EmitErrorMessage(
+                    line,
+                        column,
+                        length,
+                        LS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function 'importNamespace'. Expected 1 argument."
+                        );
+                }
+
+                string ns = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+                CurrentFile.Imports.Add(ns);
+
+                return true;
+        }
+
+        return false;
     }
 }

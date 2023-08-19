@@ -17,7 +17,7 @@ internal class Program
             {
                 ["config"] => Helpers.BuildLSConfig(),
                 ["build", ..] => Helpers.CompileAll(args[1..]),
-                ["interactive" or "repl"] => Helpers.StartReplSession(),
+                ["interactive" or "repl"] => Interactive.StartInteractiveSession(),
                 ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
                 ["make" or "new", ..] => LSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => WatchForFileChanges(args),

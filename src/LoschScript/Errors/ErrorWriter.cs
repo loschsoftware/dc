@@ -39,27 +39,46 @@ public static class ErrorWriter
     /// </summary>
     public static LSConfig Config { get; set; } = new();
 
-    /// <summary>
-    /// Writes an error message using <see cref="ErrorOut"/>.
-    /// </summary>
-    public static void EmitErrorMessage(ErrorInfo error, bool addToErrorList = true)
+    private static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
     {
         try
         {
+            ConsoleColor defaultColor = Console.ForegroundColor;
+
             // Filter out duplicate messages
             if (messages.Where(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition).Any())
                 return;
 
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = error.Severity switch
+            {
+                Severity.Error => ConsoleColor.Red,
+                Severity.Warning => ConsoleColor.Yellow,
+                _ => ConsoleColor.Cyan
+            };
 
             Console.CursorLeft = 0;
-            ErrorOut.WriteLine($"\r\n{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): error {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
-            CurrentFile.CompilationFailed = true;
+
+            (error.Severity switch
+            {
+                Severity.Error => ErrorOut,
+                Severity.Warning => WarnOut,
+                _ => InfoOut
+
+            }).WriteLine($"\r\n{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): {error.Severity switch
+            {
+                Severity.Error => "error",
+                Severity.Warning => "warning",
+                _ => "information"
+            }
+            } {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
+
+            if (treatAsError || error.Severity == Severity.Error)
+                CurrentFile.CompilationFailed = true;
 
             if (addToErrorList)
                 CurrentFile.Errors.Add(error);
-
-            Console.ForegroundColor = ConsoleColor.Gray;
+            
+            Console.ForegroundColor = defaultColor;
 
             messages.Add(error);
         }
@@ -68,6 +87,14 @@ public static class ErrorWriter
             CurrentFile.Errors.Add(error);
             return;
         }
+    }
+
+    /// <summary>
+    /// Writes an error message using <see cref="ErrorOut"/>.
+    /// </summary>
+    public static void EmitErrorMessage(ErrorInfo error, bool addToErrorList = true)
+    {
+        EmitGeneric(error, true, addToErrorList);
     }
 
     /// <summary>
@@ -75,36 +102,7 @@ public static class ErrorWriter
     /// </summary>
     public static void EmitWarningMessage(ErrorInfo error, bool treatAsError = false)
     {
-        try
-        {
-            // Filter out duplicate messages
-            if (messages.Where(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition).Any())
-                return;
-
-            if (Config.IgnoreWarnings)
-                return;
-
-            if (Config.TreatWarningsAsErrors)
-                treatAsError = true;
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.CursorLeft = 0;
-            WarnOut.WriteLine($"\r\n{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): warning {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
-            Console.ForegroundColor = ConsoleColor.Gray;
-
-            if (treatAsError)
-            {
-                CurrentFile.Errors.Add(error);
-                CurrentFile.CompilationFailed = true;
-            }
-
-            messages.Add(error);
-        }
-        catch (IOException)
-        {
-            CurrentFile.Errors.Add(error);
-            return;
-        }
+        EmitGeneric(error, treatAsError, false);
     }
 
     /// <summary>
@@ -112,27 +110,7 @@ public static class ErrorWriter
     /// </summary>
     public static void EmitMessage(ErrorInfo error)
     {
-        try
-        {
-            // Filter out duplicate messages
-            if (messages.Where(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition).Any())
-                return;
-
-            if (!Config.IgnoreMessages)
-            {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.CursorLeft = 0;
-                InfoOut.WriteLine($"\r\n{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): information {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
-                Console.ForegroundColor = ConsoleColor.Gray;
-            }
-
-            messages.Add(error);
-        }
-        catch (IOException)
-        {
-            CurrentFile.Errors.Add(error);
-            return;
-        }
+        EmitGeneric(error, false, false);
     }
 
     /// <summary>
