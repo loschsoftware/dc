@@ -117,7 +117,7 @@ ScriptHost.Run ""script.els""";
                 break;
         }
 
-        System.Console.WriteLine($"Built new project in {sourceDir} based of template '{args[1]}'.");
+        System.Console.WriteLine($"Built new project in {sourceDir} based on template '{args[1]}'.");
 
         return 0;
     }

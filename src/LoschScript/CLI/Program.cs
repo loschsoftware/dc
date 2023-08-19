@@ -141,7 +141,7 @@ internal class Program
         LogOut.Write("-i".PadRight(25).PadRight(50));
         LogOut.WriteLine("Interprets the program and doesn't save an assembly to the disk.");
         LogOut.Write("-diagnostics".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Provide advanced diagnostic information.");
+        LogOut.WriteLine("Provides advanced diagnostic information.");
         LogOut.Write("-elapsed".PadRight(25).PadRight(50));
         LogOut.WriteLine("Measures the elapsed build time.");
         LogOut.Write("-default".PadRight(25).PadRight(50));
@@ -155,7 +155,7 @@ internal class Program
         LogOut.WriteLine();
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("make <Type> <Name>".PadRight(50));
+        LogOut.Write("new <Type> <Name>".PadRight(50));
         Console.ForegroundColor = ConsoleColor.Gray;
         LogOut.WriteLine("Creates the file structure of a LoschScript project.");
 
@@ -164,9 +164,9 @@ internal class Program
         LogOut.WriteLine();
 
         LogOut.Write("console".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Creates a (currently Windows-only) console project.");
+        LogOut.WriteLine("Specifies a command-line application.");
         LogOut.Write("library".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Specifies a library (.dll).");
+        LogOut.WriteLine("Specifies a dynamic linked library.");
         LogOut.Write("script".PadRight(25).PadRight(50));
         LogOut.WriteLine("A script can be used to run LoschScript code embedded in LS/.NET applications.");
         LogOut.WriteLine();
