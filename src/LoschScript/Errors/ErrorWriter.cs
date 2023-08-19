@@ -69,16 +69,48 @@ public static class ErrorWriter
                 Severity.Error => "error",
                 Severity.Warning => "warning",
                 _ => "information"
+            }} {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
+
+            Console.ForegroundColor = defaultColor;
+
+            if (Context.Configuration.AdvancedErrorMessages)
+            {
+                try
+                {
+                    Console.WriteLine();
+
+                    using StreamReader sr = new(CurrentFile.Path);
+                    string line = "";
+
+                    for (int i = 0; i < error.CodePosition.Item1; i++, line = sr.ReadLine()) ;
+
+                    Console.WriteLine(line);
+
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+
+                    Console.Write(new string(' ', error.CodePosition.Item2));
+                    Console.Write("^");
+                    Console.WriteLine(new string('~', Math.Max(error.Length, 0)));
+
+                    Console.ForegroundColor = defaultColor;
+                }
+                catch (Exception)
+                {
+                    Console.ForegroundColor = defaultColor;
+
+                    if (addToErrorList)
+                        CurrentFile.Errors.Add(error);
+
+                    if (treatAsError || error.Severity == Severity.Error)
+                        CurrentFile.CompilationFailed = true;
+                }
             }
-            } {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
 
             if (treatAsError || error.Severity == Severity.Error)
                 CurrentFile.CompilationFailed = true;
 
             if (addToErrorList)
                 CurrentFile.Errors.Add(error);
-            
-            Console.ForegroundColor = defaultColor;
 
             messages.Add(error);
         }
