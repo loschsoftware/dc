@@ -662,7 +662,7 @@ public partial class LoschScriptParser : Parser {
 	}
 	public partial class Type_importContext : Import_directiveContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Import() { return GetToken(LoschScriptParser.Import, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Type() { return GetToken(LoschScriptParser.Type, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Module() { return GetToken(LoschScriptParser.Module, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public Full_identifierContext[] full_identifier() {
 			return GetRuleContexts<Full_identifierContext>();
 		}
@@ -755,7 +755,7 @@ public partial class LoschScriptParser : Parser {
 				State = 171;
 				Match(Import);
 				State = 172;
-				Match(Type);
+				Match(Module);
 				State = 173;
 				full_identifier();
 				State = 178;
@@ -7170,7 +7170,7 @@ public partial class LoschScriptParser : Parser {
 		0,160,165,3,12,6,0,161,162,5,60,0,0,162,164,3,12,6,0,163,161,1,0,0,0,164,
 		167,1,0,0,0,165,163,1,0,0,0,165,166,1,0,0,0,166,198,1,0,0,0,167,165,1,
 		0,0,0,168,170,5,72,0,0,169,168,1,0,0,0,169,170,1,0,0,0,170,171,1,0,0,0,
-		171,172,5,5,0,0,172,173,5,8,0,0,173,178,3,12,6,0,174,175,5,60,0,0,175,
+		171,172,5,5,0,0,172,173,5,9,0,0,173,178,3,12,6,0,174,175,5,60,0,0,175,
 		177,3,12,6,0,176,174,1,0,0,0,177,180,1,0,0,0,178,176,1,0,0,0,178,179,1,
 		0,0,0,179,198,1,0,0,0,180,178,1,0,0,0,181,183,5,72,0,0,182,181,1,0,0,0,
 		182,183,1,0,0,0,183,184,1,0,0,0,184,185,5,5,0,0,185,186,5,119,0,0,186,
