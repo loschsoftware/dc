@@ -1,5 +1,4 @@
 ﻿using Antlr4.Runtime;
-using LoschScript.Meta;
 using System.IO;
 
 namespace LoschScript.Errors;
@@ -15,7 +14,8 @@ internal class SyntaxErrorListener : BaseErrorListener
             CodePosition = (line, charPositionInLine),
             ErrorCode = LS0001_SyntaxError,
             ErrorMessage = msg,
-            File = CurrentFile.Path
+            File = CurrentFile.Path,
+            Severity = Severity.Error
         }, true);
     }
 }
