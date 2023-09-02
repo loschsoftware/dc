@@ -1,5 +1,6 @@
 ﻿using LoschScript.Errors;
 using LoschScript.Text;
+using LoschScript.Text.Regions;
 using System;
 using System.Collections.Generic;
 
@@ -44,6 +45,8 @@ internal class FileContext
     public bool CompilationFailed { get; set; }
 
     public List<ErrorInfo> Errors { get; } = new();
+
+    public List<FoldingRegion> FoldingRegions { get; } = new();
 
     public bool CheckType(Type type) => AvailableTypes.Contains(type);
 }

@@ -30,6 +30,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitCompilation_unit([NotNull] LoschScriptParser.Compilation_unitContext context)
     {
+        if (context.import_directive().Length > 1)
+        {
+            CurrentFile.FoldingRegions.Add(new()
+            {
+                StartLine = context.import_directive().First().Start.Line,
+                StartColumn = context.import_directive().First().Start.Column,
+                EndLine = context.import_directive().Last().Start.Line,
+                EndColumn = context.import_directive().Last().Start.Column + context.import_directive().Last().GetText().Length
+            });
+        }
+
         foreach (IParseTree tree in context.import_directive())
             Visit(tree);
 
@@ -1772,6 +1783,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitCode_block([NotNull] LoschScriptParser.Code_blockContext context)
     {
+        CurrentFile.FoldingRegions.Add(new()
+        {
+            StartLine = context.Open_Brace().Symbol.Line,
+            StartColumn = context.Open_Brace().Symbol.Column,
+            EndLine = context.Close_Brace().Symbol.Line,
+            EndColumn = context.Close_Brace().Symbol.Column + 1
+        });
+
         if (context.expression().Length == 0)
             return typeof(void);
 
@@ -2399,7 +2418,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitLdloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
 
             EmitStloc(CurrentMethod.IL, local.Index);
-            
+
             EmitLdloc(CurrentMethod.IL, local.Index);
 
             return local.Builder.LocalType;

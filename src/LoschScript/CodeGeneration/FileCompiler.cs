@@ -60,8 +60,8 @@ public static class FileCompiler
     /// </summary>
     /// <param name="source">The source code to emit fragments for.</param>
     /// <param name="config">The compiler configuration.</param>
-    /// <returns>Returns a <see cref="FileFragment"/> object containing the fragments of the source file. The <see cref="FileFragment.FilePath"/> property is set to an empty string.</returns>
-    public static (FileFragment Fragments, List<ErrorInfo> Errors) GetEditorInfo(string source, LSConfig config)
+    /// <returns>The editor info of the source code.</returns>
+    public static EditorInfo GetEditorInfo(string source, LSConfig config)
     {
         FileFragment ffrag = new()
         {
@@ -69,42 +69,38 @@ public static class FileCompiler
             Fragments = new()
         };
 
-        try
+        Context = new();
+        CurrentFile = new("");
+
+        Context.Configuration = config;
+
+        Helpers.SetupBogusAssembly();
+
+        ICharStream charStream = CharStreams.fromString(source);
+        ITokenSource lexer = new LoschScriptLexer(charStream);
+        ITokenStream tokens = new CommonTokenStream(lexer);
+
+        LoschScriptParser parser = new(tokens);
+        parser.RemoveErrorListeners();
+        parser.AddErrorListener(new SyntaxErrorListener());
+
+        Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
+        var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
+
+        if (refsToAdd != null)
+            Context.ReferencedAssemblies.AddRange(refsToAdd);
+
+        IParseTree compilationUnit = parser.compilation_unit();
+        Visitor v = new(false);
+        v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
+
+        ffrag.Fragments.AddRange(CurrentFile.Fragments);
+
+        return new()
         {
-            Context = new();
-            CurrentFile = new("");
-
-            Context.Configuration = config;
-
-            Helpers.SetupBogusAssembly();
-
-            ICharStream charStream = CharStreams.fromString(source);
-            ITokenSource lexer = new LoschScriptLexer(charStream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
-
-            LoschScriptParser parser = new(tokens);
-            parser.RemoveErrorListeners();
-            parser.AddErrorListener(new SyntaxErrorListener());
-
-            Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
-            var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
-
-            if (refsToAdd != null)
-                Context.ReferencedAssemblies.AddRange(refsToAdd);
-
-            IParseTree compilationUnit = parser.compilation_unit();
-            Visitor v = new(false);
-            v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
-
-            ffrag.Fragments.AddRange(CurrentFile.Fragments);
-
-            return (ffrag, CurrentFile.Errors);
-        }
-        catch (Exception ex)
-        {
-            File.AppendAllText("exception.txt", ex.ToString());
-
-            return (ffrag, CurrentFile.Errors);
-        }
+            Fragments = ffrag,
+            Errors = CurrentFile.Errors,
+            FoldingRegions = CurrentFile.FoldingRegions
+        };
     }
 }
