@@ -24,4 +24,9 @@ public class EditorInfo
     /// Folding regions to support code folding mechanisms offered by many editors.
     /// </summary>
     public List<FoldingRegion> FoldingRegions { get; set; } = new();
+
+    /// <summary>
+    /// A list of lines to support structure guide lines.
+    /// </summary>
+    public List<GuideLine> GuideLines { get; set; } = new();
 }

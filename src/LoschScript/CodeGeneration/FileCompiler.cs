@@ -100,7 +100,8 @@ public static class FileCompiler
         {
             Fragments = ffrag,
             Errors = CurrentFile.Errors,
-            FoldingRegions = CurrentFile.FoldingRegions
+            FoldingRegions = CurrentFile.FoldingRegions,
+            GuideLines = CurrentFile.GuideLines
         };
     }
 }

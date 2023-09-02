@@ -1791,6 +1791,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EndColumn = context.Close_Brace().Symbol.Column + 1
         });
 
+        CurrentFile.GuideLines.Add(new()
+        {
+            StartLine = context.Open_Brace().Symbol.Line,
+            EndLine = context.Close_Brace().Symbol.Line,
+            Column = context.Close_Brace().Symbol.Column // TOOD: A highly questionable implementation
+        });
+
         if (context.expression().Length == 0)
             return typeof(void);
 
