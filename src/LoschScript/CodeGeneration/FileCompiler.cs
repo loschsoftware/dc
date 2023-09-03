@@ -8,6 +8,7 @@ using LoschScript.Text.FragmentStore;
 using LoschScript.Validation;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
@@ -69,32 +70,42 @@ public static class FileCompiler
             Fragments = new()
         };
 
-        Context = new();
-        CurrentFile = new("");
+        try
+        {
+            Context = new();
+            CurrentFile = new("");
 
-        Context.Configuration = config;
+            Context.Configuration = config;
 
-        Helpers.SetupBogusAssembly();
+            Helpers.SetupBogusAssembly();
 
-        ICharStream charStream = CharStreams.fromString(source);
-        ITokenSource lexer = new LoschScriptLexer(charStream);
-        ITokenStream tokens = new CommonTokenStream(lexer);
+            ICharStream charStream = CharStreams.fromString(source);
+            ITokenSource lexer = new LoschScriptLexer(charStream);
+            ITokenStream tokens = new CommonTokenStream(lexer);
 
-        LoschScriptParser parser = new(tokens);
-        parser.RemoveErrorListeners();
-        parser.AddErrorListener(new SyntaxErrorListener());
+            LoschScriptParser parser = new(tokens);
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(new SyntaxErrorListener());
 
-        Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
-        var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
+            Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
+            var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
 
-        if (refsToAdd != null)
-            Context.ReferencedAssemblies.AddRange(refsToAdd);
+            if (refsToAdd != null)
+                Context.ReferencedAssemblies.AddRange(refsToAdd);
 
-        IParseTree compilationUnit = parser.compilation_unit();
-        Visitor v = new(false);
-        v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
+            IParseTree compilationUnit = parser.compilation_unit();
+            Visitor v = new(false);
+            v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
 
-        ffrag.Fragments.AddRange(CurrentFile.Fragments);
+            ffrag.Fragments.AddRange(CurrentFile.Fragments);
+        }
+        catch (Exception ex)
+        {
+            string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Losch", "Script")).FullName;
+
+            using StreamWriter sw = File.AppendText(Path.Combine(dir, "exception.log"));
+            sw.WriteLine(ex.ToString());
+        }
 
         return new()
         {
