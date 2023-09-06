@@ -1,0 +1,1327 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>mdbgext</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.ArgParser">
+            <summary>
+            This allows for easy and consistent parsing of command arguments
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.#ctor(System.String)">
+            <summary>
+            Creates a new ArgParser using the given arguments.
+            </summary>
+            <param name="arguments">The arguments to parse.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new ArgParser using the given arguments and Option Specification.
+            Options need to be in the format: "optionName(:1)?;optionName(:1)"
+            </summary>
+            <param name="arguments">The arguments to parse.</param>
+            <param name="optionSpec">The Option Specification to use.</param>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ArgParser.Count">
+            <summary>
+            Gets how many arguments there are.
+            </summary>
+            <value>The number of arguments.</value>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.Exists(System.Int32)">
+            <summary>
+            Determines if a given argument index exists without throwing an IndexOutOfRangeException.
+            </summary>
+            <param name="index">What index to check.</param>
+            <returns>If there is an argument at that index.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.GetArgument(System.Int32)">
+            <summary>
+            Gets the argument from a given index.
+            </summary>
+            <param name="index">Which index to get the argument from.</param>
+            <returns>The argument at he given index.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.OptionPassed(System.String)">
+            <summary>
+            Determines if an argument was passed.
+            </summary>
+            <param name="name">Which argument you are looking for.</param>
+            <returns>Was that argument passed.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.GetOption(System.String)">
+            <summary>
+            Gets an Option's value if it was supplied.
+            </summary>
+            <param name="name">Which Option to get.</param>
+            <returns>An ArgToken for that option.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.AsBool(System.Int32)">
+            <summary>
+            Returns argument at given index as a Boolean. (For backward compatibility.)
+            </summary>
+            <param name="index">Which index to use.</param>
+            <returns>The argument at that index as a Boolean.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.AsInt(System.Int32)">
+            <summary>
+            Returns argument at given index as an integer. (For backward compatibility.)
+            </summary>
+            <param name="index">Which index to use.</param>
+            <returns>The argument at that index as an integer.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.AsString(System.Int32)">
+            <summary>
+            Returns argument at given index as a string. (For backward compatibility.)
+            </summary>
+            <param name="index">Which index to use.</param>
+            <returns>The argument at that index as a string.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.AsDouble(System.Int32)">
+            <summary>
+            Returns argument at given index as a double. (For backward compatibility.)
+            </summary>
+            <param name="index">Which index to use.</param>
+            <returns>The argument at that index as a double.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgParser.AsCommand(System.Int32,Microsoft.Samples.Tools.Mdbg.CommandArgument)">
+            <summary>
+            Returns argument at given index with a given Command Argument as a command. (For backward compatibility.)
+            </summary>
+            <param name="index">Which index to use.</param>
+            <param name="ca">A Command Argument to use.</param>
+            <returns>A command where the argument at the given index is the command and the given ca make the Arguments.</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.CommandArgument">
+            <summary>
+            Command Argument class
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandArgument.#ctor(System.String[])">
+            <summary>
+            Creates a new instance of the CommandArgument class with the given array of command names.
+            </summary>
+            <param name="commandNames">Which command names to use for the new CommandArgument</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandArgument.AddCommand(System.String)">
+            <summary>
+            Adds the given command name.
+            </summary>
+            <param name="commandName">Which command name to add.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandArgument.AddCommand(System.String[])">
+            <summary>
+            Adds each command name from the given array.
+            </summary>
+            <param name="commandNames">Which command names to add.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandArgument.Lookup(System.String)">
+            <summary>
+            Looks up a command.
+            </summary>
+            <param name="input">Which command to look up.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.ArgToken">
+            <summary>
+            This struct provides implementation for turning argument tokens into usable types.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ArgToken.AsBool">
+            <summary>
+            Parses the token as a Boolean.
+            </summary>
+            <value>The Boolean that the token represents.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ArgToken.AsInt">
+            <summary>
+            Parses the token as an int.
+            </summary>
+            <value>The int that the token represents.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ArgToken.AsHexOrDecInt">
+            <summary>
+            Parses the token as an int, treating it as hex if prefixed with 0x
+            </summary>
+            <value>The int that the token represents.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ArgToken.AsAddress">
+            <summary>
+            Parses the token as an address entered as hex or decimal number.
+            </summary>
+            <value>The int that the token represents.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ArgToken.AsString">
+            <summary>
+            Returns the string value of the token.
+            </summary>
+            <value>The string that the token represents.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ArgToken.AsDouble">
+            <summary>
+            Parses the token as a double.
+            </summary>
+            <value>The double that the token represents.</value>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgToken.AsCommand(Microsoft.Samples.Tools.Mdbg.CommandArgument)">
+            <summary>
+            Looks up the token and creates a command for it using the given command argument.
+            </summary>
+            <param name="ca">What command argument to use.</param>
+            <returns>The command.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgToken.op_Inequality(Microsoft.Samples.Tools.Mdbg.ArgToken,Microsoft.Samples.Tools.Mdbg.ArgToken)">
+            <summary>
+            Inequality testing.  Allows for things like "if(thing1 != thing2)" to work properly.
+            </summary>
+            <param name="operand">First Operand.</param>
+            <param name="operand2">Second Operand.</param>
+            <returns>true if not equal, else false.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgToken.op_Equality(Microsoft.Samples.Tools.Mdbg.ArgToken,Microsoft.Samples.Tools.Mdbg.ArgToken)">
+            <summary>
+            Equality testing.  Allows for things like "if(thing1 == thing2)" to work properly.
+            </summary>
+            <param name="operand">First Operand.</param>
+            <param name="operand2">Second Operand.</param>
+            <returns>true if equal, else false.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgToken.GetHashCode">
+            <summary>
+            Required to override Equals.
+            </summary>
+            <returns>Hash Code.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ArgToken.Equals(System.Object)">
+            <summary>
+            Determines if the value is equal to another.
+            </summary>
+            <param name="value">The object to compare to.</param>
+            <returns>true if equal, else false.</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute">
+            <summary>
+            This attribute describes the command.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute.CommandName">
+            <summary>
+            Returns the command name.
+            </summary>
+            <value>Name of the command.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute.MinimumAbbrev">
+            <summary>
+            Returns the minimum number of characters you must use to invoke this command.
+            </summary>
+            <value>The minimum number of characters.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute.ShortHelp">
+            <summary>
+            Returns a brief help message for the command.
+            </summary>
+            <value>The help message.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute.LongHelp">
+            <summary>
+            Returns a more detailed help message for the command.
+            </summary>
+            <value>The help message.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute.IsRepeatable">
+            <summary>
+            Returns if the command is repeatable (hitting enter again will repeat these commands)
+            </summary>
+            <value>true if the command is repeatable</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute.ResourceManagerKey">
+            <summary>
+            Gets or sets the Resource Manager Key.
+            </summary>
+            <value>The Resource Manager Key.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute.UseHelpFrom">
+            <summary>
+            Gets or sets where to get the help from.
+            </summary>
+            <value>Where to get the help from.</value>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandDescriptionAttribute.RegisterResourceMgr(System.Type,System.Resources.ResourceManager)">
+            <summary>
+            Registers the Resource Manager.
+            </summary>
+            <param name="key">Whet Type to use.</param>
+            <param name="resourceManager">Which Resource Manager to register.</param>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand">
+            <summary>
+            This class defines MDbg Attribute Defined Commands.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.AddCommandsFromType(Microsoft.Samples.Tools.Mdbg.IMDbgCommandCollection,System.Type)">
+            <summary>
+            Adds commands from type.
+            </summary>
+            <param name="commandSet">Command Set to add.</param>
+            <param name="type">Type to add commands for.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.RemoveCommandsFromType(Microsoft.Samples.Tools.Mdbg.IMDbgCommandCollection,System.Type)">
+            <summary>
+            Removes commands from type
+            </summary>
+            <param name="commandSet">Command Set to remove.</param>
+            <param name="type">Type to remove commands for.</param>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.CommandName">
+            <summary>
+            Returns the command name.
+            </summary>
+            <value>Name of the command.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.MinimumAbbrev">
+            <summary>
+            Returns the minimum number of characters you must use to invoke this command.
+            </summary>
+            <value>The minimum number of characters.</value>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.Execute(System.String)">
+            <summary>
+            Executes the command.
+            </summary>
+            <param name="arguments">Arguments to pass to the command.</param>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.ShortHelp">
+            <summary>
+            Returns a brief help message for the command.
+            </summary>
+            <value>The help message.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.LongHelp">
+            <summary>
+            Returns a more detailed help message for the command.
+            </summary>
+            <value>The help message.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.LoadedFrom">
+            <summary>
+            Assembly the command was loaded from
+            </summary>
+            <value>The Assembly.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgAttributeDefinedCommand.IsRepeatable">
+            <summary>
+            Returns if the command is repeatable (hitting enter again will repeat these commands)
+            </summary>
+            <value>true if the command is repeatable</value>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.CommandExecutedEventArgs">
+            <summary>
+            This class contains information about an executed command.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandExecutedEventArgs.#ctor(Microsoft.Samples.Tools.Mdbg.IMDbgShell,Microsoft.Samples.Tools.Mdbg.IMDbgCommand,System.String,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <b>CommandExecutedEventArgs</b> class.
+            </summary>
+            <param name="sender">The sender for this event</param>
+            <param name="command">The command that is getting executed</param>
+            <param name="arguments">The arguments for the command</param>
+            <param name="movementCommand">Is this a movement command.</param>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandExecutedEventArgs.Sender">
+            <summary>
+            The sender for this event
+            </summary>
+            <value>The sender for this event</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandExecutedEventArgs.Command">
+            <summary>
+            The command that is getting executed.
+            </summary>
+            <value>The command that is getting executed.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandExecutedEventArgs.Arguments">
+            <summary>
+            The arguments for the command
+            </summary>
+            <value>The arguments for the command</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandExecutedEventArgs.MovementCommand">
+            <summary>
+            Is this a movement command.
+            </summary>
+            <value>Is this a movement command.</value>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.CommandExecutedEventHandler">
+            <summary>
+            Allows you to register for the CommandExecuted Event.
+            </summary>
+            <param name="sender">Object sending the event.</param>
+            <param name="e">CommandExecutedEventArgs for the event.</param>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IBreakpointParser">
+            <summary>
+            Pluggable parser object to parse breakpoint location strings.
+            </summary>
+            <remarks>Breakpoint location object. Returns null if the parser doesn't recognize the format. 
+            This allows parsers to be chained together. If a parser does recognize the format, then it can do more
+            specific argument checking and throw an exception. </remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IBreakpointParser.ParseFunctionBreakpoint(System.String)">
+            <summary>
+            Parser string describing IL-level breakpoint.
+            </summary>
+            <param name="args">string argument representing breakpoint location syntax to parse</param>
+            <returns>Breakpoint location object. Returns null if the parser doesn't recognize the format. 
+            This allows parsers to be chained together. If a parser does recognize the format, then it can do more
+            specific argument checking and throw an exception. 
+            </returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IExpressionParser">
+            <summary> Pluggable parser object to parse an expression.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IExpressionParser.ParseExpression(System.String,Microsoft.Samples.Debugging.MdbgEngine.MDbgProcess,Microsoft.Samples.Debugging.MdbgEngine.MDbgFrame)">
+            <summary> Parse a string into an expression.
+            </summary>
+            <param name="variableName">A name of variable to look-up.</param>
+            <param name="process">A debugged process.</param>
+            <param name="scope">A resolution scope.</param>
+            <returns>MDbgValue class representing a resulting value.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IExpressionParser.ParseExpression2(System.String,Microsoft.Samples.Debugging.MdbgEngine.MDbgProcess,Microsoft.Samples.Debugging.MdbgEngine.MDbgFrame)">
+            <summary>
+            Parse a string into a CorValue.
+            </summary>
+            <param name="value">An expression to parse.</param>
+            <param name="process">A debugged process.</param>
+            <param name="scope">A resolution scope.</param>
+            <returns>CorValue class representing the value passed in.</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgShell">
+            <summary>
+            Interface for the mdbg shell
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgShell.Debugger">
+            <summary>
+            Gets or sets with MDbgEngine should be used for all other actions.
+            </summary>
+            <value>The MDbgEngine.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgShell.Commands">
+            <summary>
+            Gets the available commands.
+            </summary>
+            <value>The commands.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgShell.IO">
+            <summary>
+            Gets or sets the IO interface.
+            </summary>
+            <value>The implementer of IMDbgIO.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgShell.FileLocator">
+            <summary>
+            Gets the File Locator.
+            </summary>
+            <value>The File Locator.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgShell.SourceFileMgr">
+            <summary>
+            Gets the Source File Manager
+            </summary>
+            <value>The Source File Manager</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgShell.Properties">
+            <summary>
+            Gets properties for the shell.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgShell.QuitWithExitCode(System.Int32)">
+            <summary>
+            Quits with a given exit code.
+            </summary>
+            <param name="exitCode">The exitcode to exit with.</param>
+        </member>
+        <member name="E:Microsoft.Samples.Tools.Mdbg.IMDbgShell.OnCommandExecuted">
+            <summary>
+            Called when command is executed and prompt is going to be displayed.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgShell.DisplayCurrentLocation">
+            <summary>
+            Displays current location.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgShell.ReportException(System.Exception)">
+            <summary>
+            Shell displays to the user a reason for the failure.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgShell.BreakpointParser">
+            <summary>
+            Get the default Breakpoint parser for this collection.
+            </summary>
+            <remarks> The breakpoint collection maintains a default breakpoint parser. 
+            Extensions can get the parser so that they can use the share the parsing implementation to get the 
+            same breakpoint syntax as the rest of the shell. This encourages a uniform breakpoint syntax.
+            Extensions can also set the parser so that they can override and even extend the breakpoint syntax.
+            This may be null (and is in fact null by default), though it is reasonable for extensions to 
+            expect that the shell supplies a parser.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgShell.ExpressionParser">
+            <summary>
+            Get the default expression parser for this shell.
+            </summary>
+            <remarks>
+              The expressino parser is responsible for parsing variable names and
+              simple expressions into MDbgValue objects that represent a result of
+              parsing.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgOutputConstants">
+            <summary>
+            This class contains special output constant names for output of different types.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgOutputConstants.StdOutput">
+            <summary>
+            Output goes to Standard Out
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgOutputConstants.StdError">
+            <summary>
+            Output goes to Standard Error
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgOutputConstants.Ignore">
+            <summary>
+            This is special output type.  It will be written to StdOut, but its content should be ignored (non-important output).
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgIO">
+            <summary>
+            Interface for mdbg Input/Output routines
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgIO.WriteOutput(System.String,System.String)">
+            <summary>
+            Writes the specified string value to the output stream for the given output type.
+            </summary>
+            <param name="outputType">Specifies which MDbgOutputConstants output type to write to</param>
+            <param name="output">The value to write.</param>
+            <remarks>This does not include a newline. That is a breaking change
+            from previous releases of MDbg</remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgIO.ReadCommand(System.String@)">
+            <summary>
+            Prints the "mdbg>" prompt and reads the next line of input.
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgIO2">
+            <summary>
+            Extension of the basic IMDbgIO functionality
+            Users who want to take advantage of IMDBgIO2 functionality needs to cast IMDbgIO to IMDbgIO2
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgIO2.WriteOutput(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Much like IMDbgIO:WriteOutput but allows for highlighting of parts of the string
+            </summary>
+            <param name="outputType">Specifies which MDbgOutputConstants output type to write to</param>
+            <param name="message">The value to write.</param>
+            <param name="highlightStart">The index to begin highlighting.</param>
+            <param name="highlightLen">How many characters to highlight.</param>
+            <remarks>This does not include a newline. That is a breaking change
+            from previous releases of MDbg</remarks>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgIO3">
+            <summary>
+            Another extension of the basic IMDbgIO functionality.
+            Users who want to take advantage of IMDBgIO3 functionality needs to cast IMDbgIO to IMDbgIO3
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgIO3.ReadKey(System.Boolean)">
+            <summary>
+            Returns the next character or function key pressed by the user.
+            </summary>
+            <param name="intercept">If intercept is true, the pressed key is displayed in the console window.
+            If false, the key is not displayed.</param>
+            <returns>The next character or function key pressed by the user.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgIO3.ReadLine">
+            <summary>
+            Returns the next line of input without printing the "mdbg>" prompt.
+            </summary>
+            <returns>The next line of input.</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgCommand">
+            <summary>
+            Interface for mdbg commands.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgCommand.CommandName">
+            <summary>
+            Returns the command name.
+            </summary>
+            <value>Name of the command.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgCommand.MinimumAbbrev">
+            <summary>
+            Returns the minimum number of characters you must use to invoke this command.
+            </summary>
+            <value>The minimum number of characters.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgCommand.IsRepeatable">
+            <summary>
+            Returns if the command is repeatable (hitting enter again will repeat these commands)
+            </summary>
+            <value>true if the command is repeatable</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgCommand.ShortHelp">
+            <summary>
+            Returns a brief help message for the command.
+            </summary>
+            <value>The help message.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgCommand.LongHelp">
+            <summary>
+            Returns a more detailed help message for the command.
+            </summary>
+            <value>The help message.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgCommand.LoadedFrom">
+            <summary>
+            Assembly the command was loaded from
+            </summary>
+            <value>The Assembly.</value>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgCommand.Execute(System.String)">
+            <summary>
+            Executes the command.
+            </summary>
+            <param name="args">Arguments to pass to the command.</param>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgCommandCollection">
+            <summary>
+            Interface for mdbg command collections.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgCommandCollection.Add(Microsoft.Samples.Tools.Mdbg.IMDbgCommand)">
+            <summary>
+            Adds a command to the collection.
+            </summary>
+            <param name="command">Command to add.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgCommandCollection.Remove(Microsoft.Samples.Tools.Mdbg.IMDbgCommand)">
+            <summary>
+            Removes a command from the collection.
+            </summary>
+            <param name="command">Command to remove.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgCommandCollection.Lookup(System.String)">
+            <summary>
+            Looks up a command in the collection.
+            </summary>
+            <param name="cmd">The name of the command to look up.</param>
+            <returns>The command corresponding to the given name.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgCommandCollection.ParseCommand(System.String,Microsoft.Samples.Tools.Mdbg.IMDbgCommand@,System.String@)">
+            <summary>
+            Parses a command.
+            </summary>
+            <param name="fullText">Raw text for the command and arguments all together.</param>
+            <param name="command">Returns the command from the given text.</param>
+            <param name="commandArguments">Returns the arguments from the given text.</param>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgFileLocator">
+            <summary>
+            Interface for File Location
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgFileLocator.Path">
+            <summary>
+            Gets or Sets the path. Setting a path will clear any associations.
+            </summary>
+            <value>the path</value>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgFileLocator.GetFileLocation(System.String)">
+            <summary>
+            Gets a file location
+            </summary>
+            <param name="file">the file</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgFileLocator.Associate(System.String,System.String)">
+            <summary>
+            Forces debugger to use different source files for displaying of sources.
+            </summary>
+            <param name="originalName">An original name that is stored in .pdb of debugged program.</param>
+            <param name="newName">A new name that should be used as source file name instead.</param>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgShellException">
+            <summary>
+            This is an exception for when mdbg shell needs its own special type
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgShellException.#ctor">
+            <summary>
+            Initializes a new instance of the MDbgShellException class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgShellException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the MDbgShellException class with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgShellException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the MDbgShellException class with a specified error message and inner exception.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+            <param name="innerException">The inner exception for the new exception</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgShellException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the MDbgShellException class with serialized data.
+            </summary>
+            <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
+            <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.CommandBase">
+            <summary>
+            A base abstract class for commands.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandBase.Shell">
+            <summary>
+            Gets or sets the IMdbgShell.
+            </summary>
+            <value>The IMdbgShell.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.CommandBase.Debugger">
+            <summary>
+            Gets the Debugger.
+            </summary>
+            <value>The Debugger.</value>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.ExecuteCommand(System.String)">
+            <summary>
+            Executes the given command.
+            </summary>
+            <param name="commandText">What command to execute.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.WriteOutput(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Much like IMDbgIO:WriteOutput but allows for highlighting of parts of the string.
+            Prints a new line after message.
+            </summary>
+            <param name="outputType">Specifies which MDbgOutputConstants output type to write to</param>
+            <param name="message">The value to write.</param>
+            <param name="highlightStart">The index to begin highlighting.</param>
+            <param name="highlightLen">How many characters to highlight.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.Write(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Much like IMDbgIO:WriteOutput but allows for highlighting of parts of the string.
+            Does not print a new line after message.
+            </summary>
+            <param name="outputType">Specifies which MDbgOutputConstants output type to write to</param>
+            <param name="message">The value to write.</param>
+            <param name="highlightStart">The index to begin highlighting.</param>
+            <param name="highlightLen">How many characters to highlight.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.WriteOutput(System.String,System.String)">
+            <summary>
+            Writes output of a given type, followed by a new line.
+            </summary>
+            <param name="outputType">What MDbgOutputConstants type the output is</param>
+            <param name="message">What text to output</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.Write(System.String,System.String)">
+            <summary>
+            Writes output of a given type. Does not print a new line after output.
+            </summary>
+            <param name="outputType">What MDbgOutputConstants type the output is</param>
+            <param name="message">What text to output</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.WriteOutput(System.String)">
+            <summary>
+            Writes output using STDOUT output type, followed by a new line.
+            </summary>
+            <param name="message">What text to output</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.Write(System.String)">
+            <summary>
+            Writes output using STDOUT output type. Does not print a new line after output.
+            </summary>
+            <param name="message">What text to output</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.WriteError(System.String)">
+            <summary>
+            Writes output using STDERR output type
+            </summary>
+            <param name="message">What text to output</param>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.CommandBase.AssertOnErrors">
+            <summary>
+            Internal Only.  Do not use.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.CommandBase.ShowInternalFrames">
+            <summary>
+            ShowInternalFrames is used by mode if command to
+            Enable/Disable showing of internal frames in where
+            command. This flag is defined here and not in the Engine.cs
+            (engine layer) because this flag only affects whether the
+            frames are visible in "where" command. However they are
+            always exposed by the engine.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.CommandBase.FailOnError">
+            <summary>
+            Gets or sets if Mdbg should fail on errors.
+            </summary>
+            <value>Default is false.</value>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.CommandBase.ExtensionPath">
+            <summary>
+            ExtensionPath variable contains a set of paths that are searched for extensions when
+            "load" command is used to load an extension.
+            </summary>
+            <remarks>
+            The paths are separated with the PathSeparator char.
+            This defaults to the 1) current directory and 2) the directory that the debugger 
+            was loaded from.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.PreParseRunArguments(System.String,Microsoft.Samples.Debugging.MdbgEngine.DebugModeFlag@,System.String@,System.String@)">
+            <summary>
+            Parses arguments for the run command, but does not provide direct access to the path to the
+            program to run.
+            </summary>
+            <param name="arguments">Argument to the run and crun command</param>
+            <param name="debugMode">Returns desired debugging mode. Returns internal
+            default if not specified
+            </param>
+            <param name="debuggeeVersion">Returns the debugger interface version.
+               Is null if the version cannot be determined.
+            </param>
+            <param name="programAndArgsToRun">Returns the command line for the program
+            being run.  Note that the program name may be quoted and may not contain
+            a ".exe" extension.  Rather than try to parse this, if you need the path to the binary
+            being run, then use the 5 argument overload below.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.CommandBase.PreParseRunArguments(System.String,Microsoft.Samples.Debugging.MdbgEngine.DebugModeFlag@,System.String@,System.String@,System.String@)">
+            <summary>
+            Helper function that parses inputs to run and crun commands.
+            </summary>
+            <param name="arguments">Argument to the run and crun command</param>
+            <param name="debugMode">Returns desired debugging mode. Returns internal
+            default if not specified
+            </param>
+            <param name="debuggeeVersion">Returns the debugger interface version.
+               Is null if the version cannot be determined.
+            </param>
+            <param name="programToRun">Returns path of the program to execute.</param>
+            <param name="programArguments">Returns arguments to pass to the program being 
+            run, including the binary name as the 0th argument</param>
+            <seealso cref="T:Microsoft.Samples.Tools.Mdbg.RunOptions"/>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.ClrImplementationModel">
+            <summary>
+            Identify the CLR implementation model which will ultimately be used to get the factory to instantiate
+            an ICorDebugProcess.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.ClrImplementationModel.Whidbey">
+            <summary>
+            Use Whidbey creation model via mscoree!CreateDebuggingInterfaceFromVersion
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.RunVerbosity">
+            <summary>
+            Controls the level of informational output in the standard "run" command
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.RunOptions">
+            <summary>
+            Options for a standard "run" command. This supercedes the PreParseRunArguments functions.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.RunOptions.DebugMode">
+            <summary>
+            Debug mode (optimized, enc, etc).  Pass this to MDbgProcess.DebugMode.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.RunOptions.Application">
+            <summary>
+            Path to application executable to startup. Non-null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.RunOptions.Arguments">
+            <summary>
+            Arguments to pass to debuggee. May be null. This may honor the convention of including the application name as argument 0.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.RunOptions.Version">
+            <summary>
+            Debuggee version string. May be null. This may default to a version infered from the Application path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.RunOptions.Model">
+            <summary>
+            Model used to get the factory for creating an ICorDebugProcess.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.RunOptions.#ctor(System.String)">
+            <summary>
+            Parse from a command string 
+            </summary>
+            <param name="arguments">arguments string passed to a 'run' command. This gets parsed to fill out
+            the run options. </param>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgSourceFileMgr">
+            <summary>
+            Interface for mdbg Source File Management
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgSourceFileMgr.ClearDocumentCache">
+            <summary>
+            Clears the document cache.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.IMDbgSourceFileMgr.GetSourceFile(System.String)">
+            <summary>
+            Gets a source file.
+            </summary>
+            <param name="path">Where to get the source file from.</param>
+            <returns>An IMDbgSourceFile from the given url.</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.IMDbgSourceFile">
+            <summary>
+            Defines generalized functions relating to source files that a class may implement to create situation-specific methods.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgSourceFile.Path">
+            <summary>
+            Where is the file.
+            </summary>
+            <value>Where is the file.</value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgSourceFile.Item(System.Int32)">
+            <summary>
+            Allows for indexing into the file by line number. Index is 1-based. Highest valud index is Count property.
+            </summary>
+            <param name="lineNo">Which line number to get.</param>
+            <returns>The text in the file at the requested line number.</returns>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.IMDbgSourceFile.Count">
+            <summary>
+            How many lines are in the file.
+            </summary>
+            <value>How many lines are in the file.</value>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgExtensionEntryPointClassAttribute">
+            <summary>
+              Defines generalized functions relating to source files that a class may
+              implement to create situation-specific methods.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgExtensionEntryPointClassAttribute.Url">
+            <summary> URL to provde more detail about this extension. May be null if not supplied.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgExtensionEntryPointClassAttribute.EMailAddress">
+            <summary> Email address to contract for more detail about this extension. May be null if not supplied.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgExtensionEntryPointClassAttribute.ShortDescription">
+            <summary> Short description of functionality in this extension. May be null.
+            </summary>        
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions">
+            <summary>
+            Class for storing and managing stop option policies for debugger callback events.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.PropertyName">
+            <value>
+              Key name that is used for storing this object into Shell.Properties.
+            </value>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.#ctor">
+            <summary>
+            Default constructor.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.Add(Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy,Microsoft.Samples.Debugging.CorDebug.ManagedCallbackType)">
+            <summary>
+            Adds an MDbgStopOptionPolicy object to the collection of stop option policies,
+            and registers it for a type of callback
+            </summary>
+            <param name="sop">The stop option policy to add.</param>
+            <param name="callbackType">The type of callback to register the stop option
+            policy for.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.Add(Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy,Microsoft.Samples.Debugging.CorDebug.ManagedCallbackType[])">
+            <summary>
+            Adds an MDbgStopOptionPolicy object to the collection of stop option policies,
+            and registers it for one or more types of callbacks.
+            </summary>
+            <param name="sop">The stop option policy to add.</param>
+            <param name="callbackTypes">The types of callbacks to register the stop option
+            policy for.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.Remove(Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy)">
+            <summary>
+            Removes an MDbgStopOptionPolicy object from the collection of stop option policies.
+            </summary>
+            <param name="sop">The stop option policy to remove.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.ActOnCallback(Microsoft.Samples.Debugging.MdbgEngine.MDbgProcess,Microsoft.Samples.Debugging.MdbgEngine.CustomPostCallbackEventArgs)">
+            <summary>
+            Acts on debugger callback based on the contained stop option policies matching
+            the callback type.
+            </summary>
+            <param name="currentProcess">Current MDbgProcess.</param>
+            <param name="args">Debugger callback arguments.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.ModifyOptions(System.String,Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior,System.String)">
+            <summary>
+            Modifies all contained stop option policies with the given acronym.
+            </summary>
+            <param name="acronym">Stop option policy acronym.</param>
+            <param name="option">Desired debugger behavior - stop, log, or ignore.</param>
+            <param name="arguments">Arguments to pass to the stop option policy.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.PrintOptions">
+            <summary>
+            Print current stop option policies.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptions.Policies">
+            <summary>
+            Returns an iterator over all contained stop option policies.
+            </summary>
+            <returns>An iterator over all contained stop option policies.</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgModeSettings">
+            <summary>
+             Collection of modes supported by the debugger.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgModeSettings.PropertyName">
+            <value>
+              Key name that is used for storing this object into Shell.Properties.
+            </value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgModeSettings.Items">
+            <value>
+                A list of different modes supported the shell.
+            </value>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.ModeChangedEvent">
+            <summary>
+            Delegate for MDbgModeItem class. Called whenever the mode is changed
+            by the user with mode command.
+            </summary>
+            <param name="item">Object that sent the event.</param>
+            <param name="onOff">True if the mode is turned on, otherwise false.</param>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.GetModeValueEvent">
+            <summary>
+            Delegate for MDbgModeItem class. Called whenever the mode's value is read.
+            </summary>
+            <param name="item">Object that sent the event.</param>
+            <returns> true if the mode is on </returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgModeItem">
+            <summary>
+              An individual item from the MDbgModeSettings collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgModeItem.#ctor(System.String,System.String,Microsoft.Samples.Tools.Mdbg.GetModeValueEvent,Microsoft.Samples.Tools.Mdbg.ModeChangedEvent)">
+            <summary>
+            Creates a new MDbgModeItem object.
+            </summary>
+            <param name="shortcut">A shortcut for the mode command.</param>
+            <param name="description">A description of what this mode represents.</param>
+            <param name="modeValueCallback">An event that is called whenever current value of the mode is queried.</param>
+            <param name="modeChangedCallback">An event that is called whenever user changes mode with mode command.</param>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgModeItem.ShortCut">
+            <value>
+                Shortcut used by user to change the mode.
+            </value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgModeItem.Description">
+            <value>
+                A description of the mode.
+            </value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgModeItem.OnOff">
+            <value>
+                Gets or sets current setting of the mode.
+            </value>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgUtil">
+            <summary>
+            A class of utility functions used in mdbg.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgUtil.ConvertSimpleExpToRegExp(System.String)">
+             <summary>
+             converts a dos-like regexp to true regular expresion.
+             This enables simple filters for types as e.g.:
+             x mod!System.String*
+            
+             currently function supports just 2 special chars: * (match
+             0-unlim chars) and ? (match 1 char).
+             </summary>
+             <param name="simpleExp">dos-like regular expression</param>
+             <returns>A regexp pattern matching teh dos regular exrepssion</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgUtil.IsRegex(System.String)">
+            <summary>
+            Checks if a string is a regular expression supported by MDbg. Currently, MDbg supports 
+            just 2 special chars: * (match 0-unlim chars) and ? (match 1 char).
+            </summary>
+            <param name="s">input string</param>
+            <returns>true if s is a regular expression supported by MDbg, false otherwise</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgUtil.CreateStopReasonFromEventArgs(Microsoft.Samples.Debugging.CorDebug.CorEventArgs,Microsoft.Samples.Debugging.MdbgEngine.MDbgProcess)">
+            <summary>
+            Given a CorEventArgs object, returns a corresponding StopReason.
+            </summary>
+            <param name="args">Callback Arguments.</param>
+            <param name="currentProcess">Current MDbgProcess.</param>
+            <returns>A stop reason corresponsing to the given callback arguments. This
+            function currently creates StopReason objects for CorEventArgs with the following
+            callback types: OnCreateThread, OnExceptionUnwind2, OnModuleLoad, OnMDANotification.
+            For all other callback types, this function returns args.ToString().</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy">
+            <summary>
+            Base class for implementing stop option policies, used to customize and determine what the
+            debugger should do when it receives callbacks.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.SetBehavior(Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior,System.String)">
+            <summary>
+            Sets the debugger behavior for this stop option policy.
+            </summary>
+            <param name="behavior">Debugger behavior - stop, log, or ignore.</param>
+            <param name="arguments">Other arguments.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.ActOnCallback(Microsoft.Samples.Debugging.MdbgEngine.MDbgProcess,Microsoft.Samples.Debugging.MdbgEngine.CustomPostCallbackEventArgs)">
+            <summary>
+            Acts on debugger callback.
+            </summary>
+            <param name="currentProcess">The current MDbgProcess. </param>
+            <param name="args">The callback arguments.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.Print">
+            <summary>
+            Prints the stop option policy.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.Acronym">
+            <summary>
+            The acronym associated with the stop option policy. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior">
+            <summary>
+            Possible behaviors of the debugger when it receives a callback.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior.Ignore">
+            <summary>
+            The debugger should ignore this callback.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior.Log">
+            <summary>
+            The debugger should log this callback.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior.Notify">
+            <summary>
+            The debugger should notify this callback.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior.Stop">
+            <summary>
+            The debugger should stop on this callback.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.SimpleStopOptionPolicy">
+            <summary>
+            A simple stop option policy that allows a user to specify a single behavior for a callback type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.SimpleStopOptionPolicy.#ctor(System.String,System.String)">
+            <summary>
+            Default constructor. Sets the default behavior to DebuggerBehaviors.ignore.
+            </summary>
+            <param name="acronym">The acronym associated with this stop option policy.</param>
+            <param name="fullName">The full name of the callback event, for printing.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.SimpleStopOptionPolicy.ActOnCallback(Microsoft.Samples.Debugging.MdbgEngine.MDbgProcess,Microsoft.Samples.Debugging.MdbgEngine.CustomPostCallbackEventArgs)">
+            <summary>
+            Acts on the current callback, based on the current debugger behavior for this stop
+            option policy.
+            </summary>
+            <param name="currentProcess">Current MDbgProcess.</param>
+            <param name="args">Callback arguments.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.SimpleStopOptionPolicy.SetBehavior(Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior,System.String)">
+            <summary>
+            Sets the debugger behavior for this stop option policy.
+            </summary>
+            <param name="behavior">stop, log, notify, or ignore</param>
+            <param name="arguments">Must be null.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.SimpleStopOptionPolicy.Print">
+            <summary>
+            Prints the stop option policy.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.SimpleStopOptionPolicy.FullName">
+            <summary>
+            The full name of this stop option policy.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.SimpleStopOptionPolicy.Behavior">
+            <summary>
+            The current debugger behavior for this stop option policy.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy">
+            <summary>
+            Details debugger's behavior when the process it is attached to throws an exception. The user
+            can specify different behaviors for different types of exceptions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy.#ctor">
+            <summary>
+            Default constructor. Sets the default behavior to ignore all exceptions, and sets
+            the ExceptionEnhanced switch to false.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy.ActOnCallback(Microsoft.Samples.Debugging.MdbgEngine.MDbgProcess,Microsoft.Samples.Debugging.MdbgEngine.CustomPostCallbackEventArgs)">
+            <summary>
+            Acts on the debugger callback, based on the stop option policy settings and the 
+            type of exception thrown.
+            </summary>
+            <param name="currentProcess">Current MDbgProcess.</param>
+            <param name="args">Callback arguments.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy.SetBehavior(Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior,System.String)">
+            <summary>
+            Modifies the exception settings, given an exception type and corresponding debugger behavior.
+            </summary>
+            <param name="behavior">stop, log, or ignore</param>
+            <param name="arguments">A type of exception, or a regular expression.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy.Print">
+            <summary>
+            Prints the current exception settings.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy.DetermineBehavior(System.String)">
+            <summary>
+            Given an exception thrown by a process, determines whether the debugger should 
+            log, ignore, or stop on this exception, based on the type of exception and the
+            existing exception settings. 
+            </summary>
+            <returns>stop, log, or ignore</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy.ItemsCount">
+            <summary>
+            Returns the number of ExceptionStopOptionPolicyItem objects in m_items.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy.ExceptionEnhancedOn">
+            <summary>
+            A master switch to control whether the debugger should act on all exception callbacks.
+            If it is set to true, the debugger acts on all exception callbacks. If it is set to 
+            false, the debugger acts only on DEBUG_EXCEPTION_FIRST_CHANCE callbacks.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy.Default">
+            <summary>
+            Default behavior.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicyItem">
+            <summary>
+             Item in ExceptionStopOptionPolicy. Details debugger behavior for specific types of exceptions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicyItem.#ctor(System.String,Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior)">
+            <summary>
+            Default constructor.
+            </summary>
+            <param name="exceptionType">An exception type or regular expression.</param>
+            <param name="behavior">Debugger behavior - stop, log, or ignore</param>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicyItem.ExceptionType">
+            <value>
+              Exception type, or regular expression.
+            </value>
+        </member>
+        <member name="P:Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicyItem.Behavior">
+            <value>
+              Behavior of debugger when it encounters exception of type ExceptionType,
+              or matching the regular expression ExceptionType.
+            </value>
+        </member>
+        <member name="T:Microsoft.Samples.Tools.Mdbg.ExceptionEnhancedStopOptionPolicy">
+            <summary>
+            Used to control the ExceptionEnhanced switch in a given ExceptionStopOptionPolicy object. 
+            This switch controls whether the debugger should act on all exception callbacks.
+            If it is set to true, the debugger acts on all exception callbacks. If it is set to 
+            false, the debugger acts only on DEBUG_EXCEPTION_FIRST_CHANCE callbacks.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionEnhancedStopOptionPolicy.#ctor(Microsoft.Samples.Tools.Mdbg.ExceptionStopOptionPolicy)">
+            <summary>
+            Default constructor. Sets the acronym to "ee".
+            </summary>
+            <param name="esop">The ExceptionStopOptionPolicy whose switch to control.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionEnhancedStopOptionPolicy.ActOnCallback(Microsoft.Samples.Debugging.MdbgEngine.MDbgProcess,Microsoft.Samples.Debugging.MdbgEngine.CustomPostCallbackEventArgs)">
+            <summary>
+            Does nothing - an ExceptionEnhancedStopOptionPolicy object  is only meant to control the 
+            ExceptionEnhanced switch in an ExceptionStopOptionPolicy object, not to directly stop the 
+            debugger or to log a callback. 
+            </summary>
+            <param name="currentProcess">Current MDbgProcess.</param>
+            <param name="args">Callback arguments.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionEnhancedStopOptionPolicy.SetBehavior(Microsoft.Samples.Tools.Mdbg.MDbgStopOptionPolicy.DebuggerBehavior,System.String)">
+            <summary>
+            Sets the ExceptionEnhanced switch of the associated ExceptionStopOptionPolicy object
+            on or off. 
+            </summary>
+            <param name="behavior">DebuggerBehaviors.stop turns ON ExceptionEnhanced switch of the associated 
+            ExceptionStopOptionPolicy object, and DebuggerBehaviors.ignore turns the switch OFF. The command 
+            DebuggerBehaviors.log is not supported.</param>
+            <param name="arguments">Must be null.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Tools.Mdbg.ExceptionEnhancedStopOptionPolicy.Print">
+            <summary>
+            Prints whether the ExceptionEnhanced switch of the associated ExceptionStopOptionPolicy object
+            is turned on or off.
+            </summary>
+        </member>
+    </members>
+</doc>
