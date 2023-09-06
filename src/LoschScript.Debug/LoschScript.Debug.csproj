@@ -7,21 +7,4 @@
 		<Platforms>x64</Platforms>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <Reference Include="corapi">
-	    <HintPath>..\..\tools\mdbg\corapi.dll</HintPath>
-	  </Reference>
-	  <Reference Include="mdbgeng">
-	    <HintPath>..\..\tools\mdbg\mdbgeng.dll</HintPath>
-	  </Reference>
-	  <Reference Include="raw">
-	    <HintPath>..\..\tools\mdbg\raw.dll</HintPath>
-	  </Reference>
-	  <Reference Include="System.Management" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Engine\" />
-	</ItemGroup>
-
 </Project>
