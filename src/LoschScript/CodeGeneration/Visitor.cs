@@ -1,14 +1,12 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using LoschScript.CLI;
-using LoschScript.CompilerServices;
 using LoschScript.Core;
 using LoschScript.Meta;
 using LoschScript.Parser;
 using LoschScript.Runtime;
 using LoschScript.Text;
 using LoschScript.Text.Tooltips;
-using Microsoft.Build.Framework;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,7 +14,6 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
-using System.Windows;
 
 namespace LoschScript.CodeGeneration;
 
@@ -160,7 +157,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Line = context.Identifier().Symbol.Line,
             Column = context.Identifier().Symbol.Column,
             Length = context.Identifier().GetText().Length,
-            ToolTip = TooltipGenerator.Type(tb.CreateTypeInfo(), true, true)
+            ToolTip = TooltipGenerator.Type(tb.CreateTypeInfo(), true, true),
+            IsNavigationTarget = true
         });
     }
 
@@ -246,7 +244,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Line = context.Identifier().Symbol.Line,
             Column = context.Identifier().Symbol.Column,
             Length = context.Identifier().GetText().Length,
-            ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params)
+            ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params),
+            NavigationTargetKind = Fragment.NavigationKind.Constructor
         });
     }
 
@@ -326,7 +325,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Line = context.Identifier().Symbol.Line,
                 Column = context.Identifier().Symbol.Column,
                 Length = context.Identifier().GetText().Length,
-                ToolTip = TooltipGenerator.Function(context.Identifier().GetText(), tReturn, _params.ToArray())
+                ToolTip = TooltipGenerator.Function(context.Identifier().GetText(), tReturn, _params.ToArray()),
+                IsNavigationTarget = true
             });
 
             // TODO: Ignore "Attribute" suffix for attributes
@@ -386,7 +386,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Column = context.Identifier().Symbol.Column,
             Line = context.Identifier().Symbol.Line,
             Length = context.Identifier().GetText().Length,
-            ToolTip = TooltipGenerator.Field(fb)
+            ToolTip = TooltipGenerator.Field(fb),
+            IsNavigationTarget = true
         });
 
         return typeof(void);
@@ -2454,7 +2455,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Column = context.Identifier().Symbol.Column,
             Length = context.Identifier().GetText().Length,
             Color = context.Var() == null ? Color.LocalValue : Color.LocalVariable,
-            ToolTip = TooltipGenerator.Local(context.Identifier().GetText(), context.Var() != null, lb)
+            ToolTip = TooltipGenerator.Local(context.Identifier().GetText(), context.Var() != null, lb),
+            IsNavigationTarget = true
         });
 
 #if !NET7_COMPATIBLE
