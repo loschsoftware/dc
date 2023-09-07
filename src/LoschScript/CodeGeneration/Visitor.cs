@@ -2387,7 +2387,10 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Type type = Visit(context.expression());
 
             LocalBuilder tempLocalBuilder = CurrentMethod.IL.DeclareLocal(type);
-            tempLocalBuilder.SetLocalSymInfo(GetTempVariableName(CurrentMethod.TempValueIndex++));
+
+            if (Context.Configuration.Configuration == Losch.LoschScript.Configuration.Configuration.Debug && createAssembly)
+                tempLocalBuilder.SetLocalSymInfo(GetTempVariableName(CurrentMethod.TempValueIndex++));
+
             CurrentMethod.Locals.Add((GetTempVariableName(CurrentMethod.TempValueIndex), tempLocalBuilder, true, CurrentMethod.LocalIndex++, new(null, type)));
 
             EmitStloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
