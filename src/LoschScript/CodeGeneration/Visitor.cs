@@ -535,8 +535,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         foreach (IParseTree child in context.children.Take(context.children.Count - 1))
         {
             Type _t = Visit(child);
-
-            if (_t != typeof(void) && CurrentMethod.SkipPop)
+            
+            if (_t != typeof(void) && !CurrentMethod.SkipPop)
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
             if (CurrentMethod.SkipPop)
