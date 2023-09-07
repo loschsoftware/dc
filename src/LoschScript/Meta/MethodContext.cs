@@ -50,5 +50,7 @@ internal class MethodContext
 
     public int TempValueIndex { get; set; } = 0;
 
+    public bool SkipPop { get; set; }
+
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 }

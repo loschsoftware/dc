@@ -8,6 +8,7 @@ using LoschScript.Parser;
 using LoschScript.Runtime;
 using LoschScript.Text;
 using LoschScript.Text.Tooltips;
+using Microsoft.Build.Framework;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -1805,8 +1806,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             Type _t = Visit(tree);
 
-            if (_t != typeof(void))
+            if (_t != typeof(void) && !CurrentMethod.SkipPop)
                 CurrentMethod.IL.Emit(OpCodes.Pop);
+
+            if (CurrentMethod.SkipPop)
+                CurrentMethod.SkipPop = false;
         }
 
         return Visit(context.expression().Last());
@@ -2399,6 +2403,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                         MethodInfo m = typeof(UnionValue).GetMethod("set_Value", new Type[] { typeof(object) });
                         CurrentMethod.IL.Emit(OpCodes.Call, m);
 
+                        CurrentMethod.SkipPop = true;
                         return local.Union.GetType();
                     }
 
