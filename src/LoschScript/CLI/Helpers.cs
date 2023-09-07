@@ -660,15 +660,19 @@ internal static class Helpers
 
     public static void SetEntryPoint(AssemblyBuilder ab, MethodInfo m)
     {
+#if !NET7_COMPATIBLE
         ab.SetEntryPoint(m);
+#endif
     }
 
-    public static void SetLocalSymInfo(LocalBuilder lb, string name, bool set)
+    public static void SetLocalSymInfo(LocalBuilder lb, string name)
     {
-        if (!set)
+        if (Context.Configuration.Configuration != Configuration.Debug)
             return;
 
+#if !NET7_COMPATIBLE
         lb.SetLocalSymInfo(name);
+#endif
     }
 
     public static bool HandleSpecialFunction(string name, LoschScriptParser.ArglistContext args, int line, int column, int length)

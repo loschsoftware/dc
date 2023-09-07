@@ -94,7 +94,7 @@ public static class FileCompiler
                 Context.ReferencedAssemblies.AddRange(refsToAdd);
 
             IParseTree compilationUnit = parser.compilation_unit();
-            Visitor v = new(false);
+            Visitor v = new();
             v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
 
             ffrag.Fragments.AddRange(CurrentFile.Fragments);
