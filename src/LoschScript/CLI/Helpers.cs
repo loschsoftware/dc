@@ -663,8 +663,11 @@ internal static class Helpers
         ab.SetEntryPoint(m);
     }
 
-    public static void SetLocalSymInfo(LocalBuilder lb, string name)
+    public static void SetLocalSymInfo(LocalBuilder lb, string name, bool set)
     {
+        if (!set)
+            return;
+
         lb.SetLocalSymInfo(name);
     }
 
