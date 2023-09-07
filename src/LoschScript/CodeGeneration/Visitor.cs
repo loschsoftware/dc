@@ -545,8 +545,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             Type _t = Visit(child);
 
-            if (_t != typeof(void))
+            if (_t != typeof(void) && CurrentMethod.SkipPop)
                 CurrentMethod.IL.Emit(OpCodes.Pop);
+
+            if (CurrentMethod.SkipPop)
+                CurrentMethod.SkipPop = false;
         }
 
         // Last expression is like return statement
