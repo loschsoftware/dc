@@ -2440,7 +2440,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 Column = context.Identifier().Symbol.Column,
                 Length = context.Identifier().GetText().Length,
                 Color = context.Var() == null ? Color.LocalValue : Color.LocalVariable,
-                ToolTip = TooltipGenerator.Local(context.Identifier().GetText(), context.Var() != null, local.Builder),
+                ToolTip = TooltipGenerator.Local(context.Identifier().GetText(), true, local.Builder),
                 IsNavigationTarget = false
             });
 
