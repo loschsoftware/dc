@@ -2377,6 +2377,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             Type type = Visit(context.expression());
 
+            // I don't know why the fuck I'm creating a temporary local here...????
+            // But I'm gonna keep it because I'm sure it's needed somewhere somehow
+
             LocalBuilder tempLocalBuilder = CurrentMethod.IL.DeclareLocal(type);
 
 #if !NET7_COMPATIBLE
@@ -2430,6 +2433,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             EmitStloc(CurrentMethod.IL, local.Index);
 
             EmitLdloc(CurrentMethod.IL, local.Index);
+
+            CurrentFile.Fragments.Add(new()
+            {
+                Line = context.Identifier().Symbol.Line,
+                Column = context.Identifier().Symbol.Column,
+                Length = context.Identifier().GetText().Length,
+                Color = context.Var() == null ? Color.LocalValue : Color.LocalVariable,
+                ToolTip = TooltipGenerator.Local(context.Identifier().GetText(), context.Var() != null, local.Builder),
+                IsNavigationTarget = false
+            });
 
             return local.Builder.LocalType;
         }
