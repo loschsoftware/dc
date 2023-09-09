@@ -50,7 +50,10 @@ public static class FileCompiler
             Context.ReferencedAssemblies.AddRange(refsToAdd);
 
         IParseTree compilationUnit = parser.compilation_unit();
-        Visitor v = new();
+
+        ExpressionEvaluator eval = new();
+
+        Visitor v = new(eval);
         v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
 
         return CurrentFile.Errors.ToArray();
@@ -94,7 +97,10 @@ public static class FileCompiler
                 Context.ReferencedAssemblies.AddRange(refsToAdd);
 
             IParseTree compilationUnit = parser.compilation_unit();
-            Visitor v = new();
+
+            ExpressionEvaluator eval = new();
+
+            Visitor v = new(eval);
             v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
 
             ffrag.Fragments.AddRange(CurrentFile.Fragments);

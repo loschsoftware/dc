@@ -14,11 +14,16 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LoschScript.CodeGeneration;
 
 internal class Visitor : LoschScriptParserBaseVisitor<Type>
 {
+    private readonly ExpressionEvaluator eval;
+
+    public Visitor(ExpressionEvaluator evaluator) => eval = evaluator;
+
     public override Type VisitCompilation_unit([NotNull] LoschScriptParser.Compilation_unitContext context)
     {
         if (context.import_directive().Length > 1)
@@ -2223,54 +2228,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitString_atom([NotNull] LoschScriptParser.String_atomContext context)
     {
-        string text = context.GetText()[1..^1];
-
-        if (context.Verbatim_String_Literal() != null)
-        {
-            string verbatimText = text[1..];
-
-            Regex doubleQuote = new(@"""""");
-            foreach (Match match in doubleQuote.Matches(verbatimText))
-            {
-                CurrentFile.Fragments.Add(new()
-                {
-                    Color = Color.StringEscapeSequence,
-                    Length = match.Length,
-                    Line = context.Start.Line,
-                    Column = context.Start.Column + match.Index + 1,
-                });
-            }
-
-            CurrentMethod.IL.Emit(OpCodes.Ldstr, verbatimText);
-            return typeof(string);
-        }
-
-        Regex escapeSequenceRegex = new(@"\^(?:['""^0abfnrtv]|[0-9A-Fa-f]{1,4})");
-        foreach (Match match in escapeSequenceRegex.Matches(text))
-        {
-            CurrentFile.Fragments.Add(new()
-            {
-                Color = Color.StringEscapeSequence,
-                Length = match.Length,
-                Line = context.Start.Line,
-                Column = context.Start.Column + match.Index + 1,
-            });
-        }
-
-        string rawText = context.GetText()[1..^1]
-            .Replace("^'", "'")
-            .Replace("^\"", "\"")
-            .Replace("^^", "^")
-            .Replace("^0", "\0")
-            .Replace("^a", "\a")
-            .Replace("^b", "\b")
-            .Replace("^f", "\f")
-            .Replace("^n", "\n")
-            .Replace("^r", "\r")
-            .Replace("^t", "\t")
-            .Replace("^v", "\v");
-
-        // TODO: Handle Hex and Unicode escape sequences
+        string rawText = eval.VisitString_atom(context).Value;
 
         CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
 
@@ -2279,18 +2237,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitCharacter_atom([NotNull] LoschScriptParser.Character_atomContext context)
     {
-        char rawChar = char.Parse(context.GetText()
-            .Replace("^'", "'")
-            .Replace("^\"", "\"")
-            .Replace("^^", "^")
-            .Replace("^0", "\0")
-            .Replace("^a", "\a")
-            .Replace("^b", "\b")
-            .Replace("^f", "\f")
-            .Replace("^n", "\n")
-            .Replace("^r", "\r")
-            .Replace("^t", "\t")
-            .Replace("^v", "\v")[1..^1]);
+        char rawChar = eval.VisitCharacter_atom(context).Value;
 
         CurrentMethod.IL.Emit(OpCodes.Ldc_I4, rawChar);
 
