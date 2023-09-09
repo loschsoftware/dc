@@ -40,4 +40,6 @@ internal class ProgramContext
     public TypeContext GetType(string name) => Types.Where(t => t.FullName == name).First();
 
     public LSConfig Configuration { get; set; }
+
+    public bool ShouldThrowLS0027 { get; set; } = false;
 }

@@ -527,11 +527,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         Context.Types.Add(tc);
 
-        if (context.expression().Length == 0)
+        if ((context.expression().Length == 0 && Context.Files.Last() == CurrentFile) || (Context.ShouldThrowLS0027 && Context.Files.Last() == CurrentFile))
         {
             EmitErrorMessage(0, 0, context.GetText().Length, LS0027_EmptyProgram, "The program does not contain any executable code.");
             return typeof(void);
         }
+        else if (context.expression().Length == 0)
+            Context.ShouldThrowLS0027 = true;
 
         foreach (IParseTree child in context.children.Take(context.children.Count - 1))
         {
