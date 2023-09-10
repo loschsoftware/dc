@@ -1,7 +1,12 @@
 ﻿using Antlr4.Runtime.Misc;
+using LoschScript.CLI;
 using LoschScript.Parser;
+using LoschScript.Runtime;
 using LoschScript.Text;
 using System;
+using System.Globalization;
+using System.Linq;
+using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 
 namespace LoschScript.CodeGeneration;
@@ -135,5 +140,99 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
 
         text += "00";
         return new(typeof(int), int.Parse(text[0..^2].Replace("'", "")));
+    }
+
+    public override Expression VisitReal_atom([NotNull] LoschScriptParser.Real_atomContext context)
+    {
+        string text = context.GetText();
+
+        if (text.EndsWith("s"))
+            return new(typeof(float), float.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
+
+        if (text.EndsWith("d"))
+            return new(typeof(double), double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
+
+        if (text.EndsWith("m"))
+        {
+            // TODO: Apparently decimals are a pain in the ass... For now we'll cheat and emit doubles instead
+            return new(typeof(double), double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
+        }
+
+        return new(typeof(double), double.Parse(text.Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
+    }
+
+    public override Expression VisitBoolean_atom([NotNull] LoschScriptParser.Boolean_atomContext context)
+    {
+        return new(typeof(bool), context.False() == null);
+    }
+
+    public override Expression VisitType_name([NotNull] LoschScriptParser.Type_nameContext context)
+    {
+        if (context.identifier_atom() != null)
+            return Visit(context.identifier_atom());
+
+        if (context.builtin_type_alias() != null)
+        {
+            string dotNetTypeName = $"System.{context.GetText() switch
+            {
+                "int8" => "SByte",
+                "uint8" => "Byte",
+                "int16" => "Int16",
+                "uint16" => "UInt16",
+                "int32" => "Int32",
+                "uint32" => "UInt32",
+                "int64" => "Int64",
+                "uint64" => "UInt64",
+                "float32" => "Single",
+                "float64" => "Double",
+                "decimal" => "Decimal",
+                "native" => "IntPtr",
+                "unative" => "UIntPtr",
+                "bool" => "Boolean",
+                "string" => "String",
+                "char" => "Char",
+                _ => "Object"
+            }}";
+
+            Type t = Helpers.ResolveTypeName(
+                        dotNetTypeName,
+                        context.Start.Line,
+                        context.Start.Column,
+                        context.GetText().Length);
+
+            return new(t, t);
+        }
+
+        if (context.Bar() != null)
+        {
+            UnionValue union = new(null, context.type_name().Select(VisitType_name).Select(e => e.Type).ToArray());
+            CurrentMethod.CurrentUnion = union;
+
+            if (union.AllowedTypes.Distinct().Count() < union.AllowedTypes.Length)
+            {
+                EmitWarningMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.GetText().Length,
+                    LS0047_UnionTypeDuplicate,
+                    "The union type contains duplicate cases.");
+            }
+
+            return new(union.GetType(), union.GetType());
+        }
+
+        // TODO: Implement the other types
+        return new(typeof(object), typeof(object));
+    }
+
+    public override Expression VisitEmpty_atom([NotNull] LoschScriptParser.Empty_atomContext context)
+    {
+        return new(typeof(object), null);
+    }
+
+    public override Expression VisitIndex([NotNull] LoschScriptParser.IndexContext context)
+    {
+        Expression a = Visit(context.integer_atom());
+        return new(typeof(Index), new Index(a.Value, context.Caret() != null));
     }
 }

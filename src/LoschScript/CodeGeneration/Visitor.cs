@@ -680,9 +680,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
 
             if (context.op.Text == "<" || context.op.Text == ">=")
-                EmitClt(CurrentMethod.IL, t);
+                EmitClt(t);
             else
-                EmitCgt(CurrentMethod.IL, t);
+                EmitCgt(t);
 
             if (context.op.Text == "<=" || context.op.Text == ">=")
             {
@@ -983,7 +983,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t))
         {
-            EmitMul(CurrentMethod.IL, t);
+            EmitMul(t);
             return t;
         }
 
@@ -1014,7 +1014,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t))
         {
-            EmitDiv(CurrentMethod.IL, t);
+            EmitDiv(t);
             return t;
         }
 
@@ -1045,7 +1045,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t) && Helpers.IsNumericType(t2))
         {
-            EmitAdd(CurrentMethod.IL, t);
+            EmitAdd(t);
             return t;
         }
 
@@ -1054,8 +1054,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (t2 != typeof(string))
             {
                 CurrentMethod.IL.DeclareLocal(t2);
-                EmitStloc(CurrentMethod.IL, ++CurrentMethod.LocalIndex);
-                EmitLdloca(CurrentMethod.IL, CurrentMethod.LocalIndex);
+                EmitStloc(++CurrentMethod.LocalIndex);
+                EmitLdloca(CurrentMethod.LocalIndex);
 
                 MethodInfo toString = t2.GetMethod("ToString", Array.Empty<Type>());
                 CurrentMethod.IL.EmitCall(Helpers.GetCallOpCode(t2), toString, null);
@@ -1067,8 +1067,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
                 CurrentMethod.IL.DeclareLocal(t);
-                EmitStloc(CurrentMethod.IL, ++CurrentMethod.LocalIndex);
-                EmitLdloca(CurrentMethod.IL, CurrentMethod.LocalIndex);
+                EmitStloc(++CurrentMethod.LocalIndex);
+                EmitLdloca(CurrentMethod.LocalIndex);
 
                 MethodInfo toString = t.GetMethod("ToString", Array.Empty<Type>());
                 CurrentMethod.IL.EmitCall(Helpers.GetCallOpCode(t), toString, null);
@@ -1109,7 +1109,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t))
         {
-            EmitSub(CurrentMethod.IL, t);
+            EmitSub(t);
             return t;
         }
 
@@ -1140,7 +1140,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsNumericType(t))
         {
-            EmitRem(CurrentMethod.IL, t);
+            EmitRem(t);
             return t;
         }
 
@@ -1232,7 +1232,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         if (Helpers.IsIntegerType(t))
         {
-            EmitShr(CurrentMethod.IL, t);
+            EmitShr(t);
             return t;
         }
 
@@ -1560,7 +1560,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 try
                 {
                     // Constant
-                    EmitConst(CurrentMethod.IL, f.GetRawConstantValue());
+                    EmitConst(f.GetRawConstantValue());
                 }
                 catch (Exception)
                 {
@@ -1752,7 +1752,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             try
             {
                 // Constant
-                EmitConst(CurrentMethod.IL, f.GetRawConstantValue());
+                EmitConst(f.GetRawConstantValue());
             }
             catch (Exception)
             {
@@ -1790,90 +1790,95 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
     {
-        // Check for local or argument of this name
-        SymbolInfo sym = Helpers.GetSymbol(context.Identifier().GetText());
-
-        if (sym != null)
-            return sym.Type();
-
-        Type t = Visit(context.expression());
-
-        if (t.IsValueType)
-        {
-            CurrentMethod.IL.DeclareLocal(t);
-            CurrentMethod.LocalIndex++;
-            CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
-            EmitLdloca(CurrentMethod.IL, CurrentMethod.LocalIndex);
-        }
-
-        return GetMember(t, context.Identifier().GetText(), context.arglist(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
+        return base.VisitMember_access_expression(context);
     }
 
-    public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
-    {
-        Type type;
+    //public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
+    //{
+    // Check for local or argument of this name
+    //SymbolInfo sym = Helpers.GetSymbol(context.Identifier().GetText());
 
-        SymbolInfo symbol = Helpers.GetSymbol(context.full_identifier().Identifier()[0].GetText());
+    //if (sym != null)
+    //    return sym.Type();
 
-        if (symbol != null)
-        {
-            type = symbol.Type();
+    //Type t = Visit(context.expression());
 
-            CurrentFile.Fragments.Add(symbol.GetFragment(
-                context.full_identifier().Identifier()[0].Symbol.Line,
-                context.full_identifier().Identifier()[0].Symbol.Column,
-                context.full_identifier().Identifier()[0].GetText().Length,
-                false));
+    //if (t.IsValueType)
+    //{
+    //    CurrentMethod.IL.DeclareLocal(t);
+    //    CurrentMethod.LocalIndex++;
+    //    CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
+    //    EmitLdloca(CurrentMethod.LocalIndex);
+    //}
 
-            if (context.full_identifier().Identifier().Length == 1)
-            {
-                if (type == typeof(UnionValue))
-                {
-                    symbol.LoadAddress();
+    //return GetMember(t, context.Identifier().GetText(), context.arglist(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
+    //}
 
-                    MethodInfo getter = type.GetMethod("get_Value");
-                    CurrentMethod.IL.EmitCall(OpCodes.Call, getter, null);
+    //public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
+    //{
+    //    Type type;
 
-                    return typeof(object);
-                }
+    //    SymbolInfo symbol = Helpers.GetSymbol(context.full_identifier().Identifier()[0].GetText());
 
-                symbol.Load();
+    //    if (symbol != null)
+    //    {
+    //        type = symbol.Type();
 
-                return type;
-            }
+    //        CurrentFile.Fragments.Add(symbol.GetFragment(
+    //            context.full_identifier().Identifier()[0].Symbol.Line,
+    //            context.full_identifier().Identifier()[0].Symbol.Column,
+    //            context.full_identifier().Identifier()[0].GetText().Length,
+    //            false));
 
-            symbol.LoadAddressIfValueType();
-        }
-        else
-        {
-            if (context.full_identifier().Identifier().Length == 1)
-            {
-                // Global Method (Type Import)
-                Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length).Type;
+    //        if (context.full_identifier().Identifier().Length == 1)
+    //        {
+    //            if (type == typeof(UnionValue))
+    //            {
+    //                symbol.LoadAddress();
 
-                if (t != null)
-                    return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
-                else
-                {
-                    Type _t = GetMemberOfCurrentType(context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
+    //                MethodInfo getter = type.GetMethod("get_Value");
+    //                CurrentMethod.IL.EmitCall(OpCodes.Call, getter, null);
 
-                    if (_t != typeof(void))
-                        return _t;
-                }
+    //                return typeof(object);
+    //            }
 
-                // Constructor
-                Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
-                return GetConstructorOrCast(cType, context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
-            }
+    //            symbol.Load();
 
-            type = Helpers.ResolveTypeName(
-                string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
-                context.full_identifier().Identifier()[^2].Symbol.Line, context.full_identifier().Identifier()[^2].Symbol.Column, context.full_identifier().Identifier()[^2].GetText().Length,
-                false);
-        }
+    //            return type;
+    //        }
 
-        return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
-    }
+    //        symbol.LoadAddressIfValueType();
+    //    }
+    //    else
+    //    {
+    //        if (context.full_identifier().Identifier().Length == 1)
+    //        {
+    //            // Global Method (Type Import)
+    //            Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length).Type;
+
+    //            if (t != null)
+    //                return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
+    //            else
+    //            {
+    //                Type _t = GetMemberOfCurrentType(context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
+
+    //                if (_t != typeof(void))
+    //                    return _t;
+    //            }
+
+    //            // Constructor
+    //            Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
+    //            return GetConstructorOrCast(cType, context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
+    //        }
+
+    //        type = Helpers.ResolveTypeName(
+    //            string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
+    //            context.full_identifier().Identifier()[^2].Symbol.Line, context.full_identifier().Identifier()[^2].Symbol.Column, context.full_identifier().Identifier()[^2].GetText().Length,
+    //            false);
+    //    }
+
+    //    return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
+    //}
 
     public override Type VisitArglist([NotNull] LoschScriptParser.ArglistContext context)
     {
@@ -1930,19 +1935,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return Helpers.ResolveTypeName(context.Identifier().GetText(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
     }
 
-    public override Type VisitIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context)
-    {
-        return Visit(context.Identifier());
-    }
-
     public override Type VisitFull_identifier([NotNull] LoschScriptParser.Full_identifierContext context)
     {
         return Helpers.ResolveTypeName(context.GetText(), context.Identifier().Last().Symbol.Line, context.Identifier().Last().Symbol.Column, context.Identifier().Last().GetText().Length);
-    }
-
-    public override Type VisitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context)
-    {
-        return Visit(context.full_identifier());
     }
 
     public override Type VisitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context)
@@ -2262,103 +2257,26 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitReal_atom([NotNull] LoschScriptParser.Real_atomContext context)
     {
-        string text = context.GetText();
+        Expression expr = eval.VisitReal_atom(context);
 
-        if (text.EndsWith("s"))
-        {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, float.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
-            return typeof(float);
-        }
+        if (expr.Type == typeof(float))
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R4, expr.Value);
+        else
+            CurrentMethod.IL.Emit(OpCodes.Ldc_R8, expr.Value);
 
-        if (text.EndsWith("d"))
-        {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R8, double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
-            return typeof(double);
-        }
-
-        if (text.EndsWith("m"))
-        {
-            // TODO: Apparently decimals are a pain in the ass... For now we'll cheat and emit doubles instead
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R8, double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
-            return typeof(double);
-        }
-
-        CurrentMethod.IL.Emit(OpCodes.Ldc_R8, double.Parse(text.Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
-        return typeof(double);
+        return expr.Type;
     }
 
     public override Type VisitInteger_atom([NotNull] LoschScriptParser.Integer_atomContext context)
     {
-        string text = context.GetText();
+        Expression expr = eval.VisitInteger_atom(context);
 
-        if (text.EndsWith("sb", StringComparison.OrdinalIgnoreCase))
-        {
-            EmitLdcI4(CurrentMethod.IL, sbyte.Parse(text[0..^2].Replace("'", "")));
-            return typeof(sbyte);
-        }
+        if (expr.Type == typeof(ulong) || expr.Type == typeof(long))
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I8, expr.Value);
+        else
+            EmitLdcI4(expr.Value);
 
-        if (text.EndsWith("b", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-
-            EmitLdcI4(CurrentMethod.IL, byte.Parse(text[0..^2].Replace("'", "")));
-            return typeof(byte);
-        }
-
-        if (text.EndsWith("us", StringComparison.OrdinalIgnoreCase))
-        {
-            EmitLdcI4(CurrentMethod.IL, ushort.Parse(text[0..^2].Replace("'", "")));
-            return typeof(ushort);
-        }
-
-        if (text.EndsWith("s", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-
-            EmitLdcI4(CurrentMethod.IL, short.Parse(text[0..^2].Replace("'", "")));
-            return typeof(short);
-        }
-
-        if (text.EndsWith("ul", StringComparison.OrdinalIgnoreCase))
-        {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I8, long.Parse(text[0..^2].Replace("'", "")));
-            return typeof(ulong);
-        }
-
-        if (text.EndsWith("u", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-
-            EmitLdcI4(CurrentMethod.IL, uint.Parse(text[0..^2].Replace("'", "")));
-            return typeof(uint);
-        }
-
-        if (text.EndsWith("l", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I8, long.Parse(text[0..^2].Replace("'", "")));
-            return typeof(long);
-        }
-
-        if (text.EndsWith("un", StringComparison.OrdinalIgnoreCase))
-        {
-            EmitLdcI4(CurrentMethod.IL, int.Parse(text[0..^2].Replace("'", "")));
-            return typeof(nuint);
-        }
-
-        if (text.EndsWith("n", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-
-            EmitLdcI4(CurrentMethod.IL, int.Parse(text[0..^2].Replace("'", "")));
-            return typeof(nint);
-        }
-
-        text += "00";
-
-        EmitLdcI4(CurrentMethod.IL, int.Parse(text[0..^2].Replace("'", "")));
-        return typeof(int);
+        return expr.Type;
     }
 
     public override Type VisitString_atom([NotNull] LoschScriptParser.String_atomContext context)
@@ -2381,13 +2299,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitBoolean_atom([NotNull] LoschScriptParser.Boolean_atomContext context)
     {
-        if (context.True() != null)
-        {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)1);
-            return typeof(bool);
-        }
+        Expression val = eval.VisitBoolean_atom(context);
 
-        CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
+        CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)(val.Value ? 1 : 0));
 
         return typeof(bool);
     }
@@ -2423,7 +2337,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.Locals.Add(new(GetTempVariableName(CurrentMethod.TempValueIndex), tempLocalBuilder, true, CurrentMethod.LocalIndex++, new(null, type)));
 
-            EmitStloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
+            EmitStloc(CurrentMethod.LocalIndex);
 
             if (type != sym.Type())
             {
@@ -2433,7 +2347,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     {
                         sym.LoadAddress();
 
-                        EmitLdloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
+                        EmitLdloc(CurrentMethod.LocalIndex);
                         CurrentMethod.IL.Emit(OpCodes.Box, type);
 
                         MethodInfo m = typeof(UnionValue).GetMethod("set_Value", new Type[] { typeof(object) });
@@ -2463,7 +2377,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 return type;
             }
 
-            EmitLdloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
+            EmitLdloc(CurrentMethod.LocalIndex);
 
             sym.Set();
             sym.Load();
@@ -2518,13 +2432,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             UnionValue union = CurrentMethod.CurrentUnion;
 
-            EmitLdcI4(CurrentMethod.IL, union.AllowedTypes.Length);
+            EmitLdcI4(union.AllowedTypes.Length);
             CurrentMethod.IL.Emit(OpCodes.Newarr, typeof(Type));
             CurrentMethod.IL.Emit(OpCodes.Dup);
 
             for (int i = 0; i < union.AllowedTypes.Length; i++)
             {
-                EmitLdcI4(CurrentMethod.IL, i);
+                EmitLdcI4(i);
                 CurrentMethod.IL.Emit(OpCodes.Ldtoken, union.AllowedTypes[i]);
 
                 MethodInfo getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
@@ -2539,68 +2453,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Newobj, constructor);
         }
 
-        EmitStloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
+        EmitStloc(CurrentMethod.LocalIndex);
 
-        EmitLdloc(CurrentMethod.IL, CurrentMethod.LocalIndex);
+        EmitLdloc(CurrentMethod.LocalIndex);
 
         return t;
     }
 
     public override Type VisitType_name([NotNull] LoschScriptParser.Type_nameContext context)
     {
-        if (context.identifier_atom() != null)
-            return Visit(context.identifier_atom());
-
-        if (context.builtin_type_alias() != null)
-        {
-            string dotNetTypeName = $"System.{context.GetText() switch
-            {
-                "int8" => "SByte",
-                "uint8" => "Byte",
-                "int16" => "Int16",
-                "uint16" => "UInt16",
-                "int32" => "Int32",
-                "uint32" => "UInt32",
-                "int64" => "Int64",
-                "uint64" => "UInt64",
-                "float32" => "Single",
-                "float64" => "Double",
-                "decimal" => "Decimal",
-                "native" => "IntPtr",
-                "unative" => "UIntPtr",
-                "bool" => "Boolean",
-                "string" => "String",
-                "char" => "Char",
-                _ => "Object"
-            }}";
-
-            return Helpers.ResolveTypeName(
-                dotNetTypeName,
-                context.Start.Line,
-                context.Start.Column,
-                context.GetText().Length);
-        }
-
-        if (context.Bar() != null)
-        {
-            UnionValue union = new(null, context.type_name().Select(VisitType_name).ToArray());
-            CurrentMethod.CurrentUnion = union;
-
-            if (union.AllowedTypes.Distinct().Count() < union.AllowedTypes.Length)
-            {
-                EmitWarningMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.GetText().Length,
-                    LS0047_UnionTypeDuplicate,
-                    "The union type contains duplicate cases.");
-            }
-
-            return union.GetType();
-        }
-
-        // TODO: Implement the other types
-        return typeof(object);
+        return eval.VisitType_name(context).Type;
     }
 
     public override Type VisitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context)
@@ -2678,14 +2540,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Type arrayType = Visit(context.expression()[0]);
         CurrentMethod.IL.Emit(OpCodes.Pop);
 
-        EmitLdcI4(CurrentMethod.IL, context.expression().Length);
+        EmitLdcI4(context.expression().Length);
         CurrentMethod.IL.Emit(OpCodes.Newarr, arrayType);
 
         int index = 0;
         foreach (IParseTree tree in context.expression())
         {
             CurrentMethod.IL.Emit(OpCodes.Dup);
-            EmitLdcI4(CurrentMethod.IL, index++);
+            EmitLdcI4(index++);
             Type t = Visit(tree);
 
             if (t != arrayType)
@@ -2703,7 +2565,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitEmpty_atom([NotNull] LoschScriptParser.Empty_atomContext context)
     {
         CurrentMethod.IL.Emit(OpCodes.Ldnull);
-        return null;
+        return typeof(object);
     }
 
     public override Type VisitIndex_expression([NotNull] LoschScriptParser.Index_expressionContext context)
@@ -2782,7 +2644,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         Visit(context.integer_atom());
 
-        EmitLdcI4(CurrentMethod.IL, context.Caret() == null ? 0 : 1);
+        EmitLdcI4(context.Caret() == null ? 0 : 1);
 
         CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Index).GetConstructor(new Type[] { typeof(int), typeof(bool) }));
         return typeof(Index);
@@ -2832,7 +2694,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++, new(null, typeof(int))));
 
-            EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
 #if !NET7_COMPATIBLE
             Helpers.SetLocalSymInfo(returnBuilder,
@@ -2860,9 +2722,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 // Save the return value of the current iteration to the returning array
 
                 // Array
-                EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
                 // Index
-                EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
                 tReturn = Visit(context.expression().Last());
 
@@ -2885,9 +2747,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 // Save the return value of the current iteration to the returning array
 
                 // Array
-                EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
                 // Index
-                EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
                 tReturn = Visit(context.code_block().expression().Last());
 
@@ -2903,18 +2765,18 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 }
             }
 
-            EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)1);
             CurrentMethod.IL.Emit(OpCodes.Add);
-            EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
             CurrentMethod.IL.MarkLabel(loop);
 
-            EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
             Visit(context.expression().First());
             CurrentMethod.IL.Emit(OpCodes.Blt, start);
 
-            EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
             return typeof(object[]);
         }
@@ -2930,7 +2792,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++, new(null, typeof(List<string>))));
 
-            EmitStloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
 #if !NET7_COMPATIBLE
             Helpers.SetLocalSymInfo(
@@ -2947,7 +2809,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (context.code_block() == null)
             {
-                EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
                 tReturn = Visit(context.expression().Last());
 
                 if (tReturn == typeof(void))
@@ -2966,7 +2828,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 foreach (IParseTree tree in context.code_block().expression()[..^1])
                     Visit(tree);
 
-                EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
                 tReturn = Visit(context.code_block().expression().Last());
 
                 if (tReturn == typeof(void))
@@ -2986,7 +2848,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Visit(context.expression().First());
             CurrentMethod.IL.Emit(OpCodes.Brtrue, start);
 
-            EmitLdloc(CurrentMethod.IL, CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
             return typeof(List<object>);
         }
