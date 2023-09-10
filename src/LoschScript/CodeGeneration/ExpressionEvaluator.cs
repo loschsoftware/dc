@@ -2,7 +2,6 @@
 using LoschScript.Parser;
 using LoschScript.Text;
 using System;
-using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 
 namespace LoschScript.CodeGeneration;

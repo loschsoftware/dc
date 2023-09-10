@@ -7,9 +7,12 @@ namespace LoschScript.Meta;
 
 internal class MethodContext
 {
-    public MethodContext()
+    public MethodContext(bool add = true)
     {
         CurrentMethod = this;
+
+        if (add)
+            TypeContext.Current.Methods.Add(this);
     }
 
     public static string GetThrowawayCounterVariableName(int index)

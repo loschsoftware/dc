@@ -13,8 +13,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LoschScript.CodeGeneration;
 
@@ -511,6 +509,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context)
     {
+        if ((context.expression().Length == 0 && Context.Files.Count < 2) || (Context.Files.Last() == CurrentFile && Context.ShouldThrowLS0027))
+        {
+            EmitErrorMessage(0, 0, context.GetText().Length, LS0027_EmptyProgram, "The program does not contain any executable code.");
+            return typeof(void);
+        }
+        else if (context.expression().Length == 0)
+            Context.ShouldThrowLS0027 = true;
+
+        if (context.children == null)
+            return typeof(void);
+
         TypeBuilder tb = Context.Module.DefineType($"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}Program");
 
         TypeContext tc = new()
@@ -534,18 +543,10 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         Context.Types.Add(tc);
 
-        if ((context.expression().Length == 0 && Context.Files.Last() == CurrentFile) || (Context.ShouldThrowLS0027 && Context.Files.Last() == CurrentFile))
-        {
-            EmitErrorMessage(0, 0, context.GetText().Length, LS0027_EmptyProgram, "The program does not contain any executable code.");
-            return typeof(void);
-        }
-        else if (context.expression().Length == 0)
-            Context.ShouldThrowLS0027 = true;
-
         foreach (IParseTree child in context.children.Take(context.children.Count - 1))
         {
             Type _t = Visit(child);
-            
+
             if (_t != typeof(void) && !CurrentMethod.SkipPop)
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
@@ -629,7 +630,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                         context.op.Column,
                         context.op.Text.Length,
                         LS0036_ArithmeticError,
-                        $"The type '{t.Name}' does not implement the equality operation.",
+                        $"The type '{t.Name}' does not implement an equality operation with the specified operand types.",
                         Path.GetFileName(CurrentFile.Path));
 
                 return typeof(bool);
@@ -648,7 +649,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                         context.op.Column,
                         context.op.Text.Length,
                         LS0036_ArithmeticError,
-                        $"The type '{t.Name}' does not implement the inequality operation.",
+                        $"The type '{t.Name}' does not implement an inequality operation with the specified operand types.",
                         Path.GetFileName(CurrentFile.Path));
 
                 return typeof(bool);
@@ -709,7 +710,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     context.op.Column,
                     context.op.Text.Length,
                     LS0036_ArithmeticError,
-                    $"The type '{t.Name}' does not implement this comparison operation.",
+                    $"The type '{t.Name}' does not implement a comparison operation with the specified operand types.",
                     Path.GetFileName(CurrentFile.Path));
 
             return typeof(bool);
@@ -739,7 +740,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                         context.Minus().Symbol.Column,
                         context.Minus().GetText().Length,
                     LS0036_ArithmeticError,
-                    $"The type '{t.Name}' does not implement the unary negation operation.",
+                    $"The type '{t.Name}' does not implement the unary negation operation with the specified operand types.",
                     Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -797,7 +798,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Exclamation_Mark().Symbol.Column,
                 context.Exclamation_Mark().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement the logical negation operation.",
+                $"The type '{t.Name}' does not implement the logical negation operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1460,6 +1461,133 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return cType;
     }
 
+    public Type GetMemberOfCurrentType(string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length, SymbolInfo sym = null)
+    {
+        if (arglist != null)
+        {
+            Visit(arglist);
+
+            if (!TypeContext.Current.Methods.Any(m => m.Builder.Name == name))
+                return null;
+
+            if (!TypeContext.Current.Methods.Any(m => m.Builder.GetParameters().Select(p => p.ParameterType).ToList() == CurrentMethod.ArgumentTypesForNextMethodCall))
+                return null;
+
+            MethodInfo m = TypeContext.Current.Methods.First(m => m.Builder.GetParameters().Select(p => p.ParameterType).ToList() == CurrentMethod.ArgumentTypesForNextMethodCall).Builder;
+
+            CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+
+            if (m != null)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = line,
+                    Column = column,
+                    Length = length,
+                    Color = Color.Function,
+                    ToolTip = TooltipGenerator.Function(m)
+                });
+
+                if (m.IsStatic || TypeContext.Current.Builder.IsValueType)
+                    CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
+                else
+                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
+
+                return m.ReturnType;
+            }
+        }
+
+        if (TypeContext.Current.Methods.Any(m => m.Builder.GetParameters().Length == 0))
+        {
+            MethodInfo parameterlessFunc = TypeContext.Current.Methods.First(m => m.Builder.GetParameters().Length == 0).Builder;
+            if (parameterlessFunc != null)
+            {
+                if (parameterlessFunc.IsStatic || TypeContext.Current.Builder.IsValueType)
+                {
+                    if (parameterlessFunc.DeclaringType == typeof(object))
+                    {
+                        CurrentMethod.IL.Emit(OpCodes.Pop);
+                        sym.Load();
+                        CurrentMethod.IL.Emit(OpCodes.Box, sym.Type());
+                    }
+
+                    CurrentMethod.IL.EmitCall(OpCodes.Call, parameterlessFunc, null);
+                }
+                else
+                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, parameterlessFunc, null);
+
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = line,
+                    Column = column,
+                    Length = length,
+                    Color = Color.Function,
+                    ToolTip = TooltipGenerator.Function(parameterlessFunc)
+                });
+
+                return parameterlessFunc.ReturnType;
+            }
+        }
+
+        if (TypeContext.Current.Methods.Any(m => m.Builder.Name == $"get_{name}"))
+        {
+            MethodInfo property = TypeContext.Current.Methods.First(m => m.Builder.Name == $"get_{name}").Builder;
+            if (property != null)
+            {
+                if (property.IsStatic || TypeContext.Current.Builder.IsValueType)
+                    CurrentMethod.IL.EmitCall(OpCodes.Call, property, null);
+                else
+                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, property, null);
+
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = line,
+                    Column = column,
+                    Length = length,
+                    Color = Color.Property,
+                    ToolTip = TooltipGenerator.Property(TypeContext.Current.Builder.GetProperty(name))
+                });
+
+                return property.ReturnType;
+            }
+        }
+
+        if (TypeContext.Current.Fields.Any(m => m.Builder.Name == name))
+        {
+            FieldInfo f = TypeContext.Current.Fields.First(m => m.Builder.Name == name).Builder;
+            if (f != null)
+            {
+                try
+                {
+                    // Constant
+                    EmitConst(CurrentMethod.IL, f.GetRawConstantValue());
+                }
+                catch (Exception)
+                {
+                    // Not a constant
+
+                    if (f.IsStatic)
+                        CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
+                    else
+                        CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
+                }
+
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = line,
+                    Column = column,
+                    Length = length,
+                    Color = Color.Field,
+                    ToolTip = TooltipGenerator.Field(f)
+                });
+
+                return f.FieldType;
+            }
+        }
+
+        return typeof(void);
+    }
+
     public Type GetMember(Type type, string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length, SymbolInfo sym = null)
     {
         // Handle special functions of CodeGeneration class
@@ -1725,6 +1853,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 if (t != null)
                     return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
+                else
+                {
+                    Type _t = GetMemberOfCurrentType(context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
+
+                    if (_t != typeof(void))
+                        return _t;
+                }
 
                 // Constructor
                 Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);

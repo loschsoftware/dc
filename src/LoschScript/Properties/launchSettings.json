@@ -6,7 +6,7 @@
     },
     "default": {
       "commandName": "Project",
-      "commandLineArgs": "code.txt"
+      "commandLineArgs": "build"
     }
   }
 }
