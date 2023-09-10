@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 
 namespace LoschScript.Meta;
 
-internal class SymbolInfo
+internal class SymbolInfo : SymbolContextBase
 {
     public enum SymType
     {
