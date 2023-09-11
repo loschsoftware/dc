@@ -471,20 +471,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>typeof_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -652,20 +638,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>full_identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>full_identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

@@ -38,9 +38,8 @@ code_block
     ;
 
 expression
-    : full_identifier arglist? #full_identifier_member_access_expression
-    | full_identifier #full_identifier_expression
-    | Identifier #identifier_expression
+    : expression (Dot Identifier)+ arglist? #member_access_expression
+    | full_identifier arglist? #full_identifier_member_access_expression
     | Tilde expression #bitwise_complement_expression
     | expression At_Sign expression Equals expression #array_element_assignment
     | expression Double_Asterisk expression #power_expression
@@ -64,14 +63,13 @@ expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
     | (Var | Val)? Identifier (Colon type_name)? Equals expression #local_declaration_or_assignment
-    | expression Dot Identifier arglist? #member_access_expression
     | expression Arrow_Right expression #right_pipe_expression
     | expression Arrow_Left expression #left_pipe_expression
     | expression Dot Identifier #dotted_expression
     | range #range_expression
     | expression At_Sign expression #index_expression
     | attribute+ expression #attributed_expression
-    | if_branch NewLine* elif_branch* NewLine* else_branch?  #prefix_if_expression
+    | if_branch NewLine* elif_branch* NewLine* else_branch? #prefix_if_expression
     | expression postfix_if_branch #postfix_if_expression
     | code_block NewLine? postfix_if_branch #block_postfix_if_expression
     | unless_branch NewLine* else_unless_branch* NewLine* else_branch? #prefix_unless_expression

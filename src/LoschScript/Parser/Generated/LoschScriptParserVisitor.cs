@@ -250,13 +250,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>typeof_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -340,13 +333,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>full_identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

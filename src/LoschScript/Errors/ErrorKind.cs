@@ -236,5 +236,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when multiple functions are declared as application entry points.
     /// </summary>
-    LS0055_MultipleEntryPoints
+    LS0055_MultipleEntryPoints,
+    /// <summary>
+    /// Generic error emitted when a symbol of various kinds could not be resolved.
+    /// </summary>
+    LS0056_SymbolResolveError
 }

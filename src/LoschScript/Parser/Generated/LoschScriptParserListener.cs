@@ -402,18 +402,6 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitIdentifier_expression([NotNull] LoschScriptParser.Identifier_expressionContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>typeof_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -557,18 +545,6 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>full_identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>full_identifier_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitFull_identifier_expression([NotNull] LoschScriptParser.Full_identifier_expressionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

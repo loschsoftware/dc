@@ -350,16 +350,16 @@ internal static class Helpers
         switch (sym.SymbolType)
         {
             case SymbolInfo.SymType.Local:
-                EmitLdloca(CurrentMethod.IL, sym.Local.Index);
+                EmitLdloca(sym.Local.Index);
                 break;
 
             case SymbolInfo.SymType.Parameter:
-                EmitLdarga(CurrentMethod.IL, sym.Parameter.Index);
+                EmitLdarga(sym.Parameter.Index);
                 break;
 
             default:
                 if (!sym.Field.Builder.IsStatic)
-                    EmitLdarg0IfCurrentType(CurrentMethod.IL, sym.Field.Builder.FieldType);
+                    EmitLdarg0IfCurrentType(sym.Field.Builder.FieldType);
 
                 CurrentMethod.IL.Emit(sym.Field.Builder.IsStatic ? OpCodes.Ldsflda : OpCodes.Ldflda, sym.Field.Builder);
                 break;
@@ -371,16 +371,16 @@ internal static class Helpers
         switch (sym.SymbolType)
         {
             case SymbolInfo.SymType.Local:
-                EmitLdloc(CurrentMethod.IL, sym.Local.Index);
+                EmitLdloc(sym.Local.Index);
                 break;
 
             case SymbolInfo.SymType.Parameter:
-                EmitLdarg(CurrentMethod.IL, sym.Parameter.Index);
+                EmitLdarg(sym.Parameter.Index);
                 break;
 
             default:
                 if (!sym.Field.Builder.IsStatic)
-                    EmitLdarg0IfCurrentType(CurrentMethod.IL, sym.Field.Builder.FieldType);
+                    EmitLdarg0IfCurrentType(sym.Field.Builder.FieldType);
 
                 CurrentMethod.IL.Emit(sym.Field.Builder.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, sym.Field.Builder);
                 break;
@@ -744,7 +744,7 @@ internal static class Helpers
                 }
 
                 string arg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
-                EmitInlineIL(CurrentMethod.IL, arg, args.expression()[0].Start.Line, args.expression()[0].Start.Column + 1, args.expression()[0].GetText().Length);
+                EmitInlineIL(arg, args.expression()[0].Start.Line, args.expression()[0].Start.Column + 1, args.expression()[0].GetText().Length);
                 
                 return true;
 

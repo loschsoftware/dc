@@ -96,7 +96,7 @@ internal class SymbolInfo
         switch (SymbolType)
         {
             case SymType.Local:
-                EmitStloc(CurrentMethod.IL, Local.Index);
+                EmitStloc(Local.Index);
                 break;
 
             case SymType.Parameter:
@@ -108,7 +108,7 @@ internal class SymbolInfo
                     CurrentMethod.IL.Emit(OpCodes.Stsfld, Field.Builder);
                 else
                 {
-                    EmitLdarg0IfCurrentType(CurrentMethod.IL, Field.Builder.FieldType);
+                    EmitLdarg0IfCurrentType(Field.Builder.FieldType);
                     CurrentMethod.IL.Emit(OpCodes.Stfld, Field.Builder);
                 }
                 break;
