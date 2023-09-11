@@ -13,6 +13,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.Serialization;
 
 namespace LoschScript.CodeGeneration;
 
@@ -1788,9 +1789,129 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
     }
 
+    public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
+    {
+        Type t = SymbolResolver.GetSmallestTypeFromLeft(
+            context.full_identifier(),
+            context.full_identifier().Start.Line,
+            context.full_identifier().Start.Column,
+            context.full_identifier().GetText().Length,
+            out int firstIndex);
+
+        BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
+
+        foreach (ITerminalNode identifier in context.full_identifier().Identifier()[firstIndex..])
+        {
+            Type[] _params = null;
+
+            if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null)
+            {
+                Visit(context.arglist());
+                _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+            }
+
+            object member = SymbolResolver.ResolveMember(
+                t,
+                identifier.GetText(),
+                identifier.Symbol.Line,
+                identifier.Symbol.Column,
+                identifier.GetText().Length,
+                false,
+                _params,
+                flags);
+
+            if (member == null)
+                return null;
+
+            if (member is FieldInfo f)
+            {
+                LoadField(f);
+                t = f.FieldType;
+            }
+
+            else if (member is PropertyInfo p)
+            {
+                EmitCall(t, p.GetGetMethod());
+                t = p.PropertyType;
+            }
+
+            else if (member is MethodInfo m)
+            {
+                EmitCall(t, m);
+                t = m.ReturnType;
+            }
+        }
+
+        return t;
+    }
+
     public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
     {
-        return base.VisitMember_access_expression(context);
+        CurrentMethod.ShouldLoadAddressIfValueType = true;
+        CurrentMethod.IgnoreTypesInSymbolResolve = true;
+
+        Type t = Visit(context.expression());
+        BindingFlags flags = BindingFlags.Public;
+
+        if (CurrentMethod.StaticCallType != null)
+        {
+            t = CurrentMethod.StaticCallType;
+            flags |= BindingFlags.Static;
+
+            CurrentMethod.StaticCallType = null;
+        }
+
+        if (t.IsValueType)
+        {
+            CurrentMethod.IL.DeclareLocal(t);
+            CurrentMethod.LocalIndex++;
+            EmitStloc(CurrentMethod.LocalIndex);
+            EmitLdloca(CurrentMethod.LocalIndex);
+        }
+
+        foreach (ITerminalNode identifier in context.Identifier())
+        {
+            Type[] _params = null;
+
+            if (identifier == context.Identifier().Last() && context.arglist() != null)
+            {
+                Visit(context.arglist());
+                _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+            }
+
+            object member = SymbolResolver.ResolveMember(
+                t,
+                identifier.GetText(),
+                identifier.Symbol.Line,
+                identifier.Symbol.Column,
+                identifier.GetText().Length,
+                false,
+                _params,
+                flags);
+
+            if (member == null)
+                return null;
+
+            if (member is FieldInfo f)
+            {
+                LoadField(f);
+                t = f.FieldType;
+            }
+
+            else if (member is PropertyInfo p)
+            {
+                EmitCall(t, p.GetGetMethod());
+                t = p.PropertyType;
+            }
+
+            else if (member is MethodInfo m)
+            {
+                EmitCall(t, m);
+                t = m.ReturnType;
+            }
+        }
+
+        return t;
     }
 
     //public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
@@ -1924,21 +2045,96 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitIdentifier_atom([NotNull] LoschScriptParser.Identifier_atomContext context)
     {
-        SymbolInfo sym = Helpers.GetSymbol(context.Identifier().GetText());
+        string text = context.Identifier() != null
+            ? context.Identifier().GetText()
+            : context.full_identifier().GetText();
 
-        if (sym != null)
+        object obj = SymbolResolver.ResolveIdentifier(
+            text,
+            context.Start.Line,
+            context.Start.Column,
+            text.Length);
+
+        if (obj == null)
         {
-            sym.Load();
-            return sym.Type();
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                text.Length,
+                LS0056_SymbolResolveError,
+                $"The name '{text}' could not be resolved.");
+
+            return null;
         }
 
-        return Helpers.ResolveTypeName(context.Identifier().GetText(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
+        if (obj is ParamInfo p)
+        {
+            SymbolInfo s = new()
+            {
+                Parameter = p,
+                SymbolType = SymbolInfo.SymType.Parameter
+            };
+
+            if (CurrentMethod.ShouldLoadAddressIfValueType)
+                s.LoadAddressIfValueType();
+            else
+                s.Load();
+
+            return p.Type;
+        }
+
+        else if (obj is LocalInfo l)
+        {
+            SymbolInfo s = new()
+            {
+                Local = l,
+                SymbolType = SymbolInfo.SymType.Local
+            };
+
+            if (CurrentMethod.ShouldLoadAddressIfValueType)
+                s.LoadAddressIfValueType();
+            else
+                s.Load();
+
+            return l.Builder.LocalType;
+        }
+
+        else if (obj is MethodBuilder m)
+        {
+            EmitCall(m.DeclaringType, m);
+
+            if (m.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType)
+            {
+                CurrentMethod.IL.DeclareLocal(m.ReturnType);
+                CurrentMethod.LocalIndex++;
+                CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
+                EmitLdloca(CurrentMethod.LocalIndex);
+            }
+
+            return m.ReturnType;
+        }
+
+        else if (obj is Type t)
+        {
+            if (CurrentMethod.IgnoreTypesInSymbolResolve)
+            {
+                CurrentMethod.StaticCallType = t;
+
+                CurrentMethod.IgnoreTypesInSymbolResolve = false;
+                return typeof(Type);
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
+            return typeof(RuntimeTypeHandle);
+        }
+
+        return null;
     }
 
-    public override Type VisitFull_identifier([NotNull] LoschScriptParser.Full_identifierContext context)
-    {
-        return Helpers.ResolveTypeName(context.GetText(), context.Identifier().Last().Symbol.Line, context.Identifier().Last().Symbol.Column, context.Identifier().Last().GetText().Length);
-    }
+    //public override Type VisitFull_identifier([NotNull] LoschScriptParser.Full_identifierContext context)
+    //{
+    //    return Helpers.ResolveTypeName(context.GetText(), context.Identifier().Last().Symbol.Line, context.Identifier().Last().Symbol.Column, context.Identifier().Last().GetText().Length);
+    //}
 
     public override Type VisitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context)
     {

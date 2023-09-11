@@ -404,6 +404,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>full_identifier_member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>implementation_query_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

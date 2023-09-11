@@ -666,6 +666,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>full_identifier_member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>full_identifier_member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>implementation_query_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

@@ -58,4 +58,10 @@ internal class MethodContext
     public bool SkipPop { get; set; }
 
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
+
+    public bool ShouldLoadAddressIfValueType { get; set; } = false;
+
+    public Type StaticCallType { get; set; }
+
+    public bool IgnoreTypesInSymbolResolve { get; set; } = false;
 }

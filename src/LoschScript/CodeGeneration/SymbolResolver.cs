@@ -3,24 +3,56 @@ using LoschScript.Parser;
 using LoschScript.Text.Tooltips;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using System.Xml.Linq;
 
 namespace LoschScript.CodeGeneration;
 
 internal static class SymbolResolver
 {
-    public static object ResolveIdentifier(LoschScriptParser.Identifier_atomContext context, int row, int col, int len, bool noEmitFragments = false)
+    public static Type GetSmallestTypeFromLeft(LoschScriptParser.Full_identifierContext fullId, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
     {
-        string text;
+        string[] parts = fullId.Identifier().Select(f => f.GetText()).ToArray();
+        firstUnusedPart = 0;
 
-        if (context.Identifier() != null)
-            text = context.Identifier().GetText();
-        else
-            text = context.full_identifier().GetText();
+        string typeString = "";
 
+        for (int i = 1; i < parts.Length; i++)
+        {
+            typeString = string.Join(".", parts[0..i]);
+            firstUnusedPart++;
+
+            if (ResolveIdentifier(typeString, row, col, len, true) is Type t)
+            {
+                if (!noEmitFragments)
+                {
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = len,
+                        Color = TooltipGenerator.ColorForType(t.GetTypeInfo()),
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.Type(t.GetTypeInfo(), false, true)
+                    });
+                }
+
+                return t;
+            }
+        }
+
+        EmitErrorMessage(
+            row,
+            col,
+            len,
+            LS0002_MethodNotFound,
+            $"Could not resolve name '{typeString}'.");
+
+        return null;
+    }
+
+    public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false)
+    {
         // 1. Parameters
         if (CurrentMethod.Parameters.Any(p => p.Name == text))
             return CurrentMethod.Parameters.First(p => p.Name == text);
@@ -31,7 +63,7 @@ internal static class SymbolResolver
 
         // 3. Members of current class
         if (TypeContext.Current.Methods.Select(m => m.Builder).Any(m => m.Name == text))
-            return TypeContext.Current.Methods.Select(m => m.Builder).Where(m => m.Name == text).ToList();
+            return TypeContext.Current.Methods.Select(m => m.Builder).First(m => m.Name == text);
 
         // 4. Members of type-imported types ("global members")
         if (TryGetGlobalMember(text, out object globals, row, col, len))
@@ -42,6 +74,84 @@ internal static class SymbolResolver
             return t;
 
         // 6. Members of other classes
+        return null;
+    }
+
+    public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public)
+    {
+        // 1. Fields
+        FieldInfo f = type.GetField(name, flags);
+        if (f != null)
+        {
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = len,
+                    Color = Text.Color.Field,
+                    IsNavigationTarget = false,
+                    ToolTip = TooltipGenerator.Field(f)
+                });
+            }
+
+            return f;
+        }
+
+        // 2. Properties
+        PropertyInfo p = type.GetProperty(name, flags);
+        if (p != null)
+        {
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = len,
+                    Color = Text.Color.Property,
+                    IsNavigationTarget = false,
+                    ToolTip = TooltipGenerator.Property(p)
+                });
+            }
+
+            return p;
+        }
+
+        // 3. Methods
+
+        MethodInfo[] methods = type.GetMethods()
+            .Where(m => m.Name == name)
+            .Where(m => m.GetParameters().Select(p => p.ParameterType).SequenceEqual(argumentTypes ?? Type.EmptyTypes))
+            .ToArray();
+
+        if (methods.Any())
+        {
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = len,
+                    Color = Text.Color.Function,
+                    IsNavigationTarget = false,
+                    ToolTip = TooltipGenerator.Function(methods.First())
+                });
+            }
+
+            return methods.First();
+        }
+
+        EmitErrorMessage(
+            row,
+            col,
+            len,
+            LS0002_MethodNotFound,
+            $"Type '{type.FullName}' has no member called '{name}'.");
+
+        return null;
     }
 
     private static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false)

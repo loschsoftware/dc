@@ -263,4 +263,23 @@ internal static class EmitHelpers
         else
             CurrentMethod.IL.Emit((OpCode)opcodeField.GetValue(null));
     }
+
+    public static void LoadField(FieldInfo f)
+    {
+        if (f.IsStatic)
+            CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
+        else
+            CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
+    }
+
+    public static void EmitCall(Type type, MethodInfo m)
+    {
+        if (m.IsStatic || type.IsValueType)
+            CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
+        else
+            CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
+
+        if (m.ReturnType == typeof(void))
+            CurrentMethod.SkipPop = true;
+    }
 }

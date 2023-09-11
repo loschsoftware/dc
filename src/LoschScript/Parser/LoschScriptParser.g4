@@ -38,7 +38,9 @@ code_block
     ;
 
 expression
-    : Tilde expression #bitwise_complement_expression
+    : expression (Dot Identifier)+ arglist? #member_access_expression
+    | full_identifier arglist? #full_identifier_member_access_expression
+    | Tilde expression #bitwise_complement_expression
     | expression At_Sign expression Equals expression #array_element_assignment
     | expression Double_Asterisk expression #power_expression
     | Exclamation_Mark expression #logical_negation_expression
@@ -61,7 +63,6 @@ expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
     | (Var | Val)? Identifier (Colon type_name)? Equals expression #local_declaration_or_assignment
-    | expression arglist #member_access_expression
     | expression Arrow_Right expression #right_pipe_expression
     | expression Arrow_Left expression #left_pipe_expression
     | expression Dot Identifier #dotted_expression
