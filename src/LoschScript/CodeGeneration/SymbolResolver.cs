@@ -10,7 +10,7 @@ namespace LoschScript.CodeGeneration;
 
 internal static class SymbolResolver
 {
-    public static Type GetSmallestTypeFromLeft(LoschScriptParser.Full_identifierContext fullId, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
+    public static object GetSmallestTypeFromLeft(LoschScriptParser.Full_identifierContext fullId, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
     {
         string[] parts = fullId.Identifier().Select(f => f.GetText()).ToArray();
         firstUnusedPart = 0;
@@ -41,14 +41,13 @@ internal static class SymbolResolver
             }
         }
 
-        EmitErrorMessage(
+        // First part of full_id could also be parameter, local, member of current class.
+        return ResolveIdentifier(
+            parts[0],
             row,
             col,
             len,
-            LS0002_MethodNotFound,
-            $"Could not resolve name '{typeString}'.");
-
-        return null;
+            noEmitFragments);
     }
 
     public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false)

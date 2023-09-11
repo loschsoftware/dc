@@ -8,12 +8,14 @@ using LoschScript.Runtime;
 using LoschScript.Text;
 using LoschScript.Text.Tooltips;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LoschScript.CodeGeneration;
 
@@ -1791,12 +1793,78 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
-        Type t = SymbolResolver.GetSmallestTypeFromLeft(
+        object o = SymbolResolver.GetSmallestTypeFromLeft(
             context.full_identifier(),
             context.full_identifier().Start.Line,
             context.full_identifier().Start.Column,
             context.full_identifier().GetText().Length,
             out int firstIndex);
+
+        Type t = null;
+
+        if (o is Type type)
+            t = type;
+        else
+        {
+            if (o == null)
+            {
+                EmitErrorMessage(
+                    context.full_identifier().Identifier()[0].Symbol.Line,
+                    context.full_identifier().Identifier()[0].Symbol.Column,
+                    context.full_identifier().Identifier()[0].GetText().Length,
+                    LS0056_SymbolResolveError,
+                    $"The name '{context.full_identifier().Identifier()[0].GetText()}' could not be resolved.");
+
+                return null;
+            }
+
+            if (o is ParamInfo p)
+            {
+                SymbolInfo s = new()
+                {
+                    Parameter = p,
+                    SymbolType = SymbolInfo.SymType.Parameter
+                };
+
+                if (CurrentMethod.ShouldLoadAddressIfValueType)
+                    s.LoadAddressIfValueType();
+                else
+                    s.Load();
+
+                return p.Type;
+            }
+
+            else if (o is LocalInfo l)
+            {
+                SymbolInfo s = new()
+                {
+                    Local = l,
+                    SymbolType = SymbolInfo.SymType.Local
+                };
+
+                if (CurrentMethod.ShouldLoadAddressIfValueType)
+                    s.LoadAddressIfValueType();
+                else
+                    s.Load();
+
+                return l.Builder.LocalType;
+            }
+
+            else if (o is MethodBuilder m)
+            {
+                EmitCall(m.DeclaringType, m);
+
+                if (m.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType)
+                {
+                    CurrentMethod.IL.DeclareLocal(m.ReturnType);
+                    CurrentMethod.LocalIndex++;
+                    CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
+                    EmitLdloca(CurrentMethod.LocalIndex);
+                }
+
+                return m.ReturnType;
+            }
+        }
 
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
@@ -1808,6 +1876,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             {
                 Visit(context.arglist());
                 _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
             }
 
             object member = SymbolResolver.ResolveMember(
