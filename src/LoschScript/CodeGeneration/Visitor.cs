@@ -8,14 +8,12 @@ using LoschScript.Runtime;
 using LoschScript.Text;
 using LoschScript.Text.Tooltips;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.Serialization;
-using static System.Net.Mime.MediaTypeNames;
+using Color = LoschScript.Text.Color;
 
 namespace LoschScript.CodeGeneration;
 
@@ -1863,6 +1861,70 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 }
 
                 return m.ReturnType;
+            }
+
+            // Global method
+            else if (o is List<MethodInfo> methods)
+            {
+                Visit(context.arglist());
+                Type[] argumentTypes = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+                MethodInfo final = null;
+
+                if (methods.Any())
+                {
+                    foreach (MethodInfo possibleMethod in methods)
+                    {
+                        if (final != null)
+                            break;
+
+                        if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
+                        {
+                            final = possibleMethod;
+                            break;
+                        }
+
+                        for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
+                        {
+                            if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                            {
+                                if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                                    CurrentMethod.ParameterBoxIndices.Add(i);
+
+                                if (i == possibleMethod.GetParameters().Length - 1)
+                                {
+                                    final = possibleMethod;
+                                    break;
+                                }
+                            }
+
+                            else
+                                break;
+                        }
+                    }
+
+                    if (final == null)
+                    {
+                        EmitErrorMessage(
+                            context.full_identifier().Identifier()[0].Symbol.Line,
+                            context.full_identifier().Identifier()[0].Symbol.Column,
+                            context.full_identifier().Identifier()[0].GetText().Length,
+                            LS0002_MethodNotFound,
+                            $"Could not resolve global function '{context.full_identifier().Identifier()[0].GetText()}'.");
+                    }
+
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = context.full_identifier().Identifier()[0].Symbol.Line,
+                        Column = context.full_identifier().Identifier()[0].Symbol.Column,
+                        Length = context.full_identifier().Identifier()[0].GetText().Length,
+                        Color = Text.Color.Function,
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.Function(final)
+                    });
+                }
+
+                EmitCall(final.DeclaringType, final);
+                return final.ReturnType;
             }
         }
 

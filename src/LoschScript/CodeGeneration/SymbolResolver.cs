@@ -176,7 +176,7 @@ internal static class SymbolResolver
                     Length = len,
                     Color = Text.Color.Function,
                     IsNavigationTarget = false,
-                    ToolTip = TooltipGenerator.Function(methods.First())
+                    ToolTip = TooltipGenerator.Function(final)
                 });
             }
 
