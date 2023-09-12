@@ -64,4 +64,8 @@ internal class MethodContext
     public Type StaticCallType { get; set; }
 
     public bool IgnoreTypesInSymbolResolve { get; set; } = false;
+
+    public List<int> ParameterBoxIndices { get; set; } = new();
+
+    public bool BoxCallingType { get; set; }
 }

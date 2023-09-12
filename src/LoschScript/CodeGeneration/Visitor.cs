@@ -1906,6 +1906,19 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             else if (member is MethodInfo m)
             {
+                if (CurrentMethod.BoxCallingType)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, t);
+                    CurrentMethod.BoxCallingType = false;
+                }
+                else if (t.IsValueType)
+                {
+                    CurrentMethod.IL.DeclareLocal(t);
+                    CurrentMethod.LocalIndex++;
+                    EmitStloc(CurrentMethod.LocalIndex);
+                    EmitLdloca(CurrentMethod.LocalIndex);
+                }
+
                 EmitCall(t, m);
                 t = m.ReturnType;
             }
@@ -1928,14 +1941,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             flags |= BindingFlags.Static;
 
             CurrentMethod.StaticCallType = null;
-        }
-
-        if (t.IsValueType)
-        {
-            CurrentMethod.IL.DeclareLocal(t);
-            CurrentMethod.LocalIndex++;
-            EmitStloc(CurrentMethod.LocalIndex);
-            EmitLdloca(CurrentMethod.LocalIndex);
         }
 
         foreach (ITerminalNode identifier in context.Identifier())
@@ -1975,6 +1980,19 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             else if (member is MethodInfo m)
             {
+                if (CurrentMethod.BoxCallingType)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, t);
+                    CurrentMethod.BoxCallingType = false;
+                }
+                else if (t.IsValueType)
+                {
+                    CurrentMethod.IL.DeclareLocal(t);
+                    CurrentMethod.LocalIndex++;
+                    EmitStloc(CurrentMethod.LocalIndex);
+                    EmitLdloca(CurrentMethod.LocalIndex);
+                }
+
                 EmitCall(t, m);
                 t = m.ReturnType;
             }
@@ -1983,97 +2001,23 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return t;
     }
 
-    //public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
-    //{
-    // Check for local or argument of this name
-    //SymbolInfo sym = Helpers.GetSymbol(context.Identifier().GetText());
-
-    //if (sym != null)
-    //    return sym.Type();
-
-    //Type t = Visit(context.expression());
-
-    //if (t.IsValueType)
-    //{
-    //    CurrentMethod.IL.DeclareLocal(t);
-    //    CurrentMethod.LocalIndex++;
-    //    CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
-    //    EmitLdloca(CurrentMethod.LocalIndex);
-    //}
-
-    //return GetMember(t, context.Identifier().GetText(), context.arglist(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
-    //}
-
-    //public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
-    //{
-    //    Type type;
-
-    //    SymbolInfo symbol = Helpers.GetSymbol(context.full_identifier().Identifier()[0].GetText());
-
-    //    if (symbol != null)
-    //    {
-    //        type = symbol.Type();
-
-    //        CurrentFile.Fragments.Add(symbol.GetFragment(
-    //            context.full_identifier().Identifier()[0].Symbol.Line,
-    //            context.full_identifier().Identifier()[0].Symbol.Column,
-    //            context.full_identifier().Identifier()[0].GetText().Length,
-    //            false));
-
-    //        if (context.full_identifier().Identifier().Length == 1)
-    //        {
-    //            if (type == typeof(UnionValue))
-    //            {
-    //                symbol.LoadAddress();
-
-    //                MethodInfo getter = type.GetMethod("get_Value");
-    //                CurrentMethod.IL.EmitCall(OpCodes.Call, getter, null);
-
-    //                return typeof(object);
-    //            }
-
-    //            symbol.Load();
-
-    //            return type;
-    //        }
-
-    //        symbol.LoadAddressIfValueType();
-    //    }
-    //    else
-    //    {
-    //        if (context.full_identifier().Identifier().Length == 1)
-    //        {
-    //            // Global Method (Type Import)
-    //            Type t = Helpers.ResolveGlobalMethod(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length).Type;
-
-    //            if (t != null)
-    //                return GetMember(t, context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
-    //            else
-    //            {
-    //                Type _t = GetMemberOfCurrentType(context.full_identifier().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
-
-    //                if (_t != typeof(void))
-    //                    return _t;
-    //            }
-
-    //            // Constructor
-    //            Type cType = Helpers.ResolveTypeName(context.full_identifier().GetText(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
-    //            return GetConstructorOrCast(cType, context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length);
-    //        }
-
-    //        type = Helpers.ResolveTypeName(
-    //            string.Join(".", context.full_identifier().Identifier()[0..^1].Select(i => i.GetText())),
-    //            context.full_identifier().Identifier()[^2].Symbol.Line, context.full_identifier().Identifier()[^2].Symbol.Column, context.full_identifier().Identifier()[^2].GetText().Length,
-    //            false);
-    //    }
-
-    //    return GetMember(type, context.full_identifier().Identifier().Last().GetText(), context.arglist(), context.full_identifier().Identifier().Last().Symbol.Line, context.full_identifier().Identifier().Last().Symbol.Column, context.full_identifier().Identifier().Last().GetText().Length, null);
-    //}
-
     public override Type VisitArglist([NotNull] LoschScriptParser.ArglistContext context)
     {
-        foreach (IParseTree tree in context.expression())
-            CurrentMethod.ArgumentTypesForNextMethodCall.Add(Visit(tree));
+        for (int i = 0; i < context.expression().Length; i++)
+        {
+            IParseTree tree = context.expression()[i];
+            Type t = Visit(tree);
+
+            if (CurrentMethod.ParameterBoxIndices.Contains(i))
+            {
+                CurrentMethod.IL.Emit(OpCodes.Box, t);
+                t = typeof(object);
+            }
+
+            CurrentMethod.ArgumentTypesForNextMethodCall.Add(t);
+        }
+
+        CurrentMethod.ParameterBoxIndices.Clear();
 
         return typeof(void);
     }

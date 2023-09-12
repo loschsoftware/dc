@@ -120,13 +120,53 @@ internal static class SymbolResolver
 
         // 3. Methods
 
+        argumentTypes ??= Type.EmptyTypes;
+
         MethodInfo[] methods = type.GetMethods()
             .Where(m => m.Name == name)
-            .Where(m => m.GetParameters().Select(p => p.ParameterType).SequenceEqual(argumentTypes ?? Type.EmptyTypes))
+            .Where(m => m.GetParameters().Length == argumentTypes.Length)
             .ToArray();
 
         if (methods.Any())
         {
+            MethodInfo final = null;
+
+            foreach (MethodInfo possibleMethod in methods)
+            {
+                if (final != null)
+                    break;
+
+                if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
+                {
+                    final = possibleMethod;
+                    break;
+                }
+
+                for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
+                {
+                    if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                    {
+                        if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                            CurrentMethod.ParameterBoxIndices.Add(i);
+
+                        if (i == possibleMethod.GetParameters().Length - 1)
+                        {
+                            final = possibleMethod;
+                            break;
+                        }
+                    }
+
+                    else
+                        break;
+                }
+            }
+
+            if (final == null)
+                goto Error;
+
+            if (type != typeof(object) && final.DeclaringType == typeof(object))
+                CurrentMethod.BoxCallingType = true;
+
             if (!noEmitFragments)
             {
                 CurrentFile.Fragments.Add(new()
@@ -140,15 +180,17 @@ internal static class SymbolResolver
                 });
             }
 
-            return methods.First();
+            return final;
         }
+
+        Error:
 
         EmitErrorMessage(
             row,
             col,
             len,
             LS0002_MethodNotFound,
-            $"Type '{type.FullName}' has no member called '{name}'.");
+            $"Type '{type.FullName}' has no compatible member called '{name}'.");
 
         return null;
     }
