@@ -16,7 +16,7 @@ public class EditorInfo
     public List<ErrorInfo> Errors { get; set; } = new();
 
     /// <summary>
-    /// Fragments to support advanced syntax highlighting.
+    /// Fragments to support semantic syntax highlighting.
     /// </summary>
     public FileFragment Fragments { get; set; }
 

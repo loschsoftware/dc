@@ -60,7 +60,7 @@ public static class FileCompiler
     }
 
     /// <summary>
-    /// Emits fragments for a string of LoschScript source code.
+    /// Gets metadata for a LoschScript source file used to support language-specific features of text editors.
     /// </summary>
     /// <param name="source">The source code to emit fragments for.</param>
     /// <param name="config">The compiler configuration.</param>
