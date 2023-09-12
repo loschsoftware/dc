@@ -86,7 +86,12 @@ public static class ErrorWriter
 
                     Console.WriteLine(line);
 
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.ForegroundColor = error.Severity switch
+                    {
+                        Severity.Error => ConsoleColor.DarkRed,
+                        Severity.Warning => ConsoleColor.DarkYellow,
+                        _ => ConsoleColor.DarkCyan
+                    };
 
                     Console.Write(new string(' ', error.CodePosition.Item2));
                     Console.Write("^");
