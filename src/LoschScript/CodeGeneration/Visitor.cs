@@ -510,13 +510,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitTop_level_statements([NotNull] LoschScriptParser.Top_level_statementsContext context)
     {
-        if ((context.expression().Length == 0 && Context.Files.Count < 2) || (Context.Files.Last() == CurrentFile && Context.ShouldThrowLS0027))
+        if (Context.Files.Count > 0)
         {
-            EmitErrorMessage(0, 0, context.GetText().Length, LS0027_EmptyProgram, "The program does not contain any executable code.");
-            return typeof(void);
+            if ((context.expression().Length == 0 && Context.Files.Count < 2) || (Context.Files.Last() == CurrentFile && Context.ShouldThrowLS0027))
+            {
+                EmitErrorMessage(0, 0, context.GetText().Length, LS0027_EmptyProgram, "The program does not contain any executable code.");
+                return typeof(void);
+            }
+
+            else if (context.expression().Length == 0)
+                Context.ShouldThrowLS0027 = true;
         }
-        else if (context.expression().Length == 0)
-            Context.ShouldThrowLS0027 = true;
 
         if (context.children == null)
             return typeof(void);
