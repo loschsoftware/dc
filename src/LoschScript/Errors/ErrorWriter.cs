@@ -71,6 +71,12 @@ public static class ErrorWriter
                 _ => "information"
             }} {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
 
+            if (!string.IsNullOrEmpty(error.Tip) && Context.Configuration.EnableTips)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                InfoOut.WriteLine(error.Tip);
+            }
+
             Console.ForegroundColor = defaultColor;
 
             if (Context.Configuration.AdvancedErrorMessages)
@@ -154,7 +160,7 @@ public static class ErrorWriter
     /// Writes an error message using <see cref="ErrorOut"/>.
     /// </summary>
     /// <remarks>If <paramref name="file"/> is null, will assume <see cref="FileContext.Path"/>.</remarks>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool addToErrorList = true)
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool addToErrorList = true, string tip = "")
     {
         ObservableCollection<Word> words = new()
         {
@@ -172,6 +178,7 @@ public static class ErrorWriter
             ErrorMessage = msg,
             File = file ?? Path.GetFileName(CurrentFile.Path),
             Severity = Severity.Error,
+            Tip = tip,
             ToolTip = new()
             {
                 IconResourceName = "CodeErrorRule",
@@ -183,7 +190,7 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a warning message using <see cref="WarnOut"/>.
     /// </summary>
-    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false)
+    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false, string tip = "")
     {
         ObservableCollection<Word> words = new()
         {
@@ -204,6 +211,7 @@ public static class ErrorWriter
             ErrorMessage = msg,
             File = file ?? CurrentFile.Path,
             Severity = Severity.Warning,
+            Tip = tip,
             ToolTip = new()
             {
                 Words = words,
@@ -223,7 +231,7 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a message using <see cref="InfoOut"/>.
     /// </summary>
-    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null)
+    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.LS0001_SyntaxError, string msg = "Syntax error.", string file = null, string tip = "")
     {
         ObservableCollection<Word> words = new()
         {
@@ -244,6 +252,7 @@ public static class ErrorWriter
             ErrorMessage = msg,
             File = file ?? CurrentFile.Path,
             Severity = Severity.Information,
+            Tip = tip,
             ToolTip = new()
             {
                 Words = words,

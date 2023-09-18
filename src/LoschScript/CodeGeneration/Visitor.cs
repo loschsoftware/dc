@@ -568,7 +568,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.expression().Last().Start.Column,
                 context.expression().Last().GetText().Length,
                 LS0050_ExpectedIntegerReturnValue,
-                $"Expected expression of type 'int32' or 'void', but got type '{ret.FullName}'.");
+                $"Expected expression of type 'int32' or 'void', but got type '{ret.FullName}'.",
+                tip: "You may use the function 'ignore' to discard a value and return 'void'.");
 
             return ret;
         }
@@ -803,7 +804,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Exclamation_Mark().Symbol.Column,
                 context.Exclamation_Mark().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement the logical negation operation with the specified operand types.",
+                $"The type '{t.Name}' does not implement a logical negation operation with the specified operand type.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -830,7 +831,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             context.Double_Ampersand().Symbol.Column,
             context.Double_Ampersand().GetText().Length,
             LS0002_MethodNotFound,
-            $"The logical and operation is only supported by boolean types.",
+            $"The logical and operation is only supported by the type '{typeof(bool).FullName}'.",
             Path.GetFileName(CurrentFile.Path));
 
         return t;
@@ -852,7 +853,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             context.Double_Bar().Symbol.Column,
             context.Double_Bar().GetText().Length,
             LS0002_MethodNotFound,
-            $"The logical or operation is only supported by boolean types.",
+            $"The logical or operation is only supported by the type '{typeof(bool).FullName}'.",
             Path.GetFileName(CurrentFile.Path));
 
         return t;
@@ -878,7 +879,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Bar().Symbol.Column,
                 context.Bar().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a bitwise or operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a bitwise or operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -909,7 +910,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Ampersand().Symbol.Column,
                 context.Ampersand().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a bitwise and operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a bitwise and operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -940,7 +941,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Caret().Symbol.Column,
                 context.Caret().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement an exclusive or operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement an exclusive or operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1001,7 +1002,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Asterisk().Symbol.Column,
                 context.Asterisk().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a multiplication operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a multiplication operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1032,7 +1033,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Slash().Symbol.Column,
                 context.Slash().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a division operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a division operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1096,7 +1097,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Plus().Symbol.Column,
                 context.Plus().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement an addition operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement an addition operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1127,7 +1128,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Minus().Symbol.Column,
                 context.Minus().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a subtraction operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a subtraction operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1158,7 +1159,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Percent().Symbol.Column,
                 context.Percent().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a remainder operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a remainder operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1219,7 +1220,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Double_Less_Than().Symbol.Column,
                 context.Double_Less_Than().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a left shift operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a left shift operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1250,7 +1251,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 context.Double_Greater_Than().Symbol.Column,
                 context.Double_Greater_Than().GetText().Length,
                 LS0002_MethodNotFound,
-                $"The type '{t.Name}' does not implement a right shift operation with the specified parameter types.",
+                $"The type '{t.Name}' does not implement a right shift operation with the specified operand types.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;

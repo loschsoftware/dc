@@ -136,24 +136,10 @@ internal static class Helpers
             Process.Start(psi);
         }
 
-        if (errors.Select(e => e.Length).Sum() == 0)
-        {
-            Console.WriteLine($"\r\nCompilation successful, generated assembly {assembly}.");
-
-            if (args.Any(a => a == "-elapsed") || Context.Configuration.MeasureElapsedTime)
-                Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
-
-            return 0;
-        }
-
-        int count = errors.Select(e => e.Length).Sum();
-
-        Console.WriteLine($"\r\nCompilation failed with {count} error{(count > 1 ? "s" : "")}.");
-
         if (args.Any(a => a == "-elapsed") || Context.Configuration.MeasureElapsedTime)
             Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
 
-        return -1;
+        return errors.Select(e => e.Length).Sum() == 0 ? 0 : -1;
     }
 
     public static int CompileAll(string[] args)

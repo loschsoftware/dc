@@ -43,6 +43,11 @@ public class ErrorInfo
     public Tooltip ToolTip { get; set; }
 
     /// <summary>
+    /// Advanced information regarding the error that could be useful in debugging the error.
+    /// </summary>
+    public string Tip { get; set; }
+
+    /// <summary>
     /// Converts the error into a human-readable format.
     /// </summary>
     /// <returns>A friendly representation of the error.</returns>

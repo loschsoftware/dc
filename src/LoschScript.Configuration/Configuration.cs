@@ -70,6 +70,9 @@ public sealed class LSConfig
 
     [XmlElement("AdvancedErrorMessages")]
     public bool AdvancedErrorMessages { get; set; }
+
+    [XmlElement("EnableTips")]
+    public bool EnableTips { get; set; }
 }
 
 [Serializable]
