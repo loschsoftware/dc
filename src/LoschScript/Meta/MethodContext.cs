@@ -90,8 +90,8 @@ internal class MethodContext
 
     public bool IgnoreTypesInSymbolResolve { get; set; } = false;
 
-    // TODO: ParameterBoxIndices wird beim zweiten Durchgang gleich für die erste Methode verwendet -> es soll aber
-    // nur auf eine bestimmte Methode angewendet werden
+    // TODO: ParameterBoxIndices wird beim zweiten Durchgang gleich für die erste Methode verwendet (AddHours) -> es soll aber
+    // nur auf eine bestimmte Methode angewendet werden (WriteLine)
     // WICHTIG!!
     public List<int> ParameterBoxIndices { get; set; } = new();
 
