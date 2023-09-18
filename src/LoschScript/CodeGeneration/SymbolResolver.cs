@@ -195,7 +195,7 @@ internal static class SymbolResolver
         return null;
     }
 
-    private static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false)
+    public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false)
     {
         type = Type.GetType(name);
 

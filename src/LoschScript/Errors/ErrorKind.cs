@@ -240,5 +240,9 @@ public enum ErrorKind
     /// <summary>
     /// Generic error emitted when a symbol of various kinds could not be resolved.
     /// </summary>
-    LS0056_SymbolResolveError
+    LS0056_SymbolResolveError,
+    /// <summary>
+    /// Emitted when a variable is assigned an expression of an incompatible type.
+    /// </summary>
+    LS0057_IncompatibleType
 }

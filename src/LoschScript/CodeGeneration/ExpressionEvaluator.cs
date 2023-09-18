@@ -169,7 +169,17 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
     public override Expression VisitType_name([NotNull] LoschScriptParser.Type_nameContext context)
     {
         if (context.identifier_atom() != null)
-            return Visit(context.identifier_atom());
+        {
+            bool success = SymbolResolver.TryGetType(
+                              context.identifier_atom().GetText(),
+                              out Type t,
+                              context.identifier_atom().Start.Line,
+                              context.identifier_atom().Start.Column,
+                              context.identifier_atom().GetText().Length);
+
+            if (success)
+                return new(typeof(Type), t);
+        }
 
         if (context.builtin_type_alias() != null)
         {
@@ -234,5 +244,5 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
     {
         Expression a = Visit(context.integer_atom());
         return new(typeof(Index), new Index(a.Value, context.Caret() != null));
-    } 
+    }
 }

@@ -2476,7 +2476,23 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             Type t2 = Visit(context.type_name());
 
-            // TODO: Check if types are compatible and possibly call op_Implicit / op_Explicit...
+            if (t2 != t)
+            {
+                MethodInfo implicitConversion = t.GetMethod("op_Implicit", new Type[] { t2 }, null);
+                if (implicitConversion != null)
+                {
+                    EmitCall(t, implicitConversion);
+                }
+                else
+                {
+                    EmitErrorMessage(
+                        context.expression().Start.Line,
+                        context.expression().Start.Column,
+                        context.expression().GetText().Length,
+                        LS0057_IncompatibleType,
+                        $"An expression of type '{t.FullName}' cannot be assigned to a variable of type '{t2.FullName}'.");
+                }
+            }
 
             t = t2;
         }
@@ -2539,7 +2555,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitType_name([NotNull] LoschScriptParser.Type_nameContext context)
     {
-        return eval.VisitType_name(context).Type;
+        return eval.VisitType_name(context).Value;
     }
 
     public override Type VisitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context)
