@@ -1,4 +1,6 @@
-﻿namespace LoschScript.Core;
+﻿using System;
+
+namespace LoschScript.Core;
 
 /// <summary>
 /// Provides functionality related to values.

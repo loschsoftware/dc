@@ -164,6 +164,15 @@ internal static class SymbolResolver
             if (final == null)
                 goto Error;
 
+            for (int i = 0; i < final.GetParameters().Length; i++)
+            {
+                if (CurrentMethod.ParameterBoxIndices.Contains(i)
+                    && final.GetParameters()[i].ParameterType != typeof(object))
+                {
+                    CurrentMethod.ParameterBoxIndices.Remove(i);
+                }
+            }
+
             if (type != typeof(object) && final.DeclaringType == typeof(object))
                 CurrentMethod.BoxCallingType = true;
 

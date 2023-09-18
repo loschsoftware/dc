@@ -1769,6 +1769,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             {
                 EmitCall(t, p.GetGetMethod());
                 t = p.PropertyType;
+
+                if (identifier != context.full_identifier().Identifier().Last() && t.IsValueType)
+                {
+                    CurrentMethod.IL.DeclareLocal(t);
+                    CurrentMethod.LocalIndex++;
+                    EmitStloc(CurrentMethod.LocalIndex);
+                    EmitLdloca(CurrentMethod.LocalIndex);
+                }
             }
 
             else if (member is MethodInfo m)
@@ -1778,19 +1786,28 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     CurrentMethod.IL.Emit(OpCodes.Box, t);
                     CurrentMethod.BoxCallingType = false;
                 }
+                else if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.BoxCallingType)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, t);
+                    VisitorStep1CurrentMethod.BoxCallingType = false;
+                }
                 else if (t.IsValueType)
                 {
-                    CurrentMethod.IL.DeclareLocal(t);
-                    CurrentMethod.LocalIndex++;
-                    EmitStloc(CurrentMethod.LocalIndex);
-                    EmitLdloca(CurrentMethod.LocalIndex);
+                    //CurrentMethod.IL.DeclareLocal(t);
+                    //CurrentMethod.LocalIndex++;
+                    //EmitStloc(CurrentMethod.LocalIndex);
+                    //EmitLdloca(CurrentMethod.LocalIndex);
                 }
 
                 EmitCall(t, m);
                 t = m.ReturnType;
+
+                if (VisitorStep1CurrentMethod != null)
+                    CurrentMethod.ParameterBoxIndices.Clear();
             }
         }
 
+        //CurrentMethod.ParameterBoxIndices.Clear();
         return t;
     }
 
@@ -1862,9 +1879,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 EmitCall(t, m);
                 t = m.ReturnType;
+
+                if (VisitorStep1CurrentMethod != null)
+                    CurrentMethod.ParameterBoxIndices.Clear();
             }
         }
 
+        //CurrentMethod.ParameterBoxIndices.Clear();
         return t;
     }
 
@@ -1886,6 +1907,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         }
 
         CurrentMethod.ParameterBoxIndices.Clear();
+
+        VisitorStep1CurrentMethod?.ParameterBoxIndices.Clear();
 
         return null;
     }

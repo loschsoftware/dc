@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace LoschScript.Meta;
@@ -89,6 +90,9 @@ internal class MethodContext
 
     public bool IgnoreTypesInSymbolResolve { get; set; } = false;
 
+    // TODO: ParameterBoxIndices wird beim zweiten Durchgang gleich für die erste Methode verwendet -> es soll aber
+    // nur auf eine bestimmte Methode angewendet werden
+    // WICHTIG!!
     public List<int> ParameterBoxIndices { get; set; } = new();
 
     public bool BoxCallingType { get; set; }
