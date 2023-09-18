@@ -2483,6 +2483,10 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 {
                     EmitCall(t, implicitConversion);
                 }
+                else if (t2 == typeof(object))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, t);
+                }
                 else
                 {
                     EmitErrorMessage(
