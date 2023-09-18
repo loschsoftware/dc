@@ -10,6 +10,8 @@ namespace LoschScript.Meta;
 internal class ProgramContext
 {
     public static ProgramContext Context { get; set; }
+    
+    public static ProgramContext VisitorStep1 { get; set; }
 
     public List<FileContext> Files { get; } = new();
 

@@ -1874,7 +1874,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             IParseTree tree = context.expression()[i];
             Type t = Visit(tree);
 
-            if (CurrentMethod.ParameterBoxIndices.Contains(i))
+            if (CurrentMethod.ParameterBoxIndices.Contains(i)
+                || (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.ParameterBoxIndices.Contains(i)))
             {
                 CurrentMethod.IL.Emit(OpCodes.Box, t);
                 t = typeof(object);
@@ -1885,7 +1886,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         CurrentMethod.ParameterBoxIndices.Clear();
 
-        return typeof(void);
+        return null;
     }
 
     public override Type VisitCode_block([NotNull] LoschScriptParser.Code_blockContext context)

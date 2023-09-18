@@ -95,6 +95,11 @@ internal static class Helpers
 
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
+        // Step 1
+        CompileSource(args.Where(File.Exists).ToArray(), config);
+        VisitorStep1 = Context;
+
+        // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
         Context.Assembly.DefineVersionInfoResource(

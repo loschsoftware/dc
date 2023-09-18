@@ -234,5 +234,5 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
     {
         Expression a = Visit(context.integer_atom());
         return new(typeof(Index), new Index(a.Value, context.Caret() != null));
-    }
+    } 
 }

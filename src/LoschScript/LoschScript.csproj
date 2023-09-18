@@ -8,11 +8,12 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>11</LangVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<!--<DefineConstants>NET7_COMPATIBLE</DefineConstants>-->
 	</PropertyGroup>
 	
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+	<!--<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 	  <DefineConstants>$(DefineConstants);NET7_COMPATIBLE</DefineConstants>
-	</PropertyGroup>
+	</PropertyGroup>-->
 
 	<ItemGroup>
 		<Folder Include="Parser\Generated\" />
