@@ -90,10 +90,7 @@ internal class MethodContext
 
     public bool IgnoreTypesInSymbolResolve { get; set; } = false;
 
-    // TODO: ParameterBoxIndices wird beim zweiten Durchgang gleich für die erste Methode verwendet (AddHours) -> es soll aber
-    // nur auf eine bestimmte Methode angewendet werden (WriteLine)
-    // WICHTIG!!
-    public List<int> ParameterBoxIndices { get; set; } = new();
+    public Dictionary<int, List<int>> ParameterBoxIndices { get; set; } = new();
 
     public bool BoxCallingType { get; set; }
 }

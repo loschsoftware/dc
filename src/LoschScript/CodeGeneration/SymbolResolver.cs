@@ -76,8 +76,11 @@ internal static class SymbolResolver
         return null;
     }
 
+    static int memberIndex = -1;
     public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public)
     {
+        memberIndex++;
+
         // 1. Fields
         FieldInfo f = type.GetField(name, flags);
         if (f != null)
@@ -127,6 +130,9 @@ internal static class SymbolResolver
             .Where(m => m.GetParameters().Length == argumentTypes.Length)
             .ToArray();
 
+        if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+            CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
         if (methods.Any())
         {
             MethodInfo final = null;
@@ -147,7 +153,9 @@ internal static class SymbolResolver
                     if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                     {
                         if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
-                            CurrentMethod.ParameterBoxIndices.Add(i);
+                        {
+                            CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
+                        }
 
                         if (i == possibleMethod.GetParameters().Length - 1)
                         {
@@ -166,7 +174,7 @@ internal static class SymbolResolver
 
             for (int i = 0; i < final.GetParameters().Length; i++)
             {
-                if (CurrentMethod.ParameterBoxIndices.Contains(i)
+                if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
                     && final.GetParameters()[i].ParameterType != typeof(object))
                 {
                     CurrentMethod.ParameterBoxIndices.Remove(i);
@@ -192,7 +200,7 @@ internal static class SymbolResolver
             return final;
         }
 
-        Error:
+    Error:
 
         EmitErrorMessage(
             row,
@@ -217,7 +225,7 @@ internal static class SymbolResolver
             if (assemblies.Any())
             {
                 type = assemblies.First().GetType(name);
-                
+
                 if (!noEmitFragments)
                 {
                     CurrentFile.Fragments.Add(new()

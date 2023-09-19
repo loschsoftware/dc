@@ -1596,6 +1596,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
+        memberIndex++;
+
         object o = SymbolResolver.GetSmallestTypeFromLeft(
             context.full_identifier(),
             context.full_identifier().Start.Line,
@@ -1688,12 +1690,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                             break;
                         }
 
+                        if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+                            CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
                         for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                         {
                             if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                             {
                                 if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
-                                    CurrentMethod.ParameterBoxIndices.Add(i);
+                                    CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
 
                                 if (i == possibleMethod.GetParameters().Length - 1)
                                 {
@@ -1811,8 +1816,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return t;
     }
 
+    int memberIndex = -1;
+
     public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
     {
+        memberIndex++;
+
         CurrentMethod.ShouldLoadAddressIfValueType = true;
         CurrentMethod.IgnoreTypesInSymbolResolve = true;
 
@@ -1896,8 +1905,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             IParseTree tree = context.expression()[i];
             Type t = Visit(tree);
 
-            if (CurrentMethod.ParameterBoxIndices.Contains(i)
-                || (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.ParameterBoxIndices.Contains(i)))
+            if ((VisitorStep1CurrentMethod != null) && !VisitorStep1CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+                VisitorStep1CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
+            if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+                CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
+            if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
+                || (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)))
             {
                 CurrentMethod.IL.Emit(OpCodes.Box, t);
                 t = typeof(object);
@@ -1906,9 +1921,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.ArgumentTypesForNextMethodCall.Add(t);
         }
 
-        CurrentMethod.ParameterBoxIndices.Clear();
-
-        VisitorStep1CurrentMethod?.ParameterBoxIndices.Clear();
+        CurrentMethod.ParameterBoxIndices[memberIndex].Clear();
+        VisitorStep1CurrentMethod?.ParameterBoxIndices[memberIndex].Clear();
 
         return null;
     }
