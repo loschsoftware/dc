@@ -1784,6 +1784,26 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 }
             }
 
+            else if (member is ConstructorInfo c)
+            {
+                if (CurrentMethod.BoxCallingType)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, t);
+                    CurrentMethod.BoxCallingType = false;
+                }
+                else if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.BoxCallingType)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, t);
+                    VisitorStep1CurrentMethod.BoxCallingType = false;
+                }
+
+                CurrentMethod.IL.Emit(OpCodes.Newobj, c);
+                t = c.DeclaringType;
+
+                if (VisitorStep1CurrentMethod != null)
+                    CurrentMethod.ParameterBoxIndices.Clear();
+            }
+
             else if (member is MethodInfo m)
             {
                 if (CurrentMethod.BoxCallingType)
@@ -2911,6 +2931,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Blt, start);
 
             EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            CurrentMethod.SkipPop = false;
 
             return typeof(object[]);
         }
@@ -2983,6 +3004,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Brtrue, start);
 
             EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            CurrentMethod.SkipPop = false;
 
             return typeof(List<object>);
         }

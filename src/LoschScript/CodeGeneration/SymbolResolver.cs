@@ -81,6 +81,86 @@ internal static class SymbolResolver
     {
         memberIndex++;
 
+        // 0. Constructors
+        if (name == type.Name)
+        {
+            argumentTypes ??= Type.EmptyTypes;
+
+            ConstructorInfo[] cons = type.GetConstructors()
+                .Where(c => c.GetParameters().Length == argumentTypes.Length)
+                .ToArray();
+
+            if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+                CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
+            if (cons.Any())
+            {
+                ConstructorInfo final = null;
+
+                foreach (ConstructorInfo possibleMethod in cons)
+                {
+                    if (final != null)
+                        break;
+
+                    if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
+                    {
+                        final = possibleMethod;
+                        break;
+                    }
+
+                    for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
+                    {
+                        if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                        {
+                            if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                            {
+                                CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
+                            }
+
+                            if (i == possibleMethod.GetParameters().Length - 1)
+                            {
+                                final = possibleMethod;
+                                break;
+                            }
+                        }
+
+                        else
+                            break;
+                    }
+                }
+
+                if (final == null)
+                    goto Error;
+
+                for (int i = 0; i < final.GetParameters().Length; i++)
+                {
+                    if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
+                        && final.GetParameters()[i].ParameterType != typeof(object))
+                    {
+                        CurrentMethod.ParameterBoxIndices.Remove(i);
+                    }
+                }
+
+                if (type != typeof(object) && final.DeclaringType == typeof(object))
+                    CurrentMethod.BoxCallingType = true;
+
+                if (!noEmitFragments)
+                {
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = len,
+                        Color = Text.Color.Function,
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.Constructor(final)
+                    });
+                }
+
+                return final;
+            }
+        }
+
         // 1. Fields
         FieldInfo f = type.GetField(name, flags);
         if (f != null)

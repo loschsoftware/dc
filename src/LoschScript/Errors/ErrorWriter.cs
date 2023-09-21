@@ -41,9 +41,6 @@ public static class ErrorWriter
 
     private static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
     {
-        if (VisitorStep1 == null)
-            return;
-
         try
         {
             ConsoleColor defaultColor = Console.ForegroundColor;
