@@ -1636,7 +1636,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 else
                     s.Load();
 
-                return p.Type;
+                t = s.Type();
             }
 
             else if (o is LocalInfo l)
@@ -1652,7 +1652,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 else
                     s.Load();
 
-                return l.Builder.LocalType;
+                t = s.Type();
             }
 
             else if (o is MethodBuilder m)
