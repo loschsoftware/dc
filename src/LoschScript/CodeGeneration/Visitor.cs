@@ -1738,6 +1738,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
         }
 
+        if (context.full_identifier().Identifier().Length == 1)
+            return t;
+
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
         foreach (ITerminalNode identifier in context.full_identifier().Identifier()[firstIndex..])
