@@ -1594,6 +1594,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(void);
     }
 
+    int memberIndex = -1;
+
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
         memberIndex++;
@@ -1839,8 +1841,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         //CurrentMethod.ParameterBoxIndices.Clear();
         return t;
     }
-
-    int memberIndex = -1;
 
     public override Type VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context)
     {

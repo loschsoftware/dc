@@ -38,8 +38,7 @@ code_block
     ;
 
 expression
-    : full_identifier arglist? #full_identifier_member_access_expression
-    | Tilde expression #bitwise_complement_expression
+    : Tilde expression #bitwise_complement_expression
     | expression At_Sign expression Equals expression #array_element_assignment
     | expression Double_Asterisk expression #power_expression
     | Exclamation_Mark expression #logical_negation_expression
@@ -84,6 +83,7 @@ expression
     | code_block #block_expression
     // | Plus expression #unary_plus_expression
     // Minus expression #unary_negation_expression
+    | full_identifier arglist? #full_identifier_member_access_expression
     | expression (Dot Identifier)+ arglist? #member_access_expression
     ;
 
