@@ -10,8 +10,8 @@ internal class Program
     static int Main(string[] args)
     {
 //#if RELEASE
-        try
-        {
+        //try
+        //{
 //#endif
         return args switch
         {
@@ -29,17 +29,17 @@ internal class Program
             _ => Helpers.HandleArgs(args)
         };
 //#if RELEASE
-        }
-        catch (Exception ex)
-        {
-            if (messages.Count == 0)
-            {
-                EmitErrorMessage(0, 0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
-                Console.WriteLine();
-            }
+        //}
+        //catch (Exception ex)
+        //{
+        //    if (messages.Count == 0)
+        //    {
+        //        EmitErrorMessage(0, 0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
+        //        Console.WriteLine();
+        //    }
 
-            return -1;
-        }
+        //    return -1;
+        //}
 //#endif
     }
 

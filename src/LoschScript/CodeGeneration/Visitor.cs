@@ -232,6 +232,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
         }
 
+        if (CurrentMethod.Builder.IsStatic)
+        {
+            foreach (var param in CurrentMethod.Parameters)
+                param.Index--;
+        }
+
         HandleFieldInitializersAndDefaultConstructor();
 
         Visit(context.expression());
@@ -263,8 +269,10 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        Helpers.CreateFakeMethod();
-        Type _tReturn = Visit(context.expression());
+        //Helpers.CreateFakeMethod();
+        //Type _tReturn = Visit(context.expression());
+
+        Type _tReturn = typeof(object);
 
         if (context.parameter_list() != null || _tReturn == typeof(void))
         {
@@ -303,6 +311,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     param.Context.Identifier().GetText());
 
                 CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
+            }
+
+            if (CurrentMethod.Builder.IsStatic)
+            {
+                foreach (var param in CurrentMethod.Parameters)
+                    param.Index--;
             }
 
             _tReturn = Visit(context.expression());
@@ -1659,6 +1673,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             else if (o is MethodBuilder m)
             {
+                if (context.arglist() != null)
+                    Visit(context.arglist());
+
                 EmitCall(m.DeclaringType, m);
 
                 if (m.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType)
@@ -1668,6 +1685,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
                     EmitLdloca(CurrentMethod.LocalIndex);
                 }
+
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
 
                 return m.ReturnType;
             }
