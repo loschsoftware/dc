@@ -1675,6 +1675,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             {
                 Visit(context.arglist());
                 Type[] argumentTypes = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                 MethodInfo final = null;
 
                 if (methods.Any())
@@ -1697,7 +1698,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                         {
                             if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                             {
-                                if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                                if (possibleMethod.GetParameters()[i].ParameterType == typeof(object) && argumentTypes[i] != typeof(object))
                                     CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
 
                                 if (i == possibleMethod.GetParameters().Length - 1)
@@ -1923,6 +1924,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitArglist([NotNull] LoschScriptParser.ArglistContext context)
     {
+        CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+
         for (int i = 0; i < context.expression().Length; i++)
         {
             IParseTree tree = context.expression()[i];

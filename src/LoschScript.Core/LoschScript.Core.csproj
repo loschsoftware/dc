@@ -6,4 +6,7 @@
 		<Platforms>AnyCPU;x64</Platforms>
 		<RootNamespace>LoschScript</RootNamespace>
 	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+	</ItemGroup>
 </Project>
