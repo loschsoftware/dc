@@ -61,7 +61,7 @@ internal static class SymbolResolver
             return CurrentMethod.Locals.First(p => p.Name == text);
 
         // 3. Members of current class
-        if (TypeContext.Current.Methods.Select(m => m.Builder).Any(m => m.Name == text))
+        if (TypeContext.Current.Methods.Select(m => m.Builder).Where(m => m != null).Any(m => m.Name == text))
             return TypeContext.Current.Methods.Select(m => m.Builder).First(m => m.Name == text);
 
         // 4. Members of type-imported types ("global members")
