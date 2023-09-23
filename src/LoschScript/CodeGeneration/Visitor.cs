@@ -727,35 +727,35 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(bool);
     }
 
-    public override Type VisitUnary_negation_expression([NotNull] LoschScriptParser.Unary_negation_expressionContext context)
-    {
-        Type t = Visit(context.expression());
+    //public override Type VisitUnary_negation_expression([NotNull] LoschScriptParser.Unary_negation_expressionContext context)
+    //{
+    //    Type t = Visit(context.expression());
 
-        if (Helpers.IsNumericType(t))
-        {
-            CurrentMethod.IL.Emit(OpCodes.Neg);
-            return t;
-        }
+    //    if (Helpers.IsNumericType(t))
+    //    {
+    //        CurrentMethod.IL.Emit(OpCodes.Neg);
+    //        return t;
+    //    }
 
-        MethodInfo op = t.GetMethod("op_UnaryNegation", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
+    //    MethodInfo op = t.GetMethod("op_UnaryNegation", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
 
-        if (op == null)
-        {
-            EmitErrorMessage(
-                    context.Minus().Symbol.Line,
-                        context.Minus().Symbol.Column,
-                        context.Minus().GetText().Length,
-                    LS0036_ArithmeticError,
-                    $"The type '{t.Name}' does not implement the unary negation operation with the specified operand types.",
-                    Path.GetFileName(CurrentFile.Path));
+    //    if (op == null)
+    //    {
+    //        EmitErrorMessage(
+    //                context.Minus().Symbol.Line,
+    //                    context.Minus().Symbol.Column,
+    //                    context.Minus().GetText().Length,
+    //                LS0036_ArithmeticError,
+    //                $"The type '{t.Name}' does not implement the unary negation operation with the specified operand types.",
+    //                Path.GetFileName(CurrentFile.Path));
 
-            return t;
-        }
+    //        return t;
+    //    }
 
-        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+    //    CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
 
-        return t;
-    }
+    //    return t;
+    //}
 
     //public override Type VisitUnary_plus_expression([NotNull] LoschScriptParser.Unary_plus_expressionContext context)
     //{

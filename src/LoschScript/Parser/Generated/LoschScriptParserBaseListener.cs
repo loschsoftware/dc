@@ -415,20 +415,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitRange_expression([NotNull] LoschScriptParser.Range_expressionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>unary_negation_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterUnary_negation_expression([NotNull] LoschScriptParser.Unary_negation_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>unary_negation_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitUnary_negation_expression([NotNull] LoschScriptParser.Unary_negation_expressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>member_access_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>

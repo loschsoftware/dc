@@ -38,8 +38,7 @@ code_block
     ;
 
 expression
-    : expression (Dot Identifier)+ arglist? #member_access_expression
-    | full_identifier arglist? #full_identifier_member_access_expression
+    : full_identifier arglist? #full_identifier_member_access_expression
     | Tilde expression #bitwise_complement_expression
     | expression At_Sign expression Equals expression #array_element_assignment
     | expression Double_Asterisk expression #power_expression
@@ -58,7 +57,6 @@ expression
     | expression Bar expression #or_expression
     | expression Double_Bar expression #logical_or_expression
     | expression Caret expression #xor_expression
-    | Minus expression #unary_negation_expression
     | Caret Identifier  #typeof_expression
     | Percent_Caret expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
@@ -85,6 +83,8 @@ expression
     | expression NewLine #newlined_expression
     | code_block #block_expression
     // | Plus expression #unary_plus_expression
+    // Minus expression #unary_negation_expression
+    | expression (Dot Identifier)+ arglist? #member_access_expression
     ;
 
 atom
