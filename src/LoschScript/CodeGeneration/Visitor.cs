@@ -1622,9 +1622,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             out int firstIndex);
 
         Type t = null;
+        bool exitEarly = true;
 
         if (o is Type type)
+        {
             t = type;
+            exitEarly = false;
+        }
         else
         {
             if (o == null)
@@ -1669,6 +1673,20 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     s.Load();
 
                 t = s.Type();
+            }
+
+            else if (o is FieldInfo f)
+            {
+                if (f.IsStatic)
+                    CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
+
+                else if (TypeContext.Current.Fields.Any(_f => _f.Builder == f))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Ldarg_0);
+                    CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
+                }
+
+                return f.FieldType;
             }
 
             else if (o is MethodBuilder m)
@@ -1760,7 +1778,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
         }
 
-        if (context.full_identifier().Identifier().Length == 1)
+        if (context.full_identifier().Identifier().Length == 1 && exitEarly)
             return t;
 
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
