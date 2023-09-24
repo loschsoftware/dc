@@ -529,6 +529,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitExport_directive([NotNull] LoschScriptParser.Export_directiveContext context)
     {
         CurrentFile.ExportedNamespace = context.full_identifier().GetText();
+        CurrentFile.Imports.Add(CurrentFile.ExportedNamespace);
 
         CurrentFile.Fragments.Add(new()
         {
