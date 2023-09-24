@@ -244,5 +244,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a variable is assigned an expression of an incompatible type.
     /// </summary>
-    LS0057_IncompatibleType
+    LS0057_IncompatibleType,
+    /// <summary>
+    /// Message emitted when a type or member is declared with a redundant access modifier.
+    /// </summary>
+    LS0058_RedundantModifier
 }

@@ -283,14 +283,17 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CallingConventions callingConventions = CallingConventions.HasThis;
 
-            if (context.member_special_modifier().Any(m => m.Static() != null))
+            if (context.member_special_modifier().Any(m => m.Static() != null) || (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract))
                 callingConventions = CallingConventions.Standard;
 
             var paramTypes = ResolveParameterList(context.parameter_list());
 
             MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
                 context.Identifier().GetText(),
-                Helpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()),
+                Helpers.GetMethodAttributes(
+                    context.member_access_modifier(),
+                    context.member_oop_modifier(),
+                    context.member_special_modifier()),
                 callingConventions,
                 tReturn,
                 paramTypes.Select(p => p.Type).ToArray());

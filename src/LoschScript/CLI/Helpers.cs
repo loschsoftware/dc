@@ -464,6 +464,19 @@ internal static class Helpers
                 baseAttributes |= MethodAttributes.Static;
         }
 
+        if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(MethodAttributes.Static))
+        {
+            EmitMessage(
+                specialModifiers.First(s => s.GetText() == "static").Start.Line,
+                specialModifiers.First(s => s.GetText() == "static").Start.Column,
+                specialModifiers.First(s => s.GetText() == "static").GetText().Length,
+                LS0058_RedundantModifier,
+                "The 'static' modifier is implicit for module members and can be omitted.");
+        }
+
+        if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(MethodAttributes.Static))
+            baseAttributes |= MethodAttributes.Static;
+
         return baseAttributes;
     }
 
