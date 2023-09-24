@@ -6,6 +6,9 @@ namespace Losch.LoschScript.Configuration;
 [XmlRoot("LSConfig")]
 public sealed class LSConfig
 {
+    [XmlAttribute("FormatVersion")]
+    public string FormatVersion { get; set; }
+
     [XmlArray("References")]
     [XmlArrayItem(Type = typeof(AssemblyReference))]
     [XmlArrayItem(Type = typeof(FileReference))]
