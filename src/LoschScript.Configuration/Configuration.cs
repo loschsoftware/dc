@@ -44,7 +44,7 @@ public sealed class LSConfig
     [XmlElement("EmitPdb")]
     public bool CreatePdb { get; set; }
 
-    [XmlElement("IgnoreMessages")]
+    [XmlElement("IgnoreCodeStyleMessages")]
     public bool IgnoreMessages { get; set; }
     
     [XmlElement("IgnoreWarnings")]

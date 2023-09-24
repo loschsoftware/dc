@@ -439,6 +439,19 @@ internal static class Helpers
             }
         }
 
+        if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(FieldAttributes.Static))
+        {
+            EmitMessage(
+                specialModifiers.First(s => s.GetText() == "static").Start.Line,
+                specialModifiers.First(s => s.GetText() == "static").Start.Column,
+                specialModifiers.First(s => s.GetText() == "static").GetText().Length,
+                LS0058_RedundantModifier,
+                "The 'static' modifier is implicit for module members and can be omitted.");
+        }
+
+        if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(FieldAttributes.Static))
+            baseAttributes |= FieldAttributes.Static;
+
         return baseAttributes;
     }
 
