@@ -347,32 +347,49 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 IsNavigationTarget = true
             });
 
-            // TODO: Ignore "Attribute" suffix for attributes
-            if (context.attribute() != null && Helpers.ResolveTypeName(context.attribute().type_name()) == typeof(EntryPointAttribute))
+            if (context.attribute() != null)
             {
-                if (Context.EntryPointIsSet)
+                Type attribType = null;
+
+                if (context.attribute().type_name().GetText() == "EntryPoint")
+                    attribType = typeof(EntryPointAttribute);
+                else
+                    attribType = Helpers.ResolveTypeName(context.attribute().type_name());
+
+                if (attribType == typeof(EntryPointAttribute))
                 {
-                    EmitErrorMessage(
-                        context.attribute().Start.Line,
-                        context.attribute().Start.Column,
-                        context.attribute().GetText().Length,
-                        LS0055_MultipleEntryPoints,
-                        "Only one function can be declared as an entry point.");
+                    if (Context.EntryPointIsSet)
+                    {
+                        EmitErrorMessage(
+                            context.attribute().Start.Line,
+                            context.attribute().Start.Column,
+                            context.attribute().GetText().Length,
+                            LS0055_MultipleEntryPoints,
+                            "Only one function can be declared as an entry point.");
+                    }
+
+                    if (!mb.IsStatic)
+                    {
+                        EmitErrorMessage(
+                            context.Identifier().Symbol.Line,
+                            context.Identifier().Symbol.Column,
+                            context.Identifier().GetText().Length,
+                            LS0035_EntryPointNotStatic,
+                            "The application entry point must be static.");
+                    }
+
+                    Context.EntryPointIsSet = true;
+
+                    Context.Assembly.SetEntryPoint(mb);
+
+                    CurrentMethod.Builder.SetCustomAttribute(new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
                 }
 
-                if (!mb.IsStatic)
+                else if (attribType != null)
                 {
-                    EmitErrorMessage(
-                        context.Identifier().Symbol.Line,
-                        context.Identifier().Symbol.Column,
-                        context.Identifier().GetText().Length,
-                        LS0035_EntryPointNotStatic,
-                        "The application entry point must be static.");
+                    // TODO: Support attributes on functions
+                    //CurrentMethod.Builder.SetCustomAttribute(cab);
                 }
-
-                Context.EntryPointIsSet = true;
-
-                Context.Assembly.SetEntryPoint(mb);
             }
 
             return typeof(void);
