@@ -32,6 +32,9 @@ internal class Program
         }
         catch (Exception ex)
         {
+            if (ex is IOException)
+                EmitErrorMessage(0, 0, 0, LS0029_FileAccessDenied, $"Access to file '{Path.GetFileName(CurrentFile.Path)}' denied.");
+
             if (messages.Count == 0)
             {
                 EmitErrorMessage(0, 0, 0, LS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "lsc.exe");
