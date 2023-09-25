@@ -56,8 +56,8 @@ expression
     | expression Bar expression #or_expression
     | expression Double_Bar expression #logical_or_expression
     | expression Caret expression #xor_expression
-    | Caret Identifier  #typeof_expression
-    | Percent_Caret expression #nameof_expression
+    | Caret_Backslash Identifier  #typeof_expression
+    | Dollar_Backslash expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
     | (Var | Val)? Identifier (Colon type_name)? Equals expression #local_declaration_or_assignment
     | expression Arrow_Right expression #right_pipe_expression

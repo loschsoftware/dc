@@ -1308,6 +1308,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(Type);
     }
 
+    public override Type VisitNameof_expression([NotNull] LoschScriptParser.Nameof_expressionContext context)
+    {
+        CurrentMethod.IL.Emit(OpCodes.Ldstr, context.expression().GetText());
+        return typeof(string);
+    }
+
     public Type GetConstructorOrCast(Type cType, LoschScriptParser.ArglistContext arglist, int line, int column, int length)
     {
         if (arglist != null)

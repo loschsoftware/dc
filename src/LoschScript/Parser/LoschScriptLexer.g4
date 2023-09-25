@@ -92,7 +92,9 @@ At_Sign: '@';
 Exclamation_At: '!@';
 Dollar_Sign: '$';
 Caret: '^';
+Caret_Backslash: '^\\';
 Percent_Caret: '%^';
+Dollar_Backslash: '$\\';
 
 Bar: '|';
 Bar_GreaterThan: '|>';
@@ -120,6 +122,7 @@ Asterisk_Equals: '*=';
 Double_Asterisk: '**';
 Double_Asterisk_Equals: '**=';
 Slash: '/';
+Backslash: '\\';
 Slash_Equals: '/=';
 Percent: '%';
 Percent_Equals: '%=';
