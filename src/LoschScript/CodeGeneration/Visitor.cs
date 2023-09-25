@@ -1299,6 +1299,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context)
     {
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = Color.Word,
+            Line = context.Caret_Backslash().Symbol.Line,
+            Column = context.Caret_Backslash().Symbol.Column,
+            Length = context.Caret_Backslash().GetText().Length,
+        });
+
         Type t = Helpers.ResolveTypeName(context.Identifier().ToString(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
         CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
 
@@ -1310,6 +1318,22 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitNameof_expression([NotNull] LoschScriptParser.Nameof_expressionContext context)
     {
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = Color.Word,
+            Line = context.Dollar_Backslash().Symbol.Line,
+            Column = context.Dollar_Backslash().Symbol.Column,
+            Length = context.Dollar_Backslash().GetText().Length,
+        });
+
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = Color.ExpressionString,
+            Line = context.expression().Start.Line,
+            Column = context.expression().Start.Column,
+            Length = context.expression().GetText().Length,
+        });
+
         CurrentMethod.IL.Emit(OpCodes.Ldstr, context.expression().GetText());
         return typeof(string);
     }

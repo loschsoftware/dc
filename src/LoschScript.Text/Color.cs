@@ -119,5 +119,9 @@ public enum Color : byte
     /// <summary>
     /// An information message.
     /// </summary>
-    Information
+    Information,
+    /// <summary>
+    /// The color of the child expression of a nameof expression.
+    /// </summary>
+    ExpressionString
 }
