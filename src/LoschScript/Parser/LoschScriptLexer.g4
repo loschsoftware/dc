@@ -103,6 +103,8 @@ Double_Bar: '||';
 Bar_Equals: '|=';
 Double_Bar_Equals: '||=';
 Ampersand: '&';
+Ampersand_Greater: '&>';
+Less_Ampersand: '<&';
 Double_Ampersand: '&&';
 Double_Ampersand_Equals: '&&=';
 Ampersand_Equals: '&=';

@@ -497,9 +497,9 @@ internal static class Helpers
     {
         ParameterAttributes baseAttributes = ParameterAttributes.None;
 
-        if (modifier != null && modifier.Arrow_Right() != null)
+        if (modifier != null && modifier.Ampersand_Greater() != null)
             baseAttributes = ParameterAttributes.In;
-        else if (modifier != null && modifier.Arrow_Left() != null)
+        else if (modifier != null && modifier.Less_Ampersand() != null)
             baseAttributes = ParameterAttributes.Out;
 
         if (hasDefault)

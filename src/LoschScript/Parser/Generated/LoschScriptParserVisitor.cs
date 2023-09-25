@@ -369,6 +369,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitDivide_expression([NotNull] LoschScriptParser.Divide_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>byref_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitByref_expression([NotNull] LoschScriptParser.Byref_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>array_element_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

@@ -56,6 +56,7 @@ expression
     | expression Bar expression #or_expression
     | expression Double_Bar expression #logical_or_expression
     | expression Caret expression #xor_expression
+    | Ampersand expression #byref_expression
     | Caret_Backslash Identifier  #typeof_expression
     | Dollar_Backslash expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
@@ -142,10 +143,10 @@ identifier_atom
     ;
 
 type_name
-    : builtin_type_alias
+    : builtin_type_alias Ampersand?
     | Open_Paren type_name (Bar type_name)+ Close_Paren
-    | generic_identifier
-    | identifier_atom
+    | generic_identifier Ampersand?
+    | identifier_atom Ampersand?
     | param_list_type
     ;
 
@@ -292,8 +293,8 @@ parameter_list
 
 parameter_modifier
     : Ampersand // ref
-    | Arrow_Right // in
-    | Arrow_Left // out
+    | Ampersand_Greater // in
+    | Less_Ampersand // out
     ;
 
 parameter

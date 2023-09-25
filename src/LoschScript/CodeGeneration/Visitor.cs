@@ -475,6 +475,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Length = param.Identifier().GetText().Length,
         });
 
+        if (param.parameter_modifier()?.Ampersand() != null)
+            t = t.MakeByRefType();
+
         return t;
     }
 
@@ -1326,6 +1329,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Length = context.Dollar_Backslash().GetText().Length,
         });
 
+        CurrentMethod.IL.DeclareLocal(typeof(int).MakeByRefType());
+
         CurrentFile.Fragments.Add(new()
         {
             Color = Color.ExpressionString,
@@ -1336,6 +1341,15 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         CurrentMethod.IL.Emit(OpCodes.Ldstr, context.expression().GetText());
         return typeof(string);
+    }
+
+    public override Type VisitByref_expression([NotNull] LoschScriptParser.Byref_expressionContext context)
+    {
+        Type t = Visit(context.expression());
+
+        // TODO: Implement byref capability
+
+        return t.MakeByRefType();
     }
 
     public Type GetConstructorOrCast(Type cType, LoschScriptParser.ArglistContext arglist, int line, int column, int length)

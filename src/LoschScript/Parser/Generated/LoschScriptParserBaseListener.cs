@@ -709,6 +709,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitDivide_expression([NotNull] LoschScriptParser.Divide_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>byref_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterByref_expression([NotNull] LoschScriptParser.Byref_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>byref_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitByref_expression([NotNull] LoschScriptParser.Byref_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>array_element_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
