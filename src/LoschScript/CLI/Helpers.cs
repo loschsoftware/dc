@@ -109,7 +109,7 @@ internal static class Helpers
             Context.Configuration.Copyright,
             Context.Configuration.Trademark);
 
-        if (Context.Files.All(f => f.Errors.Count == 0))
+        if (Context.Files.All(f => f.Errors.Count == 0) && ProgramContext.VisitorStep1.Files.All(f => f.Errors.Count == 0))
             Context.Assembly.Save(assembly);
 
         if (File.Exists(Context.Configuration.ApplicationIcon))
