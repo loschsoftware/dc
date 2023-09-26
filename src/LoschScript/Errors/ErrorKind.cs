@@ -248,5 +248,25 @@ public enum ErrorKind
     /// <summary>
     /// Message emitted when a type or member is declared with a redundant access modifier.
     /// </summary>
-    LS0058_RedundantModifier
+    LS0058_RedundantModifier,
+    /// <summary>
+    /// Emitted when a rethrow expression is used outside of a catch block.
+    /// </summary>
+    LS0059_RethrowOutsideCatchBlock,
+    /// <summary>
+    /// Emitted when the expression to be thrown is not a reference type.
+    /// </summary>
+    LS0060_InvalidThrowExpression,
+    /// <summary>
+    /// Emitted when a try block is not followed by a catch block.
+    /// </summary>
+    LS0061_MissingCatchBranch,
+    /// <summary>
+    /// Emitted when a local is not in scope.
+    /// </summary>
+    LS0062_LocalOutsideScope,
+    /// <summary>
+    /// Emitted when a feature that is not yet implemented is used.
+    /// </summary>
+    LS0063_UnsupportedFeature
 }

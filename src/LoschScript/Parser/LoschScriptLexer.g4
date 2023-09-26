@@ -59,7 +59,10 @@ Base: 'base';
 Override: 'override';
 
 Try: 'try';
-Raise: 'raise';
+Raise: 'throw';
+Catch: 'catch';
+Finally: 'finally';
+Fault: 'fault';
 
 True: 'true';
 False: 'false';

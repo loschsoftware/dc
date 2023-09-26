@@ -163,34 +163,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitCode_block([NotNull] LoschScriptParser.Code_blockContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>attributed_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterAttributed_expression([NotNull] LoschScriptParser.Attributed_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>attributed_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitAttributed_expression([NotNull] LoschScriptParser.Attributed_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>equality_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterEquality_expression([NotNull] LoschScriptParser.Equality_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>equality_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitEquality_expression([NotNull] LoschScriptParser.Equality_expressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>subtraction_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -219,20 +191,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBitwise_complement_expression([NotNull] LoschScriptParser.Bitwise_complement_expressionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>until_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterUntil_loop([NotNull] LoschScriptParser.Until_loopContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>until_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitUntil_loop([NotNull] LoschScriptParser.Until_loopContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>right_pipe_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -246,76 +204,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitRight_pipe_expression([NotNull] LoschScriptParser.Right_pipe_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>while_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterWhile_loop([NotNull] LoschScriptParser.While_loopContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>while_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitWhile_loop([NotNull] LoschScriptParser.While_loopContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>xor_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterXor_expression([NotNull] LoschScriptParser.Xor_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>xor_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitXor_expression([NotNull] LoschScriptParser.Xor_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>prefix_if_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>prefix_if_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>logical_negation_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterLogical_negation_expression([NotNull] LoschScriptParser.Logical_negation_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>logical_negation_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitLogical_negation_expression([NotNull] LoschScriptParser.Logical_negation_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>right_shift_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>right_shift_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>array_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -415,34 +303,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAnd_expression([NotNull] LoschScriptParser.And_expressionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>range_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterRange_expression([NotNull] LoschScriptParser.Range_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>range_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitRange_expression([NotNull] LoschScriptParser.Range_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>member_access_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>member_access_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>newlined_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -457,34 +317,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>remainder_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>remainder_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>typeof_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>typeof_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>block_postfix_if_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -498,20 +330,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBlock_postfix_if_expression([NotNull] LoschScriptParser.Block_postfix_if_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>block_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>block_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>postfix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -540,48 +358,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitPower_expression([NotNull] LoschScriptParser.Power_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>left_pipe_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterLeft_pipe_expression([NotNull] LoschScriptParser.Left_pipe_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>left_pipe_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitLeft_pipe_expression([NotNull] LoschScriptParser.Left_pipe_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>dictionary_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>dictionary_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>prefix_unless_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPrefix_unless_expression([NotNull] LoschScriptParser.Prefix_unless_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>prefix_unless_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPrefix_unless_expression([NotNull] LoschScriptParser.Prefix_unless_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>addition_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -639,6 +415,300 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>or_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterOr_expression([NotNull] LoschScriptParser.Or_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>or_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitOr_expression([NotNull] LoschScriptParser.Or_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>try_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterTry_expression([NotNull] LoschScriptParser.Try_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>try_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitTry_expression([NotNull] LoschScriptParser.Try_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>dotted_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>dotted_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>left_shift_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>left_shift_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>attributed_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAttributed_expression([NotNull] LoschScriptParser.Attributed_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>attributed_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAttributed_expression([NotNull] LoschScriptParser.Attributed_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>equality_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterEquality_expression([NotNull] LoschScriptParser.Equality_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>equality_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitEquality_expression([NotNull] LoschScriptParser.Equality_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>until_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterUntil_loop([NotNull] LoschScriptParser.Until_loopContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>until_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitUntil_loop([NotNull] LoschScriptParser.Until_loopContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>while_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterWhile_loop([NotNull] LoschScriptParser.While_loopContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>while_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitWhile_loop([NotNull] LoschScriptParser.While_loopContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>xor_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterXor_expression([NotNull] LoschScriptParser.Xor_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>xor_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitXor_expression([NotNull] LoschScriptParser.Xor_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>prefix_if_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>prefix_if_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>logical_negation_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLogical_negation_expression([NotNull] LoschScriptParser.Logical_negation_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>logical_negation_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLogical_negation_expression([NotNull] LoschScriptParser.Logical_negation_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>right_shift_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>right_shift_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>rethrow_exception</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterRethrow_exception([NotNull] LoschScriptParser.Rethrow_exceptionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>rethrow_exception</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitRethrow_exception([NotNull] LoschScriptParser.Rethrow_exceptionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>range_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterRange_expression([NotNull] LoschScriptParser.Range_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>range_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitRange_expression([NotNull] LoschScriptParser.Range_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>remainder_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>remainder_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>typeof_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>typeof_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>block_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>block_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>left_pipe_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLeft_pipe_expression([NotNull] LoschScriptParser.Left_pipe_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>left_pipe_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLeft_pipe_expression([NotNull] LoschScriptParser.Left_pipe_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>dictionary_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>dictionary_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>prefix_unless_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPrefix_unless_expression([NotNull] LoschScriptParser.Prefix_unless_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>prefix_unless_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPrefix_unless_expression([NotNull] LoschScriptParser.Prefix_unless_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -667,20 +737,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>or_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterOr_expression([NotNull] LoschScriptParser.Or_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>or_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitOr_expression([NotNull] LoschScriptParser.Or_expressionContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>nameof_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -694,20 +750,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitNameof_expression([NotNull] LoschScriptParser.Nameof_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>try_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTry_expression([NotNull] LoschScriptParser.Try_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>try_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTry_expression([NotNull] LoschScriptParser.Try_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>postfix_if_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -778,34 +820,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLogical_and_expression([NotNull] LoschScriptParser.Logical_and_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>dotted_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>dotted_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by the <c>left_shift_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>left_shift_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>full_identifier_member_access_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

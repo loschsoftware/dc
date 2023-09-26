@@ -44,25 +44,26 @@ public partial class LoschScriptParser : Parser {
 		Int32=26, UInt32=27, Int64=28, UInt64=29, Native=30, UNative=31, Float32=32, 
 		Float64=33, Decimal=34, Bool=35, String=36, Char=37, Dynamic=38, Object=39, 
 		Infix=40, Inline=41, Ref=42, Var=43, Val=44, Const=45, Base=46, Override=47, 
-		Try=48, Raise=49, True=50, False=51, This=52, Open_Paren=53, Close_Paren=54, 
-		Open_Paren_Bar=55, Bar_Close_Paren=56, Open_Bracket=57, Close_Bracket=58, 
-		Open_Brace=59, Close_Brace=60, Comma=61, Double_Comma=62, Dot=63, Double_Dot=64, 
-		Double_Dot_Question_Mark=65, Dot_Equals=66, Colon=67, Double_Colon=68, 
-		Triple_Colon=69, Semicolon=70, Underscore=71, Single_Quote=72, Double_Quote=73, 
-		Question_Mark=74, Exclamation_Mark=75, Exclamation_Question=76, Exclamation_Colon=77, 
-		At_Sign=78, Exclamation_At=79, Dollar_Sign=80, Caret=81, Caret_Backslash=82, 
-		Percent_Caret=83, Dollar_Backslash=84, Bar=85, Bar_GreaterThan=86, LessThan_Bar=87, 
-		Double_Bar=88, Bar_Equals=89, Double_Bar_Equals=90, Ampersand=91, Ampersand_Greater=92, 
-		Less_Ampersand=93, Double_Ampersand=94, Double_Ampersand_Equals=95, Ampersand_Equals=96, 
-		Less_Than=97, Greater_Than=98, Less_Equals=99, Greater_Equals=100, Double_Equals=101, 
-		Exclamation_Equals=102, Plus=103, Plus_Equals=104, Minus=105, Minus_Equals=106, 
-		Asterisk=107, Asterisk_Equals=108, Double_Asterisk=109, Double_Asterisk_Equals=110, 
-		Slash=111, Backslash=112, Slash_Equals=113, Percent=114, Percent_Equals=115, 
-		Equals=116, Tilde=117, Double_Tilde=118, Tilde_Equals=119, Double_Less_Than=120, 
-		Double_Less_Than_Equals=121, Double_Greater_Than=122, Double_Greater_Than_Equals=123, 
-		Arrow_Right=124, Arrow_Left=125, Double_Backtick=126, Identifier=127, 
-		Integer_Literal=128, Hex_Integer_Literal=129, Binary_Integer_Literal=130, 
-		Real_Literal=131, Character_Literal=132, String_Literal=133, Verbatim_String_Literal=134;
+		Try=48, Raise=49, Catch=50, Finally=51, Fault=52, True=53, False=54, This=55, 
+		Open_Paren=56, Close_Paren=57, Open_Paren_Bar=58, Bar_Close_Paren=59, 
+		Open_Bracket=60, Close_Bracket=61, Open_Brace=62, Close_Brace=63, Comma=64, 
+		Double_Comma=65, Dot=66, Double_Dot=67, Double_Dot_Question_Mark=68, Dot_Equals=69, 
+		Colon=70, Double_Colon=71, Triple_Colon=72, Semicolon=73, Underscore=74, 
+		Single_Quote=75, Double_Quote=76, Question_Mark=77, Exclamation_Mark=78, 
+		Exclamation_Question=79, Exclamation_Colon=80, At_Sign=81, Exclamation_At=82, 
+		Dollar_Sign=83, Caret=84, Caret_Backslash=85, Percent_Caret=86, Dollar_Backslash=87, 
+		Bar=88, Bar_GreaterThan=89, LessThan_Bar=90, Double_Bar=91, Bar_Equals=92, 
+		Double_Bar_Equals=93, Ampersand=94, Ampersand_Greater=95, Less_Ampersand=96, 
+		Double_Ampersand=97, Double_Ampersand_Equals=98, Ampersand_Equals=99, 
+		Less_Than=100, Greater_Than=101, Less_Equals=102, Greater_Equals=103, 
+		Double_Equals=104, Exclamation_Equals=105, Plus=106, Plus_Equals=107, 
+		Minus=108, Minus_Equals=109, Asterisk=110, Asterisk_Equals=111, Double_Asterisk=112, 
+		Double_Asterisk_Equals=113, Slash=114, Backslash=115, Slash_Equals=116, 
+		Percent=117, Percent_Equals=118, Equals=119, Tilde=120, Double_Tilde=121, 
+		Tilde_Equals=122, Double_Less_Than=123, Double_Less_Than_Equals=124, Double_Greater_Than=125, 
+		Double_Greater_Than_Equals=126, Arrow_Right=127, Arrow_Left=128, Double_Backtick=129, 
+		Identifier=130, Integer_Literal=131, Hex_Integer_Literal=132, Binary_Integer_Literal=133, 
+		Real_Literal=134, Character_Literal=135, String_Literal=136, Verbatim_String_Literal=137;
 	public const int
 		RULE_compilation_unit = 0, RULE_file_body = 1, RULE_top_level_statements = 2, 
 		RULE_full_program = 3, RULE_import_directive = 4, RULE_export_directive = 5, 
@@ -109,15 +110,16 @@ public partial class LoschScriptParser : Parser {
 		"'int64'", "'uint64'", "'native'", "'unative'", "'float32'", "'float64'", 
 		"'decimal'", "'bool'", "'string'", "'char'", "'dynamic'", "'object'", 
 		"'infix'", "'inline'", "'ref'", "'var'", "'val'", "'const'", "'base'", 
-		"'override'", "'try'", "'raise'", "'true'", "'false'", "'this'", "'('", 
-		"')'", "'(|'", "'|)'", "'['", "']'", "'{'", "'}'", "','", "',,'", "'.'", 
-		"'..'", "'..?'", "'.='", "':'", "'::'", "':::'", "';'", "'_'", "'''", 
-		"'\"'", "'?'", "'!'", "'!?'", "'!:'", "'@'", "'!@'", "'$'", "'^'", "'^\\'", 
-		"'%^'", "'$\\'", "'|'", "'|>'", "'<|'", "'||'", "'|='", "'||='", "'&'", 
-		"'&>'", "'<&'", "'&&'", "'&&='", "'&='", "'<'", "'>'", "'<='", "'>='", 
-		"'=='", "'!='", "'+'", "'+='", "'-'", "'-='", "'*'", "'*='", "'**'", "'**='", 
-		"'/'", "'\\'", "'/='", "'%'", "'%='", "'='", "'~'", "'~~'", "'~='", "'<<'", 
-		"'<<='", "'>>'", "'>>='", "'->'", "'<-'", "'``'"
+		"'override'", "'try'", "'throw'", "'catch'", "'finally'", "'fault'", "'true'", 
+		"'false'", "'this'", "'('", "')'", "'(|'", "'|)'", "'['", "']'", "'{'", 
+		"'}'", "','", "',,'", "'.'", "'..'", "'..?'", "'.='", "':'", "'::'", "':::'", 
+		"';'", "'_'", "'''", "'\"'", "'?'", "'!'", "'!?'", "'!:'", "'@'", "'!@'", 
+		"'$'", "'^'", "'^\\'", "'%^'", "'$\\'", "'|'", "'|>'", "'<|'", "'||'", 
+		"'|='", "'||='", "'&'", "'&>'", "'<&'", "'&&'", "'&&='", "'&='", "'<'", 
+		"'>'", "'<='", "'>='", "'=='", "'!='", "'+'", "'+='", "'-'", "'-='", "'*'", 
+		"'*='", "'**'", "'**='", "'/'", "'\\'", "'/='", "'%'", "'%='", "'='", 
+		"'~'", "'~~'", "'~='", "'<<'", "'<<='", "'>>'", "'>>='", "'->'", "'<-'", 
+		"'``'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, "Ws", "NewLine", "Single_Line_Comment", "Delimited_Comment", "Import", 
@@ -126,12 +128,12 @@ public partial class LoschScriptParser : Parser {
 		"Virtual", "Extern", "Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", 
 		"Int64", "UInt64", "Native", "UNative", "Float32", "Float64", "Decimal", 
 		"Bool", "String", "Char", "Dynamic", "Object", "Infix", "Inline", "Ref", 
-		"Var", "Val", "Const", "Base", "Override", "Try", "Raise", "True", "False", 
-		"This", "Open_Paren", "Close_Paren", "Open_Paren_Bar", "Bar_Close_Paren", 
-		"Open_Bracket", "Close_Bracket", "Open_Brace", "Close_Brace", "Comma", 
-		"Double_Comma", "Dot", "Double_Dot", "Double_Dot_Question_Mark", "Dot_Equals", 
-		"Colon", "Double_Colon", "Triple_Colon", "Semicolon", "Underscore", "Single_Quote", 
-		"Double_Quote", "Question_Mark", "Exclamation_Mark", "Exclamation_Question", 
+		"Var", "Val", "Const", "Base", "Override", "Try", "Raise", "Catch", "Finally", 
+		"Fault", "True", "False", "This", "Open_Paren", "Close_Paren", "Open_Paren_Bar", 
+		"Bar_Close_Paren", "Open_Bracket", "Close_Bracket", "Open_Brace", "Close_Brace", 
+		"Comma", "Double_Comma", "Dot", "Double_Dot", "Double_Dot_Question_Mark", 
+		"Dot_Equals", "Colon", "Double_Colon", "Triple_Colon", "Semicolon", "Underscore", 
+		"Single_Quote", "Double_Quote", "Question_Mark", "Exclamation_Mark", "Exclamation_Question", 
 		"Exclamation_Colon", "At_Sign", "Exclamation_At", "Dollar_Sign", "Caret", 
 		"Caret_Backslash", "Percent_Caret", "Dollar_Backslash", "Bar", "Bar_GreaterThan", 
 		"LessThan_Bar", "Double_Bar", "Bar_Equals", "Double_Bar_Equals", "Ampersand", 
@@ -412,7 +414,7 @@ public partial class LoschScriptParser : Parser {
 			State = 147;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (((((_la - 2)) & ~0x3f) == 0 && ((1L << (_la - 2)) & 4796269831475167233L) != 0) || ((((_la - 71)) & ~0x3f) == 0 && ((1L << (_la - 71)) & -936678353680716359L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 5900586325064548356L) != 0) || ((((_la - 67)) & ~0x3f) == 0 && ((1L << (_la - 67)) & -9214364828874384255L) != 0) || ((((_la - 131)) & ~0x3f) == 0 && ((1L << (_la - 131)) & 121L) != 0)) {
 				{
 				State = 145;
 				ErrorHandler.Sync(this);
@@ -1056,7 +1058,7 @@ public partial class LoschScriptParser : Parser {
 				State = 223;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				while (((((_la - 2)) & ~0x3f) == 0 && ((1L << (_la - 2)) & 4796269831475167233L) != 0) || ((((_la - 71)) & ~0x3f) == 0 && ((1L << (_la - 71)) & -936678353680716359L) != 0)) {
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 5900586325064548356L) != 0) || ((((_la - 67)) & ~0x3f) == 0 && ((1L << (_la - 67)) & -9214364828874384255L) != 0) || ((((_la - 131)) & ~0x3f) == 0 && ((1L << (_la - 131)) & 121L) != 0)) {
 					{
 					State = 221;
 					ErrorHandler.Sync(this);
@@ -1147,62 +1149,6 @@ public partial class LoschScriptParser : Parser {
 			base.CopyFrom(context);
 		}
 	}
-	public partial class Attributed_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
-			return GetRuleContext<ExpressionContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public AttributeContext[] attribute() {
-			return GetRuleContexts<AttributeContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public AttributeContext attribute(int i) {
-			return GetRuleContext<AttributeContext>(i);
-		}
-		public Attributed_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterAttributed_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitAttributed_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitAttributed_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Equality_expressionContext : ExpressionContext {
-		public IToken op;
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Equals() { return GetToken(LoschScriptParser.Double_Equals, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Exclamation_Equals() { return GetToken(LoschScriptParser.Exclamation_Equals, 0); }
-		public Equality_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterEquality_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitEquality_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitEquality_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
 	public partial class Subtraction_expressionContext : ExpressionContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
 			return GetRuleContexts<ExpressionContext>();
@@ -1252,36 +1198,6 @@ public partial class LoschScriptParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
-	public partial class Until_loopContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Exclamation_At() { return GetToken(LoschScriptParser.Exclamation_At, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Equals() { return GetToken(LoschScriptParser.Equals, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public Code_blockContext code_block() {
-			return GetRuleContext<Code_blockContext>(0);
-		}
-		public Until_loopContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterUntil_loop(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitUntil_loop(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitUntil_loop(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
 	public partial class Right_pipe_expressionContext : ExpressionContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
 			return GetRuleContexts<ExpressionContext>();
@@ -1305,146 +1221,6 @@ public partial class LoschScriptParser : Parser {
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
 			if (typedVisitor != null) return typedVisitor.VisitRight_pipe_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class While_loopContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode At_Sign() { return GetToken(LoschScriptParser.At_Sign, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Equals() { return GetToken(LoschScriptParser.Equals, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public Code_blockContext code_block() {
-			return GetRuleContext<Code_blockContext>(0);
-		}
-		public While_loopContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterWhile_loop(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitWhile_loop(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitWhile_loop(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Xor_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Caret() { return GetToken(LoschScriptParser.Caret, 0); }
-		public Xor_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterXor_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitXor_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitXor_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Prefix_if_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public If_branchContext if_branch() {
-			return GetRuleContext<If_branchContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] NewLine() { return GetTokens(LoschScriptParser.NewLine); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NewLine(int i) {
-			return GetToken(LoschScriptParser.NewLine, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Elif_branchContext[] elif_branch() {
-			return GetRuleContexts<Elif_branchContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Elif_branchContext elif_branch(int i) {
-			return GetRuleContext<Elif_branchContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Else_branchContext else_branch() {
-			return GetRuleContext<Else_branchContext>(0);
-		}
-		public Prefix_if_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterPrefix_if_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitPrefix_if_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitPrefix_if_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Logical_negation_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Exclamation_Mark() { return GetToken(LoschScriptParser.Exclamation_Mark, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
-			return GetRuleContext<ExpressionContext>(0);
-		}
-		public Logical_negation_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterLogical_negation_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitLogical_negation_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitLogical_negation_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Right_shift_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Greater_Than() { return GetToken(LoschScriptParser.Double_Greater_Than, 0); }
-		public Right_shift_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterRight_shift_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitRight_shift_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRight_shift_expression(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -1636,61 +1412,6 @@ public partial class LoschScriptParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
-	public partial class Range_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public RangeContext range() {
-			return GetRuleContext<RangeContext>(0);
-		}
-		public Range_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterRange_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitRange_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRange_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Member_access_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
-			return GetRuleContext<ExpressionContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Dot() { return GetTokens(LoschScriptParser.Dot); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Dot(int i) {
-			return GetToken(LoschScriptParser.Dot, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Identifier() { return GetTokens(LoschScriptParser.Identifier); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Identifier(int i) {
-			return GetToken(LoschScriptParser.Identifier, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ArglistContext arglist() {
-			return GetRuleContext<ArglistContext>(0);
-		}
-		public Member_access_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterMember_access_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitMember_access_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitMember_access_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
 	public partial class Newlined_expressionContext : ExpressionContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
 			return GetRuleContext<ExpressionContext>(0);
@@ -1711,53 +1432,6 @@ public partial class LoschScriptParser : Parser {
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
 			if (typedVisitor != null) return typedVisitor.VisitNewlined_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Remainder_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Percent() { return GetToken(LoschScriptParser.Percent, 0); }
-		public Remainder_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterRemainder_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitRemainder_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRemainder_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Typeof_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Caret_Backslash() { return GetToken(LoschScriptParser.Caret_Backslash, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Identifier() { return GetToken(LoschScriptParser.Identifier, 0); }
-		public Typeof_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterTypeof_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitTypeof_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitTypeof_expression(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -1784,28 +1458,6 @@ public partial class LoschScriptParser : Parser {
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
 			if (typedVisitor != null) return typedVisitor.VisitBlock_postfix_if_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Block_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public Code_blockContext code_block() {
-			return GetRuleContext<Code_blockContext>(0);
-		}
-		public Block_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterBlock_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitBlock_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitBlock_expression(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -1857,104 +1509,6 @@ public partial class LoschScriptParser : Parser {
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
 			if (typedVisitor != null) return typedVisitor.VisitPower_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Left_pipe_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Arrow_Left() { return GetToken(LoschScriptParser.Arrow_Left, 0); }
-		public Left_pipe_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterLeft_pipe_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitLeft_pipe_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitLeft_pipe_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Dictionary_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Open_Bracket() { return GetTokens(LoschScriptParser.Open_Bracket); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Open_Bracket(int i) {
-			return GetToken(LoschScriptParser.Open_Bracket, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Close_Bracket() { return GetTokens(LoschScriptParser.Close_Bracket); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Close_Bracket(int i) {
-			return GetToken(LoschScriptParser.Close_Bracket, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Comma() { return GetTokens(LoschScriptParser.Comma); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Comma(int i) {
-			return GetToken(LoschScriptParser.Comma, i);
-		}
-		public Dictionary_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterDictionary_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitDictionary_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitDictionary_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Prefix_unless_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public Unless_branchContext unless_branch() {
-			return GetRuleContext<Unless_branchContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] NewLine() { return GetTokens(LoschScriptParser.NewLine); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NewLine(int i) {
-			return GetToken(LoschScriptParser.NewLine, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Else_unless_branchContext[] else_unless_branch() {
-			return GetRuleContexts<Else_unless_branchContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Else_unless_branchContext else_unless_branch(int i) {
-			return GetRuleContext<Else_unless_branchContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Else_branchContext else_branch() {
-			return GetRuleContext<Else_branchContext>(0);
-		}
-		public Prefix_unless_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterPrefix_unless_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitPrefix_unless_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitPrefix_unless_expression(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -2062,6 +1616,584 @@ public partial class LoschScriptParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
+	public partial class Or_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Bar() { return GetToken(LoschScriptParser.Bar, 0); }
+		public Or_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterOr_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitOr_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOr_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Try_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public Try_branchContext try_branch() {
+			return GetRuleContext<Try_branchContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Catch_branchContext[] catch_branch() {
+			return GetRuleContexts<Catch_branchContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Catch_branchContext catch_branch(int i) {
+			return GetRuleContext<Catch_branchContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Fault_branchContext fault_branch() {
+			return GetRuleContext<Fault_branchContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Finally_branchContext finally_branch() {
+			return GetRuleContext<Finally_branchContext>(0);
+		}
+		public Try_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterTry_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitTry_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitTry_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Dotted_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
+			return GetRuleContext<ExpressionContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Dot() { return GetToken(LoschScriptParser.Dot, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Identifier() { return GetToken(LoschScriptParser.Identifier, 0); }
+		public Dotted_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterDotted_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitDotted_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitDotted_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Left_shift_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Less_Than() { return GetToken(LoschScriptParser.Double_Less_Than, 0); }
+		public Left_shift_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterLeft_shift_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitLeft_shift_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitLeft_shift_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Attributed_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
+			return GetRuleContext<ExpressionContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public AttributeContext[] attribute() {
+			return GetRuleContexts<AttributeContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public AttributeContext attribute(int i) {
+			return GetRuleContext<AttributeContext>(i);
+		}
+		public Attributed_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterAttributed_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitAttributed_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitAttributed_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Equality_expressionContext : ExpressionContext {
+		public IToken op;
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Equals() { return GetToken(LoschScriptParser.Double_Equals, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Exclamation_Equals() { return GetToken(LoschScriptParser.Exclamation_Equals, 0); }
+		public Equality_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterEquality_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitEquality_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEquality_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Until_loopContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Exclamation_At() { return GetToken(LoschScriptParser.Exclamation_At, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Equals() { return GetToken(LoschScriptParser.Equals, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public Code_blockContext code_block() {
+			return GetRuleContext<Code_blockContext>(0);
+		}
+		public Until_loopContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterUntil_loop(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitUntil_loop(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitUntil_loop(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class While_loopContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode At_Sign() { return GetToken(LoschScriptParser.At_Sign, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Equals() { return GetToken(LoschScriptParser.Equals, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public Code_blockContext code_block() {
+			return GetRuleContext<Code_blockContext>(0);
+		}
+		public While_loopContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterWhile_loop(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitWhile_loop(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitWhile_loop(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Xor_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Caret() { return GetToken(LoschScriptParser.Caret, 0); }
+		public Xor_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterXor_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitXor_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitXor_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Prefix_if_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public If_branchContext if_branch() {
+			return GetRuleContext<If_branchContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] NewLine() { return GetTokens(LoschScriptParser.NewLine); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NewLine(int i) {
+			return GetToken(LoschScriptParser.NewLine, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Elif_branchContext[] elif_branch() {
+			return GetRuleContexts<Elif_branchContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Elif_branchContext elif_branch(int i) {
+			return GetRuleContext<Elif_branchContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Else_branchContext else_branch() {
+			return GetRuleContext<Else_branchContext>(0);
+		}
+		public Prefix_if_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterPrefix_if_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitPrefix_if_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitPrefix_if_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Logical_negation_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Exclamation_Mark() { return GetToken(LoschScriptParser.Exclamation_Mark, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
+			return GetRuleContext<ExpressionContext>(0);
+		}
+		public Logical_negation_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterLogical_negation_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitLogical_negation_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitLogical_negation_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Right_shift_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Greater_Than() { return GetToken(LoschScriptParser.Double_Greater_Than, 0); }
+		public Right_shift_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterRight_shift_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitRight_shift_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRight_shift_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Rethrow_exceptionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Raise() { return GetToken(LoschScriptParser.Raise, 0); }
+		public Rethrow_exceptionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterRethrow_exception(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitRethrow_exception(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRethrow_exception(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Range_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public RangeContext range() {
+			return GetRuleContext<RangeContext>(0);
+		}
+		public Range_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterRange_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitRange_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRange_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Member_access_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
+			return GetRuleContext<ExpressionContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Dot() { return GetTokens(LoschScriptParser.Dot); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Dot(int i) {
+			return GetToken(LoschScriptParser.Dot, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Identifier() { return GetTokens(LoschScriptParser.Identifier); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Identifier(int i) {
+			return GetToken(LoschScriptParser.Identifier, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ArglistContext arglist() {
+			return GetRuleContext<ArglistContext>(0);
+		}
+		public Member_access_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterMember_access_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitMember_access_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMember_access_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Remainder_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Percent() { return GetToken(LoschScriptParser.Percent, 0); }
+		public Remainder_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterRemainder_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitRemainder_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRemainder_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Typeof_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Caret_Backslash() { return GetToken(LoschScriptParser.Caret_Backslash, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Identifier() { return GetToken(LoschScriptParser.Identifier, 0); }
+		public Typeof_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterTypeof_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitTypeof_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitTypeof_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Block_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public Code_blockContext code_block() {
+			return GetRuleContext<Code_blockContext>(0);
+		}
+		public Block_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterBlock_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitBlock_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitBlock_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Left_pipe_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Arrow_Left() { return GetToken(LoschScriptParser.Arrow_Left, 0); }
+		public Left_pipe_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterLeft_pipe_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitLeft_pipe_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitLeft_pipe_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Dictionary_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Open_Bracket() { return GetTokens(LoschScriptParser.Open_Bracket); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Open_Bracket(int i) {
+			return GetToken(LoschScriptParser.Open_Bracket, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Close_Bracket() { return GetTokens(LoschScriptParser.Close_Bracket); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Close_Bracket(int i) {
+			return GetToken(LoschScriptParser.Close_Bracket, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
+			return GetRuleContexts<ExpressionContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
+			return GetRuleContext<ExpressionContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Comma() { return GetTokens(LoschScriptParser.Comma); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Comma(int i) {
+			return GetToken(LoschScriptParser.Comma, i);
+		}
+		public Dictionary_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterDictionary_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitDictionary_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitDictionary_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class Prefix_unless_expressionContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public Unless_branchContext unless_branch() {
+			return GetRuleContext<Unless_branchContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] NewLine() { return GetTokens(LoschScriptParser.NewLine); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NewLine(int i) {
+			return GetToken(LoschScriptParser.NewLine, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Else_unless_branchContext[] else_unless_branch() {
+			return GetRuleContexts<Else_unless_branchContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Else_unless_branchContext else_unless_branch(int i) {
+			return GetRuleContext<Else_unless_branchContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Else_branchContext else_branch() {
+			return GetRuleContext<Else_branchContext>(0);
+		}
+		public Prefix_unless_expressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.EnterPrefix_unless_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
+			if (typedListener != null) typedListener.ExitPrefix_unless_expression(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitPrefix_unless_expression(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
 	public partial class Local_declaration_or_assignmentContext : ExpressionContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Identifier() { return GetToken(LoschScriptParser.Identifier, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Equals() { return GetToken(LoschScriptParser.Equals, 0); }
@@ -2123,32 +2255,6 @@ public partial class LoschScriptParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
-	public partial class Or_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Bar() { return GetToken(LoschScriptParser.Bar, 0); }
-		public Or_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterOr_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitOr_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitOr_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
 	public partial class Nameof_expressionContext : ExpressionContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Dollar_Backslash() { return GetToken(LoschScriptParser.Dollar_Backslash, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
@@ -2169,37 +2275,6 @@ public partial class LoschScriptParser : Parser {
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
 			if (typedVisitor != null) return typedVisitor.VisitNameof_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Try_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public Try_branchContext try_branch() {
-			return GetRuleContext<Try_branchContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Catch_branchContext catch_branch() {
-			return GetRuleContext<Catch_branchContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Finally_branchContext finally_branch() {
-			return GetRuleContext<Finally_branchContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public Fault_branchContext fault_branch() {
-			return GetRuleContext<Fault_branchContext>(0);
-		}
-		public Try_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterTry_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitTry_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitTry_expression(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -2330,56 +2405,6 @@ public partial class LoschScriptParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
-	public partial class Dotted_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
-			return GetRuleContext<ExpressionContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Dot() { return GetToken(LoschScriptParser.Dot, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Identifier() { return GetToken(LoschScriptParser.Identifier, 0); }
-		public Dotted_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterDotted_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitDotted_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitDotted_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class Left_shift_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Less_Than() { return GetToken(LoschScriptParser.Double_Less_Than, 0); }
-		public Left_shift_expressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.EnterLeft_shift_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ILoschScriptParserListener typedListener = listener as ILoschScriptParserListener;
-			if (typedListener != null) typedListener.ExitLeft_shift_expression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILoschScriptParserVisitor<TResult> typedVisitor = visitor as ILoschScriptParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitLeft_shift_expression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
 	public partial class Full_identifier_member_access_expressionContext : ExpressionContext {
 		[System.Diagnostics.DebuggerNonUserCode] public Full_identifierContext full_identifier() {
 			return GetRuleContext<Full_identifierContext>(0);
@@ -2449,9 +2474,9 @@ public partial class LoschScriptParser : Parser {
 			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 402;
+			State = 408;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,46,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,47,Context) ) {
 			case 1:
 				{
 				_localctx = new Bitwise_complement_expressionContext(_localctx);
@@ -2461,7 +2486,7 @@ public partial class LoschScriptParser : Parser {
 				State = 232;
 				Match(Tilde);
 				State = 233;
-				expression(48);
+				expression(49);
 				}
 				break;
 			case 2:
@@ -2472,7 +2497,7 @@ public partial class LoschScriptParser : Parser {
 				State = 234;
 				Match(Exclamation_Mark);
 				State = 235;
-				expression(45);
+				expression(46);
 				}
 				break;
 			case 3:
@@ -2483,7 +2508,7 @@ public partial class LoschScriptParser : Parser {
 				State = 236;
 				Match(Ampersand);
 				State = 237;
-				expression(30);
+				expression(31);
 				}
 				break;
 			case 4:
@@ -2505,7 +2530,7 @@ public partial class LoschScriptParser : Parser {
 				State = 240;
 				Match(Dollar_Backslash);
 				State = 241;
-				expression(28);
+				expression(29);
 				}
 				break;
 			case 6:
@@ -2547,7 +2572,7 @@ public partial class LoschScriptParser : Parser {
 				State = 250;
 				Match(Equals);
 				State = 251;
-				expression(26);
+				expression(27);
 				}
 				break;
 			case 7:
@@ -2585,7 +2610,7 @@ public partial class LoschScriptParser : Parser {
 					_alt = Interpreter.AdaptivePredict(TokenStream,23,Context);
 				} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
 				State = 258;
-				expression(20);
+				expression(21);
 				}
 				break;
 			case 9:
@@ -2802,7 +2827,7 @@ public partial class LoschScriptParser : Parser {
 					break;
 				}
 				State = 328;
-				expression(13);
+				expression(14);
 				}
 				break;
 			case 14:
@@ -2870,25 +2895,39 @@ public partial class LoschScriptParser : Parser {
 				_prevctx = _localctx;
 				State = 343;
 				try_branch();
-				State = 344;
-				catch_branch();
-				State = 346;
+				State = 347;
 				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,38,Context) ) {
-				case 1:
-					{
-					State = 345;
-					finally_branch();
+				_alt = Interpreter.AdaptivePredict(TokenStream,38,Context);
+				while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
+					if ( _alt==1 ) {
+						{
+						{
+						State = 344;
+						catch_branch();
+						}
+						} 
 					}
-					break;
+					State = 349;
+					ErrorHandler.Sync(this);
+					_alt = Interpreter.AdaptivePredict(TokenStream,38,Context);
 				}
-				State = 349;
+				State = 351;
 				ErrorHandler.Sync(this);
 				switch ( Interpreter.AdaptivePredict(TokenStream,39,Context) ) {
 				case 1:
 					{
-					State = 348;
+					State = 350;
 					fault_branch();
+					}
+					break;
+				}
+				State = 354;
+				ErrorHandler.Sync(this);
+				switch ( Interpreter.AdaptivePredict(TokenStream,40,Context) ) {
+				case 1:
+					{
+					State = 353;
+					finally_branch();
 					}
 					break;
 				}
@@ -2899,162 +2938,171 @@ public partial class LoschScriptParser : Parser {
 				_localctx = new Raise_expressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 351;
+				State = 356;
 				Match(Raise);
-				State = 352;
-				expression(9);
+				State = 357;
+				expression(10);
 				}
 				break;
 			case 18:
 				{
+				_localctx = new Rethrow_exceptionContext(_localctx);
+				Context = _localctx;
+				_prevctx = _localctx;
+				State = 358;
+				Match(Raise);
+				}
+				break;
+			case 19:
+				{
 				_localctx = new Array_expressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 353;
+				State = 359;
 				Match(Open_Bracket);
-				State = 362;
+				State = 368;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (((((_la - 43)) & ~0x3f) == 0 && ((1L << (_la - 43)) & 18299015525386211L) != 0) || ((((_la - 117)) & ~0x3f) == 0 && ((1L << (_la - 117)) & 248833L) != 0)) {
+				if (((((_la - 43)) & ~0x3f) == 0 && ((1L << (_la - 43)) & 146392124203088995L) != 0) || ((((_la - 120)) & ~0x3f) == 0 && ((1L << (_la - 120)) & 248833L) != 0)) {
 					{
-					State = 354;
+					State = 360;
 					expression(0);
-					State = 359;
+					State = 365;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 					while (_la==Comma) {
 						{
 						{
-						State = 355;
+						State = 361;
 						Match(Comma);
-						State = 356;
+						State = 362;
 						expression(0);
 						}
 						}
-						State = 361;
+						State = 367;
 						ErrorHandler.Sync(this);
 						_la = TokenStream.LA(1);
 					}
 					}
 				}
 
-				State = 364;
+				State = 370;
 				Match(Close_Bracket);
 				}
 				break;
-			case 19:
+			case 20:
 				{
 				_localctx = new Tuple_expressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 365;
+				State = 371;
 				Match(Open_Paren);
-				State = 366;
+				State = 372;
 				expression(0);
-				State = 369;
+				State = 375;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				do {
 					{
 					{
-					State = 367;
+					State = 373;
 					Match(Comma);
-					State = 368;
+					State = 374;
 					expression(0);
 					}
 					}
-					State = 371;
+					State = 377;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				} while ( _la==Comma );
-				State = 373;
+				State = 379;
 				Match(Close_Paren);
 				}
 				break;
-			case 20:
+			case 21:
 				{
 				_localctx = new Dictionary_expressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 375;
+				State = 381;
 				Match(Open_Bracket);
-				State = 393;
+				State = 399;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Open_Bracket) {
 					{
-					State = 376;
+					State = 382;
 					Match(Open_Bracket);
-					State = 377;
+					State = 383;
 					expression(0);
-					State = 378;
+					State = 384;
 					Match(Comma);
-					State = 379;
+					State = 385;
 					expression(0);
-					State = 380;
+					State = 386;
 					Match(Close_Bracket);
-					State = 390;
+					State = 396;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 					while (_la==Comma) {
 						{
 						{
-						State = 381;
+						State = 387;
 						Match(Comma);
-						State = 382;
+						State = 388;
 						Match(Open_Bracket);
-						State = 383;
+						State = 389;
 						expression(0);
-						State = 384;
+						State = 390;
 						Match(Comma);
-						State = 385;
+						State = 391;
 						expression(0);
-						State = 386;
+						State = 392;
 						Match(Close_Bracket);
 						}
 						}
-						State = 392;
+						State = 398;
 						ErrorHandler.Sync(this);
 						_la = TokenStream.LA(1);
 					}
 					}
 				}
 
-				State = 395;
+				State = 401;
 				Match(Close_Bracket);
-				}
-				break;
-			case 21:
-				{
-				_localctx = new Atom_expressionContext(_localctx);
-				Context = _localctx;
-				_prevctx = _localctx;
-				State = 396;
-				atom();
 				}
 				break;
 			case 22:
 				{
-				_localctx = new Block_expressionContext(_localctx);
+				_localctx = new Atom_expressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 397;
-				code_block();
+				State = 402;
+				atom();
 				}
 				break;
 			case 23:
 				{
+				_localctx = new Block_expressionContext(_localctx);
+				Context = _localctx;
+				_prevctx = _localctx;
+				State = 403;
+				code_block();
+				}
+				break;
+			case 24:
+				{
 				_localctx = new Full_identifier_member_access_expressionContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 398;
+				State = 404;
 				full_identifier();
-				State = 400;
+				State = 406;
 				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,45,Context) ) {
+				switch ( Interpreter.AdaptivePredict(TokenStream,46,Context) ) {
 				case 1:
 					{
-					State = 399;
+					State = 405;
 					arglist();
 					}
 					break;
@@ -3063,137 +3111,137 @@ public partial class LoschScriptParser : Parser {
 				break;
 			}
 			Context.Stop = TokenStream.LT(-1);
-			State = 488;
+			State = 494;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,50,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,51,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( ParseListeners!=null )
 						TriggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					State = 486;
+					State = 492;
 					ErrorHandler.Sync(this);
-					switch ( Interpreter.AdaptivePredict(TokenStream,49,Context) ) {
+					switch ( Interpreter.AdaptivePredict(TokenStream,50,Context) ) {
 					case 1:
 						{
 						_localctx = new Array_element_assignmentContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 404;
-						if (!(Precpred(Context, 47))) throw new FailedPredicateException(this, "Precpred(Context, 47)");
-						State = 405;
+						State = 410;
+						if (!(Precpred(Context, 48))) throw new FailedPredicateException(this, "Precpred(Context, 48)");
+						State = 411;
 						Match(At_Sign);
-						State = 406;
+						State = 412;
 						expression(0);
-						State = 407;
+						State = 413;
 						Match(Equals);
-						State = 408;
-						expression(48);
+						State = 414;
+						expression(49);
 						}
 						break;
 					case 2:
 						{
 						_localctx = new Power_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 410;
-						if (!(Precpred(Context, 46))) throw new FailedPredicateException(this, "Precpred(Context, 46)");
-						State = 411;
+						State = 416;
+						if (!(Precpred(Context, 47))) throw new FailedPredicateException(this, "Precpred(Context, 47)");
+						State = 417;
 						Match(Double_Asterisk);
-						State = 412;
-						expression(47);
+						State = 418;
+						expression(48);
 						}
 						break;
 					case 3:
 						{
 						_localctx = new Multiply_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 413;
-						if (!(Precpred(Context, 44))) throw new FailedPredicateException(this, "Precpred(Context, 44)");
-						State = 414;
+						State = 419;
+						if (!(Precpred(Context, 45))) throw new FailedPredicateException(this, "Precpred(Context, 45)");
+						State = 420;
 						Match(Asterisk);
-						State = 415;
-						expression(45);
+						State = 421;
+						expression(46);
 						}
 						break;
 					case 4:
 						{
 						_localctx = new Divide_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 416;
-						if (!(Precpred(Context, 43))) throw new FailedPredicateException(this, "Precpred(Context, 43)");
-						State = 417;
+						State = 422;
+						if (!(Precpred(Context, 44))) throw new FailedPredicateException(this, "Precpred(Context, 44)");
+						State = 423;
 						Match(Slash);
-						State = 418;
-						expression(44);
+						State = 424;
+						expression(45);
 						}
 						break;
 					case 5:
 						{
 						_localctx = new Remainder_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 419;
-						if (!(Precpred(Context, 42))) throw new FailedPredicateException(this, "Precpred(Context, 42)");
-						State = 420;
+						State = 425;
+						if (!(Precpred(Context, 43))) throw new FailedPredicateException(this, "Precpred(Context, 43)");
+						State = 426;
 						Match(Percent);
-						State = 421;
-						expression(43);
+						State = 427;
+						expression(44);
 						}
 						break;
 					case 6:
 						{
 						_localctx = new Addition_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 422;
-						if (!(Precpred(Context, 41))) throw new FailedPredicateException(this, "Precpred(Context, 41)");
-						State = 423;
+						State = 428;
+						if (!(Precpred(Context, 42))) throw new FailedPredicateException(this, "Precpred(Context, 42)");
+						State = 429;
 						Match(Plus);
-						State = 424;
-						expression(42);
+						State = 430;
+						expression(43);
 						}
 						break;
 					case 7:
 						{
 						_localctx = new Subtraction_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 425;
-						if (!(Precpred(Context, 40))) throw new FailedPredicateException(this, "Precpred(Context, 40)");
-						State = 426;
+						State = 431;
+						if (!(Precpred(Context, 41))) throw new FailedPredicateException(this, "Precpred(Context, 41)");
+						State = 432;
 						Match(Minus);
-						State = 427;
-						expression(41);
+						State = 433;
+						expression(42);
 						}
 						break;
 					case 8:
 						{
 						_localctx = new Left_shift_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 428;
-						if (!(Precpred(Context, 39))) throw new FailedPredicateException(this, "Precpred(Context, 39)");
-						State = 429;
+						State = 434;
+						if (!(Precpred(Context, 40))) throw new FailedPredicateException(this, "Precpred(Context, 40)");
+						State = 435;
 						Match(Double_Less_Than);
-						State = 430;
-						expression(40);
+						State = 436;
+						expression(41);
 						}
 						break;
 					case 9:
 						{
 						_localctx = new Right_shift_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 431;
-						if (!(Precpred(Context, 38))) throw new FailedPredicateException(this, "Precpred(Context, 38)");
-						State = 432;
+						State = 437;
+						if (!(Precpred(Context, 39))) throw new FailedPredicateException(this, "Precpred(Context, 39)");
+						State = 438;
 						Match(Double_Greater_Than);
-						State = 433;
-						expression(39);
+						State = 439;
+						expression(40);
 						}
 						break;
 					case 10:
 						{
 						_localctx = new Equality_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 434;
-						if (!(Precpred(Context, 37))) throw new FailedPredicateException(this, "Precpred(Context, 37)");
-						State = 435;
+						State = 440;
+						if (!(Precpred(Context, 38))) throw new FailedPredicateException(this, "Precpred(Context, 38)");
+						State = 441;
 						((Equality_expressionContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !(_la==Double_Equals || _la==Exclamation_Equals) ) {
@@ -3203,147 +3251,147 @@ public partial class LoschScriptParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 436;
-						expression(38);
+						State = 442;
+						expression(39);
 						}
 						break;
 					case 11:
 						{
 						_localctx = new Comparison_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 437;
-						if (!(Precpred(Context, 36))) throw new FailedPredicateException(this, "Precpred(Context, 36)");
-						State = 438;
+						State = 443;
+						if (!(Precpred(Context, 37))) throw new FailedPredicateException(this, "Precpred(Context, 37)");
+						State = 444;
 						((Comparison_expressionContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
-						if ( !(((((_la - 97)) & ~0x3f) == 0 && ((1L << (_la - 97)) & 15L) != 0)) ) {
+						if ( !(((((_la - 100)) & ~0x3f) == 0 && ((1L << (_la - 100)) & 15L) != 0)) ) {
 							((Comparison_expressionContext)_localctx).op = ErrorHandler.RecoverInline(this);
 						}
 						else {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 439;
-						expression(37);
+						State = 445;
+						expression(38);
 						}
 						break;
 					case 12:
 						{
 						_localctx = new And_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 440;
-						if (!(Precpred(Context, 35))) throw new FailedPredicateException(this, "Precpred(Context, 35)");
-						State = 441;
+						State = 446;
+						if (!(Precpred(Context, 36))) throw new FailedPredicateException(this, "Precpred(Context, 36)");
+						State = 447;
 						Match(Ampersand);
-						State = 442;
-						expression(36);
+						State = 448;
+						expression(37);
 						}
 						break;
 					case 13:
 						{
 						_localctx = new Logical_and_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 443;
-						if (!(Precpred(Context, 34))) throw new FailedPredicateException(this, "Precpred(Context, 34)");
-						State = 444;
+						State = 449;
+						if (!(Precpred(Context, 35))) throw new FailedPredicateException(this, "Precpred(Context, 35)");
+						State = 450;
 						Match(Double_Ampersand);
-						State = 445;
-						expression(35);
+						State = 451;
+						expression(36);
 						}
 						break;
 					case 14:
 						{
 						_localctx = new Or_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 446;
-						if (!(Precpred(Context, 33))) throw new FailedPredicateException(this, "Precpred(Context, 33)");
-						State = 447;
+						State = 452;
+						if (!(Precpred(Context, 34))) throw new FailedPredicateException(this, "Precpred(Context, 34)");
+						State = 453;
 						Match(Bar);
-						State = 448;
-						expression(34);
+						State = 454;
+						expression(35);
 						}
 						break;
 					case 15:
 						{
 						_localctx = new Logical_or_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 449;
-						if (!(Precpred(Context, 32))) throw new FailedPredicateException(this, "Precpred(Context, 32)");
-						State = 450;
+						State = 455;
+						if (!(Precpred(Context, 33))) throw new FailedPredicateException(this, "Precpred(Context, 33)");
+						State = 456;
 						Match(Double_Bar);
-						State = 451;
-						expression(33);
+						State = 457;
+						expression(34);
 						}
 						break;
 					case 16:
 						{
 						_localctx = new Xor_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 452;
-						if (!(Precpred(Context, 31))) throw new FailedPredicateException(this, "Precpred(Context, 31)");
-						State = 453;
+						State = 458;
+						if (!(Precpred(Context, 32))) throw new FailedPredicateException(this, "Precpred(Context, 32)");
+						State = 459;
 						Match(Caret);
-						State = 454;
-						expression(32);
+						State = 460;
+						expression(33);
 						}
 						break;
 					case 17:
 						{
 						_localctx = new Implementation_query_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 455;
-						if (!(Precpred(Context, 27))) throw new FailedPredicateException(this, "Precpred(Context, 27)");
-						State = 456;
+						State = 461;
+						if (!(Precpred(Context, 28))) throw new FailedPredicateException(this, "Precpred(Context, 28)");
+						State = 462;
 						Match(Double_Dot_Question_Mark);
-						State = 457;
-						expression(28);
+						State = 463;
+						expression(29);
 						}
 						break;
 					case 18:
 						{
 						_localctx = new Right_pipe_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 458;
-						if (!(Precpred(Context, 25))) throw new FailedPredicateException(this, "Precpred(Context, 25)");
-						State = 459;
+						State = 464;
+						if (!(Precpred(Context, 26))) throw new FailedPredicateException(this, "Precpred(Context, 26)");
+						State = 465;
 						Match(Arrow_Right);
-						State = 460;
-						expression(26);
+						State = 466;
+						expression(27);
 						}
 						break;
 					case 19:
 						{
 						_localctx = new Left_pipe_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 461;
-						if (!(Precpred(Context, 24))) throw new FailedPredicateException(this, "Precpred(Context, 24)");
-						State = 462;
+						State = 467;
+						if (!(Precpred(Context, 25))) throw new FailedPredicateException(this, "Precpred(Context, 25)");
+						State = 468;
 						Match(Arrow_Left);
-						State = 463;
-						expression(25);
+						State = 469;
+						expression(26);
 						}
 						break;
 					case 20:
 						{
 						_localctx = new Index_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 464;
-						if (!(Precpred(Context, 21))) throw new FailedPredicateException(this, "Precpred(Context, 21)");
-						State = 465;
+						State = 470;
+						if (!(Precpred(Context, 22))) throw new FailedPredicateException(this, "Precpred(Context, 22)");
+						State = 471;
 						Match(At_Sign);
-						State = 466;
-						expression(22);
+						State = 472;
+						expression(23);
 						}
 						break;
 					case 21:
 						{
 						_localctx = new Dotted_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 467;
-						if (!(Precpred(Context, 23))) throw new FailedPredicateException(this, "Precpred(Context, 23)");
-						State = 468;
+						State = 473;
+						if (!(Precpred(Context, 24))) throw new FailedPredicateException(this, "Precpred(Context, 24)");
+						State = 474;
 						Match(Dot);
-						State = 469;
+						State = 475;
 						Match(Identifier);
 						}
 						break;
@@ -3351,9 +3399,9 @@ public partial class LoschScriptParser : Parser {
 						{
 						_localctx = new Postfix_if_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 470;
-						if (!(Precpred(Context, 18))) throw new FailedPredicateException(this, "Precpred(Context, 18)");
-						State = 471;
+						State = 476;
+						if (!(Precpred(Context, 19))) throw new FailedPredicateException(this, "Precpred(Context, 19)");
+						State = 477;
 						postfix_if_branch();
 						}
 						break;
@@ -3361,9 +3409,9 @@ public partial class LoschScriptParser : Parser {
 						{
 						_localctx = new Postfix_unless_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 472;
-						if (!(Precpred(Context, 15))) throw new FailedPredicateException(this, "Precpred(Context, 15)");
-						State = 473;
+						State = 478;
+						if (!(Precpred(Context, 16))) throw new FailedPredicateException(this, "Precpred(Context, 16)");
+						State = 479;
 						postfix_unless_branch();
 						}
 						break;
@@ -3371,9 +3419,9 @@ public partial class LoschScriptParser : Parser {
 						{
 						_localctx = new Newlined_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 474;
+						State = 480;
 						if (!(Precpred(Context, 4))) throw new FailedPredicateException(this, "Precpred(Context, 4)");
-						State = 475;
+						State = 481;
 						Match(NewLine);
 						}
 						break;
@@ -3381,9 +3429,9 @@ public partial class LoschScriptParser : Parser {
 						{
 						_localctx = new Member_access_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 476;
+						State = 482;
 						if (!(Precpred(Context, 1))) throw new FailedPredicateException(this, "Precpred(Context, 1)");
-						State = 479;
+						State = 485;
 						ErrorHandler.Sync(this);
 						_alt = 1;
 						do {
@@ -3391,9 +3439,9 @@ public partial class LoschScriptParser : Parser {
 							case 1:
 								{
 								{
-								State = 477;
+								State = 483;
 								Match(Dot);
-								State = 478;
+								State = 484;
 								Match(Identifier);
 								}
 								}
@@ -3401,16 +3449,16 @@ public partial class LoschScriptParser : Parser {
 							default:
 								throw new NoViableAltException(this);
 							}
-							State = 481;
+							State = 487;
 							ErrorHandler.Sync(this);
-							_alt = Interpreter.AdaptivePredict(TokenStream,47,Context);
+							_alt = Interpreter.AdaptivePredict(TokenStream,48,Context);
 						} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
-						State = 484;
+						State = 490;
 						ErrorHandler.Sync(this);
-						switch ( Interpreter.AdaptivePredict(TokenStream,48,Context) ) {
+						switch ( Interpreter.AdaptivePredict(TokenStream,49,Context) ) {
 						case 1:
 							{
-							State = 483;
+							State = 489;
 							arglist();
 							}
 							break;
@@ -3420,9 +3468,9 @@ public partial class LoschScriptParser : Parser {
 					}
 					} 
 				}
-				State = 490;
+				State = 496;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,50,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,51,Context);
 			}
 			}
 		}
@@ -3493,69 +3541,69 @@ public partial class LoschScriptParser : Parser {
 		AtomContext _localctx = new AtomContext(Context, State);
 		EnterRule(_localctx, 18, RULE_atom);
 		try {
-			State = 500;
+			State = 506;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,51,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,52,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 491;
+				State = 497;
 				expression_atom();
 				}
 				break;
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 492;
+				State = 498;
 				integer_atom();
 				}
 				break;
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 493;
+				State = 499;
 				real_atom();
 				}
 				break;
 			case 4:
 				EnterOuterAlt(_localctx, 4);
 				{
-				State = 494;
+				State = 500;
 				boolean_atom();
 				}
 				break;
 			case 5:
 				EnterOuterAlt(_localctx, 5);
 				{
-				State = 495;
+				State = 501;
 				string_atom();
 				}
 				break;
 			case 6:
 				EnterOuterAlt(_localctx, 6);
 				{
-				State = 496;
+				State = 502;
 				character_atom();
 				}
 				break;
 			case 7:
 				EnterOuterAlt(_localctx, 7);
 				{
-				State = 497;
+				State = 503;
 				empty_atom();
 				}
 				break;
 			case 8:
 				EnterOuterAlt(_localctx, 8);
 				{
-				State = 498;
+				State = 504;
 				wildcard_atom();
 				}
 				break;
 			case 9:
 				EnterOuterAlt(_localctx, 9);
 				{
-				State = 499;
+				State = 505;
 				this_atom();
 				}
 				break;
@@ -3604,7 +3652,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 502;
+			State = 508;
 			Match(This);
 			}
 		}
@@ -3655,11 +3703,11 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 504;
+			State = 510;
 			Match(Open_Paren);
-			State = 505;
+			State = 511;
 			expression(0);
-			State = 506;
+			State = 512;
 			Match(Close_Paren);
 			}
 		}
@@ -3706,7 +3754,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 508;
+			State = 514;
 			Match(Integer_Literal);
 			}
 		}
@@ -3753,7 +3801,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 510;
+			State = 516;
 			Match(Real_Literal);
 			}
 		}
@@ -3802,7 +3850,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 512;
+			State = 518;
 			_la = TokenStream.LA(1);
 			if ( !(_la==True || _la==False) ) {
 			ErrorHandler.RecoverInline(this);
@@ -3858,7 +3906,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 514;
+			State = 520;
 			_la = TokenStream.LA(1);
 			if ( !(_la==String_Literal || _la==Verbatim_String_Literal) ) {
 			ErrorHandler.RecoverInline(this);
@@ -3912,7 +3960,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 516;
+			State = 522;
 			Match(Character_Literal);
 			}
 		}
@@ -3960,9 +4008,9 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 518;
+			State = 524;
 			Match(Open_Paren);
-			State = 519;
+			State = 525;
 			Match(Close_Paren);
 			}
 		}
@@ -4009,7 +4057,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 521;
+			State = 527;
 			Match(Underscore);
 			}
 		}
@@ -4064,48 +4112,48 @@ public partial class LoschScriptParser : Parser {
 		EnterRule(_localctx, 38, RULE_identifier_atom);
 		int _la;
 		try {
-			State = 537;
+			State = 543;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,54,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,55,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 526;
+				State = 532;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==Less_Than) {
 					{
 					{
-					State = 523;
+					State = 529;
 					attribute();
 					}
 					}
-					State = 528;
+					State = 534;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 529;
+				State = 535;
 				Match(Identifier);
 				}
 				break;
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 533;
+				State = 539;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==Less_Than) {
 					{
 					{
-					State = 530;
+					State = 536;
 					attribute();
 					}
 					}
-					State = 535;
+					State = 541;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 536;
+				State = 542;
 				full_identifier();
 				}
 				break;
@@ -4177,20 +4225,20 @@ public partial class LoschScriptParser : Parser {
 		EnterRule(_localctx, 40, RULE_type_name);
 		int _la;
 		try {
-			State = 562;
+			State = 568;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,59,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,60,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 539;
+				State = 545;
 				builtin_type_alias();
-				State = 541;
+				State = 547;
 				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,55,Context) ) {
+				switch ( Interpreter.AdaptivePredict(TokenStream,56,Context) ) {
 				case 1:
 					{
-					State = 540;
+					State = 546;
 					Match(Ampersand);
 					}
 					break;
@@ -4200,41 +4248,41 @@ public partial class LoschScriptParser : Parser {
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 543;
+				State = 549;
 				Match(Open_Paren);
-				State = 544;
+				State = 550;
 				type_name();
-				State = 547;
+				State = 553;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				do {
 					{
 					{
-					State = 545;
+					State = 551;
 					Match(Bar);
-					State = 546;
+					State = 552;
 					type_name();
 					}
 					}
-					State = 549;
+					State = 555;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				} while ( _la==Bar );
-				State = 551;
+				State = 557;
 				Match(Close_Paren);
 				}
 				break;
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 553;
+				State = 559;
 				generic_identifier();
-				State = 555;
+				State = 561;
 				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,57,Context) ) {
+				switch ( Interpreter.AdaptivePredict(TokenStream,58,Context) ) {
 				case 1:
 					{
-					State = 554;
+					State = 560;
 					Match(Ampersand);
 					}
 					break;
@@ -4244,14 +4292,14 @@ public partial class LoschScriptParser : Parser {
 			case 4:
 				EnterOuterAlt(_localctx, 4);
 				{
-				State = 557;
+				State = 563;
 				identifier_atom();
-				State = 559;
+				State = 565;
 				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,58,Context) ) {
+				switch ( Interpreter.AdaptivePredict(TokenStream,59,Context) ) {
 				case 1:
 					{
-					State = 558;
+					State = 564;
 					Match(Ampersand);
 					}
 					break;
@@ -4261,7 +4309,7 @@ public partial class LoschScriptParser : Parser {
 			case 5:
 				EnterOuterAlt(_localctx, 5);
 				{
-				State = 561;
+				State = 567;
 				param_list_type();
 				}
 				break;
@@ -4327,7 +4375,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 564;
+			State = 570;
 			_la = TokenStream.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 824629526528L) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
@@ -4393,27 +4441,27 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 566;
-			Match(Open_Paren_Bar);
-			State = 567;
-			type_name();
 			State = 572;
+			Match(Open_Paren_Bar);
+			State = 573;
+			type_name();
+			State = 578;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==Comma) {
 				{
 				{
-				State = 568;
+				State = 574;
 				Match(Comma);
-				State = 569;
+				State = 575;
 				type_name();
 				}
 				}
-				State = 574;
+				State = 580;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 575;
+			State = 581;
 			Match(Bar_Close_Paren);
 			}
 		}
@@ -4470,24 +4518,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 577;
+			State = 583;
 			Match(Question_Mark);
-			State = 578;
+			State = 584;
 			expression(0);
-			State = 579;
+			State = 585;
 			Match(Equals);
-			State = 582;
+			State = 588;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,61,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,62,Context) ) {
 			case 1:
 				{
-				State = 580;
+				State = 586;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 581;
+				State = 587;
 				expression(0);
 				}
 				break;
@@ -4540,9 +4588,9 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 584;
+			State = 590;
 			Match(Question_Mark);
-			State = 585;
+			State = 591;
 			expression(0);
 			}
 		}
@@ -4599,24 +4647,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 587;
+			State = 593;
 			Match(Colon);
-			State = 588;
+			State = 594;
 			expression(0);
-			State = 589;
+			State = 595;
 			Match(Equals);
-			State = 592;
+			State = 598;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,62,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,63,Context) ) {
 			case 1:
 				{
-				State = 590;
+				State = 596;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 591;
+				State = 597;
 				expression(0);
 				}
 				break;
@@ -4673,22 +4721,22 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 594;
+			State = 600;
 			Match(Colon);
-			State = 595;
+			State = 601;
 			Match(Equals);
-			State = 598;
+			State = 604;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,63,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,64,Context) ) {
 			case 1:
 				{
-				State = 596;
+				State = 602;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 597;
+				State = 603;
 				expression(0);
 				}
 				break;
@@ -4748,24 +4796,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 600;
+			State = 606;
 			Match(Exclamation_Question);
-			State = 601;
+			State = 607;
 			expression(0);
-			State = 602;
+			State = 608;
 			Match(Equals);
-			State = 605;
+			State = 611;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,64,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,65,Context) ) {
 			case 1:
 				{
-				State = 603;
+				State = 609;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 604;
+				State = 610;
 				expression(0);
 				}
 				break;
@@ -4825,24 +4873,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 607;
+			State = 613;
 			Match(Exclamation_Colon);
-			State = 608;
+			State = 614;
 			expression(0);
-			State = 609;
+			State = 615;
 			Match(Equals);
-			State = 612;
+			State = 618;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,65,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,66,Context) ) {
 			case 1:
 				{
-				State = 610;
+				State = 616;
 				code_block();
 				}
 				break;
 			case 2:
 				{
-				State = 611;
+				State = 617;
 				expression(0);
 				}
 				break;
@@ -4895,9 +4943,9 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 614;
+			State = 620;
 			Match(Exclamation_Question);
-			State = 615;
+			State = 621;
 			expression(0);
 			}
 		}
@@ -4951,24 +4999,24 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 618;
+			State = 624;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Caret || _la==Integer_Literal) {
 				{
-				State = 617;
+				State = 623;
 				index();
 				}
 			}
 
-			State = 620;
+			State = 626;
 			Match(Double_Dot);
-			State = 622;
+			State = 628;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,67,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,68,Context) ) {
 			case 1:
 				{
-				State = 621;
+				State = 627;
 				index();
 				}
 				break;
@@ -5022,17 +5070,17 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 625;
+			State = 631;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Caret) {
 				{
-				State = 624;
+				State = 630;
 				Match(Caret);
 				}
 			}
 
-			State = 627;
+			State = 633;
 			integer_atom();
 			}
 		}
@@ -5099,59 +5147,59 @@ public partial class LoschScriptParser : Parser {
 			EnterOuterAlt(_localctx, 1);
 			{
 			{
-			State = 631;
+			State = 637;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,69,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,70,Context) ) {
 			case 1:
 				{
-				State = 629;
+				State = 635;
 				Match(Identifier);
-				State = 630;
+				State = 636;
 				Match(Colon);
 				}
 				break;
 			}
-			State = 633;
+			State = 639;
 			expression(0);
 			}
-			State = 643;
+			State = 649;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,71,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,72,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
-					State = 635;
+					State = 641;
 					Match(Comma);
 					{
-					State = 638;
+					State = 644;
 					ErrorHandler.Sync(this);
-					switch ( Interpreter.AdaptivePredict(TokenStream,70,Context) ) {
+					switch ( Interpreter.AdaptivePredict(TokenStream,71,Context) ) {
 					case 1:
 						{
-						State = 636;
+						State = 642;
 						Match(Identifier);
-						State = 637;
+						State = 643;
 						Match(Colon);
 						}
 						break;
 					}
-					State = 640;
+					State = 646;
 					expression(0);
 					}
 					}
 					} 
 				}
-				State = 645;
+				State = 651;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,71,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,72,Context);
 			}
-			State = 647;
+			State = 653;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,72,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,73,Context) ) {
 			case 1:
 				{
-				State = 646;
+				State = 652;
 				Match(Double_Comma);
 				}
 				break;
@@ -5213,33 +5261,33 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 649;
+			State = 655;
 			Match(Less_Than);
-			State = 650;
+			State = 656;
 			type_name();
-			State = 652;
+			State = 658;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if (((((_la - 43)) & ~0x3f) == 0 && ((1L << (_la - 43)) & 18299015525386211L) != 0) || ((((_la - 117)) & ~0x3f) == 0 && ((1L << (_la - 117)) & 248833L) != 0)) {
+			if (((((_la - 43)) & ~0x3f) == 0 && ((1L << (_la - 43)) & 146392124203088995L) != 0) || ((((_la - 120)) & ~0x3f) == 0 && ((1L << (_la - 120)) & 248833L) != 0)) {
 				{
-				State = 651;
+				State = 657;
 				arglist();
 				}
 			}
 
-			State = 654;
+			State = 660;
 			Match(Greater_Than);
-			State = 658;
+			State = 664;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==NewLine) {
 				{
 				{
-				State = 655;
+				State = 661;
 				Match(NewLine);
 				}
 				}
-				State = 660;
+				State = 666;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
@@ -5295,13 +5343,13 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 661;
+			State = 667;
 			identifier_atom();
-			State = 662;
+			State = 668;
 			Match(Open_Bracket);
-			State = 663;
+			State = 669;
 			identifier_atom();
-			State = 664;
+			State = 670;
 			Match(Close_Bracket);
 			}
 		}
@@ -5350,20 +5398,20 @@ public partial class LoschScriptParser : Parser {
 		EnterRule(_localctx, 70, RULE_field_access_modifier);
 		int _la;
 		try {
-			State = 678;
+			State = 684;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case Global:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 666;
+				State = 672;
 				Match(Global);
-				State = 668;
+				State = 674;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Partial) {
 					{
-					State = 667;
+					State = 673;
 					Match(Partial);
 					}
 				}
@@ -5373,14 +5421,14 @@ public partial class LoschScriptParser : Parser {
 			case Local:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 670;
+				State = 676;
 				Match(Local);
-				State = 672;
+				State = 678;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Partial) {
 					{
-					State = 671;
+					State = 677;
 					Match(Partial);
 					}
 				}
@@ -5390,14 +5438,14 @@ public partial class LoschScriptParser : Parser {
 			case Internal:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 674;
+				State = 680;
 				Match(Internal);
-				State = 676;
+				State = 682;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Partial) {
 					{
-					State = 675;
+					State = 681;
 					Match(Partial);
 					}
 				}
@@ -5465,14 +5513,14 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 680;
+			State = 686;
 			field_access_modifier();
-			State = 682;
+			State = 688;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Var || _la==Val) {
 				{
-				State = 681;
+				State = 687;
 				_la = TokenStream.LA(1);
 				if ( !(_la==Var || _la==Val) ) {
 				ErrorHandler.RecoverInline(this);
@@ -5484,23 +5532,23 @@ public partial class LoschScriptParser : Parser {
 				}
 			}
 
-			State = 684;
+			State = 690;
 			Match(Identifier);
-			State = 687;
+			State = 693;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Colon) {
 				{
-				State = 685;
+				State = 691;
 				Match(Colon);
-				State = 686;
+				State = 692;
 				type_name();
 				}
 			}
 
-			State = 689;
+			State = 695;
 			Match(Equals);
-			State = 690;
+			State = 696;
 			expression(0);
 			}
 		}
@@ -5547,7 +5595,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 692;
+			State = 698;
 			Match(Dot);
 			}
 		}
@@ -5596,7 +5644,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 694;
+			State = 700;
 			_la = TokenStream.LA(1);
 			if ( !(_la==Global || _la==Internal) ) {
 			ErrorHandler.RecoverInline(this);
@@ -5654,35 +5702,35 @@ public partial class LoschScriptParser : Parser {
 		EnterRule(_localctx, 78, RULE_nested_type_access_modifier);
 		int _la;
 		try {
-			State = 702;
+			State = 708;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case Global:
 			case Internal:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 696;
+				State = 702;
 				type_access_modifier();
 				}
 				break;
 			case Local:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 697;
+				State = 703;
 				Match(Local);
 				}
 				break;
 			case Protected:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 698;
+				State = 704;
 				Match(Protected);
-				State = 700;
+				State = 706;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Internal) {
 					{
-					State = 699;
+					State = 705;
 					Match(Internal);
 					}
 				}
@@ -5736,7 +5784,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 704;
+			State = 710;
 			Match(Open);
 			}
 		}
@@ -5806,59 +5854,59 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 708;
+			State = 714;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,83,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,84,Context) ) {
 			case 1:
 				{
-				State = 706;
+				State = 712;
 				type_access_modifier();
 				}
 				break;
 			case 2:
 				{
-				State = 707;
+				State = 713;
 				nested_type_access_modifier();
 				}
 				break;
 			}
-			State = 711;
+			State = 717;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Open) {
 				{
-				State = 710;
+				State = 716;
 				type_special_modifier();
 				}
 			}
 
-			State = 713;
+			State = 719;
 			type_kind();
-			State = 714;
+			State = 720;
 			Match(Identifier);
-			State = 716;
+			State = 722;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Open_Bracket) {
 				{
-				State = 715;
+				State = 721;
 				type_parameter_list();
 				}
 			}
 
-			State = 719;
+			State = 725;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Colon) {
 				{
-				State = 718;
+				State = 724;
 				inheritance_list();
 				}
 			}
 
-			State = 721;
+			State = 727;
 			Match(Equals);
-			State = 722;
+			State = 728;
 			type_block();
 			}
 		}
@@ -5917,27 +5965,27 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 724;
-			Match(Open_Bracket);
-			State = 725;
-			type_parameter();
 			State = 730;
+			Match(Open_Bracket);
+			State = 731;
+			type_parameter();
+			State = 736;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==Comma) {
 				{
 				{
-				State = 726;
+				State = 732;
 				Match(Comma);
-				State = 727;
+				State = 733;
 				type_parameter();
 				}
 				}
-				State = 732;
+				State = 738;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 733;
+			State = 739;
 			Match(Close_Bracket);
 			}
 		}
@@ -5989,16 +6037,16 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 735;
+			State = 741;
 			Match(Identifier);
-			State = 738;
+			State = 744;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Colon) {
 				{
-				State = 736;
+				State = 742;
 				Match(Colon);
-				State = 737;
+				State = 743;
 				type_parameter_constraint();
 				}
 			}
@@ -6051,7 +6099,7 @@ public partial class LoschScriptParser : Parser {
 		Type_parameter_constraintContext _localctx = new Type_parameter_constraintContext(Context, State);
 		EnterRule(_localctx, 88, RULE_type_parameter_constraint);
 		try {
-			State = 742;
+			State = 748;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case Type:
@@ -6061,7 +6109,7 @@ public partial class LoschScriptParser : Parser {
 			case Val:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 740;
+				State = 746;
 				type_kind();
 				}
 				break;
@@ -6088,7 +6136,7 @@ public partial class LoschScriptParser : Parser {
 			case Identifier:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 741;
+				State = 747;
 				type_name();
 				}
 				break;
@@ -6150,23 +6198,23 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 744;
-			Match(Colon);
-			State = 745;
-			type_name();
 			State = 750;
+			Match(Colon);
+			State = 751;
+			type_name();
+			State = 756;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==Comma) {
 				{
 				{
-				State = 746;
+				State = 752;
 				Match(Comma);
-				State = 747;
+				State = 753;
 				type_name();
 				}
 				}
-				State = 752;
+				State = 758;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
@@ -6218,47 +6266,47 @@ public partial class LoschScriptParser : Parser {
 		EnterRule(_localctx, 92, RULE_type_kind);
 		int _la;
 		try {
-			State = 761;
+			State = 767;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case Type:
 			case Ref:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 754;
+				State = 760;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Ref) {
 					{
-					State = 753;
+					State = 759;
 					Match(Ref);
 					}
 				}
 
-				State = 756;
+				State = 762;
 				Match(Type);
 				}
 				break;
 			case Val:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 757;
+				State = 763;
 				Match(Val);
-				State = 758;
+				State = 764;
 				Match(Type);
 				}
 				break;
 			case Template:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 759;
+				State = 765;
 				Match(Template);
 				}
 				break;
 			case Module:
 				EnterOuterAlt(_localctx, 4);
 				{
-				State = 760;
+				State = 766;
 				Match(Module);
 				}
 				break;
@@ -6313,7 +6361,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 763;
+			State = 769;
 			_la = TokenStream.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 47104L) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
@@ -6367,7 +6415,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 765;
+			State = 771;
 			Match(Virtual);
 			}
 		}
@@ -6418,7 +6466,7 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 767;
+			State = 773;
 			_la = TokenStream.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 3298536996864L) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
@@ -6500,158 +6548,158 @@ public partial class LoschScriptParser : Parser {
 		EnterRule(_localctx, 100, RULE_type_member);
 		int _la;
 		try {
-			State = 818;
+			State = 824;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,105,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,106,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 770;
+				State = 776;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Less_Than) {
 					{
-					State = 769;
+					State = 775;
 					attribute();
 					}
 				}
 
-				State = 773;
+				State = 779;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 47104L) != 0)) {
 					{
-					State = 772;
+					State = 778;
 					member_access_modifier();
 					}
 				}
 
-				State = 776;
+				State = 782;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Virtual) {
 					{
-					State = 775;
+					State = 781;
 					member_oop_modifier();
 					}
 				}
 
-				State = 781;
+				State = 787;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 3298536996864L) != 0)) {
 					{
 					{
-					State = 778;
+					State = 784;
 					member_special_modifier();
 					}
 					}
-					State = 783;
+					State = 789;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 784;
+				State = 790;
 				Match(Identifier);
-				State = 786;
+				State = 792;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Open_Bracket) {
 					{
-					State = 785;
+					State = 791;
 					type_parameter_list();
 					}
 				}
 
-				State = 789;
+				State = 795;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (_la==Open_Paren || ((((_la - 91)) & ~0x3f) == 0 && ((1L << (_la - 91)) & 68719476807L) != 0)) {
+				if (_la==Open_Paren || ((((_la - 94)) & ~0x3f) == 0 && ((1L << (_la - 94)) & 68719476807L) != 0)) {
 					{
-					State = 788;
+					State = 794;
 					parameter_list();
 					}
 				}
 
-				State = 793;
+				State = 799;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Colon) {
 					{
-					State = 791;
+					State = 797;
 					Match(Colon);
-					State = 792;
+					State = 798;
 					type_name();
 					}
 				}
 
-				State = 795;
+				State = 801;
 				Match(Equals);
-				State = 796;
+				State = 802;
 				expression(0);
 				}
 				break;
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 798;
+				State = 804;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Less_Than) {
 					{
-					State = 797;
+					State = 803;
 					attribute();
 					}
 				}
 
-				State = 801;
+				State = 807;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 47104L) != 0)) {
 					{
-					State = 800;
+					State = 806;
 					member_access_modifier();
 					}
 				}
 
-				State = 804;
+				State = 810;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Virtual) {
 					{
-					State = 803;
+					State = 809;
 					member_oop_modifier();
 					}
 				}
 
-				State = 809;
+				State = 815;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 3298536996864L) != 0)) {
 					{
 					{
-					State = 806;
+					State = 812;
 					member_special_modifier();
 					}
 					}
-					State = 811;
+					State = 817;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 812;
+				State = 818;
 				Match(Identifier);
-				State = 814;
+				State = 820;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==Open_Bracket) {
 					{
-					State = 813;
+					State = 819;
 					type_parameter_list();
 					}
 				}
 
-				State = 816;
+				State = 822;
 				Match(Colon);
-				State = 817;
+				State = 823;
 				type_name();
 				}
 				break;
@@ -6710,41 +6758,41 @@ public partial class LoschScriptParser : Parser {
 		EnterRule(_localctx, 102, RULE_parameter_list);
 		int _la;
 		try {
-			State = 840;
+			State = 846;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case Open_Paren:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 820;
+				State = 826;
 				Match(Open_Paren);
-				State = 829;
+				State = 835;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (((((_la - 91)) & ~0x3f) == 0 && ((1L << (_la - 91)) & 68719476807L) != 0)) {
+				if (((((_la - 94)) & ~0x3f) == 0 && ((1L << (_la - 94)) & 68719476807L) != 0)) {
 					{
-					State = 821;
+					State = 827;
 					parameter();
-					State = 826;
+					State = 832;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 					while (_la==Comma) {
 						{
 						{
-						State = 822;
+						State = 828;
 						Match(Comma);
-						State = 823;
+						State = 829;
 						parameter();
 						}
 						}
-						State = 828;
+						State = 834;
 						ErrorHandler.Sync(this);
 						_la = TokenStream.LA(1);
 					}
 					}
 				}
 
-				State = 831;
+				State = 837;
 				Match(Close_Paren);
 				}
 				break;
@@ -6755,21 +6803,21 @@ public partial class LoschScriptParser : Parser {
 			case Identifier:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 832;
+				State = 838;
 				parameter();
-				State = 837;
+				State = 843;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==Comma) {
 					{
 					{
-					State = 833;
+					State = 839;
 					Match(Comma);
-					State = 834;
+					State = 840;
 					parameter();
 					}
 					}
-					State = 839;
+					State = 845;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
@@ -6825,9 +6873,9 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 842;
+			State = 848;
 			_la = TokenStream.LA(1);
-			if ( !(((((_la - 91)) & ~0x3f) == 0 && ((1L << (_la - 91)) & 7L) != 0)) ) {
+			if ( !(((((_la - 94)) & ~0x3f) == 0 && ((1L << (_la - 94)) & 7L) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
 			}
 			else {
@@ -6898,68 +6946,68 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 845;
+			State = 851;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Less_Than) {
 				{
-				State = 844;
+				State = 850;
 				attribute();
 				}
 			}
 
-			State = 848;
+			State = 854;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if (((((_la - 91)) & ~0x3f) == 0 && ((1L << (_la - 91)) & 7L) != 0)) {
+			if (((((_la - 94)) & ~0x3f) == 0 && ((1L << (_la - 94)) & 7L) != 0)) {
 				{
-				State = 847;
+				State = 853;
 				parameter_modifier();
 				}
 			}
 
-			State = 850;
+			State = 856;
 			Match(Identifier);
-			State = 852;
+			State = 858;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Double_Dot) {
 				{
-				State = 851;
+				State = 857;
 				Match(Double_Dot);
 				}
 			}
 
-			State = 856;
+			State = 862;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,113,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,114,Context) ) {
 			case 1:
 				{
-				State = 854;
+				State = 860;
 				Match(Colon);
-				State = 855;
+				State = 861;
 				type_name();
 				}
 				break;
 			}
-			State = 859;
+			State = 865;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Open_Brace || _la==Question_Mark) {
 				{
-				State = 858;
+				State = 864;
 				parameter_constraint();
 				}
 			}
 
-			State = 863;
+			State = 869;
 			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,115,Context) ) {
+			switch ( Interpreter.AdaptivePredict(TokenStream,116,Context) ) {
 			case 1:
 				{
-				State = 861;
+				State = 867;
 				Match(Equals);
-				State = 862;
+				State = 868;
 				expression(0);
 				}
 				break;
@@ -7015,21 +7063,21 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 866;
+			State = 872;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==Question_Mark) {
 				{
-				State = 865;
+				State = 871;
 				Match(Question_Mark);
 				}
 			}
 
-			State = 868;
+			State = 874;
 			Match(Open_Brace);
-			State = 869;
+			State = 875;
 			expression(0);
-			State = 870;
+			State = 876;
 			Match(Close_Brace);
 			}
 		}
@@ -7094,41 +7142,41 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 872;
-			Match(Open_Brace);
 			State = 878;
+			Match(Open_Brace);
+			State = 884;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 25288770780932L) != 0) || _la==Less_Than || _la==Identifier) {
 				{
-				State = 876;
+				State = 882;
 				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,117,Context) ) {
+				switch ( Interpreter.AdaptivePredict(TokenStream,118,Context) ) {
 				case 1:
 					{
-					State = 873;
+					State = 879;
 					type_member();
 					}
 					break;
 				case 2:
 					{
-					State = 874;
+					State = 880;
 					type();
 					}
 					break;
 				case 3:
 					{
-					State = 875;
+					State = 881;
 					Match(NewLine);
 					}
 					break;
 				}
 				}
-				State = 880;
+				State = 886;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 881;
+			State = 887;
 			Match(Close_Brace);
 			}
 		}
@@ -7179,11 +7227,11 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 883;
+			State = 889;
 			Match(Try);
-			State = 884;
+			State = 890;
 			Match(Equals);
-			State = 885;
+			State = 891;
 			expression(0);
 			}
 		}
@@ -7199,11 +7247,16 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	public partial class Catch_branchContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Colon() { return GetToken(LoschScriptParser.Colon, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Catch() { return GetToken(LoschScriptParser.Catch, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Equals() { return GetToken(LoschScriptParser.Equals, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
 			return GetRuleContext<ExpressionContext>(0);
 		}
+		[System.Diagnostics.DebuggerNonUserCode] public Type_nameContext type_name() {
+			return GetRuleContext<Type_nameContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Identifier() { return GetToken(LoschScriptParser.Identifier, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Colon() { return GetToken(LoschScriptParser.Colon, 0); }
 		public Catch_branchContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -7231,14 +7284,37 @@ public partial class LoschScriptParser : Parser {
 	public Catch_branchContext catch_branch() {
 		Catch_branchContext _localctx = new Catch_branchContext(Context, State);
 		EnterRule(_localctx, 114, RULE_catch_branch);
+		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 887;
-			Match(Colon);
-			State = 888;
+			State = 893;
+			Match(Catch);
+			State = 899;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 360288794819166208L) != 0) || _la==Less_Than || _la==Identifier) {
+				{
+				State = 896;
+				ErrorHandler.Sync(this);
+				switch ( Interpreter.AdaptivePredict(TokenStream,120,Context) ) {
+				case 1:
+					{
+					State = 894;
+					Match(Identifier);
+					State = 895;
+					Match(Colon);
+					}
+					break;
+				}
+				State = 898;
+				type_name();
+				}
+			}
+
+			State = 901;
 			Match(Equals);
-			State = 889;
+			State = 902;
 			expression(0);
 			}
 		}
@@ -7254,7 +7330,7 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	public partial class Finally_branchContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Double_Colon() { return GetToken(LoschScriptParser.Double_Colon, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Finally() { return GetToken(LoschScriptParser.Finally, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Equals() { return GetToken(LoschScriptParser.Equals, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
 			return GetRuleContext<ExpressionContext>(0);
@@ -7289,11 +7365,11 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 891;
-			Match(Double_Colon);
-			State = 892;
+			State = 904;
+			Match(Finally);
+			State = 905;
 			Match(Equals);
-			State = 893;
+			State = 906;
 			expression(0);
 			}
 		}
@@ -7309,7 +7385,7 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	public partial class Fault_branchContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Triple_Colon() { return GetToken(LoschScriptParser.Triple_Colon, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Fault() { return GetToken(LoschScriptParser.Fault, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Equals() { return GetToken(LoschScriptParser.Equals, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
 			return GetRuleContext<ExpressionContext>(0);
@@ -7344,11 +7420,11 @@ public partial class LoschScriptParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 895;
-			Match(Triple_Colon);
-			State = 896;
+			State = 908;
+			Match(Fault);
+			State = 909;
 			Match(Equals);
-			State = 897;
+			State = 910;
 			expression(0);
 			}
 		}
@@ -7371,29 +7447,29 @@ public partial class LoschScriptParser : Parser {
 	}
 	private bool expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
-		case 0: return Precpred(Context, 47);
-		case 1: return Precpred(Context, 46);
-		case 2: return Precpred(Context, 44);
-		case 3: return Precpred(Context, 43);
-		case 4: return Precpred(Context, 42);
-		case 5: return Precpred(Context, 41);
-		case 6: return Precpred(Context, 40);
-		case 7: return Precpred(Context, 39);
-		case 8: return Precpred(Context, 38);
-		case 9: return Precpred(Context, 37);
-		case 10: return Precpred(Context, 36);
-		case 11: return Precpred(Context, 35);
-		case 12: return Precpred(Context, 34);
-		case 13: return Precpred(Context, 33);
-		case 14: return Precpred(Context, 32);
-		case 15: return Precpred(Context, 31);
-		case 16: return Precpred(Context, 27);
-		case 17: return Precpred(Context, 25);
-		case 18: return Precpred(Context, 24);
-		case 19: return Precpred(Context, 21);
-		case 20: return Precpred(Context, 23);
-		case 21: return Precpred(Context, 18);
-		case 22: return Precpred(Context, 15);
+		case 0: return Precpred(Context, 48);
+		case 1: return Precpred(Context, 47);
+		case 2: return Precpred(Context, 45);
+		case 3: return Precpred(Context, 44);
+		case 4: return Precpred(Context, 43);
+		case 5: return Precpred(Context, 42);
+		case 6: return Precpred(Context, 41);
+		case 7: return Precpred(Context, 40);
+		case 8: return Precpred(Context, 39);
+		case 9: return Precpred(Context, 38);
+		case 10: return Precpred(Context, 37);
+		case 11: return Precpred(Context, 36);
+		case 12: return Precpred(Context, 35);
+		case 13: return Precpred(Context, 34);
+		case 14: return Precpred(Context, 33);
+		case 15: return Precpred(Context, 32);
+		case 16: return Precpred(Context, 28);
+		case 17: return Precpred(Context, 26);
+		case 18: return Precpred(Context, 25);
+		case 19: return Precpred(Context, 22);
+		case 20: return Precpred(Context, 24);
+		case 21: return Precpred(Context, 19);
+		case 22: return Precpred(Context, 16);
 		case 23: return Precpred(Context, 4);
 		case 24: return Precpred(Context, 1);
 		}
@@ -7401,7 +7477,7 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,134,900,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
+		4,1,137,913,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
 		7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,
 		2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,21,
 		2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,2,27,7,27,2,28,7,28,
@@ -7425,298 +7501,304 @@ public partial class LoschScriptParser : Parser {
 		8,294,9,8,1,8,5,8,297,8,8,10,8,12,8,300,9,8,1,8,5,8,303,8,8,10,8,12,8,
 		306,9,8,1,8,3,8,309,8,8,1,8,1,8,3,8,313,8,8,1,8,1,8,1,8,1,8,1,8,1,8,5,
 		8,321,8,8,10,8,12,8,324,9,8,1,8,3,8,327,8,8,1,8,1,8,1,8,1,8,1,8,1,8,3,
-		8,335,8,8,1,8,1,8,1,8,1,8,1,8,3,8,342,8,8,1,8,1,8,1,8,3,8,347,8,8,1,8,
-		3,8,350,8,8,1,8,1,8,1,8,1,8,1,8,1,8,5,8,358,8,8,10,8,12,8,361,9,8,3,8,
-		363,8,8,1,8,1,8,1,8,1,8,1,8,4,8,370,8,8,11,8,12,8,371,1,8,1,8,1,8,1,8,
-		1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,5,8,389,8,8,10,8,12,8,392,
-		9,8,3,8,394,8,8,1,8,1,8,1,8,1,8,1,8,3,8,401,8,8,3,8,403,8,8,1,8,1,8,1,
+		8,335,8,8,1,8,1,8,1,8,1,8,1,8,3,8,342,8,8,1,8,1,8,5,8,346,8,8,10,8,12,
+		8,349,9,8,1,8,3,8,352,8,8,1,8,3,8,355,8,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,
+		5,8,364,8,8,10,8,12,8,367,9,8,3,8,369,8,8,1,8,1,8,1,8,1,8,1,8,4,8,376,
+		8,8,11,8,12,8,377,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,
+		1,8,1,8,5,8,395,8,8,10,8,12,8,398,9,8,3,8,400,8,8,1,8,1,8,1,8,1,8,1,8,
+		3,8,407,8,8,3,8,409,8,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,
 		8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,
 		1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,
 		8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,
-		1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,
-		8,1,8,1,8,4,8,480,8,8,11,8,12,8,481,1,8,3,8,485,8,8,5,8,487,8,8,10,8,12,
-		8,490,9,8,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,3,9,501,8,9,1,10,1,10,1,
-		11,1,11,1,11,1,11,1,12,1,12,1,13,1,13,1,14,1,14,1,15,1,15,1,16,1,16,1,
-		17,1,17,1,17,1,18,1,18,1,19,5,19,525,8,19,10,19,12,19,528,9,19,1,19,1,
-		19,5,19,532,8,19,10,19,12,19,535,9,19,1,19,3,19,538,8,19,1,20,1,20,3,20,
-		542,8,20,1,20,1,20,1,20,1,20,4,20,548,8,20,11,20,12,20,549,1,20,1,20,1,
-		20,1,20,3,20,556,8,20,1,20,1,20,3,20,560,8,20,1,20,3,20,563,8,20,1,21,
-		1,21,1,22,1,22,1,22,1,22,5,22,571,8,22,10,22,12,22,574,9,22,1,22,1,22,
-		1,23,1,23,1,23,1,23,1,23,3,23,583,8,23,1,24,1,24,1,24,1,25,1,25,1,25,1,
-		25,1,25,3,25,593,8,25,1,26,1,26,1,26,1,26,3,26,599,8,26,1,27,1,27,1,27,
-		1,27,1,27,3,27,606,8,27,1,28,1,28,1,28,1,28,1,28,3,28,613,8,28,1,29,1,
-		29,1,29,1,30,3,30,619,8,30,1,30,1,30,3,30,623,8,30,1,31,3,31,626,8,31,
-		1,31,1,31,1,32,1,32,3,32,632,8,32,1,32,1,32,1,32,1,32,1,32,3,32,639,8,
-		32,1,32,5,32,642,8,32,10,32,12,32,645,9,32,1,32,3,32,648,8,32,1,33,1,33,
-		1,33,3,33,653,8,33,1,33,1,33,5,33,657,8,33,10,33,12,33,660,9,33,1,34,1,
-		34,1,34,1,34,1,34,1,35,1,35,3,35,669,8,35,1,35,1,35,3,35,673,8,35,1,35,
-		1,35,3,35,677,8,35,3,35,679,8,35,1,36,1,36,3,36,683,8,36,1,36,1,36,1,36,
-		3,36,688,8,36,1,36,1,36,1,36,1,37,1,37,1,38,1,38,1,39,1,39,1,39,1,39,3,
-		39,701,8,39,3,39,703,8,39,1,40,1,40,1,41,1,41,3,41,709,8,41,1,41,3,41,
-		712,8,41,1,41,1,41,1,41,3,41,717,8,41,1,41,3,41,720,8,41,1,41,1,41,1,41,
-		1,42,1,42,1,42,1,42,5,42,729,8,42,10,42,12,42,732,9,42,1,42,1,42,1,43,
-		1,43,1,43,3,43,739,8,43,1,44,1,44,3,44,743,8,44,1,45,1,45,1,45,1,45,5,
-		45,749,8,45,10,45,12,45,752,9,45,1,46,3,46,755,8,46,1,46,1,46,1,46,1,46,
-		1,46,3,46,762,8,46,1,47,1,47,1,48,1,48,1,49,1,49,1,50,3,50,771,8,50,1,
-		50,3,50,774,8,50,1,50,3,50,777,8,50,1,50,5,50,780,8,50,10,50,12,50,783,
-		9,50,1,50,1,50,3,50,787,8,50,1,50,3,50,790,8,50,1,50,1,50,3,50,794,8,50,
-		1,50,1,50,1,50,3,50,799,8,50,1,50,3,50,802,8,50,1,50,3,50,805,8,50,1,50,
-		5,50,808,8,50,10,50,12,50,811,9,50,1,50,1,50,3,50,815,8,50,1,50,1,50,3,
-		50,819,8,50,1,51,1,51,1,51,1,51,5,51,825,8,51,10,51,12,51,828,9,51,3,51,
-		830,8,51,1,51,1,51,1,51,1,51,5,51,836,8,51,10,51,12,51,839,9,51,3,51,841,
-		8,51,1,52,1,52,1,53,3,53,846,8,53,1,53,3,53,849,8,53,1,53,1,53,3,53,853,
-		8,53,1,53,1,53,3,53,857,8,53,1,53,3,53,860,8,53,1,53,1,53,3,53,864,8,53,
-		1,54,3,54,867,8,54,1,54,1,54,1,54,1,54,1,55,1,55,1,55,1,55,5,55,877,8,
-		55,10,55,12,55,880,9,55,1,55,1,55,1,56,1,56,1,56,1,56,1,57,1,57,1,57,1,
-		57,1,58,1,58,1,58,1,58,1,59,1,59,1,59,1,59,1,59,0,1,16,60,0,2,4,6,8,10,
-		12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,
-		60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,
-		106,108,110,112,114,116,118,0,10,1,0,43,44,1,0,101,102,1,0,97,100,1,0,
-		50,51,1,0,133,134,2,0,22,37,39,39,2,0,11,11,13,13,2,0,11,13,15,15,3,0,
-		14,14,21,21,40,41,1,0,91,93,1019,0,124,1,0,0,0,2,141,1,0,0,0,4,147,1,0,
-		0,0,6,150,1,0,0,0,8,205,1,0,0,0,10,207,1,0,0,0,12,210,1,0,0,0,14,218,1,
-		0,0,0,16,402,1,0,0,0,18,500,1,0,0,0,20,502,1,0,0,0,22,504,1,0,0,0,24,508,
-		1,0,0,0,26,510,1,0,0,0,28,512,1,0,0,0,30,514,1,0,0,0,32,516,1,0,0,0,34,
-		518,1,0,0,0,36,521,1,0,0,0,38,537,1,0,0,0,40,562,1,0,0,0,42,564,1,0,0,
-		0,44,566,1,0,0,0,46,577,1,0,0,0,48,584,1,0,0,0,50,587,1,0,0,0,52,594,1,
-		0,0,0,54,600,1,0,0,0,56,607,1,0,0,0,58,614,1,0,0,0,60,618,1,0,0,0,62,625,
-		1,0,0,0,64,631,1,0,0,0,66,649,1,0,0,0,68,661,1,0,0,0,70,678,1,0,0,0,72,
-		680,1,0,0,0,74,692,1,0,0,0,76,694,1,0,0,0,78,702,1,0,0,0,80,704,1,0,0,
-		0,82,708,1,0,0,0,84,724,1,0,0,0,86,735,1,0,0,0,88,742,1,0,0,0,90,744,1,
-		0,0,0,92,761,1,0,0,0,94,763,1,0,0,0,96,765,1,0,0,0,98,767,1,0,0,0,100,
-		818,1,0,0,0,102,840,1,0,0,0,104,842,1,0,0,0,106,845,1,0,0,0,108,866,1,
-		0,0,0,110,872,1,0,0,0,112,883,1,0,0,0,114,887,1,0,0,0,116,891,1,0,0,0,
-		118,895,1,0,0,0,120,123,3,8,4,0,121,123,5,2,0,0,122,120,1,0,0,0,122,121,
-		1,0,0,0,123,126,1,0,0,0,124,122,1,0,0,0,124,125,1,0,0,0,125,134,1,0,0,
-		0,126,124,1,0,0,0,127,131,3,10,5,0,128,130,5,2,0,0,129,128,1,0,0,0,130,
-		133,1,0,0,0,131,129,1,0,0,0,131,132,1,0,0,0,132,135,1,0,0,0,133,131,1,
-		0,0,0,134,127,1,0,0,0,134,135,1,0,0,0,135,136,1,0,0,0,136,137,3,2,1,0,
-		137,138,5,0,0,1,138,1,1,0,0,0,139,142,3,4,2,0,140,142,3,6,3,0,141,139,
-		1,0,0,0,141,140,1,0,0,0,142,3,1,0,0,0,143,146,3,16,8,0,144,146,5,2,0,0,
-		145,143,1,0,0,0,145,144,1,0,0,0,146,149,1,0,0,0,147,145,1,0,0,0,147,148,
-		1,0,0,0,148,5,1,0,0,0,149,147,1,0,0,0,150,154,3,82,41,0,151,153,5,2,0,
-		0,152,151,1,0,0,0,153,156,1,0,0,0,154,152,1,0,0,0,154,155,1,0,0,0,155,
-		161,1,0,0,0,156,154,1,0,0,0,157,160,3,82,41,0,158,160,5,2,0,0,159,157,
-		1,0,0,0,159,158,1,0,0,0,160,163,1,0,0,0,161,159,1,0,0,0,161,162,1,0,0,
-		0,162,7,1,0,0,0,163,161,1,0,0,0,164,166,5,75,0,0,165,164,1,0,0,0,165,166,
-		1,0,0,0,166,167,1,0,0,0,167,168,5,5,0,0,168,173,3,12,6,0,169,170,5,61,
-		0,0,170,172,3,12,6,0,171,169,1,0,0,0,172,175,1,0,0,0,173,171,1,0,0,0,173,
-		174,1,0,0,0,174,206,1,0,0,0,175,173,1,0,0,0,176,178,5,75,0,0,177,176,1,
-		0,0,0,177,178,1,0,0,0,178,179,1,0,0,0,179,180,5,5,0,0,180,181,5,9,0,0,
-		181,186,3,12,6,0,182,183,5,61,0,0,183,185,3,12,6,0,184,182,1,0,0,0,185,
-		188,1,0,0,0,186,184,1,0,0,0,186,187,1,0,0,0,187,206,1,0,0,0,188,186,1,
-		0,0,0,189,191,5,75,0,0,190,189,1,0,0,0,190,191,1,0,0,0,191,192,1,0,0,0,
-		192,193,5,5,0,0,193,194,5,127,0,0,194,195,5,116,0,0,195,202,3,12,6,0,196,
-		197,5,61,0,0,197,198,5,127,0,0,198,199,5,116,0,0,199,201,3,12,6,0,200,
-		196,1,0,0,0,201,204,1,0,0,0,202,200,1,0,0,0,202,203,1,0,0,0,203,206,1,
-		0,0,0,204,202,1,0,0,0,205,165,1,0,0,0,205,177,1,0,0,0,205,190,1,0,0,0,
-		206,9,1,0,0,0,207,208,5,6,0,0,208,209,3,12,6,0,209,11,1,0,0,0,210,215,
-		5,127,0,0,211,212,5,63,0,0,212,214,5,127,0,0,213,211,1,0,0,0,214,217,1,
-		0,0,0,215,213,1,0,0,0,215,216,1,0,0,0,216,13,1,0,0,0,217,215,1,0,0,0,218,
-		227,5,59,0,0,219,222,5,2,0,0,220,222,3,16,8,0,221,219,1,0,0,0,221,220,
-		1,0,0,0,222,225,1,0,0,0,223,221,1,0,0,0,223,224,1,0,0,0,224,228,1,0,0,
-		0,225,223,1,0,0,0,226,228,3,74,37,0,227,223,1,0,0,0,227,226,1,0,0,0,228,
-		229,1,0,0,0,229,230,5,60,0,0,230,15,1,0,0,0,231,232,6,8,-1,0,232,233,5,
-		117,0,0,233,403,3,16,8,48,234,235,5,75,0,0,235,403,3,16,8,45,236,237,5,
-		91,0,0,237,403,3,16,8,30,238,239,5,82,0,0,239,403,5,127,0,0,240,241,5,
-		84,0,0,241,403,3,16,8,28,242,244,7,0,0,0,243,242,1,0,0,0,243,244,1,0,0,
-		0,244,245,1,0,0,0,245,248,5,127,0,0,246,247,5,67,0,0,247,249,3,40,20,0,
-		248,246,1,0,0,0,248,249,1,0,0,0,249,250,1,0,0,0,250,251,5,116,0,0,251,
-		403,3,16,8,26,252,403,3,60,30,0,253,255,3,66,33,0,254,253,1,0,0,0,255,
-		256,1,0,0,0,256,254,1,0,0,0,256,257,1,0,0,0,257,258,1,0,0,0,258,259,3,
-		16,8,20,259,403,1,0,0,0,260,264,3,46,23,0,261,263,5,2,0,0,262,261,1,0,
-		0,0,263,266,1,0,0,0,264,262,1,0,0,0,264,265,1,0,0,0,265,270,1,0,0,0,266,
-		264,1,0,0,0,267,269,3,50,25,0,268,267,1,0,0,0,269,272,1,0,0,0,270,268,
-		1,0,0,0,270,271,1,0,0,0,271,276,1,0,0,0,272,270,1,0,0,0,273,275,5,2,0,
-		0,274,273,1,0,0,0,275,278,1,0,0,0,276,274,1,0,0,0,276,277,1,0,0,0,277,
-		280,1,0,0,0,278,276,1,0,0,0,279,281,3,52,26,0,280,279,1,0,0,0,280,281,
-		1,0,0,0,281,403,1,0,0,0,282,284,3,14,7,0,283,285,5,2,0,0,284,283,1,0,0,
-		0,284,285,1,0,0,0,285,286,1,0,0,0,286,287,3,48,24,0,287,403,1,0,0,0,288,
-		292,3,54,27,0,289,291,5,2,0,0,290,289,1,0,0,0,291,294,1,0,0,0,292,290,
-		1,0,0,0,292,293,1,0,0,0,293,298,1,0,0,0,294,292,1,0,0,0,295,297,3,56,28,
-		0,296,295,1,0,0,0,297,300,1,0,0,0,298,296,1,0,0,0,298,299,1,0,0,0,299,
-		304,1,0,0,0,300,298,1,0,0,0,301,303,5,2,0,0,302,301,1,0,0,0,303,306,1,
-		0,0,0,304,302,1,0,0,0,304,305,1,0,0,0,305,308,1,0,0,0,306,304,1,0,0,0,
-		307,309,3,52,26,0,308,307,1,0,0,0,308,309,1,0,0,0,309,403,1,0,0,0,310,
-		312,3,14,7,0,311,313,5,2,0,0,312,311,1,0,0,0,312,313,1,0,0,0,313,314,1,
-		0,0,0,314,315,3,58,29,0,315,403,1,0,0,0,316,317,5,127,0,0,317,326,5,124,
-		0,0,318,319,5,127,0,0,319,321,5,124,0,0,320,318,1,0,0,0,321,324,1,0,0,
-		0,322,320,1,0,0,0,322,323,1,0,0,0,323,325,1,0,0,0,324,322,1,0,0,0,325,
-		327,5,127,0,0,326,322,1,0,0,0,326,327,1,0,0,0,327,328,1,0,0,0,328,403,
-		3,16,8,13,329,330,5,78,0,0,330,331,3,16,8,0,331,334,5,116,0,0,332,335,
-		3,14,7,0,333,335,3,16,8,0,334,332,1,0,0,0,334,333,1,0,0,0,335,403,1,0,
-		0,0,336,337,5,79,0,0,337,338,3,16,8,0,338,341,5,116,0,0,339,342,3,14,7,
-		0,340,342,3,16,8,0,341,339,1,0,0,0,341,340,1,0,0,0,342,403,1,0,0,0,343,
-		344,3,112,56,0,344,346,3,114,57,0,345,347,3,116,58,0,346,345,1,0,0,0,346,
-		347,1,0,0,0,347,349,1,0,0,0,348,350,3,118,59,0,349,348,1,0,0,0,349,350,
-		1,0,0,0,350,403,1,0,0,0,351,352,5,49,0,0,352,403,3,16,8,9,353,362,5,57,
-		0,0,354,359,3,16,8,0,355,356,5,61,0,0,356,358,3,16,8,0,357,355,1,0,0,0,
-		358,361,1,0,0,0,359,357,1,0,0,0,359,360,1,0,0,0,360,363,1,0,0,0,361,359,
-		1,0,0,0,362,354,1,0,0,0,362,363,1,0,0,0,363,364,1,0,0,0,364,403,5,58,0,
-		0,365,366,5,53,0,0,366,369,3,16,8,0,367,368,5,61,0,0,368,370,3,16,8,0,
-		369,367,1,0,0,0,370,371,1,0,0,0,371,369,1,0,0,0,371,372,1,0,0,0,372,373,
-		1,0,0,0,373,374,5,54,0,0,374,403,1,0,0,0,375,393,5,57,0,0,376,377,5,57,
-		0,0,377,378,3,16,8,0,378,379,5,61,0,0,379,380,3,16,8,0,380,390,5,58,0,
-		0,381,382,5,61,0,0,382,383,5,57,0,0,383,384,3,16,8,0,384,385,5,61,0,0,
-		385,386,3,16,8,0,386,387,5,58,0,0,387,389,1,0,0,0,388,381,1,0,0,0,389,
-		392,1,0,0,0,390,388,1,0,0,0,390,391,1,0,0,0,391,394,1,0,0,0,392,390,1,
-		0,0,0,393,376,1,0,0,0,393,394,1,0,0,0,394,395,1,0,0,0,395,403,5,58,0,0,
-		396,403,3,18,9,0,397,403,3,14,7,0,398,400,3,12,6,0,399,401,3,64,32,0,400,
-		399,1,0,0,0,400,401,1,0,0,0,401,403,1,0,0,0,402,231,1,0,0,0,402,234,1,
-		0,0,0,402,236,1,0,0,0,402,238,1,0,0,0,402,240,1,0,0,0,402,243,1,0,0,0,
-		402,252,1,0,0,0,402,254,1,0,0,0,402,260,1,0,0,0,402,282,1,0,0,0,402,288,
-		1,0,0,0,402,310,1,0,0,0,402,316,1,0,0,0,402,329,1,0,0,0,402,336,1,0,0,
-		0,402,343,1,0,0,0,402,351,1,0,0,0,402,353,1,0,0,0,402,365,1,0,0,0,402,
-		375,1,0,0,0,402,396,1,0,0,0,402,397,1,0,0,0,402,398,1,0,0,0,403,488,1,
-		0,0,0,404,405,10,47,0,0,405,406,5,78,0,0,406,407,3,16,8,0,407,408,5,116,
-		0,0,408,409,3,16,8,48,409,487,1,0,0,0,410,411,10,46,0,0,411,412,5,109,
-		0,0,412,487,3,16,8,47,413,414,10,44,0,0,414,415,5,107,0,0,415,487,3,16,
-		8,45,416,417,10,43,0,0,417,418,5,111,0,0,418,487,3,16,8,44,419,420,10,
-		42,0,0,420,421,5,114,0,0,421,487,3,16,8,43,422,423,10,41,0,0,423,424,5,
-		103,0,0,424,487,3,16,8,42,425,426,10,40,0,0,426,427,5,105,0,0,427,487,
-		3,16,8,41,428,429,10,39,0,0,429,430,5,120,0,0,430,487,3,16,8,40,431,432,
-		10,38,0,0,432,433,5,122,0,0,433,487,3,16,8,39,434,435,10,37,0,0,435,436,
-		7,1,0,0,436,487,3,16,8,38,437,438,10,36,0,0,438,439,7,2,0,0,439,487,3,
-		16,8,37,440,441,10,35,0,0,441,442,5,91,0,0,442,487,3,16,8,36,443,444,10,
-		34,0,0,444,445,5,94,0,0,445,487,3,16,8,35,446,447,10,33,0,0,447,448,5,
-		85,0,0,448,487,3,16,8,34,449,450,10,32,0,0,450,451,5,88,0,0,451,487,3,
-		16,8,33,452,453,10,31,0,0,453,454,5,81,0,0,454,487,3,16,8,32,455,456,10,
-		27,0,0,456,457,5,65,0,0,457,487,3,16,8,28,458,459,10,25,0,0,459,460,5,
-		124,0,0,460,487,3,16,8,26,461,462,10,24,0,0,462,463,5,125,0,0,463,487,
-		3,16,8,25,464,465,10,21,0,0,465,466,5,78,0,0,466,487,3,16,8,22,467,468,
-		10,23,0,0,468,469,5,63,0,0,469,487,5,127,0,0,470,471,10,18,0,0,471,487,
-		3,48,24,0,472,473,10,15,0,0,473,487,3,58,29,0,474,475,10,4,0,0,475,487,
-		5,2,0,0,476,479,10,1,0,0,477,478,5,63,0,0,478,480,5,127,0,0,479,477,1,
-		0,0,0,480,481,1,0,0,0,481,479,1,0,0,0,481,482,1,0,0,0,482,484,1,0,0,0,
-		483,485,3,64,32,0,484,483,1,0,0,0,484,485,1,0,0,0,485,487,1,0,0,0,486,
-		404,1,0,0,0,486,410,1,0,0,0,486,413,1,0,0,0,486,416,1,0,0,0,486,419,1,
-		0,0,0,486,422,1,0,0,0,486,425,1,0,0,0,486,428,1,0,0,0,486,431,1,0,0,0,
-		486,434,1,0,0,0,486,437,1,0,0,0,486,440,1,0,0,0,486,443,1,0,0,0,486,446,
-		1,0,0,0,486,449,1,0,0,0,486,452,1,0,0,0,486,455,1,0,0,0,486,458,1,0,0,
-		0,486,461,1,0,0,0,486,464,1,0,0,0,486,467,1,0,0,0,486,470,1,0,0,0,486,
-		472,1,0,0,0,486,474,1,0,0,0,486,476,1,0,0,0,487,490,1,0,0,0,488,486,1,
-		0,0,0,488,489,1,0,0,0,489,17,1,0,0,0,490,488,1,0,0,0,491,501,3,22,11,0,
-		492,501,3,24,12,0,493,501,3,26,13,0,494,501,3,28,14,0,495,501,3,30,15,
-		0,496,501,3,32,16,0,497,501,3,34,17,0,498,501,3,36,18,0,499,501,3,20,10,
-		0,500,491,1,0,0,0,500,492,1,0,0,0,500,493,1,0,0,0,500,494,1,0,0,0,500,
-		495,1,0,0,0,500,496,1,0,0,0,500,497,1,0,0,0,500,498,1,0,0,0,500,499,1,
-		0,0,0,501,19,1,0,0,0,502,503,5,52,0,0,503,21,1,0,0,0,504,505,5,53,0,0,
-		505,506,3,16,8,0,506,507,5,54,0,0,507,23,1,0,0,0,508,509,5,128,0,0,509,
-		25,1,0,0,0,510,511,5,131,0,0,511,27,1,0,0,0,512,513,7,3,0,0,513,29,1,0,
-		0,0,514,515,7,4,0,0,515,31,1,0,0,0,516,517,5,132,0,0,517,33,1,0,0,0,518,
-		519,5,53,0,0,519,520,5,54,0,0,520,35,1,0,0,0,521,522,5,71,0,0,522,37,1,
-		0,0,0,523,525,3,66,33,0,524,523,1,0,0,0,525,528,1,0,0,0,526,524,1,0,0,
-		0,526,527,1,0,0,0,527,529,1,0,0,0,528,526,1,0,0,0,529,538,5,127,0,0,530,
-		532,3,66,33,0,531,530,1,0,0,0,532,535,1,0,0,0,533,531,1,0,0,0,533,534,
-		1,0,0,0,534,536,1,0,0,0,535,533,1,0,0,0,536,538,3,12,6,0,537,526,1,0,0,
-		0,537,533,1,0,0,0,538,39,1,0,0,0,539,541,3,42,21,0,540,542,5,91,0,0,541,
-		540,1,0,0,0,541,542,1,0,0,0,542,563,1,0,0,0,543,544,5,53,0,0,544,547,3,
-		40,20,0,545,546,5,85,0,0,546,548,3,40,20,0,547,545,1,0,0,0,548,549,1,0,
-		0,0,549,547,1,0,0,0,549,550,1,0,0,0,550,551,1,0,0,0,551,552,5,54,0,0,552,
-		563,1,0,0,0,553,555,3,68,34,0,554,556,5,91,0,0,555,554,1,0,0,0,555,556,
-		1,0,0,0,556,563,1,0,0,0,557,559,3,38,19,0,558,560,5,91,0,0,559,558,1,0,
-		0,0,559,560,1,0,0,0,560,563,1,0,0,0,561,563,3,44,22,0,562,539,1,0,0,0,
-		562,543,1,0,0,0,562,553,1,0,0,0,562,557,1,0,0,0,562,561,1,0,0,0,563,41,
-		1,0,0,0,564,565,7,5,0,0,565,43,1,0,0,0,566,567,5,55,0,0,567,572,3,40,20,
-		0,568,569,5,61,0,0,569,571,3,40,20,0,570,568,1,0,0,0,571,574,1,0,0,0,572,
-		570,1,0,0,0,572,573,1,0,0,0,573,575,1,0,0,0,574,572,1,0,0,0,575,576,5,
-		56,0,0,576,45,1,0,0,0,577,578,5,74,0,0,578,579,3,16,8,0,579,582,5,116,
-		0,0,580,583,3,14,7,0,581,583,3,16,8,0,582,580,1,0,0,0,582,581,1,0,0,0,
-		583,47,1,0,0,0,584,585,5,74,0,0,585,586,3,16,8,0,586,49,1,0,0,0,587,588,
-		5,67,0,0,588,589,3,16,8,0,589,592,5,116,0,0,590,593,3,14,7,0,591,593,3,
-		16,8,0,592,590,1,0,0,0,592,591,1,0,0,0,593,51,1,0,0,0,594,595,5,67,0,0,
-		595,598,5,116,0,0,596,599,3,14,7,0,597,599,3,16,8,0,598,596,1,0,0,0,598,
-		597,1,0,0,0,599,53,1,0,0,0,600,601,5,76,0,0,601,602,3,16,8,0,602,605,5,
-		116,0,0,603,606,3,14,7,0,604,606,3,16,8,0,605,603,1,0,0,0,605,604,1,0,
-		0,0,606,55,1,0,0,0,607,608,5,77,0,0,608,609,3,16,8,0,609,612,5,116,0,0,
-		610,613,3,14,7,0,611,613,3,16,8,0,612,610,1,0,0,0,612,611,1,0,0,0,613,
-		57,1,0,0,0,614,615,5,76,0,0,615,616,3,16,8,0,616,59,1,0,0,0,617,619,3,
-		62,31,0,618,617,1,0,0,0,618,619,1,0,0,0,619,620,1,0,0,0,620,622,5,64,0,
-		0,621,623,3,62,31,0,622,621,1,0,0,0,622,623,1,0,0,0,623,61,1,0,0,0,624,
-		626,5,81,0,0,625,624,1,0,0,0,625,626,1,0,0,0,626,627,1,0,0,0,627,628,3,
-		24,12,0,628,63,1,0,0,0,629,630,5,127,0,0,630,632,5,67,0,0,631,629,1,0,
-		0,0,631,632,1,0,0,0,632,633,1,0,0,0,633,634,3,16,8,0,634,643,1,0,0,0,635,
-		638,5,61,0,0,636,637,5,127,0,0,637,639,5,67,0,0,638,636,1,0,0,0,638,639,
-		1,0,0,0,639,640,1,0,0,0,640,642,3,16,8,0,641,635,1,0,0,0,642,645,1,0,0,
-		0,643,641,1,0,0,0,643,644,1,0,0,0,644,647,1,0,0,0,645,643,1,0,0,0,646,
-		648,5,62,0,0,647,646,1,0,0,0,647,648,1,0,0,0,648,65,1,0,0,0,649,650,5,
-		97,0,0,650,652,3,40,20,0,651,653,3,64,32,0,652,651,1,0,0,0,652,653,1,0,
-		0,0,653,654,1,0,0,0,654,658,5,98,0,0,655,657,5,2,0,0,656,655,1,0,0,0,657,
-		660,1,0,0,0,658,656,1,0,0,0,658,659,1,0,0,0,659,67,1,0,0,0,660,658,1,0,
-		0,0,661,662,3,38,19,0,662,663,5,57,0,0,663,664,3,38,19,0,664,665,5,58,
-		0,0,665,69,1,0,0,0,666,668,5,11,0,0,667,669,5,16,0,0,668,667,1,0,0,0,668,
-		669,1,0,0,0,669,679,1,0,0,0,670,672,5,12,0,0,671,673,5,16,0,0,672,671,
-		1,0,0,0,672,673,1,0,0,0,673,679,1,0,0,0,674,676,5,13,0,0,675,677,5,16,
-		0,0,676,675,1,0,0,0,676,677,1,0,0,0,677,679,1,0,0,0,678,666,1,0,0,0,678,
-		670,1,0,0,0,678,674,1,0,0,0,679,71,1,0,0,0,680,682,3,70,35,0,681,683,7,
-		0,0,0,682,681,1,0,0,0,682,683,1,0,0,0,683,684,1,0,0,0,684,687,5,127,0,
-		0,685,686,5,67,0,0,686,688,3,40,20,0,687,685,1,0,0,0,687,688,1,0,0,0,688,
-		689,1,0,0,0,689,690,5,116,0,0,690,691,3,16,8,0,691,73,1,0,0,0,692,693,
-		5,63,0,0,693,75,1,0,0,0,694,695,7,6,0,0,695,77,1,0,0,0,696,703,3,76,38,
-		0,697,703,5,12,0,0,698,700,5,15,0,0,699,701,5,13,0,0,700,699,1,0,0,0,700,
-		701,1,0,0,0,701,703,1,0,0,0,702,696,1,0,0,0,702,697,1,0,0,0,702,698,1,
-		0,0,0,703,79,1,0,0,0,704,705,5,17,0,0,705,81,1,0,0,0,706,709,3,76,38,0,
-		707,709,3,78,39,0,708,706,1,0,0,0,708,707,1,0,0,0,708,709,1,0,0,0,709,
-		711,1,0,0,0,710,712,3,80,40,0,711,710,1,0,0,0,711,712,1,0,0,0,712,713,
-		1,0,0,0,713,714,3,92,46,0,714,716,5,127,0,0,715,717,3,84,42,0,716,715,
-		1,0,0,0,716,717,1,0,0,0,717,719,1,0,0,0,718,720,3,90,45,0,719,718,1,0,
-		0,0,719,720,1,0,0,0,720,721,1,0,0,0,721,722,5,116,0,0,722,723,3,110,55,
-		0,723,83,1,0,0,0,724,725,5,57,0,0,725,730,3,86,43,0,726,727,5,61,0,0,727,
-		729,3,86,43,0,728,726,1,0,0,0,729,732,1,0,0,0,730,728,1,0,0,0,730,731,
-		1,0,0,0,731,733,1,0,0,0,732,730,1,0,0,0,733,734,5,58,0,0,734,85,1,0,0,
-		0,735,738,5,127,0,0,736,737,5,67,0,0,737,739,3,88,44,0,738,736,1,0,0,0,
-		738,739,1,0,0,0,739,87,1,0,0,0,740,743,3,92,46,0,741,743,3,40,20,0,742,
-		740,1,0,0,0,742,741,1,0,0,0,743,89,1,0,0,0,744,745,5,67,0,0,745,750,3,
-		40,20,0,746,747,5,61,0,0,747,749,3,40,20,0,748,746,1,0,0,0,749,752,1,0,
-		0,0,750,748,1,0,0,0,750,751,1,0,0,0,751,91,1,0,0,0,752,750,1,0,0,0,753,
-		755,5,42,0,0,754,753,1,0,0,0,754,755,1,0,0,0,755,756,1,0,0,0,756,762,5,
-		8,0,0,757,758,5,44,0,0,758,762,5,8,0,0,759,762,5,10,0,0,760,762,5,9,0,
-		0,761,754,1,0,0,0,761,757,1,0,0,0,761,759,1,0,0,0,761,760,1,0,0,0,762,
-		93,1,0,0,0,763,764,7,7,0,0,764,95,1,0,0,0,765,766,5,20,0,0,766,97,1,0,
-		0,0,767,768,7,8,0,0,768,99,1,0,0,0,769,771,3,66,33,0,770,769,1,0,0,0,770,
-		771,1,0,0,0,771,773,1,0,0,0,772,774,3,94,47,0,773,772,1,0,0,0,773,774,
-		1,0,0,0,774,776,1,0,0,0,775,777,3,96,48,0,776,775,1,0,0,0,776,777,1,0,
-		0,0,777,781,1,0,0,0,778,780,3,98,49,0,779,778,1,0,0,0,780,783,1,0,0,0,
-		781,779,1,0,0,0,781,782,1,0,0,0,782,784,1,0,0,0,783,781,1,0,0,0,784,786,
-		5,127,0,0,785,787,3,84,42,0,786,785,1,0,0,0,786,787,1,0,0,0,787,789,1,
-		0,0,0,788,790,3,102,51,0,789,788,1,0,0,0,789,790,1,0,0,0,790,793,1,0,0,
-		0,791,792,5,67,0,0,792,794,3,40,20,0,793,791,1,0,0,0,793,794,1,0,0,0,794,
-		795,1,0,0,0,795,796,5,116,0,0,796,819,3,16,8,0,797,799,3,66,33,0,798,797,
-		1,0,0,0,798,799,1,0,0,0,799,801,1,0,0,0,800,802,3,94,47,0,801,800,1,0,
-		0,0,801,802,1,0,0,0,802,804,1,0,0,0,803,805,3,96,48,0,804,803,1,0,0,0,
-		804,805,1,0,0,0,805,809,1,0,0,0,806,808,3,98,49,0,807,806,1,0,0,0,808,
-		811,1,0,0,0,809,807,1,0,0,0,809,810,1,0,0,0,810,812,1,0,0,0,811,809,1,
-		0,0,0,812,814,5,127,0,0,813,815,3,84,42,0,814,813,1,0,0,0,814,815,1,0,
-		0,0,815,816,1,0,0,0,816,817,5,67,0,0,817,819,3,40,20,0,818,770,1,0,0,0,
-		818,798,1,0,0,0,819,101,1,0,0,0,820,829,5,53,0,0,821,826,3,106,53,0,822,
-		823,5,61,0,0,823,825,3,106,53,0,824,822,1,0,0,0,825,828,1,0,0,0,826,824,
-		1,0,0,0,826,827,1,0,0,0,827,830,1,0,0,0,828,826,1,0,0,0,829,821,1,0,0,
-		0,829,830,1,0,0,0,830,831,1,0,0,0,831,841,5,54,0,0,832,837,3,106,53,0,
-		833,834,5,61,0,0,834,836,3,106,53,0,835,833,1,0,0,0,836,839,1,0,0,0,837,
-		835,1,0,0,0,837,838,1,0,0,0,838,841,1,0,0,0,839,837,1,0,0,0,840,820,1,
-		0,0,0,840,832,1,0,0,0,841,103,1,0,0,0,842,843,7,9,0,0,843,105,1,0,0,0,
-		844,846,3,66,33,0,845,844,1,0,0,0,845,846,1,0,0,0,846,848,1,0,0,0,847,
-		849,3,104,52,0,848,847,1,0,0,0,848,849,1,0,0,0,849,850,1,0,0,0,850,852,
-		5,127,0,0,851,853,5,64,0,0,852,851,1,0,0,0,852,853,1,0,0,0,853,856,1,0,
-		0,0,854,855,5,67,0,0,855,857,3,40,20,0,856,854,1,0,0,0,856,857,1,0,0,0,
-		857,859,1,0,0,0,858,860,3,108,54,0,859,858,1,0,0,0,859,860,1,0,0,0,860,
-		863,1,0,0,0,861,862,5,116,0,0,862,864,3,16,8,0,863,861,1,0,0,0,863,864,
-		1,0,0,0,864,107,1,0,0,0,865,867,5,74,0,0,866,865,1,0,0,0,866,867,1,0,0,
-		0,867,868,1,0,0,0,868,869,5,59,0,0,869,870,3,16,8,0,870,871,5,60,0,0,871,
-		109,1,0,0,0,872,878,5,59,0,0,873,877,3,100,50,0,874,877,3,82,41,0,875,
-		877,5,2,0,0,876,873,1,0,0,0,876,874,1,0,0,0,876,875,1,0,0,0,877,880,1,
-		0,0,0,878,876,1,0,0,0,878,879,1,0,0,0,879,881,1,0,0,0,880,878,1,0,0,0,
-		881,882,5,60,0,0,882,111,1,0,0,0,883,884,5,48,0,0,884,885,5,116,0,0,885,
-		886,3,16,8,0,886,113,1,0,0,0,887,888,5,67,0,0,888,889,5,116,0,0,889,890,
-		3,16,8,0,890,115,1,0,0,0,891,892,5,68,0,0,892,893,5,116,0,0,893,894,3,
-		16,8,0,894,117,1,0,0,0,895,896,5,69,0,0,896,897,5,116,0,0,897,898,3,16,
-		8,0,898,119,1,0,0,0,119,122,124,131,134,141,145,147,154,159,161,165,173,
-		177,186,190,202,205,215,221,223,227,243,248,256,264,270,276,280,284,292,
-		298,304,308,312,322,326,334,341,346,349,359,362,371,390,393,400,402,481,
-		484,486,488,500,526,533,537,541,549,555,559,562,572,582,592,598,605,612,
-		618,622,625,631,638,643,647,652,658,668,672,676,678,682,687,700,702,708,
-		711,716,719,730,738,742,750,754,761,770,773,776,781,786,789,793,798,801,
-		804,809,814,818,826,829,837,840,845,848,852,856,859,863,866,876,878
+		1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,4,8,486,8,8,11,8,12,8,487,
+		1,8,3,8,491,8,8,5,8,493,8,8,10,8,12,8,496,9,8,1,9,1,9,1,9,1,9,1,9,1,9,
+		1,9,1,9,1,9,3,9,507,8,9,1,10,1,10,1,11,1,11,1,11,1,11,1,12,1,12,1,13,1,
+		13,1,14,1,14,1,15,1,15,1,16,1,16,1,17,1,17,1,17,1,18,1,18,1,19,5,19,531,
+		8,19,10,19,12,19,534,9,19,1,19,1,19,5,19,538,8,19,10,19,12,19,541,9,19,
+		1,19,3,19,544,8,19,1,20,1,20,3,20,548,8,20,1,20,1,20,1,20,1,20,4,20,554,
+		8,20,11,20,12,20,555,1,20,1,20,1,20,1,20,3,20,562,8,20,1,20,1,20,3,20,
+		566,8,20,1,20,3,20,569,8,20,1,21,1,21,1,22,1,22,1,22,1,22,5,22,577,8,22,
+		10,22,12,22,580,9,22,1,22,1,22,1,23,1,23,1,23,1,23,1,23,3,23,589,8,23,
+		1,24,1,24,1,24,1,25,1,25,1,25,1,25,1,25,3,25,599,8,25,1,26,1,26,1,26,1,
+		26,3,26,605,8,26,1,27,1,27,1,27,1,27,1,27,3,27,612,8,27,1,28,1,28,1,28,
+		1,28,1,28,3,28,619,8,28,1,29,1,29,1,29,1,30,3,30,625,8,30,1,30,1,30,3,
+		30,629,8,30,1,31,3,31,632,8,31,1,31,1,31,1,32,1,32,3,32,638,8,32,1,32,
+		1,32,1,32,1,32,1,32,3,32,645,8,32,1,32,5,32,648,8,32,10,32,12,32,651,9,
+		32,1,32,3,32,654,8,32,1,33,1,33,1,33,3,33,659,8,33,1,33,1,33,5,33,663,
+		8,33,10,33,12,33,666,9,33,1,34,1,34,1,34,1,34,1,34,1,35,1,35,3,35,675,
+		8,35,1,35,1,35,3,35,679,8,35,1,35,1,35,3,35,683,8,35,3,35,685,8,35,1,36,
+		1,36,3,36,689,8,36,1,36,1,36,1,36,3,36,694,8,36,1,36,1,36,1,36,1,37,1,
+		37,1,38,1,38,1,39,1,39,1,39,1,39,3,39,707,8,39,3,39,709,8,39,1,40,1,40,
+		1,41,1,41,3,41,715,8,41,1,41,3,41,718,8,41,1,41,1,41,1,41,3,41,723,8,41,
+		1,41,3,41,726,8,41,1,41,1,41,1,41,1,42,1,42,1,42,1,42,5,42,735,8,42,10,
+		42,12,42,738,9,42,1,42,1,42,1,43,1,43,1,43,3,43,745,8,43,1,44,1,44,3,44,
+		749,8,44,1,45,1,45,1,45,1,45,5,45,755,8,45,10,45,12,45,758,9,45,1,46,3,
+		46,761,8,46,1,46,1,46,1,46,1,46,1,46,3,46,768,8,46,1,47,1,47,1,48,1,48,
+		1,49,1,49,1,50,3,50,777,8,50,1,50,3,50,780,8,50,1,50,3,50,783,8,50,1,50,
+		5,50,786,8,50,10,50,12,50,789,9,50,1,50,1,50,3,50,793,8,50,1,50,3,50,796,
+		8,50,1,50,1,50,3,50,800,8,50,1,50,1,50,1,50,3,50,805,8,50,1,50,3,50,808,
+		8,50,1,50,3,50,811,8,50,1,50,5,50,814,8,50,10,50,12,50,817,9,50,1,50,1,
+		50,3,50,821,8,50,1,50,1,50,3,50,825,8,50,1,51,1,51,1,51,1,51,5,51,831,
+		8,51,10,51,12,51,834,9,51,3,51,836,8,51,1,51,1,51,1,51,1,51,5,51,842,8,
+		51,10,51,12,51,845,9,51,3,51,847,8,51,1,52,1,52,1,53,3,53,852,8,53,1,53,
+		3,53,855,8,53,1,53,1,53,3,53,859,8,53,1,53,1,53,3,53,863,8,53,1,53,3,53,
+		866,8,53,1,53,1,53,3,53,870,8,53,1,54,3,54,873,8,54,1,54,1,54,1,54,1,54,
+		1,55,1,55,1,55,1,55,5,55,883,8,55,10,55,12,55,886,9,55,1,55,1,55,1,56,
+		1,56,1,56,1,56,1,57,1,57,1,57,3,57,897,8,57,1,57,3,57,900,8,57,1,57,1,
+		57,1,57,1,58,1,58,1,58,1,58,1,59,1,59,1,59,1,59,1,59,0,1,16,60,0,2,4,6,
+		8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,
+		56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,
+		102,104,106,108,110,112,114,116,118,0,10,1,0,43,44,1,0,104,105,1,0,100,
+		103,1,0,53,54,1,0,136,137,2,0,22,37,39,39,2,0,11,11,13,13,2,0,11,13,15,
+		15,3,0,14,14,21,21,40,41,1,0,94,96,1036,0,124,1,0,0,0,2,141,1,0,0,0,4,
+		147,1,0,0,0,6,150,1,0,0,0,8,205,1,0,0,0,10,207,1,0,0,0,12,210,1,0,0,0,
+		14,218,1,0,0,0,16,408,1,0,0,0,18,506,1,0,0,0,20,508,1,0,0,0,22,510,1,0,
+		0,0,24,514,1,0,0,0,26,516,1,0,0,0,28,518,1,0,0,0,30,520,1,0,0,0,32,522,
+		1,0,0,0,34,524,1,0,0,0,36,527,1,0,0,0,38,543,1,0,0,0,40,568,1,0,0,0,42,
+		570,1,0,0,0,44,572,1,0,0,0,46,583,1,0,0,0,48,590,1,0,0,0,50,593,1,0,0,
+		0,52,600,1,0,0,0,54,606,1,0,0,0,56,613,1,0,0,0,58,620,1,0,0,0,60,624,1,
+		0,0,0,62,631,1,0,0,0,64,637,1,0,0,0,66,655,1,0,0,0,68,667,1,0,0,0,70,684,
+		1,0,0,0,72,686,1,0,0,0,74,698,1,0,0,0,76,700,1,0,0,0,78,708,1,0,0,0,80,
+		710,1,0,0,0,82,714,1,0,0,0,84,730,1,0,0,0,86,741,1,0,0,0,88,748,1,0,0,
+		0,90,750,1,0,0,0,92,767,1,0,0,0,94,769,1,0,0,0,96,771,1,0,0,0,98,773,1,
+		0,0,0,100,824,1,0,0,0,102,846,1,0,0,0,104,848,1,0,0,0,106,851,1,0,0,0,
+		108,872,1,0,0,0,110,878,1,0,0,0,112,889,1,0,0,0,114,893,1,0,0,0,116,904,
+		1,0,0,0,118,908,1,0,0,0,120,123,3,8,4,0,121,123,5,2,0,0,122,120,1,0,0,
+		0,122,121,1,0,0,0,123,126,1,0,0,0,124,122,1,0,0,0,124,125,1,0,0,0,125,
+		134,1,0,0,0,126,124,1,0,0,0,127,131,3,10,5,0,128,130,5,2,0,0,129,128,1,
+		0,0,0,130,133,1,0,0,0,131,129,1,0,0,0,131,132,1,0,0,0,132,135,1,0,0,0,
+		133,131,1,0,0,0,134,127,1,0,0,0,134,135,1,0,0,0,135,136,1,0,0,0,136,137,
+		3,2,1,0,137,138,5,0,0,1,138,1,1,0,0,0,139,142,3,4,2,0,140,142,3,6,3,0,
+		141,139,1,0,0,0,141,140,1,0,0,0,142,3,1,0,0,0,143,146,3,16,8,0,144,146,
+		5,2,0,0,145,143,1,0,0,0,145,144,1,0,0,0,146,149,1,0,0,0,147,145,1,0,0,
+		0,147,148,1,0,0,0,148,5,1,0,0,0,149,147,1,0,0,0,150,154,3,82,41,0,151,
+		153,5,2,0,0,152,151,1,0,0,0,153,156,1,0,0,0,154,152,1,0,0,0,154,155,1,
+		0,0,0,155,161,1,0,0,0,156,154,1,0,0,0,157,160,3,82,41,0,158,160,5,2,0,
+		0,159,157,1,0,0,0,159,158,1,0,0,0,160,163,1,0,0,0,161,159,1,0,0,0,161,
+		162,1,0,0,0,162,7,1,0,0,0,163,161,1,0,0,0,164,166,5,78,0,0,165,164,1,0,
+		0,0,165,166,1,0,0,0,166,167,1,0,0,0,167,168,5,5,0,0,168,173,3,12,6,0,169,
+		170,5,64,0,0,170,172,3,12,6,0,171,169,1,0,0,0,172,175,1,0,0,0,173,171,
+		1,0,0,0,173,174,1,0,0,0,174,206,1,0,0,0,175,173,1,0,0,0,176,178,5,78,0,
+		0,177,176,1,0,0,0,177,178,1,0,0,0,178,179,1,0,0,0,179,180,5,5,0,0,180,
+		181,5,9,0,0,181,186,3,12,6,0,182,183,5,64,0,0,183,185,3,12,6,0,184,182,
+		1,0,0,0,185,188,1,0,0,0,186,184,1,0,0,0,186,187,1,0,0,0,187,206,1,0,0,
+		0,188,186,1,0,0,0,189,191,5,78,0,0,190,189,1,0,0,0,190,191,1,0,0,0,191,
+		192,1,0,0,0,192,193,5,5,0,0,193,194,5,130,0,0,194,195,5,119,0,0,195,202,
+		3,12,6,0,196,197,5,64,0,0,197,198,5,130,0,0,198,199,5,119,0,0,199,201,
+		3,12,6,0,200,196,1,0,0,0,201,204,1,0,0,0,202,200,1,0,0,0,202,203,1,0,0,
+		0,203,206,1,0,0,0,204,202,1,0,0,0,205,165,1,0,0,0,205,177,1,0,0,0,205,
+		190,1,0,0,0,206,9,1,0,0,0,207,208,5,6,0,0,208,209,3,12,6,0,209,11,1,0,
+		0,0,210,215,5,130,0,0,211,212,5,66,0,0,212,214,5,130,0,0,213,211,1,0,0,
+		0,214,217,1,0,0,0,215,213,1,0,0,0,215,216,1,0,0,0,216,13,1,0,0,0,217,215,
+		1,0,0,0,218,227,5,62,0,0,219,222,5,2,0,0,220,222,3,16,8,0,221,219,1,0,
+		0,0,221,220,1,0,0,0,222,225,1,0,0,0,223,221,1,0,0,0,223,224,1,0,0,0,224,
+		228,1,0,0,0,225,223,1,0,0,0,226,228,3,74,37,0,227,223,1,0,0,0,227,226,
+		1,0,0,0,228,229,1,0,0,0,229,230,5,63,0,0,230,15,1,0,0,0,231,232,6,8,-1,
+		0,232,233,5,120,0,0,233,409,3,16,8,49,234,235,5,78,0,0,235,409,3,16,8,
+		46,236,237,5,94,0,0,237,409,3,16,8,31,238,239,5,85,0,0,239,409,5,130,0,
+		0,240,241,5,87,0,0,241,409,3,16,8,29,242,244,7,0,0,0,243,242,1,0,0,0,243,
+		244,1,0,0,0,244,245,1,0,0,0,245,248,5,130,0,0,246,247,5,70,0,0,247,249,
+		3,40,20,0,248,246,1,0,0,0,248,249,1,0,0,0,249,250,1,0,0,0,250,251,5,119,
+		0,0,251,409,3,16,8,27,252,409,3,60,30,0,253,255,3,66,33,0,254,253,1,0,
+		0,0,255,256,1,0,0,0,256,254,1,0,0,0,256,257,1,0,0,0,257,258,1,0,0,0,258,
+		259,3,16,8,21,259,409,1,0,0,0,260,264,3,46,23,0,261,263,5,2,0,0,262,261,
+		1,0,0,0,263,266,1,0,0,0,264,262,1,0,0,0,264,265,1,0,0,0,265,270,1,0,0,
+		0,266,264,1,0,0,0,267,269,3,50,25,0,268,267,1,0,0,0,269,272,1,0,0,0,270,
+		268,1,0,0,0,270,271,1,0,0,0,271,276,1,0,0,0,272,270,1,0,0,0,273,275,5,
+		2,0,0,274,273,1,0,0,0,275,278,1,0,0,0,276,274,1,0,0,0,276,277,1,0,0,0,
+		277,280,1,0,0,0,278,276,1,0,0,0,279,281,3,52,26,0,280,279,1,0,0,0,280,
+		281,1,0,0,0,281,409,1,0,0,0,282,284,3,14,7,0,283,285,5,2,0,0,284,283,1,
+		0,0,0,284,285,1,0,0,0,285,286,1,0,0,0,286,287,3,48,24,0,287,409,1,0,0,
+		0,288,292,3,54,27,0,289,291,5,2,0,0,290,289,1,0,0,0,291,294,1,0,0,0,292,
+		290,1,0,0,0,292,293,1,0,0,0,293,298,1,0,0,0,294,292,1,0,0,0,295,297,3,
+		56,28,0,296,295,1,0,0,0,297,300,1,0,0,0,298,296,1,0,0,0,298,299,1,0,0,
+		0,299,304,1,0,0,0,300,298,1,0,0,0,301,303,5,2,0,0,302,301,1,0,0,0,303,
+		306,1,0,0,0,304,302,1,0,0,0,304,305,1,0,0,0,305,308,1,0,0,0,306,304,1,
+		0,0,0,307,309,3,52,26,0,308,307,1,0,0,0,308,309,1,0,0,0,309,409,1,0,0,
+		0,310,312,3,14,7,0,311,313,5,2,0,0,312,311,1,0,0,0,312,313,1,0,0,0,313,
+		314,1,0,0,0,314,315,3,58,29,0,315,409,1,0,0,0,316,317,5,130,0,0,317,326,
+		5,127,0,0,318,319,5,130,0,0,319,321,5,127,0,0,320,318,1,0,0,0,321,324,
+		1,0,0,0,322,320,1,0,0,0,322,323,1,0,0,0,323,325,1,0,0,0,324,322,1,0,0,
+		0,325,327,5,130,0,0,326,322,1,0,0,0,326,327,1,0,0,0,327,328,1,0,0,0,328,
+		409,3,16,8,14,329,330,5,81,0,0,330,331,3,16,8,0,331,334,5,119,0,0,332,
+		335,3,14,7,0,333,335,3,16,8,0,334,332,1,0,0,0,334,333,1,0,0,0,335,409,
+		1,0,0,0,336,337,5,82,0,0,337,338,3,16,8,0,338,341,5,119,0,0,339,342,3,
+		14,7,0,340,342,3,16,8,0,341,339,1,0,0,0,341,340,1,0,0,0,342,409,1,0,0,
+		0,343,347,3,112,56,0,344,346,3,114,57,0,345,344,1,0,0,0,346,349,1,0,0,
+		0,347,345,1,0,0,0,347,348,1,0,0,0,348,351,1,0,0,0,349,347,1,0,0,0,350,
+		352,3,118,59,0,351,350,1,0,0,0,351,352,1,0,0,0,352,354,1,0,0,0,353,355,
+		3,116,58,0,354,353,1,0,0,0,354,355,1,0,0,0,355,409,1,0,0,0,356,357,5,49,
+		0,0,357,409,3,16,8,10,358,409,5,49,0,0,359,368,5,60,0,0,360,365,3,16,8,
+		0,361,362,5,64,0,0,362,364,3,16,8,0,363,361,1,0,0,0,364,367,1,0,0,0,365,
+		363,1,0,0,0,365,366,1,0,0,0,366,369,1,0,0,0,367,365,1,0,0,0,368,360,1,
+		0,0,0,368,369,1,0,0,0,369,370,1,0,0,0,370,409,5,61,0,0,371,372,5,56,0,
+		0,372,375,3,16,8,0,373,374,5,64,0,0,374,376,3,16,8,0,375,373,1,0,0,0,376,
+		377,1,0,0,0,377,375,1,0,0,0,377,378,1,0,0,0,378,379,1,0,0,0,379,380,5,
+		57,0,0,380,409,1,0,0,0,381,399,5,60,0,0,382,383,5,60,0,0,383,384,3,16,
+		8,0,384,385,5,64,0,0,385,386,3,16,8,0,386,396,5,61,0,0,387,388,5,64,0,
+		0,388,389,5,60,0,0,389,390,3,16,8,0,390,391,5,64,0,0,391,392,3,16,8,0,
+		392,393,5,61,0,0,393,395,1,0,0,0,394,387,1,0,0,0,395,398,1,0,0,0,396,394,
+		1,0,0,0,396,397,1,0,0,0,397,400,1,0,0,0,398,396,1,0,0,0,399,382,1,0,0,
+		0,399,400,1,0,0,0,400,401,1,0,0,0,401,409,5,61,0,0,402,409,3,18,9,0,403,
+		409,3,14,7,0,404,406,3,12,6,0,405,407,3,64,32,0,406,405,1,0,0,0,406,407,
+		1,0,0,0,407,409,1,0,0,0,408,231,1,0,0,0,408,234,1,0,0,0,408,236,1,0,0,
+		0,408,238,1,0,0,0,408,240,1,0,0,0,408,243,1,0,0,0,408,252,1,0,0,0,408,
+		254,1,0,0,0,408,260,1,0,0,0,408,282,1,0,0,0,408,288,1,0,0,0,408,310,1,
+		0,0,0,408,316,1,0,0,0,408,329,1,0,0,0,408,336,1,0,0,0,408,343,1,0,0,0,
+		408,356,1,0,0,0,408,358,1,0,0,0,408,359,1,0,0,0,408,371,1,0,0,0,408,381,
+		1,0,0,0,408,402,1,0,0,0,408,403,1,0,0,0,408,404,1,0,0,0,409,494,1,0,0,
+		0,410,411,10,48,0,0,411,412,5,81,0,0,412,413,3,16,8,0,413,414,5,119,0,
+		0,414,415,3,16,8,49,415,493,1,0,0,0,416,417,10,47,0,0,417,418,5,112,0,
+		0,418,493,3,16,8,48,419,420,10,45,0,0,420,421,5,110,0,0,421,493,3,16,8,
+		46,422,423,10,44,0,0,423,424,5,114,0,0,424,493,3,16,8,45,425,426,10,43,
+		0,0,426,427,5,117,0,0,427,493,3,16,8,44,428,429,10,42,0,0,429,430,5,106,
+		0,0,430,493,3,16,8,43,431,432,10,41,0,0,432,433,5,108,0,0,433,493,3,16,
+		8,42,434,435,10,40,0,0,435,436,5,123,0,0,436,493,3,16,8,41,437,438,10,
+		39,0,0,438,439,5,125,0,0,439,493,3,16,8,40,440,441,10,38,0,0,441,442,7,
+		1,0,0,442,493,3,16,8,39,443,444,10,37,0,0,444,445,7,2,0,0,445,493,3,16,
+		8,38,446,447,10,36,0,0,447,448,5,94,0,0,448,493,3,16,8,37,449,450,10,35,
+		0,0,450,451,5,97,0,0,451,493,3,16,8,36,452,453,10,34,0,0,453,454,5,88,
+		0,0,454,493,3,16,8,35,455,456,10,33,0,0,456,457,5,91,0,0,457,493,3,16,
+		8,34,458,459,10,32,0,0,459,460,5,84,0,0,460,493,3,16,8,33,461,462,10,28,
+		0,0,462,463,5,68,0,0,463,493,3,16,8,29,464,465,10,26,0,0,465,466,5,127,
+		0,0,466,493,3,16,8,27,467,468,10,25,0,0,468,469,5,128,0,0,469,493,3,16,
+		8,26,470,471,10,22,0,0,471,472,5,81,0,0,472,493,3,16,8,23,473,474,10,24,
+		0,0,474,475,5,66,0,0,475,493,5,130,0,0,476,477,10,19,0,0,477,493,3,48,
+		24,0,478,479,10,16,0,0,479,493,3,58,29,0,480,481,10,4,0,0,481,493,5,2,
+		0,0,482,485,10,1,0,0,483,484,5,66,0,0,484,486,5,130,0,0,485,483,1,0,0,
+		0,486,487,1,0,0,0,487,485,1,0,0,0,487,488,1,0,0,0,488,490,1,0,0,0,489,
+		491,3,64,32,0,490,489,1,0,0,0,490,491,1,0,0,0,491,493,1,0,0,0,492,410,
+		1,0,0,0,492,416,1,0,0,0,492,419,1,0,0,0,492,422,1,0,0,0,492,425,1,0,0,
+		0,492,428,1,0,0,0,492,431,1,0,0,0,492,434,1,0,0,0,492,437,1,0,0,0,492,
+		440,1,0,0,0,492,443,1,0,0,0,492,446,1,0,0,0,492,449,1,0,0,0,492,452,1,
+		0,0,0,492,455,1,0,0,0,492,458,1,0,0,0,492,461,1,0,0,0,492,464,1,0,0,0,
+		492,467,1,0,0,0,492,470,1,0,0,0,492,473,1,0,0,0,492,476,1,0,0,0,492,478,
+		1,0,0,0,492,480,1,0,0,0,492,482,1,0,0,0,493,496,1,0,0,0,494,492,1,0,0,
+		0,494,495,1,0,0,0,495,17,1,0,0,0,496,494,1,0,0,0,497,507,3,22,11,0,498,
+		507,3,24,12,0,499,507,3,26,13,0,500,507,3,28,14,0,501,507,3,30,15,0,502,
+		507,3,32,16,0,503,507,3,34,17,0,504,507,3,36,18,0,505,507,3,20,10,0,506,
+		497,1,0,0,0,506,498,1,0,0,0,506,499,1,0,0,0,506,500,1,0,0,0,506,501,1,
+		0,0,0,506,502,1,0,0,0,506,503,1,0,0,0,506,504,1,0,0,0,506,505,1,0,0,0,
+		507,19,1,0,0,0,508,509,5,55,0,0,509,21,1,0,0,0,510,511,5,56,0,0,511,512,
+		3,16,8,0,512,513,5,57,0,0,513,23,1,0,0,0,514,515,5,131,0,0,515,25,1,0,
+		0,0,516,517,5,134,0,0,517,27,1,0,0,0,518,519,7,3,0,0,519,29,1,0,0,0,520,
+		521,7,4,0,0,521,31,1,0,0,0,522,523,5,135,0,0,523,33,1,0,0,0,524,525,5,
+		56,0,0,525,526,5,57,0,0,526,35,1,0,0,0,527,528,5,74,0,0,528,37,1,0,0,0,
+		529,531,3,66,33,0,530,529,1,0,0,0,531,534,1,0,0,0,532,530,1,0,0,0,532,
+		533,1,0,0,0,533,535,1,0,0,0,534,532,1,0,0,0,535,544,5,130,0,0,536,538,
+		3,66,33,0,537,536,1,0,0,0,538,541,1,0,0,0,539,537,1,0,0,0,539,540,1,0,
+		0,0,540,542,1,0,0,0,541,539,1,0,0,0,542,544,3,12,6,0,543,532,1,0,0,0,543,
+		539,1,0,0,0,544,39,1,0,0,0,545,547,3,42,21,0,546,548,5,94,0,0,547,546,
+		1,0,0,0,547,548,1,0,0,0,548,569,1,0,0,0,549,550,5,56,0,0,550,553,3,40,
+		20,0,551,552,5,88,0,0,552,554,3,40,20,0,553,551,1,0,0,0,554,555,1,0,0,
+		0,555,553,1,0,0,0,555,556,1,0,0,0,556,557,1,0,0,0,557,558,5,57,0,0,558,
+		569,1,0,0,0,559,561,3,68,34,0,560,562,5,94,0,0,561,560,1,0,0,0,561,562,
+		1,0,0,0,562,569,1,0,0,0,563,565,3,38,19,0,564,566,5,94,0,0,565,564,1,0,
+		0,0,565,566,1,0,0,0,566,569,1,0,0,0,567,569,3,44,22,0,568,545,1,0,0,0,
+		568,549,1,0,0,0,568,559,1,0,0,0,568,563,1,0,0,0,568,567,1,0,0,0,569,41,
+		1,0,0,0,570,571,7,5,0,0,571,43,1,0,0,0,572,573,5,58,0,0,573,578,3,40,20,
+		0,574,575,5,64,0,0,575,577,3,40,20,0,576,574,1,0,0,0,577,580,1,0,0,0,578,
+		576,1,0,0,0,578,579,1,0,0,0,579,581,1,0,0,0,580,578,1,0,0,0,581,582,5,
+		59,0,0,582,45,1,0,0,0,583,584,5,77,0,0,584,585,3,16,8,0,585,588,5,119,
+		0,0,586,589,3,14,7,0,587,589,3,16,8,0,588,586,1,0,0,0,588,587,1,0,0,0,
+		589,47,1,0,0,0,590,591,5,77,0,0,591,592,3,16,8,0,592,49,1,0,0,0,593,594,
+		5,70,0,0,594,595,3,16,8,0,595,598,5,119,0,0,596,599,3,14,7,0,597,599,3,
+		16,8,0,598,596,1,0,0,0,598,597,1,0,0,0,599,51,1,0,0,0,600,601,5,70,0,0,
+		601,604,5,119,0,0,602,605,3,14,7,0,603,605,3,16,8,0,604,602,1,0,0,0,604,
+		603,1,0,0,0,605,53,1,0,0,0,606,607,5,79,0,0,607,608,3,16,8,0,608,611,5,
+		119,0,0,609,612,3,14,7,0,610,612,3,16,8,0,611,609,1,0,0,0,611,610,1,0,
+		0,0,612,55,1,0,0,0,613,614,5,80,0,0,614,615,3,16,8,0,615,618,5,119,0,0,
+		616,619,3,14,7,0,617,619,3,16,8,0,618,616,1,0,0,0,618,617,1,0,0,0,619,
+		57,1,0,0,0,620,621,5,79,0,0,621,622,3,16,8,0,622,59,1,0,0,0,623,625,3,
+		62,31,0,624,623,1,0,0,0,624,625,1,0,0,0,625,626,1,0,0,0,626,628,5,67,0,
+		0,627,629,3,62,31,0,628,627,1,0,0,0,628,629,1,0,0,0,629,61,1,0,0,0,630,
+		632,5,84,0,0,631,630,1,0,0,0,631,632,1,0,0,0,632,633,1,0,0,0,633,634,3,
+		24,12,0,634,63,1,0,0,0,635,636,5,130,0,0,636,638,5,70,0,0,637,635,1,0,
+		0,0,637,638,1,0,0,0,638,639,1,0,0,0,639,640,3,16,8,0,640,649,1,0,0,0,641,
+		644,5,64,0,0,642,643,5,130,0,0,643,645,5,70,0,0,644,642,1,0,0,0,644,645,
+		1,0,0,0,645,646,1,0,0,0,646,648,3,16,8,0,647,641,1,0,0,0,648,651,1,0,0,
+		0,649,647,1,0,0,0,649,650,1,0,0,0,650,653,1,0,0,0,651,649,1,0,0,0,652,
+		654,5,65,0,0,653,652,1,0,0,0,653,654,1,0,0,0,654,65,1,0,0,0,655,656,5,
+		100,0,0,656,658,3,40,20,0,657,659,3,64,32,0,658,657,1,0,0,0,658,659,1,
+		0,0,0,659,660,1,0,0,0,660,664,5,101,0,0,661,663,5,2,0,0,662,661,1,0,0,
+		0,663,666,1,0,0,0,664,662,1,0,0,0,664,665,1,0,0,0,665,67,1,0,0,0,666,664,
+		1,0,0,0,667,668,3,38,19,0,668,669,5,60,0,0,669,670,3,38,19,0,670,671,5,
+		61,0,0,671,69,1,0,0,0,672,674,5,11,0,0,673,675,5,16,0,0,674,673,1,0,0,
+		0,674,675,1,0,0,0,675,685,1,0,0,0,676,678,5,12,0,0,677,679,5,16,0,0,678,
+		677,1,0,0,0,678,679,1,0,0,0,679,685,1,0,0,0,680,682,5,13,0,0,681,683,5,
+		16,0,0,682,681,1,0,0,0,682,683,1,0,0,0,683,685,1,0,0,0,684,672,1,0,0,0,
+		684,676,1,0,0,0,684,680,1,0,0,0,685,71,1,0,0,0,686,688,3,70,35,0,687,689,
+		7,0,0,0,688,687,1,0,0,0,688,689,1,0,0,0,689,690,1,0,0,0,690,693,5,130,
+		0,0,691,692,5,70,0,0,692,694,3,40,20,0,693,691,1,0,0,0,693,694,1,0,0,0,
+		694,695,1,0,0,0,695,696,5,119,0,0,696,697,3,16,8,0,697,73,1,0,0,0,698,
+		699,5,66,0,0,699,75,1,0,0,0,700,701,7,6,0,0,701,77,1,0,0,0,702,709,3,76,
+		38,0,703,709,5,12,0,0,704,706,5,15,0,0,705,707,5,13,0,0,706,705,1,0,0,
+		0,706,707,1,0,0,0,707,709,1,0,0,0,708,702,1,0,0,0,708,703,1,0,0,0,708,
+		704,1,0,0,0,709,79,1,0,0,0,710,711,5,17,0,0,711,81,1,0,0,0,712,715,3,76,
+		38,0,713,715,3,78,39,0,714,712,1,0,0,0,714,713,1,0,0,0,714,715,1,0,0,0,
+		715,717,1,0,0,0,716,718,3,80,40,0,717,716,1,0,0,0,717,718,1,0,0,0,718,
+		719,1,0,0,0,719,720,3,92,46,0,720,722,5,130,0,0,721,723,3,84,42,0,722,
+		721,1,0,0,0,722,723,1,0,0,0,723,725,1,0,0,0,724,726,3,90,45,0,725,724,
+		1,0,0,0,725,726,1,0,0,0,726,727,1,0,0,0,727,728,5,119,0,0,728,729,3,110,
+		55,0,729,83,1,0,0,0,730,731,5,60,0,0,731,736,3,86,43,0,732,733,5,64,0,
+		0,733,735,3,86,43,0,734,732,1,0,0,0,735,738,1,0,0,0,736,734,1,0,0,0,736,
+		737,1,0,0,0,737,739,1,0,0,0,738,736,1,0,0,0,739,740,5,61,0,0,740,85,1,
+		0,0,0,741,744,5,130,0,0,742,743,5,70,0,0,743,745,3,88,44,0,744,742,1,0,
+		0,0,744,745,1,0,0,0,745,87,1,0,0,0,746,749,3,92,46,0,747,749,3,40,20,0,
+		748,746,1,0,0,0,748,747,1,0,0,0,749,89,1,0,0,0,750,751,5,70,0,0,751,756,
+		3,40,20,0,752,753,5,64,0,0,753,755,3,40,20,0,754,752,1,0,0,0,755,758,1,
+		0,0,0,756,754,1,0,0,0,756,757,1,0,0,0,757,91,1,0,0,0,758,756,1,0,0,0,759,
+		761,5,42,0,0,760,759,1,0,0,0,760,761,1,0,0,0,761,762,1,0,0,0,762,768,5,
+		8,0,0,763,764,5,44,0,0,764,768,5,8,0,0,765,768,5,10,0,0,766,768,5,9,0,
+		0,767,760,1,0,0,0,767,763,1,0,0,0,767,765,1,0,0,0,767,766,1,0,0,0,768,
+		93,1,0,0,0,769,770,7,7,0,0,770,95,1,0,0,0,771,772,5,20,0,0,772,97,1,0,
+		0,0,773,774,7,8,0,0,774,99,1,0,0,0,775,777,3,66,33,0,776,775,1,0,0,0,776,
+		777,1,0,0,0,777,779,1,0,0,0,778,780,3,94,47,0,779,778,1,0,0,0,779,780,
+		1,0,0,0,780,782,1,0,0,0,781,783,3,96,48,0,782,781,1,0,0,0,782,783,1,0,
+		0,0,783,787,1,0,0,0,784,786,3,98,49,0,785,784,1,0,0,0,786,789,1,0,0,0,
+		787,785,1,0,0,0,787,788,1,0,0,0,788,790,1,0,0,0,789,787,1,0,0,0,790,792,
+		5,130,0,0,791,793,3,84,42,0,792,791,1,0,0,0,792,793,1,0,0,0,793,795,1,
+		0,0,0,794,796,3,102,51,0,795,794,1,0,0,0,795,796,1,0,0,0,796,799,1,0,0,
+		0,797,798,5,70,0,0,798,800,3,40,20,0,799,797,1,0,0,0,799,800,1,0,0,0,800,
+		801,1,0,0,0,801,802,5,119,0,0,802,825,3,16,8,0,803,805,3,66,33,0,804,803,
+		1,0,0,0,804,805,1,0,0,0,805,807,1,0,0,0,806,808,3,94,47,0,807,806,1,0,
+		0,0,807,808,1,0,0,0,808,810,1,0,0,0,809,811,3,96,48,0,810,809,1,0,0,0,
+		810,811,1,0,0,0,811,815,1,0,0,0,812,814,3,98,49,0,813,812,1,0,0,0,814,
+		817,1,0,0,0,815,813,1,0,0,0,815,816,1,0,0,0,816,818,1,0,0,0,817,815,1,
+		0,0,0,818,820,5,130,0,0,819,821,3,84,42,0,820,819,1,0,0,0,820,821,1,0,
+		0,0,821,822,1,0,0,0,822,823,5,70,0,0,823,825,3,40,20,0,824,776,1,0,0,0,
+		824,804,1,0,0,0,825,101,1,0,0,0,826,835,5,56,0,0,827,832,3,106,53,0,828,
+		829,5,64,0,0,829,831,3,106,53,0,830,828,1,0,0,0,831,834,1,0,0,0,832,830,
+		1,0,0,0,832,833,1,0,0,0,833,836,1,0,0,0,834,832,1,0,0,0,835,827,1,0,0,
+		0,835,836,1,0,0,0,836,837,1,0,0,0,837,847,5,57,0,0,838,843,3,106,53,0,
+		839,840,5,64,0,0,840,842,3,106,53,0,841,839,1,0,0,0,842,845,1,0,0,0,843,
+		841,1,0,0,0,843,844,1,0,0,0,844,847,1,0,0,0,845,843,1,0,0,0,846,826,1,
+		0,0,0,846,838,1,0,0,0,847,103,1,0,0,0,848,849,7,9,0,0,849,105,1,0,0,0,
+		850,852,3,66,33,0,851,850,1,0,0,0,851,852,1,0,0,0,852,854,1,0,0,0,853,
+		855,3,104,52,0,854,853,1,0,0,0,854,855,1,0,0,0,855,856,1,0,0,0,856,858,
+		5,130,0,0,857,859,5,67,0,0,858,857,1,0,0,0,858,859,1,0,0,0,859,862,1,0,
+		0,0,860,861,5,70,0,0,861,863,3,40,20,0,862,860,1,0,0,0,862,863,1,0,0,0,
+		863,865,1,0,0,0,864,866,3,108,54,0,865,864,1,0,0,0,865,866,1,0,0,0,866,
+		869,1,0,0,0,867,868,5,119,0,0,868,870,3,16,8,0,869,867,1,0,0,0,869,870,
+		1,0,0,0,870,107,1,0,0,0,871,873,5,77,0,0,872,871,1,0,0,0,872,873,1,0,0,
+		0,873,874,1,0,0,0,874,875,5,62,0,0,875,876,3,16,8,0,876,877,5,63,0,0,877,
+		109,1,0,0,0,878,884,5,62,0,0,879,883,3,100,50,0,880,883,3,82,41,0,881,
+		883,5,2,0,0,882,879,1,0,0,0,882,880,1,0,0,0,882,881,1,0,0,0,883,886,1,
+		0,0,0,884,882,1,0,0,0,884,885,1,0,0,0,885,887,1,0,0,0,886,884,1,0,0,0,
+		887,888,5,63,0,0,888,111,1,0,0,0,889,890,5,48,0,0,890,891,5,119,0,0,891,
+		892,3,16,8,0,892,113,1,0,0,0,893,899,5,50,0,0,894,895,5,130,0,0,895,897,
+		5,70,0,0,896,894,1,0,0,0,896,897,1,0,0,0,897,898,1,0,0,0,898,900,3,40,
+		20,0,899,896,1,0,0,0,899,900,1,0,0,0,900,901,1,0,0,0,901,902,5,119,0,0,
+		902,903,3,16,8,0,903,115,1,0,0,0,904,905,5,51,0,0,905,906,5,119,0,0,906,
+		907,3,16,8,0,907,117,1,0,0,0,908,909,5,52,0,0,909,910,5,119,0,0,910,911,
+		3,16,8,0,911,119,1,0,0,0,122,122,124,131,134,141,145,147,154,159,161,165,
+		173,177,186,190,202,205,215,221,223,227,243,248,256,264,270,276,280,284,
+		292,298,304,308,312,322,326,334,341,347,351,354,365,368,377,396,399,406,
+		408,487,490,492,494,506,532,539,543,547,555,561,565,568,578,588,598,604,
+		611,618,624,628,631,637,644,649,653,658,664,674,678,682,684,688,693,706,
+		708,714,717,722,725,736,744,748,756,760,767,776,779,782,787,792,795,799,
+		804,807,810,815,820,824,832,835,843,846,851,854,858,862,865,869,872,882,
+		884,896,899
 	};
 
 	public static readonly ATN _ATN =

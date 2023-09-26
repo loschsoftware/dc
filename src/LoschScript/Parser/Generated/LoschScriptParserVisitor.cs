@@ -96,20 +96,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitCode_block([NotNull] LoschScriptParser.Code_blockContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>attributed_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitAttributed_expression([NotNull] LoschScriptParser.Attributed_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>equality_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitEquality_expression([NotNull] LoschScriptParser.Equality_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>subtraction_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -124,54 +110,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBitwise_complement_expression([NotNull] LoschScriptParser.Bitwise_complement_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>until_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitUntil_loop([NotNull] LoschScriptParser.Until_loopContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>right_pipe_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitRight_pipe_expression([NotNull] LoschScriptParser.Right_pipe_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>while_loop</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitWhile_loop([NotNull] LoschScriptParser.While_loopContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>xor_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitXor_expression([NotNull] LoschScriptParser.Xor_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>prefix_if_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>logical_negation_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitLogical_negation_expression([NotNull] LoschScriptParser.Logical_negation_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>right_shift_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>array_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -222,20 +166,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAnd_expression([NotNull] LoschScriptParser.And_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>range_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitRange_expression([NotNull] LoschScriptParser.Range_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>member_access_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>newlined_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -243,33 +173,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>remainder_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>typeof_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>block_postfix_if_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitBlock_postfix_if_expression([NotNull] LoschScriptParser.Block_postfix_if_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>block_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>postfix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -284,27 +193,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitPower_expression([NotNull] LoschScriptParser.Power_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>left_pipe_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitLeft_pipe_expression([NotNull] LoschScriptParser.Left_pipe_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>dictionary_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>prefix_unless_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitPrefix_unless_expression([NotNull] LoschScriptParser.Prefix_unless_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>addition_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -334,6 +222,153 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitComparison_expression([NotNull] LoschScriptParser.Comparison_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>or_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOr_expression([NotNull] LoschScriptParser.Or_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>try_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTry_expression([NotNull] LoschScriptParser.Try_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>dotted_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>left_shift_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>attributed_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAttributed_expression([NotNull] LoschScriptParser.Attributed_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>equality_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitEquality_expression([NotNull] LoschScriptParser.Equality_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>until_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitUntil_loop([NotNull] LoschScriptParser.Until_loopContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>while_loop</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitWhile_loop([NotNull] LoschScriptParser.While_loopContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>xor_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitXor_expression([NotNull] LoschScriptParser.Xor_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>prefix_if_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPrefix_if_expression([NotNull] LoschScriptParser.Prefix_if_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>logical_negation_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLogical_negation_expression([NotNull] LoschScriptParser.Logical_negation_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>right_shift_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>rethrow_exception</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRethrow_exception([NotNull] LoschScriptParser.Rethrow_exceptionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>range_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRange_expression([NotNull] LoschScriptParser.Range_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>member_access_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMember_access_expression([NotNull] LoschScriptParser.Member_access_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>remainder_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRemainder_expression([NotNull] LoschScriptParser.Remainder_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>typeof_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTypeof_expression([NotNull] LoschScriptParser.Typeof_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>block_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBlock_expression([NotNull] LoschScriptParser.Block_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>left_pipe_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLeft_pipe_expression([NotNull] LoschScriptParser.Left_pipe_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>dictionary_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>prefix_unless_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPrefix_unless_expression([NotNull] LoschScriptParser.Prefix_unless_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
@@ -348,26 +383,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitTuple_expression([NotNull] LoschScriptParser.Tuple_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>or_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitOr_expression([NotNull] LoschScriptParser.Or_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>nameof_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitNameof_expression([NotNull] LoschScriptParser.Nameof_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>try_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitTry_expression([NotNull] LoschScriptParser.Try_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>postfix_if_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
@@ -403,20 +424,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLogical_and_expression([NotNull] LoschScriptParser.Logical_and_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>dotted_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>left_shift_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitLeft_shift_expression([NotNull] LoschScriptParser.Left_shift_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>full_identifier_member_access_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

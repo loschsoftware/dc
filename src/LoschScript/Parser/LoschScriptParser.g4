@@ -76,8 +76,9 @@ expression
     | Identifier Arrow_Right ((Identifier Arrow_Right)* Identifier)? expression #loop_expression
     | At_Sign expression Equals (code_block | expression) #while_loop
     | Exclamation_At expression Equals (code_block | expression) #until_loop
-    | try_branch catch_branch finally_branch? fault_branch? #try_expression
+    | try_branch catch_branch* fault_branch? finally_branch? #try_expression
     | Raise expression #raise_expression
+    | Raise #rethrow_exception
     | Open_Bracket (expression (Comma expression)*)? Close_Bracket #array_expression
     | Open_Paren expression (Comma expression)+ Close_Paren #tuple_expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
@@ -316,13 +317,13 @@ try_branch
     ;
 
 catch_branch
-    : Colon Equals expression
+    : Catch ((Identifier Colon)? type_name)? Equals expression
     ;
 
 finally_branch
-    : Double_Colon Equals expression
+    : Finally Equals expression
     ;
 
 fault_branch
-    : Triple_Colon Equals expression
+    : Fault Equals expression
     ;

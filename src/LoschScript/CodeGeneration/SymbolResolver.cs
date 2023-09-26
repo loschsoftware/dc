@@ -58,7 +58,21 @@ internal static class SymbolResolver
 
         // 2. Locals
         if (CurrentMethod.Locals.Any(p => p.Name == text))
-            return CurrentMethod.Locals.First(p => p.Name == text);
+        {
+            LocalInfo loc = CurrentMethod.Locals.First(p => p.Name == text);
+
+            if (!loc.IsAvailable)
+            {
+                EmitErrorMessage(
+                    row,
+                    col,
+                    len,
+                    LS0062_LocalOutsideScope,
+                    $"The local '{loc.Name}' is not in scope.");
+            }
+
+            return loc;
+        }
 
         // 3. Members of current class
         if (TypeContext.Current.Methods.Select(m => m.Builder).Where(m => m != null).Any(m => m.Name == text))

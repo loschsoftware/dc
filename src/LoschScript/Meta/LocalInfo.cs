@@ -28,6 +28,8 @@ internal class LocalInfo : IEquatable<LocalInfo>
 
     public UnionValue Union { get; set; }
 
+    public bool IsAvailable { get; set; } = true;
+
     public override bool Equals(object obj)
     {
         return Equals(obj as LocalInfo);

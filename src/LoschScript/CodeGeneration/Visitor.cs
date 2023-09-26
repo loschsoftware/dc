@@ -2075,6 +2075,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         if (context.expression().Length == 0)
             return typeof(void);
 
+        CurrentMethod.IL.BeginScope();
+
         foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
         {
             Type _t = Visit(tree);
@@ -2086,7 +2088,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 CurrentMethod.SkipPop = false;
         }
 
-        return Visit(context.expression().Last());
+        Type ret = Visit(context.expression().Last());
+
+        CurrentMethod.IL.EndScope();
+
+        return ret;
     }
 
     public override Type VisitIdentifier_atom([NotNull] LoschScriptParser.Identifier_atomContext context)
@@ -3175,9 +3181,139 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitRaise_expression([NotNull] LoschScriptParser.Raise_expressionContext context)
     {
-        Visit(context.expression());
-        CurrentMethod.IL.Emit(OpCodes.Throw);
+        Type t = Visit(context.expression());
 
+        if (t.IsValueType)
+        {
+            EmitErrorMessage(
+               context.expression().Start.Line,
+               context.expression().Start.Column,
+               context.expression().GetText().Length,
+               LS0060_InvalidThrowExpression,
+               "The expression to throw must be a reference type.");
+
+            return typeof(void);
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Throw);
+        return typeof(void);
+    }
+
+    public override Type VisitRethrow_exception([NotNull] LoschScriptParser.Rethrow_exceptionContext context)
+    {
+        if (!_isInsideCatch)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                LS0059_RethrowOutsideCatchBlock,
+                "Rethrowing exceptions is not possible outside of a catch block.");
+
+            return typeof(void);
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Rethrow);
+        return typeof(void);
+    }
+
+    bool _isInsideCatch = false;
+    Label _exceptionBlockEnd;
+
+    public override Type VisitTry_expression([NotNull] LoschScriptParser.Try_expressionContext context)
+    {
+        Type t = Visit(context.try_branch());
+
+        if (context.catch_branch() == null || context.catch_branch().Length < 1)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                LS0061_MissingCatchBranch,
+                "A try expression must contain at least one catch block.");
+
+            return t;
+        }
+
+        if (context.fault_branch() != null)
+            Visit(context.fault_branch());
+
+        foreach (IParseTree tree in context.catch_branch())
+        {
+            Visit(tree);
+
+            foreach (LocalInfo loc in invalidationList)
+                loc.IsAvailable = false;
+
+            invalidationList.Clear();
+        }
+
+        if (context.finally_branch() != null)
+            Visit(context.finally_branch());
+
+        CurrentMethod.IL.EndExceptionBlock();
+
+        return t;
+    }
+
+    public override Type VisitTry_branch([NotNull] LoschScriptParser.Try_branchContext context)
+    {
+        _exceptionBlockEnd = CurrentMethod.IL.BeginExceptionBlock();
+        Type t = Visit(context.expression());
+        return t;
+    }
+
+    List<LocalInfo> invalidationList = new();
+
+    public override Type VisitCatch_branch([NotNull] LoschScriptParser.Catch_branchContext context)
+    {
+        Type t = context.type_name() != null ? Helpers.ResolveTypeName(context.type_name()) : typeof(object);
+
+        CurrentMethod.IL.BeginCatchBlock(t);
+
+        if (context.Identifier() == null)
+            CurrentMethod.IL.Emit(OpCodes.Pop);
+
+        else
+        {
+            LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
+            lb.SetLocalSymInfo(context.Identifier().GetText());
+
+            LocalInfo loc = new(context.Identifier().GetText(), lb, true, ++CurrentMethod.LocalIndex, default);
+            invalidationList.Add(loc);
+            CurrentMethod.Locals.Add(loc);
+
+            EmitStloc(CurrentMethod.LocalIndex);
+        }
+
+        _isInsideCatch = true;
+        Visit(context.expression());
+        _isInsideCatch = false;
+
+        return typeof(void);
+    }
+
+    public override Type VisitFinally_branch([NotNull] LoschScriptParser.Finally_branchContext context)
+    {
+        CurrentMethod.IL.BeginFinallyBlock();
+        Visit(context.expression());
+        return typeof(void);
+    }
+
+    public override Type VisitFault_branch([NotNull] LoschScriptParser.Fault_branchContext context)
+    {
+        EmitErrorMessage(
+            context.Start.Line,
+            context.Start.Column,
+            context.GetText().Length,
+            LS0063_UnsupportedFeature,
+            "LoschScript does not support 'fault' blocks yet.");
+
+        return typeof(void);
+
+        CurrentMethod.IL.BeginFaultBlock();
+        Visit(context.expression());
         return typeof(void);
     }
 }
