@@ -76,6 +76,8 @@ expression
     | Identifier Arrow_Right ((Identifier Arrow_Right)* Identifier)? expression #loop_expression
     | At_Sign expression Equals (code_block | expression) #while_loop
     | Exclamation_At expression Equals (code_block | expression) #until_loop
+    | try_branch catch_branch finally_branch? fault_branch? #try_expression
+    | Raise expression #raise_expression
     | Open_Bracket (expression (Comma expression)*)? Close_Bracket #array_expression
     | Open_Paren expression (Comma expression)+ Close_Paren #tuple_expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
@@ -307,4 +309,20 @@ parameter_constraint
 
 type_block
     : Open_Brace (type_member | type | NewLine)* Close_Brace
+    ;
+
+try_branch
+    : Try Equals expression
+    ;
+
+catch_branch
+    : Colon Equals expression
+    ;
+
+finally_branch
+    : Double_Colon Equals expression
+    ;
+
+fault_branch
+    : Triple_Colon Equals expression
     ;

@@ -3172,4 +3172,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
         return TypeContext.Current.Builder;
     }
+
+    public override Type VisitRaise_expression([NotNull] LoschScriptParser.Raise_expressionContext context)
+    {
+        Visit(context.expression());
+        CurrentMethod.IL.Emit(OpCodes.Throw);
+
+        return typeof(void);
+    }
 }

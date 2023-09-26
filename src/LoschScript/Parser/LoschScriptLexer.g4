@@ -58,6 +58,7 @@ Const: 'const';
 Base: 'base';
 Override: 'override';
 
+Try: 'try';
 Raise: 'raise';
 
 True: 'true';
@@ -80,6 +81,8 @@ Double_Dot: '..';
 Double_Dot_Question_Mark: '..?';
 Dot_Equals: '.=';
 Colon: ':';
+Double_Colon: '::';
+Triple_Colon: ':::';
 Semicolon: ';';
 Underscore: '_';
 Single_Quote: '\'';
