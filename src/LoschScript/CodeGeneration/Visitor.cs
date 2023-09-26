@@ -2556,6 +2556,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context)
     {
+        if (context.expression() is LoschScriptParser.Try_expressionContext)
+        {
+            EmitErrorMessage(
+                context.expression().Start.Line,
+                context.expression().Start.Column,
+                context.expression().GetText().Length,
+                LS0064_InvalidExpression,
+                "A try block cannot be used as an expression.");
+        }
+
         SymbolInfo sym = Helpers.GetSymbol(context.Identifier().GetText());
 
         if (sym != null)

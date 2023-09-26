@@ -268,5 +268,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a feature that is not yet implemented is used.
     /// </summary>
-    LS0063_UnsupportedFeature
+    LS0063_UnsupportedFeature,
+    /// <summary>
+    /// Emitted when something that shouldn't is used as an expression.
+    /// </summary>
+    LS0064_InvalidExpression
 }
