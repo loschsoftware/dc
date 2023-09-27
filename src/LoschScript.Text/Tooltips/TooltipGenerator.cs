@@ -110,6 +110,27 @@ public static class TooltipGenerator
     }
 
     /// <summary>
+    /// Generates a tooltip for an enumeration member.
+    /// </summary>
+    /// <param name="field">The enum member to generate a tooltip for.</param>
+    /// <returns>The generated tooltip.</returns>
+    public static Tooltip EnumField(FieldInfo field)
+    {
+        ObservableCollection<Word> words = new()
+        {
+            BuildWord(field.Name, Color.EnumField),
+            BuildWord(": "),
+            BuildWord(field.FieldType.Name, ColorForType(field.FieldType.GetTypeInfo()))
+        };
+
+        return new()
+        {
+            Words = words,
+            IconResourceName = "EnumerationItemPublic"
+        };
+    }
+
+    /// <summary>
     /// Generates a tooltip for a constructor.
     /// </summary>
     /// <returns>The generated tooltip.</returns>

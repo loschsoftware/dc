@@ -123,5 +123,13 @@ public enum Color : byte
     /// <summary>
     /// The color of the child expression of a nameof expression.
     /// </summary>
-    ExpressionString
+    ExpressionString,
+    /// <summary>
+    /// The color of an enumeration member.
+    /// </summary>
+    EnumField,
+    /// <summary>
+    /// The color of an enumeration type.
+    /// </summary>
+    EnumType
 }

@@ -1754,6 +1754,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 return f.FieldType;
             }
 
+            else if (o is SymbolResolver.EnumValueInfo e)
+            {
+                EmitLdcI4((int)e.Value);
+                return e.EnumType;
+            }
+
             else if (o is MethodBuilder m)
             {
                 if (context.arglist() != null)
@@ -1878,6 +1884,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 t = f.FieldType;
             }
 
+            else if (member is SymbolResolver.EnumValueInfo e)
+            {
+                EmitLdcI4((int)e.Value);
+                t = e.EnumType;
+            }
+
             else if (member is PropertyInfo p)
             {
                 EmitCall(t, p.GetGetMethod());
@@ -1989,6 +2001,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             {
                 LoadField(f);
                 t = f.FieldType;
+            }
+
+            else if (member is SymbolResolver.EnumValueInfo e)
+            {
+                EmitLdcI4((int)e.Value);
+                t = e.EnumType;
             }
 
             else if (member is PropertyInfo p)

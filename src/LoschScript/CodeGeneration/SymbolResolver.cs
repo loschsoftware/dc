@@ -10,6 +10,15 @@ namespace LoschScript.CodeGeneration;
 
 internal static class SymbolResolver
 {
+    public class EnumValueInfo
+    {
+        public string Name { get; set; }
+
+        public object Value { get; set; }
+
+        public Type EnumType { get; set; }
+    }
+
     public static object GetSmallestTypeFromLeft(LoschScriptParser.Full_identifierContext fullId, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
     {
         string[] parts = fullId.Identifier().Select(f => f.GetText()).ToArray();
@@ -182,6 +191,29 @@ internal static class SymbolResolver
         FieldInfo f = type.GetField(name, flags);
         if (f != null)
         {
+            if (type.IsEnum)
+            {
+                if (!noEmitFragments)
+                {
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = len,
+                        Color = Text.Color.EnumField,
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.EnumField(f)
+                    });
+                }
+
+                return new EnumValueInfo()
+                {
+                    Name = f.Name,
+                    Value = f.GetRawConstantValue(),
+                    EnumType = type
+                };
+            }
+
             if (!noEmitFragments)
             {
                 CurrentFile.Fragments.Add(new()
