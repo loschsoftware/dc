@@ -510,6 +510,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitRethrow_exception([NotNull] LoschScriptParser.Rethrow_exceptionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>separated_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSeparated_expression([NotNull] LoschScriptParser.Separated_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>separated_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSeparated_expression([NotNull] LoschScriptParser.Separated_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>range_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

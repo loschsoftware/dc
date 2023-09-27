@@ -3345,4 +3345,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Visit(context.expression());
         return typeof(void);
     }
+
+    public override Type VisitSeparated_expression([NotNull] LoschScriptParser.Separated_expressionContext context)
+    {
+        return Visit(context.expression());
+    }
 }

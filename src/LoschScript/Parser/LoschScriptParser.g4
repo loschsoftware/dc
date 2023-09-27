@@ -84,6 +84,7 @@ expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
     | atom #atom_expression
     | expression NewLine #newlined_expression
+    | expression Semicolon #separated_expression
     | code_block #block_expression
     // | Plus expression #unary_plus_expression
     // | Minus expression #unary_negation_expression

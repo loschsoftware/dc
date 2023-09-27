@@ -597,6 +597,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitRethrow_exception([NotNull] LoschScriptParser.Rethrow_exceptionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>separated_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterSeparated_expression([NotNull] LoschScriptParser.Separated_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>separated_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitSeparated_expression([NotNull] LoschScriptParser.Separated_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>range_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
