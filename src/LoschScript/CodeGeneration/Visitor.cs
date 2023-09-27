@@ -288,12 +288,22 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             var paramTypes = ResolveParameterList(context.parameter_list());
 
-            MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
-                context.Identifier().GetText(),
-                Helpers.GetMethodAttributes(
+            MethodAttributes attrib = Helpers.GetMethodAttributes(
                     context.member_access_modifier(),
                     context.member_oop_modifier(),
-                    context.member_special_modifier()),
+                    context.member_special_modifier());
+
+            if (attrib.HasFlag(MethodAttributes.PinvokeImpl))
+            {
+                // TODO: Implement P/Invoke methods
+                //MethodBuilder pInvokeMethod = TypeContext.Current.Builder.DefinePInvokeMethod();
+
+                return tReturn;
+            }
+
+            MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
+                context.Identifier().GetText(),
+                attrib,
                 callingConventions,
                 tReturn,
                 paramTypes.Select(p => p.Type).ToArray());

@@ -151,7 +151,6 @@ Verbatim_String_Literal=137
 'closed'=18
 'auto'=19
 'virtual'=20
-'extern'=21
 'int8'=22
 'uint8'=23
 'int16'=24

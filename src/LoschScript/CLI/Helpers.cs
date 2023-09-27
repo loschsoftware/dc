@@ -476,6 +476,9 @@ internal static class Helpers
         {
             if (modifier.Static() != null)
                 baseAttributes |= MethodAttributes.Static;
+
+            if (modifier.Extern() != null)
+                baseAttributes |= MethodAttributes.PinvokeImpl;
         }
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(MethodAttributes.Static))

@@ -27,7 +27,7 @@ Open: 'open';
 Closed: 'closed';
 Auto: 'auto';
 Virtual: 'virtual';
-Extern: 'extern';
+Extern: At_Sign;
 
 Int8: 'int8';
 UInt8: 'uint8';
