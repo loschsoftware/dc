@@ -695,6 +695,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitDictionary_expression([NotNull] LoschScriptParser.Dictionary_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>assignment</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAssignment([NotNull] LoschScriptParser.AssignmentContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>assignment</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAssignment([NotNull] LoschScriptParser.AssignmentContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>prefix_unless_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>

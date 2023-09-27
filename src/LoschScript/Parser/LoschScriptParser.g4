@@ -86,9 +86,10 @@ expression
     | expression NewLine #newlined_expression
     | code_block #block_expression
     // | Plus expression #unary_plus_expression
-    // Minus expression #unary_negation_expression
+    // | Minus expression #unary_negation_expression
     | full_identifier arglist? #full_identifier_member_access_expression
     | expression (Dot Identifier)+ arglist? #member_access_expression
+    | expression Equals expression #assignment
     ;
 
 atom

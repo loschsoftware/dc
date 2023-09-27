@@ -272,5 +272,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when something that shouldn't is used as an expression.
     /// </summary>
-    LS0064_InvalidExpression
+    LS0064_InvalidExpression,
+    /// <summary>
+    /// Emitted when the left side of an assignment is invalid.
+    /// </summary>
+    LS0065_AssignmentInvalidLeftSide
 }

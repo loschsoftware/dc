@@ -1757,6 +1757,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             else if (o is SymbolResolver.EnumValueInfo e)
             {
                 EmitLdcI4((int)e.Value);
+
                 return e.EnumType;
             }
 
