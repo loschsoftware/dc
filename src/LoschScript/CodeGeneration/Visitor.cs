@@ -582,7 +582,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
+        CustomAttributeBuilder entryPointAttribute = new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>());
+
         MethodBuilder mb = tb.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard, typeof(int), new Type[] { typeof(string[]) });
+        mb.SetCustomAttribute(entryPointAttribute);
+
         ILGenerator il = mb.GetILGenerator();
         MethodContext mc = new()
         {
