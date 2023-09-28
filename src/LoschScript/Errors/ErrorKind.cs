@@ -276,5 +276,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the left side of an assignment is invalid.
     /// </summary>
-    LS0065_AssignmentInvalidLeftSide
+    LS0065_AssignmentInvalidLeftSide,
+    /// <summary>
+    /// Emitted when a property cannot be assigned to.
+    /// </summary>
+    LS0066_PropertyNoSuitableSetter
 }

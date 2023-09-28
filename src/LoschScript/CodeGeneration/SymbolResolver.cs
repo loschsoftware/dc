@@ -188,7 +188,7 @@ internal static class SymbolResolver
         }
 
         // 1. Fields
-        FieldInfo f = type.GetField(name, flags);
+        FieldInfo f = type.GetField(name/*, flags*/);
         if (f != null)
         {
             if (type.IsEnum)
@@ -231,7 +231,7 @@ internal static class SymbolResolver
         }
 
         // 2. Properties
-        PropertyInfo p = type.GetProperty(name, flags);
+        PropertyInfo p = type.GetProperty(name/*, flags*/);
         if (p != null)
         {
             if (!noEmitFragments)

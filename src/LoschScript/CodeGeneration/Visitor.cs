@@ -2583,6 +2583,346 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return typeof(bool);
     }
 
+    public override Type VisitAssignment([NotNull] LoschScriptParser.AssignmentContext context)
+    {
+        if (context.expression()[0].GetType() != typeof(LoschScriptParser.Full_identifier_member_access_expressionContext)
+            && context.expression()[0].GetType() != typeof(LoschScriptParser.Member_access_expressionContext))
+        {
+            EmitErrorMessage(
+                context.expression()[0].Start.Line,
+                context.expression()[0].Start.Column,
+                context.expression()[0].GetText().Length,
+                LS0065_AssignmentInvalidLeftSide,
+                "Invalid left side of assignment.");
+
+            return Visit(context.expression()[1]);
+        }
+
+        memberIndex++;
+
+        CurrentMethod.ShouldLoadAddressIfValueType = true;
+        CurrentMethod.IgnoreTypesInSymbolResolve = true;
+
+        Type ret = Visit(context.expression()[1]);
+        int tempIndex = ++CurrentMethod.LocalIndex;
+
+        CurrentMethod.IL.DeclareLocal(ret);
+        EmitStloc(tempIndex);
+
+        //if (context.expression()[0].GetType() == typeof(LoschScriptParser.Member_access_expressionContext))
+
+        dynamic con = context.expression()[0] as LoschScriptParser.Member_access_expressionContext;
+        con ??= context.expression()[0] as LoschScriptParser.Full_identifier_member_access_expressionContext;
+
+        object o = null;
+        int firstIndex = 0;
+        bool exitEarly = true;
+
+        if (context.expression()[0].GetType() == typeof(LoschScriptParser.Full_identifier_member_access_expressionContext))
+        {
+            o = SymbolResolver.GetSmallestTypeFromLeft(
+            con.full_identifier(),
+            con.full_identifier().Start.Line,
+            con.full_identifier().Start.Column,
+            con.full_identifier().GetText().Length,
+            out firstIndex);
+        }
+
+        Type t = null;
+
+        if (o == null)
+            t = Visit(con.expression());
+
+        if (o != null && o is Type type)
+        {
+            t = type;
+            exitEarly = false;
+        }
+        else
+        {
+            if (o == null)
+            {
+                EmitErrorMessage(
+                    con.full_identifier().Identifier()[0].Symbol.Line,
+                    con.full_identifier().Identifier()[0].Symbol.Column,
+                    con.full_identifier().Identifier()[0].GetText().Length,
+                    LS0056_SymbolResolveError,
+                    $"The name '{con.full_identifier().Identifier()[0].GetText()}' could not be resolved.");
+
+                return null;
+            }
+
+            if (o is ParamInfo p)
+            {
+                SymbolInfo s = new()
+                {
+                    Parameter = p,
+                    SymbolType = SymbolInfo.SymType.Parameter
+                };
+
+                if (CurrentMethod.ShouldLoadAddressIfValueType)
+                    s.LoadAddressIfValueType();
+                else
+                    s.Load();
+
+                t = s.Type();
+            }
+
+            else if (o is LocalInfo l)
+            {
+                SymbolInfo s = new()
+                {
+                    Local = l,
+                    SymbolType = SymbolInfo.SymType.Local
+                };
+
+                if (CurrentMethod.ShouldLoadAddressIfValueType)
+                    s.LoadAddressIfValueType();
+                else
+                    s.Load();
+
+                t = s.Type();
+            }
+
+            else if (o is FieldInfo f)
+            {
+                if (f.IsStatic)
+                {
+                    EmitLdloc(tempIndex);
+                    CurrentMethod.IL.Emit(OpCodes.Stsfld, f);
+                }
+
+                else if (TypeContext.Current.Fields.Any(_f => _f.Builder == f))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Ldarg_0);
+                    EmitLdloc(tempIndex);
+                    CurrentMethod.IL.Emit(OpCodes.Stfld, f);
+                }
+
+                return ret;
+            }
+
+            else if (o is SymbolResolver.EnumValueInfo e)
+            {
+                EmitLdcI4((int)e.Value);
+
+                return ret;
+            }
+
+            else if (o is MethodBuilder m)
+            {
+                if (con.arglist() != null)
+                    Visit(con.arglist());
+
+                EmitCall(m.DeclaringType, m);
+
+                if (m.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType)
+                {
+                    CurrentMethod.IL.DeclareLocal(m.ReturnType);
+                    CurrentMethod.LocalIndex++;
+                    CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
+                    EmitLdloca(CurrentMethod.LocalIndex);
+                }
+
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+
+                return m.ReturnType;
+            }
+
+            // Global method
+            else if (o is List<MethodInfo> methods)
+            {
+                Visit(con.arglist());
+                Type[] argumentTypes = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+                MethodInfo final = null;
+
+                if (methods.Any())
+                {
+                    foreach (MethodInfo possibleMethod in methods)
+                    {
+                        if (final != null)
+                            break;
+
+                        if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
+                        {
+                            final = possibleMethod;
+                            break;
+                        }
+
+                        if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+                            CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
+                        for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
+                        {
+                            if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                            {
+                                if (possibleMethod.GetParameters()[i].ParameterType == typeof(object) && argumentTypes[i] != typeof(object))
+                                    CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
+
+                                if (i == possibleMethod.GetParameters().Length - 1)
+                                {
+                                    final = possibleMethod;
+                                    break;
+                                }
+                            }
+
+                            else
+                                break;
+                        }
+                    }
+
+                    if (final == null)
+                    {
+                        EmitErrorMessage(
+                            con.full_identifier().Identifier()[0].Symbol.Line,
+                            con.full_identifier().Identifier()[0].Symbol.Column,
+                            con.full_identifier().Identifier()[0].GetText().Length,
+                            LS0002_MethodNotFound,
+                            $"Could not resolve global function '{con.full_identifier().Identifier()[0].GetText()}'.");
+                    }
+
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = con.full_identifier().Identifier()[0].Symbol.Line,
+                        Column = con.full_identifier().Identifier()[0].Symbol.Column,
+                        Length = con.full_identifier().Identifier()[0].GetText().Length,
+                        Color = Text.Color.Function,
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.Function(final)
+                    });
+                }
+
+                EmitCall(final.DeclaringType, final);
+                return final.ReturnType;
+            }
+        }
+
+        if (con.full_identifier().Identifier().Length == 1 && exitEarly)
+        {
+            CurrentMethod.ShouldLoadAddressIfValueType = false;
+            CurrentMethod.IgnoreTypesInSymbolResolve = false;
+
+            return ret;
+        }
+
+        BindingFlags flags = BindingFlags.Public;
+
+        if (CurrentMethod.StaticCallType != null)
+        {
+            t = CurrentMethod.StaticCallType;
+            flags |= BindingFlags.Static;
+
+            CurrentMethod.StaticCallType = null;
+        }
+
+        IEnumerable<ITerminalNode> ids;
+
+        if (context.expression()[0].GetType() == typeof(LoschScriptParser.Full_identifier_member_access_expressionContext))
+        {
+            ids = con.full_identifier().Identifier();
+            ids = ids.ToArray()[firstIndex..];
+        }
+        else
+            ids = con.Identifier();
+
+        foreach (ITerminalNode identifier in ids)
+        {
+            Type[] _params = null;
+
+            if (identifier == ids.Last() && con.arglist() != null)
+            {
+                Visit(con.arglist());
+                _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+            }
+
+            object member = SymbolResolver.ResolveMember(
+                t,
+                identifier.GetText(),
+                identifier.Symbol.Line,
+                identifier.Symbol.Column,
+                identifier.GetText().Length,
+                false,
+                _params,
+                flags);
+
+            if (member == null)
+                return null;
+
+            if (member is FieldInfo f)
+            {
+                if (identifier == ids.Last())
+                {
+                    EmitLdloc(tempIndex);
+                    EmitStfld(f);
+                    CurrentMethod.SkipPop = true;
+                }
+                else
+                {
+                    LoadField(f);
+                    t = f.FieldType;
+                }
+            }
+
+            else if (member is SymbolResolver.EnumValueInfo e)
+            {
+                EmitLdcI4((int)e.Value);
+                t = e.EnumType;
+            }
+
+            else if (member is PropertyInfo p)
+            {
+                if (identifier == ids.Last())
+                {
+                    if (p.GetSetMethod() == null)
+                    {
+                        EmitErrorMessage(
+                            con.Identifier().Last().Symbol.Line,
+                            con.Identifier().Last().Symbol.Column,
+                            con.Identifier().Last().GetText().Length,
+                            LS0066_PropertyNoSuitableSetter,
+                            $"The property '{p.Name}' does not have a suitable setter.");
+                    }
+
+                    EmitLdloc(tempIndex);
+                    EmitCall(t, p.GetSetMethod());
+                }
+                else
+                {
+                    EmitCall(t, p.GetGetMethod());
+                    t = p.PropertyType;
+                }
+            }
+
+            else if (member is MethodInfo m)
+            {
+                if (CurrentMethod.BoxCallingType)
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, t);
+                    CurrentMethod.BoxCallingType = false;
+                }
+                else if (t.IsValueType)
+                {
+                    CurrentMethod.IL.DeclareLocal(t);
+                    CurrentMethod.LocalIndex++;
+                    EmitStloc(CurrentMethod.LocalIndex);
+                    EmitLdloca(CurrentMethod.LocalIndex);
+                }
+
+                EmitCall(t, m);
+                t = m.ReturnType;
+
+                if (VisitorStep1CurrentMethod != null)
+                    CurrentMethod.ParameterBoxIndices.Clear();
+            }
+        }
+
+        CurrentMethod.ShouldLoadAddressIfValueType = false;
+        CurrentMethod.IgnoreTypesInSymbolResolve = false;
+
+        return ret;
+    }
+
     public override Type VisitLocal_declaration_or_assignment([NotNull] LoschScriptParser.Local_declaration_or_assignmentContext context)
     {
         if (context.expression() is LoschScriptParser.Try_expressionContext)

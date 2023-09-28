@@ -236,13 +236,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitTry_expression([NotNull] LoschScriptParser.Try_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>dotted_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>left_shift_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

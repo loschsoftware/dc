@@ -378,18 +378,6 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitTry_expression([NotNull] LoschScriptParser.Try_expressionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>dotted_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>dotted_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitDotted_expression([NotNull] LoschScriptParser.Dotted_expressionContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>left_shift_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>

@@ -63,7 +63,7 @@ expression
     | (Var | Val)? Identifier (Colon type_name)? Equals expression #local_declaration_or_assignment
     | expression Arrow_Right expression #right_pipe_expression
     | expression Arrow_Left expression #left_pipe_expression
-    | expression Dot Identifier #dotted_expression
+    /*| expression Dot Identifier #dotted_expression*/
     | range #range_expression
     | expression At_Sign expression #index_expression
     | attribute+ expression #attributed_expression

@@ -272,6 +272,14 @@ internal static class EmitHelpers
             CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
     }
 
+    public static void EmitStfld(FieldInfo f)
+    {
+        if (f.IsStatic)
+            CurrentMethod.IL.Emit(OpCodes.Stsfld, f);
+        else
+            CurrentMethod.IL.Emit(OpCodes.Stfld, f);
+    }
+
     public static void EmitCall(Type type, MethodInfo m)
     {
         if (m.IsStatic || type.IsValueType)
