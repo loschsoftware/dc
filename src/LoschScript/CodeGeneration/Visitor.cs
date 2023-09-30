@@ -9,10 +9,12 @@ using LoschScript.Text;
 using LoschScript.Text.Tooltips;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Xml.Linq;
 using Color = LoschScript.Text.Color;
 
 namespace LoschScript.CodeGeneration;
@@ -1692,6 +1694,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
         memberIndex++;
+
+        if (Helpers.HandleSpecialFunction(
+            context.full_identifier().Identifier().Last().GetText(),
+            context.arglist(),
+            context.full_identifier().Identifier().Last().Symbol.Line,
+            context.full_identifier().Identifier().Last().Symbol.Column,
+            context.full_identifier().Identifier().Last().GetText().Length))
+            return typeof(void);
 
         object o = SymbolResolver.GetSmallestTypeFromLeft(
             context.full_identifier(),
