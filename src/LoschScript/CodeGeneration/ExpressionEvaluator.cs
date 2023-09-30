@@ -33,7 +33,7 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
                 });
             }
 
-            return new(typeof(string), verbatimText);
+            return new(typeof(string), verbatimText.Replace("\"\"", "\""));
         }
 
         Regex escapeSequenceRegex = new(@"\^(?:['""^0abfnrtv]|[0-9A-Fa-f]{1,4})");
