@@ -747,7 +747,7 @@ internal static class Helpers
             Line = line,
             Column = column,
             Length = length,
-            Color = Color.Function,
+            Color = Color.IntrinsicFunction,
             ToolTip = TooltipGenerator.Function(typeof(CompilerServices.CodeGeneration).GetMethod(name))
         });
 

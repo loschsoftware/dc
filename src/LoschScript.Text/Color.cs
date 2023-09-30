@@ -131,5 +131,9 @@ public enum Color : byte
     /// <summary>
     /// The color of an enumeration type.
     /// </summary>
-    EnumType
+    EnumType,
+    /// <summary>
+    /// The color of an intrinsic function.
+    /// </summary>
+    IntrinsicFunction
 }
