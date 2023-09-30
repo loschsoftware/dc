@@ -748,7 +748,7 @@ internal static class Helpers
             Column = column,
             Length = length,
             Color = Color.IntrinsicFunction,
-            ToolTip = TooltipGenerator.Function(typeof(CompilerServices.CodeGeneration).GetMethod(name))
+            ToolTip = TooltipGenerator.Function(typeof(CompilerServices.CodeGeneration).GetMethod(name), true)
         });
 
         switch (name)

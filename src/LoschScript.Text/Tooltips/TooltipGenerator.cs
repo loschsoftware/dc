@@ -221,13 +221,16 @@ public static class TooltipGenerator
     /// <param name="name"></param>
     /// <param name="returnType"></param>
     /// <param name="parameters"></param>
+    /// <param name="intrinsic"></param>
     /// <returns></returns>
-    public static Tooltip Function(string name, Type returnType, (string Name, Type Type)[] parameters)
+    public static Tooltip Function(string name, Type returnType, (string Name, Type Type)[] parameters, bool intrinsic = false)
     {
-        ObservableCollection<Word> words = new()
-        {
-            BuildWord(name, Color.Function)
-        };
+        ObservableCollection<Word> words = new();
+
+        if (intrinsic)
+            words.Add(BuildWord("[intrinsic] "));
+
+        words.Add(BuildWord(name, intrinsic ? Color.IntrinsicFunction : Color.Function));
 
         if (parameters.Length > 0)
         {
@@ -268,13 +271,17 @@ public static class TooltipGenerator
     /// Generates a tooltip for a function.
     /// </summary>
     /// <param name="method">The MethodInfo representing the function.</param>
+    /// <param name="intrinsic"></param>
     /// <returns>The generated tooltip.</returns>
-    public static Tooltip Function(MethodInfo method)
+    public static Tooltip Function(MethodInfo method, bool intrinsic = false)
     {
-        ObservableCollection<Word> words = new()
-        {
-            BuildWord(method.Name, Color.Function)
-        };
+        ObservableCollection<Word> words = new();
+
+        if (intrinsic)
+            words.Add(BuildWord("[intrinsic] "));
+
+        words.Add(BuildWord(method.Name, intrinsic ? Color.IntrinsicFunction : Color.Function));
+        
 
         if (method.GetParameters().Length > 0)
         {
