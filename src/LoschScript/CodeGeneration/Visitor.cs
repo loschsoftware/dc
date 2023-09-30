@@ -2306,14 +2306,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             return t;
 
         if (!allEqual || t != t3 || t != t2[0])
-        {
-            EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.GetText().Length,
-                    LS0037_BranchExpressionTypesUnequal,
-                    $"The return types of the branches of the conditional expression do not match.");
-        }
+            return typeof(UnionValue);
 
         return t;
     }

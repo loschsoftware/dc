@@ -3,7 +3,7 @@ using LoschScript.CodeGeneration;
 using LoschScript.Errors;
 using LoschScript.Meta;
 using LoschScript.Parser;
-using LoschScript.Shell;
+using LoschScript.Runtime;
 using LoschScript.Text;
 using LoschScript.Text.Tooltips;
 using LoschScript.Unmanaged;
@@ -12,7 +12,6 @@ using Microsoft.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -199,6 +198,9 @@ internal static class Helpers
 
             return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments);
         }
+
+        if (name.Open_Paren() != null)
+            return typeof(UnionValue);
 
         // TODO: Implement other kinds of types
         return null;
