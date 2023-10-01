@@ -202,12 +202,30 @@ internal static class Helpers
         if (name.Open_Paren() != null)
             return typeof(UnionValue);
 
+        if (name.type_arg_list() != null)
+        {
+            Type[] typeParams = name.type_arg_list().type_name().Select(t => ResolveTypeName(t, noEmitFragments)).ToArray();
+
+            if (name.identifier_atom().Identifier() != null)
+                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams);
+        }
+
         // TODO: Implement other kinds of types
         return null;
     }
 
-    public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false)
+    public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false, Type[] typeParams = null)
     {
+        if (typeParams != null)
+        {
+            name += $"`{typeParams.Length}[";
+
+            foreach (Type param in typeParams[0..^1])
+                name += $"[{param.AssemblyQualifiedName}], ";
+
+            name += $"[{typeParams.Last().AssemblyQualifiedName}]]";
+        }
+
         Type type = Type.GetType(name);
 
         if (type == null)

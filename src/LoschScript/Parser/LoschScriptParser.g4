@@ -88,8 +88,8 @@ expression
     | code_block #block_expression
     // | Plus expression #unary_plus_expression
     // | Minus expression #unary_negation_expression
-    | full_identifier arglist? #full_identifier_member_access_expression
-    | expression (Dot Identifier)+ arglist? #member_access_expression
+    | full_identifier type_arg_list? arglist? #full_identifier_member_access_expression
+    | expression (Dot Identifier)+ type_arg_list? arglist? #member_access_expression
     | expression Equals expression #assignment
     | parameter_list? (Colon type_name)? Equals expression #anonymous_function_expression
     ;
@@ -152,6 +152,7 @@ type_name
     : builtin_type_alias Ampersand?
     | Open_Paren type_name (Bar type_name)+ Close_Paren
     | generic_identifier Ampersand?
+    | identifier_atom Open_Brace type_arg_list Close_Bracket Ampersand?
     | identifier_atom Ampersand?
     | param_list_type
     ;
@@ -209,7 +210,7 @@ attribute
     ;
 
 generic_identifier
-    : identifier_atom Open_Bracket identifier_atom Close_Bracket
+    : identifier_atom Open_Bracket type_parameter_list Close_Bracket
     ;
 
 field_access_modifier
@@ -329,4 +330,8 @@ finally_branch
 
 fault_branch
     : Fault Equals expression
+    ;
+
+type_arg_list
+    : Open_Bracket type_name (Comma type_name)* Close_Bracket
     ;

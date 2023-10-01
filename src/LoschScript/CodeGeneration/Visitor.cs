@@ -1741,6 +1741,14 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     {
         memberIndex++;
 
+        Type[] typeArgs = null;
+        if (context.type_arg_list() != null)
+        {
+            typeArgs = new Type[context.type_arg_list().type_name().Length];
+            for (int i = 0; i < context.type_arg_list().type_name().Length; i++)
+                typeArgs[i] = Helpers.ResolveTypeName(context.type_arg_list().type_name()[i]);
+        }
+
         if (Helpers.HandleSpecialFunction(
             context.full_identifier().Identifier().Last().GetText(),
             context.arglist(),
@@ -1751,6 +1759,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
         object o = SymbolResolver.GetSmallestTypeFromLeft(
             context.full_identifier(),
+            typeArgs,
             context.full_identifier().Start.Line,
             context.full_identifier().Start.Column,
             context.full_identifier().GetText().Length,
@@ -2675,6 +2684,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             o = SymbolResolver.GetSmallestTypeFromLeft(
             con.full_identifier(),
+            null,
             con.full_identifier().Start.Line,
             con.full_identifier().Start.Column,
             con.full_identifier().GetText().Length,

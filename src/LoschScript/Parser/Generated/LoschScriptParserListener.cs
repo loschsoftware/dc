@@ -1259,5 +1259,15 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitFault_branch([NotNull] LoschScriptParser.Fault_branchContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.type_arg_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_arg_list([NotNull] LoschScriptParser.Type_arg_listContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.type_arg_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_arg_list([NotNull] LoschScriptParser.Type_arg_listContext context);
 }
 } // namespace LoschScript.Parser

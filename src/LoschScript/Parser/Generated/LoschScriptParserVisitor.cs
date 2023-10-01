@@ -758,5 +758,11 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitFault_branch([NotNull] LoschScriptParser.Fault_branchContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.type_arg_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_arg_list([NotNull] LoschScriptParser.Type_arg_listContext context);
 }
 } // namespace LoschScript.Parser

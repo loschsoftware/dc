@@ -19,7 +19,7 @@ internal static class SymbolResolver
         public Type EnumType { get; set; }
     }
 
-    public static object GetSmallestTypeFromLeft(LoschScriptParser.Full_identifierContext fullId, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
+    public static object GetSmallestTypeFromLeft(LoschScriptParser.Full_identifierContext fullId, Type[] typeArgs, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
     {
         string[] parts = fullId.Identifier().Select(f => f.GetText()).ToArray();
         firstUnusedPart = 0;
