@@ -215,7 +215,7 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
 
         if (context.Bar() != null)
         {
-            UnionValue union = new(null, context.type_name().Select(VisitType_name).Select(e => e.Type).ToArray());
+            UnionValue union = new(null, context.type_name().Select(VisitType_name).Select(e => (Type)e.Value).ToArray());
             CurrentMethod.CurrentUnion = union;
 
             if (union.AllowedTypes.Distinct().Count() < union.AllowedTypes.Length)
