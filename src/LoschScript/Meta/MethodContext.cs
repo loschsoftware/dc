@@ -17,11 +17,13 @@ internal class MethodContext
             TypeContext.Current.Methods.Add(this);
     }
 
+    public int ClosureIndex = 0;
+    public static string GetClosureTypeName(int index) => $"<>g_Anon{index}";
+
     public static string GetThrowawayCounterVariableName(int index)
     {
         return $"<>g_Index{index}";
     }
-
     public static string GetLoopArrayReturnValueVariableName(int index)
     {
         return $"<>g_LoopArray{index}";
@@ -93,4 +95,6 @@ internal class MethodContext
     public Dictionary<int, List<int>> ParameterBoxIndices { get; set; } = new();
 
     public bool BoxCallingType { get; set; }
+
+    public List<TypeContext> ClosureTypes { get; } = new();
 }

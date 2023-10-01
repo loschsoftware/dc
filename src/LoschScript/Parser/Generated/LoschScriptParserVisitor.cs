@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\source\repos\loschsoftware\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\source\repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -298,6 +298,13 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>anonymous_function_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAnonymous_function_expression([NotNull] LoschScriptParser.Anonymous_function_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>rethrow_exception</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

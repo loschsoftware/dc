@@ -261,6 +261,52 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         });
     }
 
+    public override Type VisitAnonymous_function_expression([NotNull] LoschScriptParser.Anonymous_function_expressionContext context)
+    {
+        TypeBuilder closureType = TypeContext.Current.Builder.DefineNestedType(
+            GetClosureTypeName(CurrentMethod.ClosureIndex),
+            TypeAttributes.NestedPrivate | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit | TypeAttributes.AutoClass);
+
+        TypeContext.Current.Children.Add(new()
+        {
+            Builder = closureType
+        });
+
+        foreach (var local in CurrentMethod.Locals)
+            closureType.DefineField(local.Name, local.Builder.LocalType, FieldAttributes.Public);
+
+        Type ret = typeof(object); // TODO: Add type inference
+
+        if (context.type_name() != null)
+            ret = Helpers.ResolveTypeName(context.type_name());
+
+        var paramList = ResolveParameterList(context.parameter_list());
+
+        MethodBuilder invokeMethod = closureType.DefineMethod(
+            "Invoke",
+            MethodAttributes.Assembly | MethodAttributes.HideBySig,
+            CallingConventions.HasThis,
+            ret,
+            paramList.Select(p => p.Type).ToArray());
+
+        MethodContext current = CurrentMethod;
+
+        CurrentMethod = new()
+        {
+            Builder = invokeMethod,
+            IL = invokeMethod.GetILGenerator()
+        };
+
+        Visit(context.expression());
+        CurrentMethod.IL.Emit(OpCodes.Ret);
+
+        closureType.CreateType();
+
+        CurrentMethod = current;
+        CurrentMethod.ClosureIndex++;
+        return ret;
+    }
+
     public override Type VisitType_member([NotNull] LoschScriptParser.Type_memberContext context)
     {
         if (context.Identifier().GetText() == TypeContext.Current.Builder.Name)

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\source\repos\loschsoftware\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\source\repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -568,6 +568,20 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitRight_shift_expression([NotNull] LoschScriptParser.Right_shift_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>anonymous_function_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAnonymous_function_expression([NotNull] LoschScriptParser.Anonymous_function_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>anonymous_function_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAnonymous_function_expression([NotNull] LoschScriptParser.Anonymous_function_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>rethrow_exception</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.

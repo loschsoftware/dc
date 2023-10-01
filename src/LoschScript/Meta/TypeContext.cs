@@ -26,4 +26,6 @@ internal class TypeContext
     public List<MethodContext> Methods { get; } = new();
 
     public List<MetaFieldInfo> Fields { get; } = new();
+
+    public List<TypeContext> Children { get; } = new();
 }

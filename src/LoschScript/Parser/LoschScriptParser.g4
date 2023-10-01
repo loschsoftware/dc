@@ -91,6 +91,7 @@ expression
     | full_identifier arglist? #full_identifier_member_access_expression
     | expression (Dot Identifier)+ arglist? #member_access_expression
     | expression Equals expression #assignment
+    | parameter_list? (Colon type_name)? Equals expression #anonymous_function_expression
     ;
 
 atom
