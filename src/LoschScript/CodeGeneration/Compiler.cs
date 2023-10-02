@@ -63,7 +63,7 @@ public static class Compiler
         AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
         AssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndSave);
 
-        ModuleBuilder mb = ab.DefineDynamicModule(asmFileName, asmFileName, config.CreatePdb || config.Configuration == Configuration.Debug);
+        ModuleBuilder mb = ab.DefineDynamicModule(asmFileName, asmFileName, config.CreatePdb || config.Configuration == ApplicationConfiguration.Debug);
 
         Context.Assembly = ab;
         Context.Module = mb;

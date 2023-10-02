@@ -1,5 +1,6 @@
 ﻿using Losch.LoschScript.Configuration;
 using LoschScript.CodeGeneration;
+using LoschScript.Configuration;
 using LoschScript.Errors;
 using LoschScript.Meta;
 using LoschScript.Parser;
@@ -76,7 +77,7 @@ internal static class Helpers
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
 
-        if (args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Where(f => !File.Exists(f)).Any())
+        if (args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Any(f => !File.Exists(f)))
         {
             foreach (string file in args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Where(f => !File.Exists(f)))
             {
@@ -90,6 +91,12 @@ internal static class Helpers
             }
 
             return -1;
+        }
+
+        if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
+        {
+            Directory.CreateDirectory(config.BuildOutputDirectory);
+            Directory.SetCurrentDirectory(config.BuildOutputDirectory);
         }
 
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
@@ -108,7 +115,10 @@ internal static class Helpers
             Context.Configuration.Copyright,
             Context.Configuration.Trademark);
 
-        if (Context.Files.All(f => f.Errors.Count == 0) && ProgramContext.VisitorStep1.Files.All(f => f.Errors.Count == 0))
+        foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
+            AddResource(res, Directory.GetCurrentDirectory());
+
+        if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
             Context.Assembly.Save(assembly);
 
         if (File.Exists(Context.Configuration.ApplicationIcon))
@@ -116,6 +126,12 @@ internal static class Helpers
             if (!Win32Helpers.SetIcon(assembly, Context.Configuration.ApplicationIcon))
                 EmitWarningMessage(0, 0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
         }
+
+        //if (!string.IsNullOrEmpty(Context.Configuration.BuildOutputDirectory))
+        //{
+        //    Directory.CreateDirectory(Context.Configuration.BuildOutputDirectory);
+        //    File.Move(assembly, Path.Combine(Context.Configuration.BuildOutputDirectory, assembly));
+        //}
 
         sw.Stop();
 
@@ -377,7 +393,7 @@ internal static class Helpers
                 break;
         }
     }
-    
+
     public static void LoadSymbol(SymbolInfo sym)
     {
         switch (sym.SymbolType)
@@ -747,7 +763,7 @@ internal static class Helpers
 
     public static void SetLocalSymInfo(LocalBuilder lb, string name)
     {
-        if (Context.Configuration.Configuration != Configuration.Debug)
+        if (Context.Configuration.Configuration != ApplicationConfiguration.Debug)
             return;
 
 #if !NET7_COMPATIBLE
@@ -790,7 +806,7 @@ internal static class Helpers
 
                 string arg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
                 EmitInlineIL(arg, args.expression()[0].Start.Line, args.expression()[0].Start.Column + 1, args.expression()[0].GetText().Length);
-                
+
                 return true;
 
             case "importNamespace":
@@ -813,5 +829,42 @@ internal static class Helpers
         }
 
         return false;
+    }
+
+    public static void AddResource(Resource res, string basePath)
+    {
+        if (!File.Exists(res.Path))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                LS0067_ResourceFileNotFound,
+                $"The resource file '{res.Path}' could not be located.",
+                "lsconfig.xml");
+        }
+
+        else if (res is UnmanagedResource)
+        {
+            try
+            {
+                Context.Assembly.DefineUnmanagedResource(File.ReadAllBytes(res.Path));
+            }
+            catch (ArgumentException)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    LS0068_MultipleUnmanagedResources,
+                    "An assembly can only contain one unmanaged resource blob.",
+                    "lsconfig.xml");
+            }
+        }
+
+        else
+        {
+            ManagedResource mres = (ManagedResource)res;
+            string resFile = Path.Combine(basePath, Path.GetFileName(mres.Path));
+
+            File.Copy(mres.Path, resFile, true);
+            Context.Assembly.AddResourceFile(mres.Name, resFile);
+        }
     }
 }

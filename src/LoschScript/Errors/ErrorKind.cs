@@ -280,5 +280,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a property cannot be assigned to.
     /// </summary>
-    LS0066_PropertyNoSuitableSetter
+    LS0066_PropertyNoSuitableSetter,
+    /// <summary>
+    /// Emitted when a resource specified in lsconfig.xml could not be located.
+    /// </summary>
+    LS0067_ResourceFileNotFound,
+    /// <summary>
+    /// Emitted when multiple unmanaged resources are specified in lsconfig.xml.
+    /// </summary>
+    LS0068_MultipleUnmanagedResources
 }

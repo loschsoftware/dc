@@ -41,6 +41,9 @@ public static class ErrorWriter
 
     private static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
     {
+        Context ??= new();
+        Context.Configuration ??= new();
+
         try
         {
             ConsoleColor defaultColor = Console.ForegroundColor;

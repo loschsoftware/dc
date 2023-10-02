@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoschScript.Configuration;
+using System;
 using System.Xml.Serialization;
 namespace Losch.LoschScript.Configuration;
 
@@ -13,6 +14,11 @@ public sealed class LSConfig
     [XmlArrayItem(Type = typeof(AssemblyReference))]
     [XmlArrayItem(Type = typeof(FileReference))]
     public Reference[] References { get; set; }
+
+    [XmlArray]
+    [XmlArrayItem(Type = typeof(ManagedResource))]
+    [XmlArrayItem(Type = typeof(UnmanagedResource))]
+    public Resource[] Resources { get; set; }
 
     [XmlElement("DefaultNamespace")]
     public string DefaultNamespace { get; set; }
@@ -63,7 +69,7 @@ public sealed class LSConfig
     public bool MeasureElapsedTime { get; set; }
 
     [XmlElement("Configuration")]
-    public Configuration Configuration { get; set; }
+    public ApplicationConfiguration Configuration { get; set; }
 
     [XmlElement("VersionInformation")]
     public VersionInformation VersionInformation { get; set; }
@@ -87,7 +93,7 @@ public enum ApplicationType
 }
 
 [Serializable]
-public enum Configuration
+public enum ApplicationConfiguration
 {
     Debug,
     Release
