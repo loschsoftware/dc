@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace LoschScript.Unmanaged.ResFile;
+namespace LoschScript.ResFile;
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct ResourceHeader
