@@ -751,7 +751,11 @@ internal static class Helpers
             return;
 
 #if !NET7_COMPATIBLE
-        lb.SetLocalSymInfo(name);
+        try
+        {
+            lb.SetLocalSymInfo(name);
+        }
+        catch (IndexOutOfRangeException) { }
 #endif
     }
 
