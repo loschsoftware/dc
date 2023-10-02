@@ -127,12 +127,6 @@ internal static class Helpers
                 EmitWarningMessage(0, 0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
         }
 
-        //if (!string.IsNullOrEmpty(Context.Configuration.BuildOutputDirectory))
-        //{
-        //    Directory.CreateDirectory(Context.Configuration.BuildOutputDirectory);
-        //    File.Move(assembly, Path.Combine(Context.Configuration.BuildOutputDirectory, assembly));
-        //}
-
         sw.Stop();
 
         if (args.Any(a => a == "-ilout"))
