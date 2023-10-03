@@ -288,5 +288,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when multiple unmanaged resources are specified in lsconfig.xml.
     /// </summary>
-    LS0068_MultipleUnmanagedResources
+    LS0068_MultipleUnmanagedResources,
+    /// <summary>
+    /// Emitted when a required Windows SDK tool could not be located.
+    /// </summary>
+    LS0069_WinSdkToolNotFound
 }

@@ -108,6 +108,39 @@ internal static class Helpers
         // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
+        if (File.Exists(Context.Configuration.ApplicationIcon))
+        {
+            string rc = WinSdkHelper.GetToolPath("rc.exe");
+
+            if (string.IsNullOrEmpty(rc))
+            {
+                EmitWarningMessage(
+                    0, 0, 0,
+                    LS0069_WinSdkToolNotFound,
+                    $"The Windows SDK tool 'rc.exe' could not be located. Setting assembly icon failed.",
+                    "lsconfig.xmL");
+            }
+
+            Guid guid = Guid.NewGuid();
+            string baseDir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "lsc")).FullName;
+            string rcPath = Path.Combine(baseDir, $"{guid}.rc");
+
+            ResourceScriptWriter rsw = new(rcPath);
+            rsw.AddMainIcon(Context.Configuration.ApplicationIcon);
+
+            rsw.Dispose();
+
+            ProcessStartInfo psi = new()
+            {
+                FileName = rc,
+                Arguments = rcPath,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+
+            Process.Start(psi);
+        }
+
         if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource))
         {
             Context.Assembly.DefineVersionInfoResource(
@@ -123,12 +156,6 @@ internal static class Helpers
 
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
             Context.Assembly.Save(assembly);
-
-        if (File.Exists(Context.Configuration.ApplicationIcon))
-        {
-            if (!Win32Helpers.SetIcon(assembly, Context.Configuration.ApplicationIcon))
-                EmitWarningMessage(0, 0, 0, LS0000_UnexpectedError, "The compilation was successful, but the assembly icon could not be set.", Path.GetFileName(assembly));
-        }
 
         sw.Stop();
 
@@ -850,7 +877,7 @@ internal static class Helpers
                 EmitErrorMessage(
                     0, 0, 0,
                     LS0068_MultipleUnmanagedResources,
-                    "An assembly can only contain one unmanaged resource blob.",
+                    "An assembly can only contain one unmanaged resource file.",
                     "lsconfig.xml");
             }
         }
