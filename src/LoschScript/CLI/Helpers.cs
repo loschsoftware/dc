@@ -108,12 +108,15 @@ internal static class Helpers
         // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
-        Context.Assembly.DefineVersionInfoResource(
-            Context.Configuration.Product,
-            Context.Configuration.Version,
-            Context.Configuration.Company,
-            Context.Configuration.Copyright,
-            Context.Configuration.Trademark);
+        if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource))
+        {
+            Context.Assembly.DefineVersionInfoResource(
+                Context.Configuration.Product,
+                Context.Configuration.Version,
+                Context.Configuration.Company,
+                Context.Configuration.Copyright,
+                Context.Configuration.Trademark);
+        }
 
         foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
             AddResource(res, Directory.GetCurrentDirectory());
