@@ -108,6 +108,8 @@ internal static class Helpers
         // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
+        string resFile = "";
+
         if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource) && Context.Configuration.VersionInfo != null)
         {
             EmitMessage(
@@ -123,17 +125,21 @@ internal static class Helpers
                 EmitWarningMessage(
                     0, 0, 0,
                     LS0069_WinSdkToolNotFound,
-                    $"The Windows SDK tool 'rc.exe' could not be located. Setting assembly icon failed.",
+                    $"The Windows SDK tool 'rc.exe' could not be located. Setting version information failed. Consider precompiling your version info and including it as an unmanaged resource.",
                     "lsconfig.xml");
 
                 return -1;
             }
 
             Guid guid = Guid.NewGuid();
-            string baseDir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "lsc")).FullName;
-            string rcPath = Path.Combine(baseDir, $"{guid}.rc");
 
+            string rcPath = Path.ChangeExtension(config.AssemblyName, "rc");
             ResourceScriptWriter rsw = new(rcPath);
+
+            //rsw.BeginVersionInfo();
+            //rsw.AddFileVersion(Context.Configuration.VersionInfo.FileVersion);
+            //rsw.AddProductVersion(Context.Configuration.VersionInfo.Version);
+            //rsw.End();
 
             //Context.Assembly.DefineVersionInfoResource(
             //    Context.Configuration.Product,
@@ -168,8 +174,13 @@ internal static class Helpers
 
             Process.Start(psi).WaitForExit();
 
-            if (File.Exists(Path.ChangeExtension(rcPath, ".res")))
-                Context.Assembly.DefineUnmanagedResource(Path.ChangeExtension(rcPath, ".res"));
+            resFile = Path.ChangeExtension(rcPath, ".res");
+
+            if (File.Exists(resFile))
+                Context.Assembly.DefineUnmanagedResource(resFile);
+
+            if (!args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("rc")).Any())
+                File.Delete(rcPath);
         }
 
         foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
@@ -179,6 +190,9 @@ internal static class Helpers
             Context.Assembly.Save(assembly);
 
         sw.Stop();
+
+        if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
+            File.Delete(resFile);
 
         if (args.Any(a => a == "-ilout"))
         {

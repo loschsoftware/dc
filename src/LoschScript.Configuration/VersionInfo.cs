@@ -24,4 +24,7 @@ public class VersionInfo
 
     [XmlElement("Version")]
     public string Version { get; set; }
+
+    [XmlElement("FileVersion")]
+    public string FileVersion { get; set; }
 }

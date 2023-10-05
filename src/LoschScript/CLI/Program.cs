@@ -137,7 +137,7 @@ internal class Program
         Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Compiles the specified source files.");
 
-        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.ForegroundColor = ConsoleColor.Cyan;
 
         LogOut.Write("    -i".PadRight(25).PadRight(50));
         LogOut.WriteLine("Interprets the program and doesn't save an assembly to the disk.");
@@ -153,6 +153,8 @@ internal class Program
         LogOut.WriteLine("Applies IL optimizations to the assembly, ignoring lsconfig.xml.");
         LogOut.Write("    -ilout".PadRight(25).PadRight(50));
         LogOut.WriteLine("Saves the generated CIL code to the disk in a human-readable format.");
+        LogOut.Write("    -rc".PadRight(25).PadRight(50));
+        LogOut.WriteLine("Emits a Windows resource script (.rc file) associated with the program.");
         LogOut.WriteLine();
 
         Console.ForegroundColor = def;
@@ -162,7 +164,7 @@ internal class Program
         Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Creates the file structure of a LoschScript project.");
 
-        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.ForegroundColor = ConsoleColor.Cyan;
         LogOut.Write("    console".PadRight(25).PadRight(50));
         LogOut.WriteLine("Specifies a command-line application.");
         LogOut.Write("    library".PadRight(25).PadRight(50));

@@ -68,6 +68,9 @@ public sealed class LSConfig
     [XmlElement("EnableTips")]
     public bool EnableTips { get; set; }
 
+    [XmlElement("PersistentResourceFile")]
+    public bool PersistentResourceFile { get; set; }
+
     [XmlArray("IgnoredMessages")]
     [XmlArrayItem(typeof(Message))]
     [XmlArrayItem(typeof(Warning))]
