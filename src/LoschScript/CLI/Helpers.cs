@@ -226,6 +226,18 @@ internal static class Helpers
     public static int CompileAll(string[] args)
     {
         string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ls", SearchOption.AllDirectories).ToArray();
+
+        if (filesToCompile.Length < 1)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                LS0072_NoSourceFilesFound,
+                "No source files present.",
+                "build");
+
+            return -1;
+        }
+
         return HandleArgs(filesToCompile.Concat(args).ToArray());
     }
 

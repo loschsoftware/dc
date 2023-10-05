@@ -300,5 +300,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an ingored message is specified in lsconfig.xml that cannot be ignored.
     /// </summary>
-    LS0071_IllegalIgnoredMessage
+    LS0071_IllegalIgnoredMessage,
+    /// <summary>
+    /// Emitted when 'lsc build' is called but there are no source files.
+    /// </summary>
+    LS0072_NoSourceFilesFound
 }
