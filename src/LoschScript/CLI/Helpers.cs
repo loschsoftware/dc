@@ -108,8 +108,16 @@ internal static class Helpers
         // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
-        if (File.Exists(Context.Configuration.ApplicationIcon))
+        if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource))
         {
+            Context.Configuration.VersionInfo ??= new();
+
+            EmitMessage(
+                0, 0, 0,
+                LS0070_AvoidVersionInfoTag,
+                $"Using the 'VersionInfo' tag in lsconfig.xml worsens compile performance. Consider precompiling your version info and including it as an unmanaged resource.",
+                "lsconfig.xml");
+
             string rc = WinSdkHelper.GetToolPath("rc.exe");
 
             if (string.IsNullOrEmpty(rc))
@@ -118,7 +126,9 @@ internal static class Helpers
                     0, 0, 0,
                     LS0069_WinSdkToolNotFound,
                     $"The Windows SDK tool 'rc.exe' could not be located. Setting assembly icon failed.",
-                    "lsconfig.xmL");
+                    "lsconfig.xml");
+
+                return -1;
             }
 
             Guid guid = Guid.NewGuid();
@@ -126,7 +136,27 @@ internal static class Helpers
             string rcPath = Path.Combine(baseDir, $"{guid}.rc");
 
             ResourceScriptWriter rsw = new(rcPath);
-            rsw.AddMainIcon(Context.Configuration.ApplicationIcon);
+
+            //Context.Assembly.DefineVersionInfoResource(
+            //    Context.Configuration.Product,
+            //    Context.Configuration.Version,
+            //    Context.Configuration.Company,
+            //    Context.Configuration.Copyright,
+            //    Context.Configuration.Trademark);
+
+            if (!string.IsNullOrEmpty(Context.Configuration.VersionInfo.ApplicationIcon) && !File.Exists(Context.Configuration.VersionInfo.ApplicationIcon))
+            {
+                EmitWarningMessage(
+                   0, 0, 0,
+                   LS0069_WinSdkToolNotFound,
+                   $"The specified icon file '{Context.Configuration.VersionInfo.ApplicationIcon}' could not be found.",
+                   "lsconfig.xml");
+
+                return -1;
+            }
+
+            if (File.Exists(Context.Configuration.VersionInfo.ApplicationIcon ?? ""))
+                rsw.AddMainIcon(Context.Configuration.VersionInfo.ApplicationIcon);
 
             rsw.Dispose();
 
@@ -138,17 +168,10 @@ internal static class Helpers
                 WindowStyle = ProcessWindowStyle.Hidden
             };
 
-            Process.Start(psi);
-        }
+            Process.Start(psi).WaitForExit();
 
-        if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource))
-        {
-            Context.Assembly.DefineVersionInfoResource(
-                Context.Configuration.Product,
-                Context.Configuration.Version,
-                Context.Configuration.Company,
-                Context.Configuration.Copyright,
-                Context.Configuration.Trademark);
+            if (File.Exists(Path.ChangeExtension(rcPath, ".res")))
+                Context.Assembly.DefineUnmanagedResource(Path.ChangeExtension(rcPath, ".res"));
         }
 
         foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())

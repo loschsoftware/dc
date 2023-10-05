@@ -1,4 +1,5 @@
 ﻿using Losch.LoschScript.Configuration;
+using LoschScript.Configuration;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
@@ -82,12 +83,16 @@ ScriptHost.Run ""script.els""";
                 ns.Add("", "");
 
                 var xmls = new XmlSerializer(typeof(LSConfig));
+
                 xmls.Serialize(configFile, new LSConfig()
                 {
                     ApplicationType = ApplicationType.Console,
                     AssemblyName = "app",
                     DefaultNamespace = "Application",
-                    Version = "1.0.0.0",
+                    VersionInfo = new()
+                    {
+                        Version = "1.0.0.0"
+                    },
                     BuildOutputDirectory = ".\\build"
                 }, ns);
                 break;
@@ -111,7 +116,10 @@ ScriptHost.Run ""script.els""";
                     ApplicationType = ApplicationType.Console,
                     AssemblyName = "app",
                     DefaultNamespace = "Application",
-                    Version = "1.0.0.0",
+                    VersionInfo = new()
+                    {
+                        Version = "1.0.0.0"
+                    },
                     BuildOutputDirectory = ".\\build"
                 }, _ns);
                 break;

@@ -292,5 +292,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a required Windows SDK tool could not be located.
     /// </summary>
-    LS0069_WinSdkToolNotFound
+    LS0069_WinSdkToolNotFound,
+    /// <summary>
+    /// Emitted when the <code>&lt;VersionInfo&gt;</code> tag is used in lsconfig.xml.
+    /// </summary>
+    LS0070_AvoidVersionInfoTag
 }

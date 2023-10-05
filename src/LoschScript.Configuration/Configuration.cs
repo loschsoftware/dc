@@ -29,23 +29,8 @@ public sealed class LSConfig
     [XmlElement("ApplicationType")]
     public ApplicationType ApplicationType { get; set; }
 
-    [XmlElement("IconFile")]
-    public string ApplicationIcon { get; set; }
-
-    [XmlElement("Product")]
-    public string Product { get; set; }
-
-    [XmlElement("Company")]
-    public string Company { get; set; }
-
-    [XmlElement("Copyright")]
-    public string Copyright { get; set; }
-
-    [XmlElement("Trademark")]
-    public string Trademark { get; set; }
-
-    [XmlElement("Version")]
-    public string Version { get; set; }
+    [XmlElement("VersionInfo")]
+    public VersionInfo VersionInfo { get; set; }
 
     [XmlElement("BuildDirectory")]
     public string BuildOutputDirectory { get; set; }
