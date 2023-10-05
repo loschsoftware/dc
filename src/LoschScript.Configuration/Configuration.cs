@@ -1,5 +1,6 @@
 ﻿using LoschScript.Configuration;
 using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
 namespace Losch.LoschScript.Configuration;
 
@@ -35,21 +36,27 @@ public sealed class LSConfig
     [XmlElement("BuildDirectory")]
     public string BuildOutputDirectory { get; set; }
 
+    [DefaultValue(false)]
     [XmlElement("EmitPdb")]
     public bool CreatePdb { get; set; }
 
+    [DefaultValue(false)]
     [XmlElement("IgnoreAllMessages")]
     public bool IgnoreMessages { get; set; }
-    
+
+    [DefaultValue(false)]
     [XmlElement("IgnoreAllWarnings")]
     public bool IgnoreWarnings { get; set; }
-    
+
+    [DefaultValue(false)]
     [XmlElement("TreatWarningsAsErrors")]
     public bool TreatWarningsAsErrors { get; set; }
 
+    [DefaultValue(true)]
     [XmlElement("IlOptimizations")]
-    public bool IlOptimizations { get; set; }
+    public bool IlOptimizations { get; set; } = true;
 
+    [DefaultValue(false)]
     [XmlElement("MeasureElapsedTime")]
     public bool MeasureElapsedTime { get; set; }
 
@@ -59,15 +66,19 @@ public sealed class LSConfig
     [XmlElement("VersionInformation")]
     public VersionInformation VersionInformation { get; set; }
 
+    [DefaultValue(false)]
     [XmlElement("IncludeDependencies")]
     public bool IncludeDependencies { get; set; }
 
+    [DefaultValue(false)]
     [XmlElement("AdvancedErrorMessages")]
     public bool AdvancedErrorMessages { get; set; }
 
+    [DefaultValue(true)]
     [XmlElement("EnableTips")]
-    public bool EnableTips { get; set; }
+    public bool EnableTips { get; set; } = true;
 
+    [DefaultValue(false)]
     [XmlElement("PersistentResourceFile")]
     public bool PersistentResourceFile { get; set; }
 
