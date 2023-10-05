@@ -9,6 +9,12 @@
 		<LangVersion>11</LangVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<!--<DefineConstants>NET7_COMPATIBLE</DefineConstants>-->
+		
+		<Company>Losch</Company>
+		<Product>LoschScript</Product>
+		<ProductName>LoschScript</ProductName>
+		<Description>LoschScript Compiler</Description>
+		<Copyright>© 2023 Losch</Copyright>
 	</PropertyGroup>
 	
 	<!--<PropertyGroup Condition="'$(Configuration)' == 'Debug'">

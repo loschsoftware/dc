@@ -136,17 +136,23 @@ internal static class Helpers
             string rcPath = Path.ChangeExtension(config.AssemblyName, "rc");
             ResourceScriptWriter rsw = new(rcPath);
 
-            //rsw.BeginVersionInfo();
-            //rsw.AddFileVersion(Context.Configuration.VersionInfo.FileVersion);
-            //rsw.AddProductVersion(Context.Configuration.VersionInfo.Version);
-            //rsw.End();
+            rsw.BeginVersionInfo();
+            rsw.AddFileVersion(Context.Configuration.VersionInfo.FileVersion);
+            rsw.AddProductVersion(Context.Configuration.VersionInfo.Version);
 
-            //Context.Assembly.DefineVersionInfoResource(
-            //    Context.Configuration.Product,
-            //    Context.Configuration.Version,
-            //    Context.Configuration.Company,
-            //    Context.Configuration.Copyright,
-            //    Context.Configuration.Trademark);
+            rsw.Begin();
+            rsw.AddStringFileInfo(
+                Context.Configuration.VersionInfo.Company,
+                Context.Configuration.VersionInfo.Description,
+                Context.Configuration.VersionInfo.FileVersion,
+                Context.Configuration.VersionInfo.InternalName,
+                Context.Configuration.VersionInfo.Copyright,
+                Context.Configuration.VersionInfo.Trademark,
+                Context.Configuration.VersionInfo.Product,
+                Context.Configuration.VersionInfo.Version
+                );
+
+            rsw.End();
 
             if (!string.IsNullOrEmpty(Context.Configuration.VersionInfo.ApplicationIcon) && !File.Exists(Context.Configuration.VersionInfo.ApplicationIcon))
             {

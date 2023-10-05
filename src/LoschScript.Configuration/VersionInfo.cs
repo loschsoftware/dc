@@ -27,4 +27,10 @@ public class VersionInfo
 
     [XmlElement("FileVersion")]
     public string FileVersion { get; set; }
+
+    [XmlElement("Description")]
+    public string Description { get; set; }
+    
+    [XmlElement("InternalName")]
+    public string InternalName { get; set; }
 }

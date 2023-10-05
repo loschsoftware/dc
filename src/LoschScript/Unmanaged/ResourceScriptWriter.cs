@@ -13,9 +13,6 @@ internal class ResourceScriptWriter : IDisposable
         {
             AutoFlush = true
         };
-
-        //sw.WriteLine("#include <winver.h>");
-        //sw.WriteLine("#include <ntdef.h>");
     }
 
     public void AddIcon(string iconPath, int id)
@@ -65,6 +62,10 @@ internal class ResourceScriptWriter : IDisposable
     public void BeginVersionInfo()
     {
         sw.WriteLine("VS_VERSION_INFO VERSIONINFO");
+
+        sw.WriteLine(@"FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0
+FILESUBTYPE 0x0");
     }
 
     public void AddFileVersion(int major, int minor, int patch = 0, int build = 0)
@@ -75,6 +76,50 @@ internal class ResourceScriptWriter : IDisposable
     public void AddProductVersion(int major, int minor, int patch = 0, int build = 0)
     {
         sw.WriteLine($"PRODUCTVERSION {major},{minor},{patch},{build}");
+    }
+
+    public void Begin()
+    {
+        sw.WriteLine("BEGIN");
+    }
+
+    public void AddStringFileInfo(
+        string company,
+        string description,
+        string fileVersion,
+        string internalName,
+        string legalCopyright,
+        string legalTrademarks,
+        string productName,
+        string productVersion)
+    {
+        company ??= "";
+        description ??= "";
+        fileVersion ??= "";
+        internalName ??= "";
+        legalCopyright ??= "";
+        legalTrademarks ??= "";
+        productName ??= "";
+        productVersion ??= "";
+
+        sw.WriteLine($@"BLOCK ""StringFileInfo""
+    BEGIN
+        BLOCK ""040904b0""
+        BEGIN
+            VALUE ""CompanyName"", ""{company}"" ""\0""
+            VALUE ""FileDescription"", ""{description}""
+            VALUE ""FileVersion"", ""{fileVersion}"" ""\0""
+            VALUE ""InternalName"", ""{internalName}""
+            VALUE ""LegalCopyright"", ""{legalCopyright}"" ""\0""
+            VALUE ""LegalTrademarks"", ""{legalTrademarks}"" ""\0""
+            VALUE ""ProductName"", ""{productName}""
+            VALUE ""ProductVersion"", ""{productVersion}"" ""\0""
+        END
+    END
+    BLOCK ""VarFileInfo""
+    BEGIN
+        VALUE ""Translation"", 0x409, 1200
+    END");
     }
 
     public void End()
