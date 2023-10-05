@@ -108,14 +108,12 @@ internal static class Helpers
         // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
 
-        if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource))
+        if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource) && Context.Configuration.VersionInfo != null)
         {
-            Context.Configuration.VersionInfo ??= new();
-
             EmitMessage(
                 0, 0, 0,
                 LS0070_AvoidVersionInfoTag,
-                $"Using the 'VersionInfo' tag in lsconfig.xml worsens compile performance. Consider precompiling your version info and including it as an unmanaged resource.",
+                $"Using the 'VersionInfo' tag in lsconfig.xml worsens compilation performance. Consider precompiling your version info and including it as an unmanaged resource.",
                 "lsconfig.xml");
 
             string rc = WinSdkHelper.GetToolPath("rc.exe");

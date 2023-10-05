@@ -38,10 +38,10 @@ public sealed class LSConfig
     [XmlElement("EmitPdb")]
     public bool CreatePdb { get; set; }
 
-    [XmlElement("IgnoreCodeStyleMessages")]
+    [XmlElement("IgnoreAllMessages")]
     public bool IgnoreMessages { get; set; }
     
-    [XmlElement("IgnoreWarnings")]
+    [XmlElement("IgnoreAllWarnings")]
     public bool IgnoreWarnings { get; set; }
     
     [XmlElement("TreatWarningsAsErrors")]
@@ -67,6 +67,11 @@ public sealed class LSConfig
 
     [XmlElement("EnableTips")]
     public bool EnableTips { get; set; }
+
+    [XmlArray("IgnoredMessages")]
+    [XmlArrayItem(typeof(Message))]
+    [XmlArrayItem(typeof(Warning))]
+    public Ignore[] IgnoredMessages { get; set; }
 }
 
 [Serializable]

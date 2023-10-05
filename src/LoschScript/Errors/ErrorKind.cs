@@ -296,5 +296,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the <code>&lt;VersionInfo&gt;</code> tag is used in lsconfig.xml.
     /// </summary>
-    LS0070_AvoidVersionInfoTag
+    LS0070_AvoidVersionInfoTag,
+    /// <summary>
+    /// Emitted when an ingored message is specified in lsconfig.xml that cannot be ignored.
+    /// </summary>
+    LS0071_IllegalIgnoredMessage
 }
