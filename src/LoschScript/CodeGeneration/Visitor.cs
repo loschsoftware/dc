@@ -77,7 +77,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitType([NotNull] LoschScriptParser.TypeContext context)
     {
-        if (context.Identifier().GetText().Length > 1024)
+        VisitType(context, null);
+        return typeof(void);
+    }
+
+    private void VisitType(LoschScriptParser.TypeContext context, TypeBuilder enclosingType)
+    {
+        if (context.Identifier().GetText().Length + (CurrentFile.ExportedNamespace ?? "").Length > 1024)
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
@@ -86,15 +92,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 LS0073_TypeNameTooLong,
                 "A type name cannot be longer than 1024 characters.");
 
-            return typeof(void);
+            return;
         }
 
-        VisitType(context, null);
-        return typeof(void);
-    }
-
-    private void VisitType(LoschScriptParser.TypeContext context, TypeBuilder enclosingType)
-    {
         Type parent = typeof(object);
         List<Type> interfaces = new();
 
