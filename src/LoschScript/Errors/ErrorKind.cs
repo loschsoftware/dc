@@ -304,5 +304,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when 'lsc build' is called but there are no source files.
     /// </summary>
-    LS0072_NoSourceFilesFound
+    LS0072_NoSourceFilesFound,
+    /// <summary>
+    /// Emitted when the name of a type exceeds the .NET limit of 1024 characters.
+    /// </summary>
+    LS0073_TypeNameTooLong,
+    /// <summary>
+    /// Emitted when more than 65534 locals are defined in a function.
+    /// </summary>
+    LS0074_TooManyLocals
 }

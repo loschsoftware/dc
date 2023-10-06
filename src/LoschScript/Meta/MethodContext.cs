@@ -64,7 +64,23 @@ internal class MethodContext
 
     public ConstructorBuilder ConstructorBuilder { get; set; }
 
-    public int LocalIndex { get; set; } = -1;
+    private int _localIndex = -1;
+    public int LocalIndex
+    {
+        get => _localIndex;
+        set
+        {
+            if (value > 65534)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    LS0074_TooManyLocals,
+                    "Only 65534 locals can be declared per function.");
+            }
+
+            _localIndex = value;
+        }
+    }
 
     public int ParameterIndex { get; set; } = 0;
 
@@ -73,11 +89,11 @@ internal class MethodContext
     public List<ParamInfo> Parameters { get; } = new();
 
     public List<SymbolInfo> AvailableSymbols { get; } = new();
-    
+
     public UnionValue CurrentUnion { get; set; } = new(null, typeof(object));
 
     public int ThrowawayCounterVariableIndex { get; set; } = 0;
-    
+
     public int LoopArrayReturnValueIndex { get; set; } = 0;
 
     public int TempValueIndex { get; set; } = 0;

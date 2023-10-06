@@ -77,6 +77,18 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitType([NotNull] LoschScriptParser.TypeContext context)
     {
+        if (context.Identifier().GetText().Length > 1024)
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                LS0073_TypeNameTooLong,
+                "A type name cannot be longer than 1024 characters.");
+
+            return typeof(void);
+        }
+
         VisitType(context, null);
         return typeof(void);
     }
