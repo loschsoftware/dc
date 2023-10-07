@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace LoschScript.CLI;
 
@@ -123,16 +124,23 @@ internal class Program
 
     static int DisplayHelpMessage()
     {
+        Version v = Assembly.GetExecutingAssembly().GetName().Version;
+
+        // 8517 -> days between 01/01/2000 and 27/04/2023, on which the current implementation of lsc was started
+        Version version = new(v.Major, v.Minor, v.Build - 8517);
+        DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
+
         ConsoleColor def = Console.ForegroundColor;
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.WriteLine();
         LogOut.WriteLine("LoschScript Command Line Compiler for .NET (lsc.exe)");
-        LogOut.WriteLine("Command Line Arguments:");
-        LogOut.WriteLine();
-        Console.ForegroundColor = def;
+        LogOut.WriteLine($"Version {version.ToString(2)}, Build {version.Build} ({buildDate.ToShortDateString()})");
 
         Console.ForegroundColor = ConsoleColor.Yellow;
+        LogOut.WriteLine();
+        LogOut.WriteLine("Command Line Arguments:");
+        LogOut.WriteLine();
+
         LogOut.Write("<FileName> [<FileName>..]".PadRight(50));
         Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Compiles the specified source files.");
