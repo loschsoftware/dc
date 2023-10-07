@@ -86,6 +86,9 @@ public sealed class LSConfig
     [XmlArrayItem(typeof(Message))]
     [XmlArrayItem(typeof(Warning))]
     public Ignore[] IgnoredMessages { get; set; }
+
+    [XmlArray("CodeAnalyzers")]
+    public CodeAnalyzer[] CodeAnalyzers { get; set; }
 }
 
 [Serializable]
