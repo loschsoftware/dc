@@ -136,7 +136,7 @@ internal static class SymbolResolver
 
                     for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                     {
-                        if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                        if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
                         {
                             if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                             {
@@ -279,7 +279,7 @@ internal static class SymbolResolver
 
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
-                    if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                    if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
                     {
                         if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                         {
