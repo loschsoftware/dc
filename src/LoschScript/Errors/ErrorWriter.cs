@@ -78,6 +78,8 @@ public static class ErrorWriter
 
             Console.CursorLeft = 0;
 
+            string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
+
             (error.Severity switch
             {
                 Severity.Error => ErrorOut,
@@ -89,7 +91,7 @@ public static class ErrorWriter
                 Severity.Error => "error",
                 Severity.Warning => "warning",
                 _ => "information"
-            }} {error.ErrorCode.ToString().Split('_')[0]}: {error.ErrorMessage}");
+            }} {errCode}: {error.ErrorMessage}");
 
             if (!string.IsNullOrEmpty(error.Tip) && Context.Configuration.EnableTips)
             {

@@ -13,6 +13,11 @@ public class ErrorInfo
     public ErrorKind ErrorCode { get; set; }
 
     /// <summary>
+    /// Supports custom error codes to be used by analyzers.
+    /// </summary>
+    public string CustomErrorCode { get; set; }
+
+    /// <summary>
     /// The error message as emitted by the compiler.
     /// </summary>
     public string ErrorMessage { get; set; }
@@ -51,7 +56,11 @@ public class ErrorInfo
     /// Converts the error into a human-readable format.
     /// </summary>
     /// <returns>A friendly representation of the error.</returns>
-    public override string ToString() => $"{File} ({CodePosition.Item1},{CodePosition.Item2}): error {ErrorCode.ToString().Split('_')[0]}: {ErrorMessage}\r\n";
+    public override string ToString()
+    {
+        string code = ErrorCode == ErrorKind.CustomError ? CustomErrorCode : ErrorCode.ToString().Split('_')[0];
+        return $"{File} ({CodePosition.Item1},{CodePosition.Item2}): error {code}: {ErrorMessage}\r\n";
+    }
 }
 
 /// <summary>

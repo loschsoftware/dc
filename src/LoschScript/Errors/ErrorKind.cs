@@ -8,6 +8,10 @@ namespace LoschScript.Errors;
 public enum ErrorKind
 {
     /// <summary>
+    /// Represents a custom error message emitted by tools such as code analyzers.
+    /// </summary>
+    CustomError = -1,
+    /// <summary>
     /// An unexpected and not further specified error.
     /// </summary>
     LS0000_UnexpectedError,
