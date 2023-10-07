@@ -654,6 +654,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             IL = il
         };
 
+        mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(0, ParameterAttributes.None, "args"), 0, default));
+
         mc.FilesWhereDefined.Add(CurrentFile.Path);
 
         tc.Methods.Add(mc);

@@ -65,7 +65,7 @@ expression
     | expression Arrow_Left expression #left_pipe_expression
     /*| expression Dot Identifier #dotted_expression*/
     | range #range_expression
-    | expression At_Sign expression #index_expression
+    | expression Open_Bracket expression Close_Bracket #index_expression
     | attribute+ expression #attributed_expression
     | if_branch NewLine* elif_branch* NewLine* else_branch? #prefix_if_expression
     | expression postfix_if_branch #postfix_if_expression
