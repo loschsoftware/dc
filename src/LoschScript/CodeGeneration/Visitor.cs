@@ -1756,8 +1756,10 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             // Global method
             else if (o is List<MethodInfo> methods)
             {
-                Visit(context.arglist());
-                Type[] argumentTypes = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+                if (context.arglist() != null)
+                    Visit(context.arglist());
+
+                Type[] argumentTypes = (CurrentMethod.ArgumentTypesForNextMethodCall ?? Type.EmptyTypes.ToList()).ToArray();
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                 MethodInfo final = null;
 

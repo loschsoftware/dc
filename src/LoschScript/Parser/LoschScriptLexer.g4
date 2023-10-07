@@ -149,7 +149,10 @@ Arrow_Left: '<-';
 
 Double_Backtick: '``';
 
-Identifier: Double_Backtick? IdentifierOrKeyword Double_Backtick?;
+Identifier
+	: IdentifierOrKeyword
+	| Double_Backtick IdentifierOrKeyword Double_Backtick
+	;
 
 Integer_Literal: (Minus | Plus)? [0-9] ('\''* [0-9])* Integer_Suffix?;
 Hex_Integer_Literal: (Minus | Plus)? '0' [xX] ('\''* HexDigit)+ Integer_Suffix?;
