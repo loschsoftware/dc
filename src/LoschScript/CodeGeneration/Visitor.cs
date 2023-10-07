@@ -2910,7 +2910,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     context.Equals().Symbol.Column,
                     context.Equals().GetText().Length,
                     LS0018_ImmutableValueReassignment,
-                    $"'{sym.Name()}' is immutable and cannot be changed.");
+                    $"'{sym.Name()}' is immutable and cannot be modified.");
 
                 return sym.Type();
             }

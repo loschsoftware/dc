@@ -18,6 +18,8 @@ internal class Program
             {
                 ["config"] => Helpers.BuildLSConfig(),
                 ["build", ..] => Helpers.CompileAll(args[1..]),
+                ["check" or "verify"] => Helpers.CheckAll(),
+                ["check" or "verify", ..] => Helpers.Check(args[1..]),
                 ["interactive" or "repl"] => Interactive.StartInteractiveSession(),
                 ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
                 ["make" or "new", ..] => LSTemplates.CreateStructure(args),
@@ -126,26 +128,28 @@ internal class Program
     {
         Version v = Assembly.GetExecutingAssembly().GetName().Version;
 
-        // 8517 -> days between 01/01/2000 and 27/04/2023, on which the current implementation of lsc was started
+        // 8517 -> Days between 01/01/2000 and 27/04/2023, on which development on LSC was started
         Version version = new(v.Major, v.Minor, v.Build - 8517);
         DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
 
         ConsoleColor def = Console.ForegroundColor;
 
+        Console.ForegroundColor = ConsoleColor.Yellow;
+
         LogOut.WriteLine();
         LogOut.WriteLine("LoschScript Command Line Compiler for .NET (lsc.exe)");
         LogOut.WriteLine($"Version {version.ToString(2)}, Build {version.Build} ({buildDate.ToShortDateString()})");
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.ForegroundColor = def;
+
         LogOut.WriteLine();
         LogOut.WriteLine("Command Line Arguments:");
         LogOut.WriteLine();
 
         LogOut.Write("<FileName> [<FileName>..]".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Compiles the specified source files.");
 
-        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.ForegroundColor = ConsoleColor.Yellow;
 
         LogOut.Write("    -i".PadRight(25).PadRight(50));
         LogOut.WriteLine("Interprets the program and doesn't save an assembly to the disk.");
@@ -167,12 +171,11 @@ internal class Program
 
         Console.ForegroundColor = def;
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("new <Type> <Name>".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
+
         LogOut.WriteLine("Creates the file structure of a LoschScript project.");
 
-        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("    console".PadRight(25).PadRight(50));
         LogOut.WriteLine("Specifies a command-line application.");
         LogOut.Write("    library".PadRight(25).PadRight(50));
@@ -182,66 +185,36 @@ internal class Program
         LogOut.WriteLine();
         Console.ForegroundColor = def;
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("build".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Compiles all .ls source files in the current directory.");
         LogOut.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("watch, auto".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
-        LogOut.WriteLine("Watches all .ls files in the current directory and automatically recompiles when files are changed.");
+        LogOut.WriteLine("Watches all .ls files in the current folder structure and automatically recompiles when files are changed.");
         LogOut.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("quit".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Stops all file watchers.");
         LogOut.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("check <FileName>".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
-        LogOut.WriteLine("Checks the specified file for syntax errors.");
+        LogOut.Write("check, verify [<FileName>..]".PadRight(50));
+        LogOut.WriteLine("Checks the specified files, or all .ls files in the current folder structure, for syntax errors.");
         LogOut.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("optimize <FileName>".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
-        LogOut.WriteLine("Applies IL optimizations to the specified assembly.");
-        LogOut.WriteLine();
-
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("merge <OutputFileName> [<FileName>..]".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
-        LogOut.WriteLine("Merges the specified assemblies into one.");
-        LogOut.WriteLine();
-
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("config".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Creates a new lsconfig.xml file with default values.");
         LogOut.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("p, preprocess <FileName>".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Preprocesses <FileName>.");
         LogOut.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("interactive, repl".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Provides a read-evaluate-print-loop to run single expressions.");
         LogOut.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
         LogOut.Write("help, ?".PadRight(50));
-        Console.ForegroundColor = ConsoleColor.White;
         LogOut.WriteLine("Shows this page.");
-
-        Console.ForegroundColor = def;
 
         LogOut.WriteLine();
         LogOut.WriteLine("Valid prefixes for options are -, --, and /.");

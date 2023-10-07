@@ -241,6 +241,48 @@ internal static class Helpers
         return HandleArgs(filesToCompile.Concat(args).ToArray());
     }
 
+    public static int Check(string[] args)
+    {
+        LSConfig config = null;
+
+        if (File.Exists("lsconfig.xml"))
+        {
+            XmlSerializer xmls = new(typeof(LSConfig));
+            using StreamReader sr = new("lsconfig.xml");
+            config = (LSConfig)xmls.Deserialize(sr);
+        }
+
+        config ??= new();
+
+        IEnumerable<ErrorInfo> errors = CompileSource(args, config).SelectMany(e => e);
+
+        if (errors.Count() == 0)
+            Console.WriteLine("No errors found.");
+
+        else
+            Console.WriteLine($"{Environment.NewLine}{errors.Count()} error{(errors.Count() == 1 ? "": "s")} found.");
+
+        return errors.Count() > 0 ? -1 : 0;
+    }
+
+    public static int CheckAll()
+    {
+        string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ls", SearchOption.AllDirectories).ToArray();
+
+        if (filesToCompile.Length < 1)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                LS0072_NoSourceFilesFound,
+                "No source files present.",
+                "check");
+
+            return -1;
+        }
+
+        return Check(filesToCompile);
+    }
+
     public static int InterpretFiles(string[] args)
     {
         return 0;
