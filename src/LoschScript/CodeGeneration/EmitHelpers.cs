@@ -290,4 +290,18 @@ internal static class EmitHelpers
         if (m.ReturnType == typeof(void))
             CurrentMethod.SkipPop = true;
     }
+
+    public static bool TryGetConstantValue(FieldInfo field, out object value)
+    {
+        try
+        {
+            value = field.GetRawConstantValue();
+            return true;
+        }
+        catch (Exception)
+        {
+            value = null;
+            return false;
+        }
+    }
 }

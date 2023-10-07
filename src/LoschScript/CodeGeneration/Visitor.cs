@@ -1620,133 +1620,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return cType;
     }
 
-    public Type GetMemberOfCurrentType(string name, LoschScriptParser.ArglistContext arglist, int line, int column, int length, SymbolInfo sym = null)
-    {
-        if (arglist != null)
-        {
-            Visit(arglist);
-
-            if (!TypeContext.Current.Methods.Any(m => m.Builder.Name == name))
-                return null;
-
-            if (!TypeContext.Current.Methods.Any(m => m.Builder.GetParameters().Select(p => p.ParameterType).ToList() == CurrentMethod.ArgumentTypesForNextMethodCall))
-                return null;
-
-            MethodInfo m = TypeContext.Current.Methods.First(m => m.Builder.GetParameters().Select(p => p.ParameterType).ToList() == CurrentMethod.ArgumentTypesForNextMethodCall).Builder;
-
-            CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
-
-            if (m != null)
-            {
-                CurrentFile.Fragments.Add(new()
-                {
-                    Line = line,
-                    Column = column,
-                    Length = length,
-                    Color = Color.Function,
-                    ToolTip = TooltipGenerator.Function(m)
-                });
-
-                if (m.IsStatic || TypeContext.Current.Builder.IsValueType)
-                    CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
-                else
-                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
-
-                return m.ReturnType;
-            }
-        }
-
-        if (TypeContext.Current.Methods.Any(m => m.Builder.GetParameters().Length == 0))
-        {
-            MethodInfo parameterlessFunc = TypeContext.Current.Methods.First(m => m.Builder.GetParameters().Length == 0).Builder;
-            if (parameterlessFunc != null)
-            {
-                if (parameterlessFunc.IsStatic || TypeContext.Current.Builder.IsValueType)
-                {
-                    if (parameterlessFunc.DeclaringType == typeof(object))
-                    {
-                        CurrentMethod.IL.Emit(OpCodes.Pop);
-                        sym.Load();
-                        CurrentMethod.IL.Emit(OpCodes.Box, sym.Type());
-                    }
-
-                    CurrentMethod.IL.EmitCall(OpCodes.Call, parameterlessFunc, null);
-                }
-                else
-                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, parameterlessFunc, null);
-
-                CurrentFile.Fragments.Add(new()
-                {
-                    Line = line,
-                    Column = column,
-                    Length = length,
-                    Color = Color.Function,
-                    ToolTip = TooltipGenerator.Function(parameterlessFunc)
-                });
-
-                return parameterlessFunc.ReturnType;
-            }
-        }
-
-        if (TypeContext.Current.Methods.Any(m => m.Builder.Name == $"get_{name}"))
-        {
-            MethodInfo property = TypeContext.Current.Methods.First(m => m.Builder.Name == $"get_{name}").Builder;
-            if (property != null)
-            {
-                if (property.IsStatic || TypeContext.Current.Builder.IsValueType)
-                    CurrentMethod.IL.EmitCall(OpCodes.Call, property, null);
-                else
-                    CurrentMethod.IL.EmitCall(OpCodes.Callvirt, property, null);
-
-                CurrentFile.Fragments.Add(new()
-                {
-                    Line = line,
-                    Column = column,
-                    Length = length,
-                    Color = Color.Property,
-                    ToolTip = TooltipGenerator.Property(TypeContext.Current.Builder.GetProperty(name))
-                });
-
-                return property.ReturnType;
-            }
-        }
-
-        if (TypeContext.Current.Fields.Any(m => m.Builder.Name == name))
-        {
-            FieldInfo f = TypeContext.Current.Fields.First(m => m.Builder.Name == name).Builder;
-            if (f != null)
-            {
-                try
-                {
-                    // Constant
-                    EmitConst(f.GetRawConstantValue());
-                }
-                catch (Exception)
-                {
-                    // Not a constant
-
-                    if (f.IsStatic)
-                        CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
-                    else
-                        CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
-                }
-
-                CurrentFile.Fragments.Add(new()
-                {
-                    Line = line,
-                    Column = column,
-                    Length = length,
-                    Color = Color.Field,
-                    ToolTip = TooltipGenerator.Field(f)
-                });
-
-                return f.FieldType;
-            }
-        }
-
-        return typeof(void);
-    }
-
     int memberIndex = -1;
 
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
@@ -1833,6 +1706,12 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             else if (o is FieldInfo f)
             {
+                if (TryGetConstantValue(f, out object v))
+                {
+                    EmitConst(v);
+                    return f.FieldType;
+                }
+
                 if (f.IsStatic)
                     CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
 
@@ -1972,7 +1851,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (member is FieldInfo f)
             {
-                LoadField(f);
+                if (TryGetConstantValue(f, out object v))
+                    EmitConst(v);
+                else
+                    LoadField(f);
+
                 t = f.FieldType;
             }
 
@@ -2091,7 +1974,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (member is FieldInfo f)
             {
-                LoadField(f);
+                if (TryGetConstantValue(f, out object v))
+                    EmitConst(v);
+                else
+                    LoadField(f);
+
                 t = f.FieldType;
             }
 
