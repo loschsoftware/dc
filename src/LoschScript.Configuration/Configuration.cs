@@ -89,6 +89,9 @@ public sealed class LSConfig
 
     [XmlArray("CodeAnalyzers")]
     public CodeAnalyzer[] CodeAnalyzers { get; set; }
+
+    [XmlElement]
+    public string AssemblyManifest { get; set; }
 }
 
 [Serializable]

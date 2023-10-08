@@ -147,26 +147,6 @@ Double_Less_Than_Equals: '<<=';
 Double_Greater_Than: '>>';
 Double_Greater_Than_Equals: '>>=';
 
-Assignment_Operator
-	: Equals
-	| Plus_Equals
-	| Minus_Equals
-	| Asterisk_Equals
-	| Slash_Equals
-	| Double_Asterisk_Equals
-	| Percent_Equals
-	| Tilde_Equals
-	| Double_Less_Than_Equals
-	| Double_Greater_Than_Equals
-	| Bar_Equals
-	| Ampersand_Equals
-	| Double_Bar_Equals
-	| Double_Ampersand_Equals
-	| Caret_Equals
-	| Dot_Equals
-	| Double_Question_Mark_Equals
-	;
-
 Arrow_Right: '->';
 Arrow_Left: '<-';
 

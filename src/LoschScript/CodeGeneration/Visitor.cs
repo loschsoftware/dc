@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Tree;
 using LoschScript.CLI;
 using LoschScript.Core;
+using LoschScript.Lowering;
 using LoschScript.Meta;
 using LoschScript.Parser;
 using LoschScript.Runtime;
@@ -2913,9 +2914,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (!sym.IsMutable())
             {
                 EmitErrorMessage(
-                    context.Assignment_Operator().Symbol.Line,
-                    context.Assignment_Operator().Symbol.Column,
-                    context.Assignment_Operator().GetText().Length,
+                    context.assignment_operator().Start.Line,
+                    context.assignment_operator().Start.Column,
+                    context.assignment_operator().GetText().Length,
                     LS0018_ImmutableValueReassignment,
                     $"'{sym.Name()}' is immutable and cannot be modified.");
 
@@ -2956,9 +2957,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     }
 
                     EmitErrorMessage(
-                        context.Assignment_Operator().Symbol.Line,
-                        context.Assignment_Operator().Symbol.Column,
-                        context.Assignment_Operator().GetText().Length,
+                        context.assignment_operator().Start.Line,
+                        context.assignment_operator().Start.Column,
+                        context.assignment_operator().GetText().Length,
                         LS0019_GenericValueTypeInvalid,
                         $"Values of type '{type}' are not supported by union type '{sym.Union().ToTypeString()}'.");
 
@@ -2966,9 +2967,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 }
 
                 EmitErrorMessage(
-                    context.Assignment_Operator().Symbol.Line,
-                    context.Assignment_Operator().Symbol.Column,
-                    context.Assignment_Operator().GetText().Length,
+                    context.assignment_operator().Start.Line,
+                    context.assignment_operator().Start.Column,
+                    context.assignment_operator().GetText().Length,
                     LS0006_VariableTypeChanged,
                     $"The type of the new value of '{sym.Name()}' does not match the type of the old value.");
 

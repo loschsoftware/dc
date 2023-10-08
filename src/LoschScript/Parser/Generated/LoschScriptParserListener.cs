@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\source\repos\loschsoftware\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\source\repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -1269,5 +1269,15 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitType_arg_list([NotNull] LoschScriptParser.Type_arg_listContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.assignment_operator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterAssignment_operator([NotNull] LoschScriptParser.Assignment_operatorContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.assignment_operator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitAssignment_operator([NotNull] LoschScriptParser.Assignment_operatorContext context);
 }
 } // namespace LoschScript.Parser

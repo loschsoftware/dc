@@ -60,7 +60,7 @@ expression
     | Caret_Backslash Identifier  #typeof_expression
     | Dollar_Backslash expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
-    | (Var | Val)? Identifier (Colon type_name)? Assignment_Operator expression #local_declaration_or_assignment
+    | (Var | Val)? Identifier (Colon type_name)? assignment_operator expression #local_declaration_or_assignment
     | expression Arrow_Right expression #right_pipe_expression
     | expression Arrow_Left expression #left_pipe_expression
     /*| expression Dot Identifier #dotted_expression*/
@@ -91,8 +91,8 @@ expression
     // | Minus expression #unary_negation_expression
     | full_identifier type_arg_list? arglist? #full_identifier_member_access_expression
     | expression (Dot Identifier)+ type_arg_list? arglist? #member_access_expression
-    | expression Assignment_Operator expression #assignment
-    | parameter_list? (Colon type_name)? Equals expression #anonymous_function_expression
+    | expression assignment_operator expression #assignment
+    | Backslash parameter_list (Colon type_name)? Equals expression #anonymous_function_expression
     ;
 
 atom
@@ -336,3 +336,23 @@ fault_branch
 type_arg_list
     : Open_Bracket type_name (Comma type_name)* Close_Bracket
     ;
+
+assignment_operator
+	: Equals
+	| Plus_Equals
+	| Minus_Equals
+	| Asterisk_Equals
+	| Slash_Equals
+	| Double_Asterisk_Equals
+	| Percent_Equals
+	| Tilde_Equals
+	| Double_Less_Than_Equals
+	| Double_Greater_Than_Equals
+	| Bar_Equals
+	| Ampersand_Equals
+	| Double_Bar_Equals
+	| Double_Ampersand_Equals
+	| Caret_Equals
+	| Dot_Equals
+	| Double_Question_Mark_Equals
+	;

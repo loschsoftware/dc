@@ -17,8 +17,11 @@ internal static class SourceFileRewriter
 
         IParseTree compilationUnit = parser.compilation_unit();
 
-        LoweringVisitor lowerer = new();
+        LoweringVisitor lowerer = new(charStream);
         lowerer.Visit(compilationUnit);
+
+        // TODO: Return early until LoweringVisitor is implemented
+        return source;
 
         return lowerer.Builder.ToString();
     }

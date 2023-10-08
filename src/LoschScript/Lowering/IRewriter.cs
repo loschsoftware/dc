@@ -6,6 +6,5 @@ namespace LoschScript.Lowering;
 
 internal interface IRewriter
 {
-    public List<Type> TreeTypes { get; }
     public string Rewrite(IParseTree tree);
 }

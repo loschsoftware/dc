@@ -189,6 +189,11 @@ internal static class Helpers
                 File.Delete(rcPath);
         }
 
+        if (!string.IsNullOrEmpty(config.AssemblyManifest) && File.Exists(config.AssemblyManifest))
+        {
+            // TODO: Include .manifest file
+        }
+
         foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
             AddResource(res, Directory.GetCurrentDirectory());
 
