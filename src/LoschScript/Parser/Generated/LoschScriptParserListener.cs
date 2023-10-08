@@ -342,18 +342,6 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitIndex_expression([NotNull] LoschScriptParser.Index_expressionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>prefix_newlined_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterPrefix_newlined_expression([NotNull] LoschScriptParser.Prefix_newlined_expressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>prefix_newlined_expression</c>
-	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitPrefix_newlined_expression([NotNull] LoschScriptParser.Prefix_newlined_expressionContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>comparison_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
