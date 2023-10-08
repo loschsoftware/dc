@@ -83,6 +83,7 @@ expression
     | Open_Paren expression (Comma expression)+ Close_Paren #tuple_expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
     | atom #atom_expression
+    // | NewLine expression #prefix_newlined_expression
     | expression NewLine #newlined_expression
     | expression Semicolon #separated_expression
     | code_block #block_expression
