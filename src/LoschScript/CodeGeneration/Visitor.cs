@@ -704,6 +704,11 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return Visit(context.expression());
     }
 
+    public override Type VisitPrefix_newlined_expression([NotNull] LoschScriptParser.Prefix_newlined_expressionContext context)
+    {
+        return Visit(context.expression());
+    }
+
     public override Type VisitNewlined_expression([NotNull] LoschScriptParser.Newlined_expressionContext context)
     {
         return Visit(context.expression());
