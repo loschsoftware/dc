@@ -1,8 +1,8 @@
 lexer grammar LoschScriptLexer;
 
-channels { Comments_Channel }
+channels { Comments_Channel, Whitespace_Channel }
 
-Ws: [ \t]+ -> skip;
+Ws: [ \t]+ -> channel(Whitespace_Channel);
 
 NewLine
 	: ('\r\n' | '\r' | '\n' | '\u0085' | '\u2028' | '\u2029');
@@ -91,6 +91,8 @@ Underscore: '_';
 Single_Quote: '\'';
 Double_Quote: '"';
 Question_Mark: '?';
+Double_Question_Mark: '??';
+Double_Question_Mark_Equals: '??=';
 Exclamation_Mark: '!';
 Exclamation_Question: '!?';
 Exclamation_Colon: '!:';
@@ -98,6 +100,7 @@ At_Sign: '@';
 Exclamation_At: '!@';
 Dollar_Sign: '$';
 Caret: '^';
+Caret_Equals: '^=';
 Caret_Backslash: '^\\';
 Percent_Caret: '%^';
 Dollar_Backslash: '$\\';
@@ -143,6 +146,26 @@ Double_Less_Than: '<<';
 Double_Less_Than_Equals: '<<=';
 Double_Greater_Than: '>>';
 Double_Greater_Than_Equals: '>>=';
+
+Assignment_Operator
+	: Equals
+	| Plus_Equals
+	| Minus_Equals
+	| Asterisk_Equals
+	| Slash_Equals
+	| Double_Asterisk_Equals
+	| Percent_Equals
+	| Tilde_Equals
+	| Double_Less_Than_Equals
+	| Double_Greater_Than_Equals
+	| Bar_Equals
+	| Ampersand_Equals
+	| Double_Bar_Equals
+	| Double_Ampersand_Equals
+	| Caret_Equals
+	| Dot_Equals
+	| Double_Question_Mark_Equals
+	;
 
 Arrow_Right: '->';
 Arrow_Left: '<-';

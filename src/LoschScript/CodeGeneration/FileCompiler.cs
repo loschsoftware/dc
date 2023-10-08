@@ -3,6 +3,7 @@ using Antlr4.Runtime.Tree;
 using Losch.LoschScript.Configuration;
 using LoschScript.CLI;
 using LoschScript.Errors;
+using LoschScript.Lowering;
 using LoschScript.Parser;
 using LoschScript.Text.FragmentStore;
 using LoschScript.Validation;
@@ -34,8 +35,11 @@ public static class FileCompiler
         CurrentFile = Context.GetFile(path);
 
         string source = File.ReadAllText(path);
+        string lowered = SourceFileRewriter.Rewrite(source);
 
-        ICharStream charStream = CharStreams.fromString(source);
+        File.WriteAllText(Path.GetFileNameWithoutExtension(path) + ".i.ls", lowered);
+
+        ICharStream charStream = CharStreams.fromString(lowered);
         ITokenSource lexer = new LoschScriptLexer(charStream);
         ITokenStream tokens = new CommonTokenStream(lexer);
 

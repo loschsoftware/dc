@@ -2913,9 +2913,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             if (!sym.IsMutable())
             {
                 EmitErrorMessage(
-                    context.Equals().Symbol.Line,
-                    context.Equals().Symbol.Column,
-                    context.Equals().GetText().Length,
+                    context.Assignment_Operator().Symbol.Line,
+                    context.Assignment_Operator().Symbol.Column,
+                    context.Assignment_Operator().GetText().Length,
                     LS0018_ImmutableValueReassignment,
                     $"'{sym.Name()}' is immutable and cannot be modified.");
 
@@ -2956,9 +2956,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     }
 
                     EmitErrorMessage(
-                        context.Equals().Symbol.Line,
-                        context.Equals().Symbol.Column,
-                        context.Equals().GetText().Length,
+                        context.Assignment_Operator().Symbol.Line,
+                        context.Assignment_Operator().Symbol.Column,
+                        context.Assignment_Operator().GetText().Length,
                         LS0019_GenericValueTypeInvalid,
                         $"Values of type '{type}' are not supported by union type '{sym.Union().ToTypeString()}'.");
 
@@ -2966,9 +2966,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 }
 
                 EmitErrorMessage(
-                    context.Equals().Symbol.Line,
-                    context.Equals().Symbol.Column,
-                    context.Equals().GetText().Length,
+                    context.Assignment_Operator().Symbol.Line,
+                    context.Assignment_Operator().Symbol.Column,
+                    context.Assignment_Operator().GetText().Length,
                     LS0006_VariableTypeChanged,
                     $"The type of the new value of '{sym.Name()}' does not match the type of the old value.");
 
