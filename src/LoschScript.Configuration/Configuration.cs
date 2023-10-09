@@ -82,6 +82,10 @@ public sealed class LSConfig
     [XmlElement("PersistentResourceFile")]
     public bool PersistentResourceFile { get; set; }
 
+    [DefaultValue(false)]
+    [XmlElement("KeepIntermediateFiles")]
+    public bool KeepIntermediateFiles { get; set; } = false;
+
     [XmlArray("IgnoredMessages")]
     [XmlArrayItem(typeof(Message))]
     [XmlArrayItem(typeof(Warning))]

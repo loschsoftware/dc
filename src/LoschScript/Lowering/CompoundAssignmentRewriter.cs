@@ -1,7 +1,5 @@
 ﻿using Antlr4.Runtime.Tree;
 using LoschScript.Parser;
-using System;
-using System.Collections.Generic;
 
 namespace LoschScript.Lowering;
 

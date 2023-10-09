@@ -37,7 +37,9 @@ public static class FileCompiler
         string source = File.ReadAllText(path);
         string lowered = SourceFileRewriter.Rewrite(source);
 
-        File.WriteAllText(Path.GetFileNameWithoutExtension(path) + ".i.ls", lowered);
+        Directory.CreateDirectory("obj");
+        string intermediatePath = Path.Combine("obj", Path.GetFileNameWithoutExtension(path) + ".i.ls");
+        File.WriteAllText(intermediatePath, lowered);
 
         ICharStream charStream = CharStreams.fromString(lowered);
         ITokenSource lexer = new LoschScriptLexer(charStream);
@@ -59,6 +61,12 @@ public static class FileCompiler
 
         Visitor v = new(eval);
         v.VisitCompilation_unit((LoschScriptParser.Compilation_unitContext)compilationUnit);
+
+        if (!config.KeepIntermediateFiles)
+        {
+            File.Delete(intermediatePath);
+            Directory.Delete("obj");
+        }
 
         return CurrentFile.Errors.ToArray();
     }
