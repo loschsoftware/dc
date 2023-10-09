@@ -138,15 +138,15 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
 
             if (text.EndsWith("un", StringComparison.OrdinalIgnoreCase))
             {
-                literalType = typeof(nuint);
-                return new(typeof(nuint), (nuint)uint.Parse(text[0..^2].Replace("'", "")));
+                literalType = typeof(uint);
+                return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", "")));
             }
 
             if (text.EndsWith("n", StringComparison.OrdinalIgnoreCase))
             {
-                literalType = typeof(nint);
+                literalType = typeof(int);
                 text += "0";
-                return new(typeof(nint), (nint)int.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(int), int.Parse(text[0..^2].Replace("'", "")));
             }
 
             text += "00";
