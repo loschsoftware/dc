@@ -7,7 +7,7 @@ namespace LoschScript.Lowering;
 
 internal class CompoundAssignmentRewriter : IRewriter
 {
-    public string Rewrite(IParseTree tree)
+    public string Rewrite(IParseTree tree, string originalText)
     {
         IParseTree op;
         string left, right, expr;
@@ -17,7 +17,7 @@ internal class CompoundAssignmentRewriter : IRewriter
             op = a.assignment_operator();
             left = a.expression()[0].GetText();
             expr = a.expression()[1].GetText();
-            right = $"({a.expression()[0].GetText()}) ";
+            right = $"{a.expression()[0].GetText()} ";
         }
 
         else
@@ -25,16 +25,16 @@ internal class CompoundAssignmentRewriter : IRewriter
             var local = (LoschScriptParser.Local_declaration_or_assignmentContext)tree;
 
             op = local.assignment_operator();
-            left = $"{(local.Var() == null ? "" : "var")} {local.Identifier().GetText()} {(local.type_name() == null ? "" : $": {local.type_name().GetText()}")}";
+            left = $"{(local.Var() == null ? "" : "var ")}{local.Identifier().GetText()}{(local.type_name() == null ? " " : $": {local.type_name().GetText()}")}";
             expr = local.expression().GetText();
-            right = $"({local.Identifier().GetText()}) ";
+            right = $"{local.Identifier().GetText()} ";
         }
 
         if (op.GetText() == "=")
-            return tree.GetText();
+            return originalText;
 
-        right += tree.GetText()[0..^1];
-        right += $" ({expr})";
+        right += op.GetText()[0..^1];
+        right += $" {expr}";
 
         return $"{left} = {right}";
     }

@@ -1,10 +1,8 @@
 ﻿using Antlr4.Runtime.Tree;
-using System;
-using System.Collections.Generic;
 
 namespace LoschScript.Lowering;
 
 internal interface IRewriter
 {
-    public string Rewrite(IParseTree tree);
+    public string Rewrite(IParseTree tree, string originalText);
 }
