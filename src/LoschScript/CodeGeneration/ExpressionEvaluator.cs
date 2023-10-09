@@ -6,7 +6,6 @@ using LoschScript.Text;
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 
 namespace LoschScript.CodeGeneration;
@@ -87,59 +86,83 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
     public override Expression VisitInteger_atom([NotNull] LoschScriptParser.Integer_atomContext context)
     {
         string text = context.GetText();
+        Type literalType = typeof(int);
 
-        if (text.EndsWith("sb", StringComparison.OrdinalIgnoreCase))
+        try
         {
-            return new(typeof(sbyte), sbyte.Parse(text[0..^2].Replace("'", "")));
-        }
+            if (text.EndsWith("sb", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(sbyte);
+                return new(typeof(sbyte), sbyte.Parse(text[0..^2].Replace("'", "")));
+            }
 
-        if (text.EndsWith("b", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-            return new(typeof(byte), byte.Parse(text[0..^2].Replace("'", "")));
-        }
+            if (text.EndsWith("b", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(byte);
+                text += "0";
+                return new(typeof(byte), byte.Parse(text[0..^2].Replace("'", "")));
+            }
 
-        if (text.EndsWith("us", StringComparison.OrdinalIgnoreCase))
-        {
-            return new(typeof(ushort), ushort.Parse(text[0..^2].Replace("'", "")));
-        }
+            if (text.EndsWith("us", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(ushort);
+                return new(typeof(ushort), ushort.Parse(text[0..^2].Replace("'", "")));
+            }
 
-        if (text.EndsWith("s", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-            return new(typeof(short), short.Parse(text[0..^2].Replace("'", "")));
-        }
+            if (text.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(short);
+                text += "0";
+                return new(typeof(short), short.Parse(text[0..^2].Replace("'", "")));
+            }
 
-        if (text.EndsWith("ul", StringComparison.OrdinalIgnoreCase))
-        {
-            return new(typeof(ulong), ulong.Parse(text[0..^2].Replace("'", "")));
-        }
+            if (text.EndsWith("ul", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(ulong);
+                return new(typeof(ulong), ulong.Parse(text[0..^2].Replace("'", "")));
+            }
 
-        if (text.EndsWith("u", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-            return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", "")));
-        }
+            if (text.EndsWith("u", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(uint);
+                text += "0";
+                return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", "")));
+            }
 
-        if (text.EndsWith("l", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
-            return new(typeof(long), long.Parse(text[0..^2].Replace("'", "")));
-        }
+            if (text.EndsWith("l", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(long);
+                text += "0";
+                return new(typeof(long), long.Parse(text[0..^2].Replace("'", "")));
+            }
 
-        if (text.EndsWith("un", StringComparison.OrdinalIgnoreCase))
-        {
-            return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", "")));
-        }
+            if (text.EndsWith("un", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(nuint);
+                return new(typeof(nuint), (nuint)uint.Parse(text[0..^2].Replace("'", "")));
+            }
 
-        if (text.EndsWith("n", StringComparison.OrdinalIgnoreCase))
-        {
-            text += "0";
+            if (text.EndsWith("n", StringComparison.OrdinalIgnoreCase))
+            {
+                literalType = typeof(nint);
+                text += "0";
+                return new(typeof(nint), (nint)int.Parse(text[0..^2].Replace("'", "")));
+            }
+
+            text += "00";
             return new(typeof(int), int.Parse(text[0..^2].Replace("'", "")));
         }
+        catch (OverflowException)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                LS0075_Overflow,
+                $"The integer literal is too large for type '{literalType.FullName}'.");
+        }
 
-        text += "00";
-        return new(typeof(int), int.Parse(text[0..^2].Replace("'", "")));
+        return new(typeof(int), 1);
     }
 
     public override Expression VisitReal_atom([NotNull] LoschScriptParser.Real_atomContext context)

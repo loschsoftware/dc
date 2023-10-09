@@ -316,5 +316,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when more than 65534 locals are defined in a function.
     /// </summary>
-    LS0074_TooManyLocals
+    LS0074_TooManyLocals,
+    /// <summary>
+    /// Emitted when an integer literal is too big for its type.
+    /// </summary>
+    LS0075_Overflow
 }
