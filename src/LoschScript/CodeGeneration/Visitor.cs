@@ -1642,6 +1642,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 typeArgs[i] = Helpers.ResolveTypeName(context.type_arg_list().type_name()[i]);
         }
 
+        if (context.full_identifier().Identifier().Length > 1)
+            CurrentMethod.ShouldLoadAddressIfValueType = true;
+
         if (Helpers.HandleSpecialFunction(
             context.full_identifier().Identifier().Last().GetText(),
             context.arglist(),
@@ -1729,7 +1732,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
                 }
 
-                return f.FieldType;
+                //return f.FieldType;
+                t = f.FieldType;
             }
 
             else if (o is SymbolResolver.EnumValueInfo e)

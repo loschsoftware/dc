@@ -102,7 +102,18 @@ internal class MethodContext
 
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 
-    public bool ShouldLoadAddressIfValueType { get; set; } = false;
+    private bool _shouldLoadAddressIfValueType = false;
+
+    public bool ShouldLoadAddressIfValueType
+    {
+        get
+        {
+            bool ret = _shouldLoadAddressIfValueType;
+            _shouldLoadAddressIfValueType = !_shouldLoadAddressIfValueType;
+            return ret;
+        }
+        set => _shouldLoadAddressIfValueType = value;
+    }
 
     public Type StaticCallType { get; set; }
 
