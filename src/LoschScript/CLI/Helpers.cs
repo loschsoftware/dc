@@ -933,7 +933,7 @@ internal static class Helpers
 
                 return true;
 
-            case "importNamespace":
+            case "localImport":
 
                 if (args.expression().Length != 1)
                 {
@@ -942,12 +942,84 @@ internal static class Helpers
                         column,
                         length,
                         LS0002_MethodNotFound,
-                        $"Invalid number of arguments for special function 'importNamespace'. Expected 1 argument."
+                        $"Invalid number of arguments for special function 'localImport'. Expected 1 argument."
                         );
                 }
 
                 string ns = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+
+                if (Type.GetType(ns) != null)
+                {
+                    CurrentFile.ImportedTypes.Add(ns);
+                    return true;
+                }
+
                 CurrentFile.Imports.Add(ns);
+
+                return true;
+
+            case "globalImport":
+
+                if (args.expression().Length != 1)
+                {
+                    EmitErrorMessage(
+                    line,
+                        column,
+                        length,
+                        LS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function 'globalImport'. Expected 1 argument."
+                        );
+                }
+                
+                string _ns = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+
+                if (Type.GetType(_ns) != null)
+                {
+                    Context.GlobalTypeImports.Add(_ns);
+                    return true;
+                }
+
+                Context.GlobalImports.Add(_ns);
+
+                return true;
+
+            case "localAlias":
+
+                if (args.expression().Length != 2)
+                {
+                    EmitErrorMessage(
+                    line,
+                        column,
+                        length,
+                        LS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function 'localAlias'. Expected 2 arguments."
+                        );
+                }
+                
+                string localAlias = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+                string localAliasedNS = args.expression()[1].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+
+                CurrentFile.Aliases.Add((localAliasedNS, localAlias));
+
+                return true;
+
+            case "globalAlias":
+
+                if (args.expression().Length != 2)
+                {
+                    EmitErrorMessage(
+                    line,
+                        column,
+                        length,
+                        LS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function 'globalAlias'. Expected 2 arguments."
+                        );
+                }
+
+                string globalAlias = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+                string globalAliasedNS = args.expression()[1].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+
+                CurrentFile.Aliases.Add((globalAliasedNS, globalAlias));
 
                 return true;
         }
