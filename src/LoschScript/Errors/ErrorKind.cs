@@ -320,5 +320,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an integer literal is too big for its type.
     /// </summary>
-    LS0075_Overflow
+    LS0075_Overflow,
+    /// <summary>
+    /// Emitted when a character literal contains no character.
+    /// </summary>
+    LS0076_EmptyCharacterLiteral
 }

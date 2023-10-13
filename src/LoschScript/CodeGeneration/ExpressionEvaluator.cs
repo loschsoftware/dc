@@ -67,6 +67,18 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
 
     public override Expression VisitCharacter_atom([NotNull] LoschScriptParser.Character_atomContext context)
     {
+        if (context.GetText().Length < 3)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                LS0076_EmptyCharacterLiteral,
+                "A character literal cannot be empty.");
+
+            return new(typeof(char), ' ');
+        }
+
         char rawChar = char.Parse(context.GetText()
             .Replace("^'", "'")
             .Replace("^\"", "\"")
