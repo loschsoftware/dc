@@ -554,8 +554,34 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
     public override Type VisitBasic_import([NotNull] LoschScriptParser.Basic_importContext context)
     {
-        foreach (string ns in context.full_identifier().Select(f => f.GetText()))
+        foreach (var id in context.full_identifier())
         {
+            string ns = id.GetText();
+
+            if (Type.GetType(ns) != null)
+            {
+                Type t = Type.GetType(ns);
+
+                if (!(t.IsAbstract && t.IsSealed))
+                {
+                    EmitErrorMessage(
+                        id.Start.Line,
+                        id.Start.Column,
+                        ns.Length,
+                        LS0077_InvalidImport,
+                        "Only namespaces and modules can be imported.");
+                }
+
+                if (context.Exclamation_Mark() != null)
+                {
+                    Context.GlobalTypeImports.Add(ns);
+                    continue;
+                }
+
+                CurrentFile.ImportedTypes.Add(ns);
+                continue;
+            }
+
             if (context.Exclamation_Mark() == null)
             {
                 CurrentFile.Imports.Add(ns);
@@ -563,22 +589,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
 
             Context.GlobalImports.Add(ns);
-        }
-
-        return typeof(void);
-    }
-
-    public override Type VisitType_import([NotNull] LoschScriptParser.Type_importContext context)
-    {
-        foreach (string ns in context.full_identifier().Select(f => f.GetText()))
-        {
-            if (context.Exclamation_Mark() == null)
-            {
-                CurrentFile.ImportedTypes.Add(ns);
-                continue;
-            }
-
-            Context.GlobalTypeImports.Add(ns);
         }
 
         return typeof(void);

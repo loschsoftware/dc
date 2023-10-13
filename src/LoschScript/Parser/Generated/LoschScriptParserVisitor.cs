@@ -64,13 +64,6 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBasic_import([NotNull] LoschScriptParser.Basic_importContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>type_import</c>
-	/// labeled alternative in <see cref="LoschScriptParser.import_directive"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitType_import([NotNull] LoschScriptParser.Type_importContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>alias</c>
 	/// labeled alternative in <see cref="LoschScriptParser.import_directive"/>.
 	/// </summary>

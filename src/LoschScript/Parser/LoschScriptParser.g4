@@ -21,7 +21,6 @@ full_program
 
 import_directive
     : Exclamation_Mark? Import full_identifier (Comma full_identifier)* #basic_import
-    | Exclamation_Mark? Import Module full_identifier (Comma full_identifier)* #type_import
     | Exclamation_Mark? Import Identifier Equals full_identifier (Comma Identifier Equals full_identifier)* #alias
     ;
 

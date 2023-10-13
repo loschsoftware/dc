@@ -324,5 +324,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a character literal contains no character.
     /// </summary>
-    LS0076_EmptyCharacterLiteral
+    LS0076_EmptyCharacterLiteral,
+    /// <summary>
+    /// Emitted when an import directive is invalid.
+    /// </summary>
+    LS0077_InvalidImport
 }

@@ -99,20 +99,6 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBasic_import([NotNull] LoschScriptParser.Basic_importContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>type_import</c>
-	/// labeled alternative in <see cref="LoschScriptParser.import_directive"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterType_import([NotNull] LoschScriptParser.Type_importContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>type_import</c>
-	/// labeled alternative in <see cref="LoschScriptParser.import_directive"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitType_import([NotNull] LoschScriptParser.Type_importContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>alias</c>
 	/// labeled alternative in <see cref="LoschScriptParser.import_directive"/>.
 	/// <para>The default implementation does nothing.</para>
