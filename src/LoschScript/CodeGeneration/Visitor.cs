@@ -2938,19 +2938,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             }
 
             Type type = Visit(context.expression());
-
-            // I don't know why the fuck I'm creating a temporary local here...????
-            // But I'm gonna keep it because I'm sure it's needed somewhere somehow
-
-            LocalBuilder tempLocalBuilder = CurrentMethod.IL.DeclareLocal(type);
-
-#if !NET7_COMPATIBLE
-            tempLocalBuilder.SetLocalSymInfo(GetTempVariableName(CurrentMethod.TempValueIndex++));
-#endif
-
-            CurrentMethod.Locals.Add(new(GetTempVariableName(CurrentMethod.TempValueIndex), tempLocalBuilder, true, CurrentMethod.LocalIndex++, new(null, type)));
-
-            EmitStloc(CurrentMethod.LocalIndex);
+            sym.Set();
 
             if (type != sym.Type())
             {
@@ -2990,9 +2978,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                 return type;
             }
 
-            EmitLdloc(CurrentMethod.LocalIndex);
-
-            sym.Set();
             sym.Load();
 
             CurrentFile.Fragments.Add(sym.GetFragment(
