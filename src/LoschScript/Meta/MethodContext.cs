@@ -103,13 +103,12 @@ internal class MethodContext
     public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
 
     private bool _shouldLoadAddressIfValueType = false;
-
     public bool ShouldLoadAddressIfValueType
     {
         get
         {
             bool ret = _shouldLoadAddressIfValueType;
-            _shouldLoadAddressIfValueType = !_shouldLoadAddressIfValueType;
+            _shouldLoadAddressIfValueType = false;
             return ret;
         }
         set => _shouldLoadAddressIfValueType = value;

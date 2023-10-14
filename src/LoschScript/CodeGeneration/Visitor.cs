@@ -1643,7 +1643,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     }
 
     int memberIndex = -1;
-    bool localIsArg = false;
+    bool notLoadAddress = false;
 
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
@@ -1706,7 +1706,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Parameter
                 };
 
-                if (CurrentMethod.ShouldLoadAddressIfValueType)
+                if (CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
                     s.LoadAddressIfValueType();
                 else
                     s.Load();
@@ -1722,13 +1722,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Local
                 };
 
-                if (CurrentMethod.ShouldLoadAddressIfValueType && !localIsArg)
+                if (CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
                     s.LoadAddressIfValueType();
                 else
                     s.Load();
 
                 t = s.Type();
-                localIsArg = false;
+                notLoadAddress = false;
             }
 
             else if (o is FieldInfo f)
@@ -1755,8 +1755,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             else if (o is SymbolResolver.EnumValueInfo e)
             {
                 EmitLdcI4((int)e.Value);
-
-                return e.EnumType;
+                t = e.EnumType;
             }
 
             else if (o is MethodBuilder m)
@@ -1766,17 +1765,16 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 EmitCall(m.DeclaringType, m);
 
-                if (m.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType)
+                if (m.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
                 {
                     CurrentMethod.IL.DeclareLocal(m.ReturnType);
                     CurrentMethod.LocalIndex++;
-                    CurrentMethod.IL.Emit(OpCodes.Stloc, CurrentMethod.LocalIndex);
+                    EmitStloc(CurrentMethod.LocalIndex);
                     EmitLdloca(CurrentMethod.LocalIndex);
                 }
 
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
-
-                return m.ReturnType;
+                t = m.ReturnType;
             }
 
             // Global method
@@ -1861,7 +1859,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null)
             {
-                localIsArg = true;
+                notLoadAddress = true;
 
                 Visit(context.arglist());
                 _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
