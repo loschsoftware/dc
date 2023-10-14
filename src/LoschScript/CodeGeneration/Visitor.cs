@@ -1189,7 +1189,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         {
             if (t2 != typeof(string))
             {
-                CurrentMethod.IL.DeclareLocal(t2);
+                LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t2);
+                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
+
                 EmitStloc(++CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);
 
@@ -1202,7 +1204,9 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
-                CurrentMethod.IL.DeclareLocal(t);
+                LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
+                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
+
                 EmitStloc(++CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);
 
@@ -1639,6 +1643,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
     }
 
     int memberIndex = -1;
+    bool localIsArg = false;
 
     public override Type VisitFull_identifier_member_access_expression([NotNull] LoschScriptParser.Full_identifier_member_access_expressionContext context)
     {
@@ -1717,12 +1722,13 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Local
                 };
 
-                if (CurrentMethod.ShouldLoadAddressIfValueType)
+                if (CurrentMethod.ShouldLoadAddressIfValueType && !localIsArg)
                     s.LoadAddressIfValueType();
                 else
                     s.Load();
 
                 t = s.Type();
+                localIsArg = false;
             }
 
             else if (o is FieldInfo f)
@@ -1855,6 +1861,8 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null)
             {
+                localIsArg = true;
+
                 Visit(context.arglist());
                 _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
