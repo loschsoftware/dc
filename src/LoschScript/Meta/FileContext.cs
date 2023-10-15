@@ -38,7 +38,25 @@ internal class FileContext
         "LoschScript.CompilerServices.CodeGeneration"
     };
 
-    public List<(string Name, string Alias)> Aliases { get; } = new();
+    public List<(string Name, string Alias)> Aliases { get; } = new()
+    {
+        ("System.SByte", "int8"),
+        ("System.Byte", "uint8"),
+        ("System.Int16", "int16"),
+        ("System.UInt16", "uint16"),
+        ("System.Int32", "int32"),
+        ("System.UInt32", "uint32"),
+        ("System.Int64", "int64"),
+        ("System.UInt64", "uint64"),
+        ("System.Single", "float32"),
+        ("System.Double", "float64"),
+        ("System.Decimal", "decimal"),
+        ("System.IntPtr", "native"),
+        ("System.UIntPtr", "unative"),
+        ("System.Boolean", "bool"),
+        ("System.String", "string"),
+        ("System.Char", "char")
+    };
 
     public string ExportedNamespace { get; set; }
 

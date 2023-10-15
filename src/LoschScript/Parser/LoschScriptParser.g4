@@ -149,16 +149,11 @@ identifier_atom
     ;
 
 type_name
-    : builtin_type_alias Ampersand?
-    | Open_Paren type_name (Bar type_name)+ Close_Paren
+    : Open_Paren type_name (Bar type_name)+ Close_Paren
     | generic_identifier Ampersand?
     | identifier_atom Open_Brace type_arg_list Close_Bracket Ampersand?
     | identifier_atom Ampersand?
     | param_list_type
-    ;
-
-builtin_type_alias
-    : Int8 | UInt8 | Int16 | UInt16 | Int32 | UInt32 | Int64 | UInt64 | Native | UNative | Float32 | Float64 | Decimal | Char | String | Bool | Object
     ;
 
 param_list_type

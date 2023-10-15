@@ -216,38 +216,6 @@ internal class ExpressionEvaluator : LoschScriptParserBaseVisitor<Expression>
                 return new(typeof(Type), t);
         }
 
-        if (context.builtin_type_alias() != null)
-        {
-            string dotNetTypeName = $"System.{context.GetText() switch
-            {
-                "int8" => "SByte",
-                "uint8" => "Byte",
-                "int16" => "Int16",
-                "uint16" => "UInt16",
-                "int32" => "Int32",
-                "uint32" => "UInt32",
-                "int64" => "Int64",
-                "uint64" => "UInt64",
-                "float32" => "Single",
-                "float64" => "Double",
-                "decimal" => "Decimal",
-                "native" => "IntPtr",
-                "unative" => "UIntPtr",
-                "bool" => "Boolean",
-                "string" => "String",
-                "char" => "Char",
-                _ => "Object"
-            }}";
-
-            Type t = Helpers.ResolveTypeName(
-                        dotNetTypeName,
-                        context.Start.Line,
-                        context.Start.Column,
-                        context.GetText().Length);
-
-            return new(t, t);
-        }
-
         if (context.Bar() != null)
         {
             UnionValue union = new(null, context.type_name().Select(VisitType_name).Select(e => (Type)e.Value).ToArray());
