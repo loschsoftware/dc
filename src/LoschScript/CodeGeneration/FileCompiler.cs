@@ -34,6 +34,15 @@ public static class FileCompiler
         Context.Files.Add(new(path));
         CurrentFile = Context.GetFile(path);
 
+        if (!config.ImplicitImports)
+        {
+            CurrentFile.Imports.Clear();
+            CurrentFile.ImportedTypes.Clear();
+        }
+
+        if (!config.ImplicitTypeAliases)
+            CurrentFile.Aliases.Clear();
+
         string source = File.ReadAllText(path);
         string lowered = SourceFileRewriter.Rewrite(source);
 

@@ -96,6 +96,14 @@ public sealed class LSConfig
 
     [XmlElement]
     public string AssemblyManifest { get; set; }
+
+    [DefaultValue(true)]
+    [XmlElement]
+    public bool ImplicitImports { get; set; } = true;
+
+    [DefaultValue(true)]
+    [XmlElement]
+    public bool ImplicitTypeAliases { get; set; } = true;
 }
 
 [Serializable]
