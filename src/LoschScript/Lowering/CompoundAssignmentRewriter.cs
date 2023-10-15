@@ -1,11 +1,12 @@
-﻿using Antlr4.Runtime.Tree;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using LoschScript.Parser;
 
 namespace LoschScript.Lowering;
 
 internal class CompoundAssignmentRewriter : IRewriter
 {
-    public string Rewrite(IParseTree tree, string originalText)
+    public string Rewrite(IParseTree tree, LoweringListener listener)
     {
         IParseTree op;
         string left, right, expr;
@@ -29,7 +30,7 @@ internal class CompoundAssignmentRewriter : IRewriter
         }
 
         if (op.GetText() == "=")
-            return originalText;
+            return listener.GetTextForRule((ParserRuleContext)tree);
 
         right += op.GetText()[0..^1];
         right += $" {expr}";

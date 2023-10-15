@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\Source\Repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\source\repos\lsc\src\LoschScript\Parser\LoschScriptParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -1366,6 +1366,18 @@ public partial class LoschScriptParserBaseListener : ILoschScriptParserListener 
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType_member([NotNull] LoschScriptParser.Type_memberContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.access_modifier_member_group"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAccess_modifier_member_group([NotNull] LoschScriptParser.Access_modifier_member_groupContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.access_modifier_member_group"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAccess_modifier_member_group([NotNull] LoschScriptParser.Access_modifier_member_groupContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.parameter_list"/>.
 	/// <para>The default implementation does nothing.</para>

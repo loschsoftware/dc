@@ -328,5 +328,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an import directive is invalid.
     /// </summary>
-    LS0077_InvalidImport
+    LS0077_InvalidImport,
+    /// <summary>
+    /// Emitted when the modifier of an access modifier group is the default member modifier of the containing type.
+    /// </summary>
+    LS0078_RedundantAccessModifierGroup
 }

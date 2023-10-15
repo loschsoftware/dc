@@ -4,5 +4,5 @@ namespace LoschScript.Lowering;
 
 internal interface IRewriter
 {
-    public string Rewrite(IParseTree tree, string originalText);
+    public string Rewrite(IParseTree tree, LoweringListener listener);
 }

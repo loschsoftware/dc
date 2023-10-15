@@ -293,6 +293,10 @@ type_member
     | attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? Colon type_name
     ;
 
+access_modifier_member_group
+    :  member_access_modifier Equals Open_Brace (NewLine | type_member)* Close_Brace
+    ;
+
 parameter_list
     : Open_Paren (parameter (Comma parameter)*)? Close_Paren
     | parameter (Comma parameter)*
@@ -313,7 +317,7 @@ parameter_constraint
     ;
 
 type_block
-    : Open_Brace (type_member | type | NewLine)* Close_Brace
+    : Open_Brace (type_member | type | NewLine | access_modifier_member_group)* Close_Brace
     ;
 
 try_branch
