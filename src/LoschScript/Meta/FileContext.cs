@@ -55,7 +55,8 @@ internal class FileContext
         ("System.UIntPtr", "unative"),
         ("System.Boolean", "bool"),
         ("System.String", "string"),
-        ("System.Char", "char")
+        ("System.Char", "char"),
+        ("System.Void", "null")
     };
 
     public string ExportedNamespace { get; set; }
