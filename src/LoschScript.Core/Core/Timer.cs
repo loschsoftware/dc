@@ -41,4 +41,9 @@ public static class Timer
     /// Gets the time measured by the stopwatch.
     /// </summary>
     public static TimeSpan Elapsed => sw.Elapsed;
+
+    /// <summary>
+    /// Gets the underlying <see cref="Stopwatch"/> instance.
+    /// </summary>
+    public static Stopwatch Stopwatch => sw;
 }
