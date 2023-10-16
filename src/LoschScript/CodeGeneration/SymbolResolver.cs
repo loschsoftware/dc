@@ -50,6 +50,8 @@ internal static class SymbolResolver
             }
         }
 
+        firstUnusedPart = Math.Min(1, fullId.Identifier().Length - 1);
+
         // First part of full_id could also be parameter, local, member of current class.
         return ResolveIdentifier(
             parts[0],
@@ -406,12 +408,12 @@ internal static class SymbolResolver
 
         if (type == null)
         {
-            EmitErrorMessage(
-                row,
-                col,
-                len,
-                LS0009_TypeNotFound,
-                $"The name '{name}' could not be resolved.");
+            //EmitErrorMessage(
+            //    row,
+            //    col,
+            //    len,
+            //    LS0009_TypeNotFound,
+            //    $"The name '{name}' could not be resolved.");
 
             return false;
         }
