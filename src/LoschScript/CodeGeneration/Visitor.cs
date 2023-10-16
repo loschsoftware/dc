@@ -1722,7 +1722,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Local
                 };
 
-                if (CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
+                if ((CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress) || (l.Builder.LocalType.IsValueType && context.full_identifier().Identifier().Length > 1))
                     s.LoadAddressIfValueType();
                 else
                     s.Load();
