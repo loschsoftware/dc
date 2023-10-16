@@ -281,7 +281,7 @@ public static class TooltipGenerator
             words.Add(BuildWord("[intrinsic] "));
 
         words.Add(BuildWord(method.Name, intrinsic ? Color.IntrinsicFunction : Color.Function));
-        
+
 
         if (method.GetParameters().Length > 0)
         {
@@ -335,6 +335,29 @@ public static class TooltipGenerator
         };
     }
 
+    static readonly Dictionary<Type, string> builtinTypeAliases = new()
+    {
+        [typeof(sbyte)] = "int8",
+        [typeof(byte)] = "uint8",
+        [typeof(short)] = "int16",
+        [typeof(ushort)] = "uint16",
+        [typeof(int)] = "int32",
+        [typeof(int)] = "int",
+        [typeof(uint)] = "uint32",
+        [typeof(uint)] = "uint",
+        [typeof(long)] = "int64",
+        [typeof(ulong)] = "uint64",
+        [typeof(float)] = "float32",
+        [typeof(double)] = "float64",
+        [typeof(decimal)] = "decimal",
+        [typeof(IntPtr)] = "native",
+        [typeof(UIntPtr)] = "unative",
+        [typeof(bool)] = "bool",
+        [typeof(string)] = "string",
+        [typeof(char)] = "char",
+        [typeof(void)] = "null"
+    };
+
     /// <summary>
     /// Generates a tooltip for a type.
     /// </summary>
@@ -342,10 +365,26 @@ public static class TooltipGenerator
     /// <param name="showBaseType">Wheter to include the base type in the tooltip.</param>
     /// <param name="omitNamespace">If <see langword="true"/>, omits the namespace of the type from the tooltip.</param>
     /// <param name="doc">Optional XML documentation of the type.</param>
+    /// <param name="ignoreBuiltinAliases">Wheter to ignore built-in type aliases.</param>
     /// <returns>Returns the generated tooltip.</returns>
-    public static Tooltip Type(TypeInfo type, bool showBaseType, bool omitNamespace = false, bool noModifiers = false, Tooltip doc = null)
+    public static Tooltip Type(TypeInfo type, bool showBaseType, bool omitNamespace = false, bool noModifiers = false, Tooltip doc = null, bool ignoreBuiltinAliases = false)
     {
         ObservableCollection<Word> words = new();
+
+        if (!ignoreBuiltinAliases && builtinTypeAliases.ContainsKey(type.AsType()))
+        {
+            words.Add(new()
+            {
+                Fragment = new() { Color = Color.Word },
+                Text = builtinTypeAliases[type.AsType()]
+            });
+
+            return new()
+            {
+                Words = words,
+                IconResourceName = ResourceNameForType(type)
+            };
+        }
 
         if (!noModifiers)
         {
