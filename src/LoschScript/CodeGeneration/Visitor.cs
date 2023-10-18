@@ -3341,52 +3341,24 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.IL.MarkLabel(start);
 
-            if (context.code_block() == null)
+            // Save the return value of the current iteration to the returning array
+
+            // Array
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            // Index
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+
+            tReturn = Visit(context.expression().Last());
+
+            if (tReturn == typeof(void))
             {
-                // Save the return value of the current iteration to the returning array
-
-                // Array
-                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
-                // Index
-                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
-
-                tReturn = Visit(context.expression().Last());
-
-                if (tReturn == typeof(void))
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Ldnull);
-                    CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
-                }
-                else
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
-                    CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
-                }
+                CurrentMethod.IL.Emit(OpCodes.Ldnull);
+                CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
             }
             else
             {
-                foreach (IParseTree tree in context.code_block().expression()[..^1])
-                    Visit(tree);
-
-                // Save the return value of the current iteration to the returning array
-
-                // Array
-                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
-                // Index
-                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
-
-                tReturn = Visit(context.code_block().expression().Last());
-
-                if (tReturn == typeof(void))
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Ldnull);
-                    CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
-                }
-                else
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
-                    CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
-                }
+                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
+                CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
             }
 
             EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
@@ -3432,41 +3404,19 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
 
             CurrentMethod.IL.MarkLabel(start);
 
-            if (context.code_block() == null)
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            tReturn = Visit(context.expression().Last());
+
+            if (tReturn == typeof(void))
             {
-                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
-                tReturn = Visit(context.expression().Last());
-
-                if (tReturn == typeof(void))
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Ldnull);
-                }
-                else
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
-                }
-
-                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add", new Type[] { typeof(object) }), null);
+                CurrentMethod.IL.Emit(OpCodes.Ldnull);
             }
             else
             {
-                foreach (IParseTree tree in context.code_block().expression()[..^1])
-                    Visit(tree);
-
-                EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
-                tReturn = Visit(context.code_block().expression().Last());
-
-                if (tReturn == typeof(void))
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Ldnull);
-                }
-                else
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
-                }
-
-                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add", new Type[] { typeof(object) }), null);
+                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
             }
+
+            CurrentMethod.IL.EmitCall(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add", new Type[] { typeof(object) }), null);
 
             CurrentMethod.IL.MarkLabel(loop);
 
@@ -3491,15 +3441,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         Label infiniteLoop = CurrentMethod.IL.DefineLabel();
         CurrentMethod.IL.MarkLabel(infiniteLoop);
 
-        if (context.code_block() == null)
-            tReturn = Visit(context.expression().Last());
-        else
-        {
-            foreach (IParseTree tree in context.code_block().expression()[..^1])
-                Visit(tree);
-
-            tReturn = Visit(context.code_block().expression().Last());
-        }
+        tReturn = Visit(context.expression().Last());
 
         CurrentMethod.IL.Emit(OpCodes.Br, infiniteLoop);
 

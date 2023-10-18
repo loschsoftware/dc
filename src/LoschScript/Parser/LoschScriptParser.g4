@@ -73,8 +73,8 @@ expression
     | expression postfix_unless_branch #postfix_unless_expression
     | code_block NewLine? postfix_unless_branch #block_postfix_unless_expression
     | Identifier Arrow_Right ((Identifier Arrow_Right)* Identifier)? expression #loop_expression
-    | At_Sign expression Equals (code_block | expression) #while_loop
-    | Exclamation_At expression Equals (code_block | expression) #until_loop
+    | At_Sign expression Equals expression #while_loop
+    | Exclamation_At expression Equals expression #until_loop
     | try_branch catch_branch* fault_branch? finally_branch? #try_expression
     | Raise expression #raise_expression
     | Raise #rethrow_exception
