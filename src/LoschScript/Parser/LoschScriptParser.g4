@@ -38,7 +38,7 @@ code_block
 
 expression
     : Tilde expression #bitwise_complement_expression
-    | expression At_Sign expression Equals expression #array_element_assignment
+    | expression Open_Bracket expression Close_Bracket Equals expression #array_element_assignment
     | expression Double_Asterisk expression #power_expression
     | Exclamation_Mark expression #logical_negation_expression
     | expression Asterisk expression #multiply_expression
