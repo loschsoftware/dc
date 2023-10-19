@@ -66,6 +66,9 @@ public static class FileCompiler
 
         IParseTree compilationUnit = parser.compilation_unit();
 
+        SymbolListener listener = new();
+        ParseTreeWalker.Default.Walk(listener, compilationUnit);
+
         ExpressionEvaluator eval = new();
 
         Visitor v = new(eval);
