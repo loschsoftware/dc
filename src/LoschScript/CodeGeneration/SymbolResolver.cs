@@ -345,6 +345,12 @@ internal static class SymbolResolver
 
     public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false)
     {
+        if (Context.Types.Select(t => t.Builder.FullName).Any(f => f == name))
+        {
+            type = Context.Types.Select(t => t.Builder).First(f => f.FullName == name);
+            return true;
+        }
+
         type = Type.GetType(name);
 
         if (type == null)
