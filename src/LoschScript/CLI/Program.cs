@@ -44,6 +44,9 @@ internal class Program
                 Console.WriteLine();
             }
 
+            if (Debugger.IsAttached)
+                throw;
+
             return -1;
         }
         //#endif
