@@ -1,9 +1,11 @@
-﻿using LoschScript.CLI.Interactive;
+﻿using Losch.LoschScript.Configuration;
+using LoschScript.CLI.Interactive;
 using LoschScript.Templates;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace LoschScript.CLI;
 
@@ -47,6 +49,21 @@ internal class Program
 
             if (Debugger.IsAttached)
                 throw;
+
+            if (File.Exists("lsconfig.xml"))
+            {
+                try
+                {
+                    XmlSerializer xmls = new(typeof(LSConfig));
+                    using StreamReader sr = new("lsconfig.xml");
+
+                    LSConfig config = (LSConfig)xmls.Deserialize(sr);
+
+                    if (config.PrintExceptionInfo)
+                        Console.WriteLine(ex);
+                }
+                catch { }
+            }
 
             return -1;
         }

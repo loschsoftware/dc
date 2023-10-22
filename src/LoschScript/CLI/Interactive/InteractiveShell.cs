@@ -13,7 +13,7 @@ internal static class InteractiveShell
 
     public static int Start()
     {
-        tmpFile = Path.GetTempFileName();
+        tmpFile = Path.GetFileName(Path.GetTempFileName());
 
         Console.Clear();
         println("LoschScript Interactive Shell");
@@ -42,6 +42,11 @@ internal static class InteractiveShell
             AppendAndExecute(input);
         }
 
+        File.Delete(tmpFile);
+
+        if (File.Exists(Path.ChangeExtension(tmpFile, ".exe")))
+            File.Delete(Path.ChangeExtension(tmpFile, ".exe"));
+
         return 0;
     }
 
@@ -50,6 +55,6 @@ internal static class InteractiveShell
         File.AppendAllText(tmpFile, $"{input}{Environment.NewLine}");
 
         Helpers.HandleArgs(new string[] { tmpFile });
-        Process.Start(Path.ChangeExtension(Path.GetFileName(tmpFile), ".exe"));
+        Process.Start(Path.ChangeExtension(tmpFile, ".exe"));
     }
 }

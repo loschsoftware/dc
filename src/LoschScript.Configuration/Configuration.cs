@@ -104,6 +104,10 @@ public sealed class LSConfig
     [DefaultValue(true)]
     [XmlElement]
     public bool ImplicitTypeAliases { get; set; } = true;
+
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool PrintExceptionInfo { get; set; } = false;
 }
 
 [Serializable]
