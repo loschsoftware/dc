@@ -2335,36 +2335,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
         return t;
     }
 
-    public override Type VisitBlock_postfix_if_expression([NotNull] LoschScriptParser.Block_postfix_if_expressionContext context)
-    {
-        Label fb = CurrentMethod.IL.DefineLabel();
-        Label rest = CurrentMethod.IL.DefineLabel();
-
-        // Comparative expression
-        Type ct = Visit(context.postfix_if_branch().expression());
-
-        if (ct != typeof(bool))
-        {
-            EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.Start.Text.Length,
-                    LS0038_ConditionalExpressionClauseNotBoolean,
-                    $"The condition of a conditional expression has to be a boolean.");
-        }
-
-        CurrentMethod.IL.Emit(OpCodes.Brfalse, fb);
-
-        Type t = Visit(context.code_block());
-
-        CurrentMethod.IL.MarkLabel(fb);
-        CurrentMethod.IL.Emit(OpCodes.Br, rest);
-
-        CurrentMethod.IL.MarkLabel(rest);
-
-        return t;
-    }
-
     public override Type VisitPrefix_unless_expression([NotNull] LoschScriptParser.Prefix_unless_expressionContext context)
     {
 
@@ -2459,36 +2429,6 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
                     LS0037_BranchExpressionTypesUnequal,
                     $"The return types of the branches of the conditional expression do not match.");
         }
-
-        return t;
-    }
-
-    public override Type VisitBlock_postfix_unless_expression([NotNull] LoschScriptParser.Block_postfix_unless_expressionContext context)
-    {
-        Label fb = CurrentMethod.IL.DefineLabel();
-        Label rest = CurrentMethod.IL.DefineLabel();
-
-        // Comparative expression
-        Type ct = Visit(context.postfix_unless_branch().expression());
-
-        if (ct != typeof(bool))
-        {
-            EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.Start.Text.Length,
-                    LS0038_ConditionalExpressionClauseNotBoolean,
-                    $"The condition of a conditional expression has to be a boolean.");
-        }
-
-        CurrentMethod.IL.Emit(OpCodes.Brtrue, fb);
-
-        Type t = Visit(context.code_block());
-
-        CurrentMethod.IL.MarkLabel(fb);
-        CurrentMethod.IL.Emit(OpCodes.Br, rest);
-
-        CurrentMethod.IL.MarkLabel(rest);
 
         return t;
     }

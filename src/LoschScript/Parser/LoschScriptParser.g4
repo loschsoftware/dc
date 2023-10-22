@@ -68,10 +68,8 @@ expression
     | attribute+ expression #attributed_expression
     | if_branch NewLine* elif_branch* NewLine* else_branch? #prefix_if_expression
     | expression postfix_if_branch #postfix_if_expression
-    | code_block NewLine? postfix_if_branch #block_postfix_if_expression
     | unless_branch NewLine* else_unless_branch* NewLine* else_branch? #prefix_unless_expression
     | expression postfix_unless_branch #postfix_unless_expression
-    | code_block NewLine? postfix_unless_branch #block_postfix_unless_expression
     | Identifier Arrow_Right ((Identifier Arrow_Right)* Identifier)? expression #loop_expression
     | At_Sign expression Equals expression #while_loop
     | Exclamation_At expression Equals expression #until_loop
