@@ -355,7 +355,8 @@ public static class TooltipGenerator
         [typeof(bool)] = "bool",
         [typeof(string)] = "string",
         [typeof(char)] = "char",
-        [typeof(void)] = "null"
+        [typeof(void)] = "null",
+        [typeof(object)] = "object"
     };
 
     /// <summary>
