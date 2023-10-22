@@ -1,4 +1,5 @@
-﻿using LoschScript.Templates;
+﻿using LoschScript.CLI.Interactive;
+using LoschScript.Templates;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -20,7 +21,7 @@ internal class Program
                 ["build", ..] => Helpers.CompileAll(args[1..]),
                 ["check" or "verify"] => Helpers.CheckAll(),
                 ["check" or "verify", ..] => Helpers.Check(args[1..]),
-                ["interactive" or "repl"] => Interactive.StartInteractiveSession(),
+                ["interactive" or "repl"] => InteractiveShell.Start(),
                 ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
                 ["make" or "new", ..] => LSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => WatchForFileChanges(args),
