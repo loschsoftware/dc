@@ -40,7 +40,7 @@ public static class ErrorWriter
     /// </summary>
     public static LSConfig Config { get; set; } = new();
 
-    private static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
+    internal static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
     {
         Context ??= new();
         Context.Configuration ??= new();

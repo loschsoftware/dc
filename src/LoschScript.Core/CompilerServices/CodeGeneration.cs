@@ -41,4 +41,25 @@ public static class CodeGeneration
     /// <param name="alias">The alias to set.</param>
     /// <param name="namespaceOrModule">The namespace or module to set an alias for.</param>
     public static void globalAlias(string alias, string namespaceOrModule) { }
+
+    /// <summary>
+    /// Emits an error message.
+    /// </summary>
+    /// <param name="code">The error code.</param>
+    /// <param name="message">The actual error message.</param>
+    public static void error(string code, string message) { }
+
+    /// <summary>
+    /// Emits a warning message.
+    /// </summary>
+    /// <param name="code">The error code.</param>
+    /// <param name="message">The actual error message.</param>
+    public static void warn(string code, string message) { }
+
+    /// <summary>
+    /// Emits a message.
+    /// </summary>
+    /// <param name="code">The error code.</param>
+    /// <param name="message">The actual error message.</param>
+    public static void msg(string code, string message) { }
 }

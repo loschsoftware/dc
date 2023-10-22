@@ -920,12 +920,14 @@ internal static class Helpers
                 if (args.expression().Length != 1)
                 {
                     EmitErrorMessage(
-                    line,
+                        line,
                         column,
                         length,
                         LS0002_MethodNotFound,
                         $"Invalid number of arguments for special function 'il'. Expected 1 argument."
                         );
+
+                    return true;
                 }
 
                 string arg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
@@ -938,12 +940,14 @@ internal static class Helpers
                 if (args.expression().Length != 1)
                 {
                     EmitErrorMessage(
-                    line,
+                        line,
                         column,
                         length,
                         LS0002_MethodNotFound,
                         $"Invalid number of arguments for special function 'localImport'. Expected 1 argument."
                         );
+
+                    return true;
                 }
 
                 string ns = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
@@ -963,12 +967,14 @@ internal static class Helpers
                 if (args.expression().Length != 1)
                 {
                     EmitErrorMessage(
-                    line,
+                        line,
                         column,
                         length,
                         LS0002_MethodNotFound,
                         $"Invalid number of arguments for special function 'globalImport'. Expected 1 argument."
                         );
+
+                    return true;
                 }
                 
                 string _ns = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
@@ -988,12 +994,14 @@ internal static class Helpers
                 if (args.expression().Length != 2)
                 {
                     EmitErrorMessage(
-                    line,
+                        line,
                         column,
                         length,
                         LS0002_MethodNotFound,
                         $"Invalid number of arguments for special function 'localAlias'. Expected 2 arguments."
                         );
+
+                    return true;
                 }
                 
                 string localAlias = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
@@ -1008,18 +1016,55 @@ internal static class Helpers
                 if (args.expression().Length != 2)
                 {
                     EmitErrorMessage(
-                    line,
+                        line,
                         column,
                         length,
                         LS0002_MethodNotFound,
                         $"Invalid number of arguments for special function 'globalAlias'. Expected 2 arguments."
                         );
+
+                    return true;
                 }
 
                 string globalAlias = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
                 string globalAliasedNS = args.expression()[1].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
 
                 CurrentFile.Aliases.Add((globalAliasedNS, globalAlias));
+
+                return true;
+
+            case "error":
+            case "warn":
+            case "msg":
+                
+                if (args.expression().Length != 2)
+                {
+                    EmitErrorMessage(
+                        line,
+                        column,
+                        length,
+                        LS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function '{name}'. Expected 2 arguments."
+                        );
+
+                    return true;
+                }
+
+                string code = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+                string err = args.expression()[1].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+
+                ErrorInfo errInfo = new()
+                {
+                    CodePosition = (line, column),
+                    Length = length,
+                    CustomErrorCode = code,
+                    ErrorCode = CustomError,
+                    ErrorMessage = err,
+                    File = Path.GetFileName(CurrentFile.Path),
+                    Severity = name == "error" ? Severity.Error : name == "warn" ? Severity.Warning : Severity.Information
+                };
+
+                EmitGeneric(errInfo);
 
                 return true;
         }
