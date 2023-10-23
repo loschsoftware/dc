@@ -266,7 +266,7 @@ internal static class Helpers
             Console.WriteLine("No errors found.");
 
         else
-            Console.WriteLine($"{Environment.NewLine}{errors.Count()} error{(errors.Count() == 1 ? "": "s")} found.");
+            Console.WriteLine($"{Environment.NewLine}{errors.Count()} error{(errors.Count() == 1 ? "" : "s")} found.");
 
         return errors.Count() > 0 ? -1 : 0;
     }
@@ -338,6 +338,16 @@ internal static class Helpers
         {
             arrayDims = (name.array_type_specifier().Comma() ?? Array.Empty<ITerminalNode>()).Length + 1;
             arrayDims += (name.array_type_specifier().Double_Comma() ?? Array.Empty<ITerminalNode>()).Length * 2;
+        }
+
+        if (arrayDims > 32)
+        {
+            EmitErrorMessage(
+                name.Start.Line,
+                name.Start.Column,
+                name.GetText().Length,
+                LS0079_ArrayTooManyDimensions,
+                $"An array cannot have more than 32 dimensions.");
         }
 
         if (name.type_name() != null && name.type_name().Length > 0)
@@ -1000,7 +1010,7 @@ internal static class Helpers
 
                     return true;
                 }
-                
+
                 string _ns = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
 
                 if (Type.GetType(_ns) != null)
@@ -1027,7 +1037,7 @@ internal static class Helpers
 
                     return true;
                 }
-                
+
                 string localAlias = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
                 string localAliasedNS = args.expression()[1].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
 
@@ -1060,7 +1070,7 @@ internal static class Helpers
             case "error":
             case "warn":
             case "msg":
-                
+
                 if (args.expression().Length != 2)
                 {
                     EmitErrorMessage(

@@ -332,5 +332,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the modifier of an access modifier group is the default member modifier of the containing type.
     /// </summary>
-    LS0078_RedundantAccessModifierGroup
+    LS0078_RedundantAccessModifierGroup,
+    /// <summary>
+    /// Emitted when an array has more than 32 dimensions.
+    /// </summary>
+    LS0079_ArrayTooManyDimensions
 }
