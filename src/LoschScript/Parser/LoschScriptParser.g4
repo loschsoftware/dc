@@ -147,15 +147,12 @@ identifier_atom
     ;
 
 type_name
-    : Open_Paren type_name (Bar type_name)+ Close_Paren
-    | generic_identifier Ampersand?
-    | identifier_atom Open_Brace type_arg_list Close_Bracket Ampersand?
-    | identifier_atom Ampersand?
-    | param_list_type
-    ;
-
-param_list_type
-    : Open_Paren_Bar type_name (Comma type_name)* Bar_Close_Paren
+    : identifier_atom
+    | Open_Paren type_name (Bar type_name)+ Close_Paren
+    | generic_identifier
+    | type_name Open_Brace type_arg_list Close_Bracket
+    | type_name Ampersand
+    | Open_Bracket Comma* Close_Bracket type_name
     ;
 
 if_branch
