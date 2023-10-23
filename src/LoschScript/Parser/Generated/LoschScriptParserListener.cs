@@ -834,6 +834,16 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitType_name([NotNull] LoschScriptParser.Type_nameContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="LoschScriptParser.array_type_specifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterArray_type_specifier([NotNull] LoschScriptParser.Array_type_specifierContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="LoschScriptParser.array_type_specifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitArray_type_specifier([NotNull] LoschScriptParser.Array_type_specifierContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="LoschScriptParser.if_branch"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

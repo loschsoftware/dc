@@ -504,6 +504,12 @@ public interface ILoschScriptParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType_name([NotNull] LoschScriptParser.Type_nameContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="LoschScriptParser.array_type_specifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitArray_type_specifier([NotNull] LoschScriptParser.Array_type_specifierContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="LoschScriptParser.if_branch"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

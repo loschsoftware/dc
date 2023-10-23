@@ -56,7 +56,7 @@ expression
     | expression Double_Bar expression #logical_or_expression
     | expression Caret expression #xor_expression
     | Ampersand expression #byref_expression
-    | Caret_Backslash Identifier  #typeof_expression
+    | Caret_Backslash type_name  #typeof_expression
     | Dollar_Backslash expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
     | (Var | Val)? Identifier (Colon type_name)? assignment_operator expression #local_declaration_or_assignment
@@ -152,7 +152,11 @@ type_name
     | generic_identifier
     | type_name Open_Brace type_arg_list Close_Bracket
     | type_name Ampersand
-    | Open_Bracket Comma* Close_Bracket type_name
+    | type_name array_type_specifier
+    ;
+
+array_type_specifier
+    : At_Open_Bracket Comma* Close_Bracket
     ;
 
 if_branch

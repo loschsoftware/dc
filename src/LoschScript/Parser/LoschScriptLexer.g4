@@ -28,7 +28,7 @@ Open: 'open';
 Closed: 'closed';
 Auto: 'auto';
 Virtual: 'virtual';
-Extern: At_Sign;
+Extern: 'extern';
 
 Infix: 'infix';
 Inline: 'inline';
@@ -79,6 +79,7 @@ Exclamation_Mark: '!';
 Exclamation_Question: '!?';
 Exclamation_Colon: '!:';
 At_Sign: '@';
+At_Open_Bracket: '@[';
 Exclamation_At: '!@';
 Dollar_Sign: '$';
 Caret: '^';

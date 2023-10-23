@@ -1,4 +1,5 @@
-﻿using Losch.LoschScript.Configuration;
+﻿using Antlr4.Runtime.Tree;
+using Losch.LoschScript.Configuration;
 using LoschScript.CodeGeneration;
 using LoschScript.Configuration;
 using LoschScript.Errors;
@@ -331,12 +332,23 @@ internal static class Helpers
 
     public static Type ResolveTypeName(LoschScriptParser.Type_nameContext name, bool noEmitFragments = false)
     {
+        int arrayDims = 0;
+
+        if (name.array_type_specifier() != null)
+            arrayDims = (name.array_type_specifier().Comma() ?? Array.Empty<ITerminalNode>()).Length + 1;
+
+        if (name.type_name() != null && name.type_name().Length > 0)
+        {
+            Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
+            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+        }
+
         if (name.identifier_atom() != null)
         {
             if (name.identifier_atom().Identifier() != null)
-                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments);
+                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
 
-            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments);
+            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
         }
 
         if (name.Open_Paren() != null)
@@ -347,14 +359,14 @@ internal static class Helpers
             Type[] typeParams = name.type_arg_list().type_name().Select(t => ResolveTypeName(t, noEmitFragments)).ToArray();
 
             if (name.identifier_atom().Identifier() != null)
-                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams);
+                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
         }
 
         // TODO: Implement other kinds of types
         return null;
     }
 
-    public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false, Type[] typeParams = null)
+    public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0)
     {
         if (typeParams != null)
         {
@@ -389,6 +401,9 @@ internal static class Helpers
                         ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
                     });
                 }
+
+                if (arrayDimensions > 0)
+                    type = type.MakeArrayType(arrayDimensions);
 
                 return type;
             }
@@ -450,6 +465,12 @@ internal static class Helpers
                 });
             }
         }
+
+        if (arrayDimensions > 1)
+            type = type.MakeArrayType(arrayDimensions);
+
+        else if (arrayDimensions == 1)
+            type = type.MakeArrayType();
 
         return type;
     }

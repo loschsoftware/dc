@@ -1407,7 +1407,7 @@ internal class Visitor : LoschScriptParserBaseVisitor<Type>
             Length = context.Caret_Backslash().GetText().Length,
         });
 
-        Type t = Helpers.ResolveTypeName(context.Identifier().ToString(), context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
+        Type t = Helpers.ResolveTypeName(context.type_name());
         CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
 
         MethodInfo typeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
