@@ -156,7 +156,7 @@ type_name
     ;
 
 array_type_specifier
-    : At_Open_Bracket Comma* Close_Bracket
+    : At_Open_Bracket (Comma | Double_Comma)* Close_Bracket
     ;
 
 if_branch

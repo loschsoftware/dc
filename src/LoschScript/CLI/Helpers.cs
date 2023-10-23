@@ -335,7 +335,10 @@ internal static class Helpers
         int arrayDims = 0;
 
         if (name.array_type_specifier() != null)
+        {
             arrayDims = (name.array_type_specifier().Comma() ?? Array.Empty<ITerminalNode>()).Length + 1;
+            arrayDims += (name.array_type_specifier().Double_Comma() ?? Array.Empty<ITerminalNode>()).Length * 2;
+        }
 
         if (name.type_name() != null && name.type_name().Length > 0)
         {
