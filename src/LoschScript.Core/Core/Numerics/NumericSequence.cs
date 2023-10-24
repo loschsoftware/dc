@@ -17,7 +17,7 @@ public static class NumericSequence
     public static string formatArray(int[] array)
     {
         StringBuilder sb = new();
-        sb.Append("[ ");
+        sb.Append("@[ ");
 
         foreach (int i in array[..^1])
             sb.Append($"{i}, ");
@@ -37,7 +37,7 @@ public static class NumericSequence
     public static string formatArray(object[] array)
     {
         StringBuilder sb = new();
-        sb.Append("[ ");
+        sb.Append("@[ ");
 
         foreach (int i in array[..^1])
             sb.Append($"{i}, ");

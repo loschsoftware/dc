@@ -409,7 +409,7 @@ public partial class LoschScriptParser : Parser {
 			State = 151;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190716L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511253L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190716L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
 				{
 				State = 149;
 				ErrorHandler.Sync(this);
@@ -430,6 +430,7 @@ public partial class LoschScriptParser : Parser {
 				case Exclamation_Mark:
 				case Exclamation_Question:
 				case At_Sign:
+				case At_Open_Bracket:
 				case Exclamation_At:
 				case Caret:
 				case Caret_Backslash:
@@ -967,6 +968,7 @@ public partial class LoschScriptParser : Parser {
 			case Exclamation_Mark:
 			case Exclamation_Question:
 			case At_Sign:
+			case At_Open_Bracket:
 			case Exclamation_At:
 			case Caret:
 			case Caret_Backslash:
@@ -985,7 +987,7 @@ public partial class LoschScriptParser : Parser {
 				State = 214;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190716L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511253L) != 0)) {
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190716L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
 					{
 					State = 212;
 					ErrorHandler.Sync(this);
@@ -1012,6 +1014,7 @@ public partial class LoschScriptParser : Parser {
 					case Exclamation_Mark:
 					case Exclamation_Question:
 					case At_Sign:
+					case At_Open_Bracket:
 					case Exclamation_At:
 					case Caret:
 					case Caret_Backslash:
@@ -1153,7 +1156,7 @@ public partial class LoschScriptParser : Parser {
 		}
 	}
 	public partial class Array_expressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Open_Bracket() { return GetToken(LoschScriptParser.Open_Bracket, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode At_Open_Bracket() { return GetToken(LoschScriptParser.At_Open_Bracket, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Close_Bracket() { return GetToken(LoschScriptParser.Close_Bracket, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
 			return GetRuleContexts<ExpressionContext>();
@@ -2829,11 +2832,11 @@ public partial class LoschScriptParser : Parser {
 				Context = _localctx;
 				_prevctx = _localctx;
 				State = 335;
-				Match(Open_Bracket);
+				Match(At_Open_Bracket);
 				State = 344;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511253L) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
 					{
 					State = 336;
 					expression(0);
@@ -5150,7 +5153,7 @@ public partial class LoschScriptParser : Parser {
 			State = 655;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511253L) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
 				{
 				State = 654;
 				arglist();
@@ -7775,7 +7778,7 @@ public partial class LoschScriptParser : Parser {
 		0,0,324,327,1,0,0,0,325,323,1,0,0,0,326,328,3,118,59,0,327,326,1,0,0,0,
 		327,328,1,0,0,0,328,330,1,0,0,0,329,331,3,116,58,0,330,329,1,0,0,0,330,
 		331,1,0,0,0,331,397,1,0,0,0,332,333,5,32,0,0,333,397,3,16,8,13,334,397,
-		5,32,0,0,335,344,5,43,0,0,336,341,3,16,8,0,337,338,5,47,0,0,338,340,3,
+		5,32,0,0,335,344,5,67,0,0,336,341,3,16,8,0,337,338,5,47,0,0,338,340,3,
 		16,8,0,339,337,1,0,0,0,340,343,1,0,0,0,341,339,1,0,0,0,341,342,1,0,0,0,
 		342,345,1,0,0,0,343,341,1,0,0,0,344,336,1,0,0,0,344,345,1,0,0,0,345,346,
 		1,0,0,0,346,397,5,44,0,0,347,348,5,39,0,0,348,351,3,16,8,0,349,350,5,47,
