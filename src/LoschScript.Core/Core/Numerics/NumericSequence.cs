@@ -68,7 +68,7 @@ public static class NumericSequence
     /// </summary>
     /// <param name="end">The last number of the sequence.</param>
     /// <returns>Returns an enumerable containing the generated numbers.</returns>
-    public static IEnumerable<int> range(int end) => Enumerable.Range(0, end);
+    public static int[] range(int end) => Enumerable.Range(0, end).ToArray();
 
     /// <summary>
     /// Creates a sequence of numbers within a specified range.
@@ -76,7 +76,7 @@ public static class NumericSequence
     /// <param name="start">The first number of the sequence.</param>nt
     /// <param name="count">The amount of numbers to include in the sequence.</param>
     /// <returns>Returns an enumerable containing the generated numbers.</returns>
-    public static IEnumerable<int> range(int start, int count) => Enumerable.Range(start, count);
+    public static int[] range(int start, int count) => Enumerable.Range(start, count).ToArray();
 
     /// <summary>
     /// Creates a sequence of numbers between the specified ends using the specified step size.
@@ -85,5 +85,5 @@ public static class NumericSequence
     /// <param name="step">The step size.</param>
     /// <param name="count">The last number of the sequence.</param>
     /// <returns>Returns an enumerable containing the generated numbers.</returns>
-    public static IEnumerable<int> range(int start, int step, int count) => Enumerable.Range(start, count).Where(i => (i - start) % step == 0);
+    public static int[] range(int start, int step, int count) => Enumerable.Range(start, count).Where(i => (i - start) % step == 0).ToArray();
 }
