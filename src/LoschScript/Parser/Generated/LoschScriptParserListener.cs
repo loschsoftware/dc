@@ -342,6 +342,18 @@ public interface ILoschScriptParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitTry_expression([NotNull] LoschScriptParser.Try_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>list_initializer_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterList_initializer_expression([NotNull] LoschScriptParser.List_initializer_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>list_initializer_expression</c>
+	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitList_initializer_expression([NotNull] LoschScriptParser.List_initializer_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>left_shift_expression</c>
 	/// labeled alternative in <see cref="LoschScriptParser.expression"/>.
 	/// </summary>
