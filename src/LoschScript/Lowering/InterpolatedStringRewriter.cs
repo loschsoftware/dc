@@ -21,7 +21,6 @@ internal class InterpolatedStringRewriter : IRewriter
 
         result.Append("\"\"");
 
-        // TODO: Replace this retarded algorithm
         while (sr.Peek() != -1)
         {
             char c = (char)sr.Read();
@@ -39,17 +38,26 @@ internal class InterpolatedStringRewriter : IRewriter
 
                     if (c2 == '{')
                     {
-                        result.Append("+ \"{\"");
-                        continue;
+                        result.Append(" + \"{\"");
+                        break;
                     }
-                    
+
                     sb.Append(c2);
                 }
 
-                result.Append($"+ {sb}");
+                if (sb.Length > 0)
+                    result.Append($" + {sb}");
             }
             else
-                result.Append($"+ \"{c}\"");
+            {
+                StringBuilder sb = new();
+                sb.Append(c);
+
+                while ((char)sr.Peek() != '{' && sr.Peek() != -1)
+                    sb.Append((char)sr.Read());
+
+                result.Append($" + \"{sb}\"");
+            }
         }
 
         return result.ToString();
