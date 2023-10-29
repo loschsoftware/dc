@@ -61,7 +61,8 @@ public partial class LoschScriptParser : Parser {
 		Double_Less_Than_Equals=111, Double_Greater_Than=112, Double_Greater_Than_Equals=113, 
 		Arrow_Right=114, Arrow_Left=115, Double_Backtick=116, Identifier=117, 
 		Integer_Literal=118, Hex_Integer_Literal=119, Binary_Integer_Literal=120, 
-		Real_Literal=121, Character_Literal=122, String_Literal=123, Verbatim_String_Literal=124;
+		Real_Literal=121, Character_Literal=122, String_Literal=123, Interpolated_String_Literal=124, 
+		Verbatim_String_Literal=125;
 	public const int
 		RULE_compilation_unit = 0, RULE_file_body = 1, RULE_top_level_statements = 2, 
 		RULE_full_program = 3, RULE_import_directive = 4, RULE_export_directive = 5, 
@@ -141,7 +142,7 @@ public partial class LoschScriptParser : Parser {
 		"Double_Greater_Than", "Double_Greater_Than_Equals", "Arrow_Right", "Arrow_Left", 
 		"Double_Backtick", "Identifier", "Integer_Literal", "Hex_Integer_Literal", 
 		"Binary_Integer_Literal", "Real_Literal", "Character_Literal", "String_Literal", 
-		"Verbatim_String_Literal"
+		"Interpolated_String_Literal", "Verbatim_String_Literal"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -409,7 +410,7 @@ public partial class LoschScriptParser : Parser {
 			State = 151;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190716L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190716L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 4494601499095205213L) != 0)) {
 				{
 				State = 149;
 				ErrorHandler.Sync(this);
@@ -444,6 +445,7 @@ public partial class LoschScriptParser : Parser {
 				case Real_Literal:
 				case Character_Literal:
 				case String_Literal:
+				case Interpolated_String_Literal:
 				case Verbatim_String_Literal:
 					{
 					State = 147;
@@ -982,12 +984,13 @@ public partial class LoschScriptParser : Parser {
 			case Real_Literal:
 			case Character_Literal:
 			case String_Literal:
+			case Interpolated_String_Literal:
 			case Verbatim_String_Literal:
 				{
 				State = 214;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190716L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190716L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 4494601499095205213L) != 0)) {
 					{
 					State = 212;
 					ErrorHandler.Sync(this);
@@ -1028,6 +1031,7 @@ public partial class LoschScriptParser : Parser {
 					case Real_Literal:
 					case Character_Literal:
 					case String_Literal:
+					case Interpolated_String_Literal:
 					case Verbatim_String_Literal:
 						{
 						State = 211;
@@ -2867,7 +2871,7 @@ public partial class LoschScriptParser : Parser {
 				State = 344;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 4494601499095205213L) != 0)) {
 					{
 					State = 336;
 					expression(0);
@@ -2904,7 +2908,7 @@ public partial class LoschScriptParser : Parser {
 				State = 356;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 4494601499095205213L) != 0)) {
 					{
 					State = 348;
 					expression(0);
@@ -3877,6 +3881,7 @@ public partial class LoschScriptParser : Parser {
 	public partial class String_atomContext : ParserRuleContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode String_Literal() { return GetToken(LoschScriptParser.String_Literal, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Verbatim_String_Literal() { return GetToken(LoschScriptParser.Verbatim_String_Literal, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Interpolated_String_Literal() { return GetToken(LoschScriptParser.Interpolated_String_Literal, 0); }
 		public String_atomContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -3910,7 +3915,7 @@ public partial class LoschScriptParser : Parser {
 			{
 			State = 529;
 			_la = TokenStream.LA(1);
-			if ( !(_la==String_Literal || _la==Verbatim_String_Literal) ) {
+			if ( !(((((_la - 123)) & ~0x3f) == 0 && ((1L << (_la - 123)) & 7L) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
 			}
 			else {
@@ -5221,7 +5226,7 @@ public partial class LoschScriptParser : Parser {
 			State = 667;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 2188758489881511261L) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -7925164426364190720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 4494601499095205213L) != 0)) {
 				{
 				State = 666;
 				arglist();
@@ -7699,7 +7704,7 @@ public partial class LoschScriptParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,124,950,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
+		4,1,125,950,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
 		7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,
 		2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,21,
 		2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,2,27,7,27,2,28,7,28,
@@ -7774,7 +7779,7 @@ public partial class LoschScriptParser : Parser {
 		14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,
 		62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,106,
 		108,110,112,114,116,118,120,122,0,11,1,0,26,27,1,0,91,92,1,0,87,90,1,0,
-		36,37,1,0,123,124,1,0,47,48,2,0,12,12,14,14,2,0,12,14,16,16,2,0,15,15,
+		36,37,1,0,123,125,1,0,47,48,2,0,12,12,14,14,2,0,12,14,16,16,2,0,15,15,
 		22,24,1,0,81,83,14,0,52,52,62,62,71,71,79,80,85,86,94,94,96,96,98,98,100,
 		100,103,103,105,106,109,109,111,111,113,113,1073,0,128,1,0,0,0,2,145,1,
 		0,0,0,4,151,1,0,0,0,6,154,1,0,0,0,8,196,1,0,0,0,10,198,1,0,0,0,12,201,

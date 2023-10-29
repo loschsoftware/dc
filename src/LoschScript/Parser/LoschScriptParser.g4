@@ -129,6 +129,7 @@ boolean_atom
 string_atom
     : String_Literal
     | Verbatim_String_Literal
+    | Interpolated_String_Literal
     ;
 
 character_atom
