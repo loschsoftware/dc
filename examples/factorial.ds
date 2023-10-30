@@ -1,0 +1,15 @@
+import System
+
+module App = {
+
+	Factorial (n: int): int = {
+		? n <= 1 = 1
+		: = n * Factorial n - 1
+	}
+
+	<EntryPoint>
+	Main (): null = {
+		number = rdint "Enter a number: "
+		println $"{number}! = {Factorial number}"
+	}
+}
