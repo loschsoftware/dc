@@ -46,7 +46,7 @@ internal class InterpolatedStringRewriter : IRewriter
                 }
 
                 if (sb.Length > 0)
-                    result.Append($" + {sb}");
+                    result.Append($" + ({sb})");
             }
             else
             {
