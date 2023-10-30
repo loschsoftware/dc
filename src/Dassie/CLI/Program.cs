@@ -170,27 +170,28 @@ internal class Program
         LogOut.Write("<FileName> [<FileName>..]".PadRight(50));
         LogOut.WriteLine("Compiles the specified source files.");
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
+        //Console.ForegroundColor = ConsoleColor.Yellow;
 
-        LogOut.Write("    -i".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Interprets the program and doesn't save an assembly to the disk.");
-        LogOut.Write("    -diagnostics".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Provides advanced diagnostic information.");
-        LogOut.Write("    -elapsed".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Measures the elapsed build time.");
-        LogOut.Write("    -default".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Uses the default configuration and ignores DassieConfig.xml files.");
-        LogOut.Write("    -out:<FileName>".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Specifies the output assembly name, ignoring DassieConfig.xml.");
-        LogOut.Write("    -optimize".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Applies IL optimizations to the assembly, ignoring DassieConfig.xml.");
-        LogOut.Write("    -ilout".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Saves the generated CIL code to the disk in a human-readable format.");
-        LogOut.Write("    -rc".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Emits a Windows resource script (.rc file) associated with the program.");
+        //LogOut.Write("    -i".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("Interprets the program and doesn't save an assembly to the disk.");
+        //LogOut.Write("    -diagnostics".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("Provides advanced diagnostic information.");
+        //LogOut.Write("    -elapsed".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("Measures the elapsed build time.");
+        //LogOut.Write("    -default".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("Uses the default configuration and ignores DassieConfig.xml files.");
+        //LogOut.Write("    -out:<FileName>".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("Specifies the output assembly name, ignoring DassieConfig.xml.");
+        //LogOut.Write("    -optimize".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("Applies IL optimizations to the assembly, ignoring DassieConfig.xml.");
+        //LogOut.Write("    -ilout".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("Saves the generated CIL code to the disk in a human-readable format.");
+        //LogOut.Write("    -rc".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("Emits a Windows resource script (.rc file) associated with the program.");
+
+        //Console.ForegroundColor = def;
+
         LogOut.WriteLine();
-
-        Console.ForegroundColor = def;
 
         LogOut.Write("new <Type> <Name>".PadRight(50));
 
