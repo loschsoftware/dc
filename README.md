@@ -1,5 +1,5 @@
 # Dassie Command Line Compiler (dc.exe)
-A .NET Framework implementation of a Dassie compiler. For more information about the language, including code examples, visit the [dassie](https://github.com/loschsoftware/dassie) repository. For now, here's "Hello World!" in Dassie:
+A .NET Framework implementation of a Dassie compiler. For more information about the language, including code examples, visit the [dassie](https://github.com/loschsoftware/dassie) repository (will become public soon). For now, here's "Hello World!" in Dassie:
 
 ````dassie
 println "Hello World!"
