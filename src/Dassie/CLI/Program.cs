@@ -224,22 +224,22 @@ internal class Program
         LogOut.WriteLine();
 
         LogOut.Write("config".PadRight(50));
-        LogOut.WriteLine("Creates a new DassieConfig.xml file with default values.");
+        LogOut.WriteLine("Creates a new dsconfig.xml file with default values.");
         LogOut.WriteLine();
 
-        LogOut.Write("p, preprocess <FileName>".PadRight(50));
-        LogOut.WriteLine("Preprocesses <FileName>.");
-        LogOut.WriteLine();
+        //LogOut.Write("p, preprocess <FileName>".PadRight(50));
+        //LogOut.WriteLine("Preprocesses <FileName>.");
+        //LogOut.WriteLine();
 
-        LogOut.Write("interactive, repl".PadRight(50));
-        LogOut.WriteLine("Provides a read-evaluate-print-loop to run single expressions.");
-        LogOut.WriteLine();
+        //LogOut.Write("interactive, repl".PadRight(50));
+        //LogOut.WriteLine("Provides a read-evaluate-print-loop to run single expressions.");
+        //LogOut.WriteLine();
 
         LogOut.Write("help, ?".PadRight(50));
         LogOut.WriteLine("Shows this page.");
 
         LogOut.WriteLine();
-        LogOut.WriteLine("Valid prefixes for options are -, --, and /.");
+        //LogOut.WriteLine("Valid prefixes for options are -, --, and /.");
         return 0;
     }
 }
