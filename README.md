@@ -7,6 +7,5 @@ println "Hello World!"
 This uses the built-in ``println`` function. Since Dassie runs on the CLR, you can also use the .NET ``Console`` module.
 ````dassie
 import System
-
 Console.WriteLine "Hello World!"
 ````
