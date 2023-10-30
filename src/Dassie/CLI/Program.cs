@@ -25,7 +25,7 @@ internal class Program
                 ["check" or "verify", ..] => Helpers.Check(args[1..]),
                 ["interactive" or "repl"] => InteractiveShell.Start(),
                 ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
-                ["make" or "new", ..] => LSTemplates.CreateStructure(args),
+                ["make" or "new", ..] => DSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => WatchForFileChanges(args),
                 ["call", ..] => Helpers.CallMethod(args),
                 ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),

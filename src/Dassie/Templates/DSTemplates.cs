@@ -9,7 +9,7 @@ namespace Dassie.Templates;
 /// <summary>
 /// Provides templates for commonly used Dassie project types.
 /// </summary>
-public static class LSTemplates
+public static class DSTemplates
 {
     /// <summary>
     /// Contains a template for a console application.
