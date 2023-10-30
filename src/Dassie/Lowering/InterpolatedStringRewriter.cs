@@ -1,10 +1,9 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using Dassie.Lowering;
 using System.IO;
 using System.Text;
 
-namespace Dassie.Lowerin;
+namespace Dassie.Lowering;
 
 internal class InterpolatedStringRewriter : ITreeToStringRewriter
 {
