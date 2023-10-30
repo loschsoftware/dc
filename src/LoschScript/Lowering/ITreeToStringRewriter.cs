@@ -2,7 +2,7 @@
 
 namespace LoschScript.Lowering;
 
-internal interface IRewriter
+internal interface ITreeToStringRewriter
 {
     public string Rewrite(IParseTree tree, LoweringListener listener);
 }

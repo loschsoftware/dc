@@ -4,7 +4,7 @@ using LoschScript.Parser;
 
 namespace LoschScript.Lowering;
 
-internal class CompoundAssignmentRewriter : IRewriter
+internal class CompoundAssignmentRewriter : ITreeToStringRewriter
 {
     public string Rewrite(IParseTree tree, LoweringListener listener)
     {

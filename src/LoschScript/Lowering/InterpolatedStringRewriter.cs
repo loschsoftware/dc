@@ -6,7 +6,7 @@ using System.Text;
 
 namespace LoschScript.Lowerin;
 
-internal class InterpolatedStringRewriter : IRewriter
+internal class InterpolatedStringRewriter : ITreeToStringRewriter
 {
     public string Rewrite(IParseTree tree, LoweringListener listener)
     {

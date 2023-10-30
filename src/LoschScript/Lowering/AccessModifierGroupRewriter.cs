@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace LoschScript.Lowering;
 
-internal class AccessModifierGroupRewriter : IRewriter
+internal class AccessModifierGroupRewriter : ITreeToStringRewriter
 {
     public string Rewrite(IParseTree tree, LoweringListener listener)
     {
