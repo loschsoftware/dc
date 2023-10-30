@@ -1,0 +1,12 @@
+﻿global using static Dassie.Meta.FileContext;
+global using static Dassie.Meta.ProgramContext;
+global using static Dassie.Meta.MethodContext;
+global using static Dassie.Errors.ErrorWriter;
+global using static Dassie.Errors.ErrorKind;
+global using static Dassie.CodeGeneration.Compiler;
+global using static Dassie.CodeGeneration.EmitHelpers;
+global using File = System.IO.File;
+global using Directory = System.IO.Directory;
+global using DirectoryInfo = System.IO.DirectoryInfo;
+global using SearchOption = System.IO.SearchOption;
+global using Path = System.IO.Path;
