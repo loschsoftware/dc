@@ -14,5 +14,7 @@ Console.WriteLine "Hello World!"
 
 Assuming the above code is contained in a file called ``hello.ds``, it can be compiled using the command ``dc hello.ds``, yielding an executable called ``hello.exe``. Alternatively, the command ``dc build`` can be used to compile all .ds source files in the current folder structure.
 
+<br/>
+
 > [!NOTE]  
-> Once the documentation repository is public, the code examples will be removed from this repo.
+> Once the documentation repository is public, the code examples in the ``examples`` directory will be removed from this repo.
