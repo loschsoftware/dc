@@ -11,3 +11,5 @@ This uses the built-in ``println`` function. Since Dassie runs on the CLR, you c
 import System
 Console.WriteLine "Hello World!"
 ````
+
+Assuming the above code is contained in a file called ``hello.ds``, it can be compiled using the command ``dc hello.ds``, yielding an executable called ``hello.exe``. Alternatively, the command ``dc build`` can be used to compile all .ds source files in the current folder structure.
