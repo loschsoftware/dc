@@ -200,6 +200,11 @@ internal static class Helpers
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
             Context.Assembly.Save(assembly);
 
+        string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
+
+        if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory))
+            File.Copy(coreLib, Path.Combine(Directory.GetCurrentDirectory(), "Dassie.Core.dll"), true);
+
         sw.Stop();
 
         if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
