@@ -30,6 +30,8 @@ Auto: 'auto';
 Virtual: 'virtual';
 Extern: 'extern';
 
+Result: 'result';
+
 Infix: 'infix';
 Inline: 'inline';
 
