@@ -202,8 +202,8 @@ internal class Program
         LogOut.WriteLine("Specifies a command-line application.");
         LogOut.Write("    library".PadRight(25).PadRight(50));
         LogOut.WriteLine("Specifies a dynamic linked library.");
-        LogOut.Write("    script".PadRight(25).PadRight(50));
-        LogOut.WriteLine("A script can be used to run Dassie code embedded in LS/.NET applications.");
+        //LogOut.Write("    script".PadRight(25).PadRight(50));
+        //LogOut.WriteLine("A script can be used to run Dassie code embedded in LS/.NET applications.");
         LogOut.WriteLine();
         Console.ForegroundColor = def;
 
