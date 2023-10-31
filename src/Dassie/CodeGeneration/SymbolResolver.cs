@@ -305,10 +305,17 @@ internal static class SymbolResolver
 
             for (int i = 0; i < final.GetParameters().Length; i++)
             {
-                if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
-                    && final.GetParameters()[i].ParameterType != typeof(object))
+                try
                 {
-                    CurrentMethod.ParameterBoxIndices.Remove(i);
+                    if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
+                                && final.GetParameters()[i].ParameterType != typeof(object))
+                    {
+                        CurrentMethod.ParameterBoxIndices.Remove(i);
+                    }
+                }
+                catch
+                {
+                    break;
                 }
             }
 
