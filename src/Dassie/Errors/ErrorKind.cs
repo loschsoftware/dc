@@ -336,5 +336,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an array has more than 32 dimensions.
     /// </summary>
-    DS0079_ArrayTooManyDimensions
+    DS0079_ArrayTooManyDimensions,
+    /// <summary>
+    /// Emitted when an illegal identifier is used.
+    /// </summary>
+    DS0080_ReservedIdentifier
 }
