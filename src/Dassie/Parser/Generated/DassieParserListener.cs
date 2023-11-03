@@ -186,18 +186,6 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitMultiply_expression([NotNull] DassieParser.Multiply_expressionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>loop_expression</c>
-	/// labeled alternative in <see cref="DassieParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterLoop_expression([NotNull] DassieParser.Loop_expressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>loop_expression</c>
-	/// labeled alternative in <see cref="DassieParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitLoop_expression([NotNull] DassieParser.Loop_expressionContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>logical_or_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -245,6 +233,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitNewlined_expression([NotNull] DassieParser.Newlined_expressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>foreach_loop</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterForeach_loop([NotNull] DassieParser.Foreach_loopContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>foreach_loop</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitForeach_loop([NotNull] DassieParser.Foreach_loopContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>postfix_unless_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.

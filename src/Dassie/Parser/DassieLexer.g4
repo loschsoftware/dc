@@ -68,6 +68,7 @@ Double_Dot: '..';
 Double_Dot_Question_Mark: '..?';
 Dot_Equals: '.=';
 Colon: ':';
+Colon_Greater_Than: ':>';
 Double_Colon: '::';
 Triple_Colon: ':::';
 Semicolon: ';';

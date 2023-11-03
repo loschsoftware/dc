@@ -124,13 +124,6 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitMultiply_expression([NotNull] DassieParser.Multiply_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>loop_expression</c>
-	/// labeled alternative in <see cref="DassieParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitLoop_expression([NotNull] DassieParser.Loop_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>logical_or_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -158,6 +151,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitNewlined_expression([NotNull] DassieParser.Newlined_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>foreach_loop</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitForeach_loop([NotNull] DassieParser.Foreach_loopContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>postfix_unless_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.

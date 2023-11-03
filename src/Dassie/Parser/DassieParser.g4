@@ -64,13 +64,13 @@ expression
     | expression Arrow_Left expression #left_pipe_expression
     /*| expression Dot Identifier #dotted_expression*/
     | range #range_expression
-    | expression Open_Bracket expression Close_Bracket #index_expression
+    | expression Double_Colon expression #index_expression
     | attribute+ expression #attributed_expression
     | if_branch NewLine* elif_branch* NewLine* else_branch? #prefix_if_expression
     | expression postfix_if_branch #postfix_if_expression
     | unless_branch NewLine* else_unless_branch* NewLine* else_branch? #prefix_unless_expression
     | expression postfix_unless_branch #postfix_unless_expression
-    | Identifier Arrow_Right ((Identifier Arrow_Right)* Identifier)? expression #loop_expression
+    | At_Sign ((Var | Val)? Identifier Colon_Greater_Than expression) Equals expression #foreach_loop
     | At_Sign expression Equals expression #while_loop
     | Exclamation_At expression Equals expression #until_loop
     | try_branch catch_branch* fault_branch? finally_branch? #try_expression

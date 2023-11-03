@@ -19,6 +19,7 @@ internal class LoweringListener : DassieParserBaseListener
     readonly CompoundAssignmentRewriter compoundAssignmentRewriter = new();
     readonly AccessModifierGroupRewriter accessModifierGroupRewriter = new();
     readonly InterpolatedStringRewriter interpolatedStringRewriter = new();
+    readonly ForEachLoopRewriter forEachLoopRewriter = new();
 
     public string GetTextForRule(ParserRuleContext rule)
     {
@@ -59,5 +60,10 @@ internal class LoweringListener : DassieParserBaseListener
     public override void EnterString_atom([NotNull] DassieParser.String_atomContext context)
     {
         Text = Replace(interpolatedStringRewriter.Rewrite(context, this), context);
+    }
+
+    public override void EnterForeach_loop([NotNull] DassieParser.Foreach_loopContext context)
+    {
+        Text = Replace(forEachLoopRewriter.Rewrite(context, this), context);
     }
 }

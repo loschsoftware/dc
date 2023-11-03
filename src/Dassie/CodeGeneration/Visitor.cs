@@ -3385,23 +3385,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return typeof(object[]);
     }
 
-    public override Type VisitLoop_expression([NotNull] DassieParser.Loop_expressionContext context)
-    {
-        if (context.Identifier().Length > 2)
-        {
-            EmitErrorMessage(
-                context.Identifier()[2].Symbol.Line,
-                context.Identifier()[2].Symbol.Column,
-                context.Identifier()[2].GetText().Length,
-                DS0049_InvalidForLoopSyntax,
-                "The loop syntax is invalid, it can contain at most 3 linked expressions.");
-
-            return null;
-        }
-
-        return null;
-    }
-
     public override Type VisitPlaceholder([NotNull] DassieParser.PlaceholderContext context)
     {
         CurrentMethod.IL.Emit(OpCodes.Nop);

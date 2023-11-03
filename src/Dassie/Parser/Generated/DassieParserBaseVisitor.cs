@@ -183,17 +183,6 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// <return>The visitor result.</return>
 	public virtual Result VisitMultiply_expression([NotNull] DassieParser.Multiply_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>loop_expression</c>
-	/// labeled alternative in <see cref="DassieParser.expression"/>.
-	/// <para>
-	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
-	/// on <paramref name="context"/>.
-	/// </para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	public virtual Result VisitLoop_expression([NotNull] DassieParser.Loop_expressionContext context) { return VisitChildren(context); }
-	/// <summary>
 	/// Visit a parse tree produced by the <c>logical_or_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>
@@ -237,6 +226,17 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitNewlined_expression([NotNull] DassieParser.Newlined_expressionContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>foreach_loop</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitForeach_loop([NotNull] DassieParser.Foreach_loopContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>postfix_unless_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
