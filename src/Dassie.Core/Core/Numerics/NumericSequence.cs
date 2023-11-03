@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Dassie.Core.Numerics;
@@ -49,6 +50,26 @@ public static class NumericSequence
     }
 
     /// <summary>
+    /// Formats the specified boxed integer list as a string.
+    /// </summary>
+    /// <param name="list">The list to format.</param>
+    /// <returns>The formatted string.</returns>
+    public static string formatArray(List<object> list)
+    {
+        StringBuilder sb = new();
+        sb.Append("@[ ");
+
+        foreach (int i in list.ToArray()[..^1])
+            sb.Append($"{i}, ");
+
+        sb.Append($"{list.Last()}");
+
+        sb.Append(" ]");
+
+        return sb.ToString();
+    }
+
+    /// <summary>
     /// Computes the sum of an array of integers.
     /// </summary>
     /// <param name="array">The array of which to compute the sum.</param>
@@ -85,4 +106,18 @@ public static class NumericSequence
     /// <param name="count">The last number of the sequence.</param>
     /// <returns>Returns an enumerable containing the generated numbers.</returns>
     public static int[] range(int start, int step, int count) => Enumerable.Range(start, count).Where(i => (i - start) % step == 0).ToArray();
+
+    /// <summary>
+    /// Converts the specified list of numbers to an array.
+    /// </summary>
+    /// <param name="numbers">The list to convert.</param>
+    /// <returns>The converted array.</returns>
+    public static int[] seq(List<int> numbers) => numbers.ToArray();
+
+    /// <summary>
+    /// Converts the specified list of boxed numbers to an array.
+    /// </summary>
+    /// <param name="numbers">The list to convert.</param>
+    /// <returns>The converted array.</returns>
+    public static int[] seq(List<object> numbers) => numbers.Select(n => (int)n).ToArray();
 }
