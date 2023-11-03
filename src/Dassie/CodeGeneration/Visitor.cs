@@ -243,7 +243,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
         }
 
-        if (CurrentMethod.Builder.IsStatic)
+        if (CurrentMethod.ConstructorBuilder.IsStatic)
         {
             foreach (var param in CurrentMethod.Parameters)
                 param.Index--;
@@ -2880,6 +2880,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 return sym.Type();
             }
 
+            if (sym.Field != null && !sym.Field.Builder.IsStatic)
+                EmitLdarg(0);
+
             Type type = Visit(context.expression());
             sym.Set();
 
@@ -2920,6 +2923,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 return type;
             }
+
+            if (sym.Field != null && !sym.Field.Builder.IsStatic)
+                EmitLdarg(0);
 
             sym.Load();
 
