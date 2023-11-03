@@ -38,7 +38,6 @@ Inline: 'inline';
 Ref: 'ref';
 Var: 'var';
 Val: 'val';
-Const: 'const';
 Base: 'base';
 Override: 'override';
 

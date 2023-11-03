@@ -179,11 +179,11 @@ internal class Program
         //LogOut.Write("    -elapsed".PadRight(25).PadRight(50));
         //LogOut.WriteLine("Measures the elapsed build time.");
         //LogOut.Write("    -default".PadRight(25).PadRight(50));
-        //LogOut.WriteLine("Uses the default configuration and ignores DassieConfig.xml files.");
+        //LogOut.WriteLine("Uses the default configuration and ignores dsconfig.xml files.");
         //LogOut.Write("    -out:<FileName>".PadRight(25).PadRight(50));
-        //LogOut.WriteLine("Specifies the output assembly name, ignoring DassieConfig.xml.");
+        //LogOut.WriteLine("Specifies the output assembly name, ignoring dsconfig.xml.");
         //LogOut.Write("    -optimize".PadRight(25).PadRight(50));
-        //LogOut.WriteLine("Applies IL optimizations to the assembly, ignoring DassieConfig.xml.");
+        //LogOut.WriteLine("Applies IL optimizations to the assembly, ignoring dsconfig.xml.");
         //LogOut.Write("    -ilout".PadRight(25).PadRight(50));
         //LogOut.WriteLine("Saves the generated CIL code to the disk in a human-readable format.");
         //LogOut.Write("    -rc".PadRight(25).PadRight(50));
