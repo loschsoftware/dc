@@ -20,6 +20,7 @@ internal class LoweringListener : DassieParserBaseListener
     readonly AccessModifierGroupRewriter accessModifierGroupRewriter = new();
     readonly InterpolatedStringRewriter interpolatedStringRewriter = new();
     readonly ForEachLoopRewriter forEachLoopRewriter = new();
+    readonly PipeRewriter pipeRewriter = new();
 
     public string GetTextForRule(ParserRuleContext rule)
     {
@@ -65,5 +66,15 @@ internal class LoweringListener : DassieParserBaseListener
     public override void EnterForeach_loop([NotNull] DassieParser.Foreach_loopContext context)
     {
         Text = Replace(forEachLoopRewriter.Rewrite(context, this), context);
+    }
+
+    public override void EnterRight_pipe_expression([NotNull] DassieParser.Right_pipe_expressionContext context)
+    {
+        Text = Replace(pipeRewriter.Rewrite(context, this), context);
+    }
+
+    public override void EnterLeft_pipe_expression([NotNull] DassieParser.Left_pipe_expressionContext context)
+    {
+        Text = Replace(pipeRewriter.Rewrite(context, this), context);
     }
 }
