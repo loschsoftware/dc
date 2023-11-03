@@ -1,7 +1,7 @@
 # Dassie Command Line Compiler (dc.exe)
 <img alt="GitHub commit activity (branch)" src="https://img.shields.io/github/commit-activity/m/loschsoftware/dc"> <img alt="GitHub issues" src="https://img.shields.io/github/issues/loschsoftware/dc">
 
-A .NET Framework implementation of a Dassie compiler. For more information about the language, including code examples, visit the [dassie](https://github.com/loschsoftware/dassie) repository (will become public soon). For now, here's "Hello World!" in Dassie:
+A .NET Framework implementation of a Dassie compiler. For more information about the language, including code examples, visit the [dassie](https://github.com/loschsoftware/dassie) repository. For now, here's "Hello World!" in Dassie:
 
 ````dassie
 println "Hello World!"
@@ -13,8 +13,3 @@ Console.WriteLine "Hello World!"
 ````
 
 Assuming the above code is contained in a file called ``hello.ds``, it can be compiled using the command ``dc hello.ds``, yielding an executable called ``hello.exe``. Alternatively, the command ``dc build`` can be used to compile all .ds source files in the current folder structure.
-
-<br/>
-
-> [!NOTE]  
-> Once the documentation repository is public, the code examples in the ``examples`` directory will be removed from this repo.
