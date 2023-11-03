@@ -70,6 +70,24 @@ public static class NumericSequence
     }
 
     /// <summary>
+    /// Formats the specified integer array as a string representing a table row.
+    /// </summary>
+    /// <param name="array">The array to format.</param>
+    /// <param name="width">The width of each integer.</param>
+    /// <returns>The formatted string.</returns>
+    public static string table(int[] array, int width)
+    {
+        StringBuilder sb = new();
+
+        foreach (int i in array[..^1])
+            sb.Append($"{i.ToString().PadLeft(width, '0')}, ");
+
+        sb.Append($"{array.Last().ToString().PadLeft(width, '0')}, ");
+
+        return sb.ToString();
+    }
+
+    /// <summary>
     /// Computes the sum of an array of integers.
     /// </summary>
     /// <param name="array">The array of which to compute the sum.</param>
