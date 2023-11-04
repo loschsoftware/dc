@@ -25,6 +25,9 @@ public static class ObjectDump
     /// <returns>The string representation of the object.</returns>
     public static string Dump(this object obj)
     {
+        if (obj == null)
+            return "{System.Object}: ()\r\n";
+
         return Dump(obj, 0);
     }
 
