@@ -80,7 +80,7 @@ public static class ObjectDump
     private static string Format(object obj, int prevDepth, bool omitNL = false)
     {
         if (obj == null)
-            return "()";
+            return $"(){(omitNL ? "" : Environment.NewLine)}";
 
         if (obj is SelfReference s)
             return $"[self reference: {{{s.WrappedType.FullName}}}]{(omitNL ? "" : Environment.NewLine)}";
