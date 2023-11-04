@@ -122,4 +122,10 @@ public static class stdout
     /// <param name="format">The string to format and print.</param>
     /// <param name="args">The format arguments.</param>
     public static void printfn(string format, params object[] args) => Console.WriteLine(string.Format(format, args));
+
+    /// <summary>
+    /// Dumps the properties of the specified object.
+    /// </summary>
+    /// <param name="obj">The object to dump.</param>
+    public static void dump(object obj) => print(ObjectDump.Dump(obj));
 }
