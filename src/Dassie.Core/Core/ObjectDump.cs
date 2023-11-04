@@ -11,6 +11,13 @@ namespace Dassie.Core;
 /// </summary>
 public static class ObjectDump
 {
+    private struct SelfReference
+    {
+        public SelfReference(Type wrappedType) => WrappedType = wrappedType;
+
+        public Type WrappedType { get; set; }
+    }
+
     /// <summary>
     /// Dumps the properties of an object to a string.
     /// </summary>
@@ -34,14 +41,34 @@ public static class ObjectDump
         {
             object val;
 
-            if (member is PropertyInfo prop)
-                val = prop.GetValue(obj);
+            try
+            {
+                if (member is PropertyInfo prop)
+                {
+                    if (prop.PropertyType == obj.GetType())
+                        val = new SelfReference(prop.PropertyType);
+                    else
+                        val = prop.GetValue(obj);
+                }
 
-            else if (member is FieldInfo field && field.IsPublic && !field.IsStatic)
-                val = field.GetValue(obj);
+                else if (member is FieldInfo field && field.IsPublic && !field.IsStatic)
+                {
+                    if (field.FieldType == obj.GetType())
+                        val = new SelfReference(field.FieldType);
+                    else
+                        val = field.GetValue(obj);
+                }
 
-            else
+                else
+                    continue;
+            }
+            catch
+            {
+                sb.Append(new string(' ', (depth + 1) * 2));
+                sb.Append($"{member.Name}: [ERROR reading value]{Environment.NewLine}");
+
                 continue;
+            }
 
             sb.Append(new string(' ', (depth + 1) * 2));
             sb.Append($"{member.Name}: {Format(val, depth)}");
@@ -52,11 +79,23 @@ public static class ObjectDump
 
     private static string Format(object obj, int prevDepth, bool omitNL = false)
     {
+        if (obj == null)
+            return "()";
+
+        if (obj is SelfReference s)
+            return $"[self reference: {{{s.WrappedType.FullName}}}]{(omitNL ? "" : Environment.NewLine)}";
+
         if (obj.GetType().IsPrimitive)
             return $"{obj}{(omitNL ? "" : Environment.NewLine)}";
 
         if (obj is string)
-            return $"\"{obj}\"{(omitNL ? "" : Environment.NewLine)}";
+            return $"\"{obj.ToString()
+                .Replace("^", "^^")
+                .Replace("\r", "^r")
+                .Replace("\n", "^n")
+                .Replace("\v", "^v")
+                .Replace("\t", "^t")
+                .Replace("\b", "^b")}\"{(omitNL ? "" : Environment.NewLine)}";
 
         if (obj is IEnumerable || obj.GetType().IsArray)
         {
