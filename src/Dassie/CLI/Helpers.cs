@@ -1,12 +1,12 @@
 ﻿using Antlr4.Runtime.Tree;
-using Dassie.Configuration;
-using Dassie.Runtime;
-using Dassie.Text;
-using Dassie.Text.Tooltips;
 using Dassie.CodeGeneration;
+using Dassie.Configuration;
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Runtime;
+using Dassie.Text;
+using Dassie.Text.Tooltips;
 using Dassie.Unmanaged;
 using Microsoft.Build.Utilities;
 using Microsoft.IO;
@@ -1122,6 +1122,28 @@ internal static class Helpers
                 };
 
                 EmitGeneric(errInfo);
+
+                return true;
+
+            case "todo":
+
+                if (args.expression().Length != 1)
+                {
+                    EmitErrorMessage(
+                        line,
+                        column,
+                        length,
+                        DS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function '{name}'. Expected 1 argument."
+                        );
+
+                    return true;
+                }
+                
+                string todoMsg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+                string todoStr = $"TODO ({line}): {todoMsg}";
+
+                CurrentMethod.IL.EmitWriteLine(todoStr);
 
                 return true;
         }

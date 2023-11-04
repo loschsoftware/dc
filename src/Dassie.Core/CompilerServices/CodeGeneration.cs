@@ -62,4 +62,11 @@ public static class CodeGeneration
     /// <param name="code">The error code.</param>
     /// <param name="message">The actual error message.</param>
     public static void msg(string code, string message) { }
+
+    /// <summary>
+    /// Prints a message to the standard output indicating that a certain operation is not yet implemented.
+    /// </summary>
+    /// <remarks>This function has no effect on its own, as it is evaluated by the Dassie compiler at compile time.</remarks>
+    /// <param name="message">The todo message to print.</param>
+    public static void todo(string message) { }
 }
