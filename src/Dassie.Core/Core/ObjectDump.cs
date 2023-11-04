@@ -25,9 +25,6 @@ public static class ObjectDump
     /// <returns>The string representation of the object.</returns>
     public static string Dump(this object obj)
     {
-        if (obj == null)
-            return "{System.Object}: ()\r\n";
-
         return Dump(obj, 0);
     }
 
@@ -39,6 +36,12 @@ public static class ObjectDump
             sb.Append(new string(' ', depth * 2));
 
         sb.AppendLine($"{{{obj.GetType().FullName}}}");
+
+        if (obj == null)
+            return Format(obj, depth);
+
+        if (obj is IEnumerable or string || obj.GetType().IsPrimitive || obj.GetType().IsArray)
+            return Format(obj, depth);
 
         foreach (MemberInfo member in obj.GetType().GetMembers())
         {
