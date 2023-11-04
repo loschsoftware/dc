@@ -1141,7 +1141,7 @@ internal static class Helpers
                 }
                 
                 string todoMsg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
-                string todoStr = $"TODO ({line}): {todoMsg}";
+                string todoStr = $"TODO ({CurrentFile.Path}, line {line}): {todoMsg}";
 
                 CurrentMethod.IL.EmitWriteLine(todoStr);
 
@@ -1163,7 +1163,7 @@ internal static class Helpers
                 }
 
                 string ptodoMsg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
-                string ptodoStr = $"TODO ({line}): {ptodoMsg}";
+                string ptodoStr = $"TODO ({CurrentFile.Path}, line {line}): {ptodoMsg}";
 
                 CurrentMethod.IL.Emit(OpCodes.Ldstr, ptodoStr);
                 CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(NotImplementedException).GetConstructor(new[] { typeof(string) }));
