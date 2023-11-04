@@ -127,5 +127,5 @@ public static class stdout
     /// Dumps the properties of the specified object.
     /// </summary>
     /// <param name="obj">The object to dump.</param>
-    public static void dump(object obj) => print(ObjectDump.Dump(obj));
+    public static void dump(object obj) => print(obj.Dump());
 }

@@ -16,7 +16,7 @@ public static class ObjectDump
     /// </summary>
     /// <param name="obj">The object to dump.</param>
     /// <returns>The string representation of the object.</returns>
-    public static string Dump(object obj)
+    public static string Dump(this object obj)
     {
         return Dump(obj, 0);
     }
