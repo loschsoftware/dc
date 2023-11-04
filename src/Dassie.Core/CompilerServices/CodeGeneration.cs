@@ -1,4 +1,6 @@
-﻿namespace Dassie.CompilerServices;
+﻿using System;
+
+namespace Dassie.CompilerServices;
 
 /// <summary>
 /// Provides special functions for interacting with the Dassie code generator.
@@ -69,4 +71,10 @@ public static class CodeGeneration
     /// <remarks>This function has no effect on its own, as it is evaluated by the Dassie compiler at compile time.</remarks>
     /// <param name="message">The todo message to print.</param>
     public static void todo(string message) { }
+
+    /// <summary>
+    /// Throws a <see cref="NotImplementedException"/> with a message indicating that a certain operation is not yet implemented."
+    /// </summary>
+    /// <param name="message">The todo message to print.</param>
+    public static void ptodo(string message) { }
 }

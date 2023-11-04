@@ -1146,6 +1146,30 @@ internal static class Helpers
                 CurrentMethod.IL.EmitWriteLine(todoStr);
 
                 return true;
+
+            case "ptodo":
+
+                if (args.expression().Length != 1)
+                {
+                    EmitErrorMessage(
+                        line,
+                        column,
+                        length,
+                        DS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function '{name}'. Expected 1 argument."
+                        );
+
+                    return true;
+                }
+
+                string ptodoMsg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
+                string ptodoStr = $"TODO ({line}): {ptodoMsg}";
+
+                CurrentMethod.IL.Emit(OpCodes.Ldstr, ptodoStr);
+                CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(NotImplementedException).GetConstructor(new[] { typeof(string) }));
+                CurrentMethod.IL.Emit(OpCodes.Throw);
+
+                return true;
         }
 
         return false;
