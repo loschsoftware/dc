@@ -948,18 +948,18 @@ internal static class Helpers
         if (typeof(Dassie.CompilerServices.CodeGeneration).GetMethod(name) == null)
             return false;
 
-        if (args == null)
-        {
-            EmitErrorMessage(
-                line,
-                column,
-                length,
-                DS0080_ReservedIdentifier,
-                $"The identifier '{name}' is reserved and cannot be used as a function or variable name."
-                );
+        //if (args == null)
+        //{
+        //    EmitErrorMessage(
+        //        line,
+        //        column,
+        //        length,
+        //        DS0080_ReservedIdentifier,
+        //        $"The identifier '{name}' is reserved and cannot be used as a function or variable name."
+        //        );
 
-            return true;
-        }
+        //    return true;
+        //}
 
         CurrentFile.Fragments.Add(new()
         {
