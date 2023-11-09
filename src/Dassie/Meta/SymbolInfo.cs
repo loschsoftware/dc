@@ -60,9 +60,9 @@ internal class SymbolInfo
         ToolTip = GetToolTip()
     };
 
-    public void Load() => Helpers.LoadSymbol(this);
+    public void Load() => CliHelpers.LoadSymbol(this);
 
-    public void LoadAddress() => Helpers.LoadSymbolAddress(this);
+    public void LoadAddress() => CliHelpers.LoadSymbolAddress(this);
 
     public void LoadAddressIfValueType()
     {

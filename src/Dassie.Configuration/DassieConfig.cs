@@ -14,6 +14,7 @@ public sealed class DassieConfig
     [XmlArray("References")]
     [XmlArrayItem(Type = typeof(AssemblyReference))]
     [XmlArrayItem(Type = typeof(FileReference))]
+    [XmlArrayItem(Type = typeof(ProjectReference))]
     public Reference[] References { get; set; }
 
     [XmlArray]

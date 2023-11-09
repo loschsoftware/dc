@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Tree;
+using Dassie.CLI.Helpers;
 using Dassie.CodeGeneration;
 using Dassie.Configuration;
 using Dassie.Errors;
@@ -22,7 +23,7 @@ using System.Xml.Serialization;
 
 namespace Dassie.CLI;
 
-internal static class Helpers
+internal static class CliHelpers
 {
     public static int ViewFragments(string[] args)
     {
@@ -100,6 +101,21 @@ internal static class Helpers
         }
 
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
+
+        string msgPrefix = MessagePrefix;
+
+        if (config.References != null)
+        {
+            foreach (ProjectReference projRef in config.References.Where(r => r is ProjectReference).Cast<ProjectReference>())
+            {
+                MessagePrefix = Path.GetDirectoryName(projRef.ProjectFile).Split('\\').Last();
+
+                if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath(".\\")))
+                    return -1;
+            }
+
+            MessagePrefix = msgPrefix;
+        }
 
         if (config.CacheSourceFiles)
         {

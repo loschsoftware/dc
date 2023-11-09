@@ -29,7 +29,7 @@ public static class FileCompiler
     /// <returns>An array of compilation errors that occured during the compilation. If no errors occured, this is an empty array.</returns>
     public static ErrorInfo[] CompileSingleFile(string path, DassieConfig config)
     {
-        Helpers.SetupBogusAssembly();
+        CliHelpers.SetupBogusAssembly();
 
         Context.Files.Add(new(path));
         CurrentFile = Context.GetFile(path);
@@ -104,7 +104,7 @@ public static class FileCompiler
 
             Context.Configuration = config;
 
-            Helpers.SetupBogusAssembly();
+            CliHelpers.SetupBogusAssembly();
 
             ICharStream charStream = CharStreams.fromString(source);
             ITokenSource lexer = new DassieLexer(charStream);

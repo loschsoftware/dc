@@ -19,20 +19,20 @@ internal class Program
             //#endif
             return args switch
             {
-                ["config"] => Helpers.BuildDassieConfig(),
-                ["build", ..] => Helpers.CompileAll(args[1..]),
-                ["check" or "verify"] => Helpers.CheckAll(),
-                ["check" or "verify", ..] => Helpers.Check(args[1..]),
+                ["config"] => CliHelpers.BuildDassieConfig(),
+                ["build", ..] => CliHelpers.CompileAll(args[1..]),
+                ["check" or "verify"] => CliHelpers.CheckAll(),
+                ["check" or "verify", ..] => CliHelpers.Check(args[1..]),
                 ["interactive" or "repl"] => InteractiveShell.Start(),
-                ["interpret" or "run", ..] => Helpers.InterpretFiles(args),
+                ["interpret" or "run", ..] => CliHelpers.InterpretFiles(args),
                 ["make" or "new", ..] => DSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => WatchForFileChanges(args),
-                ["call", ..] => Helpers.CallMethod(args),
+                ["call", ..] => CliHelpers.CallMethod(args),
                 ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
-                ["-viewfrags", ..] => Helpers.ViewFragments(args),
+                ["-viewfrags", ..] => CliHelpers.ViewFragments(args),
                 ["quit"] => QuitWatching(),
                 [] or ["help" or "?"] => DisplayHelpMessage(),
-                _ => Helpers.HandleArgs(args)
+                _ => CliHelpers.HandleArgs(args)
             };
             //#if RELEASE
         }

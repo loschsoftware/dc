@@ -54,7 +54,7 @@ internal static class InteractiveShell
     {
         File.AppendAllText(tmpFile, $"{input}{Environment.NewLine}");
 
-        Helpers.HandleArgs(new string[] { tmpFile });
+        CliHelpers.HandleArgs(new string[] { tmpFile });
         Process.Start(Path.ChangeExtension(tmpFile, ".exe"));
     }
 }

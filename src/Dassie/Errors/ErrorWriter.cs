@@ -35,6 +35,11 @@ public static class ErrorWriter
     public static TextWriter InfoOut { get; set; } = Console.Out;
 
     /// <summary>
+    /// A prefix of all error messages, indicating which project the error is from.
+    /// </summary>
+    public static string MessagePrefix { get; set; } = "";
+
+    /// <summary>
     /// Contains configuration for the error writer.
     /// </summary>
     public static DassieConfig Config { get; set; } = new();
@@ -68,6 +73,25 @@ public static class ErrorWriter
             if (messages.Where(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition).Any())
                 return;
 
+            var outStream = error.Severity switch
+            {
+                Severity.Error => ErrorOut,
+                Severity.Warning => WarnOut,
+                _ => InfoOut
+            };
+
+            Console.CursorLeft = 0;
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+
+            string prefix = "\r\n";
+
+            if (!string.IsNullOrEmpty(MessagePrefix))
+            {
+                outStream.Write($"\r\n[{MessagePrefix}] ");
+                prefix = "";
+            }
+
             Console.ForegroundColor = error.Severity switch
             {
                 Severity.Error => ConsoleColor.Red,
@@ -75,17 +99,9 @@ public static class ErrorWriter
                 _ => ConsoleColor.Cyan
             };
 
-            Console.CursorLeft = 0;
-
             string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
 
-            (error.Severity switch
-            {
-                Severity.Error => ErrorOut,
-                Severity.Warning => WarnOut,
-                _ => InfoOut
-
-            }).WriteLine($"\r\n{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): {error.Severity switch
+            outStream.WriteLine($"{prefix}{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): {error.Severity switch
             {
                 Severity.Error => "error",
                 Severity.Warning => "warning",

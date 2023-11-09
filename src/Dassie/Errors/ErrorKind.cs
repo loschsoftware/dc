@@ -340,5 +340,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an illegal identifier is used.
     /// </summary>
-    DS0080_ReservedIdentifier
+    DS0080_ReservedIdentifier,
+    /// <summary>
+    /// Emitted when a project reference is invalid.
+    /// </summary>
+    DS0081_InvalidProjectReference
 }

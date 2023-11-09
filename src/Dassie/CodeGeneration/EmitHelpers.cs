@@ -12,7 +12,7 @@ internal static class EmitHelpers
 {
     public static void EmitAdd(Type type, bool doOverflowCheck = false)
     {
-        if (Helpers.IsUnsignedIntegerType(type))
+        if (CliHelpers.IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Add_Ovf_Un);
         else if (doOverflowCheck)
             CurrentMethod.IL.Emit(OpCodes.Add_Ovf);
@@ -22,7 +22,7 @@ internal static class EmitHelpers
 
     public static void EmitSub(Type type, bool doOverflowCheck = false)
     {
-        if (Helpers.IsUnsignedIntegerType(type))
+        if (CliHelpers.IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Sub_Ovf_Un);
         else if (doOverflowCheck)
             CurrentMethod.IL.Emit(OpCodes.Sub_Ovf);
@@ -32,7 +32,7 @@ internal static class EmitHelpers
 
     public static void EmitMul(Type type, bool doOverflowCheck = false)
     {
-        if (Helpers.IsUnsignedIntegerType(type))
+        if (CliHelpers.IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Mul_Ovf_Un);
         else if (doOverflowCheck)
             CurrentMethod.IL.Emit(OpCodes.Mul_Ovf);
@@ -42,7 +42,7 @@ internal static class EmitHelpers
 
     public static void EmitDiv(Type type)
     {
-        if (Helpers.IsUnsignedIntegerType(type))
+        if (CliHelpers.IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Div_Un);
         else
             CurrentMethod.IL.Emit(OpCodes.Div);
@@ -50,7 +50,7 @@ internal static class EmitHelpers
 
     public static void EmitRem(Type type)
     {
-        if (Helpers.IsUnsignedIntegerType(type))
+        if (CliHelpers.IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Rem_Un);
         else
             CurrentMethod.IL.Emit(OpCodes.Rem);
@@ -58,7 +58,7 @@ internal static class EmitHelpers
 
     public static void EmitShr(Type type)
     {
-        if (Helpers.IsUnsignedIntegerType(type))
+        if (CliHelpers.IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Shr_Un);
         else
             CurrentMethod.IL.Emit(OpCodes.Shr);
@@ -66,7 +66,7 @@ internal static class EmitHelpers
 
     public static void EmitCgt(Type type)
     {
-        if (Helpers.IsUnsignedIntegerType(type))
+        if (CliHelpers.IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Cgt_Un);
         else
             CurrentMethod.IL.Emit(OpCodes.Cgt);
@@ -74,7 +74,7 @@ internal static class EmitHelpers
 
     public static void EmitClt(Type type)
     {
-        if (Helpers.IsUnsignedIntegerType(type))
+        if (CliHelpers.IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Clt_Un);
         else
             CurrentMethod.IL.Emit(OpCodes.Clt);
