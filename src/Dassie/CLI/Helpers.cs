@@ -101,6 +101,39 @@ internal static class Helpers
 
         string assembly = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
+        if (config.CacheSourceFiles)
+        {
+            string[] files = args.Where(File.Exists).ToArray();
+            if (File.Exists("dsconfig.xml"))
+                files = files.Append("dsconfig.xml").ToArray();
+
+            if (Directory.Exists(".cache")
+                && Directory.GetFiles(".cache").Select(Path.GetFileName).SequenceEqual(files.Select(Path.GetFileName)))
+            {
+                byte[] cachedFiles = Directory.GetFiles(".cache").Select(File.ReadAllBytes).SelectMany(f => f).ToArray();
+                byte[] currentFiles = files.Select(File.ReadAllBytes).SelectMany(f => f).ToArray();
+
+                if (cachedFiles.SequenceEqual(currentFiles) && File.Exists(assembly))
+                {
+                    sw.Stop();
+
+                    if (args.Any(a => a == "-elapsed") || config.MeasureElapsedTime)
+                        Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
+
+                    return 0;
+                }
+            }
+
+            var di = Directory.CreateDirectory(".cache");
+            di.Attributes |= FileAttributes.Hidden;
+
+            foreach (string file in args.Where(File.Exists))
+                File.Copy(file, Path.Combine(".cache", Path.GetFileName(file)), true);
+
+            if (File.Exists("dsconfig.xml"))
+                File.Copy("dsconfig.xml", Path.Combine(".cache", "dsconfig.xml"), true);
+        }
+
         // Step 1
         CompileSource(args.Where(File.Exists).ToArray(), config);
         VisitorStep1 = Context;
@@ -1139,7 +1172,7 @@ internal static class Helpers
 
                     return true;
                 }
-                
+
                 string todoMsg = args.expression()[0].GetText().TrimStart('"').TrimEnd('\r', '\n').TrimEnd('"');
                 string todoStr = $"TODO ({CurrentFile.Path}, line {line}): {todoMsg}";
 

@@ -108,6 +108,10 @@ public sealed class DassieConfig
     [DefaultValue(false)]
     [XmlElement]
     public bool PrintExceptionInfo { get; set; } = false;
+
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool CacheSourceFiles { get; set; } = false;
 }
 
 [Serializable]
