@@ -1186,10 +1186,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             if (t2 != typeof(string))
             {
-                LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t2);
-                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
+                CurrentMethod.LocalIndex++;
 
-                EmitStloc(++CurrentMethod.LocalIndex);
+                LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t2);
+                //lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex}");
+
+                EmitStloc(CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);
 
                 MethodInfo toString = t2.GetMethod("ToString", Array.Empty<Type>());
