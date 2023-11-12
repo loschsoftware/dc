@@ -6,7 +6,8 @@
     },
     "default": {
       "commandName": "Project",
-      "commandLineArgs": "code.txt"
+      "commandLineArgs": "build",
+      "workingDirectory": "C:\\Users\\Jonas\\Desktop\\dsproj\\Test"
     }
   }
 }

@@ -286,11 +286,11 @@ public enum ErrorKind
     /// </summary>
     DS0066_PropertyNoSuitableSetter,
     /// <summary>
-    /// Emitted when a resource specified in DassieConfig.xml could not be located.
+    /// Emitted when a resource specified in dsconfig.xml could not be located.
     /// </summary>
     DS0067_ResourceFileNotFound,
     /// <summary>
-    /// Emitted when multiple unmanaged resources are specified in DassieConfig.xml.
+    /// Emitted when multiple unmanaged resources are specified in dsconfig.xml.
     /// </summary>
     DS0068_MultipleUnmanagedResources,
     /// <summary>
@@ -298,11 +298,11 @@ public enum ErrorKind
     /// </summary>
     DS0069_WinSdkToolNotFound,
     /// <summary>
-    /// Emitted when the <code>&lt;VersionInfo&gt;</code> tag is used in DassieConfig.xml.
+    /// Emitted when the <code>&lt;VersionInfo&gt;</code> tag is used in dsconfig.xml.
     /// </summary>
     DS0070_AvoidVersionInfoTag,
     /// <summary>
-    /// Emitted when an ingored message is specified in DassieConfig.xml that cannot be ignored.
+    /// Emitted when an ingored message is specified in dsconfig.xml that cannot be ignored.
     /// </summary>
     DS0071_IllegalIgnoredMessage,
     /// <summary>
@@ -344,5 +344,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a project reference is invalid.
     /// </summary>
-    DS0081_InvalidProjectReference
+    DS0081_InvalidProjectReference,
+    /// <summary>
+    /// Emitted when an invalid macro is used in dsconfig.xml.
+    /// </summary>
+    DS0082_InvalidDSConfigMacro
 }

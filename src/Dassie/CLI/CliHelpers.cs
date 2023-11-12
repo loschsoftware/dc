@@ -2,6 +2,7 @@
 using Dassie.CLI.Helpers;
 using Dassie.CodeGeneration;
 using Dassie.Configuration;
+using Dassie.Configuration.Macros;
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -72,8 +73,12 @@ internal static class CliHelpers
             config = (DassieConfig)xmls.Deserialize(sr);
         }
 
+        MacroParser parser = new();
+
         config ??= new();
         config.AssemblyName ??= Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
+
+        parser.Normalize(config);
 
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
@@ -164,7 +169,7 @@ internal static class CliHelpers
             EmitMessage(
                 0, 0, 0,
                 DS0070_AvoidVersionInfoTag,
-                $"Using the 'VersionInfo' tag in DassieConfig.xml worsens compilation performance. Consider precompiling your version info and including it as an unmanaged resource.",
+                $"Using the 'VersionInfo' tag in dsconfig.xml worsens compilation performance. Consider precompiling your version info and including it as an unmanaged resource.",
                 "dsconfig.xml");
 
             string rc = WinSdkHelper.GetToolPath("rc.exe");
@@ -357,7 +362,7 @@ internal static class CliHelpers
     {
         if (File.Exists("dsconfig.xml"))
         {
-            LogOut.Write("The file DassieConfig.xml already exists. Overwrite [Y/N]? ");
+            LogOut.Write("The file dsconfig.xml already exists. Overwrite [Y/N]? ");
             string input = Console.ReadLine();
 
             if (input.ToLowerInvariant() != "y")
@@ -372,7 +377,7 @@ internal static class CliHelpers
         XmlSerializer xmls = new(typeof(DassieConfig));
         xmls.Serialize(configWriter, new DassieConfig(), ns);
 
-        LogOut.WriteLine("Created DassieConfig.xml using default values.");
+        LogOut.WriteLine("Created dsconfig.xml using default values.");
         return 0;
     }
 

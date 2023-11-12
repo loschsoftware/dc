@@ -17,6 +17,8 @@ public static class ErrorWriter
     static ErrorWriter()
     {
         CurrentFile ??= new("");
+        Context ??= new();
+        Context.Configuration ??= new();
     }
 
     internal static readonly List<ErrorInfo> messages = new();
