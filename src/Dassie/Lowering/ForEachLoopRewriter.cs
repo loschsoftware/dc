@@ -15,6 +15,13 @@ internal class ForEachLoopRewriter : ITreeToStringRewriter
         
         DassieParser.Foreach_loopContext loop = (DassieParser.Foreach_loopContext)tree;
 
+        string elementNameIdentifier = loop.Identifier().Length == 2
+            ? loop.Identifier()[1].GetText()
+            : loop.Identifier()[0].GetText();
+
+        if (loop.Identifier().Length == 2)
+            indexVarName = loop.Identifier()[0].GetText();
+
         StringBuilder sb = new();
 
         sb.AppendLine("{");
@@ -25,7 +32,7 @@ internal class ForEachLoopRewriter : ITreeToStringRewriter
         sb.AppendLine($"@ {indexVarName} < (({exprVarName}.Length) - 1) = {{");
 
         sb.AppendLine($"\t{indexVarName} = {indexVarName} + 1");
-        sb.AppendLine($"\t{(loop.Var() != null ? "var " : "")}{loop.Identifier().GetText()} = ({exprVarName}::{indexVarName})");
+        sb.AppendLine($"\t{(loop.Var() != null ? "var " : "")}{elementNameIdentifier} = ({exprVarName}::{indexVarName})");
 
         sb.AppendLine($"\t{listener.GetTextForRule(loop.expression().Last())}");
 

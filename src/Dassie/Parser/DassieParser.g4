@@ -70,7 +70,7 @@ expression
     | expression postfix_if_branch #postfix_if_expression
     | unless_branch NewLine* else_unless_branch* NewLine* else_branch? #prefix_unless_expression
     | expression postfix_unless_branch #postfix_unless_expression
-    | At_Sign ((Var | Val)? Identifier Colon_Greater_Than expression) Equals expression #foreach_loop
+    | At_Sign Open_Paren? ((Var | Val)? Identifier (Comma ((Var | Val)? Identifier))? Close_Paren? Colon_Greater_Than expression) Equals expression #foreach_loop
     | At_Sign expression Equals expression #while_loop
     | Exclamation_At expression Equals expression #until_loop
     | try_branch catch_branch* fault_branch? finally_branch? #try_expression
