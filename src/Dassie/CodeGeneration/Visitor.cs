@@ -2921,7 +2921,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.assignment_operator().Start.Column,
                     context.assignment_operator().GetText().Length,
                     DS0006_VariableTypeChanged,
-                    $"The type of the new value of '{sym.Name()}' does not match the type of the old value.");
+                    $"Expected expression of type '{sym.Type().FullName}', but got type '{type.FullName}'.");
 
                 return type;
             }
