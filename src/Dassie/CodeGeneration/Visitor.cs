@@ -133,7 +133,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         TypeContext tc = new()
         {
-            Builder = tb
+            Builder = tb,
+            FullName = tb.FullName
         };
 
         tc.FilesWhereDefined.Add(CurrentFile.Path);
@@ -232,6 +233,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         };
 
         CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
+        TypeContext.Current.ConstructorContexts.Add(CurrentMethod);
 
         foreach (var param in paramTypes)
         {
@@ -328,6 +330,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         //Helpers.CreateFakeMethod();
         //Type _tReturn = Visit(context.expression());
+
+        if (context.Var() != null)
+        {
+            EmitErrorMessage(
+                context.Var().Symbol.Line,
+                context.Var().Symbol.Column,
+                context.Var().GetText().Length,
+                DS0083_InvalidVarModifier,
+                "The modifier 'var' can not be used on member functions.");
+        }
 
         Type _tReturn = typeof(object);
 
@@ -3401,7 +3413,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitThis_atom([NotNull] DassieParser.This_atomContext context)
     {
-        CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
+        if (CurrentMethod.Builder.IsStatic)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                DS0084_ThisInStaticFunction,
+                "The keyword 'this' is not valid in the current context.");
+
+            return typeof(void);
+        }
+
+        EmitLdarg(0);
         return TypeContext.Current.Builder;
     }
 

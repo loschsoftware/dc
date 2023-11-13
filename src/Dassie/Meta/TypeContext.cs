@@ -9,6 +9,9 @@ internal class TypeContext
     public TypeContext()
     {
         Current = this;
+
+        if (!Context.Types.Contains(this))
+            Context.Types.Add(this);
     }
 
     public static TypeContext Current { get; set; }
@@ -26,6 +29,10 @@ internal class TypeContext
     public List<MethodContext> Methods { get; } = new();
 
     public List<MetaFieldInfo> Fields { get; } = new();
+
+    public List<PropertyBuilder> Properties { get; } = new();
+    
+    public List<MethodContext> ConstructorContexts { get; } = new();
 
     public List<TypeContext> Children { get; } = new();
 }

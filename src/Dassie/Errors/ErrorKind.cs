@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Dassie.Meta;
+using System;
+using System.Reflection.Emit;
 
 namespace Dassie.Errors;
 
@@ -348,5 +350,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an invalid macro is used in dsconfig.xml.
     /// </summary>
-    DS0082_InvalidDSConfigMacro
+    DS0082_InvalidDSConfigMacro,
+    /// <summary>
+    /// Emitted when the 'var' modifier is used on a method.
+    /// </summary>
+    DS0083_InvalidVarModifier,
+    /// <summary>
+    /// Emitted when the 'this' keyword is used in a static function.
+    /// </summary>
+    DS0084_ThisInStaticFunction,
+    /// <summary>
+    /// Emitted when a <see cref="TypeBuilder"/> could not be associated with any <see cref="TypeContext"/> object. Critical error that should never be emitted under normal circumstances.
+    /// </summary>
+    DS0085_TypeInfoCouldNotBeRead
 }

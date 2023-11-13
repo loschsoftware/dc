@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Dassie.CodeGeneration;
 
@@ -108,6 +109,9 @@ internal static class SymbolResolver
     public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public)
     {
         memberIndex++;
+
+        if (type is TypeBuilder tb)
+            return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags);
 
         // 0. Constructors
         if (name == type.Name)
@@ -253,7 +257,6 @@ internal static class SymbolResolver
         }
 
         // 3. Methods
-
         argumentTypes ??= Type.EmptyTypes;
 
         MethodInfo[] methods = type.GetMethods()
@@ -348,6 +351,266 @@ internal static class SymbolResolver
             $"Type '{type.FullName}' has no compatible member called '{name}'.");
 
         return null;
+    }
+
+    private static object ResolveMember(TypeBuilder tb, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public)
+    {
+        TypeContext[] types = Context.Types.Where(c => c.Builder == tb).ToArray();
+
+        if (types.Length == 0)
+        {
+            EmitErrorMessage(
+                row,
+                col,
+                len,
+                DS0085_TypeInfoCouldNotBeRead,
+                $"Members of '{tb.FullName}' could not be located.");
+
+            return null;
+        }
+
+        TypeContext tc = types.First();
+
+        // 0. Constructors
+        if (name == tb.Name)
+        {
+            argumentTypes ??= Type.EmptyTypes;
+
+            ConstructorInfo[] cons = tc.ConstructorContexts.Select(c => c.ConstructorBuilder)
+                .Where(c => c.GetParameters().Length == argumentTypes.Length)
+                .ToArray();
+
+            if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+                CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
+            if (cons.Any())
+            {
+                ConstructorInfo final = null;
+
+                foreach (ConstructorInfo possibleMethod in cons)
+                {
+                    if (final != null)
+                        break;
+
+                    if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
+                    {
+                        final = possibleMethod;
+                        break;
+                    }
+
+                    for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
+                    {
+                        if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
+                        {
+                            if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                            {
+                                CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
+                            }
+
+                            if (i == possibleMethod.GetParameters().Length - 1)
+                            {
+                                final = possibleMethod;
+                                break;
+                            }
+                        }
+
+                        else
+                            break;
+                    }
+                }
+
+                if (final == null)
+                    goto Error;
+
+                for (int i = 0; i < final.GetParameters().Length; i++)
+                {
+                    if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
+                        && final.GetParameters()[i].ParameterType != typeof(object))
+                    {
+                        CurrentMethod.ParameterBoxIndices.Remove(i);
+                    }
+                }
+
+                if (tc.Builder != typeof(object) && final.DeclaringType == typeof(object))
+                    CurrentMethod.BoxCallingType = true;
+
+                if (!noEmitFragments)
+                {
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = len,
+                        Color = Dassie.Text.Color.Function,
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.Constructor(final)
+                    });
+                }
+
+                return final;
+            }
+        }
+
+        // 1. Fields
+        if (tc.Fields.Any(f => f.Name == name))
+        {
+            MetaFieldInfo f = tc.Fields.First(f => f.Name == name);
+
+            if (f.Builder.FieldType.IsEnum)
+            {
+                if (!noEmitFragments)
+                {
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = len,
+                        Color = Dassie.Text.Color.EnumField,
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.EnumField(f.Builder)
+                    });
+                }
+
+                return new EnumValueInfo()
+                {
+                    Name = f.Name,
+                    Value = f.Builder.GetRawConstantValue(),
+                    EnumType = f.Builder.FieldType
+                };
+            }
+
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = len,
+                    Color = Dassie.Text.Color.Field,
+                    IsNavigationTarget = false,
+                    ToolTip = TooltipGenerator.Field(f.Builder)
+                });
+            }
+
+            return f.Builder;
+        }
+
+        // 2. Properties
+        if (tc.Properties.Any(p => p.Name == name))
+        {
+            PropertyInfo p = tc.Properties.First(p => p.Name == name);
+
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = len,
+                    Color = Dassie.Text.Color.Property,
+                    IsNavigationTarget = false,
+                    ToolTip = TooltipGenerator.Property(p)
+                });
+            }
+
+            return p;
+        }
+
+        // 3. Methods
+        argumentTypes ??= Type.EmptyTypes;
+
+        MethodInfo[] methods = tc.Methods.Select(m => m.Builder)
+            .Where(m => m.Name == name)
+            .Where(m => m.GetParameters().Length == argumentTypes.Length)
+            .ToArray();
+
+        if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+            CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
+        if (methods.Any())
+        {
+            MethodInfo final = null;
+
+            foreach (MethodInfo possibleMethod in methods)
+            {
+                if (final != null)
+                    break;
+
+                if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
+                {
+                    final = possibleMethod;
+                    break;
+                }
+
+                for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
+                {
+                    if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
+                    {
+                        if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                        {
+                            CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
+                        }
+
+                        if (i == possibleMethod.GetParameters().Length - 1)
+                        {
+                            final = possibleMethod;
+                            break;
+                        }
+                    }
+
+                    else
+                        break;
+                }
+            }
+
+            if (final == null)
+                goto Error;
+
+            for (int i = 0; i < final.GetParameters().Length; i++)
+            {
+                try
+                {
+                    if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
+                                && final.GetParameters()[i].ParameterType != typeof(object))
+                    {
+                        CurrentMethod.ParameterBoxIndices.Remove(i);
+                    }
+                }
+                catch
+                {
+                    break;
+                }
+            }
+
+            if (tc.Builder != typeof(object) && final.DeclaringType == typeof(object))
+                CurrentMethod.BoxCallingType = true;
+
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = len,
+                    Color = Dassie.Text.Color.Function,
+                    IsNavigationTarget = false,
+                    ToolTip = TooltipGenerator.Function(final)
+                });
+            }
+
+            return final;
+        }
+
+    Error:
+
+        EmitErrorMessage(
+            row,
+            col,
+            len,
+            DS0002_MethodNotFound,
+            $"Type '{tc.Builder.FullName}' has no compatible member called '{name}'.");
+
+        return false;
     }
 
     public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false)
