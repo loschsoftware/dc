@@ -43,5 +43,7 @@ internal class ProgramContext
 
     public DassieConfig Configuration { get; set; }
 
+    public string ConfigurationPath { get; set; }
+
     public bool ShouldThrowDS0027 { get; set; } = false;
 }

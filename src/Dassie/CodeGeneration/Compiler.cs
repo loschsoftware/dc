@@ -50,13 +50,15 @@ public static class Compiler
     /// </summary>
     /// <param name="sourceFiles">An array of paths to the files to compile.</param>
     /// <param name="config">Optional configuration for the compiler.</param>
+    /// <param name="configFileName">The file path to the configuration file.</param>
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
-    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null)
+    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = "dsconfig.xml")
     {
         DassieConfig cfg = config ?? new();
 
         Context = new();
         Context.Configuration = cfg;
+        Context.ConfigurationPath = configFileName;
 
         string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 

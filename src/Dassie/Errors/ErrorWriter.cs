@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration;
+using Dassie.Configuration.Analysis;
 using Dassie.Meta;
 using Dassie.Text.Tooltips;
 using System;
@@ -50,14 +51,21 @@ public static class ErrorWriter
     {
         Context ??= new();
         Context.Configuration ??= new();
+        Context.ConfigurationPath ??= "dsconfig.xml";
         Context.Configuration.IgnoredMessages ??= Array.Empty<Ignore>();
 
         if (Context.Configuration.IgnoredMessages.Any(i => i.Code == error.ErrorCode.ToString().Split('_')[0]))
         {
             if (error.Severity == Severity.Error)
             {
+                XmlLocationService.Location loc = XmlLocationService.GetElementLocation(Context.ConfigurationPath, "IgnoredMessages");
+                if (loc == XmlLocationService.Location.Invalid)
+                    loc = new(0, 0, 0);
+
                 EmitWarningMessage(
-                    0, 0, 0,
+                    loc.Row,
+                    loc.Column,
+                    loc.Length,
                     DS0071_IllegalIgnoredMessage,
                     $"The error code {error.ErrorCode.ToString().Split('_')[0]} cannot be ignored.",
                     "dsconfig.xml");
