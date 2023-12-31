@@ -6,7 +6,7 @@
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<Platforms>AnyCPU;x64</Platforms>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<LangVersion>11</LangVersion>
+		<LangVersion>12</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Deterministic>false</Deterministic>
 		<!--<DefineConstants>NET7_COMPATIBLE</DefineConstants>-->
