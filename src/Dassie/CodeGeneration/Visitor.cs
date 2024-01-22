@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Color = Dassie.Text.Color;
+using System.Data.Common;
 
 namespace Dassie.CodeGeneration;
 
@@ -1740,6 +1741,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 t = s.Type();
                 notLoadAddress = false;
+
+                CurrentFile.Fragments.Add(s.GetFragment(
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.GetText().Length,
+                    true));
             }
 
             else if (o is FieldInfo f)
