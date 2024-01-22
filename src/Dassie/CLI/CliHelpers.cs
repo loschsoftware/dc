@@ -318,6 +318,9 @@ internal static class CliHelpers
                 {
                     foreach (BuildEvent preEvent in profile.PreBuildEvents)
                     {
+                        if (string.IsNullOrEmpty(preEvent.Command))
+                            continue;
+
                         ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden;
 
                         if (!preEvent.Hidden)
@@ -366,6 +369,9 @@ internal static class CliHelpers
                 {
                     foreach (BuildEvent postEvent in profile.PostBuildEvents)
                     {
+                        if (string.IsNullOrEmpty(postEvent.Command))
+                            continue;
+
                         ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden;
 
                         if (!postEvent.Hidden)
