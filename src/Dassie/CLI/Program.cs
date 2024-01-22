@@ -21,10 +21,8 @@ internal class Program
         Console.ForegroundColor = prev;
 #endif
 
-        //#if RELEASE
         try
         {
-            //#endif
             return args switch
             {
                 ["config"] => CliHelpers.BuildDassieConfig(),
@@ -42,7 +40,6 @@ internal class Program
                 [] or ["help" or "?"] => DisplayHelpMessage(),
                 _ => CliHelpers.HandleArgs(args)
             };
-            //#if RELEASE
         }
         catch (Exception ex)
         {
@@ -75,7 +72,6 @@ internal class Program
 
             return -1;
         }
-        //#endif
     }
 
     static Process watchProcess = null;
