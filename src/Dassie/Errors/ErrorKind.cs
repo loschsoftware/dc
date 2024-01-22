@@ -362,5 +362,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a <see cref="TypeBuilder"/> could not be associated with any <see cref="TypeContext"/> object. Critical error that should never be emitted under normal circumstances.
     /// </summary>
-    DS0085_TypeInfoCouldNotBeRead
+    DS0085_TypeInfoCouldNotBeRead,
+    /// <summary>
+    /// Emitted when the command of a build profile or -event is invalid.
+    /// </summary>
+    DS0086_InvalidCommand,
+    /// <summary>
+    /// Emitted when a build or debug profile does not exist.
+    /// </summary>
+    DS0087_InvalidProfile,
+    /// <summary>
+    /// Emitted when a critical build event failed to run correctly.
+    /// </summary>
+    DS0088_BuildEventFailedToRun
 }

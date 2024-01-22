@@ -11,7 +11,7 @@ namespace Dassie.CLI;
 
 internal class Program
 {
-    static int Main(string[] args)
+    internal static int Main(string[] args)
     {
 
 #if NET7_COMPATIBLE

@@ -11,7 +11,7 @@ public class BuildProfile
     public string Name { get; set; }
 
     [XmlElement]
-    public string Command { get; set; }
+    public string Arguments { get; set; }
 
     [XmlArray]
     public BuildEvent[] PreBuildEvents { get; set; }
