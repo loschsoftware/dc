@@ -113,6 +113,14 @@ public sealed class DassieConfig
     [DefaultValue(false)]
     [XmlElement]
     public bool CacheSourceFiles { get; set; } = false;
+
+    [DefaultValue(null)]
+    [XmlArray]
+    public BuildProfile[] BuildProfiles { get; set; }
+
+    [DefaultValue(null)]
+    [XmlArray]
+    public DebugProfile[] DebugProfiles { get; set; }
 }
 
 [Serializable]
