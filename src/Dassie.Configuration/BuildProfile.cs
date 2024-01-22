@@ -12,4 +12,10 @@ public class BuildProfile
 
     [XmlElement]
     public string Command { get; set; }
+
+    [XmlArray]
+    public BuildEvent[] PreBuildEvents { get; set; }
+
+    [XmlArray]
+    public BuildEvent[] PostBuildEvents { get; set; }
 }
