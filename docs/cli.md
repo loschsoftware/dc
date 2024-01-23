@@ -9,7 +9,7 @@ Usage: ``dc <Command> <Arguments>``
 |---|---|---|---|
 ||``<FileName> [FileNames...]``|Compiles the specified source files.|``dc a.ds b.ds``|
 |``new``|``<Type> <Name>``|Creates the folder structure for a Dassie application. ``Type`` can either be ``console`` or ``library``.|``dc new console MyApplication``|
-|``build``||Compiles all .ds source files in the current folder and all subfolders.|``dc build``|
+|``build``|``[-profile:<BuildProfile>]``|Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.|``dc build``|
 |``watch``, ``auto``||Watches all .ds source files in the current folder structure for changes and automatically recompiles when files are changed.|``dc watch``|
 |``quit``||Stops all file watchers.|``dc quit``|
 |``check``, ``verify``|``[FileNames...]``|Checks all specified source files, or all files in the current folder structure, for syntax errors.|``dc check test.ds``|
