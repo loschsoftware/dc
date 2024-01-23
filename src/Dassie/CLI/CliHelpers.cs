@@ -80,12 +80,14 @@ internal static class CliHelpers
 
         parser.Normalize(config);
 
+        string[] files = args.Where(s => !s.StartsWith("-") && !s.StartsWith("/") && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).ToArray();
+
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
 
-        if (args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Any(f => !File.Exists(f)))
+        if (files.Any(f => !File.Exists(f)))
         {
-            foreach (string file in args.Where(s => !s.StartsWith("-") && !s.StartsWith("--") && !s.StartsWith("/")).Where(f => !File.Exists(f)))
+            foreach (string file in files.Where(f => !File.Exists(f)))
             {
                 EmitErrorMessage(
                     0,
@@ -124,7 +126,6 @@ internal static class CliHelpers
 
         if (config.CacheSourceFiles)
         {
-            string[] files = args.Where(File.Exists).ToArray();
             if (File.Exists("dsconfig.xml"))
                 files = files.Append("dsconfig.xml").ToArray();
 
@@ -148,7 +149,7 @@ internal static class CliHelpers
             var di = Directory.CreateDirectory(".cache");
             di.Attributes |= FileAttributes.Hidden;
 
-            foreach (string file in args.Where(File.Exists))
+            foreach (string file in files)
                 File.Copy(file, Path.Combine(".cache", Path.GetFileName(file)), true);
 
             if (File.Exists("dsconfig.xml"))
@@ -156,11 +157,11 @@ internal static class CliHelpers
         }
 
         // Step 1
-        CompileSource(args.Where(File.Exists).ToArray(), config);
+        CompileSource(files, config);
         VisitorStep1 = Context;
 
         // Step 2
-        IEnumerable<ErrorInfo[]> errors = CompileSource(args.Where(File.Exists).ToArray(), config);
+        IEnumerable<ErrorInfo[]> errors = CompileSource(files, config);
 
         string resFile = "";
 
@@ -1394,5 +1395,42 @@ internal static class CliHelpers
             File.Copy(mres.Path, resFile, true);
             Context.Assembly.AddResourceFile(mres.Name, resFile);
         }
+    }
+
+    private static string[] PatternToFileList(string pattern)
+    {
+        static bool IsFileMatchingPattern(string filePath, string filePattern)
+        {
+            string fileName = Path.GetFileName(filePath);
+            string[] patternSegments = filePattern.Split(new[] { '*', '?' }, StringSplitOptions.RemoveEmptyEntries);
+
+            int index = 0;
+            foreach (string segment in patternSegments)
+            {
+                index = fileName.IndexOf(segment, index, StringComparison.OrdinalIgnoreCase);
+
+                if (index == -1)
+                    return false;
+
+                index += segment.Length;
+            }
+
+            return true;
+        }
+
+        string directory = Path.GetDirectoryName(pattern);
+        if (string.IsNullOrEmpty(directory))
+            directory = ".\\";
+
+        string filePattern = Path.GetFileName(pattern);
+        string[] matchingFiles = Directory.GetFiles(directory, filePattern);
+
+        if (filePattern.Contains("*") || filePattern.Contains("?"))
+        {
+            matchingFiles = matchingFiles.Where(file =>
+                IsFileMatchingPattern(file, filePattern)).ToArray();
+        }
+
+        return matchingFiles;
     }
 }
