@@ -211,7 +211,7 @@ internal static class CliHelpers
 
             if (!string.IsNullOrEmpty(Context.Configuration.VersionInfo.ApplicationIcon) && !File.Exists(Context.Configuration.VersionInfo.ApplicationIcon))
             {
-                EmitWarningMessage(
+                EmitErrorMessage(
                    0, 0, 0,
                    DS0069_WinSdkToolNotFound,
                    $"The specified icon file '{Context.Configuration.VersionInfo.ApplicationIcon}' could not be found.",
