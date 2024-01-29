@@ -128,7 +128,8 @@ public enum ApplicationType
 {
     Console,
     WinExe,
-    Library
+    Library,
+    Installer
 }
 
 [Serializable]
