@@ -315,7 +315,7 @@ internal static class CliHelpers
             {
                 BuildProfile profile = config.BuildProfiles.First(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase));
 
-                if (profile.PreBuildEvents.Any())
+                if (profile.PreBuildEvents != null && profile.PreBuildEvents.Any())
                 {
                     foreach (BuildEvent preEvent in profile.PreBuildEvents)
                     {
@@ -364,9 +364,10 @@ internal static class CliHelpers
                     }
                 }
 
-                Program.Main((profile.Arguments ?? " ").Split(' '));
+                if (!string.IsNullOrEmpty(profile.Arguments))
+                    Program.Main(profile.Arguments.Split(' '));
 
-                if (profile.PostBuildEvents.Any())
+                if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
                 {
                     foreach (BuildEvent postEvent in profile.PostBuildEvents)
                     {

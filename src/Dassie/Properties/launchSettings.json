@@ -6,7 +6,7 @@
     },
     "default": {
       "commandName": "Project",
-      "commandLineArgs": "*.txt"
+      "commandLineArgs": "build -profile:X"
     }
   }
 }
