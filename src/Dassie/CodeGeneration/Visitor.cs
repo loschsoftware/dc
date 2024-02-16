@@ -463,7 +463,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                     Context.EntryPointIsSet = true;
 
-                    Context.Assembly.SetEntryPoint(mb);
+                    // TODO: Wait for preview 2
+                    //Context.Assembly.SetEntryPoint(mb);
 
                     CurrentMethod.Builder.SetCustomAttribute(new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
                 }
@@ -1217,7 +1218,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
                 LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
+                // TODO: Hope for .NET 9 implementation of LocalBuilder.SetLocalSymInfo
+                //lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
 
                 EmitStloc(++CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);
@@ -3535,7 +3537,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         else
         {
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-            lb.SetLocalSymInfo(context.Identifier().GetText());
+            // TODO: Hope for .NET 9 implementation of LocalBuilder.SetLocalSymInfo
+            //lb.SetLocalSymInfo(context.Identifier().GetText());
 
             LocalInfo loc = new(context.Identifier().GetText(), lb, true, ++CurrentMethod.LocalIndex, default);
             invalidationList.Add(loc);

@@ -11,7 +11,6 @@ using Dassie.Text;
 using Dassie.Text.Tooltips;
 using Dassie.Unmanaged;
 using Microsoft.Build.Utilities;
-using Microsoft.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -237,8 +236,9 @@ internal static class CliHelpers
 
             resFile = Path.ChangeExtension(rcPath, ".res");
 
-            if (File.Exists(resFile))
-                Context.Assembly.DefineUnmanagedResource(resFile);
+            // TODO: Hope for .NET 9 implementation of AssemblyBuilder.DefineUnmanagedResource
+            //if (File.Exists(resFile))
+            //    Context.Assembly.DefineUnmanagedResource(resFile);
 
             if (!args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("rc")).Any())
                 File.Delete(rcPath);
@@ -1111,7 +1111,8 @@ internal static class CliHelpers
     public static void SetEntryPoint(AssemblyBuilder ab, MethodInfo m)
     {
 #if !NET7_COMPATIBLE
-        ab.SetEntryPoint(m);
+        // TODO: Wait for preview 2
+        //ab.SetEntryPoint(m);
 #endif
     }
 
@@ -1123,7 +1124,8 @@ internal static class CliHelpers
 #if !NET7_COMPATIBLE
         try
         {
-            lb.SetLocalSymInfo(name);
+            // TODO: Hope for .NET 9 implementation of LocalBuilder.SetLocalSymInfo
+            //lb.SetLocalSymInfo(name);
         }
         catch (IndexOutOfRangeException) { }
 #endif
@@ -1376,7 +1378,8 @@ internal static class CliHelpers
         {
             try
             {
-                Context.Assembly.DefineUnmanagedResource(File.ReadAllBytes(res.Path));
+                // TODO: Hope for .NET 9 implementation of AssemblyBuilder.DefineUnmanagedResource
+                //Context.Assembly.DefineUnmanagedResource(File.ReadAllBytes(res.Path));
             }
             catch (ArgumentException)
             {
@@ -1394,7 +1397,8 @@ internal static class CliHelpers
             string resFile = Path.Combine(basePath, Path.GetFileName(mres.Path));
 
             File.Copy(mres.Path, resFile, true);
-            Context.Assembly.AddResourceFile(mres.Name, resFile);
+            // TODO: Hope for .NET 9 implementation of AssemblyBuilder.AddResourceFile
+            //Context.Assembly.AddResourceFile(mres.Name, resFile);
         }
     }
 
