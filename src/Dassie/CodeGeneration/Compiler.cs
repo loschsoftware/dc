@@ -63,7 +63,7 @@ public static class Compiler
         string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
         AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
-        AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+        AssemblyBuilder ab = AssemblyBuilder.DefinePersistedAssembly(name, typeof(object).Assembly);
 
         ModuleBuilder mb = ab.DefineDynamicModule(asmFileName/*, asmFileName, config.CreatePdb || config.Configuration == ApplicationConfiguration.Debug*/);
 
