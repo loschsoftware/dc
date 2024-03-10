@@ -46,8 +46,8 @@ public static class FileCompiler
         string source = File.ReadAllText(path);
         string lowered = SourceFileRewriter.Rewrite(source);
 
-        Directory.CreateDirectory("obj");
-        string intermediatePath = Path.Combine("obj", Path.GetFileNameWithoutExtension(path) + ".i.ds");
+        Directory.CreateDirectory(".temp");
+        string intermediatePath = Path.Combine(".temp", Path.GetFileNameWithoutExtension(path) + ".i.ds");
         File.WriteAllText(intermediatePath, lowered);
 
         ICharStream charStream = CharStreams.fromString(lowered);
@@ -77,7 +77,7 @@ public static class FileCompiler
         if (!config.KeepIntermediateFiles)
         {
             File.Delete(intermediatePath);
-            Directory.Delete("obj");
+            Directory.Delete(".temp");
         }
 
         return CurrentFile.Errors.ToArray();

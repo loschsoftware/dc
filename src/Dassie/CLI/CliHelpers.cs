@@ -428,6 +428,7 @@ internal static class CliHelpers
         }
 
         string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ds", SearchOption.AllDirectories).ToArray();
+        filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != ".temp").ToArray();
 
         if (filesToCompile.Length < 1)
         {
@@ -470,6 +471,7 @@ internal static class CliHelpers
     public static int CheckAll()
     {
         string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ds", SearchOption.AllDirectories).ToArray();
+        filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != ".temp").ToArray();
 
         if (filesToCompile.Length < 1)
         {
