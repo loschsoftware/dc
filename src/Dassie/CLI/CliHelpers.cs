@@ -80,7 +80,7 @@ internal static class CliHelpers
 
         parser.Normalize(config);
 
-        string[] files = args.Where(s => !s.StartsWith("-") && !s.StartsWith("/") && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).ToArray();
+        string[] files = args.Where(s => !s.StartsWith("-") && !s.StartsWith("/") && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
 
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
@@ -253,7 +253,7 @@ internal static class CliHelpers
             AddResource(res, Directory.GetCurrentDirectory());
 
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
-            Context.Assembly.Save(assembly);
+            Context.Assembly.Save(Path.GetFileName(assembly));
 
         string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
 
