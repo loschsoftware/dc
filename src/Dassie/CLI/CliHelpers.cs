@@ -296,126 +296,25 @@ internal static class CliHelpers
 
     public static int CompileAll(string[] args)
     {
+        DassieConfig config = null;
+
+        if (File.Exists("dsconfig.xml"))
+        {
+            XmlSerializer xmls = new(typeof(DassieConfig));
+            using StreamReader sr = new("dsconfig.xml");
+            config = (DassieConfig)xmls.Deserialize(sr);
+        }
+
+        config ??= new();
+
         if (args.Any(a => a.Length > 1 && a[1..].StartsWith("profile:")))
         {
             string profileName = args.First(a => a.Length > 1 && a[1..].StartsWith("profile:")).Split(':')[1];
 
-            DassieConfig config = null;
-
-            if (File.Exists("dsconfig.xml"))
-            {
-                XmlSerializer xmls = new(typeof(DassieConfig));
-                using StreamReader sr = new("dsconfig.xml");
-                config = (DassieConfig)xmls.Deserialize(sr);
-            }
-
-            config ??= new();
-
             if (config.BuildProfiles.Any(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase)))
             {
                 BuildProfile profile = config.BuildProfiles.First(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase));
-
-                if (profile.PreBuildEvents != null && profile.PreBuildEvents.Any())
-                {
-                    foreach (BuildEvent preEvent in profile.PreBuildEvents)
-                    {
-                        if (string.IsNullOrEmpty(preEvent.Command))
-                            continue;
-
-                        ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden;
-
-                        if (!preEvent.Hidden)
-                            windowStyle = ProcessWindowStyle.Normal;
-
-                        ProcessStartInfo psi = new()
-                        {
-                            FileName = "cmd.exe",
-                            Arguments = $"/c {preEvent.Command}",
-                            CreateNoWindow = true,
-                            WindowStyle = windowStyle
-                        };
-
-                        if (preEvent.RunAsAdministrator)
-                            psi.Verb = "runas";
-
-                        Process proc = Process.Start(psi);
-                        proc.WaitForExit();
-
-                        string errMsg = $"The command '{preEvent.Command}' ended with a non-zero exit code.";
-
-                        if (proc.ExitCode != 0 && preEvent.Critical)
-                        {
-                            EmitErrorMessage(
-                                0, 0, 0,
-                                DS0087_InvalidProfile,
-                                errMsg,
-                                "dsconfig.xml");
-
-                            return -1;
-                        }
-                        else if (proc.ExitCode != 0)
-                        {
-                            EmitWarningMessage(
-                                0, 0, 0,
-                                DS0087_InvalidProfile,
-                                errMsg,
-                                "dsconfig.xml");
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(profile.Arguments))
-                    Program.Main(profile.Arguments.Split(' '));
-
-                if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
-                {
-                    foreach (BuildEvent postEvent in profile.PostBuildEvents)
-                    {
-                        if (string.IsNullOrEmpty(postEvent.Command))
-                            continue;
-
-                        ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden;
-
-                        if (!postEvent.Hidden)
-                            windowStyle = ProcessWindowStyle.Normal;
-
-                        ProcessStartInfo psi = new()
-                        {
-                            FileName = "cmd.exe",
-                            Arguments = $"/c {postEvent.Command}",
-                            CreateNoWindow = true,
-                            WindowStyle = windowStyle
-                        };
-
-                        if (postEvent.RunAsAdministrator)
-                            psi.Verb = "runas";
-
-                        Process proc = Process.Start(psi);
-                        proc.WaitForExit();
-
-                        string errMsg = $"The command '{postEvent.Command}' ended with a non-zero exit code.";
-
-                        if (proc.ExitCode != 0 && postEvent.Critical)
-                        {
-                            EmitErrorMessage(
-                                0, 0, 0,
-                                DS0087_InvalidProfile,
-                                errMsg,
-                                "dsconfig.xml");
-
-                            return -1;
-                        }
-                        else if (proc.ExitCode != 0)
-                        {
-                            EmitWarningMessage(
-                                0, 0, 0,
-                                DS0087_InvalidProfile,
-                                errMsg,
-                                "dsconfig.xml");
-                        }
-                    }
-                }
-                return 0;
+                return ExecuteBuildProfile(profile);
             }
 
             EmitErrorMessage(
@@ -426,6 +325,8 @@ internal static class CliHelpers
 
             return -1;
         }
+        else if (config.BuildProfiles.Any(p => p.Name.ToLowerInvariant() == "default"))
+            return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"));
 
         string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ds", SearchOption.AllDirectories).ToArray();
         filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != ".temp").ToArray();
@@ -442,6 +343,112 @@ internal static class CliHelpers
         }
 
         return HandleArgs(filesToCompile.Concat(args).ToArray());
+    }
+
+    private static int ExecuteBuildProfile(BuildProfile profile)
+    {
+        if (profile.PreBuildEvents != null && profile.PreBuildEvents.Any())
+        {
+            foreach (BuildEvent preEvent in profile.PreBuildEvents)
+            {
+                if (string.IsNullOrEmpty(preEvent.Command))
+                    continue;
+
+                ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden;
+
+                if (!preEvent.Hidden)
+                    windowStyle = ProcessWindowStyle.Normal;
+
+                ProcessStartInfo psi = new()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c {preEvent.Command}",
+                    CreateNoWindow = true,
+                    WindowStyle = windowStyle
+                };
+
+                if (preEvent.RunAsAdministrator)
+                    psi.Verb = "runas";
+
+                Process proc = Process.Start(psi);
+                proc.WaitForExit();
+
+                string errMsg = $"The command '{preEvent.Command}' ended with a non-zero exit code.";
+
+                if (proc.ExitCode != 0 && preEvent.Critical)
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0087_InvalidProfile,
+                        errMsg,
+                        "dsconfig.xml");
+
+                    return -1;
+                }
+                else if (proc.ExitCode != 0)
+                {
+                    EmitWarningMessage(
+                        0, 0, 0,
+                        DS0087_InvalidProfile,
+                        errMsg,
+                        "dsconfig.xml");
+                }
+            }
+        }
+
+        if (!string.IsNullOrEmpty(profile.Arguments))
+            Program.Main(profile.Arguments.Split(' '));
+
+        if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
+        {
+            foreach (BuildEvent postEvent in profile.PostBuildEvents)
+            {
+                if (string.IsNullOrEmpty(postEvent.Command))
+                    continue;
+
+                ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden;
+
+                if (!postEvent.Hidden)
+                    windowStyle = ProcessWindowStyle.Normal;
+
+                ProcessStartInfo psi = new()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c {postEvent.Command}",
+                    CreateNoWindow = true,
+                    WindowStyle = windowStyle
+                };
+
+                if (postEvent.RunAsAdministrator)
+                    psi.Verb = "runas";
+
+                Process proc = Process.Start(psi);
+                proc.WaitForExit();
+
+                string errMsg = $"The command '{postEvent.Command}' ended with a non-zero exit code.";
+
+                if (proc.ExitCode != 0 && postEvent.Critical)
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0087_InvalidProfile,
+                        errMsg,
+                        "dsconfig.xml");
+
+                    return -1;
+                }
+                else if (proc.ExitCode != 0)
+                {
+                    EmitWarningMessage(
+                        0, 0, 0,
+                        DS0087_InvalidProfile,
+                        errMsg,
+                        "dsconfig.xml");
+                }
+            }
+        }
+
+        return 0;
     }
 
     public static int Check(string[] args)
