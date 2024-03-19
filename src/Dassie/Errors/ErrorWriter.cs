@@ -111,7 +111,7 @@ public static class ErrorWriter
 
             string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
 
-            outStream.WriteLine($"{prefix}{error.File} ({error.CodePosition.Item1},{error.CodePosition.Item2}): {error.Severity switch
+            outStream.WriteLine($"{prefix}{Path.GetFileName(error.File)} ({error.CodePosition.Item1},{error.CodePosition.Item2}): {error.Severity switch
             {
                 Severity.Error => "error",
                 Severity.Warning => "warning",
