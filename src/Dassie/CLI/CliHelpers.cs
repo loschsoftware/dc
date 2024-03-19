@@ -10,6 +10,7 @@ using Dassie.Runtime;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
 using Dassie.Unmanaged;
+using Dassie.Validation;
 using Microsoft.Build.Utilities;
 using Microsoft.IO;
 using System;
@@ -71,6 +72,9 @@ internal static class CliHelpers
             XmlSerializer xmls = new(typeof(DassieConfig));
             using StreamReader sr = new("dsconfig.xml");
             config = (DassieConfig)xmls.Deserialize(sr);
+
+            foreach (ErrorInfo error in ConfigValidation.Validate("dsconfig.xml"))
+                EmitGeneric(error);
         }
 
         MacroParser parser = new();

@@ -374,5 +374,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a critical build event failed to run correctly.
     /// </summary>
-    DS0088_BuildEventFailedToRun
+    DS0088_BuildEventFailedToRun,
+    /// <summary>
+    /// Emitted when a dsconfig.xml document contains an invalid property.
+    /// </summary>
+    DS0089_InvalidDSConfigProperty
 }
