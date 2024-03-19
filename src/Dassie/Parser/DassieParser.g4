@@ -290,7 +290,7 @@ type_member
     ;
 
 access_modifier_member_group
-    :  member_access_modifier Equals Open_Brace (NewLine | type_member)* Close_Brace
+    : member_access_modifier? member_oop_modifier? member_special_modifier* Equals Open_Brace (NewLine | type_member)* Close_Brace
     ;
 
 parameter_list
