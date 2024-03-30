@@ -20,15 +20,13 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Local(string name, bool mutable, LocalVariableInfo local)
     {
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             BuildWord(mutable ? "var " : "val ", Color.Word),
             BuildWord(name, Color.LocalValue),
-            BuildWord(": ")
-        };
-
-        foreach (Word word in Type(local.LocalType.GetTypeInfo(), false, true, true).Words)
-            words.Add(word);
+            BuildWord(": "),
+            .. Type(local.LocalType.GetTypeInfo(), false, true, true).Words,
+        ];
 
         return new()
         {
@@ -45,14 +43,12 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Parameter(string name, Type type)
     {
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             BuildWord(name, Color.LocalValue),
-            BuildWord(": ")
-        };
-
-        foreach (Word word in Type(type.GetTypeInfo(), false, true, true).Words)
-            words.Add(word);
+            BuildWord(": "),
+            .. Type(type.GetTypeInfo(), false, true, true).Words,
+        ];
 
         return new()
         {
@@ -68,14 +64,12 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Property(PropertyInfo property)
     {
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             BuildWord(property.Name, Color.Property),
-            BuildWord(": ")
-        };
-
-        foreach (Word word in Type(property.PropertyType.GetTypeInfo(), false, true, true).Words)
-            words.Add(word);
+            BuildWord(": "),
+            .. Type(property.PropertyType.GetTypeInfo(), false, true, true).Words,
+        ];
 
         return new()
         {
@@ -91,7 +85,7 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Field(FieldInfo field)
     {
-        ObservableCollection<Word> words = new();
+        ObservableCollection<Word> words = [];
 
         if (field.IsStatic)
             words.Add(BuildWord("static ", Color.Word));
@@ -116,12 +110,12 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip EnumField(FieldInfo field)
     {
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             BuildWord(field.Name, Color.EnumField),
             BuildWord(": "),
             BuildWord(field.FieldType.Name, ColorForType(field.FieldType.GetTypeInfo()))
-        };
+        ];
 
         return new()
         {
@@ -136,10 +130,10 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Constructor(Type type, List<(Type Type, string Name)> parameters)
     {
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             BuildWord(type.Name, ColorForType(type.GetTypeInfo()))
-        };
+        ];
 
         if (parameters.Count > 0)
         {
@@ -179,10 +173,10 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Constructor(ConstructorInfo ctor)
     {
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             BuildWord(ctor.DeclaringType.Name, ColorForType(ctor.DeclaringType.GetTypeInfo()))
-        };
+        ];
 
         if (ctor.GetParameters().Length > 0)
         {
@@ -225,7 +219,7 @@ public static class TooltipGenerator
     /// <returns></returns>
     public static Tooltip Function(string name, Type returnType, (string Name, Type Type)[] parameters, bool intrinsic = false)
     {
-        ObservableCollection<Word> words = new();
+        ObservableCollection<Word> words = [];
 
         if (intrinsic)
             words.Add(BuildWord("[intrinsic] "));
@@ -275,7 +269,7 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Function(MethodInfo method, bool intrinsic = false)
     {
-        ObservableCollection<Word> words = new();
+        ObservableCollection<Word> words = [];
 
         if (intrinsic)
             words.Add(BuildWord("[intrinsic] "));
@@ -328,10 +322,10 @@ public static class TooltipGenerator
         return new()
         {
             IconResourceName = "Namespace",
-            Words = new()
-            {
+            Words =
+            [
                 BuildWord(name, Color.Namespace),
-            }
+            ]
         };
     }
 
@@ -370,7 +364,7 @@ public static class TooltipGenerator
     /// <returns>Returns the generated tooltip.</returns>
     public static Tooltip Type(TypeInfo type, bool showBaseType, bool omitNamespace = false, bool noModifiers = false, Tooltip doc = null, bool ignoreBuiltinAliases = false)
     {
-        ObservableCollection<Word> words = new();
+        ObservableCollection<Word> words = [];
 
         if (!ignoreBuiltinAliases && builtinTypeAliases.ContainsKey(type.AsType()))
         {
