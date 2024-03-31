@@ -15,7 +15,7 @@
 		<Product>Dassie</Product>
 		<ProductName>Dassie</ProductName>
 		<Description>Dassie Compiler</Description>
-		<Copyright>© 2023 Losch</Copyright>
+		<Copyright>© 2024 Losch</Copyright>
 	</PropertyGroup>
 	
 	<!--<PropertyGroup Condition="'$(Configuration)' == 'Debug'">

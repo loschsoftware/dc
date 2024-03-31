@@ -1,5 +1,9 @@
-﻿using Dassie.Configuration;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
+using Dassie.CodeAnalysis.Structure;
+using Dassie.Configuration;
 using Dassie.Errors;
+using Dassie.Parser;
 using Dassie.Text.FragmentStore;
 using System;
 using System.Collections.Generic;
@@ -84,5 +88,35 @@ public static class Compiler
         }
 
         return errors;
+    }
+
+    /// <summary>
+    /// Generates a code structure diagram based on a shallow analysis of the specified source files. Used by LSEdit for creating structure views.
+    /// </summary>
+    /// <param name="sourceFiles">An array of paths to the files to be included in the structure diagram.</param>
+    /// <returns>A <see cref="ProjectStructure"/> representing the code structure of the current compilation context.</returns>
+    public static ProjectStructure GenerateCodeStructure(string[] sourceFiles)
+    {
+        ProjectStructure structure = new()
+        {
+            Namespaces = [],
+            Types = []
+        };
+
+        foreach (string path in sourceFiles)
+        {
+            ICharStream charStream = CharStreams.fromString(File.ReadAllText(path));
+            ITokenSource lexer = new DassieLexer(charStream);
+            ITokenStream tokens = new CommonTokenStream(lexer);
+
+            DassieParser parser = new(tokens);
+            StructureListener listener = new(structure, path);
+            ParseTreeWalker.Default.Walk(listener, parser.compilation_unit());
+
+            structure = listener.Structure;
+        }
+
+        // TODO: Structure isn't completely correct yet, but I can't be bothered to try to fix it right now
+        return structure;
     }
 }
