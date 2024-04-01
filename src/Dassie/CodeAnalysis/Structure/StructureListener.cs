@@ -50,6 +50,15 @@ internal class StructureListener(ProjectStructure prevStructure, string filePath
 
     public override void EnterType([NotNull] DassieParser.TypeContext context)
     {
+        Type.Kind kind = Type.Kind.RefType;
+
+        if (context.type_kind().Val() != null)
+            kind = Type.Kind.ValType;
+        else if (context.type_kind().Template() != null)
+            kind = Type.Kind.Template;
+        else if (context.type_kind().Module() != null)
+            kind = Type.Kind.Module;
+
         if (string.IsNullOrEmpty(_namespaceId))
         {
             Structure.Types =
@@ -58,7 +67,8 @@ internal class StructureListener(ProjectStructure prevStructure, string filePath
                 new()
                 {
                     Name = context.Identifier().GetText(),
-                    Files = [filePath]
+                    Files = [filePath],
+                    TypeKind = kind
                 }
             ];
         }
@@ -70,7 +80,8 @@ internal class StructureListener(ProjectStructure prevStructure, string filePath
                 new()
                 {
                     Name = context.Identifier().GetText(),
-                    Files = [filePath]
+                    Files = [filePath],
+                    TypeKind = kind
                 }
             ];
         }
