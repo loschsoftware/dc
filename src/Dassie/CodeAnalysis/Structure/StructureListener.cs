@@ -16,7 +16,7 @@ internal class StructureListener(ProjectStructure prevStructure, string filePath
         for (int i = _namespaceId.Split('.').Length; i > 0; i--)
         {
             string ns = string.Join(".", _namespaceId.Split('.')[0..i]);
-            if (Structure.Namespaces.Any(n => n.Name == ns))
+            if (Structure.Namespaces.Any(n => n.Name == ns) && ns != _namespaceId)
             {
                 _namespace = new()
                 {
@@ -46,6 +46,8 @@ internal class StructureListener(ProjectStructure prevStructure, string filePath
                 _namespace
             ];
         }
+        else
+            _namespace = Structure.Namespaces.First(n => n.Name == _namespaceId);
     }
 
     public override void EnterType([NotNull] DassieParser.TypeContext context)
