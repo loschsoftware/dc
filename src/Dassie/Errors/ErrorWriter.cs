@@ -115,7 +115,7 @@ public static class ErrorWriter
             {
                 Severity.Error => "error",
                 Severity.Warning => "warning",
-                _ => "information"
+                _ => "message"
             }} {errCode}: {error.ErrorMessage}");
 
             if (!string.IsNullOrEmpty(error.Tip) && Context.Configuration.EnableTips)

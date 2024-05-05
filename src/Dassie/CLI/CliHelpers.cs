@@ -879,6 +879,16 @@ internal static class CliHelpers
             {
                 baseAttributes |= MethodAttributes.Static;
                 isStatic = true;
+
+                if (oopModifier != null && oopModifier.Closed() != null)
+                {
+                    EmitMessage(
+                        oopModifier.Closed().Symbol.Line,
+                        oopModifier.Closed().Symbol.Column,
+                        oopModifier.Closed().GetText().Length,
+                        DS0058_RedundantModifier,
+                        "Redundant modifier 'closed'.");
+                }
             }
 
             if (modifier.Extern() != null)
