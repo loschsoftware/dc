@@ -274,7 +274,7 @@ member_access_modifier
     ;
 
 member_oop_modifier
-    : Virtual
+    : Closed
     ;
 
 member_special_modifier

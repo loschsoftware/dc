@@ -6419,7 +6419,7 @@ public partial class DassieParser : Parser {
 	}
 
 	public partial class Member_oop_modifierContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Virtual() { return GetToken(DassieParser.Virtual, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Closed() { return GetToken(DassieParser.Closed, 0); }
 		public Member_oop_modifierContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -6451,7 +6451,7 @@ public partial class DassieParser : Parser {
 			EnterOuterAlt(_localctx, 1);
 			{
 			State = 801;
-			Match(Virtual);
+			Match(Closed);
 			}
 		}
 		catch (RecognitionException re) {
@@ -6632,7 +6632,7 @@ public partial class DassieParser : Parser {
 				State = 815;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (_la==Virtual) {
+				if (_la==Closed) {
 					{
 					State = 814;
 					member_oop_modifier();
@@ -6754,7 +6754,7 @@ public partial class DassieParser : Parser {
 				State = 851;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (_la==Virtual) {
+				if (_la==Closed) {
 					{
 					State = 850;
 					member_oop_modifier();
@@ -6886,7 +6886,7 @@ public partial class DassieParser : Parser {
 			State = 874;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if (_la==Virtual) {
+			if (_la==Closed) {
 				{
 				State = 873;
 				member_oop_modifier();
@@ -6914,7 +6914,7 @@ public partial class DassieParser : Parser {
 			State = 888;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 769781764L) != 0) || _la==Less_Than || _la==Identifier) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 768208900L) != 0) || _la==Less_Than || _la==Identifier) {
 				{
 				State = 886;
 				ErrorHandler.Sync(this);
@@ -6930,7 +6930,7 @@ public partial class DassieParser : Parser {
 				case Internal:
 				case Static:
 				case Protected:
-				case Virtual:
+				case Closed:
 				case Extern:
 				case Infix:
 				case Inline:
@@ -7404,7 +7404,7 @@ public partial class DassieParser : Parser {
 			State = 952;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 803601924L) != 0) || ((((_la - 87)) & ~0x3f) == 0 && ((1L << (_la - 87)) & 1074266113L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 802029060L) != 0) || ((((_la - 87)) & ~0x3f) == 0 && ((1L << (_la - 87)) & 1074266113L) != 0)) {
 				{
 				State = 950;
 				ErrorHandler.Sync(this);
@@ -8188,7 +8188,7 @@ public partial class DassieParser : Parser {
 		789,791,5,25,0,0,790,789,1,0,0,0,790,791,1,0,0,0,791,792,1,0,0,0,792,798,
 		5,9,0,0,793,794,5,27,0,0,794,798,5,9,0,0,795,798,5,11,0,0,796,798,5,10,
 		0,0,797,790,1,0,0,0,797,793,1,0,0,0,797,795,1,0,0,0,797,796,1,0,0,0,798,
-		91,1,0,0,0,799,800,7,7,0,0,800,93,1,0,0,0,801,802,5,21,0,0,802,95,1,0,
+		91,1,0,0,0,799,800,7,7,0,0,800,93,1,0,0,0,801,802,5,19,0,0,802,95,1,0,
 		0,0,803,804,7,8,0,0,804,97,1,0,0,0,805,807,3,64,32,0,806,805,1,0,0,0,806,
 		807,1,0,0,0,807,809,1,0,0,0,808,810,7,0,0,0,809,808,1,0,0,0,809,810,1,
 		0,0,0,810,812,1,0,0,0,811,813,3,92,46,0,812,811,1,0,0,0,812,813,1,0,0,

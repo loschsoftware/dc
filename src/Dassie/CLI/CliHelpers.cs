@@ -818,14 +818,14 @@ internal static class CliHelpers
         else
             baseAttributes = FieldAttributes.Private;
 
-        if (oopModifier != null && oopModifier.Virtual() != null)
+        if (oopModifier != null && oopModifier.Closed() != null)
         {
             EmitErrorMessage(
                 oopModifier.Start.Line,
                 oopModifier.Start.Column,
                 oopModifier.GetText().Length,
                 DS0052_InvalidAccessModifier,
-                "The modifier 'virtual' is not supported by this element.");
+                "The modifier 'closed' is not supported by this element.");
         }
 
         foreach (var modifier in specialModifiers)
@@ -872,13 +872,14 @@ internal static class CliHelpers
         else
             baseAttributes = MethodAttributes.Private;
 
-        if (oopModifier != null && oopModifier.Virtual() != null)
-            baseAttributes |= MethodAttributes.Virtual;
-
+        bool isStatic = false;
         foreach (var modifier in specialModifiers)
         {
             if (modifier.Static() != null)
+            {
                 baseAttributes |= MethodAttributes.Static;
+                isStatic = true;
+            }
 
             if (modifier.Extern() != null)
                 baseAttributes |= MethodAttributes.PinvokeImpl;
@@ -891,8 +892,11 @@ internal static class CliHelpers
                 specialModifiers.First(s => s.GetText() == "static").Start.Column,
                 specialModifiers.First(s => s.GetText() == "static").GetText().Length,
                 DS0058_RedundantModifier,
-                "The 'static' modifier is implicit for module members and can be omitted.");
+                "Redundant modifier 'static'.");
         }
+
+        if (!isStatic && (oopModifier == null || oopModifier.Closed() == null))
+            baseAttributes |= MethodAttributes.Virtual;
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(MethodAttributes.Static))
             baseAttributes |= MethodAttributes.Static;
