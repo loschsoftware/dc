@@ -12,7 +12,6 @@ using Dassie.Text.Tooltips;
 using Dassie.Unmanaged;
 using Dassie.Validation;
 using Microsoft.Build.Utilities;
-using Microsoft.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,6 +20,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -242,7 +244,10 @@ internal static class CliHelpers
             resFile = Path.ChangeExtension(rcPath, ".res");
 
             if (File.Exists(resFile))
-                Context.Assembly.DefineUnmanagedResource(resFile);
+            {
+                // TODO: Implement alternative
+                //Context.Assembly.DefineUnmanagedResource(resFile);
+            }
 
             if (!args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("rc")).Any())
                 File.Delete(rcPath);
@@ -257,7 +262,15 @@ internal static class CliHelpers
             AddResource(res, Directory.GetCurrentDirectory());
 
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
-            Context.Assembly.Save(Path.GetFileName(assembly));
+        {
+            ManagedPEBuilder peBuilder = SetEntryPoint(Context.EntryPoint);
+
+            BlobBuilder peBlob = new();
+            peBuilder.Serialize(peBlob);
+
+            using FileStream fs = new(Path.GetFileName(assembly), FileMode.Create, FileAccess.Write);
+            peBlob.WriteContentTo(fs);
+        }
 
         string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
 
@@ -1135,11 +1148,24 @@ internal static class CliHelpers
         }
     }
 
-    public static void SetEntryPoint(AssemblyBuilder ab, MethodInfo m)
+    public static ManagedPEBuilder SetEntryPoint(MethodInfo m)
     {
-#if !NET7_COMPATIBLE
-        ab.SetEntryPoint(m);
-#endif
+        if (!(m.DeclaringType as TypeBuilder).IsCreated())
+            (m.DeclaringType as TypeBuilder).CreateType();
+
+        MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData);
+        PEHeaderBuilder headerBuilder = new(
+            imageBase: 0x00400000,
+            imageCharacteristics: Characteristics.ExecutableImage);
+
+        ManagedPEBuilder peBuilder = new(
+            headerBuilder,
+            new(mb),
+            ilStream,
+            mappedFieldData,
+            entryPoint: MetadataTokens.MethodDefinitionHandle(m.MetadataToken));
+
+        return peBuilder;
     }
 
     public static void SetLocalSymInfo(LocalBuilder lb, string name)
@@ -1150,7 +1176,8 @@ internal static class CliHelpers
 #if !NET7_COMPATIBLE
         try
         {
-            lb.SetLocalSymInfo(name);
+            // TODO: Implement alternative
+            //lb.SetLocalSymInfo(name);
         }
         catch (IndexOutOfRangeException) { }
 #endif
@@ -1403,7 +1430,8 @@ internal static class CliHelpers
         {
             try
             {
-                Context.Assembly.DefineUnmanagedResource(File.ReadAllBytes(res.Path));
+                // TODO: Implement alternative
+                //Context.Assembly.DefineUnmanagedResource(File.ReadAllBytes(res.Path));
             }
             catch (ArgumentException)
             {
@@ -1421,7 +1449,8 @@ internal static class CliHelpers
             string resFile = Path.Combine(basePath, Path.GetFileName(mres.Path));
 
             File.Copy(mres.Path, resFile, true);
-            Context.Assembly.AddResourceFile(mres.Name, resFile);
+            // TODO: Implent alternative
+            //Context.Assembly.AddResourceFile(mres.Name, resFile);
         }
     }
 

@@ -50,7 +50,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitFile_body([NotNull] DassieParser.File_bodyContext context)
     {
 #if NET7_COMPATIBLE
-        Context.Assembly = AssemblyBuilder.DefineDynamicAssembly(new("throwaway"), AssemblyBuilderAccess.Run);
+        Context.Assembly = PersistedAssemblyBuilder.DefineDynamicAssembly(new("throwaway"), PersistedAssemblyBuilderAccess.Run);
         Context.Module = Context.Assembly.DefineDynamicModule("throwaway");
 #endif
 
@@ -463,7 +463,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                     Context.EntryPointIsSet = true;
 
-                    Context.Assembly.SetEntryPoint(mb);
+                    Context.EntryPoint = mb;
 
                     CurrentMethod.Builder.SetCustomAttribute(new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
                 }
@@ -714,7 +714,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
 
-        CliHelpers.SetEntryPoint(Context.Assembly, mb);
+        Context.EntryPoint = mb;
 
         tb.CreateType();
         return ret;
@@ -1217,7 +1217,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
                 LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
+                // TODO: Implement alternative
+                //lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
 
                 EmitStloc(++CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);
@@ -3535,7 +3536,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         else
         {
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-            lb.SetLocalSymInfo(context.Identifier().GetText());
+            // TODO: Implement alternative
+            //lb.SetLocalSymInfo(context.Identifier().GetText());
 
             LocalInfo loc = new(context.Identifier().GetText(), lb, true, ++CurrentMethod.LocalIndex, default);
             invalidationList.Add(loc);

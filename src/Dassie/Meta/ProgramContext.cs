@@ -25,7 +25,9 @@ internal class ProgramContext
 
     public List<(string Name, string Alias)> GlobalAliases { get; } = new();
 
-    public AssemblyBuilder Assembly { get; set; }
+    public PersistedAssemblyBuilder Assembly { get; set; }
+
+    public MethodBuilder EntryPoint { get; set; }
 
     public AssemblyBuilder BogusAssembly { get; set; }
 
