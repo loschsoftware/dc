@@ -113,8 +113,7 @@ internal static class CliHelpers
             Directory.SetCurrentDirectory(config.BuildOutputDirectory);
         }
 
-        string assembly = Path.Combine(config.BuildOutputDirectory ?? "", $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}");
-
+        string assembly = Path.Combine(config.BuildOutputDirectory ?? "", $"{config.AssemblyName}.dll");
         string msgPrefix = MessagePrefix;
 
         if (config.References != null)
