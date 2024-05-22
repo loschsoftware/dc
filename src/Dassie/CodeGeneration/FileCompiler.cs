@@ -129,7 +129,7 @@ public static class FileCompiler
         }
         catch (Exception ex)
         {
-            string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Losch", "Script")).FullName;
+            string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie")).FullName;
 
             using StreamWriter sw = File.AppendText(Path.Combine(dir, "exception.log"));
             sw.WriteLine(ex.ToString());
