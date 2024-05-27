@@ -9,7 +9,6 @@
 		<LangVersion>12</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Deterministic>false</Deterministic>
-		<!--<DefineConstants>NET7_COMPATIBLE</DefineConstants>-->
 		
 		<Company>Losch</Company>
 		<Product>Dassie</Product>
@@ -17,10 +16,6 @@
 		<Description>Dassie Compiler</Description>
 		<Copyright>© 2024 Losch</Copyright>
 	</PropertyGroup>
-	
-	<!--<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-	  <DefineConstants>$(DefineConstants);NET7_COMPATIBLE</DefineConstants>
-	</PropertyGroup>-->
 
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.12.0" />
@@ -40,6 +35,6 @@
 	</Target>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Condition="'$(Configuration)' == 'Debug'" Command="copy $(OutDir)dc.exe ..\..\..\lsedit\tools\assemblies\dc.exe &amp;&#xD;&#xA;			copy $(OutDir)dc.exe.config ..\..\..\lsedit\tools\assemblies\dc.exe.config &amp;&#xD;&#xA;			copy $(OutDir)dc.xml ..\..\..\lsedit\tools\assemblies\dc.xml &amp;&#xD;&#xA;			copy $(OutDir)dsconfig.dll ..\..\..\lsedit\tools\assemblies\dsconfig.dll &amp;&#xD;&#xA;			copy $(OutDir)dsconfig.xml ..\..\..\lsedit\tools\assemblies\dsconfig.xml &amp;&#xD;&#xA;			copy $(OutDir)Dassie.Core.dll ..\..\..\lsedit\tools\assemblies\Dassie.Core.dll &amp;&#xD;&#xA;			copy $(OutDir)Dassie.Core.xml ..\..\..\lsedit\tools\assemblies\Dassie.Core.xml &amp;&#xD;&#xA;			copy $(OutDir)dstx.dll ..\..\..\lsedit\tools\assemblies\dstx.dll &amp;&#xD;&#xA;			copy $(OutDir)dstx.xml ..\..\..\lsedit\tools\assemblies\dstx.xml" />
+		<Exec Command="copy $(OutDir)dc.exe ..\..\..\lsedit\tools\assemblies\dc.exe &amp;&#xD;&#xA;			copy $(OutDir)dc.exe.config ..\..\..\lsedit\tools\assemblies\dc.exe.config &amp;&#xD;&#xA;			copy $(OutDir)dc.xml ..\..\..\lsedit\tools\assemblies\dc.xml &amp;&#xD;&#xA;			copy $(OutDir)dsconfig.dll ..\..\..\lsedit\tools\assemblies\dsconfig.dll &amp;&#xD;&#xA;			copy $(OutDir)dsconfig.xml ..\..\..\lsedit\tools\assemblies\dsconfig.xml &amp;&#xD;&#xA;			copy $(OutDir)Dassie.Core.dll ..\..\..\lsedit\tools\assemblies\Dassie.Core.dll &amp;&#xD;&#xA;			copy $(OutDir)Dassie.Core.xml ..\..\..\lsedit\tools\assemblies\Dassie.Core.xml &amp;&#xD;&#xA;			copy $(OutDir)dstx.dll ..\..\..\lsedit\tools\assemblies\dstx.dll &amp;&#xD;&#xA;			copy $(OutDir)dstx.xml ..\..\..\lsedit\tools\assemblies\dstx.xml" />
 	</Target>
 </Project>
