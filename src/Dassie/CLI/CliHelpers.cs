@@ -3,6 +3,7 @@ using Dassie.CLI.Helpers;
 using Dassie.CodeGeneration;
 using Dassie.Configuration;
 using Dassie.Configuration.Macros;
+using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -81,8 +82,12 @@ internal static class CliHelpers
 
         MacroParser parser = new();
 
+        string asmName = "";
+        if (args.Where(File.Exists).Any())
+            asmName = Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
+
         config ??= new();
-        config.AssemblyName ??= Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
+        config.AssemblyName ??= asmName;
 
         parser.Normalize(config);
 
@@ -90,22 +95,6 @@ internal static class CliHelpers
 
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
-
-        if (files.Any(f => !File.Exists(f)))
-        {
-            foreach (string file in files.Where(f => !File.Exists(f)))
-            {
-                EmitErrorMessage(
-                    0,
-                    0,
-                    0,
-                    DS0048_SourceFileNotFound,
-                    $"The source file '{Path.GetFileName(file)}' could not be found.",
-                    Path.GetFileName(file));
-            }
-
-            return -1;
-        }
 
         if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
         {
@@ -1485,6 +1474,17 @@ internal static class CliHelpers
         {
             matchingFiles = matchingFiles.Where(file =>
                 IsFileMatchingPattern(file, filePattern)).ToArray();
+        }
+
+        if (matchingFiles.Length == 0)
+        {
+            EmitErrorMessage(
+                0,
+                0,
+                0,
+                DS0048_SourceFileNotFound,
+                $"The source file '{filePattern}' could not be found.",
+                Path.GetFileName(filePattern));
         }
 
         return matchingFiles;

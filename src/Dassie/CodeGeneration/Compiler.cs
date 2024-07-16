@@ -85,7 +85,8 @@ public static class Compiler
             EmitErrorMessage(
                 0, 0, 0,
                 DS0030_NoEntryPoint,
-                "Program contains no entry point. Use the '<EntryPoint>' attribute to specify an application entry point.");
+                "Program contains no entry point. Use the '<EntryPoint>' attribute to specify an application entry point.",
+                "dc");
         }
 
         return errors;

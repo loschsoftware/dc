@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration;
+using Dassie.Errors;
 using Dassie.Text.FragmentStore;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,4 +49,6 @@ internal class ProgramContext
     public string ConfigurationPath { get; set; }
 
     public bool ShouldThrowDS0027 { get; set; } = false;
+
+    public List<ErrorKind> CompilerSuppressedMessages { get; } = new();
 }
