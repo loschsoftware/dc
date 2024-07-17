@@ -251,7 +251,7 @@ public static class TooltipGenerator
         }
 
         words.Add(BuildWord(": "));
-        foreach (Word word in Type(returnType.GetTypeInfo(), false, true, true).Words)
+        foreach (Word word in Type((returnType ?? typeof(Unknown)).GetTypeInfo(), false, true, true).Words)
             words.Add(word);
 
         return new()

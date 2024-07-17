@@ -74,7 +74,9 @@ public static class FileCompiler
 
         if (!config.KeepIntermediateFiles)
         {
-            File.Delete(intermediatePath);
+            if (File.Exists(intermediatePath))
+                File.Delete(intermediatePath);
+
             foreach (string file in Directory.GetFiles(".temp"))
                 File.Delete(file);
 

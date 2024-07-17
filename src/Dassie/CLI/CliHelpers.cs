@@ -651,6 +651,12 @@ internal static class CliHelpers
                     goto FoundType;
                 }
 
+                if (Context.Types.Any(t => t.FullName == n))
+                {
+                    type = Context.Types.First(t => t.FullName == n).Builder;
+                    goto FoundType;
+                }
+
                 if (type != null)
                     goto FoundType;
             }
@@ -1142,15 +1148,28 @@ internal static class CliHelpers
 
     public static ManagedPEBuilder SetEntryPoint(MethodInfo m)
     {
-        if (!(m.DeclaringType as TypeBuilder).IsCreated())
-            (m.DeclaringType as TypeBuilder).CreateType();
-
         MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData);
         PEHeaderBuilder headerBuilder = new(
             imageBase: 0x00400000,
             imageCharacteristics: Characteristics.ExecutableImage);
 
-        ManagedPEBuilder peBuilder = new(
+        ManagedPEBuilder peBuilder;
+
+        if (m == null)
+        {
+            peBuilder = new(
+                headerBuilder,
+                new(mb),
+                ilStream,
+                mappedFieldData);
+
+            return peBuilder;
+        }
+
+        if (!(m.DeclaringType as TypeBuilder).IsCreated())
+            (m.DeclaringType as TypeBuilder).CreateType();
+
+        peBuilder = new(
             headerBuilder,
             new(mb),
             ilStream,

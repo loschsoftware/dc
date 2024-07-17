@@ -661,6 +661,12 @@ internal static class SymbolResolver
                     goto FoundType;
                 }
 
+                if (Context.Types.Any(t => t.FullName == n))
+                {
+                    type = Context.Types.First(t => t.FullName == n).Builder;
+                    goto FoundType;
+                }
+
                 if (type != null)
                     goto FoundType;
             }

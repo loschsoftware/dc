@@ -222,10 +222,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         var paramTypes = ResolveParameterList(context.parameter_list());
 
-        ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(
-        CliHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()),
-        callingConventions,
-        paramTypes.Select(p => p.Type).ToArray());
+        MethodAttributes attribs = CliHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier());
+        if (attribs.HasFlag(MethodAttributes.Virtual))
+            attribs &= ~MethodAttributes.Virtual;
+
+        ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(attribs, callingConventions, paramTypes.Select(p => p.Type).ToArray());
 
         CurrentMethod = new()
         {

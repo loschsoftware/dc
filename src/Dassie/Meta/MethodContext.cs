@@ -36,6 +36,9 @@ internal class MethodContext
             if (VisitorStep1 == null)
                 return null;
 
+            if (CurrentMethod.Builder == null)
+                return null;
+
             if (VisitorStep1.Types.Any(t => t.FullName == TypeContext.Current.FullName))
             {
                 TypeContext type = VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName);
