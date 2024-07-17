@@ -919,7 +919,7 @@ internal static class CliHelpers
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(MethodAttributes.Static))
         {
             baseAttributes |= MethodAttributes.Static;
-            baseAttributes &= MethodAttributes.Virtual;
+            baseAttributes &= ~MethodAttributes.Virtual;
         }
 
         return baseAttributes;
