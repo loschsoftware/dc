@@ -43,7 +43,7 @@ internal class Program
         }
         catch (Exception ex)
         {
-            if (ex is IOException)
+            if (ex is IOException or UnauthorizedAccessException)
                 EmitErrorMessage(0, 0, 0, DS0029_FileAccessDenied, $"Access to file '{Path.GetFileName(CurrentFile.Path)}' denied.");
 
             if (messages.Count == 0)
