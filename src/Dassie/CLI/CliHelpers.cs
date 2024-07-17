@@ -311,6 +311,7 @@ internal static class CliHelpers
         }
 
         config ??= new();
+        config.BuildProfiles ??= [];
 
         if (args.Any(a => a.Length > 1 && a[1..].StartsWith("profile:")))
         {

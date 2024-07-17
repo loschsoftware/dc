@@ -6,7 +6,8 @@
     },
     "default": {
       "commandName": "Project",
-      "commandLineArgs": "lol.xyz"
+      "commandLineArgs": "build",
+      "workingDirectory": "C:\\Users\\Jonas\\Desktop\\Zeug\\DassieProjects\\ProjectRefTest"
     }
   }
 }
