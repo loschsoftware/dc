@@ -7,7 +7,7 @@
     "default": {
       "commandName": "Project",
       "commandLineArgs": "build",
-      "workingDirectory": "C:\\Users\\Jonas\\Desktop\\FinalFuckingTest"
+      "workingDirectory": "C:\\Users\\Jonas\\source\\lsedit\\Dassie.Generators"
     }
   }
 }
