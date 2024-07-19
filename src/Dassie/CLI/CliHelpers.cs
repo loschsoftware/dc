@@ -271,6 +271,18 @@ internal static class CliHelpers
             catch (IOException) { }
         }
 
+        foreach (string dependency in Context.ReferencedAssemblies.Select(a => a.Location))
+        {
+            if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(Path.GetDirectoryName(dependency)))
+            {
+                try
+                {
+                    File.Copy(dependency, Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(dependency)), true);
+                }
+                catch (IOException) { }
+            }
+        }
+
         sw.Stop();
 
         if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
