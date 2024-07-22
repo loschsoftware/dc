@@ -4,7 +4,6 @@ using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
 using Dassie.Configuration.Macros;
-using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -25,6 +24,7 @@ using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using System.Resources;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -252,7 +252,7 @@ internal static class CliHelpers
 
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
         {
-            ManagedPEBuilder peBuilder = SetEntryPoint(Context.EntryPoint);
+            ManagedPEBuilder peBuilder = CreatePEBuilder(Context.EntryPoint, resFile);
 
             BlobBuilder peBlob = new();
             peBuilder.Serialize(peBlob);
@@ -1161,35 +1161,30 @@ internal static class CliHelpers
         }
     }
 
-    public static ManagedPEBuilder SetEntryPoint(MethodInfo m)
+    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, string resFilePath = null)
     {
         MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData);
         PEHeaderBuilder headerBuilder = new(
             imageBase: 0x00400000,
             imageCharacteristics: Characteristics.ExecutableImage);
 
-        ManagedPEBuilder peBuilder;
+        MethodDefinitionHandle handle = default;
 
-        if (m == null)
+        if (entryPoint != null)
         {
-            peBuilder = new(
-                headerBuilder,
-                new(mb),
-                ilStream,
-                mappedFieldData);
+            if (!(entryPoint.DeclaringType as TypeBuilder).IsCreated())
+                (entryPoint.DeclaringType as TypeBuilder).CreateType();
 
-            return peBuilder;
+            handle = MetadataTokens.MethodDefinitionHandle(entryPoint.MetadataToken);
         }
 
-        if (!(m.DeclaringType as TypeBuilder).IsCreated())
-            (m.DeclaringType as TypeBuilder).CreateType();
-
-        peBuilder = new(
+        ManagedPEBuilder peBuilder = new(
             headerBuilder,
             new(mb),
             ilStream,
             mappedFieldData,
-            entryPoint: MetadataTokens.MethodDefinitionHandle(m.MetadataToken));
+            entryPoint: handle,
+            nativeResources: new VersionInfoBuilder(resFilePath));
 
         return peBuilder;
     }
