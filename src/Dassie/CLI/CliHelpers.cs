@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CLI.Helpers;
 using Dassie.CodeGeneration;
+using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Core;
@@ -282,6 +283,8 @@ internal static class CliHelpers
                 catch (IOException) { }
             }
         }
+
+        RuntimeConfigWriter.GenerateRuntimeConfigFile(Path.GetFileNameWithoutExtension(assembly) + ".runtimeconfig.json");
 
         sw.Stop();
 
