@@ -160,7 +160,11 @@ internal static class CliHelpers
 
         string resFile = "";
 
-        if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource) && Context.Configuration.VersionInfo != null)
+        if ((Context.Configuration.Resources ?? []).Any(r => r is UnmanagedResource))
+        {
+            resFile = ((UnmanagedResource)Context.Configuration.Resources.First(r => r is UnmanagedResource)).Path;
+        }
+        else if (Context.Configuration.VersionInfo != null)
         {
             EmitMessage(
                 0, 0, 0,
