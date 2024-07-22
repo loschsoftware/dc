@@ -24,7 +24,6 @@ using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
-using System.Resources;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -163,6 +162,15 @@ internal static class CliHelpers
         if ((Context.Configuration.Resources ?? []).Any(r => r is UnmanagedResource))
         {
             resFile = ((UnmanagedResource)Context.Configuration.Resources.First(r => r is UnmanagedResource)).Path;
+
+            if ((Context.Configuration.Resources ?? []).Where(r => r is UnmanagedResource).Count() > 1)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0068_MultipleUnmanagedResources,
+                    "An assembly can only contain one unmanaged resource file.",
+                    "dsconfig.xml");
+            }
         }
         else if (Context.Configuration.VersionInfo != null)
         {
