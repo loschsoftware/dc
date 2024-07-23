@@ -24,6 +24,7 @@ using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using System.Resources;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -264,7 +265,12 @@ internal static class CliHelpers
 
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
         {
-            ManagedPEBuilder peBuilder = CreatePEBuilder(Context.EntryPoint, resFile);
+            NativeResource[] resources = [new() {
+                Data = File.ReadAllBytes(resFile),
+                Kind = ResourceKind.Version
+            }];
+
+            ManagedPEBuilder peBuilder = CreatePEBuilder(Context.EntryPoint, resources);
 
             BlobBuilder peBlob = new();
             peBuilder.Serialize(peBlob);
@@ -1173,7 +1179,7 @@ internal static class CliHelpers
         }
     }
 
-    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, string resFilePath = null)
+    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources)
     {
         MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData);
         PEHeaderBuilder headerBuilder = new(
@@ -1196,7 +1202,7 @@ internal static class CliHelpers
             ilStream,
             mappedFieldData,
             entryPoint: handle,
-            nativeResources: new VersionInfoBuilder(resFilePath));
+            nativeResources: new ResourceBuilder(resources));
 
         return peBuilder;
     }
