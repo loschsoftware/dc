@@ -24,7 +24,6 @@ using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
-using System.Resources;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -244,12 +243,6 @@ internal static class CliHelpers
             Process.Start(psi).WaitForExit();
 
             resFile = Path.ChangeExtension(rcPath, ".res");
-
-            if (File.Exists(resFile))
-            {
-                // TODO: Implement alternative
-                //Context.Assembly.DefineUnmanagedResource(resFile);
-            }
 
             if (!args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("rc")).Any())
                 File.Delete(rcPath);

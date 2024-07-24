@@ -102,6 +102,15 @@ FILESUBTYPE 0x0");
         productName ??= "";
         productVersion ??= "";
 
+        company = company.Replace("\"", "\"\"");
+        description = description.Replace("\"", "\"\"");
+        fileVersion = fileVersion.Replace("\"", "\"\"");
+        internalName = internalName.Replace("\"", "\"\"");
+        legalCopyright = legalCopyright.Replace("\"", "\"\"");
+        legalTrademarks = legalTrademarks.Replace("\"", "\"\"");
+        productName = productName.Replace("\"", "\"\"");
+        productVersion = productVersion.Replace("\"", "\"\"");
+
         sw.WriteLine($@"BLOCK ""StringFileInfo""
     BEGIN
         BLOCK ""040904b0""
