@@ -64,9 +64,6 @@ public sealed class DassieConfig
     [XmlElement("Configuration")]
     public ApplicationConfiguration Configuration { get; set; }
 
-    [XmlElement("VersionInformation")]
-    public VersionInformation VersionInformation { get; set; }
-
     [DefaultValue(false)]
     [XmlElement("IncludeDependencies")]
     public bool IncludeDependencies { get; set; }

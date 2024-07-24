@@ -21,6 +21,9 @@ internal class ResourceBuilder : ResourceSectionBuilder
         using MemoryStream ms = new();
         BinaryWriter bw = new(ms);
 
+        // TODO: Make this whole thing work with more than just version infos
+        _resources[0].Data = ResourceExtractor.ExtractVersionInfoResource(_resources[0].Data);
+
         bw.Write((uint)0);                      // Characteristics -> irrelevant
         bw.Write((uint)0);                      // Time Stamp -> irrelevant
         bw.Write((ushort)0);                    // Major version -> irrelevant
@@ -68,7 +71,6 @@ internal class ResourceBuilder : ResourceSectionBuilder
             bw.Write(realOffset + 0x80000000 + 8);
             realOffset += 8;
 
-            // No idea what these do
             bw.Write((uint)0);     // Characteristics -> irrelevant
             bw.Write((uint)0);     // Time Stamp -> irrelevant
             bw.Write((ushort)0);   // Major version -> irrelevant
@@ -92,8 +94,6 @@ internal class ResourceBuilder : ResourceSectionBuilder
             bw.Write((uint)0);                                                 // Reserved
             realOffset += 16;
         }
-
-        Console.WriteLine(_resources[0].Data.Length);
 
         foreach (byte[] res in _resources.Select(r => r.Data))
             bw.Write(res);

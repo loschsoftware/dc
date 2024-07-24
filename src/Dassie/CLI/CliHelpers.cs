@@ -265,10 +265,16 @@ internal static class CliHelpers
 
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
         {
-            NativeResource[] resources = [new() {
-                Data = File.ReadAllBytes(resFile),
-                Kind = ResourceKind.Version
-            }];
+            NativeResource[] resources = null;
+
+            if (!string.IsNullOrEmpty(resFile))
+            {
+                resources = [new()
+                {
+                    Data = File.ReadAllBytes(resFile),
+                    Kind = ResourceKind.Version
+                }];
+            }
 
             ManagedPEBuilder peBuilder = CreatePEBuilder(Context.EntryPoint, resources);
 
@@ -1196,13 +1202,17 @@ internal static class CliHelpers
             handle = MetadataTokens.MethodDefinitionHandle(entryPoint.MetadataToken);
         }
 
+        ResourceSectionBuilder rsb = null;
+        if (resources != null)
+            rsb = new ResourceBuilder(resources);
+
         ManagedPEBuilder peBuilder = new(
             headerBuilder,
             new(mb),
             ilStream,
             mappedFieldData,
             entryPoint: handle,
-            nativeResources: new ResourceBuilder(resources));
+            nativeResources: rsb);
 
         return peBuilder;
     }
