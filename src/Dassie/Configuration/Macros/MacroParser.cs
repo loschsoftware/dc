@@ -1,5 +1,4 @@
-﻿using Antlr4.Runtime.Dfa;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,7 +14,13 @@ internal class MacroParser
             AddDefaultMacros();
     }
 
-    private readonly Dictionary<string, string> _macros = new();
+    private Dictionary<string, string> _macros = [];
+
+    public void ImportMacros(Dictionary<string, string> macros)
+    {
+        foreach (KeyValuePair<string, string> macro in macros)
+            _macros.Add(macro.Key, macro.Value);
+    }
 
     public void DeclareMacro(string name, string expansion) => _macros.Add(name, expansion);
 
@@ -38,7 +43,7 @@ internal class MacroParser
     }
 
     private void Normalize(object obj)
-    {
+    {   
         if (obj == null)
             return;
 
@@ -71,7 +76,7 @@ internal class MacroParser
             if (val == null)
                 continue;
 
-            Regex macroRegex = new(@"\$\(.+\)");
+            Regex macroRegex = new(@"\$\(.+?\)");
             foreach (Match match in macroRegex.Matches(val))
             {
                 if (!_macros.Any(k => k.Key == match.Value[2..^1].ToLowerInvariant()))

@@ -11,6 +11,11 @@ public sealed class DassieConfig
     [XmlAttribute("FormatVersion")]
     public string FormatVersion { get; set; }
 
+    [DefaultValue(null)]
+    [XmlArray("MacroDefinitions")]
+    [XmlArrayItem(Type = typeof(Define))]
+    public Define[] MacroDefinitions { get; set; }
+
     [XmlArray("References")]
     [XmlArrayItem(Type = typeof(AssemblyReference))]
     [XmlArrayItem(Type = typeof(FileReference))]

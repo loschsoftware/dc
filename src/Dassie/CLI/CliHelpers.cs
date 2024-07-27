@@ -80,8 +80,6 @@ internal static class CliHelpers
                 EmitGeneric(error);
         }
 
-        MacroParser parser = new();
-
         string asmName = "";
         if (args.Where(File.Exists).Any())
             asmName = Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
@@ -89,6 +87,8 @@ internal static class CliHelpers
         config ??= new();
         config.AssemblyName ??= asmName;
 
+        MacroParser parser = new();
+        parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
 
         string[] files = args.Where(s => !s.StartsWith("-") && !s.StartsWith("/") && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
@@ -345,6 +345,10 @@ internal static class CliHelpers
         config ??= new();
         config.BuildProfiles ??= [];
 
+        MacroParser parser = new();
+        parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
+        parser.Normalize(config);
+
         if (args.Length > 0)
         {
             string profileName = args[0];
@@ -453,7 +457,7 @@ internal static class CliHelpers
                 {
                     FileName = "cmd.exe",
                     Arguments = $"/c {postEvent.Command}",
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                     WindowStyle = windowStyle
                 };
 
