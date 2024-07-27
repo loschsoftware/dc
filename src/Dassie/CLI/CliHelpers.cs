@@ -413,27 +413,32 @@ internal static class CliHelpers
                     psi.Verb = "runas";
 
                 Process proc = Process.Start(psi);
-                proc.WaitForExit();
+
+                if (preEvent.WaitForExit)
+                    proc.WaitForExit();
 
                 string errMsg = $"The command '{preEvent.Command}' ended with a non-zero exit code.";
 
-                if (proc.ExitCode != 0 && preEvent.Critical)
+                if (preEvent.WaitForExit)
                 {
-                    EmitErrorMessage(
-                        0, 0, 0,
-                        DS0087_InvalidProfile,
-                        errMsg,
-                        "dsconfig.xml");
+                    if (proc.ExitCode != 0 && preEvent.Critical)
+                    {
+                        EmitErrorMessage(
+                            0, 0, 0,
+                            DS0087_InvalidProfile,
+                            errMsg,
+                            "dsconfig.xml");
 
-                    return -1;
-                }
-                else if (proc.ExitCode != 0)
-                {
-                    EmitWarningMessage(
-                        0, 0, 0,
-                        DS0087_InvalidProfile,
-                        errMsg,
-                        "dsconfig.xml");
+                        return -1;
+                    }
+                    else if (proc.ExitCode != 0)
+                    {
+                        EmitWarningMessage(
+                            0, 0, 0,
+                            DS0087_InvalidProfile,
+                            errMsg,
+                            "dsconfig.xml");
+                    }
                 }
             }
         }
@@ -465,27 +470,32 @@ internal static class CliHelpers
                     psi.Verb = "runas";
 
                 Process proc = Process.Start(psi);
-                proc.WaitForExit();
+
+                if (postEvent.WaitForExit)
+                    proc.WaitForExit();
 
                 string errMsg = $"The command '{postEvent.Command}' ended with a non-zero exit code.";
 
-                if (proc.ExitCode != 0 && postEvent.Critical)
+                if (postEvent.WaitForExit)
                 {
-                    EmitErrorMessage(
-                        0, 0, 0,
-                        DS0087_InvalidProfile,
-                        errMsg,
-                        "dsconfig.xml");
+                    if (proc.ExitCode != 0 && postEvent.Critical)
+                    {
+                        EmitErrorMessage(
+                            0, 0, 0,
+                            DS0087_InvalidProfile,
+                            errMsg,
+                            "dsconfig.xml");
 
-                    return -1;
-                }
-                else if (proc.ExitCode != 0)
-                {
-                    EmitWarningMessage(
-                        0, 0, 0,
-                        DS0087_InvalidProfile,
-                        errMsg,
-                        "dsconfig.xml");
+                        return -1;
+                    }
+                    else if (proc.ExitCode != 0)
+                    {
+                        EmitWarningMessage(
+                            0, 0, 0,
+                            DS0087_InvalidProfile,
+                            errMsg,
+                            "dsconfig.xml");
+                    }
                 }
             }
         }

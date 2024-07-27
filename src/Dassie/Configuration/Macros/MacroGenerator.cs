@@ -9,7 +9,9 @@ internal static class MacroGenerator
     {
         Dictionary<string, string> macros = [];
 
+        macros.Add("projectfile", Path.GetDirectoryName(Path.GetFullPath("dsconfig.xml")));
         macros.Add("projectname", Path.GetDirectoryName(Path.GetFullPath("dsconfig.xml")).Split(Path.DirectorySeparatorChar).Last());
+        macros.Add("outputdirectory", Path.GetFullPath(cfg.BuildOutputDirectory ?? Directory.GetCurrentDirectory()));
 
         if (cfg.MacroDefinitions != null)
         {

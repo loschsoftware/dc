@@ -22,4 +22,8 @@ public class BuildEvent
     [DefaultValue(false)]
     [XmlAttribute]
     public bool RunAsAdministrator { get; set; }
+
+    [DefaultValue(true)]
+    [XmlAttribute]
+    public bool WaitForExit { get; set; }
 }
