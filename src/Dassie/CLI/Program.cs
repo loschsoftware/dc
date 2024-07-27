@@ -211,7 +211,7 @@ internal class Program
         LogOut.WriteLine();
         Console.ForegroundColor = def;
 
-        LogOut.Write("build [-profile:<BuildProfile>]".PadRight(50));
+        LogOut.Write("build [BuildProfile]".PadRight(50));
         LogOut.WriteLine("Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.");
         LogOut.WriteLine();
 

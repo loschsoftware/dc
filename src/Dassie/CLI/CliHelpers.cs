@@ -345,9 +345,9 @@ internal static class CliHelpers
         config ??= new();
         config.BuildProfiles ??= [];
 
-        if (args.Any(a => a.Length > 1 && a[1..].StartsWith("profile:")))
+        if (args.Length > 0)
         {
-            string profileName = args.First(a => a.Length > 1 && a[1..].StartsWith("profile:")).Split(':')[1];
+            string profileName = args[0];
 
             if (config.BuildProfiles.Any(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase)))
             {
@@ -401,7 +401,7 @@ internal static class CliHelpers
                 {
                     FileName = "cmd.exe",
                     Arguments = $"/c {preEvent.Command}",
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                     WindowStyle = windowStyle
                 };
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Antlr4.Runtime.Dfa;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -33,9 +34,39 @@ internal class MacroParser
 
     public void Normalize(DassieConfig config)
     {
-        foreach (PropertyInfo prop in config.GetType().GetProperties().Where(p => p.PropertyType == typeof(string)))
+        Normalize((object)config);
+    }
+
+    private void Normalize(object obj)
+    {
+        if (obj == null)
+            return;
+
+        foreach (PropertyInfo prop in obj.GetType().GetProperties())
         {
-            string val = (string)prop.GetValue(config);
+            if (prop.PropertyType != typeof(string) && prop.PropertyType.IsClass)
+            {
+                if (prop.PropertyType.IsArray)
+                {
+                    object array = prop.GetValue(obj);
+
+                    if (array == null)
+                        continue;
+
+                    foreach (object item in (Array)array)
+                        Normalize(item);
+
+                    continue;
+                }
+
+                Normalize(prop.GetValue(obj));
+                continue;
+            }
+
+            if (prop.PropertyType != typeof(string))
+                continue;
+
+            string val = (string)prop.GetValue(obj);
 
             if (val == null)
                 continue;
@@ -59,7 +90,7 @@ internal class MacroParser
                 val = val.Replace(match.Value, _macros[match.Value[2..^1].ToLowerInvariant()]);
             }
 
-            prop.SetValue(config, val);
+            prop.SetValue(obj, val);
         }
     }
 }
