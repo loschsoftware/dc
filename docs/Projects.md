@@ -12,12 +12,12 @@ The following documentation is about format version 1.0, which is the most recen
 |**Table of contents**|
 |---|
 |[General settings](./Projects.md#general-settings)|
-|[Build profiles](./Projects.md#build-profiles)]
-|[Debug profiles](./Projects.md#debug-profiles)]
-|[References](./Projects.md#references)]
-|[Resources](./Projects.md#resources)]
-|[Version information](./Projects.md#version-information)]
-|[Macros](./Projects.md#macros)]
+|[Build profiles](./Projects.md#build-profiles)|
+|[Debug profiles](./Projects.md#debug-profiles)|
+|[References](./Projects.md#references)|
+|[Resources](./Projects.md#resources)|
+|[Version information](./Projects.md#version-information)|
+|[Macros](./Projects.md#macros)|
 
 ## General settings
 These settings are at the top level of the XML tree and configure the behavior of the compiler as well as resources associated with the project.
