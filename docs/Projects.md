@@ -7,6 +7,7 @@ A "project" is a collection of Dassie source files that are all compiled into a 
   <!--Settings, references and build profiles, see below-->
 </DassieConfig>
 ````
+The following documentation is about format version 1.0, which is the most recent version. Once the format is updated, the documentation for old versions will be archived in this repository.
 
 ## General settings
 These settings are at the top level of the XML tree and configure the behavior of the compiler as well as resources associated with the project.
