@@ -13,6 +13,9 @@ public class BuildProfile
     [XmlElement]
     public string Arguments { get; set; }
 
+    [XmlElement]
+    public DassieConfig Settings { get; set; }
+
     [XmlArray]
     public BuildEvent[] PreBuildEvents { get; set; }
 

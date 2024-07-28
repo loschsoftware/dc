@@ -6,7 +6,7 @@
     },
     "default": {
       "commandName": "Project",
-      "commandLineArgs": "build",
+      "commandLineArgs": "build lsedit",
       "workingDirectory": "C:\\Users\\Jonas\\Desktop\\FinalFuckingTest"
     }
   }

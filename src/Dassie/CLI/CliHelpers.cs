@@ -63,7 +63,7 @@ internal static class CliHelpers
         return 0;
     }
 
-    public static int HandleArgs(string[] args)
+    public static int HandleArgs(string[] args, DassieConfig overrideSettings = null)
     {
         Stopwatch sw = new();
         sw.Start();
@@ -86,6 +86,9 @@ internal static class CliHelpers
 
         config ??= new();
         config.AssemblyName ??= asmName;
+
+        if (overrideSettings != null)
+            config = overrideSettings;
 
         MacroParser parser = new();
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
@@ -356,7 +359,7 @@ internal static class CliHelpers
             if (config.BuildProfiles.Any(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase)))
             {
                 BuildProfile profile = config.BuildProfiles.First(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase));
-                return ExecuteBuildProfile(profile);
+                return ExecuteBuildProfile(profile, config);
             }
 
             EmitErrorMessage(
@@ -368,7 +371,7 @@ internal static class CliHelpers
             return -1;
         }
         else if (config.BuildProfiles.Any(p => p.Name.ToLowerInvariant() == "default"))
-            return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"));
+            return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"), config);
 
         string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ds", SearchOption.AllDirectories).ToArray();
         filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != ".temp").ToArray();
@@ -387,8 +390,19 @@ internal static class CliHelpers
         return HandleArgs(filesToCompile.Concat(args).ToArray());
     }
 
-    private static int ExecuteBuildProfile(BuildProfile profile)
+    private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config)
     {
+        if (profile.Settings != null)
+        {
+            foreach (PropertyInfo property in profile.Settings.GetType().GetProperties())
+            {
+                object val = property.GetValue(profile.Settings);
+
+                if (val != null)
+                    config.GetType().GetProperty(property.Name).SetValue(config, val);
+            }
+        }
+
         if (profile.PreBuildEvents != null && profile.PreBuildEvents.Any())
         {
             foreach (BuildEvent preEvent in profile.PreBuildEvents)
@@ -444,7 +458,7 @@ internal static class CliHelpers
         }
 
         if (!string.IsNullOrEmpty(profile.Arguments))
-            Program.Main(profile.Arguments.Split(' '));
+            HandleArgs(profile.Arguments.Split(' '), config);
 
         if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
         {

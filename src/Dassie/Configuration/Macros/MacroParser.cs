@@ -29,6 +29,7 @@ internal class MacroParser
         Dictionary<string, string> macros = new()
         {
             { "time", DateTime.Now.ToShortTimeString() },
+            { "timeexact", DateTime.Now.ToString("HH:mm:ss.ffff") },
             { "date", DateTime.Now.ToShortDateString() },
             { "year", DateTime.Now.Year.ToString() }
         };
