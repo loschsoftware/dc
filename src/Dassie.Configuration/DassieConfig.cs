@@ -27,8 +27,8 @@ public sealed class DassieConfig
     [XmlArrayItem(Type = typeof(UnmanagedResource))]
     public Resource[] Resources { get; set; }
 
-    [XmlElement("DefaultNamespace")]
-    public string DefaultNamespace { get; set; }
+    [XmlElement("RootNamespace")]
+    public string RootNamespace { get; set; }
 
     [XmlElement("AssemblyFileName")]
     public string AssemblyName { get; set; }
