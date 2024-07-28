@@ -93,7 +93,7 @@ internal class MacroParser
                     break;
                 }
 
-                val = val.Replace(match.Value, _macros[match.Value[2..^1].ToLowerInvariant()]);
+                val = val.Replace(match.Value, _macros[match.Value[2..^1].ToLowerInvariant()], StringComparison.InvariantCultureIgnoreCase);
             }
 
             prop.SetValue(obj, val);

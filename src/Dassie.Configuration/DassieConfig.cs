@@ -34,6 +34,7 @@ public sealed class DassieConfig
     public string AssemblyName { get; set; }
 
     [XmlElement("ApplicationType")]
+    [DefaultValue(null)]
     public ApplicationType ApplicationType { get; set; }
 
     [XmlElement("VersionInfo")]
