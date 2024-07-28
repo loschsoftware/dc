@@ -63,6 +63,41 @@ internal static class CliHelpers
         return 0;
     }
 
+    private static void VerifyFormatVersionCompatibility(DassieConfig config)
+    {
+        config.FormatVersion ??= DassieConfig.CurrentFormatVersion;
+        Version current = Version.Parse(DassieConfig.CurrentFormatVersion);
+
+        if (!Version.TryParse(config.FormatVersion, out Version formatVersion))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0090_MalformedConfigurationFile,
+                "Invalid format version.",
+                "dsconfig.xml");
+
+            return;
+        }
+
+        if (formatVersion.Major > current.Major)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0091_ConfigurationFormatVersionTooNew,
+                $"Project configuration file uses a newer format than supported by this compiler. This compiler only supports project files up to format version {current.ToString(1)}.",
+                "dsconfig.xml");
+        }
+
+        if (formatVersion.Major < current.Major)
+        {
+            EmitWarningMessage(
+                0, 0, 0,
+                DS0092_ConfigurationFormatVersionTooOld,
+                $"Project configuration file uses an outdated format. For best compatibility, the project file should be updated to version {current.ToString(2)}. Use the 'update-config' command to perform this action automatically.",
+                "dsconfig.xml");
+        }
+    }
+
     public static int HandleArgs(string[] args, DassieConfig overrideSettings = null)
     {
         Stopwatch sw = new();
@@ -93,6 +128,8 @@ internal static class CliHelpers
         MacroParser parser = new();
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
+
+        VerifyFormatVersionCompatibility(config);
 
         string[] files = args.Where(s => !s.StartsWith("-") && !s.StartsWith("/") && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
 

@@ -8,6 +8,8 @@ namespace Dassie.Configuration;
 [XmlRoot("DassieConfig")]
 public sealed class DassieConfig
 {
+    public const string CurrentFormatVersion = "1.0";
+
     [XmlAttribute("FormatVersion")]
     public string FormatVersion { get; set; }
 

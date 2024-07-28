@@ -378,5 +378,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a dsconfig.xml document contains an invalid property.
     /// </summary>
-    DS0089_InvalidDSConfigProperty
+    DS0089_InvalidDSConfigProperty,
+    /// <summary>
+    /// Emitted when some part of dsconfig.xml is malformed, either syntactically or semantically.
+    /// </summary>
+    DS0090_MalformedConfigurationFile,
+    /// <summary>
+    /// Emitted when the format of a dsconfig.xml file is newer than supported.
+    /// </summary>
+    DS0091_ConfigurationFormatVersionTooNew,
+    /// <summary>
+    /// Emitted when dsconfig.xml uses an outdated format.
+    /// </summary>
+    DS0092_ConfigurationFormatVersionTooOld
 }
