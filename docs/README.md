@@ -4,6 +4,6 @@ This directory contains documentation about how to configure and work with the D
 
 |**Table of contents**|
 |---|
-|[Command line arguments](./docs/CLI.md)|
-|[Error codes](./docs/Errors.md)|
-|[Projects and compiler configuration](./docs/Projects.md)|
+|[Command line arguments](./CLI.md)|
+|[Error codes](./Errors.md)|
+|[Projects and compiler configuration](./Projects.md)|
