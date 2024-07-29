@@ -49,21 +49,21 @@ public static class CodeGeneration
     /// </summary>
     /// <param name="code">The error code.</param>
     /// <param name="message">The actual error message.</param>
-    public static void emitError(string code, string message) { }
+    public static void error(string code, string message) { }
 
     /// <summary>
     /// Emits a warning message.
     /// </summary>
     /// <param name="code">The error code.</param>
     /// <param name="message">The actual error message.</param>
-    public static void emitWarning(string code, string message) { }
+    public static void warn(string code, string message) { }
     
     /// <summary>
     /// Emits a message.
     /// </summary>
     /// <param name="code">The error code.</param>
     /// <param name="message">The actual error message.</param>
-    public static void emitMessage(string code, string message) { }
+    public static void msg(string code, string message) { }
 
     /// <summary>
     /// Prints a message to the standard output indicating that a certain operation is not yet implemented.

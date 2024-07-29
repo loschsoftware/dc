@@ -703,6 +703,9 @@ internal static class CliHelpers
 
         if (type == null)
         {
+            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name))
+                return Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name).Builder;
+
             List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
             allAssemblies.AddRange(Context.ReferencedAssemblies);
 

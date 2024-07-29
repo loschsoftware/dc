@@ -75,22 +75,22 @@ internal class ParameterConstraintRewriter : ITreeToStringRewriter
             typeName = $"{member.Colon().Symbol.Text} {listener.GetTextForRule(member.type_name())}";
 
         sb.Append($"{listener.GetTextForRule(member.attribute())} {val}{var} {listener.GetTextForRule(member.member_access_modifier())} {listener.GetTextForRule(member.member_oop_modifier())} {specialModsText} {ovr} {member.Identifier().Symbol.Text} {listener.GetTextForRule(member.type_parameter_list())} {paramListBuilder.ToString()} {typeName}");
-        sb.AppendLine("= {");
+        sb.Append("= {");
 
         foreach (var param in member.parameter_list().parameter())
         {
             if (param.parameter_constraint() == null)
                 continue;
 
-            sb.AppendLine($"? !({listener.GetTextForRule(param.parameter_constraint().expression())}) = {{");
-            sb.AppendLine($"\tthrow Dassie.Runtime.ConstraintViolationException \"{param.Identifier().Symbol.Text}\", \"{listener.GetTextForRule(param.parameter_constraint().expression())}\"");
-            sb.AppendLine("} : = {}");
+            sb.Append($"? !({listener.GetTextForRule(param.parameter_constraint().expression())}) = {{");
+            sb.Append($"\tthrow Dassie.Runtime.ConstraintViolationException \"{param.Identifier().Symbol.Text}\", \"{listener.GetTextForRule(param.parameter_constraint().expression())}\"");
+            sb.Append("} : = {}");
 
             CurrentFile.FunctionParameterConstraints[member.Identifier().GetText()].Add(param.Identifier().GetText(), listener.GetTextForRule(param.parameter_constraint().expression()));
         }
 
-        sb.AppendLine(listener.GetTextForRule(member.expression()));
-        sb.AppendLine("}");
+        sb.Append(listener.GetTextForRule(member.expression()));
+        sb.Append("}");
 
         return sb.ToString();
     }

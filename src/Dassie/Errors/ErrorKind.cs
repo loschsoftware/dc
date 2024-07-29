@@ -28,6 +28,7 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the specified argument list does not match any available constructor for this type.
     /// </summary>
+    [Obsolete("This error code is not emitted by the compiler anymore.")]
     DS0003_ConstructorNotFound,
     /// <summary>
     /// Emitted when an import directive is used on a non-existent namespace.
@@ -390,5 +391,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when dsconfig.xml uses an outdated format.
     /// </summary>
-    DS0092_ConfigurationFormatVersionTooOld
+    DS0092_ConfigurationFormatVersionTooOld,
+    /// <summary>
+    /// Emitted when a constructor returns a value, even though it is only allowed to return void.
+    /// </summary>
+    DS0093_ConstructorReturnsValue
 }

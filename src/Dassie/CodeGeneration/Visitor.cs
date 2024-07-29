@@ -255,7 +255,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         HandleFieldInitializersAndDefaultConstructor();
 
-        Visit(context.expression());
+        Type t = Visit(context.expression());
+        
+        if (t != typeof(void))
+        {
+            EmitErrorMessage(
+                context.Equals().Symbol.Line,
+                context.Equals().Symbol.Column,
+                context.expression().Start.Column - context.Equals().Symbol.Column,
+                DS0093_ConstructorReturnsValue,
+                $"Expected expression of type 'null' but found type '{t.FullName}'.");
+        }
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
 
@@ -340,7 +350,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Var().Symbol.Column,
                 context.Var().GetText().Length,
                 DS0083_InvalidVarModifier,
-                "The modifier 'var' can not be used on member functions.");
+                "The modifier 'var' can not be used on type members.");
         }
 
         Type _tReturn = typeof(object);
