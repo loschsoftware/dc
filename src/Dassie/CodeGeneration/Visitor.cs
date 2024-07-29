@@ -516,7 +516,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         FieldBuilder fb = TypeContext.Current.Builder.DefineField(
             context.Identifier().GetText(),
             type,
-            CliHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()));
+            CliHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.Val() != null));
 
         TypeContext.Current.Fields.Add(new(context.Identifier().GetText(), fb, default));
 
@@ -2666,6 +2666,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (o is FieldInfo f)
             {
+                if (f.IsInitOnly)
+                {
+                    EmitErrorMessage(
+                        context.Start.Line,
+                        context.Start.Column,
+                        context.GetText().Length,
+                        DS0094_InitOnlyFieldAssignedOutsideOfConstructor,
+                        $"The field '{f.Name}' is readonly and cannot be modified outside of a constructor.");
+                }
+
                 if (f.IsStatic)
                 {
                     EmitLdloc(tempIndex);
@@ -2833,6 +2843,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 if (identifier == ids.Last())
                 {
+                    if (f.IsInitOnly)
+                    {
+                        EmitErrorMessage(
+                            context.Start.Line,
+                            context.Start.Column,
+                            context.GetText().Length,
+                            DS0094_InitOnlyFieldAssignedOutsideOfConstructor,
+                            $"The field '{f.Name}' is readonly and cannot be modified outside of a constructor.");
+                    }
+
                     EmitLdloc(tempIndex);
                     EmitStfld(f);
                     CurrentMethod.SkipPop = true;

@@ -395,5 +395,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a constructor returns a value, even though it is only allowed to return void.
     /// </summary>
-    DS0093_ConstructorReturnsValue
+    DS0093_ConstructorReturnsValue,
+    /// <summary>
+    /// Emitted when an init-only field is assigned to outside of a constructor.
+    /// </summary>
+    DS0094_InitOnlyFieldAssignedOutsideOfConstructor
 }

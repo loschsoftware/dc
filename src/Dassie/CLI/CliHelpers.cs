@@ -913,7 +913,7 @@ internal static class CliHelpers
         };
     }
 
-    public static FieldAttributes GetFieldAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers)
+    public static FieldAttributes GetFieldAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, bool isReadOnly)
     {
         FieldAttributes baseAttributes;
 
@@ -963,6 +963,9 @@ internal static class CliHelpers
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(FieldAttributes.Static))
             baseAttributes |= FieldAttributes.Static;
+
+        if (isReadOnly)
+            baseAttributes |= FieldAttributes.InitOnly;
 
         return baseAttributes;
     }
