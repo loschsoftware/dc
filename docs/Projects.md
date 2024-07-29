@@ -14,6 +14,7 @@ The following documentation is about format version 1.0, which is the most recen
 |[General settings](./Projects.md#general-settings)|
 |[Build profiles](./Projects.md#build-profiles)|
 |[Debug profiles](./Projects.md#debug-profiles)|
+|[Ignoring compiler messages](./Projects.md#ignoring-compiler-messages)|
 |[References](./Projects.md#references)|
 |[Resources](./Projects.md#resources)|
 |[Version information](./Projects.md#version-information)|
@@ -104,6 +105,14 @@ Debug profiles are used by a debugging environment to configure arguments passed
 |``Name``|Attribute|Any string|Sets the name of the profile.|
 |``Arguments``|Attribute|Any string|Sets the command-line arguments passed to the debuggee.|
 |``WorkingDirectory``|Attribute|Any string|Sets the directory the debuggee is launched in.|
+
+## Ignoring compiler messages
+The ``<IgnoredMessages>`` object is used to disable specific compiler error codes. Only information and warning messages can be ignored. To disable a message, add a child node corresponding to the kind of message that is to be disabled (information, warning) containing its error code. A list of error codes can be found [here](./Errors.md).
+````xml
+<IgnoredMessages>
+  <Message>DS0070</Message>
+</IgnoredMessages>
+````
 
 ## References
 References are used to declare dependencies on assemblies, other Dassie projects or NuGet packages (not yet supported). Here is an example:
