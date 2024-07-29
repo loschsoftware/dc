@@ -216,8 +216,9 @@ public static class TooltipGenerator
     /// <param name="returnType"></param>
     /// <param name="parameters"></param>
     /// <param name="intrinsic"></param>
+    /// <param name="translatedWords"></param>
     /// <returns></returns>
-    public static Tooltip Function(string name, Type returnType, (string Name, Type Type)[] parameters, bool intrinsic = false)
+    public static Tooltip Function(string name, Type returnType, Parameter[] parameters, bool intrinsic = false, Dictionary<string, string> translatedWords = null)
     {
         ObservableCollection<Word> words = [];
 
@@ -230,12 +231,12 @@ public static class TooltipGenerator
         {
             words.Add(BuildWord(" ("));
 
-            foreach ((string _name, Type _type) in parameters[..^1])
+            foreach (Parameter param in parameters[..^1])
             {
-                words.Add(BuildWord(_name, Color.LocalValue));
+                words.Add(BuildWord(param.Name, Color.LocalValue));
                 words.Add(BuildWord(": "));
 
-                foreach (Word word in Type(_type.GetTypeInfo(), false, true, true).Words)
+                foreach (Word word in Type(param.Type.GetTypeInfo(), false, true, true).Words)
                     words.Add(word);
 
                 words.Add(BuildWord(", "));
@@ -253,6 +254,32 @@ public static class TooltipGenerator
         words.Add(BuildWord(": "));
         foreach (Word word in Type((returnType ?? typeof(Unknown)).GetTypeInfo(), false, true, true).Words)
             words.Add(word);
+
+        if (parameters.Any(p => !string.IsNullOrEmpty(p.Constraint)))
+        {
+            string constraintsWord = "Constraints";
+            if (translatedWords != null && translatedWords.TryGetValue("Constraints", out string value))
+                constraintsWord = value;
+
+            words.Add(Word.LineBreak);
+            words.Add(new()
+            {
+                Text = $"{constraintsWord}\r\n",
+                Fragment = new()
+            });
+
+            foreach (Parameter p in parameters)
+            {
+                if (string.IsNullOrEmpty(p.Constraint))
+                    continue;
+
+                words.Add(new()
+                {
+                    Text = $"\t• {p.Name}: {p.Constraint}\r\n",
+                    Fragment = new()
+                });
+            }
+        }
 
         return new()
         {

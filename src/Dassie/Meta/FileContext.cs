@@ -73,4 +73,6 @@ internal class FileContext
     public List<GuideLine> GuideLines { get; } = new();
 
     public bool CheckType(Type type) => AvailableTypes.Contains(type);
+
+    public Dictionary<string, Dictionary<string, string>> FunctionParameterConstraints { get; } = [];
 }

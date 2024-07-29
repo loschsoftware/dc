@@ -10,6 +10,15 @@ namespace Dassie.Text.Tooltips;
 public struct Word : IEquatable<Word>
 {
     /// <summary>
+    /// Provides a word with the text <c>\r\n</c> that is used to add a line break in a tool tip.
+    /// </summary>
+    public static readonly Word LineBreak = new()
+    {
+        Text = "\r\n",
+        Fragment = new()
+    };
+
+    /// <summary>
     /// The fragment containing styling information associated with the word.
     /// </summary>
     public Fragment Fragment { get; set; }
