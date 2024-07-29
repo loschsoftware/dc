@@ -343,14 +343,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         //Helpers.CreateFakeMethod();
         //Type _tReturn = Visit(context.expression());
 
-        if (context.Var() != null)
+        if (context.Var() != null && context.parameter_list() != null)
         {
             EmitErrorMessage(
                 context.Var().Symbol.Line,
                 context.Var().Symbol.Column,
                 context.Var().GetText().Length,
                 DS0083_InvalidVarModifier,
-                "The modifier 'var' can not be used on type members.");
+                "The modifier 'var' cannot be used on methods.");
         }
 
         Type _tReturn = typeof(object);
