@@ -554,7 +554,7 @@ arr: int@[,,,...,] = ()</pre></td>
     <td>DS0093</td>
     <td>Error</td>
     <td>Emitted when a constructor has a return value.</td>
-    <td><pre lang="xml">type Point = {
+    <td><pre>type Point = {
 	X: int32
 	Y: int32
 	
@@ -565,5 +565,29 @@ arr: int@[,,,...,] = ()</pre></td>
 	}
 }</pre></td>
     <td>Remove the return value. Use <code>ignore</code> to discard a value.</td>
+  </tr>
+  <tr>
+    <td>DS0094</td>
+    <td>Error</td>
+    <td>Emitted when a field marked as read-only using the <code>val</code> keyword is modified outside of a constructor.</td>
+    <td><pre>type Point = {
+	val X: int32
+	val Y: int32
+	
+	Point (x: int32, y: int32) = ignore {
+		X = x
+		Y = y
+	}
+}
+module App = {
+	&lt;EntryPoint&gt;
+	Main (): int = {
+		point = Point 10, 20
+		point.X = 30 # DS0094
+		
+		0
+	}
+}</pre></td>
+    <td>Remove the assignment or remove the <code>val</code> modifier from the field.</td>
   </tr>
 </table>
