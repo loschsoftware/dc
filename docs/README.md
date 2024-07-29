@@ -7,3 +7,4 @@ This directory contains documentation about how to configure and work with the D
 |[Command line arguments](./CLI.md)|
 |[Error codes](./Errors.md)|
 |[Projects and compiler configuration](./Projects.md)|
+|[Tools for code editors](./Editors.md)|
