@@ -573,7 +573,6 @@ arr: int@[,,,...,] = ()</pre></td>
     <td><pre>type Point = {
 	val X: int32
 	val Y: int32
-	
 	Point (x: int32, y: int32) = ignore {
 		X = x
 		Y = y
@@ -584,7 +583,6 @@ module App = {
 	Main (): int = {
 		point = Point 10, 20
 		point.X = 30 # DS0094
-		
 		0
 	}
 }</pre></td>
