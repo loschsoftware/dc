@@ -8,8 +8,15 @@ namespace Dassie.Configuration;
 [XmlRoot("DassieConfig")]
 public sealed class DassieConfig
 {
+    public const string CurrentFormatVersion = "1.0";
+
     [XmlAttribute("FormatVersion")]
     public string FormatVersion { get; set; }
+
+    [DefaultValue(null)]
+    [XmlArray("MacroDefinitions")]
+    [XmlArrayItem(Type = typeof(Define))]
+    public Define[] MacroDefinitions { get; set; }
 
     [XmlArray("References")]
     [XmlArrayItem(Type = typeof(AssemblyReference))]
@@ -22,13 +29,14 @@ public sealed class DassieConfig
     [XmlArrayItem(Type = typeof(UnmanagedResource))]
     public Resource[] Resources { get; set; }
 
-    [XmlElement("DefaultNamespace")]
-    public string DefaultNamespace { get; set; }
+    [XmlElement("RootNamespace")]
+    public string RootNamespace { get; set; }
 
     [XmlElement("AssemblyFileName")]
     public string AssemblyName { get; set; }
 
     [XmlElement("ApplicationType")]
+    [DefaultValue(null)]
     public ApplicationType ApplicationType { get; set; }
 
     [XmlElement("VersionInfo")]
@@ -63,9 +71,6 @@ public sealed class DassieConfig
 
     [XmlElement("Configuration")]
     public ApplicationConfiguration Configuration { get; set; }
-
-    [XmlElement("VersionInformation")]
-    public VersionInformation VersionInformation { get; set; }
 
     [DefaultValue(false)]
     [XmlElement("IncludeDependencies")]

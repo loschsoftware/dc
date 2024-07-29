@@ -21,9 +21,13 @@ internal class LoweringListener : DassieParserBaseListener
     readonly InterpolatedStringRewriter interpolatedStringRewriter = new();
     readonly ForEachLoopRewriter forEachLoopRewriter = new();
     readonly PipeRewriter pipeRewriter = new();
+    readonly ParameterConstraintRewriter constraintRewriter = new();
 
     public string GetTextForRule(ParserRuleContext rule)
     {
+        if (rule == null)
+            return "";
+
         return CharStream.GetText(new(rule.Start.StartIndex, rule.Stop.StopIndex));
     }
 
@@ -76,5 +80,10 @@ internal class LoweringListener : DassieParserBaseListener
     public override void EnterLeft_pipe_expression([NotNull] DassieParser.Left_pipe_expressionContext context)
     {
         Text = Replace(pipeRewriter.Rewrite(context, this), context);
+    }
+
+    public override void EnterType_member([NotNull] DassieParser.Type_memberContext context)
+    {
+        Text = Replace(constraintRewriter.Rewrite(context, this), context);
     }
 }

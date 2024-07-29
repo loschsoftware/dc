@@ -43,7 +43,7 @@ internal class Program
         }
         catch (Exception ex)
         {
-            if (ex is IOException)
+            if (ex is IOException or UnauthorizedAccessException)
                 EmitErrorMessage(0, 0, 0, DS0029_FileAccessDenied, $"Access to file '{Path.GetFileName(CurrentFile.Path)}' denied.");
 
             if (messages.Count == 0)
@@ -211,7 +211,7 @@ internal class Program
         LogOut.WriteLine();
         Console.ForegroundColor = def;
 
-        LogOut.Write("build [-profile:<BuildProfile>]".PadRight(50));
+        LogOut.Write("build [BuildProfile]".PadRight(50));
         LogOut.WriteLine("Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.");
         LogOut.WriteLine();
 

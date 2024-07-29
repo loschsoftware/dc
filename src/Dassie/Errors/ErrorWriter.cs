@@ -75,6 +75,9 @@ public static class ErrorWriter
                 return;
         }
 
+        if (Context.CompilerSuppressedMessages.Any(e => e == error.ErrorCode))
+            return;
+
         try
         {
             ConsoleColor defaultColor = Console.ForegroundColor;

@@ -79,7 +79,7 @@ ScriptHost.Run ""script.dsx""";
         DassieConfig config = new()
         {
             AssemblyName = args[2],
-            DefaultNamespace = args[2][0].ToString().ToUpper() + string.Join("", args[2].Skip(1)),
+            RootNamespace = args[2][0].ToString().ToUpper() + string.Join("", args[2].Skip(1)),
             VersionInfo = new()
             {
                 Version = "1.0.0.0"

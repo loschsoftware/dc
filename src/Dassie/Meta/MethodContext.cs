@@ -36,14 +36,23 @@ internal class MethodContext
             if (VisitorStep1 == null)
                 return null;
 
+            if (CurrentMethod.Builder == null && CurrentMethod.ConstructorBuilder == null)
+                return null;
+
             if (VisitorStep1.Types.Any(t => t.FullName == TypeContext.Current.FullName))
             {
                 TypeContext type = VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName);
 
+                // TODO: Find correct constructor (parameters)
+                if (CurrentMethod.ConstructorBuilder != null && type.Methods.Any(m => m.ConstructorBuilder != null) /*&& type.Methods.Select(m => m.ConstructorBuilder).Any(c => c != null && c.GetParameters() == CurrentMethod.ConstructorBuilder.GetParameters())*/)
+                {
+                    MethodContext constructor = type.Methods.First(m => m.ConstructorBuilder != null /*&& m.ConstructorBuilder.GetParameters() == CurrentMethod.ConstructorBuilder.GetParameters()*/);
+                    return constructor;
+                }
+
                 if (type.Methods.Any(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.ReturnType.FullName == CurrentMethod.Builder.ReturnType.FullName))
                 {
                     MethodContext m = type.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.ReturnType.FullName == CurrentMethod.Builder.ReturnType.FullName);
-
                     return m;
                 }
             }

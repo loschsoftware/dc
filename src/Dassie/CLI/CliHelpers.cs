@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CLI.Helpers;
 using Dassie.CodeGeneration;
+using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Errors;
@@ -12,7 +13,6 @@ using Dassie.Text.Tooltips;
 using Dassie.Unmanaged;
 using Dassie.Validation;
 using Microsoft.Build.Utilities;
-using Microsoft.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,6 +21,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -60,7 +63,42 @@ internal static class CliHelpers
         return 0;
     }
 
-    public static int HandleArgs(string[] args)
+    private static void VerifyFormatVersionCompatibility(DassieConfig config)
+    {
+        config.FormatVersion ??= DassieConfig.CurrentFormatVersion;
+        Version current = Version.Parse(DassieConfig.CurrentFormatVersion);
+
+        if (!Version.TryParse(config.FormatVersion, out Version formatVersion))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0090_MalformedConfigurationFile,
+                "Invalid format version.",
+                "dsconfig.xml");
+
+            return;
+        }
+
+        if (formatVersion.Major > current.Major)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0091_ConfigurationFormatVersionTooNew,
+                $"Project configuration file uses a newer format than supported by this compiler. This compiler only supports project files up to format version {current.ToString(1)}.",
+                "dsconfig.xml");
+        }
+
+        if (formatVersion.Major < current.Major)
+        {
+            EmitWarningMessage(
+                0, 0, 0,
+                DS0092_ConfigurationFormatVersionTooOld,
+                $"Project configuration file uses an outdated format. For best compatibility, the project file should be updated to version {current.ToString(2)}. Use the 'update-config' command to perform this action automatically.",
+                "dsconfig.xml");
+        }
+    }
+
+    public static int HandleArgs(string[] args, DassieConfig overrideSettings = null)
     {
         Stopwatch sw = new();
         sw.Start();
@@ -77,33 +115,26 @@ internal static class CliHelpers
                 EmitGeneric(error);
         }
 
-        MacroParser parser = new();
+        string asmName = "";
+        if (args.Where(File.Exists).Any())
+            asmName = Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
 
         config ??= new();
-        config.AssemblyName ??= Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
+        config.AssemblyName ??= asmName;
 
+        if (overrideSettings != null)
+            config = overrideSettings;
+
+        MacroParser parser = new();
+        parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
+
+        VerifyFormatVersionCompatibility(config);
 
         string[] files = args.Where(s => !s.StartsWith("-") && !s.StartsWith("/") && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
 
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
-
-        if (files.Any(f => !File.Exists(f)))
-        {
-            foreach (string file in files.Where(f => !File.Exists(f)))
-            {
-                EmitErrorMessage(
-                    0,
-                    0,
-                    0,
-                    DS0048_SourceFileNotFound,
-                    $"The source file '{Path.GetFileName(file)}' could not be found.",
-                    Path.GetFileName(file));
-            }
-
-            return -1;
-        }
 
         if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
         {
@@ -111,8 +142,7 @@ internal static class CliHelpers
             Directory.SetCurrentDirectory(config.BuildOutputDirectory);
         }
 
-        string assembly = Path.Combine(config.BuildOutputDirectory ?? "", $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}");
-
+        string assembly = Path.Combine(config.BuildOutputDirectory ?? "", $"{config.AssemblyName}.dll");
         string msgPrefix = MessagePrefix;
 
         if (config.References != null)
@@ -169,7 +199,20 @@ internal static class CliHelpers
 
         string resFile = "";
 
-        if (!(Context.Configuration.Resources ?? Array.Empty<Resource>()).Any(r => r is UnmanagedResource) && Context.Configuration.VersionInfo != null)
+        if ((Context.Configuration.Resources ?? []).Any(r => r is UnmanagedResource))
+        {
+            resFile = ((UnmanagedResource)Context.Configuration.Resources.First(r => r is UnmanagedResource)).Path;
+
+            if ((Context.Configuration.Resources ?? []).Where(r => r is UnmanagedResource).Count() > 1)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0068_MultipleUnmanagedResources,
+                    "An assembly can only contain one unmanaged resource file.",
+                    "dsconfig.xml");
+            }
+        }
+        else if (Context.Configuration.VersionInfo != null)
         {
             EmitMessage(
                 0, 0, 0,
@@ -241,9 +284,6 @@ internal static class CliHelpers
 
             resFile = Path.ChangeExtension(rcPath, ".res");
 
-            if (File.Exists(resFile))
-                Context.Assembly.DefineUnmanagedResource(resFile);
-
             if (!args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("rc")).Any())
                 File.Delete(rcPath);
         }
@@ -257,7 +297,26 @@ internal static class CliHelpers
             AddResource(res, Directory.GetCurrentDirectory());
 
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
-            Context.Assembly.Save(Path.GetFileName(assembly));
+        {
+            NativeResource[] resources = null;
+
+            if (!string.IsNullOrEmpty(resFile))
+            {
+                resources = [new()
+                {
+                    Data = File.ReadAllBytes(resFile),
+                    Kind = ResourceKind.Version
+                }];
+            }
+
+            ManagedPEBuilder peBuilder = CreatePEBuilder(Context.EntryPoint, resources);
+
+            BlobBuilder peBlob = new();
+            peBuilder.Serialize(peBlob);
+
+            using FileStream fs = new(Path.GetFileName(assembly), FileMode.Create, FileAccess.Write);
+            peBlob.WriteContentTo(fs);
+        }
 
         string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
 
@@ -269,6 +328,20 @@ internal static class CliHelpers
             }
             catch (IOException) { }
         }
+
+        foreach (string dependency in Context.ReferencedAssemblies.Select(a => a.Location))
+        {
+            if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(Path.GetDirectoryName(dependency)))
+            {
+                try
+                {
+                    File.Copy(dependency, Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(dependency)), true);
+                }
+                catch (IOException) { }
+            }
+        }
+
+        RuntimeConfigWriter.GenerateRuntimeConfigFile(Path.GetFileNameWithoutExtension(assembly) + ".runtimeconfig.json");
 
         sw.Stop();
 
@@ -310,15 +383,20 @@ internal static class CliHelpers
         }
 
         config ??= new();
+        config.BuildProfiles ??= [];
 
-        if (args.Any(a => a.Length > 1 && a[1..].StartsWith("profile:")))
+        MacroParser parser = new();
+        parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
+        parser.Normalize(config);
+
+        if (args.Length > 0)
         {
-            string profileName = args.First(a => a.Length > 1 && a[1..].StartsWith("profile:")).Split(':')[1];
+            string profileName = args[0];
 
             if (config.BuildProfiles.Any(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase)))
             {
                 BuildProfile profile = config.BuildProfiles.First(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase));
-                return ExecuteBuildProfile(profile);
+                return ExecuteBuildProfile(profile, config);
             }
 
             EmitErrorMessage(
@@ -330,7 +408,7 @@ internal static class CliHelpers
             return -1;
         }
         else if (config.BuildProfiles.Any(p => p.Name.ToLowerInvariant() == "default"))
-            return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"));
+            return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"), config);
 
         string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ds", SearchOption.AllDirectories).ToArray();
         filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != ".temp").ToArray();
@@ -349,8 +427,19 @@ internal static class CliHelpers
         return HandleArgs(filesToCompile.Concat(args).ToArray());
     }
 
-    private static int ExecuteBuildProfile(BuildProfile profile)
+    private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config)
     {
+        if (profile.Settings != null)
+        {
+            foreach (PropertyInfo property in profile.Settings.GetType().GetProperties())
+            {
+                object val = property.GetValue(profile.Settings);
+
+                if (val != null)
+                    config.GetType().GetProperty(property.Name).SetValue(config, val);
+            }
+        }
+
         if (profile.PreBuildEvents != null && profile.PreBuildEvents.Any())
         {
             foreach (BuildEvent preEvent in profile.PreBuildEvents)
@@ -367,7 +456,7 @@ internal static class CliHelpers
                 {
                     FileName = "cmd.exe",
                     Arguments = $"/c {preEvent.Command}",
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                     WindowStyle = windowStyle
                 };
 
@@ -375,33 +464,38 @@ internal static class CliHelpers
                     psi.Verb = "runas";
 
                 Process proc = Process.Start(psi);
-                proc.WaitForExit();
+
+                if (preEvent.WaitForExit)
+                    proc.WaitForExit();
 
                 string errMsg = $"The command '{preEvent.Command}' ended with a non-zero exit code.";
 
-                if (proc.ExitCode != 0 && preEvent.Critical)
+                if (preEvent.WaitForExit)
                 {
-                    EmitErrorMessage(
-                        0, 0, 0,
-                        DS0087_InvalidProfile,
-                        errMsg,
-                        "dsconfig.xml");
+                    if (proc.ExitCode != 0 && preEvent.Critical)
+                    {
+                        EmitErrorMessage(
+                            0, 0, 0,
+                            DS0087_InvalidProfile,
+                            errMsg,
+                            "dsconfig.xml");
 
-                    return -1;
-                }
-                else if (proc.ExitCode != 0)
-                {
-                    EmitWarningMessage(
-                        0, 0, 0,
-                        DS0087_InvalidProfile,
-                        errMsg,
-                        "dsconfig.xml");
+                        return -1;
+                    }
+                    else if (proc.ExitCode != 0)
+                    {
+                        EmitWarningMessage(
+                            0, 0, 0,
+                            DS0087_InvalidProfile,
+                            errMsg,
+                            "dsconfig.xml");
+                    }
                 }
             }
         }
 
         if (!string.IsNullOrEmpty(profile.Arguments))
-            Program.Main(profile.Arguments.Split(' '));
+            HandleArgs(profile.Arguments.Split(' '), config);
 
         if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
         {
@@ -419,7 +513,7 @@ internal static class CliHelpers
                 {
                     FileName = "cmd.exe",
                     Arguments = $"/c {postEvent.Command}",
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                     WindowStyle = windowStyle
                 };
 
@@ -427,27 +521,32 @@ internal static class CliHelpers
                     psi.Verb = "runas";
 
                 Process proc = Process.Start(psi);
-                proc.WaitForExit();
+
+                if (postEvent.WaitForExit)
+                    proc.WaitForExit();
 
                 string errMsg = $"The command '{postEvent.Command}' ended with a non-zero exit code.";
 
-                if (proc.ExitCode != 0 && postEvent.Critical)
+                if (postEvent.WaitForExit)
                 {
-                    EmitErrorMessage(
-                        0, 0, 0,
-                        DS0087_InvalidProfile,
-                        errMsg,
-                        "dsconfig.xml");
+                    if (proc.ExitCode != 0 && postEvent.Critical)
+                    {
+                        EmitErrorMessage(
+                            0, 0, 0,
+                            DS0087_InvalidProfile,
+                            errMsg,
+                            "dsconfig.xml");
 
-                    return -1;
-                }
-                else if (proc.ExitCode != 0)
-                {
-                    EmitWarningMessage(
-                        0, 0, 0,
-                        DS0087_InvalidProfile,
-                        errMsg,
-                        "dsconfig.xml");
+                        return -1;
+                    }
+                    else if (proc.ExitCode != 0)
+                    {
+                        EmitWarningMessage(
+                            0, 0, 0,
+                            DS0087_InvalidProfile,
+                            errMsg,
+                            "dsconfig.xml");
+                    }
                 }
             }
         }
@@ -604,6 +703,9 @@ internal static class CliHelpers
 
         if (type == null)
         {
+            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name))
+                return Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name).Builder;
+
             List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
             allAssemblies.AddRange(Context.ReferencedAssemblies);
 
@@ -646,6 +748,12 @@ internal static class CliHelpers
                 if (_assemblies.Any())
                 {
                     type = _assemblies.First().GetType(n);
+                    goto FoundType;
+                }
+
+                if (Context.Types.Any(t => t.FullName == n))
+                {
+                    type = Context.Types.First(t => t.FullName == n).Builder;
                     goto FoundType;
                 }
 
@@ -909,7 +1017,10 @@ internal static class CliHelpers
             baseAttributes |= MethodAttributes.Virtual;
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(MethodAttributes.Static))
+        {
             baseAttributes |= MethodAttributes.Static;
+            baseAttributes &= ~MethodAttributes.Virtual;
+        }
 
         return baseAttributes;
     }
@@ -1135,11 +1246,36 @@ internal static class CliHelpers
         }
     }
 
-    public static void SetEntryPoint(AssemblyBuilder ab, MethodInfo m)
+    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources)
     {
-#if !NET7_COMPATIBLE
-        ab.SetEntryPoint(m);
-#endif
+        MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData);
+        PEHeaderBuilder headerBuilder = new(
+            imageBase: 0x00400000,
+            imageCharacteristics: Characteristics.ExecutableImage);
+
+        MethodDefinitionHandle handle = default;
+
+        if (entryPoint != null)
+        {
+            if (!(entryPoint.DeclaringType as TypeBuilder).IsCreated())
+                (entryPoint.DeclaringType as TypeBuilder).CreateType();
+
+            handle = MetadataTokens.MethodDefinitionHandle(entryPoint.MetadataToken);
+        }
+
+        ResourceSectionBuilder rsb = null;
+        if (resources != null)
+            rsb = new ResourceBuilder(resources);
+
+        ManagedPEBuilder peBuilder = new(
+            headerBuilder,
+            new(mb),
+            ilStream,
+            mappedFieldData,
+            entryPoint: handle,
+            nativeResources: rsb);
+
+        return peBuilder;
     }
 
     public static void SetLocalSymInfo(LocalBuilder lb, string name)
@@ -1150,7 +1286,8 @@ internal static class CliHelpers
 #if !NET7_COMPATIBLE
         try
         {
-            lb.SetLocalSymInfo(name);
+            // TODO: Implement alternative
+            //lb.SetLocalSymInfo(name);
         }
         catch (IndexOutOfRangeException) { }
 #endif
@@ -1403,7 +1540,8 @@ internal static class CliHelpers
         {
             try
             {
-                Context.Assembly.DefineUnmanagedResource(File.ReadAllBytes(res.Path));
+                // TODO: Implement alternative
+                //Context.Assembly.DefineUnmanagedResource(File.ReadAllBytes(res.Path));
             }
             catch (ArgumentException)
             {
@@ -1421,7 +1559,8 @@ internal static class CliHelpers
             string resFile = Path.Combine(basePath, Path.GetFileName(mres.Path));
 
             File.Copy(mres.Path, resFile, true);
-            Context.Assembly.AddResourceFile(mres.Name, resFile);
+            // TODO: Implent alternative
+            //Context.Assembly.AddResourceFile(mres.Name, resFile);
         }
     }
 
@@ -1457,6 +1596,17 @@ internal static class CliHelpers
         {
             matchingFiles = matchingFiles.Where(file =>
                 IsFileMatchingPattern(file, filePattern)).ToArray();
+        }
+
+        if (matchingFiles.Length == 0)
+        {
+            EmitErrorMessage(
+                0,
+                0,
+                0,
+                DS0048_SourceFileNotFound,
+                $"The source file '{filePattern}' could not be found.",
+                Path.GetFileName(filePattern));
         }
 
         return matchingFiles;

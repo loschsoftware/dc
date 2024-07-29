@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration;
+using Dassie.Errors;
 using Dassie.Text.FragmentStore;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,9 @@ internal class ProgramContext
 
     public List<(string Name, string Alias)> GlobalAliases { get; } = new();
 
-    public AssemblyBuilder Assembly { get; set; }
+    public PersistedAssemblyBuilder Assembly { get; set; }
+
+    public MethodBuilder EntryPoint { get; set; }
 
     public AssemblyBuilder BogusAssembly { get; set; }
 
@@ -46,4 +49,6 @@ internal class ProgramContext
     public string ConfigurationPath { get; set; }
 
     public bool ShouldThrowDS0027 { get; set; } = false;
+
+    public List<ErrorKind> CompilerSuppressedMessages { get; } = new();
 }

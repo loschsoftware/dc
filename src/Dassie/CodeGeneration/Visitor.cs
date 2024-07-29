@@ -50,7 +50,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitFile_body([NotNull] DassieParser.File_bodyContext context)
     {
 #if NET7_COMPATIBLE
-        Context.Assembly = AssemblyBuilder.DefineDynamicAssembly(new("throwaway"), AssemblyBuilderAccess.Run);
+        Context.Assembly = PersistedAssemblyBuilder.DefineDynamicAssembly(new("throwaway"), PersistedAssemblyBuilderAccess.Run);
         Context.Module = Context.Assembly.DefineDynamicModule("throwaway");
 #endif
 
@@ -222,10 +222,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         var paramTypes = ResolveParameterList(context.parameter_list());
 
-        ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(
-        CliHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier()),
-        callingConventions,
-        paramTypes.Select(p => p.Type).ToArray());
+        MethodAttributes attribs = CliHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier());
+        if (attribs.HasFlag(MethodAttributes.Virtual))
+            attribs &= ~MethodAttributes.Virtual;
+
+        ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(attribs, callingConventions, paramTypes.Select(p => p.Type).ToArray());
 
         CurrentMethod = new()
         {
@@ -254,7 +255,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         HandleFieldInitializersAndDefaultConstructor();
 
-        Visit(context.expression());
+        Type t = Visit(context.expression());
+        
+        if (t != typeof(void))
+        {
+            EmitErrorMessage(
+                context.Equals().Symbol.Line,
+                context.Equals().Symbol.Column,
+                context.expression().Start.Column - context.Equals().Symbol.Column,
+                DS0093_ConstructorReturnsValue,
+                $"Expected expression of type 'null' but found type '{t.FullName}'.");
+        }
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
 
@@ -339,7 +350,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Var().Symbol.Column,
                 context.Var().GetText().Length,
                 DS0083_InvalidVarModifier,
-                "The modifier 'var' can not be used on member functions.");
+                "The modifier 'var' can not be used on type members.");
         }
 
         Type _tReturn = typeof(object);
@@ -416,9 +427,21 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             CurrentMethod.IL.Emit(OpCodes.Ret);
 
-            List<(string, Type)> _params = new();
+            Dictionary<string, string> constraintsForCurrentFunction = [];
+            CurrentFile.FunctionParameterConstraints.TryGetValue(context.Identifier().GetText(), out constraintsForCurrentFunction);
+
+            List<Parameter> _params = [];
             foreach (var param in CurrentMethod.Parameters)
-                _params.Add((param.Name, param.Type));
+            {
+                constraintsForCurrentFunction.TryGetValue(param.Name, out string constraint);
+
+                _params.Add(new()
+                {
+                    Name = param.Name,
+                    Type = param.Type,
+                    Constraint = constraint
+                });
+            }
 
             CurrentFile.Fragments.Add(new()
             {
@@ -463,7 +486,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                     Context.EntryPointIsSet = true;
 
-                    Context.Assembly.SetEntryPoint(mb);
+                    Context.EntryPoint = mb;
 
                     CurrentMethod.Builder.SetCustomAttribute(new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
                 }
@@ -714,7 +737,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
 
-        CliHelpers.SetEntryPoint(Context.Assembly, mb);
+        Context.EntryPoint = mb;
 
         tb.CreateType();
         return ret;
@@ -1217,7 +1240,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
                 LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
+                // TODO: Implement alternative
+                //lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
 
                 EmitStloc(++CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);
@@ -1871,7 +1895,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
-        foreach (ITerminalNode identifier in context.full_identifier().Identifier()[firstIndex..])
+        ITerminalNode[] nextNodes = [];
+        if (context.full_identifier().Identifier().Last().GetText() == t.Name)
+            nextNodes = [(context.full_identifier().Identifier().Last())];
+        else
+            nextNodes = context.full_identifier().Identifier()[firstIndex..];
+
+        foreach (ITerminalNode identifier in nextNodes)
         {
             Type[] _params = null;
 
@@ -3535,7 +3565,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         else
         {
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-            lb.SetLocalSymInfo(context.Identifier().GetText());
+            // TODO: Implement alternative
+            //lb.SetLocalSymInfo(context.Identifier().GetText());
 
             LocalInfo loc = new(context.Identifier().GetText(), lb, true, ++CurrentMethod.LocalIndex, default);
             invalidationList.Add(loc);

@@ -67,9 +67,10 @@ public static class Compiler
         string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
         AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
-        AssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndSave);
+        //PersistedAssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, PersistedAssemblyBuilderAccess.RunAndSave);
+        PersistedAssemblyBuilder ab = new(name, typeof(object).Assembly);
 
-        ModuleBuilder mb = ab.DefineDynamicModule(asmFileName, asmFileName, config.CreatePdb || config.Configuration == ApplicationConfiguration.Debug);
+        ModuleBuilder mb = ab.DefineDynamicModule(config.AssemblyName);
 
         Context.Assembly = ab;
         Context.Module = mb;
@@ -84,7 +85,8 @@ public static class Compiler
             EmitErrorMessage(
                 0, 0, 0,
                 DS0030_NoEntryPoint,
-                "Program contains no entry point. Use the '<EntryPoint>' attribute to specify an application entry point.");
+                "Program contains no entry point. Use the '<EntryPoint>' attribute to specify an application entry point.",
+                "dc");
         }
 
         return errors;

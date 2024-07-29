@@ -1,0 +1,25 @@
+﻿namespace Dassie.CodeGeneration.Auxiliary;
+
+internal static class ResourceExtractor
+{
+    /// <summary>
+    /// Extracts version information resources in a format usable by Windows from a .res file.
+    /// </summary>
+    /// <param name="buffer">The bytes of a .res file containing version information.</param>
+    /// <returns>A new array containing the bytes of the version info resource.</returns>
+    public static byte[] ExtractVersionInfoResource(byte[] buffer)
+    {
+        byte[] fixedFileInfo = [0xBD, 0x04, 0xEF, 0xFE, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+
+        buffer = buffer[32..]; // Remove resource header
+        buffer[2] = 0x34;
+        buffer[4] = 0x0;
+        buffer[5] = 0x0;
+
+        buffer = [.. buffer[0..6], .. buffer[12..]];
+        fixedFileInfo.CopyTo(buffer, 0x28);
+        buffer = [.. buffer[0..0x5C], .. buffer[0x92..]];
+
+        return buffer;
+    }
+}

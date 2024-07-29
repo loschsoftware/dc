@@ -27,9 +27,9 @@ internal static class SymbolResolver
 
         string typeString = "";
 
-        for (int i = 1; i < parts.Length; i++)
+        for (int i = 0; i < parts.Length; i++)
         {
-            typeString = string.Join(".", parts[0..i]);
+            typeString = string.Join(".", parts[0..(i + 1)]);
             firstUnusedPart++;
 
             if (ResolveIdentifier(typeString, row, col, len, true) is Type t)
@@ -383,72 +383,79 @@ internal static class SymbolResolver
             if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
                 CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
 
-            if (cons.Any())
+            if (!cons.Any())
             {
-                ConstructorInfo final = null;
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0002_MethodNotFound,
+                    $"The type '{name}' has no constructor with the specified argument types.");
 
-                foreach (ConstructorInfo possibleMethod in cons)
+                return null;
+            }
+
+            ConstructorInfo final = null;
+
+            foreach (ConstructorInfo possibleMethod in cons)
+            {
+                if (final != null)
+                    break;
+
+                if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
                 {
-                    if (final != null)
-                        break;
+                    final = possibleMethod;
+                    break;
+                }
 
-                    if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
+                for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
+                {
+                    if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
                     {
-                        final = possibleMethod;
-                        break;
-                    }
-
-                    for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
-                    {
-                        if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
+                        if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                         {
-                            if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
-                            {
-                                CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
-                            }
-
-                            if (i == possibleMethod.GetParameters().Length - 1)
-                            {
-                                final = possibleMethod;
-                                break;
-                            }
+                            CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
                         }
 
-                        else
+                        if (i == possibleMethod.GetParameters().Length - 1)
+                        {
+                            final = possibleMethod;
                             break;
+                        }
                     }
+
+                    else
+                        break;
                 }
-
-                if (final == null)
-                    goto Error;
-
-                for (int i = 0; i < final.GetParameters().Length; i++)
-                {
-                    if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
-                        && final.GetParameters()[i].ParameterType != typeof(object))
-                    {
-                        CurrentMethod.ParameterBoxIndices.Remove(i);
-                    }
-                }
-
-                if (tc.Builder != typeof(object) && final.DeclaringType == typeof(object))
-                    CurrentMethod.BoxCallingType = true;
-
-                if (!noEmitFragments)
-                {
-                    CurrentFile.Fragments.Add(new()
-                    {
-                        Line = row,
-                        Column = col,
-                        Length = len,
-                        Color = Dassie.Text.Color.Function,
-                        IsNavigationTarget = false,
-                        ToolTip = TooltipGenerator.Constructor(final)
-                    });
-                }
-
-                return final;
             }
+
+            if (final == null)
+                goto Error;
+
+            for (int i = 0; i < final.GetParameters().Length; i++)
+            {
+                if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
+                    && final.GetParameters()[i].ParameterType != typeof(object))
+                {
+                    CurrentMethod.ParameterBoxIndices.Remove(i);
+                }
+            }
+
+            if (tc.Builder != typeof(object) && final.DeclaringType == typeof(object))
+                CurrentMethod.BoxCallingType = true;
+
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = len,
+                    Color = Dassie.Text.Color.Function,
+                    IsNavigationTarget = false,
+                    ToolTip = TooltipGenerator.Constructor(final)
+                });
+            }
+
+            return final;
         }
 
         // 1. Fields
@@ -619,6 +626,12 @@ internal static class SymbolResolver
 
         if (type == null)
         {
+            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name))
+            {
+                type = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name).Builder;
+                return true;
+            }
+
             List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
             allAssemblies.AddRange(Context.ReferencedAssemblies);
 
@@ -658,6 +671,12 @@ internal static class SymbolResolver
                 if (_assemblies.Any())
                 {
                     type = _assemblies.First().GetType(n);
+                    goto FoundType;
+                }
+
+                if (Context.Types.Any(t => t.FullName == n))
+                {
+                    type = Context.Types.First(t => t.FullName == n).Builder;
                     goto FoundType;
                 }
 
