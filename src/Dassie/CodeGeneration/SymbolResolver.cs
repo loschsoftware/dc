@@ -27,9 +27,9 @@ internal static class SymbolResolver
 
         string typeString = "";
 
-        for (int i = 1; i < parts.Length; i++)
+        for (int i = 0; i < parts.Length; i++)
         {
-            typeString = string.Join(".", parts[0..i]);
+            typeString = string.Join(".", parts[0..(i + 1)]);
             firstUnusedPart++;
 
             if (ResolveIdentifier(typeString, row, col, len, true) is Type t)

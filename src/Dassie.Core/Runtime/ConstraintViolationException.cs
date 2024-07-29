@@ -14,15 +14,23 @@ public class ConstraintViolationException : Exception
 	public ConstraintViolationException() { }
 
     /// <summary>
-    /// Creates a new instance of <see cref="ConstraintViolationException"/> with the specified exception message.
+    /// The name of the parameter that violates a constraint.
     /// </summary>
-    /// <param name="message">The exception message to display.</param>
-    public ConstraintViolationException(string message) : base(message) { }
+    public string ParameterName { get; }
 
     /// <summary>
-    /// Creates a new instance of <see cref="ConstraintViolationException"/> with the specified message and inner exception.
+    /// The constraint that was violated.
     /// </summary>
-    /// <param name="message">The exception message to display.</param>
-    /// <param name="inner">The inner exception.</param>
-    public ConstraintViolationException(string message, Exception inner) : base(message, inner) { }
+    public string Constraint { get; }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="ConstraintViolationException"/> with the specified exception message.
+    /// </summary>
+    /// <param name="parameter">The parameter that violates a constraint.</param>
+    /// <param name="constraint">The constraint that was violated.</param>
+    public ConstraintViolationException(string parameter, string constraint) : base($"Parameter '{parameter}' violates constraint '{constraint}'.")
+    {
+        ParameterName = parameter;
+        Constraint = constraint;
+    }
 }

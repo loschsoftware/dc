@@ -1873,7 +1873,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
-        foreach (ITerminalNode identifier in context.full_identifier().Identifier()[firstIndex..])
+        ITerminalNode[] nextNodes = [];
+        if (context.full_identifier().Identifier().Last().GetText() == t.Name)
+            nextNodes = [(context.full_identifier().Identifier().Last())];
+        else
+            nextNodes = context.full_identifier().Identifier()[firstIndex..];
+
+        foreach (ITerminalNode identifier in nextNodes)
         {
             Type[] _params = null;
 
