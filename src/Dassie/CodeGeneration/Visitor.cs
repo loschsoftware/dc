@@ -340,7 +340,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        //Helpers.CreateFakeMethod();
+        //CliHelpers.CreateFakeMethod();
         //Type _tReturn = Visit(context.expression());
 
         if (context.Var() != null && context.parameter_list() != null)
@@ -417,12 +417,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (_tReturn != tReturn)
             {
-                EmitErrorMessage(
-                    context.expression().Start.Line,
-                    context.expression().Start.Column,
-                    context.expression().GetText().Length,
-                    DS0053_WrongReturnType,
-                    $"Expected expression of type '{tReturn.FullName}', but got type '{_tReturn.FullName}'.");
+                if (tReturn == typeof(object))
+                {
+                    if (_tReturn.IsValueType)
+                        CurrentMethod.IL.Emit(OpCodes.Box, _tReturn);
+                }
+                else
+                {
+                    EmitErrorMessage(
+                        context.expression().Start.Line,
+                        context.expression().Start.Column,
+                        context.expression().GetText().Length,
+                        DS0053_WrongReturnType,
+                        $"Expected expression of type '{tReturn.FullName}', but got type '{_tReturn.FullName}'.");
+                }
             }
 
             CurrentMethod.IL.Emit(OpCodes.Ret);
