@@ -435,8 +435,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             CurrentMethod.IL.Emit(OpCodes.Ret);
 
-            Dictionary<string, string> constraintsForCurrentFunction = [];
-            CurrentFile.FunctionParameterConstraints.TryGetValue(context.Identifier().GetText(), out constraintsForCurrentFunction);
+            CurrentFile.FunctionParameterConstraints.TryGetValue(context.Identifier().GetText(), out Dictionary<string, string> constraintsForCurrentFunction);
+            constraintsForCurrentFunction ??= [];
 
             List<Parameter> _params = [];
             foreach (var param in CurrentMethod.Parameters)
