@@ -1286,14 +1286,11 @@ internal static class CliHelpers
         if (Context.Configuration.Configuration != ApplicationConfiguration.Debug)
             return;
 
-#if !NET7_COMPATIBLE
         try
         {
-            // TODO: Implement alternative
-            //lb.SetLocalSymInfo(name);
+            lb.SetLocalSymInfo(name);
         }
         catch (IndexOutOfRangeException) { }
-#endif
     }
 
     public static bool HandleSpecialFunction(string name, DassieParser.ArglistContext args, int line, int column, int length)

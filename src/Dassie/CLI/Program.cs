@@ -13,14 +13,6 @@ internal class Program
 {
     internal static int Main(string[] args)
     {
-
-#if NET7_COMPATIBLE
-        ConsoleColor prev = Console.ForegroundColor;
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("Warning: This is not a standalone build of the Dassie compiler and might not be able to execute some actions.");
-        Console.ForegroundColor = prev;
-#endif
-
         try
         {
             return args switch

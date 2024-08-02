@@ -49,11 +49,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitFile_body([NotNull] DassieParser.File_bodyContext context)
     {
-#if NET7_COMPATIBLE
-        Context.Assembly = PersistedAssemblyBuilder.DefineDynamicAssembly(new("throwaway"), PersistedAssemblyBuilderAccess.Run);
-        Context.Module = Context.Assembly.DefineDynamicModule("throwaway");
-#endif
-
         if (context.top_level_statements() != null)
         {
             Visit(context.top_level_statements());
@@ -1233,7 +1228,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.LocalIndex++;
 
                 LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t2);
-                //lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex}");
+                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex}");
 
                 EmitStloc(CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);
@@ -1248,8 +1243,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.IL.Emit(OpCodes.Pop);
 
                 LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-                // TODO: Implement alternative
-                //lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
+                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex + 1}");
 
                 EmitStloc(++CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);
@@ -3062,12 +3056,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             IsNavigationTarget = true
         });
 
-#if !NET7_COMPATIBLE
         CliHelpers.SetLocalSymInfo(lb, context.Identifier().GetText());
-#endif
-
         CurrentMethod.LocalIndex++;
-
         CurrentMethod.Locals.Add(new(context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex, CurrentMethod.CurrentUnion));
 
         if (t == typeof(UnionValue))
@@ -3342,10 +3332,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
-#if !NET7_COMPATIBLE
             CliHelpers.SetLocalSymInfo(returnBuilder,
                 GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
-#endif
 
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
@@ -3353,11 +3341,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(typeof(int));
             CurrentMethod.Locals.Add(new(GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++, new(null, typeof(int))));
 
-#if !NET7_COMPATIBLE
             CliHelpers.SetLocalSymInfo(
                 lb,
                 GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1));
-#endif
 
             CurrentMethod.IL.Emit(OpCodes.Br, loop);
 
@@ -3413,11 +3399,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
-#if !NET7_COMPATIBLE
             CliHelpers.SetLocalSymInfo(
                 returnBuilder,
                 GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
-#endif
 
             Label loop = CurrentMethod.IL.DefineLabel();
             Label start = CurrentMethod.IL.DefineLabel();
@@ -3593,8 +3577,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         else
         {
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-            // TODO: Implement alternative
-            //lb.SetLocalSymInfo(context.Identifier().GetText());
+            lb.SetLocalSymInfo(context.Identifier().GetText());
 
             LocalInfo loc = new(context.Identifier().GetText(), lb, true, ++CurrentMethod.LocalIndex, default);
             invalidationList.Add(loc);
