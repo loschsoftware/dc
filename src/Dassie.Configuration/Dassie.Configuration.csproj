@@ -5,5 +5,7 @@
 		<Platforms>AnyCPU;x64</Platforms>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<LangVersion>12</LangVersion>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Deterministic>false</Deterministic>
 	</PropertyGroup>
 </Project>

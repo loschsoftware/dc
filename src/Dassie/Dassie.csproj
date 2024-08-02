@@ -9,12 +9,7 @@
 		<LangVersion>12</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Deterministic>false</Deterministic>
-		
-		<Company>Losch</Company>
-		<Product>Dassie</Product>
-		<ProductName>Dassie</ProductName>
-		<Description>Dassie Compiler</Description>
-		<Copyright>© 2024 Losch</Copyright>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 
 	<ItemGroup>
