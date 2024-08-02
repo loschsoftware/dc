@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dassie.Core", "src\Dassie.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dassie.Text", "src\Dassie.Text\Dassie.Text.csproj", "{33248CCB-CD76-47BA-92D4-5338C904133A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dassie.Compiler", "src\Dassie.Compiler\Dassie.Compiler.csproj", "{B403291A-E932-45EF-93BA-B00C5A791DCF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,14 @@ Global
 		{33248CCB-CD76-47BA-92D4-5338C904133A}.Release|Any CPU.Build.0 = Release|x64
 		{33248CCB-CD76-47BA-92D4-5338C904133A}.Release|x64.ActiveCfg = Release|x64
 		{33248CCB-CD76-47BA-92D4-5338C904133A}.Release|x64.Build.0 = Release|x64
+		{B403291A-E932-45EF-93BA-B00C5A791DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B403291A-E932-45EF-93BA-B00C5A791DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B403291A-E932-45EF-93BA-B00C5A791DCF}.Debug|x64.ActiveCfg = Debug|x64
+		{B403291A-E932-45EF-93BA-B00C5A791DCF}.Debug|x64.Build.0 = Debug|x64
+		{B403291A-E932-45EF-93BA-B00C5A791DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B403291A-E932-45EF-93BA-B00C5A791DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B403291A-E932-45EF-93BA-B00C5A791DCF}.Release|x64.ActiveCfg = Release|Any CPU
+		{B403291A-E932-45EF-93BA-B00C5A791DCF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
