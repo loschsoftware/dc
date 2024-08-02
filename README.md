@@ -28,4 +28,4 @@ Further documentation on this compiler, including a list of all error codes, can
 ## Contributing
 Code contributions to the compiler are welcome. Just build the project from source as described above and open a pull request. To report bugs or request a feature, use the [issues](https://github.com/loschsoftware/dc/issues) section of this repository. If you have a feature request for the language itself, open an issue [here](https://github.com/loschsoftware/dassie/issues) instead.
 
-Instead of code contributions, [donations](https://www.paypal.com/donate/?hosted_button_id=R6XM6EX8WU9RN) are also welcome.
+If you wish to support the project monetarily instead, you can donate [here](https://www.paypal.com/donate/?hosted_button_id=R6XM6EX8WU9RN).
