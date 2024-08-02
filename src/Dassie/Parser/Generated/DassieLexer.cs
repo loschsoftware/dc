@@ -20,6 +20,9 @@
 #pragma warning disable 419
 
 namespace Dassie.Parser {
+
+    #pragma warning disable CS0108
+
 using System;
 using System.IO;
 using System.Text;

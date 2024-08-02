@@ -386,6 +386,7 @@ public static class TooltipGenerator
     /// <param name="type">The type to generate a tooltip for.</param>
     /// <param name="showBaseType">Wheter to include the base type in the tooltip.</param>
     /// <param name="omitNamespace">If <see langword="true"/>, omits the namespace of the type from the tooltip.</param>
+    /// <param name="noModifiers">If <see langword="true"/>, hides all type modifiers from the tooltip.</param>
     /// <param name="doc">Optional XML documentation of the type.</param>
     /// <param name="ignoreBuiltinAliases">Wheter to ignore built-in type aliases.</param>
     /// <returns>Returns the generated tooltip.</returns>

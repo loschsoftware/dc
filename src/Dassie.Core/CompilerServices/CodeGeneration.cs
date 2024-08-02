@@ -1,5 +1,8 @@
 ﻿using System;
 
+#pragma warning disable IDE1006
+#pragma warning disable IDE0060
+
 namespace Dassie.CompilerServices;
 
 /// <summary>

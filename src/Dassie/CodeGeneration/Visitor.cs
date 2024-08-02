@@ -3611,9 +3611,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         return typeof(void);
 
-        CurrentMethod.IL.BeginFaultBlock();
-        Visit(context.expression());
-        return typeof(void);
+        //CurrentMethod.IL.BeginFaultBlock();
+        //Visit(context.expression());
+        //return typeof(void);
     }
 
     public override Type VisitSeparated_expression([NotNull] DassieParser.Separated_expressionContext context)

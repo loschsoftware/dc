@@ -2,6 +2,10 @@ lexer grammar DassieLexer;
 
 channels { Comments_Channel, Whitespace_Channel }
 
+@header {
+    #pragma warning disable CS0108
+}
+
 Ws: [ \t]+ -> channel(Whitespace_Channel);
 
 NewLine

@@ -1,5 +1,8 @@
 ﻿using System;
 
+#pragma warning disable CS8981
+#pragma warning disable IDE1006
+
 namespace Dassie.Core;
 
 /// <summary>

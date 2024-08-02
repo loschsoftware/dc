@@ -2,6 +2,10 @@ parser grammar DassieParser;
 
 options { tokenVocab = DassieLexer; }
 
+@header {
+    #pragma warning disable CS0108
+}
+
 compilation_unit
     : (import_directive | NewLine)* (export_directive NewLine*)? file_body EOF
     ;

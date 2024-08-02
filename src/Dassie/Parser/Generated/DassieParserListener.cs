@@ -20,6 +20,9 @@
 #pragma warning disable 419
 
 namespace Dassie.Parser {
+
+    #pragma warning disable CS0108
+
 using Antlr4.Runtime.Misc;
 using IParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
 using IToken = Antlr4.Runtime.IToken;
