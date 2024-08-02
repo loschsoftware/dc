@@ -1,4 +1,4 @@
-# Dassie Command Line Compiler (dc.exe)
+# Dassie Command Line Compiler
 <img alt="GitHub commit activity (branch)" src="https://img.shields.io/github/commit-activity/m/loschsoftware/dc"> <img alt="GitHub issues" src="https://img.shields.io/github/issues/loschsoftware/dc">
 
 The official .NET compiler for the [Dassie](https://github.com/loschsoftware/dassie) programming language.
