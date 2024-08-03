@@ -104,6 +104,14 @@ internal static class EmitHelpers
             CurrentMethod.IL.Emit(OpCodes.Stloc, index);
     }
 
+    public static void EmitStarg(int index)
+    {
+        if (index <= 255)
+            CurrentMethod.IL.Emit(OpCodes.Starg_S, (byte)index);
+        else
+            CurrentMethod.IL.Emit(OpCodes.Starg, index);
+    }
+
     public static void EmitLdloc(int index)
     {
         if (index <= 255)

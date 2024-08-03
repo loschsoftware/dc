@@ -640,6 +640,9 @@ internal static class CliHelpers
 
     public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false)
     {
+        if (name.Ampersand() != null)
+            return ResolveTypeName(name.type_name().First(), noEmitFragments).MakeByRefType();
+
         int arrayDims = 0;
 
         if (name.array_type_specifier() != null)
@@ -820,74 +823,35 @@ internal static class CliHelpers
     {
         if (CurrentMethod.Locals.Any(l => l.Name == name))
         {
+            LocalInfo l = CurrentMethod.Locals.First(l => l.Name == name);
             return new()
             {
                 SymbolType = SymbolInfo.SymType.Local,
-                Local = CurrentMethod.Locals.First(l => l.Name == name)
+                Local = l
             };
         }
 
         else if (CurrentMethod.Parameters.Any(p => p.Name == name))
         {
+            ParamInfo p = CurrentMethod.Parameters.First(p => p.Name == name);
             return new()
             {
                 SymbolType = SymbolInfo.SymType.Parameter,
-                Parameter = CurrentMethod.Parameters.First(p => p.Name == name)
+                Parameter = p
             };
         }
 
         else if (TypeContext.Current.Fields.Any(f => f.Name == name))
         {
+            MetaFieldInfo f = TypeContext.Current.Fields.First(f => f.Name == name);
             return new()
             {
                 SymbolType = SymbolInfo.SymType.Field,
-                Field = TypeContext.Current.Fields.First(f => f.Name == name)
+                Field = f
             };
         }
 
         return null;
-    }
-
-    public static void LoadSymbolAddress(SymbolInfo sym)
-    {
-        switch (sym.SymbolType)
-        {
-            case SymbolInfo.SymType.Local:
-                EmitLdloca(sym.Local.Index);
-                break;
-
-            case SymbolInfo.SymType.Parameter:
-                EmitLdarga(sym.Parameter.Index);
-                break;
-
-            default:
-                if (!sym.Field.Builder.IsStatic)
-                    EmitLdarg0IfCurrentType(sym.Field.Builder.FieldType);
-
-                CurrentMethod.IL.Emit(sym.Field.Builder.IsStatic ? OpCodes.Ldsflda : OpCodes.Ldflda, sym.Field.Builder);
-                break;
-        }
-    }
-
-    public static void LoadSymbol(SymbolInfo sym)
-    {
-        switch (sym.SymbolType)
-        {
-            case SymbolInfo.SymType.Local:
-                EmitLdloc(sym.Local.Index);
-                break;
-
-            case SymbolInfo.SymType.Parameter:
-                EmitLdarg(sym.Parameter.Index);
-                break;
-
-            default:
-                if (!sym.Field.Builder.IsStatic)
-                    EmitLdarg0IfCurrentType(sym.Field.Builder.FieldType);
-
-                CurrentMethod.IL.Emit(sym.Field.Builder.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, sym.Field.Builder);
-                break;
-        }
     }
 
     public static void SetupBogusAssembly()
@@ -1143,7 +1107,7 @@ internal static class CliHelpers
             typeof(nuint)
         };
 
-        return numerics.Contains(type);
+        return numerics.Contains(type.RemoveByRef());
     }
 
     public static bool IsIntegerType(Type type)
@@ -1162,7 +1126,7 @@ internal static class CliHelpers
             typeof(nuint)
         };
 
-        return numerics.Contains(type);
+        return numerics.Contains(type.RemoveByRef());
     }
 
     public static bool IsUnsignedIntegerType(Type type)
@@ -1176,7 +1140,7 @@ internal static class CliHelpers
             typeof(nuint)
         };
 
-        return numerics.Contains(type);
+        return numerics.Contains(type.RemoveByRef());
     }
 
     public static bool IsFloatingPointType(Type type)
@@ -1187,7 +1151,7 @@ internal static class CliHelpers
             typeof(double),
         };
 
-        return floats.Contains(type);
+        return floats.Contains(type.RemoveByRef());
     }
 
     public static Type GetEnumeratedType(this Type type) =>

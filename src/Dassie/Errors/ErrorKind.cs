@@ -399,5 +399,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an init-only field is assigned to outside of a constructor.
     /// </summary>
-    DS0094_InitOnlyFieldAssignedOutsideOfConstructor
+    DS0094_InitOnlyFieldAssignedOutsideOfConstructor,
+    /// <summary>
+    /// Emitted when an immutable symbol is passed by reference.
+    /// </summary>
+    DS0095_ImmutableSymbolPassedByReference
 }

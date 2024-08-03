@@ -1,4 +1,4 @@
-﻿using Dassie.CLI;
+﻿using Dassie.CLI.Helpers;
 using Dassie.Runtime;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
@@ -23,12 +23,19 @@ internal class SymbolInfo
     public ParamInfo Parameter { get; set; }
 
     public MetaFieldInfo Field { get; set; }
-    
+
     public Type Type() => SymbolType switch
     {
         SymType.Local => Local.Builder.LocalType,
         SymType.Parameter => Parameter.Type,
         _ => Field.Builder.FieldType
+    };
+
+    public int Index() => SymbolType switch
+    {
+        SymType.Parameter => Parameter.Index,
+        SymType.Local => Local.Index,
+        _ => -1
     };
 
     public UnionValue Union() => SymbolType switch
@@ -60,9 +67,64 @@ internal class SymbolInfo
         ToolTip = GetToolTip()
     };
 
-    public void Load() => CliHelpers.LoadSymbol(this);
+    public void Load()
+    {
+        if (CurrentMethod.ByRefArguments.Contains(CurrentMethod.CurrentArg))
+        {
+            if (!IsMutable())
+            {
+                EmitErrorMessage(
+                    0, 0, 0, // TODO: Get correct location
+                    DS0095_ImmutableSymbolPassedByReference,
+                    $"The symbol '{Name()}' is immutable and cannot be passed by reference.");
+            }
 
-    public void LoadAddress() => CliHelpers.LoadSymbolAddress(this);
+            LoadAddress();
+            return;
+        }
+
+        switch (SymbolType)
+        {
+            case SymType.Local:
+                EmitLdloc(Local.Index);
+                break;
+
+            case SymType.Parameter:
+                EmitLdarg(Parameter.Index);
+                break;
+
+            default:
+                if (!Field.Builder.IsStatic)
+                    EmitLdarg0IfCurrentType(Field.Builder.FieldType);
+
+                CurrentMethod.IL.Emit(Field.Builder.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, Field.Builder);
+                break;
+        }
+
+        if (Type().IsByRef || Type().IsByRefLike)
+            CurrentMethod.IL.Emit(Type().GetElementType().GetLoadIndirectOpCode());
+    }
+
+    public void LoadAddress()
+    {
+        switch (SymbolType)
+        {
+            case SymType.Local:
+                EmitLdloca(Local.Index);
+                break;
+
+            case SymType.Parameter:
+                EmitLdarga(Parameter.Index);
+                break;
+
+            default:
+                if (!Field.Builder.IsStatic)
+                    EmitLdarg0IfCurrentType(Field.Builder.FieldType);
+
+                CurrentMethod.IL.Emit(Field.Builder.IsStatic ? OpCodes.Ldsflda : OpCodes.Ldflda, Field.Builder);
+                break;
+        }
+    }
 
     public void LoadAddressIfValueType()
     {
@@ -93,6 +155,12 @@ internal class SymbolInfo
 
     public void Set()
     {
+        if (Type().IsByRef || Type().IsByRefLike)
+        {
+            CurrentMethod.IL.Emit(Type().GetElementType().GetSetIndirectOpCode());
+            return;
+        }
+
         switch (SymbolType)
         {
             case SymType.Local:
@@ -100,7 +168,7 @@ internal class SymbolInfo
                 break;
 
             case SymType.Parameter:
-                
+                EmitStarg(Parameter.Index);
                 break;
 
             default:
@@ -118,7 +186,7 @@ internal class SymbolInfo
     public bool IsMutable() => SymbolType switch
     {
         SymType.Local => !Local.IsConstant,
-        SymType.Parameter => Parameter.Builder.IsOut,
+        SymType.Parameter => Parameter.Builder.IsOut || Parameter.IsMutable,
         _ => true
     };
 

@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Color = Dassie.Text.Color;
 using System.Data.Common;
+using Dassie.CLI.Helpers;
 
 namespace Dassie.CodeGeneration;
 
@@ -239,7 +240,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CliHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                 param.Context.Identifier().GetText());
 
-            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
+            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new(), param.Context.Var() != null));
         }
 
         if (CurrentMethod.ConstructorBuilder.IsStatic)
@@ -399,7 +400,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     CliHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                     param.Context.Identifier().GetText());
 
-                CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new()));
+                CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new(), param.Context.Var() != null));
             }
 
             if (CurrentMethod.Builder.IsStatic)
@@ -581,9 +582,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Length = param.Identifier().GetText().Length,
         });
 
-        if (param.parameter_modifier()?.Ampersand() != null)
-            t = t.MakeByRefType();
-
         return t;
     }
 
@@ -701,7 +699,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             IL = il
         };
 
-        mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(0, ParameterAttributes.None, "args"), 0, default));
+        mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(0, ParameterAttributes.None, "args"), 0, default, false));
 
         mc.FilesWhereDefined.Add(CurrentFile.Path);
 
@@ -1480,10 +1478,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitByref_expression([NotNull] DassieParser.Byref_expressionContext context)
     {
         Type t = Visit(context.expression());
-
-        // TODO: Implement byref capability
-
-        return t.MakeByRefType();
+        return t;
     }
 
     public Type GetConstructorOrCast(Type cType, DassieParser.ArglistContext arglist, int line, int column, int length)
@@ -1804,6 +1799,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (o is MethodBuilder m)
             {
+                for (int i = 0; i < m.GetParameters().Length; i++)
+                {
+                    ParameterInfo param = m.GetParameters()[i];
+
+                    if (param.ParameterType.IsByRef || param.ParameterType.IsByRefLike)
+                        CurrentMethod.ByRefArguments.Add(i);
+                }
+
                 if (context.arglist() != null)
                     Visit(context.arglist());
 
@@ -2103,10 +2106,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitArglist([NotNull] DassieParser.ArglistContext context)
     {
+        CurrentMethod.CurrentArg = 0;
         CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
 
         for (int i = 0; i < context.expression().Length; i++)
         {
+            CurrentMethod.CurrentArg = i;
+
             IParseTree tree = context.expression()[i];
             Type t = Visit(tree);
 
@@ -2132,6 +2138,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         CurrentMethod.ParameterBoxIndices[memberIndex].Clear();
         VisitorStep1CurrentMethod?.ParameterBoxIndices[memberIndex].Clear();
+        CurrentMethod.ByRefArguments.Clear();
 
         return null;
     }
@@ -2959,6 +2966,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (sym.Field != null && !sym.Field.Builder.IsStatic)
                 EmitLdarg(0);
+
+            if (sym.Type().IsByRef || sym.Type().IsByRefLike)
+                EmitLdarg(sym.Index());
 
             Type type = Visit(context.expression());
             sym.Set();

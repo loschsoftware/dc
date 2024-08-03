@@ -7,18 +7,21 @@ namespace Dassie.Meta;
 
 internal class ParamInfo : IEquatable<ParamInfo>
 {
-    public ParamInfo(string name, Type type, ParameterBuilder builder, int index, UnionValue union)
+    public ParamInfo(string name, Type type, ParameterBuilder builder, int index, UnionValue union, bool isMutable)
     {
         Name = name;
         Type = type;
         Builder = builder;
         Index = index;
         Union = union;
+        IsMutable = isMutable;
     }
 
     public ParamInfo() { }
 
     public string Name { get; set; }
+
+    public bool IsMutable { get; set; }
 
     public Type Type { get; set; }
 

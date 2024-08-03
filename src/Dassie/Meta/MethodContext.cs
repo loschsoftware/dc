@@ -126,8 +126,12 @@ internal class MethodContext
     public Type StaticCallType { get; set; }
 
     public bool IgnoreTypesInSymbolResolve { get; set; } = false;
-
+    
     public Dictionary<int, List<int>> ParameterBoxIndices { get; set; } = new();
+
+    public List<int> ByRefArguments { get; set; } = [];
+
+    public int CurrentArg { get; set; }
 
     public bool BoxCallingType { get; set; }
 

@@ -303,13 +303,13 @@ parameter_list
     ;
 
 parameter_modifier
-    : Ampersand // ref
-    | Ampersand_Greater // in
+    // : Ampersand // ref
+    : Ampersand_Greater // in
     | Less_Ampersand // out
     ;
 
 parameter
-    : attribute? parameter_modifier? Identifier Double_Dot? (Colon type_name)? parameter_constraint? (Equals expression)?
+    : attribute? (Val | Var)? parameter_modifier? Identifier Double_Dot? (Colon type_name)? parameter_constraint? (Equals expression)?
     ;
 
 parameter_constraint
