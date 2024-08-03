@@ -84,7 +84,7 @@ public static class NumericSequence
         foreach (int i in array[..^1])
             sb.Append($"{i.ToString().PadLeft(width, '0')}, ");
 
-        sb.Append($"{array.Last().ToString().PadLeft(width, '0')}, ");
+        sb.Append($"{array.Last().ToString().PadLeft(width, '0')}");
 
         return sb.ToString();
     }
