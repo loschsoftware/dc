@@ -588,4 +588,21 @@ module App = {
 }</pre></td>
     <td>Remove the assignment or remove the <code>val</code> modifier from the field.</td>
   </tr>
+  <tr>
+    <td>DS0095</td>
+    <td>Error</td>
+    <td>Emitted when a an immutable symbol is passed by reference.</td>
+    <td><pre>module App = {
+    Test (var x: int32&): null = ignore {
+        x += 1
+    }
+
+    <EntryPoint>
+    Main (): null = {
+        x = 10
+		Test &x # DS0095
+    }
+}</pre></td>
+    <td>Mark the symbol as mutable using the <code>var</code> keyword.</td>
+  </tr>
 </table>
