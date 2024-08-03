@@ -203,6 +203,9 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
     public override Expression VisitType_name([NotNull] DassieParser.Type_nameContext context)
     {
+        if (context.Ampersand() != null)
+            return new(typeof(Type), VisitType_name(context.type_name().First()).Value.MakeByRefType());
+
         if (context.identifier_atom() != null)
         {
             bool success = SymbolResolver.TryGetType(

@@ -2119,7 +2119,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
                 || (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)))
             {
-                CurrentMethod.IL.Emit(OpCodes.Box, t);
+                Type boxedType = t;
+                if (boxedType.IsByRef || boxedType.IsByRefLike)
+                    boxedType = boxedType.GetElementType();
+
+                CurrentMethod.IL.Emit(OpCodes.Box, boxedType);
                 t = typeof(object);
             }
 
@@ -3030,6 +3034,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 {
                     CurrentMethod.IL.Emit(OpCodes.Box, t);
                 }
+                else if (t.MakeByRefType() == t2) { }
                 else
                 {
                     EmitErrorMessage(
