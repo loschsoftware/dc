@@ -8,6 +8,7 @@ internal static class TreeHelpers
 {
     public static bool CanBePassedByReference(IParseTree tree)
     {
+        
         if (tree is not DassieParser.Full_identifier_member_access_expressionContext && tree is not DassieParser.Member_access_expressionContext)
             return false;
 

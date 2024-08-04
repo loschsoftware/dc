@@ -1,20 +1,18 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Dassie.CLI;
 using Dassie.Core;
+using Dassie.Meta;
+using Dassie.Parser;
 using Dassie.Runtime;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
-using Dassie.CLI;
-using Dassie.Meta;
-using Dassie.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Color = Dassie.Text.Color;
-using System.Data.Common;
-using Dassie.CLI.Helpers;
 
 namespace Dassie.CodeGeneration;
 
@@ -1803,7 +1801,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 {
                     ParameterInfo param = m.GetParameters()[i];
 
-                    if (param.ParameterType.IsByRef || param.ParameterType.IsByRefLike)
+                    if (param.ParameterType.IsByRef /*|| param.ParameterType.IsByRefLike*/)
                         CurrentMethod.ByRefArguments.Add(i);
                 }
 
@@ -1914,7 +1912,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 notLoadAddress = true;
 
+                CliHelpers.RedirectEmitterToNullStream();
                 Visit(context.arglist());
+                CliHelpers.ResetNullStream();
+
                 _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
             }
@@ -1928,6 +1929,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 false,
                 _params,
                 flags);
+
+            if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null)
+            {
+                Visit(context.arglist());
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+            }
 
             if (member == null)
                 return null;
@@ -2118,24 +2125,27 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (CurrentMethod.ByRefArguments.Contains(i))
             {
-                if (tree is not DassieParser.Byref_expressionContext)
-                {
-                    EmitErrorMessage(
-                        context.expression()[i].Start.Line,
-                        context.expression()[i].Start.Column,
-                        context.expression()[i].GetText().Length,
-                        DS0096_PassByReferenceWithoutOperator,
-                        "Passing by reference requires the '&' operator.");
-                }
-                else if (!TreeHelpers.CanBePassedByReference(((DassieParser.Byref_expressionContext)tree).expression()))
-                {
-                    EmitErrorMessage(
-                        context.expression()[i].Start.Line,
-                        context.expression()[i].Start.Column,
-                        context.expression()[i].GetText().Length,
-                        DS0097_InvalidExpressionPassedByReference,
-                        "Only assignable symbols can be passed by reference.");
-                }
+                // TODO: The following code ignores newlined_expression and parenthesized_expression as well as semicolon-delimited
+                // expressions. Not sure how to deal with this, but for now it seems way too complicated...
+
+                //if (tree is not DassieParser.Byref_expressionContext)
+                //{
+                //    EmitErrorMessage(
+                //        context.expression()[i].Start.Line,
+                //        context.expression()[i].Start.Column,
+                //        context.expression()[i].GetText().Length,
+                //        DS0096_PassByReferenceWithoutOperator,
+                //        "Passing by reference requires the '&' operator.");
+                //}
+                //else if (!TreeHelpers.CanBePassedByReference(tree))
+                //{
+                //    EmitErrorMessage(
+                //        context.expression()[i].Start.Line,
+                //        context.expression()[i].Start.Column,
+                //        context.expression()[i].GetText().Length,
+                //        DS0097_InvalidExpressionPassedByReference,
+                //        "Only assignable symbols can be passed by reference.");
+                //}
             }
 
             if ((VisitorStep1CurrentMethod != null) && !VisitorStep1CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
@@ -2148,7 +2158,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 || (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)))
             {
                 Type boxedType = t;
-                if (boxedType.IsByRef || boxedType.IsByRefLike)
+                if (boxedType.IsByRef /*|| boxedType.IsByRefLike*/)
                     boxedType = boxedType.GetElementType();
 
                 CurrentMethod.IL.Emit(OpCodes.Box, boxedType);
@@ -2972,7 +2982,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         SymbolInfo sym = CliHelpers.GetSymbol(context.Identifier().GetText());
 
-        if (sym != null)
+        if (sym is not null)
         {
             if (!sym.IsMutable())
             {
@@ -2989,13 +2999,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (sym.Field != null && !sym.Field.Builder.IsStatic)
                 EmitLdarg(0);
 
-            if (sym.Type().IsByRef || sym.Type().IsByRefLike)
+            if (sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/)
                 EmitLdarg(sym.Index());
 
             Type type = Visit(context.expression());
             sym.Set();
 
-            if (type != sym.Type())
+            if (type != sym.Type() && !((sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/) && sym.Type().GetElementType() == type))
             {
                 if (sym.Type() == typeof(UnionValue))
                 {

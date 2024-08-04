@@ -7,7 +7,7 @@ internal static class TypeHelpers
 {
     public static Type RemoveByRef(this Type t)
     {
-        if (t.IsByRef || t.IsByRefLike)
+        if (t.IsByRef /*|| t.IsByRefLike*/)
             t = t.GetElementType();
 
         return t;
@@ -36,6 +36,9 @@ internal static class TypeHelpers
         if (t == typeof(nint) || t == typeof(nuint))
             return OpCodes.Ldind_I;
 
+        if (t.IsClass)
+            return OpCodes.Ldind_Ref;
+
         throw new InvalidOperationException();
     }
 
@@ -62,12 +65,15 @@ internal static class TypeHelpers
         if (t == typeof(nint) || t == typeof(nuint))
             return OpCodes.Stind_I;
 
+        if (t.IsClass)
+            return OpCodes.Stind_Ref;
+
         throw new InvalidOperationException();
     }
 
     public static void LoadIndirectlyIfPossible(this Type t)
     {
-        if (!t.IsByRef && !t.IsByRefLike)
+        if (!t.IsByRef /*&& !t.IsByRefLike*/)
             return;
 
         if (!CliHelpers.IsNumericType(t.RemoveByRef()))

@@ -274,10 +274,14 @@ internal static class EmitHelpers
 
     public static void LoadField(FieldInfo f)
     {
-        if (f.IsStatic)
-            CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
-        else
-            CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
+        try
+        {
+            if (f.IsStatic)
+                CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
+            else
+                CurrentMethod.IL.Emit(OpCodes.Ldfld, f);
+        }
+        catch (NullReferenceException) { }
     }
 
     public static void EmitStfld(FieldInfo f)

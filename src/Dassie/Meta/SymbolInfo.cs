@@ -3,6 +3,7 @@ using Dassie.Runtime;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
 using System;
+using System.Linq;
 using System.Reflection.Emit;
 
 namespace Dassie.Meta;
@@ -101,7 +102,7 @@ internal class SymbolInfo
                 break;
         }
 
-        if (Type().IsByRef || Type().IsByRefLike)
+        if (Type().IsByRef /*|| Type().IsByRefLike*/)
             CurrentMethod.IL.Emit(Type().GetElementType().GetLoadIndirectOpCode());
     }
 
@@ -155,7 +156,7 @@ internal class SymbolInfo
 
     public void Set()
     {
-        if (Type().IsByRef || Type().IsByRefLike)
+        if (Type().IsByRef /*|| Type().IsByRefLike*/)
         {
             CurrentMethod.IL.Emit(Type().GetElementType().GetSetIndirectOpCode());
             return;
@@ -196,4 +197,31 @@ internal class SymbolInfo
         SymType.Parameter => Parameter.Name,
         _ => Field.Builder.Name
     };
+
+    public static bool operator==(SymbolInfo left, SymbolInfo right)
+    {
+        if (left is null || right is null) return false;
+
+        if (left.Local != null && right.Local != null && left.Local == right.Local) return true;
+        if (left.Parameter != null && right.Parameter != null && left.Parameter == right.Parameter) return true;
+        if (left.Field != null && right.Field != null && left.Field == right.Field) return true;
+
+        return false;
+    }
+
+    public static bool operator !=(SymbolInfo left, SymbolInfo right) => !(left == right);
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null) return false;
+        if (obj is not  SymbolInfo) return false;
+
+        return this == (SymbolInfo)obj;
+    }
+
+    public override int GetHashCode()
+    {
+        // Who cares anyway
+        return 0;
+    }
 }

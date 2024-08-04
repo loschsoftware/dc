@@ -877,6 +877,23 @@ internal static class CliHelpers
         };
     }
 
+    private static ILGenerator _il = null;
+    public static void RedirectEmitterToNullStream()
+    {
+        TypeBuilder tb = Context.BogusModule.DefineType($"Bogus{bogusCounter++}");
+        Context.BogusType = tb;
+
+        MethodBuilder bogus = tb.DefineMethod("x", MethodAttributes.Public);
+
+        _il = CurrentMethod.IL;
+        CurrentMethod.IL = bogus.GetILGenerator();
+    }
+    
+    public static void ResetNullStream()
+    {
+        CurrentMethod.IL = _il;
+    }
+
     public static FieldAttributes GetFieldAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, bool isReadOnly)
     {
         FieldAttributes baseAttributes;

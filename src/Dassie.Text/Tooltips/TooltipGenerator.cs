@@ -451,7 +451,10 @@ public static class TooltipGenerator
             words.Add(BuildWord("]"));
         }
 
-        if (showBaseType && type.BaseType != null)
+        if (type.IsByRef)
+            words.Add(BuildWord("&"));
+
+        else if (showBaseType && type.BaseType != null)
         {
             if (type.BaseType != typeof(ValueType) && type.BaseType != typeof(object) || type.ImplementedInterfaces.Count() > 0)
                 words.Add(BuildWord(": ", Color.Default));

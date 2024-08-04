@@ -110,6 +110,9 @@ internal static class SymbolResolver
     {
         memberIndex++;
 
+        if (type.IsByRef)
+            type = type.GetElementType();
+
         if (type is TypeBuilder tb)
             return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors);
 
@@ -194,7 +197,7 @@ internal static class SymbolResolver
         }
 
         // 1. Fields
-        FieldInfo f = type.GetField(name/*, flags*/);
+        FieldInfo f = f = type.GetField(name/*, flags*/);
         if (f != null)
         {
             if (type.IsEnum)
@@ -554,13 +557,20 @@ internal static class SymbolResolver
 
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
-                    if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
+                    Type pType = possibleMethod.GetParameters()[i].ParameterType;
+                    if (pType.IsByRef)
+                        pType = pType.GetElementType();
+
+                    if (argumentTypes[i] == pType || pType.IsAssignableFrom(argumentTypes[i]))
                     {
-                        if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                        if (pType == typeof(object))
                         {
                             CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
                         }
 
+                        if (possibleMethod.GetParameters()[i].ParameterType.IsByRef)
+                            CurrentMethod.ByRefArguments.Add(i);
+                        
                         if (i == possibleMethod.GetParameters().Length - 1)
                         {
                             final = possibleMethod;
