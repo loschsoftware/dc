@@ -157,7 +157,7 @@ internal class Program
         Console.ForegroundColor = ConsoleColor.Yellow;
 
         LogOut.WriteLine();
-        LogOut.WriteLine("Dassie Command Line Compiler for .NET (dc.exe)");
+        LogOut.WriteLine("Dassie Command Line Compiler for .NET");
         LogOut.WriteLine($"Version {version.ToString(2)}, Build {version.Build} ({buildDate.ToShortDateString()})");
 
         Console.ForegroundColor = def;
