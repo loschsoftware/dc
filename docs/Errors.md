@@ -633,7 +633,7 @@ module App = {
 
     <EntryPoint>
     Main (): null = {
-		Test &2
+		Test &2 # DS0097
     }
 }</pre></td>
     <td>Only assignable symbols can be passed by reference. Assign the value to a local variable before passing it by reference.</td>
