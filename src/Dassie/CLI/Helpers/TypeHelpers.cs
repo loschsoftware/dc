@@ -3,7 +3,7 @@ using System.Reflection.Emit;
 
 namespace Dassie.CLI.Helpers;
 
-internal static class TypeExtensions
+internal static class TypeHelpers
 {
     public static Type RemoveByRef(this Type t)
     {

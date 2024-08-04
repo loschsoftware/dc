@@ -605,4 +605,37 @@ module App = {
 }</pre></td>
     <td>Mark the symbol as mutable using the <code>var</code> keyword.</td>
   </tr>
+  <tr>
+    <td>DS0096</td>
+    <td>Error</td>
+    <td>Emitted when a symbol is passed by reference without the '&' operator.</td>
+    <td><pre>module App = {
+    Test (var x: int32&): null = ignore {
+        x += 1
+    }
+
+    <EntryPoint>
+    Main (): null = {
+        x = 10
+		Test x # DS0096
+    }
+}</pre></td>
+    <td>Use the <code>&amp;</code> to pass the symbol by reference.</td>
+  </tr>
+  <tr>
+    <td>DS0097</td>
+    <td>Error</td>
+    <td>Emitted when an illegal expression is passed by reference.</td>
+    <td><pre>module App = {
+    Test (var x: int32&): null = ignore {
+        x += 1
+    }
+
+    <EntryPoint>
+    Main (): null = {
+		Test &2
+    }
+}</pre></td>
+    <td>Only assignable symbols can be passed by reference. Assign the value to a local variable before passing it by reference.</td>
+  </tr>
 </table>

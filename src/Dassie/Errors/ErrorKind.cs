@@ -403,5 +403,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an immutable symbol is passed by reference.
     /// </summary>
-    DS0095_ImmutableSymbolPassedByReference
+    DS0095_ImmutableSymbolPassedByReference,
+    /// <summary>
+    /// Emitted when a symbol is passed by reference without the reference operator (&amp;).
+    /// </summary>
+    DS0096_PassByReferenceWithoutOperator,
+    /// <summary>
+    /// Emitted when an expression to be passed by reference is not valid.
+    /// </summary>
+    DS0097_InvalidExpressionPassedByReference
 }

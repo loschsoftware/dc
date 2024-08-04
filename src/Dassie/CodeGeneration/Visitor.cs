@@ -2116,6 +2116,28 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             IParseTree tree = context.expression()[i];
             Type t = Visit(tree);
 
+            if (CurrentMethod.ByRefArguments.Contains(i))
+            {
+                if (tree is not DassieParser.Byref_expressionContext)
+                {
+                    EmitErrorMessage(
+                        context.expression()[i].Start.Line,
+                        context.expression()[i].Start.Column,
+                        context.expression()[i].GetText().Length,
+                        DS0096_PassByReferenceWithoutOperator,
+                        "Passing by reference requires the '&' operator.");
+                }
+                else if (!TreeHelpers.CanBePassedByReference(((DassieParser.Byref_expressionContext)tree).expression()))
+                {
+                    EmitErrorMessage(
+                        context.expression()[i].Start.Line,
+                        context.expression()[i].Start.Column,
+                        context.expression()[i].GetText().Length,
+                        DS0097_InvalidExpressionPassedByReference,
+                        "Only assignable symbols can be passed by reference.");
+                }
+            }
+
             if ((VisitorStep1CurrentMethod != null) && !VisitorStep1CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
                 VisitorStep1CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
 

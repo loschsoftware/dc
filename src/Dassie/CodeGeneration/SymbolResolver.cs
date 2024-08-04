@@ -62,7 +62,7 @@ internal static class SymbolResolver
             noEmitFragments);
     }
 
-    public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false)
+    public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false, bool throwErrors = true)
     {
         // 1. Parameters
         if (CurrentMethod.Parameters.Any(p => p.Name == text))
@@ -73,7 +73,7 @@ internal static class SymbolResolver
         {
             LocalInfo loc = CurrentMethod.Locals.First(p => p.Name == text);
 
-            if (!loc.IsAvailable)
+            if (!loc.IsAvailable && throwErrors)
             {
                 EmitErrorMessage(
                     row,
@@ -106,12 +106,12 @@ internal static class SymbolResolver
     }
 
     static int memberIndex = -1;
-    public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public)
+    public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true)
     {
         memberIndex++;
 
         if (type is TypeBuilder tb)
-            return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags);
+            return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors);
 
         // 0. Constructors
         if (name == type.Name)
@@ -343,21 +343,24 @@ internal static class SymbolResolver
 
     Error:
 
-        EmitErrorMessage(
-            row,
-            col,
-            len,
-            DS0002_MethodNotFound,
-            $"Type '{type.FullName}' has no compatible member called '{name}'.");
+        if (throwErrors)
+        {
+            EmitErrorMessage(
+                row,
+                col,
+                len,
+                DS0002_MethodNotFound,
+                $"Type '{type.FullName}' has no compatible member called '{name}'.");
+        }
 
         return null;
     }
 
-    private static object ResolveMember(TypeBuilder tb, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public)
+    private static object ResolveMember(TypeBuilder tb, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true)
     {
         TypeContext[] types = Context.Types.Where(c => c.Builder == tb).ToArray();
 
-        if (types.Length == 0)
+        if (types.Length == 0 && throwErrors)
         {
             EmitErrorMessage(
                 row,
@@ -383,7 +386,7 @@ internal static class SymbolResolver
             if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
                 CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
 
-            if (!cons.Any())
+            if (!cons.Any() && throwErrors)
             {
                 EmitErrorMessage(
                     row, col, len,
@@ -610,12 +613,15 @@ internal static class SymbolResolver
 
     Error:
 
-        EmitErrorMessage(
-            row,
-            col,
-            len,
-            DS0002_MethodNotFound,
-            $"Type '{tc.Builder.FullName}' has no compatible member called '{name}'.");
+        if (throwErrors)
+        {
+            EmitErrorMessage(
+                row,
+                col,
+                len,
+                DS0002_MethodNotFound,
+                $"Type '{tc.Builder.FullName}' has no compatible member called '{name}'.");
+        }
 
         return false;
     }
