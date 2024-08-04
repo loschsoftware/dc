@@ -2045,8 +2045,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (identifier == context.Identifier().Last() && context.arglist() != null)
             {
+                CliHelpers.RedirectEmitterToNullStream();
                 Visit(context.arglist());
+                CliHelpers.ResetNullStream();
+
                 _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
             }
 
             object member = SymbolResolver.ResolveMember(
@@ -2058,6 +2062,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 false,
                 _params,
                 flags);
+
+            if (identifier == context.Identifier().Last() && context.arglist() != null)
+            {
+                Visit(context.arglist());
+                CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+            }
 
             if (member == null)
                 return null;
