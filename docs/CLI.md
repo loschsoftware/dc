@@ -15,4 +15,5 @@ Usage: ``dc [Command] [Options]`` or ``dc <FileName> [FileNames]``
 |``scratchpad``|``[Command] [Options]``|Opens or manages *scratches*, which allow compiling and running source code from the console. For more information regarding this command, use ``dc scratchpad help``.|``dc scratchpad``|
 |``check``, ``verify``|``[FileNames]``|Checks all specified source files, or all source files in the current folder structure, for syntax errors.|``dc check test.ds``|
 |``config``||Creates a new ``dsconfig.xml`` file with default values.|``dc config``|
+|``package``|``[Command] [Options]``|Used to manage compiler extensions. See [this page](./Extensions.md) for more information.|``dc package list``|
 |``help``, ``?``||Shows this list of commands.|``dc help``|
