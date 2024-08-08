@@ -139,7 +139,7 @@ internal static class Scratchpad
     {
         Program.DisplayLogo();
         Console.WriteLine();
-        Console.WriteLine("To mark the ending of the input, press Ctrl+Z in an empty line and hit Enter.");
+        Console.WriteLine("To mark the end of the input, press Ctrl+Z in an empty line and hit Enter.");
         Console.WriteLine();
 
         string src = Console.In.ReadToEnd();
