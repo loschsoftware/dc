@@ -224,7 +224,7 @@ internal class Program
         LogOut.Write("    scratchpad [Command] [Options]".PadRight(50));
         LogOut.WriteLine("Allows compiling and running Dassie source code from the console. Use 'dc scratchpad help' to display available commands.");
 
-        LogOut.Write("    check, verify [<FileName>..]".PadRight(50));
+        LogOut.Write("    check, verify [FileNames]".PadRight(50));
         LogOut.WriteLine("Checks the specified files, or all .ds files in the current folder structure, for syntax errors.");
 
         LogOut.Write("    config".PadRight(50));
