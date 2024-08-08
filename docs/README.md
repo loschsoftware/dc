@@ -5,7 +5,7 @@ This directory contains documentation about how to configure and work with the D
 |**Table of contents**|
 |---|
 |[Command line arguments](./CLI.md)|
-|[Compiler extensions](./Extensions.md)|
 |[Error codes](./Errors.md)|
+|[Extending the compiler with custom commands](./Extensions.md)|
 |[Projects and compiler configuration](./Projects.md)|
 |[Tools for code editors](./Editors.md)|
