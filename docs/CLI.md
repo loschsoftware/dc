@@ -12,7 +12,7 @@ Usage: ``dc [Command] [Options]`` or ``dc <FileName> [FileNames]``
 |``build``|``[BuildProfile]``|Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.|``dc build``|
 |``watch``, ``auto``||Watches all .ds source files in the current folder structure for changes and automatically recompiles when files are changed.|``dc watch``|
 |``quit``||Stops all file watchers.|``dc quit``|
-|``scratchpad``|``[Command] [Options]``|Opens or manages *scratches*, which allow compiling and running source code from the console. For more information regarding this command, visit [this page](./Scratchpad.md).|``dc scratchpad``|
+|``scratchpad``|``[Command] [Options]``|Opens or manages *scratches*, which allow compiling and running source code from the console. For more information regarding this command, use ``dc scratchpad help``.|``dc scratchpad``|
 |``check``, ``verify``|``[FileNames]``|Checks all specified source files, or all source files in the current folder structure, for syntax errors.|``dc check test.ds``|
 |``config``||Creates a new ``dsconfig.xml`` file with default values.|``dc config``|
 |``help``, ``?``||Shows this list of commands.|``dc help``|
