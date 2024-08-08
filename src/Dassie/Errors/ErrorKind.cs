@@ -411,5 +411,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an expression to be passed by reference is not valid.
     /// </summary>
-    DS0097_InvalidExpressionPassedByReference
+    DS0097_InvalidExpressionPassedByReference,
+    /// <summary>
+    /// Emitted when a specified scratch could not be found.
+    /// </summary>
+    DS0098_ScratchNotFound
 }

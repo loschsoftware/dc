@@ -26,6 +26,7 @@ internal class Program
                 ["make" or "new", ..] => DSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => WatchForFileChanges(args),
                 ["call", ..] => CliHelpers.CallMethod(args),
+                ["scratchpad", ..] => Scratchpad.HandleScratchpadCommands(args[1..]),
                 ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
                 ["-viewfrags", ..] => CliHelpers.ViewFragments(args),
                 ["quit"] => QuitWatching(),
@@ -144,7 +145,7 @@ internal class Program
         }
     }
 
-    static int DisplayHelpMessage()
+    public static void DisplayLogo()
     {
         Version v = Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -161,12 +162,20 @@ internal class Program
         LogOut.WriteLine($"Version {version.ToString(2)}, Build {version.Build} ({buildDate.ToShortDateString()})");
 
         Console.ForegroundColor = def;
+    }
+
+    static int DisplayHelpMessage()
+    {
+        ConsoleColor def = Console.ForegroundColor;
+        DisplayLogo();
 
         LogOut.WriteLine();
-        LogOut.WriteLine("Command Line Arguments:");
+        LogOut.WriteLine("Usage:");
+        LogOut.WriteLine("dc [Command] [Options]");
+        LogOut.WriteLine("dc <FileName> [FileNames]");
         LogOut.WriteLine();
 
-        LogOut.Write("<FileName> [<FileName>..]".PadRight(50));
+        LogOut.Write("<FileName> [FileNames]".PadRight(50));
         LogOut.WriteLine("Compiles the specified source files.");
 
         //Console.ForegroundColor = ConsoleColor.Yellow;
@@ -191,54 +200,40 @@ internal class Program
         //Console.ForegroundColor = def;
 
         LogOut.WriteLine();
+        LogOut.WriteLine("Available commands:");
 
-        LogOut.Write("new <Type> <Name>".PadRight(50));
+        LogOut.Write("    new <Type> <Name>".PadRight(50));
 
         LogOut.WriteLine("Creates the file structure of a Dassie project.");
 
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("    console".PadRight(25).PadRight(50));
+        LogOut.Write("        console".PadRight(25).PadRight(50));
         LogOut.WriteLine("Specifies a command-line application.");
-        LogOut.Write("    library".PadRight(25).PadRight(50));
+        LogOut.Write("        library".PadRight(25).PadRight(50));
         LogOut.WriteLine("Specifies a dynamic linked library.");
-        //LogOut.Write("    script".PadRight(25).PadRight(50));
-        //LogOut.WriteLine("A script can be used to run Dassie code embedded in LS/.NET applications.");
         LogOut.WriteLine();
-        Console.ForegroundColor = def;
 
-        LogOut.Write("build [BuildProfile]".PadRight(50));
+        LogOut.Write("    build [BuildProfile]".PadRight(50));
         LogOut.WriteLine("Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.");
-        LogOut.WriteLine();
 
-        LogOut.Write("watch, auto".PadRight(50));
+        LogOut.Write("    watch, auto".PadRight(50));
         LogOut.WriteLine("Watches all .ds files in the current folder structure and automatically recompiles when files are changed.");
-        LogOut.WriteLine();
 
-        LogOut.Write("quit".PadRight(50));
+        LogOut.Write("    quit".PadRight(50));
         LogOut.WriteLine("Stops all file watchers.");
-        LogOut.WriteLine();
 
-        LogOut.Write("check, verify [<FileName>..]".PadRight(50));
+        LogOut.Write("    scratchpad [Command] [Options]".PadRight(50));
+        LogOut.WriteLine("Allows compiling and running Dassie source code from the console. Use 'dc scratchpad help' to display available commands.");
+
+        LogOut.Write("    check, verify [<FileName>..]".PadRight(50));
         LogOut.WriteLine("Checks the specified files, or all .ds files in the current folder structure, for syntax errors.");
-        LogOut.WriteLine();
 
-        LogOut.Write("config".PadRight(50));
+        LogOut.Write("    config".PadRight(50));
         LogOut.WriteLine("Creates a new dsconfig.xml file with default values.");
-        LogOut.WriteLine();
 
-        //LogOut.Write("p, preprocess <FileName>".PadRight(50));
-        //LogOut.WriteLine("Preprocesses <FileName>.");
-        //LogOut.WriteLine();
-
-        //LogOut.Write("interactive, repl".PadRight(50));
-        //LogOut.WriteLine("Provides a read-evaluate-print-loop to run single expressions.");
-        //LogOut.WriteLine();
-
-        LogOut.Write("help, ?".PadRight(50));
+        LogOut.Write("    help, ?".PadRight(50));
         LogOut.WriteLine("Shows this page.");
 
         LogOut.WriteLine();
-        //LogOut.WriteLine("Valid prefixes for options are -, --, and /.");
         return 0;
     }
 }

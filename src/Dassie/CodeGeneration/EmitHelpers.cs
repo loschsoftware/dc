@@ -215,7 +215,7 @@ internal static class EmitHelpers
             return;
         }
     }
-    
+
     // Very rudimentary and almost useless - fix ASAP
     public static void EmitInlineIL(string instruction, int line = 0, int column = 0, int length = 0)
     {
@@ -319,15 +319,19 @@ internal static class EmitHelpers
 
     public static void SetLocalSymInfo(LocalBuilder lb, string name)
     {
-        //try
-        //{
+        try
+        {
             lb.SetLocalSymInfo(name);
-        //}
-        //catch (IndexOutOfRangeException) { }
+        }
+        catch (NotSupportedException) { }
     }
 
     public static void MarkSequencePoint(int line, int col, int length)
     {
-        CurrentMethod.IL.MarkSequencePoint(CurrentFile.SymbolDocumentWriter, line, col, line, col + length);
+        try
+        {
+            CurrentMethod.IL.MarkSequencePoint(CurrentFile.SymbolDocumentWriter, line, col, line, col + length);
+        }
+        catch (NotSupportedException) { }
     }
 }
