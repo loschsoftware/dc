@@ -638,4 +638,18 @@ module App = {
 }</pre></td>
     <td>Only assignable symbols can be passed by reference. Assign the value to a local variable before passing it by reference.</td>
   </tr>
+  <tr>
+    <td>DS0098</td>
+    <td>Error</td>
+    <td>Emitted when a <i>scratch</i> cannot be found.</td>
+    <td></td>
+    <td>Check if the name was spelled correctly.</td>
+  </tr>
+  <tr>
+    <td>DS0099</td>
+    <td>Warning</td>
+    <td>Emitted when multiple installed extensions define a command with the same name.</td>
+    <td></td>
+    <td>Remove all but one of the duplicate extensions.</td>
+  </tr>
 </table>

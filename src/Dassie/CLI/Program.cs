@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
+using System.Collections.Generic;
+using Dassie.Extensions;
 
 namespace Dassie.CLI;
 
@@ -15,6 +17,18 @@ internal class Program
     {
         try
         {
+            List<IPackage> extensions = ExtensionLoader.LoadInstalledExtensions();
+            Dictionary<string, Func<string[], int>> customCommands = ExtensionLoader.GetAllCommands(extensions);
+            Dictionary<string, string> commandDescriptions = ExtensionLoader.GetCommandDescriptions(extensions);
+
+            args ??= [];
+            if (args.Length == 0)
+                return DisplayHelpMessage(commandDescriptions);
+
+            string command = args[0];
+            if (customCommands.TryGetValue(command, out Func<string[], int> cmd))
+                return cmd(args[1..]);
+
             return args switch
             {
                 ["config"] => CliHelpers.BuildDassieConfig(),
@@ -30,7 +44,7 @@ internal class Program
                 ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
                 ["-viewfrags", ..] => CliHelpers.ViewFragments(args),
                 ["quit"] => QuitWatching(),
-                [] or ["help" or "?"] => DisplayHelpMessage(),
+                [] or ["help" or "?"] => DisplayHelpMessage(commandDescriptions),
                 _ => CliHelpers.HandleArgs(args)
             };
         }
@@ -164,7 +178,7 @@ internal class Program
         Console.ForegroundColor = def;
     }
 
-    static int DisplayHelpMessage()
+    static int DisplayHelpMessage(Dictionary<string, string> installedCommands)
     {
         ConsoleColor def = Console.ForegroundColor;
         DisplayLogo();
@@ -233,7 +247,15 @@ internal class Program
         LogOut.Write("    help, ?".PadRight(50));
         LogOut.WriteLine("Shows this page.");
 
-        LogOut.WriteLine();
+        if (installedCommands.Count > 0)
+        {
+            LogOut.WriteLine();
+            LogOut.WriteLine("Commands from external extensions:");
+
+            foreach (KeyValuePair<string, string> cmd in installedCommands)
+                LogOut.WriteLine($"{$"    {cmd.Key}",-50}{cmd.Value.Replace(Environment.NewLine, " ")}");
+        }
+
         return 0;
     }
 }

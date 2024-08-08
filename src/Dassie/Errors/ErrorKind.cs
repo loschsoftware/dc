@@ -415,5 +415,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a specified scratch could not be found.
     /// </summary>
-    DS0098_ScratchNotFound
+    DS0098_ScratchNotFound,
+    /// <summary>
+    /// Emitted when multiple installed compiler extensions define a command with the same name.
+    /// </summary>
+    DS0099_DuplicateCompilerCommand
 }
