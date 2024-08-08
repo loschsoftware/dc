@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Dassie.Extensions;
@@ -13,16 +12,34 @@ internal static class ExtensionLoader
 
     public static List<IPackage> LoadInstalledExtensions()
     {
+        if (File.Exists(Path.Combine(DefaultExtensionSource, "RemovalList.txt")))
+        {
+            foreach (string file in File.ReadAllLines(Path.Combine(DefaultExtensionSource, "RemovalList.txt")))
+            {
+                if (File.Exists(file))
+                    File.Delete(file);
+            }
+
+            File.Delete(Path.Combine(DefaultExtensionSource, "RemovalList.txt"));
+        }
+
         List<IPackage> packages = [];
 
         foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))
-        {
-            Assembly extensionAssembly = Assembly.LoadFile(file);
-            Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPackage))).ToArray();
+            packages.AddRange(LoadInstalledExtensions(file));
 
-            foreach (Type t in packageTypes)
-                packages.Add((IPackage)Activator.CreateInstance(t));
-        }
+        return packages;
+    }
+
+    public static List<IPackage> LoadInstalledExtensions(string assembly)
+    {
+        List<IPackage> packages = [];
+
+        Assembly extensionAssembly = Assembly.LoadFile(assembly);
+        Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPackage))).ToArray();
+
+        foreach (Type t in packageTypes)
+            packages.Add((IPackage)Activator.CreateInstance(t));
 
         return packages;
     }
