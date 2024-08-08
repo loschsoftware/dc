@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using Dassie.CLI;
 using Dassie.CodeAnalysis.Structure;
 using Dassie.Configuration;
 using Dassie.Errors;
@@ -67,8 +68,7 @@ public static class Compiler
         string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
         AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
-        //PersistedAssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, PersistedAssemblyBuilderAccess.RunAndSave);
-        PersistedAssemblyBuilder ab = new(name, typeof(object).Assembly);
+        PersistedAssemblyBuilder ab = new(name, CliHelpers.GetCoreAssembly(cfg.FrameworkVersion));
 
         ModuleBuilder mb = ab.DefineDynamicModule(config.AssemblyName);
 

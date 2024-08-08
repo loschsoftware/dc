@@ -39,6 +39,10 @@ public sealed class DassieConfig
     [DefaultValue(null)]
     public ApplicationType ApplicationType { get; set; }
 
+    [XmlElement]
+    [DefaultValue(null)]
+    public string FrameworkVersion { get; set; }
+
     [XmlElement("VersionInfo")]
     public VersionInfo VersionInfo { get; set; }
 

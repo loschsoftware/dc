@@ -411,5 +411,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an expression to be passed by reference is not valid.
     /// </summary>
-    DS0097_InvalidExpressionPassedByReference
+    DS0097_InvalidExpressionPassedByReference,
+    /// <summary>
+    /// Emitted when dsconfig.xml specifies a framework version that is not installed.
+    /// </summary>
+    DS0098_TargetFrameworkNotInstalled
 }

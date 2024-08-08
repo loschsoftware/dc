@@ -3,6 +3,7 @@ using Dassie.CLI.Helpers;
 using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
+using Dassie.Configuration.Analysis;
 using Dassie.Configuration.Macros;
 using Dassie.Errors;
 using Dassie.Meta;
@@ -1600,5 +1601,31 @@ internal static class CliHelpers
         }
 
         return matchingFiles;
+    }
+
+    public static Assembly GetCoreAssembly(string frameworkVersion)
+    {
+        frameworkVersion = (frameworkVersion ?? "").ToLowerInvariant();
+
+        if (frameworkVersion == "" || frameworkVersion == "current")
+            return typeof(object).Assembly;
+
+        string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "shared", "Microsoft.NETCore.App", frameworkVersion);
+        var loc = XmlLocationService.GetElementLocation("dsconfig.xml", "FrameworkVersion");
+
+        if (!Directory.Exists(dir))
+        {
+            EmitErrorMessage(
+                loc.Row,
+                loc.Column,
+                loc.Length,
+                DS0098_TargetFrameworkNotInstalled,
+                $"The target framework version '{frameworkVersion}' could not be found on the current machine.",
+                "dsconfig.xml");
+
+            return typeof(object).Assembly;
+        }
+
+        return Assembly.LoadFile(Path.Combine(dir, "System.Private.CoreLib.dll"));
     }
 }
