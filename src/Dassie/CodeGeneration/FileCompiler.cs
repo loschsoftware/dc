@@ -8,6 +8,7 @@ using Dassie.Parser;
 using Dassie.Text.FragmentStore;
 using Dassie.Validation;
 using System;
+using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -40,6 +41,8 @@ public static class FileCompiler
 
         if (!config.ImplicitTypeAliases)
             CurrentFile.Aliases.Clear();
+
+        CurrentFile.SymbolDocumentWriter = Context.Module.DefineDocument(path);
 
         string source = File.ReadAllText(path);
         string lowered = SourceFileRewriter.Rewrite(source);

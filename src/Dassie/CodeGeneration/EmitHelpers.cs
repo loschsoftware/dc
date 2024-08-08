@@ -1,10 +1,10 @@
 ﻿using Dassie.CLI;
+using Dassie.Configuration;
 using Dassie.Meta;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 
 namespace Dassie.CodeGeneration;
 
@@ -315,5 +315,19 @@ internal static class EmitHelpers
             value = null;
             return false;
         }
+    }
+
+    public static void SetLocalSymInfo(LocalBuilder lb, string name)
+    {
+        //try
+        //{
+            lb.SetLocalSymInfo(name);
+        //}
+        //catch (IndexOutOfRangeException) { }
+    }
+
+    public static void MarkSequencePoint(int line, int col, int length)
+    {
+        CurrentMethod.IL.MarkSequencePoint(CurrentFile.SymbolDocumentWriter, line, col, line, col + length);
     }
 }

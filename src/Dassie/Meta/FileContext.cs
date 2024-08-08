@@ -3,6 +3,7 @@ using Dassie.Text;
 using Dassie.Text.Regions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 
 namespace Dassie.Meta;
 
@@ -75,4 +76,6 @@ internal class FileContext
     public bool CheckType(Type type) => AvailableTypes.Contains(type);
 
     public Dictionary<string, Dictionary<string, string>> FunctionParameterConstraints { get; } = [];
+
+    public ISymbolDocumentWriter SymbolDocumentWriter { get; set; }
 }

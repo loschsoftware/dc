@@ -16,6 +16,7 @@ using Microsoft.Build.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -309,7 +310,7 @@ internal static class CliHelpers
                 }];
             }
 
-            ManagedPEBuilder peBuilder = CreatePEBuilder(Context.EntryPoint, resources);
+            ManagedPEBuilder peBuilder = CreatePEBuilder(Context.EntryPoint, resources, assembly, config.Configuration == ApplicationConfiguration.Debug || config.CreatePdb);
 
             BlobBuilder peBlob = new();
             peBuilder.Serialize(peBlob);
@@ -1230,9 +1231,9 @@ internal static class CliHelpers
         }
     }
 
-    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources)
+    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources, string asmName, bool makePdb)
     {
-        MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData);
+        MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData, out MetadataBuilder pdbBuilder);
         PEHeaderBuilder headerBuilder = new(
             imageBase: 0x00400000,
             imageCharacteristics: Characteristics.ExecutableImage);
@@ -1251,27 +1252,35 @@ internal static class CliHelpers
         if (resources != null)
             rsb = new ResourceBuilder(resources);
 
+        DebugDirectoryBuilder dbgBuilder = null;
+
+        if (makePdb)
+            dbgBuilder = GeneratePdb(pdbBuilder, mb.GetRowCounts(), handle, Path.ChangeExtension(Path.GetFileName(asmName), "pdb"));
+
         ManagedPEBuilder peBuilder = new(
-            headerBuilder,
-            new(mb),
-            ilStream,
+            header: headerBuilder,
+            metadataRootBuilder: new(mb),
+            ilStream: ilStream,
             mappedFieldData,
             entryPoint: handle,
-            nativeResources: rsb);
+            nativeResources: rsb,
+            debugDirectoryBuilder: dbgBuilder);
 
         return peBuilder;
     }
 
-    public static void SetLocalSymInfo(LocalBuilder lb, string name)
+    private static DebugDirectoryBuilder GeneratePdb(MetadataBuilder pdbBuilder, ImmutableArray<int> rowCounts, MethodDefinitionHandle entryPointHandle, string fileName)
     {
-        if (Context.Configuration.Configuration != ApplicationConfiguration.Debug)
-            return;
+        BlobBuilder portablePdbBlob = new();
+        PortablePdbBuilder portablePdbBuilder = new(pdbBuilder, rowCounts, entryPointHandle);
+        BlobContentId pdbContentId = portablePdbBuilder.Serialize(portablePdbBlob);
 
-        try
-        {
-            lb.SetLocalSymInfo(name);
-        }
-        catch (IndexOutOfRangeException) { }
+        using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write);
+        portablePdbBlob.WriteContentTo(fileStream);
+
+        DebugDirectoryBuilder debugDirectoryBuilder = new DebugDirectoryBuilder();
+        debugDirectoryBuilder.AddCodeViewEntry(fileName, pdbContentId, portablePdbBuilder.FormatVersion);
+        return debugDirectoryBuilder;
     }
 
     public static bool HandleSpecialFunction(string name, DassieParser.ArglistContext args, int line, int column, int length)

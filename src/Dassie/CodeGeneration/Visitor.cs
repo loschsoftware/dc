@@ -250,7 +250,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         HandleFieldInitializersAndDefaultConstructor();
 
         Type t = Visit(context.expression());
-        
+
         if (t != typeof(void))
         {
             EmitErrorMessage(
@@ -394,7 +394,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             foreach (var param in paramTypes)
             {
                 ParameterBuilder pb = mb.DefineParameter(
-                    CurrentMethod.ParameterIndex++,
+                    CurrentMethod.ParameterIndex++ + 1, // Add 1 so parameter indices start at 1 -> 0 is always the current instance of the containing type
                     CliHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                     param.Context.Identifier().GetText());
 
@@ -3113,7 +3113,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             IsNavigationTarget = true
         });
 
-        CliHelpers.SetLocalSymInfo(lb, context.Identifier().GetText());
+        SetLocalSymInfo(lb, context.Identifier().GetText());
+        MarkSequencePoint(context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
+
         CurrentMethod.LocalIndex++;
         CurrentMethod.Locals.Add(new(context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex, CurrentMethod.CurrentUnion));
 
@@ -3389,7 +3391,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
-            CliHelpers.SetLocalSymInfo(returnBuilder,
+            SetLocalSymInfo(returnBuilder,
                 GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
 
             Label loop = CurrentMethod.IL.DefineLabel();
@@ -3398,7 +3400,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(typeof(int));
             CurrentMethod.Locals.Add(new(GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++, new(null, typeof(int))));
 
-            CliHelpers.SetLocalSymInfo(
+            SetLocalSymInfo(
                 lb,
                 GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1));
 
@@ -3456,7 +3458,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
-            CliHelpers.SetLocalSymInfo(
+            SetLocalSymInfo(
                 returnBuilder,
                 GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
 
