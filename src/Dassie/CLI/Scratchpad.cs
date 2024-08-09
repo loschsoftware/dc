@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -233,24 +234,26 @@ internal static class Scratchpad
     /// <returns>Always returns 0.</returns>
     private static int ShowUsage()
     {
+        StringBuilder sb = new();
+        sb.AppendLine();
+        sb.AppendLine("Usage: dc scratchpad [Command] [Options]");
+        sb.AppendLine("If no command is specified, the command 'new' is used implicitly.");
+
+        sb.AppendLine();
+        sb.AppendLine("Available commands:");
+        sb.Append($"{"    new [Options]",-35}{Program.FormatLines("Creates a new scratch.", indentWidth: 35)}");
+        sb.Append($"{"        --name=<Name>",-35}{Program.FormatLines("Specifies the name of the scratch.", indentWidth: 35)}");
+        sb.Append($"{"        --config=<Path>",-35}{Program.FormatLines("The compiler configuration (dsconfig.xml) file to use.", indentWidth: 35)}");
+        sb.AppendLine();
+
+        sb.Append($"{"    load <Name>",-35}{Program.FormatLines("Loads the specified scratch.", indentWidth: 35)}");
+        sb.Append($"{"    list",-35}{Program.FormatLines("Lists all saved scratches.", indentWidth: 35)}");
+        sb.Append($"{"    delete <Name>",-35}{Program.FormatLines("Deletes the specified scratch.", indentWidth: 35)}");
+        sb.Append($"{"    clear",-35}{Program.FormatLines("Deletes all saved scratches.", indentWidth: 35)}");
+        sb.Append($"{"    help",-35}{Program.FormatLines("Shows this list.", indentWidth: 35)}");
+
         Program.DisplayLogo();
-        Console.WriteLine();
-        Console.WriteLine("Usage: dc scratchpad [Command] [Options]");
-        Console.WriteLine("If no command is specified, the command 'new' is used implicitly.");
-
-        Console.WriteLine();
-        Console.WriteLine("Available commands:");
-        Console.WriteLine($"{"    new [Options]",-35}Creates a new scratch.");
-        Console.WriteLine($"{"        --name=<Name>",-35}Specifies the name of the scratch.");
-        Console.WriteLine($"{"        --config=<Path>",-35}The compiler configuration (dsconfig.xml) file to use.");
-        Console.WriteLine();
-
-        Console.WriteLine($"{"    load <Name>",-35}Loads the specified scratch.");
-        Console.WriteLine($"{"    list",-35}Lists all saved scratches.");
-        Console.WriteLine($"{"    delete <Name>",-35}Deletes the specified scratch.");
-        Console.WriteLine($"{"    clear",-35}Deletes all saved scratches.");
-        Console.WriteLine($"{"    help",-35}Shows this list.");
-
+        Console.WriteLine(sb.ToString());
         return 0;
     }
 }

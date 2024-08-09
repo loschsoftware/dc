@@ -8,6 +8,9 @@ using System.Reflection;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using Dassie.Extensions;
+using System.Diagnostics.Tracing;
+using System.Text;
+using System.Linq;
 
 namespace Dassie.CLI;
 
@@ -178,66 +181,107 @@ internal class Program
 
         Console.ForegroundColor = def;
     }
+    
+    public static string FormatLines(string text, bool initialPadLeft = false, int indentWidth = 50)
+    {
+        int maxWidth = Console.BufferWidth - 50 - 5;
+
+        if (maxWidth < 30)
+            return $"{text}{Environment.NewLine}";
+
+        StringBuilder sb = new();
+        string[] words = text.Split(' ');
+
+        while (words.Length > 0)
+        {
+            StringBuilder lineBuilder = new();
+
+            while (words.Length > 0 && lineBuilder.Length + words[0].Length < maxWidth)
+            {
+                lineBuilder.Append(words[0] + " ");
+                words = words.Skip(1).ToArray();
+            }
+
+            string line = lineBuilder.ToString();
+
+            if (initialPadLeft || sb.Length > 0)
+                line = line.PadLeft(indentWidth + line.Length);
+
+            sb.AppendLine(line);
+        }
+
+        return sb.ToString();
+    }
 
     static int DisplayHelpMessage(Dictionary<string, string> installedCommands)
     {
-        DisplayLogo();
+        if (Console.BufferWidth - 50 - 5 < 30)
+        {
+            ConsoleColor prev = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Increase the console width for better viewing experience.");
+            Console.ForegroundColor = prev;
+        }
 
-        LogOut.WriteLine();
-        LogOut.WriteLine("Usage:");
-        LogOut.WriteLine("dc [Command] [Options]");
-        LogOut.WriteLine("dc <FileName> [FileNames]");
-        LogOut.WriteLine();
+        StringBuilder sb = new();
 
-        LogOut.Write("<FileName> [FileNames]".PadRight(50));
-        LogOut.WriteLine("Compiles the specified source files.");
+        sb.AppendLine();
+        sb.AppendLine("Usage:");
+        sb.AppendLine("dc [Command] [Options]");
+        sb.AppendLine("dc <FileName> [FileNames] [Options]");
+        sb.AppendLine();
 
-        LogOut.WriteLine();
-        LogOut.WriteLine("Available commands:");
+        sb.Append("<FileName> [FileNames] [Options]".PadRight(50));
+        sb.AppendLine("Compiles the specified source files.");
+        sb.AppendLine(FormatLines("Additional options can be included in the form --<PropertyName>=<Value>, where <PropertyName> corresponds to a property in dsconfig.xml. Only 'string', 'bool' and 'enum' properties are supported.", true));
 
-        LogOut.Write("    new <Type> <Name>".PadRight(50));
+        sb.AppendLine("Available commands:");
 
-        LogOut.WriteLine("Creates the file structure of a Dassie project.");
+        sb.Append("    new <Type> <Name>".PadRight(50));
 
-        LogOut.Write("        console".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Specifies a command-line application.");
-        LogOut.Write("        library".PadRight(25).PadRight(50));
-        LogOut.WriteLine("Specifies a dynamic linked library.");
-        LogOut.WriteLine();
+        sb.AppendLine("Creates the file structure of a Dassie project.");
 
-        LogOut.Write("    build [BuildProfile]".PadRight(50));
-        LogOut.WriteLine("Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.");
+        sb.Append("        console".PadRight(25).PadRight(50));
+        sb.AppendLine("Specifies a command-line application.");
+        sb.Append("        library".PadRight(25).PadRight(50));
+        sb.AppendLine("Specifies a dynamic linked library.");
+        sb.AppendLine();
 
-        LogOut.Write("    watch, auto".PadRight(50));
-        LogOut.WriteLine("Watches all .ds files in the current folder structure and automatically recompiles when files are changed.");
+        sb.Append("    build [BuildProfile]".PadRight(50));
+        sb.Append(FormatLines("Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified."));
 
-        LogOut.Write("    quit".PadRight(50));
-        LogOut.WriteLine("Stops all file watchers.");
+        sb.Append("    watch, auto".PadRight(50));
+        sb.Append(FormatLines("Watches all .ds files in the current folder structure and automatically recompiles when files are changed."));
 
-        LogOut.Write("    scratchpad [Command] [Options]".PadRight(50));
-        LogOut.WriteLine("Allows compiling and running Dassie source code from the console. Use 'dc scratchpad help' to display available commands.");
+        sb.Append("    quit".PadRight(50));
+        sb.Append(FormatLines("Stops all file watchers."));
 
-        LogOut.Write("    check, verify [FileNames]".PadRight(50));
-        LogOut.WriteLine("Checks the specified files, or all .ds files in the current folder structure, for syntax errors.");
+        sb.Append("    scratchpad [Command] [Options]".PadRight(50));
+        sb.Append(FormatLines("Allows compiling and running Dassie source code from the console. Use 'dc scratchpad help' to display available commands."));
 
-        LogOut.Write("    config".PadRight(50));
-        LogOut.WriteLine("Creates a new dsconfig.xml file with default values.");
+        sb.Append("    check, verify [FileNames]".PadRight(50));
+        sb.Append(FormatLines("Checks the specified files, or all .ds files in the current folder structure, for syntax errors."));
 
-        LogOut.Write("    package [Command] [Options]".PadRight(50));
-        LogOut.WriteLine("Used to install and manage compiler extensions. Use 'dc package help' to display available commands.");
+        sb.Append("    config".PadRight(50));
+        sb.Append(FormatLines("Creates a new dsconfig.xml file with default values."));
 
-        LogOut.Write("    help, ?".PadRight(50));
-        LogOut.WriteLine("Shows this page.");
+        sb.Append("    package [Command] [Options]".PadRight(50));
+        sb.Append(FormatLines("Used to install and manage compiler extensions. Use 'dc package help' to display available commands."));
+
+        sb.Append("    help, ?".PadRight(50));
+        sb.Append(FormatLines("Shows this page."));
 
         if (installedCommands.Count > 0)
         {
-            LogOut.WriteLine();
-            LogOut.WriteLine("Commands from external extensions:");
+            sb.AppendLine();
+            sb.AppendLine("Commands from external extensions:");
 
             foreach (KeyValuePair<string, string> cmd in installedCommands)
-                LogOut.WriteLine($"{$"    {cmd.Key}",-50}{cmd.Value.Replace(Environment.NewLine, " ")}");
+                sb.Append($"{$"    {cmd.Key}",-50}{FormatLines(cmd.Value.Replace(Environment.NewLine, " "))}");
         }
 
+        DisplayLogo();
+        LogOut.Write(sb.ToString());
         return 0;
     }
 }

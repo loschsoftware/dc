@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Dassie.Extensions;
 
@@ -154,20 +155,23 @@ internal static class ExtensionManagerCommandLine
 
     private static int ShowUsage()
     {
+        StringBuilder sb = new();
+
+        sb.AppendLine();
+        sb.AppendLine("Usage: dc package [Command] [Options]");
+
+        sb.AppendLine();
+        sb.AppendLine("Available commands:");
+        sb.Append($"{"    list",-35}{Program.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
+        sb.Append($"{"    info <Name>",-35}{Program.FormatLines("Displays advanced information about the specified extension.", indentWidth: 35)}");
+        sb.Append($"{"    install <Name>",-35}{Program.FormatLines("Installs the specified extension from the package repository.", indentWidth: 35)}");
+        sb.Append($"{"    import <Path>",-35}{Program.FormatLines("Installs an extension from the specified file path.", indentWidth: 35)}");
+        sb.Append($"{"    remove <Name>",-35}{Program.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
+        sb.Append($"{"    update <Name>",-35}{Program.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
+        sb.Append($"{"    help",-35}{Program.FormatLines("Shows this list.", indentWidth: 35)}");
+
         Program.DisplayLogo();
-        Console.WriteLine();
-        Console.WriteLine("Usage: dc package [Command] [Options]");
-
-        Console.WriteLine();
-        Console.WriteLine("Available commands:");
-        Console.WriteLine($"{"    list",-35}Displays a list of all installed extensions.");
-        Console.WriteLine($"{"    info <Name>",-35}Displays advanced information about the specified extension.");
-        Console.WriteLine($"{"    install <Name>",-35}Installs the specified extension from the package repository.");
-        Console.WriteLine($"{"    import <Path>",-35}Installs an extension from the specified file path.");
-        Console.WriteLine($"{"    remove <Name>",-35}Uninstalls the specified extension package.");
-        Console.WriteLine($"{"    update <Name>",-35}Updates the specified extension to the newest version.");
-        Console.WriteLine($"{"    help",-35}Shows this list.");
-
+        Console.Write(sb.ToString());
         return 0;
     }
 }
