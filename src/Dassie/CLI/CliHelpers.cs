@@ -99,76 +99,6 @@ internal static class CliHelpers
         }
     }
 
-    private static void ExtractOptions(IEnumerable<string> args, DassieConfig config)
-    {
-        args = args.Where(a => a.StartsWith("--") && a.Count(c => c == '=') == 1).Select(a => a[2..]);
-
-        if (!args.Any())
-            return;
-
-        Dictionary<string, PropertyInfo> propNames = [];
-        foreach (PropertyInfo prop in typeof(DassieConfig).GetProperties())
-        {
-            XmlElementAttribute element = prop.GetCustomAttribute<XmlElementAttribute>();
-            if (element != null && !string.IsNullOrEmpty(element.ElementName))
-            {
-                propNames.Add(element.ElementName.ToLowerInvariant(), prop);
-                continue;
-            }
-
-            XmlAttributeAttribute attrib = prop.GetCustomAttribute<XmlAttributeAttribute>();
-            if (attrib != null && !string.IsNullOrEmpty(attrib.AttributeName))
-            {
-                propNames.Add(attrib.AttributeName.ToLowerInvariant(), prop);
-                continue;
-            }
-
-            propNames.Add(prop.Name.ToLowerInvariant(), prop);
-        }
-
-        foreach (string arg in args)
-        {
-            string identifier = arg.Split('=')[0];
-            string value = arg.Split('=')[1];
-
-            if (propNames.TryGetValue(identifier.ToLowerInvariant(), out PropertyInfo prop))
-            {
-                object val = value;
-
-                try
-                {
-                    if (prop.PropertyType == typeof(bool))
-                    {
-                        if (bool.TryParse(value.ToLowerInvariant(), out bool b))
-                            val = b;
-
-                        else if (int.TryParse(value, out int i))
-                        {
-                            if (i == 0) val = false;
-                            else if (i == 1) val = true;
-                            else throw new Exception();
-                        }
-
-                        else throw new Exception();
-                    }
-
-                    else if (prop.PropertyType.IsEnum)
-                        val = Enum.Parse(prop.PropertyType, value);
-                }
-                catch (Exception)
-                {
-                    EmitErrorMessage(
-                        0, 0, 0,
-                        DS0089_InvalidDSConfigProperty,
-                        $"Invalid property value for '{prop.Name}': '{value}' cannot be converted to '{prop.PropertyType.FullName}'.",
-                        "dc");
-                }
-
-                prop.SetValue(config, val);
-            }
-        }
-    }
-
     public static int HandleArgs(string[] args, DassieConfig overrideSettings = null)
     {
         Stopwatch sw = new();
@@ -193,7 +123,7 @@ internal static class CliHelpers
         config ??= new();
         config.AssemblyName ??= asmName;
 
-        ExtractOptions(args, config);
+        CommandLineOptionParser.ParseOptions(args, config);
 
         if (overrideSettings != null)
             config = overrideSettings;
