@@ -43,6 +43,12 @@ internal static class CommandLineOptionParser
 
         foreach (string arg in args)
         {
+            if (arg.Contains("::")) // Accessing a property of a more complex element (e.g. version info)
+            {
+                ParseObjectOption(arg, config);
+                continue;
+            }
+
             if (arg.Count(c => c == '=') == 1) // Normal option of type bool, string or enum -> no array or complex object
             {
                 ParseRegularOption(arg, propNames, config);
@@ -51,13 +57,7 @@ internal static class CommandLineOptionParser
 
             if (arg.Contains('+')) // Adding an element to an array
             {
-                ParseArrayOption(arg, propNames, config);
-                continue;
-            }
-
-            if (arg.Contains("::")) // Accessing a property of a more complex element (e.g. version info)
-            {
-                ParseObjectOption(arg, propNames, config);
+                ParseArrayOption(arg, config);
                 continue;
             }
         }
@@ -105,7 +105,7 @@ internal static class CommandLineOptionParser
         }
     }
 
-    public static void ParseArrayOption(string arg, Dictionary<string, PropertyInfo> propNames, DassieConfig config)
+    public static void ParseArrayOption(string arg, DassieConfig config)
     {
         string identifier = arg.Split('+')[0].ToLowerInvariant()[2..];
         string value = arg.Split('+')[1];
@@ -177,8 +177,78 @@ internal static class CommandLineOptionParser
         }
     }
 
-    public static void ParseObjectOption(string arg, Dictionary<string, PropertyInfo> propNames, DassieConfig config)
+    public static void ParseObjectOption(string arg, DassieConfig config)
     {
-        throw new NotImplementedException();
+        string obj = arg.Split("::")[0].ToLowerInvariant()[2..];
+        string identifier = arg.Split("::")[1].Split('=')[0].ToLowerInvariant();
+        string value = arg.Split('=')[1];
+
+        Type t = null;
+
+        if ("versioninfo".StartsWith(obj))
+            t = typeof(VersionInfo);
+
+        if (t == null)
+            return;
+
+        Dictionary<string, PropertyInfo> propNames = [];
+        foreach (PropertyInfo prop in t.GetProperties())
+        {
+            XmlElementAttribute element = prop.GetCustomAttribute<XmlElementAttribute>();
+            if (element != null && !string.IsNullOrEmpty(element.ElementName))
+            {
+                propNames.Add(element.ElementName.ToLowerInvariant(), prop);
+                continue;
+            }
+
+            XmlAttributeAttribute attrib = prop.GetCustomAttribute<XmlAttributeAttribute>();
+            if (attrib != null && !string.IsNullOrEmpty(attrib.AttributeName))
+            {
+                propNames.Add(attrib.AttributeName.ToLowerInvariant(), prop);
+                continue;
+            }
+
+            propNames.Add(prop.Name.ToLowerInvariant(), prop);
+        }
+
+        if (propNames.TryGetValue(identifier, out PropertyInfo _prop))
+        {
+            object val = value;
+
+            try
+            {
+                if (_prop.PropertyType == typeof(bool))
+                {
+                    if (bool.TryParse(value.ToLowerInvariant(), out bool b))
+                        val = b;
+
+                    else if (int.TryParse(value, out int i))
+                    {
+                        if (i == 0) val = false;
+                        else if (i == 1) val = true;
+                        else throw new Exception();
+                    }
+
+                    else throw new Exception();
+                }
+
+                else if (_prop.PropertyType.IsEnum)
+                    val = Enum.Parse(_prop.PropertyType, value);
+            }
+            catch (Exception)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0089_InvalidDSConfigProperty,
+                    $"Invalid property value for '{_prop.Name}': '{value}' cannot be converted to '{_prop.PropertyType.FullName}'.",
+                    "dc");
+            }
+
+            if ("versioninfo".StartsWith(obj))
+            {
+                config.VersionInfo ??= new();
+                _prop.SetValue(config.VersionInfo, val);
+            }
+        }
     }
 }
