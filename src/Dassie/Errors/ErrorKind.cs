@@ -419,5 +419,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when multiple installed compiler extensions define a command with the same name.
     /// </summary>
-    DS0099_DuplicateCompilerCommand
+    DS0099_DuplicateCompilerCommand,
+    /// <summary>
+    /// Emitted when dc is called with an invalid command name.
+    /// </summary>
+    DS0100_InvalidCommand
 }

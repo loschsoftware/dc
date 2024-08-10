@@ -1592,6 +1592,17 @@ internal static class CliHelpers
 
         if (matchingFiles.Length == 0)
         {
+            if (pattern.All(char.IsLetter))
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0100_InvalidCommand,
+                    $"Invalid command '{pattern}'. Use 'dc help' for a list of available commands.",
+                    "dc");
+
+                Environment.Exit(-1);
+            }
+
             EmitErrorMessage(
                 0,
                 0,
