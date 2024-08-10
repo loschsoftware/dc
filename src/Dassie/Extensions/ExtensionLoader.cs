@@ -23,6 +23,20 @@ internal static class ExtensionLoader
             File.Delete(Path.Combine(DefaultExtensionSource, "RemovalList.txt"));
         }
 
+        if (File.Exists(Path.Combine(DefaultExtensionSource, "RenameList.txt")))
+        {
+            foreach (string renamePattern in File.ReadAllLines(Path.Combine(DefaultExtensionSource, "RenameList.txt")))
+            {
+                string oldPath = renamePattern.Split("==>")[0];
+                string newPath = renamePattern.Split("==>")[1];
+
+                if (File.Exists(oldPath))
+                    File.Move(oldPath, newPath);
+            }
+
+            File.Delete(Path.Combine(DefaultExtensionSource, "RenameList.txt"));
+        }
+
         List<IPackage> packages = [];
 
         foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))

@@ -29,7 +29,13 @@ internal static class ExtensionManagerCommandLine
             return Install(args[1]);
 
         if (command == "import" && args.Length > 1)
-            return Import(args[1]);
+        {
+            bool overwrite = false;
+            if (args.Length > 2 && args.Contains("-o"))
+                overwrite = true;
+
+            return Import(args[1], overwrite);
+        }
 
         if (command == "remove" && args.Length > 1)
             return Remove(args[1]);
@@ -105,7 +111,7 @@ internal static class ExtensionManagerCommandLine
         throw new NotImplementedException("Installing and updating packages from the internet is not yet implemented.");
     }
 
-    private static int Import(string path)
+    private static int Import(string path, bool overwrite = false)
     {
         if (!File.Exists(path))
         {
@@ -113,7 +119,29 @@ internal static class ExtensionManagerCommandLine
             return -1;
         }
 
-        File.Copy(path, Path.Combine(ExtensionLoader.DefaultExtensionSource, Path.GetFileName(path)));
+        string dest = Path.Combine(ExtensionLoader.DefaultExtensionSource, Path.GetFileName(path));
+
+        if (File.Exists(dest))
+        {
+            if (overwrite)
+            {
+                Guid tempNameGuid = Guid.NewGuid();
+                string tempFileName = Path.Combine(Path.GetDirectoryName(dest), $"{tempNameGuid:N}{Path.GetExtension(dest)}");
+
+                File.AppendAllText(Path.Combine(ExtensionLoader.DefaultExtensionSource, "RemovalList.txt"), $"{dest}{Environment.NewLine}");
+                File.AppendAllText(Path.Combine(ExtensionLoader.DefaultExtensionSource, "RenameList.txt"), $"{tempFileName}==>{dest}{Environment.NewLine}");
+                File.Copy(path, tempFileName);
+                return 0;
+            }
+
+            else
+            {
+                Console.WriteLine("The specified extension is already installed. Use the -o flag to overwrite existing extensions.");
+                return -1;
+            }
+        }
+
+        File.Copy(path, dest);
         return 0;
     }
 
@@ -165,7 +193,7 @@ internal static class ExtensionManagerCommandLine
         sb.Append($"{"    list",-35}{Program.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
         sb.Append($"{"    info <Name>",-35}{Program.FormatLines("Displays advanced information about the specified extension.", indentWidth: 35)}");
         sb.Append($"{"    install <Name>",-35}{Program.FormatLines("Installs the specified extension from the package repository.", indentWidth: 35)}");
-        sb.Append($"{"    import <Path>",-35}{Program.FormatLines("Installs an extension from the specified file path.", indentWidth: 35)}");
+        sb.Append($"{"    import <Path> [-o]",-35}{Program.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
         sb.Append($"{"    remove <Name>",-35}{Program.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
         sb.Append($"{"    update <Name>",-35}{Program.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
         sb.Append($"{"    help",-35}{Program.FormatLines("Shows this list.", indentWidth: 35)}");
