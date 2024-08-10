@@ -227,15 +227,15 @@ internal class Program
 
         sb.AppendLine();
         sb.AppendLine("Usage:");
-        sb.AppendLine("dc [Command] [Options]");
-        sb.AppendLine("dc <FileName> [FileNames] [Options]");
-        sb.AppendLine();
 
-        sb.Append("<FileName> [FileNames] [Options]".PadRight(50));
+        sb.Append("    dc <Command> [Options]".PadRight(50));
+        sb.Append(FormatLines("Executes a command from the list below."));
+
+        sb.Append("    dc <FileNames> [Options]".PadRight(50));
         sb.AppendLine("Compiles the specified source files.");
-        sb.AppendLine(FormatLines("Additional options can be included in the form --<PropertyName>=<Value>, where <PropertyName> corresponds to a property in dsconfig.xml. Only 'string', 'bool' and 'enum' properties are supported.", true));
 
-        sb.AppendLine("Available commands:");
+        sb.AppendLine();
+        sb.AppendLine("Commands:");
 
         sb.Append("    new <Type> <Name>".PadRight(50));
 
@@ -274,11 +274,24 @@ internal class Program
         if (installedCommands.Count > 0)
         {
             sb.AppendLine();
-            sb.AppendLine("Commands from external extensions:");
+            sb.AppendLine("External commands:");
 
             foreach (KeyValuePair<string, string> cmd in installedCommands)
                 sb.Append($"{$"    {cmd.Key}",-50}{FormatLines(cmd.Value.Replace(Environment.NewLine, " "))}");
         }
+
+        sb.AppendLine();
+        sb.AppendLine("Options:");
+        sb.AppendLine(FormatLines("Options from project files (dsconfig.xml) can be included in the following way:", true, 4));
+        
+        sb.Append("    --<PropertyName>=<Value>".PadRight(50));
+        sb.Append(FormatLines("For simple properties of type 'string', 'bool' or 'enum'. The property name is case-insensitive. For boolean properties, 0 and 1 are supported aliases for false and true. Example: --MeasureElapsedTime=true"));
+
+        sb.Append("    --<ArrayPropertyName>+<Value>".PadRight(50));
+        sb.Append(FormatLines("To add elements to an array property. Property names are recognized by the first characters, where 'References' takes precedence over 'Resources'. Example: --R+\"assembly.dll\""));
+
+        sb.Append("    --<PropertyName>::<ChildProperty>=<Value>".PadRight(50));
+        sb.Append(FormatLines("For setting child properties of more complex objects. Object names are recognized by first characters. Example: --VersionInfo::Description=\"Application\""));
 
         DisplayLogo();
         LogOut.Write(sb.ToString());
