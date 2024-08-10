@@ -33,6 +33,11 @@ public class ErrorInfo
     public (int, int) CodePosition { get; set; }
 
     /// <summary>
+    /// Allows hiding the code position for errors with no specific location.
+    /// </summary>
+    public bool HideCodePosition { get; set; }
+
+    /// <summary>
     /// The length of the error.
     /// </summary>
     public int Length { get; set; }

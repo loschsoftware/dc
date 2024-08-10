@@ -113,8 +113,12 @@ public static class ErrorWriter
             };
 
             string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
+            string codePos = "(~)";
 
-            outStream.WriteLine($"{prefix}{Path.GetFileName(error.File)} ({error.CodePosition.Item1},{error.CodePosition.Item2}): {error.Severity switch
+            if (!error.HideCodePosition)
+                codePos = $"({error.CodePosition.Item1},{error.CodePosition.Item2})";
+
+            outStream.WriteLine($"{prefix}{Path.GetFileName(error.File)} {codePos}: {error.Severity switch
             {
                 Severity.Error => "error",
                 Severity.Warning => "warning",
@@ -210,8 +214,10 @@ public static class ErrorWriter
     /// Writes an error message using <see cref="ErrorOut"/>.
     /// </summary>
     /// <remarks>If <paramref name="file"/> is null, will assume <see cref="FileContext.Path"/>.</remarks>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool addToErrorList = true, string tip = "")
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool addToErrorList = true, string tip = "", bool hideCodePosition = false)
     {
+        hideCodePosition = ln == 0 && col == 0 && length == 0;
+
         ObservableCollection<Word> words = new()
         {
             new()
@@ -229,6 +235,7 @@ public static class ErrorWriter
             File = file ?? Path.GetFileName(CurrentFile.Path),
             Severity = Severity.Error,
             Tip = tip,
+            HideCodePosition = hideCodePosition,
             ToolTip = new()
             {
                 IconResourceName = "CodeErrorRule",
@@ -240,8 +247,10 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a warning message using <see cref="WarnOut"/>.
     /// </summary>
-    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false, string tip = "")
+    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false, string tip = "", bool hideCodePosition = false)
     {
+        hideCodePosition = ln == 0 && col == 0 && length == 0;
+
         ObservableCollection<Word> words = new()
         {
             new()
@@ -262,6 +271,7 @@ public static class ErrorWriter
             File = file ?? CurrentFile.Path,
             Severity = Severity.Warning,
             Tip = tip,
+            HideCodePosition = hideCodePosition,
             ToolTip = new()
             {
                 Words = words,
@@ -281,8 +291,10 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a message using <see cref="InfoOut"/>.
     /// </summary>
-    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, string tip = "")
+    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, string tip = "", bool hideCodePosition = false)
     {
+        hideCodePosition = ln == 0 && col == 0 && length == 0;
+
         ObservableCollection<Word> words = new()
         {
             new()
@@ -303,6 +315,7 @@ public static class ErrorWriter
             File = file ?? CurrentFile.Path,
             Severity = Severity.Information,
             Tip = tip,
+            HideCodePosition = hideCodePosition,
             ToolTip = new()
             {
                 Words = words,
