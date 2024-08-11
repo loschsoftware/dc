@@ -334,4 +334,12 @@ internal static class EmitHelpers
         }
         catch (NotSupportedException) { }
     }
+
+    public static void EmitTailcall()
+    {
+        if (CurrentMethod.EmitTailCall)
+            CurrentMethod.IL.Emit(OpCodes.Tailcall);
+
+        CurrentMethod.EmitTailCall = false;
+    }
 }

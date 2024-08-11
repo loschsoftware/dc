@@ -136,4 +136,6 @@ internal class MethodContext
     public bool BoxCallingType { get; set; }
 
     public List<TypeContext> ClosureTypes { get; } = new();
+
+    public bool EmitTailCall { get; set; }
 }

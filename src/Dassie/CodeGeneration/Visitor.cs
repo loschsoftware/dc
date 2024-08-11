@@ -1,4 +1,5 @@
-﻿using Antlr4.Runtime.Misc;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Dassie.CLI;
 using Dassie.Core;
@@ -406,6 +407,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 foreach (var param in CurrentMethod.Parameters)
                     param.Index--;
             }
+
+            object ctx = context.expression();
+            if (ctx is DassieParser.Newlined_expressionContext)
+            {
+                while (ctx is DassieParser.Newlined_expressionContext expr)
+                    ctx = expr.expression();
+            }
+
+            bool allowTailCall = ctx is DassieParser.Member_access_expressionContext or DassieParser.Full_identifier_member_access_expressionContext;
+            CurrentMethod.EmitTailCall = allowTailCall;
 
             _tReturn = Visit(context.expression());
 
@@ -1808,6 +1819,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (context.arglist() != null)
                     Visit(context.arglist());
 
+                EmitTailcall();
                 EmitCall(m.DeclaringType, m);
 
                 if (m.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
@@ -1825,6 +1837,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // Global method
             else if (o is List<MethodInfo> methods)
             {
+                //int boxMemberIndex = memberIndex;
+
                 if (context.arglist() != null)
                     Visit(context.arglist());
 
@@ -2009,6 +2023,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     //EmitLdloca(CurrentMethod.LocalIndex);
                 }
 
+                EmitTailcall();
                 EmitCall(t, m);
                 t = m.ReturnType;
 
@@ -2109,6 +2124,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     EmitLdloca(CurrentMethod.LocalIndex);
                 }
 
+                EmitTailcall();
                 EmitCall(t, m);
                 t = m.ReturnType;
 
@@ -2206,6 +2222,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
 
         CurrentMethod.IL.BeginScope();
+
+        bool allowTailCall;
+        object ctx = ((DassieParser.Block_expressionContext)context.Parent).Parent;
+
+        if (ctx is not DassieParser.Type_memberContext)
+        {
+            while (((RuleContext)ctx).Parent is DassieParser.Newlined_expressionContext)
+                ctx = ((RuleContext)ctx).Parent;
+
+            ctx = ((RuleContext)ctx).Parent;
+        }
+
+        allowTailCall = ctx is DassieParser.Type_memberContext;
+        CurrentMethod.EmitTailCall = allowTailCall;
 
         foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
         {
