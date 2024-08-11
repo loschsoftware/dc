@@ -417,6 +417,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             bool allowTailCall = ctx is DassieParser.Member_access_expressionContext or DassieParser.Full_identifier_member_access_expressionContext;
             CurrentMethod.EmitTailCall = allowTailCall;
+            CurrentMethod.AllowTailCallEmission = allowTailCall || ctx is DassieParser.Block_expressionContext;
 
             _tReturn = Visit(context.expression());
 
@@ -1816,8 +1817,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         CurrentMethod.ByRefArguments.Add(i);
                 }
 
+                bool allowTailCall = CurrentMethod.AllowTailCallEmission;
+                CurrentMethod.AllowTailCallEmission = false;
+
                 if (context.arglist() != null)
                     Visit(context.arglist());
+
+                CurrentMethod.AllowTailCallEmission = allowTailCall;
 
                 EmitTailcall();
                 EmitCall(m.DeclaringType, m);
@@ -1839,8 +1845,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 //int boxMemberIndex = memberIndex;
 
+                bool allowTailCall = CurrentMethod.AllowTailCallEmission;
+                CurrentMethod.AllowTailCallEmission = false;
+
                 if (context.arglist() != null)
                     Visit(context.arglist());
+
+                CurrentMethod.AllowTailCallEmission = allowTailCall;
 
                 Type[] argumentTypes = (CurrentMethod.ArgumentTypesForNextMethodCall ?? Type.EmptyTypes.ToList()).ToArray();
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
@@ -2246,7 +2257,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             ctx = ((RuleContext)ctx).Parent;
         }
 
-        allowTailCall = ctx is DassieParser.Type_memberContext;
+        allowTailCall = ctx is DassieParser.Type_memberContext && context.expression().Last() is DassieParser.Member_access_expressionContext or DassieParser.Full_identifier_member_access_expressionContext;
         CurrentMethod.EmitTailCall = allowTailCall;
 
         Type ret = Visit(context.expression().Last());

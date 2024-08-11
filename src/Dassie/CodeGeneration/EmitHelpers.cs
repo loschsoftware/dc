@@ -337,9 +337,10 @@ internal static class EmitHelpers
 
     public static void EmitTailcall()
     {
-        if (CurrentMethod.EmitTailCall)
+        if (CurrentMethod.EmitTailCall && CurrentMethod.AllowTailCallEmission)
             CurrentMethod.IL.Emit(OpCodes.Tailcall);
 
         CurrentMethod.EmitTailCall = false;
+        CurrentMethod.AllowTailCallEmission = false;
     }
 }

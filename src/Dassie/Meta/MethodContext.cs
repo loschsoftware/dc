@@ -137,5 +137,7 @@ internal class MethodContext
 
     public List<TypeContext> ClosureTypes { get; } = new();
 
+    public bool AllowTailCallEmission { get; set; }
+
     public bool EmitTailCall { get; set; }
 }
