@@ -2222,6 +2222,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
 
         CurrentMethod.IL.BeginScope();
+        CurrentMethod.EmitTailCall = false;
+
+        foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
+        {
+            Type _t = Visit(tree);
+
+            if (_t != typeof(void) && !CurrentMethod.SkipPop)
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+
+            if (CurrentMethod.SkipPop)
+                CurrentMethod.SkipPop = false;
+        }
 
         bool allowTailCall;
         object ctx = ((DassieParser.Block_expressionContext)context.Parent).Parent;
@@ -2236,17 +2248,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         allowTailCall = ctx is DassieParser.Type_memberContext;
         CurrentMethod.EmitTailCall = allowTailCall;
-
-        foreach (IParseTree tree in context.expression().Take(context.expression().Length - 1))
-        {
-            Type _t = Visit(tree);
-
-            if (_t != typeof(void) && !CurrentMethod.SkipPop)
-                CurrentMethod.IL.Emit(OpCodes.Pop);
-
-            if (CurrentMethod.SkipPop)
-                CurrentMethod.SkipPop = false;
-        }
 
         Type ret = Visit(context.expression().Last());
 
