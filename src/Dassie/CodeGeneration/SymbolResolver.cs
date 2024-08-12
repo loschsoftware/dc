@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 
 namespace Dassie.CodeGeneration;
 
@@ -20,6 +21,23 @@ internal static class SymbolResolver
         public Type EnumType { get; set; }
     }
 
+    private static string GetTypeArgumentListSuffix(Type[] typeArgs)
+    {
+        if (typeArgs == null || typeArgs.Length == 0)
+            return "";
+
+        StringBuilder sb = new();
+
+        sb.Append($"`{typeArgs.Length}[");
+
+        foreach (Type t in typeArgs[0..^1])
+            sb.Append($"{t.ToString()},");
+
+        sb.Append(typeArgs.Last().ToString());
+        sb.Append(']');
+        return sb.ToString();
+    }
+
     public static object GetSmallestTypeFromLeft(DassieParser.Full_identifierContext fullId, Type[] typeArgs, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
     {
         string[] parts = fullId.Identifier().Select(f => f.GetText()).ToArray();
@@ -29,7 +47,7 @@ internal static class SymbolResolver
 
         for (int i = 0; i < parts.Length; i++)
         {
-            typeString = string.Join(".", parts[0..(i + 1)]);
+            typeString = string.Join(".", parts[0..(i + 1)]) + GetTypeArgumentListSuffix(typeArgs);
             firstUnusedPart++;
 
             if (ResolveIdentifier(typeString, row, col, len, true) is Type t)
