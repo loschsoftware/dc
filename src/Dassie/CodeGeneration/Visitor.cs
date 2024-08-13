@@ -2247,7 +2247,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         bool allowTailCall;
-        object ctx = ((DassieParser.Block_expressionContext)context.Parent).Parent;
+        object ctx = context;
+        if (context.Parent is DassieParser.Block_expressionContext block)
+            ctx = block.Parent;
 
         if (ctx is not DassieParser.Type_memberContext)
         {
