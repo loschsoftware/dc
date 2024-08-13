@@ -156,7 +156,7 @@ type_name
     : identifier_atom
     | Open_Paren type_name (Bar type_name)+ Close_Paren
     | generic_identifier
-    | type_name Open_Brace type_arg_list Close_Bracket
+    | type_name type_arg_list
     | type_name Ampersand
     | type_name array_type_specifier
     ;
