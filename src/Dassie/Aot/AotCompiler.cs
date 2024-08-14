@@ -52,11 +52,6 @@ internal class AotCompiler
 
         InvokeCompiler();
         InvokeLinker();
-
-        string tempDir = Path.Combine(Path.GetFullPath(_config.Config.BuildOutputDirectory), ".temp", "aot");
-        if (!_config.Config.KeepAotTempFiles && Directory.Exists(tempDir))
-            Directory.Delete(tempDir, true);
-
         return true;
     }
 
