@@ -103,10 +103,6 @@ public sealed class DassieConfig
 
     [DefaultValue(false)]
     [XmlElement]
-    public bool KeepAotTempFiles { get; set; } = false;
-
-    [DefaultValue(false)]
-    [XmlElement]
     public bool EnableMessageTimestamps { get; set; } = false;
 
     [DefaultValue(0)]
