@@ -211,7 +211,7 @@ Macros are identifiers that are replaced with a specific value by the compiler b
 
 
 > [!IMPORTANT]
-> Be careful when using the ``$(Time)`` and ``$(ExactTime)`` macros inside build events. Since all macros are evaluated before the build starts, the value of these macros will stay the same between pre-build and post-build events. On Windows, you can use the ``%time%`` variable to accurately retrieve the current time instead.
+> Be careful when using the ``$(Time)`` and ``$(TimeExact)`` macros inside build events. Since all macros are evaluated before the build starts, the value of these macros will stay the same between pre-build and post-build events. On Windows, you can use the ``%time%`` variable to accurately retrieve the current time instead.
 
 
 ### Custom macros
