@@ -32,10 +32,13 @@ These settings are at the top level of the XML tree and configure the behavior o
 |``BuildProfiles``|See below|Contains custom build profiles. See below for more info.||
 |``CacheSourceFiles``|``true`` or ``false``|If ``true``, caches source files to enable some incremental build capabilities.|Not yet finished.|
 |``CodeAnalyzers``||A list of code analyzers that are run during the build.|Not yet supported.|
+|``CompilerMessageRedirectionFile``|Any string|Sets the file the compiler writes logs and error messages to.||
 |``Configuration``|``Debug`` or ``Release``|Determines which build configuration should be used.||
 |``DebugProfiles``|See below|Contains custom debug profiles. See below for more info.|The Dassie compiler itself does not have any debugging capabilties. This setting is used by integrated development environments.|
 |``EmitPdb``|``true`` or ``false``|Determines wheter to emit symbol information.||
+|``EnableMessageTimestamps``|``true`` or ``false``|If ``true``, all compiler messages include a timestamp.||
 |``EnableTips``|``true`` or ``false``|If ``true``, some errors and warnings will display additional information to help resolve the issue.||
+|``GenerateILFiles``|``true`` or ``false``|If ``true``, the compiler outputs human-readable .NET Intermediate Language (.il) files.||
 |``IgnoreAllMessages``|``true`` or ``false``|Determines if all compiler messages (not warnings or errors) should be ignored.||
 |``IgnoreAllWarnings``|``true`` or ``false``|Determines if all compiler warnings should be ignored.||
 |``IgnoredMessages``|See below|A list of compiler messages and warnings that are ignored and will never be emitted. See below for more details.||
@@ -51,7 +54,9 @@ These settings are at the top level of the XML tree and configure the behavior o
 |``References``|See below|Used to configure dependencies. See below for more details.||
 |``Resources``|See below|Used to configure native and managed resources. See below for more details.||
 |``RootNamespace``|Any string|Sets the root namespace (determined by the ``export`` keyword) of the project. If empty, it is set to the project name.||
+|``Runtime``|``Jit`` or ``Aot``|Determines which runtime to use for the execution of the generated executables. If this property is set to ``Aot``, the compiler generates native executables for the current system and platform that are compiled ahead of time, along with regular .NET assemblies.||
 |``TreatWarningsAsErrors``|``true`` or ``false``|If ``true``, all compiler warnings are treated like errors.||
+|``Verbosity``|0, 1 or 2|Sets the level of detail for compiler messages. At level 0, the only compiler messages are errors, warnings and code suggestions. At level 1, the compiler displays more advanced information about the build process. At level 2, the compiler provides in-depth diagnostic information.||
 |``VersionInfo``|See below|Sets version information for the program. See below for more details.||
 
 ## Build profiles
