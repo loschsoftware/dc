@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Tree;
+using Dassie.Aot;
 using Dassie.CLI.Helpers;
 using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
@@ -110,7 +111,15 @@ internal static class CliHelpers
         {
             XmlSerializer xmls = new(typeof(DassieConfig));
             using StreamReader sr = new("dsconfig.xml");
-            config = (DassieConfig)xmls.Deserialize(sr);
+
+            try
+            {
+                config = (DassieConfig)xmls.Deserialize(sr);
+            }
+            catch
+            {
+                // If file is invalid, it will get caught in ConfigValidation.Validate
+            }
 
             foreach (ErrorInfo error in ConfigValidation.Validate("dsconfig.xml"))
                 EmitGeneric(error);
@@ -127,6 +136,14 @@ internal static class CliHelpers
 
         if (overrideSettings != null)
             config = overrideSettings;
+
+        if (!string.IsNullOrEmpty(config.CompilerMessageRedirectionFile))
+        {
+            StreamWriter messageWriter = new(config.CompilerMessageRedirectionFile);
+            InfoOut = new([messageWriter]);
+            WarnOut = new([messageWriter]);
+            ErrorOut = new([messageWriter]);
+        }
 
         MacroParser parser = new();
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
@@ -196,6 +213,9 @@ internal static class CliHelpers
         // Step 1
         CompileSource(files, config);
         VisitorStep1 = Context;
+
+        if (config.Verbosity >= 1)
+            EmitBuildLogMessage("Performing second pass.");
 
         // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(files, config);
@@ -317,8 +337,15 @@ internal static class CliHelpers
             BlobBuilder peBlob = new();
             peBuilder.Serialize(peBlob);
 
-            using FileStream fs = new(Path.GetFileName(assembly), FileMode.Create, FileAccess.Write);
+            FileStream fs = new(Path.GetFileName(assembly), FileMode.Create, FileAccess.Write);
             peBlob.WriteContentTo(fs);
+            fs.Dispose();
+
+            if (Context.Configuration.Runtime == Configuration.Runtime.Aot)
+            {
+                AotCompiler compiler = new(Context.Configuration, "dsconfig.xml");
+                compiler.Compile();
+            }
         }
 
         string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
@@ -351,25 +378,35 @@ internal static class CliHelpers
         if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
             File.Delete(resFile);
 
-        if (args.Any(a => a == "-ilout"))
+        if (Directory.Exists(".temp") && !Context.Configuration.KeepIntermediateFiles)
+            Directory.Delete(".temp", true);
+
+        if (Context.Configuration.GenerateILFiles)
         {
-            string ildasm = ToolLocationHelper.GetPathToDotNetFrameworkSdkFile("ildasm.exe");
+            string ildasm = WinSdkHelper.GetFrameworkToolPath("ildasm.exe", "GenerateILFiles") ?? "";
 
-            DirectoryInfo dir = Directory.CreateDirectory("cil");
-
-            ProcessStartInfo psi = new()
+            if (File.Exists(ildasm))
             {
-                FileName = ildasm,
-                Arguments = $"{assembly} /out={Path.Combine(dir.FullName, Path.GetFileNameWithoutExtension(assembly) + ".il")}",
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
+                DirectoryInfo dir = Directory.CreateDirectory("cil");
 
-            Process.Start(psi);
+                ProcessStartInfo psi = new()
+                {
+                    FileName = ildasm,
+                    Arguments = $"{Path.GetFullPath(Path.GetFileName(assembly))} /out={Path.Combine(dir.FullName, Path.GetFileNameWithoutExtension(assembly) + ".il")}",
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+
+                Process.Start(psi);
+            }
         }
 
-        if (args.Any(a => a == "-elapsed") || Context.Configuration.MeasureElapsedTime)
-            Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
+        if (Context.Configuration.MeasureElapsedTime)
+            InfoOut.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
+
+        InfoOut?.Dispose();
+        WarnOut?.Dispose();
+        ErrorOut?.Dispose();
 
         return errors.Select(e => e.Length).Sum() == 0 ? 0 : -1;
     }
@@ -380,6 +417,9 @@ internal static class CliHelpers
 
         if (File.Exists("dsconfig.xml"))
         {
+            foreach (ErrorInfo error in ConfigValidation.Validate("dsconfig.xml"))
+                EmitGeneric(error);
+
             XmlSerializer xmls = new(typeof(DassieConfig));
             using StreamReader sr = new("dsconfig.xml");
             config = (DassieConfig)xmls.Deserialize(sr);

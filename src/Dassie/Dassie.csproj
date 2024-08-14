@@ -17,6 +17,7 @@
 		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.NETCore.ILAsm" Version="7.0.0" />
+		<PackageReference Include="NuGet.Protocol" Version="6.10.2" />
 	</ItemGroup>
 
 	<ItemGroup>

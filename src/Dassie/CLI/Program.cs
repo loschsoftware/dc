@@ -11,6 +11,7 @@ using Dassie.Extensions;
 using System.Diagnostics.Tracing;
 using System.Text;
 using System.Linq;
+using Dassie.Meta;
 
 namespace Dassie.CLI;
 
@@ -20,6 +21,8 @@ internal class Program
     {
         try
         {
+            GetOrCreateToolPathsFile();
+
             List<IPackage> extensions = ExtensionLoader.LoadInstalledExtensions();
             Dictionary<string, Func<string[], int>> customCommands = ExtensionLoader.GetAllCommands(extensions);
             Dictionary<string, string> commandDescriptions = ExtensionLoader.GetCommandDescriptions(extensions);
@@ -161,6 +164,26 @@ internal class Program
 
             watcher.WaitForChanged(WatcherChangeTypes.All);
         }
+    }
+
+    private static void GetOrCreateToolPathsFile()
+    {
+        XmlSerializer xmls = new(typeof(ToolPaths));
+
+        if (File.Exists(ToolPaths.ToolPathsFile))
+        {
+            using StreamReader sr = new(ToolPaths.ToolPathsFile);
+            GlobalConfig.ExternalToolPaths = (ToolPaths)xmls.Deserialize(sr);
+            return;
+        }
+
+        GlobalConfig.ExternalToolPaths = new()
+        {
+            Tools = []
+        };
+
+        using StreamWriter sw = new(ToolPaths.ToolPathsFile);
+        xmls.Serialize(sw, GlobalConfig.ExternalToolPaths);
     }
 
     public static void DisplayLogo()

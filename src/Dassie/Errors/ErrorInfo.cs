@@ -84,5 +84,9 @@ public enum Severity
     /// <summary>
     /// An error message.
     /// </summary>
-    Error
+    Error,
+    /// <summary>
+    /// A diagnostic build log message that is not caused by an error in the code.
+    /// </summary>
+    BuildLogMessage
 }

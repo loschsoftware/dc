@@ -28,6 +28,9 @@ public static class FileCompiler
     /// <returns>An array of compilation errors that occured during the compilation. If no errors occured, this is an empty array.</returns>
     public static ErrorInfo[] CompileSingleFile(string path, DassieConfig config)
     {
+        if (config.Verbosity >= 1)
+            EmitBuildLogMessage($"Compiling source file '{path}'.");
+
         CliHelpers.SetupBogusAssembly();
 
         Context.Files.Add(new(path));
@@ -44,12 +47,18 @@ public static class FileCompiler
 
         CurrentFile.SymbolDocumentWriter = Context.Module.DefineDocument(path);
 
+        if (config.Verbosity >= 1)
+            EmitBuildLogMessage("    Lowering...");
+
         string source = File.ReadAllText(path);
         string lowered = SourceFileRewriter.Rewrite(source);
 
         Directory.CreateDirectory(".temp");
         string intermediatePath = Path.Combine(".temp", Path.GetFileNameWithoutExtension(path) + ".i.ds");
         File.WriteAllText(intermediatePath, lowered);
+
+        if (config.Verbosity >= 1)
+            EmitBuildLogMessage("    Parsing...");
 
         ICharStream charStream = CharStreams.fromString(lowered);
         ITokenSource lexer = new DassieLexer(charStream);
@@ -80,10 +89,7 @@ public static class FileCompiler
             if (File.Exists(intermediatePath))
                 File.Delete(intermediatePath);
 
-            foreach (string file in Directory.GetFiles(".temp"))
-                File.Delete(file);
-
-            Directory.Delete(".temp");
+            Directory.Delete(".temp", true);
         }
 
         return CurrentFile.Errors.ToArray();

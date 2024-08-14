@@ -423,5 +423,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when dc is called with an invalid command name.
     /// </summary>
-    DS0100_InvalidCommand
+    DS0100_InvalidCommand,
+    /// <summary>
+    /// Diagnostic information message.
+    /// </summary>
+    DS0101_DiagnosticInfo,
+    /// <summary>
+    /// Message displayed when compiling ahead of time informing of performance penalty.
+    /// </summary>
+    DS0102_AotPerformanceWarning,
+    /// <summary>
+    /// Emitted when an operation that requires an internet connection cannot be completed.
+    /// </summary>
+    DS0103_NetworkError
 }

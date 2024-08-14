@@ -327,6 +327,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitType_member([NotNull] DassieParser.Type_memberContext context)
     {
+        if (Context.Configuration.Verbosity >= 1)
+            EmitBuildLogMessage($"    Generating code for '{TypeContext.Current.Builder.FullName}::{context.Identifier().GetText()}'...");
+
         if (context.Identifier().GetText() == TypeContext.Current.Builder.Name)
         {
             // Defer constructors for field initializers
@@ -693,6 +696,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             Builder = tb
         };
+
+        if (Context.Configuration.Verbosity >= 1)
+            EmitBuildLogMessage($"    Generating code for '{tb.FullName}::Main'...");
 
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
@@ -1236,7 +1242,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.LocalIndex++;
 
                 LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t2);
-                lb.SetLocalSymInfo($"<g>{CurrentMethod.LocalIndex}");
+                SetLocalSymInfo(lb, $"<g>{CurrentMethod.LocalIndex}");
 
                 EmitStloc(CurrentMethod.LocalIndex);
                 EmitLdloca(CurrentMethod.LocalIndex);

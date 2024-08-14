@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Numerics;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -38,6 +39,14 @@ public sealed class DassieConfig
     [XmlElement("ApplicationType")]
     [DefaultValue(null)]
     public ApplicationType ApplicationType { get; set; }
+
+    [XmlElement]
+    [DefaultValue(Runtime.Jit)]
+    public Runtime Runtime { get; set; }
+
+    [XmlElement]
+    [DefaultValue("")]
+    public string RuntimeIdentifier { get; set; }
 
     [XmlElement("VersionInfo")]
     public VersionInfo VersionInfo { get; set; }
@@ -92,6 +101,26 @@ public sealed class DassieConfig
     [XmlElement("KeepIntermediateFiles")]
     public bool KeepIntermediateFiles { get; set; } = false;
 
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool KeepAotTempFiles { get; set; } = false;
+
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool EnableMessageTimestamps { get; set; } = false;
+
+    [DefaultValue(0)]
+    [XmlElement]
+    public int Verbosity { get; set; } = 0;
+
+    [DefaultValue("")]
+    [XmlElement]
+    public string CompilerMessageRedirectionFile { get; set; }
+
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool GenerateILFiles { get; set; } = false;
+
     [XmlArray("IgnoredMessages")]
     [XmlArrayItem(typeof(Message))]
     [XmlArrayItem(typeof(Warning))]
@@ -142,4 +171,11 @@ public enum ApplicationConfiguration
 {
     Debug,
     Release
+}
+
+[Serializable]
+public enum Runtime
+{
+    Jit,
+    Aot
 }

@@ -47,8 +47,23 @@ internal static class ConfigValidation
     public static List<ErrorInfo> Validate(string path)
     {
         List<ErrorInfo> errors = [];
+        XDocument doc = null;
 
-        XDocument doc = XDocument.Load(path, LoadOptions.SetLineInfo);
+        try
+        {
+            doc = XDocument.Load(path, LoadOptions.SetLineInfo);
+        }
+        catch (XmlException xmlEx)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0001_SyntaxError,
+                $"Malformed document: {xmlEx.Message}",
+                "dsconfig.xml");
+
+            return errors;
+        }
+
         foreach (XElement element in doc.Element(XName.Get("DassieConfig")).Elements())
         {
             if (!_validProperties.Contains(element.Name.LocalName))

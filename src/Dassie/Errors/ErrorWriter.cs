@@ -27,15 +27,15 @@ public static class ErrorWriter
     /// <summary>
     /// The output text writer used for error messages.
     /// </summary>
-    public static TextWriter ErrorOut { get; set; } = Console.Error;
+    public static ErrorTextWriter ErrorOut { get; set; } = new([Console.Error]);
     /// <summary>
     /// The output text writer used for warning messages.
     /// </summary>
-    public static TextWriter WarnOut { get; set; } = Console.Out;
+    public static ErrorTextWriter WarnOut { get; set; } = new([Console.Out]);
     /// <summary>
     /// The output text writer used for information messages.
     /// </summary>
-    public static TextWriter InfoOut { get; set; } = Console.Out;
+    public static ErrorTextWriter InfoOut { get; set; } = new([Console.Out]);
 
     /// <summary>
     /// A prefix of all error messages, indicating which project the error is from.
@@ -99,17 +99,26 @@ public static class ErrorWriter
 
             string prefix = "\r\n";
 
-            if (!string.IsNullOrEmpty(MessagePrefix))
+            if (!string.IsNullOrEmpty(MessagePrefix) && error.Severity != Severity.BuildLogMessage)
             {
                 outStream.Write($"\r\n[{MessagePrefix}] ");
                 prefix = "";
+            }
+
+            outStream.Write(prefix);
+
+            if (Context.Configuration.EnableMessageTimestamps)
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                outStream.Write($"[{DateTime.Now}] ");
             }
 
             Console.ForegroundColor = error.Severity switch
             {
                 Severity.Error => ConsoleColor.Red,
                 Severity.Warning => ConsoleColor.Yellow,
-                _ => ConsoleColor.Cyan
+                Severity.Information => ConsoleColor.Cyan,
+                _ => ConsoleColor.Gray
             };
 
             string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
@@ -118,12 +127,17 @@ public static class ErrorWriter
             if (!error.HideCodePosition)
                 codePos = $"({error.CodePosition.Item1},{error.CodePosition.Item2})";
 
-            outStream.WriteLine($"{prefix}{Path.GetFileName(error.File)} {codePos}: {error.Severity switch
+            if (error.Severity == Severity.BuildLogMessage)
+                outStream.WriteLine($"{error.ErrorMessage}");
+            else
             {
-                Severity.Error => "error",
-                Severity.Warning => "warning",
-                _ => "message"
-            }} {errCode}: {error.ErrorMessage}");
+                outStream.WriteLine($"{Path.GetFileName(error.File)} {codePos}: {error.Severity switch
+                {
+                    Severity.Error => "error",
+                    Severity.Warning => "warning",
+                    _ => "message"
+                }} {errCode}: {error.ErrorMessage}");
+            }
 
             if (!string.IsNullOrEmpty(error.Tip) && Context.Configuration.EnableTips)
             {
@@ -133,7 +147,7 @@ public static class ErrorWriter
 
             Console.ForegroundColor = defaultColor;
 
-            if (Context.Configuration.AdvancedErrorMessages)
+            if (Context.Configuration.AdvancedErrorMessages && error.Severity != Severity.BuildLogMessage)
             {
                 try
                 {
@@ -208,6 +222,26 @@ public static class ErrorWriter
     public static void EmitMessage(ErrorInfo error)
     {
         EmitGeneric(error, false, false);
+    }
+
+    /// <summary>
+    /// Emits a build log message that is not caused by an error in the code.
+    /// </summary>
+    /// <param name="message">The message to emit.</param>
+    public static void EmitBuildLogMessage(string message)
+    {
+        EmitGeneric(new ErrorInfo()
+        {
+            CodePosition = (0, 0),
+            Length = 0,
+            ErrorCode = DS0101_DiagnosticInfo,
+            ErrorMessage = message,
+            File = "",
+            HideCodePosition = true,
+            Severity = Severity.BuildLogMessage,
+            Tip = "",
+            ToolTip = null
+        }, false);
     }
 
     /// <summary>

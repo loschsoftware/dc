@@ -89,6 +89,12 @@ internal static class CommandLineOptionParser
                     else throw new Exception();
                 }
 
+                else if (prop.PropertyType == typeof(int))
+                {
+                    if (int.TryParse(value, out int i))
+                        val = i;
+                }
+
                 else if (prop.PropertyType.IsEnum)
                     val = Enum.Parse(prop.PropertyType, value);
             }
