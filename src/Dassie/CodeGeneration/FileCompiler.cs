@@ -4,6 +4,7 @@ using Dassie.CLI;
 using Dassie.Configuration;
 using Dassie.Errors;
 using Dassie.Lowering;
+using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Text.FragmentStore;
 using Dassie.Validation;
@@ -117,6 +118,9 @@ public static class FileCompiler
             Context.Configuration = config;
 
             CliHelpers.SetupBogusAssembly();
+            Context.Module = Context.BogusModule;
+
+            GlobalConfig.DisableDebugInfo = true;
 
             ICharStream charStream = CharStreams.fromString(source);
             ITokenSource lexer = new DassieLexer(charStream);

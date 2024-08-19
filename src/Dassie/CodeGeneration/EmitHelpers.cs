@@ -319,6 +319,9 @@ internal static class EmitHelpers
 
     public static void SetLocalSymInfo(LocalBuilder lb, string name)
     {
+        if (GlobalConfig.DisableDebugInfo)
+            return;
+
         try
         {
             lb.SetLocalSymInfo(name);
@@ -328,6 +331,9 @@ internal static class EmitHelpers
 
     public static void MarkSequencePoint(int line, int col, int length)
     {
+        if (GlobalConfig.DisableDebugInfo)
+            return;
+
         try
         {
             CurrentMethod.IL.MarkSequencePoint(CurrentFile.SymbolDocumentWriter, line, col, line, col + length);
