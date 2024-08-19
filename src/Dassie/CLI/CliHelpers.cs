@@ -14,6 +14,7 @@ using Dassie.Text.Tooltips;
 using Dassie.Unmanaged;
 using Dassie.Validation;
 using Microsoft.Build.Utilities;
+using NuGet.Packaging.PackageExtraction;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -167,6 +168,11 @@ internal static class CliHelpers
 
         if (config.References != null)
         {
+            foreach (PackageReference packRef in config.References.Where(r => r is PackageReference).Cast<PackageReference>())
+            {
+                ReferenceHandler.HandlePackageReference(packRef, config);
+            }
+
             foreach (ProjectReference projRef in config.References.Where(r => r is ProjectReference).Cast<ProjectReference>())
             {
                 MessagePrefix = Path.GetDirectoryName(projRef.ProjectFile).Split('\\').Last();

@@ -435,5 +435,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an operation that requires an internet connection cannot be completed.
     /// </summary>
-    DS0103_NetworkError
+    DS0103_NetworkError,
+    /// <summary>
+    /// Invalid when a package reference contains an invalid name or version number.
+    /// </summary>
+    DS0104_InvalidPackageReference
 }

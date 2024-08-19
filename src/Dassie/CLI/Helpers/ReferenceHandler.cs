@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration;
+using Dassie.Packages;
 using System;
 using System.IO;
 using System.Linq;
@@ -92,6 +93,36 @@ internal static class ReferenceHandler
         }
 
         Directory.SetCurrentDirectory(dir);
+        return true;
+    }
+
+    public static bool HandlePackageReference(PackageReference package, DassieConfig config)
+    {
+        string version = PackageDownloader.DownloadPackage(package.PackageId, package.Version);
+        string pkgDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages", package.PackageId, version);
+        string libDir = Path.Combine(pkgDir, "lib");
+
+        if (Directory.Exists(libDir))
+        {
+            Version coreLibVersion = typeof(object).Assembly.GetName().Version;
+            string target = coreLibVersion.ToString(2);
+            string assembliesDir = Path.Combine(libDir, target);
+
+            if (!Directory.Exists(assembliesDir))
+                assembliesDir = Directory.GetDirectories(libDir).First();
+
+            foreach (string asm in Directory.GetFiles(assembliesDir, "*.dll", SearchOption.AllDirectories))
+            {
+                config.References = [
+                    .. config.References,
+                    new AssemblyReference() {
+                        AssemblyPath = asm,
+                        CopyToOutput = true
+                    }
+                ];
+            }
+        }
+
         return true;
     }
 }

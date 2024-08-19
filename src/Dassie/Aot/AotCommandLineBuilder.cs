@@ -123,12 +123,6 @@ internal class AotCommandLineBuilder
                 // TODO: Support project references for AOT
                 continue;
             }
-
-            if (reference is PackageReference pkg)
-            {
-                // TODO: Support NuGet package references for AOT
-                continue;
-            }
         }
     }
 

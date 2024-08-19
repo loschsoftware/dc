@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration;
+using Dassie.Packages;
 using NuGet.Common;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
@@ -55,79 +56,24 @@ internal class AotCompiler
         return true;
     }
 
-    private string DownloadPackage(string packageId)
-    {
-        SourceCacheContext cache = new();
-        SourceRepository repo = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
-        FindPackageByIdResource package = repo.GetResource<FindPackageByIdResource>();
-
-        IEnumerable<NuGetVersion> versions = package.GetAllVersionsAsync(
-            packageId,
-            cache,
-            NullLogger.Instance,
-            CancellationToken.None).Result;
-
-        if (!versions.Any())
-        {
-            string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages", packageId)).FullName;
-            string[] subDirs = Directory.GetDirectories(dir);
-
-            if (subDirs.Length == 0)
-            {
-                EmitErrorMessage(
-                    0, 0, 0,
-                    DS0103_NetworkError,
-                    $"Could not download package '{packageId}'.",
-                    "dc");
-
-                return "";
-            }
-
-            return subDirs.Last().Split(Path.DirectorySeparatorChar).Last();
-        }
-
-        NuGetVersion targetVersion = versions.Last();
-        using MemoryStream ms = new();
-
-        string packageDir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages", packageId, targetVersion.ToFullString())).FullName;
-        if (File.Exists(Path.Combine(packageDir, "Icon.png"))) // Just check if any file belonging to the package exists
-            return targetVersion.ToFullString();
-
-        InfoOut.WriteLine($"Downloading package '{packageId}'...");
-
-        package.CopyNupkgToStreamAsync(
-            packageId,
-            targetVersion,
-            ms,
-            cache,
-            NullLogger.Instance,
-            CancellationToken.None).Wait();
-
-        using PackageArchiveReader reader = new(ms);
-        NuspecReader nuspecReader = reader.GetNuspecReaderAsync(CancellationToken.None).Result;
-
-        ZipFile.ExtractToDirectory(ms, packageDir);
-        return targetVersion.ToFullString();
-    }
-
     private void DownloadRuntime()
     {
         string packageId = $"Microsoft.NETCore.App.Runtime.{_config.Config.RuntimeIdentifier}";
-        string version = DownloadPackage(packageId);
+        string version = PackageDownloader.DownloadPackage(packageId);
         _config.RuntimePackageRootDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages", packageId, version);
     }
 
     private void DownloadILCompiler()
     {
         string packageId = "Microsoft.DotNet.ILCompiler";
-        string version = DownloadPackage(packageId);
+        string version = PackageDownloader.DownloadPackage(packageId);
         _config.RuntimeIndependentILCompilerPackageRootDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages", packageId, version);
     }
 
     private void DownloadPlatformDependentILCompiler()
     {
         string packageId = $"runtime.{_config.Config.RuntimeIdentifier}.Microsoft.DotNet.ILCompiler";
-        string version = DownloadPackage(packageId);
+        string version = PackageDownloader.DownloadPackage(packageId);
         _config.ILCompilerPackageRootDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages", packageId, version);
     }
 
