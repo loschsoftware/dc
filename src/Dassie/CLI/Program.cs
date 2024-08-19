@@ -170,6 +170,7 @@ internal class Program
     {
         XmlSerializer xmls = new(typeof(ToolPaths));
 
+        Directory.CreateDirectory(Path.GetDirectoryName(ToolPaths.ToolPathsFile));
         if (File.Exists(ToolPaths.ToolPathsFile))
         {
             using StreamReader sr = new(ToolPaths.ToolPathsFile);
