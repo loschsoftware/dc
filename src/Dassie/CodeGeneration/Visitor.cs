@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Dassie.CLI;
+using Dassie.CLI.Helpers;
 using Dassie.Core;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Color = Dassie.Text.Color;
+using static Dassie.CLI.Helpers.TypeHelpers;
 
 namespace Dassie.CodeGeneration;
 
@@ -778,38 +780,44 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitEquality_expression([NotNull] DassieParser.Equality_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
+        EnsureBoolean(t, throwError: false);
+        
         Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t2, throwError: false);
+        
+        MethodInfo op_eq = t.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+        MethodInfo op_ineq = t.GetMethod("op_Inequality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
-        if ((CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2)) || (t == typeof(bool) && t2 == typeof(bool)))
+        if ((op_eq == null && op_ineq == null) || (CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2)))
         {
-            if (CliHelpers.IsFloatingPointType(t) && !CliHelpers.IsFloatingPointType(t2))
+            if ((CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2)) || (IsBoolean(t) && IsBoolean(t2)))
             {
-                CurrentMethod.IL.Emit(OpCodes.Conv_R8);
-            }
-            else if (CliHelpers.IsFloatingPointType(t2) && !CliHelpers.IsFloatingPointType(t))
-            {
-                CurrentMethod.IL.Emit(OpCodes.Pop);
-                CurrentMethod.IL.Emit(OpCodes.Conv_R8);
-                Visit(context.expression()[1]);
-            }
+                if (CliHelpers.IsFloatingPointType(t) && !CliHelpers.IsFloatingPointType(t2))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+                }
+                else if (CliHelpers.IsFloatingPointType(t2) && !CliHelpers.IsFloatingPointType(t))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Pop);
+                    CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+                    Visit(context.expression()[1]);
+                }
 
-            CurrentMethod.IL.Emit(OpCodes.Ceq);
-
-            if (context.op.Text == "!=")
-            {
-                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
                 CurrentMethod.IL.Emit(OpCodes.Ceq);
-            }
 
-            return typeof(bool);
+                if (context.op.Text == "!=")
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
+                    CurrentMethod.IL.Emit(OpCodes.Ceq);
+                }
+
+                return typeof(bool);
+            }
         }
 
         if (context.op.Text == "==")
         {
-
-            MethodInfo op = t.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
-
-            if (op == null)
+            if (op_eq == null)
             {
                 EmitErrorMessage(
                         context.op.Line,
@@ -822,13 +830,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 return typeof(bool);
             }
 
-            CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+            CurrentMethod.IL.EmitCall(OpCodes.Call, op_eq, null);
         }
         else
         {
-            MethodInfo op = t.GetMethod("op_Inequality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
-
-            if (op == null)
+            if (op_ineq == null)
             {
                 EmitErrorMessage(
                         context.op.Line,
@@ -841,7 +847,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 return typeof(bool);
             }
 
-            CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+            CurrentMethod.IL.EmitCall(OpCodes.Call, op_ineq, null);
         }
 
         return typeof(bool);
@@ -852,7 +858,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if ((CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2)) || (t == typeof(bool) && t2 == typeof(bool)))
+        if (CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2))
         {
             if (CliHelpers.IsFloatingPointType(t) && !CliHelpers.IsFloatingPointType(t2))
             {
@@ -967,12 +973,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         Type t = Visit(context.expression());
 
-        if (t == typeof(bool))
+        if (IsBoolean(t))
         {
+            EnsureBoolean(t);
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
             CurrentMethod.IL.Emit(OpCodes.Ceq);
-
-            return t;
+            return typeof(bool);
         }
 
         MethodInfo op = t.GetMethod("op_LogicalNot", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t }, null);
@@ -995,15 +1001,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return t;
     }
 
+    // TODO: Implement short-circuiting
     public override Type VisitLogical_and_expression([NotNull] DassieParser.Logical_and_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t, throwError: false);
 
-        if (t == typeof(bool) && t2 == typeof(bool))
+        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t2, throwError: false);
+
+        if (IsBoolean(t) && IsBoolean(t2))
         {
             CurrentMethod.IL.Emit(OpCodes.And);
-            return t;
+            return typeof(bool);
         }
 
         EmitErrorMessage(
@@ -1017,15 +1027,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return t;
     }
 
+    // TODO: Implement short-circuiting
     public override Type VisitLogical_or_expression([NotNull] DassieParser.Logical_or_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t, throwError: false);
 
-        if (t == typeof(bool) && t2 == typeof(bool))
+        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t2, throwError: false);
+
+        if (IsBoolean(t) && IsBoolean(t2))
         {
             CurrentMethod.IL.Emit(OpCodes.Or);
-            return t;
+            return typeof(bool);
         }
 
         EmitErrorMessage(
@@ -1042,9 +1056,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitOr_expression([NotNull] DassieParser.Or_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t, throwError: false);
 
-        if (CliHelpers.IsNumericType(t) || t == typeof(bool))
+        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t2, throwError: false);
+
+        if (IsBoolean(t) && IsBoolean(t2))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Or);
+            return typeof(bool);
+        }
+
+        if (CliHelpers.IsNumericType(t))
         {
             CurrentMethod.IL.Emit(OpCodes.Or);
             return t;
@@ -1073,9 +1096,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitAnd_expression([NotNull] DassieParser.And_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t, throwError: false);
 
-        if (CliHelpers.IsNumericType(t) || t == typeof(bool))
+        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t2, throwError: false);
+
+        if (IsBoolean(t) && IsBoolean(t2))
+        {
+            CurrentMethod.IL.Emit(OpCodes.And);
+            return typeof(bool);
+        }
+
+        if (CliHelpers.IsNumericType(t))
         {
             CurrentMethod.IL.Emit(OpCodes.And);
             return t;
@@ -2380,15 +2412,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         // Comparative expression
         Type ct = Visit(context.if_branch().expression()[0]);
 
-        if (ct != typeof(bool))
-        {
-            EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.Start.Text.Length,
-                    DS0038_ConditionalExpressionClauseNotBoolean,
-                    $"The condition of a conditional expression has to be a boolean.");
-        }
+        TypeHelpers.EnsureBoolean(ct,
+            context.Start.Line,
+            context.Start.Column,
+            context.Start.Text.Length);
 
         CurrentMethod.IL.Emit(OpCodes.Brfalse, falseBranch);
 
@@ -2408,16 +2435,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Label stillFalseBranch = CurrentMethod.IL.DefineLabel();
 
                 Type _ct = Visit(tree.expression()[0]);
-
-                if (_ct != typeof(bool))
-                {
-                    EmitErrorMessage(
-                            context.Start.Line,
-                            context.Start.Column,
-                            context.Start.Text.Length,
-                            DS0038_ConditionalExpressionClauseNotBoolean,
-                            $"The condition of a conditional expression has to be a boolean.");
-                }
+                TypeHelpers.EnsureBoolean(_ct,
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.Start.Text.Length);
 
                 CurrentMethod.IL.Emit(OpCodes.Brfalse, stillFalseBranch);
 
@@ -2465,16 +2486,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         // Comparative expression
         Type ct = Visit(context.postfix_if_branch().expression());
-
-        if (ct != typeof(bool))
-        {
-            EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.Start.Text.Length,
-                    DS0038_ConditionalExpressionClauseNotBoolean,
-                    $"The condition of a conditional expression has to be a boolean.");
-        }
+        TypeHelpers.EnsureBoolean(ct,
+            context.Start.Line,
+            context.Start.Column,
+            context.Start.Text.Length);
 
         CurrentMethod.IL.Emit(OpCodes.Brfalse, fb);
 
@@ -2500,16 +2515,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         // Comparative expression
         Type ct = Visit(context.unless_branch().expression()[0]);
-
-        if (ct != typeof(bool))
-        {
-            EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.Start.Text.Length,
-                    DS0038_ConditionalExpressionClauseNotBoolean,
-                    $"The condition of a conditional expression has to be a boolean.");
-        }
+        TypeHelpers.EnsureBoolean(ct,
+            context.Start.Line,
+            context.Start.Column,
+            context.Start.Text.Length);
 
         CurrentMethod.IL.Emit(OpCodes.Brtrue, falseBranch);
 
@@ -2529,16 +2538,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Label stillFalseBranch = CurrentMethod.IL.DefineLabel();
 
                 Type _ct = Visit(tree.expression()[0]);
-
-                if (_ct != typeof(bool))
-                {
-                    EmitErrorMessage(
-                            context.Start.Line,
-                            context.Start.Column,
-                            context.Start.Text.Length,
-                            DS0038_ConditionalExpressionClauseNotBoolean,
-                            $"The condition of a conditional expression has to be a boolean.");
-                }
+                TypeHelpers.EnsureBoolean(_ct,
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.Start.Text.Length);
 
                 CurrentMethod.IL.Emit(OpCodes.Brtrue, stillFalseBranch);
 
@@ -2593,16 +2596,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         // Comparative expression
         Type ct = Visit(context.postfix_unless_branch().expression());
-
-        if (ct != typeof(bool))
-        {
-            EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.Start.Text.Length,
-                    DS0038_ConditionalExpressionClauseNotBoolean,
-                    $"The condition of a conditional expression has to be a boolean.");
-        }
+        TypeHelpers.EnsureBoolean(ct,
+            context.Start.Line,
+            context.Start.Column,
+            context.Start.Text.Length);
 
         CurrentMethod.IL.Emit(OpCodes.Brtrue, fb);
 
@@ -3495,8 +3492,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(object[]);
         }
 
-        if (t == typeof(bool))
+        if (TypeHelpers.IsBoolean(t))
         {
+            TypeHelpers.EnsureBoolean(t, 0, 0, 0);
+
             CurrentMethod.IL.Emit(OpCodes.Pop);
 
             CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes));

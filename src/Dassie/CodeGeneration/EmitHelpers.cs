@@ -2,6 +2,7 @@
 using Dassie.Configuration;
 using Dassie.Meta;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -348,5 +349,33 @@ internal static class EmitHelpers
 
         CurrentMethod.EmitTailCall = false;
         CurrentMethod.AllowTailCallEmission = false;
+    }
+
+    /// <summary>
+    /// Converts a type into a <see cref="bool"/> according to the rules specified in <see cref="Dassie.CLI.Helpers.TypeHelpers.IsBoolean(Type)"/>.
+    /// </summary>
+    /// <param name="t">The type to perform the conversion on.</param>
+    public static void EmitBoolConversion(Type t)
+    {
+        IEnumerable<MethodInfo> implicitConversions = t.GetMethods()
+            .Where(m => m.Name == "op_Implicit")
+            .Where(m => m.ReturnType == typeof(bool))
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == t);
+
+        if (implicitConversions.Any())
+        {
+            EmitCall(t, implicitConversions.First());
+            return;
+        }
+
+        MethodInfo opTrue = t.GetMethods()
+            .Where(m => m.Name == "op_True")
+            .Where(m => m.ReturnType == typeof(bool))
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == t)
+            .First();
+
+        EmitCall(t, opTrue);
     }
 }
