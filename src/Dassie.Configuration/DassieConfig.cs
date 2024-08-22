@@ -37,8 +37,8 @@ public sealed class DassieConfig
     public string AssemblyName { get; set; }
 
     [XmlElement("ApplicationType")]
-    [DefaultValue(null)]
-    public ApplicationType ApplicationType { get; set; }
+    [DefaultValue(ApplicationType.Console)]
+    public ApplicationType ApplicationType { get; set; } = ApplicationType.Console;
 
     [XmlElement]
     [DefaultValue(Runtime.Jit)]
@@ -52,7 +52,8 @@ public sealed class DassieConfig
     public VersionInfo VersionInfo { get; set; }
 
     [XmlElement("BuildDirectory")]
-    public string BuildOutputDirectory { get; set; }
+    [DefaultValue("./build")]
+    public string BuildOutputDirectory { get; set; } = "./build";
 
     [DefaultValue(false)]
     [XmlElement("EmitPdb")]

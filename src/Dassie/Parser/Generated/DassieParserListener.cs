@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:\Users\Jonas\source\repos\dassie\src\Dassie\Parser\DassieParser.g4 by ANTLR 4.12.0
+// Generated from C:\Users\Jonas\Desktop\dc\src\Dassie\Parser\DassieParser.g4 by ANTLR 4.12.0
 
 // Unreachable code detected
 #pragma warning disable 0162
