@@ -3060,9 +3060,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitLdarg(sym.Index());
 
             Type type = Visit(context.expression());
+
+            bool checkTypes = true;
+            if (type != sym.Type() && !((sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/) && sym.Type().GetElementType() == type))
+            {
+                if (CanBeConverted(type, sym.Type()))
+                {
+                    EmitConversionOperator(type, sym.Type());
+                    checkTypes = false;
+                }
+            }
+
             sym.Set();
 
-            if (type != sym.Type() && !((sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/) && sym.Type().GetElementType() == type))
+            if (checkTypes && type != sym.Type() && !((sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/) && sym.Type().GetElementType() == type))
             {
                 if (sym.Type() == typeof(UnionValue))
                 {

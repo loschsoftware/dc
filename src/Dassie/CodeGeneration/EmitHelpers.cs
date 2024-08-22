@@ -378,4 +378,29 @@ internal static class EmitHelpers
 
         EmitCall(t, opTrue);
     }
+
+    public static void EmitConversionOperator(Type from, Type to)
+    {
+        IEnumerable<MethodInfo> implicitConversions = from.GetMethods()
+            .Where(m => m.Name == "op_Implicit")
+            .Where(m => m.ReturnType == to)
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == from);
+
+        if (implicitConversions.Any())
+        {
+            EmitCall(from, implicitConversions.First());
+            return;
+        }
+
+        IEnumerable<MethodInfo> explicitConversions = to.GetMethods()
+            .Where(m => m.Name == "op_Explicit")
+            .Where(m => m.ReturnType == to)
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == from);
+
+        // TODO: Calling explicit conversions implicitly might be dangerous..?
+        if (explicitConversions.Any())
+            EmitCall(from, explicitConversions.First());
+    }
 }

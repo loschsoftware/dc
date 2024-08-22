@@ -141,4 +141,31 @@ internal static class TypeHelpers
         if (t != typeof(bool))
             EmitBoolConversion(t);
     }
+
+    /// <summary>
+    /// Checks wheter type <paramref name="from"/> can be converted into type <paramref name="to"/>.
+    /// </summary>
+    /// <param name="from">The type to convert from.</param>
+    /// <param name="to">The type to convert into.</param>
+    /// <returns>Wheter or not a conversion from <paramref name="from"/> to <paramref name="to"/> exists.</returns>
+    public static bool CanBeConverted(Type from, Type to)
+    {
+        if (from.GetMethods()
+            .Where(m => m.Name == "op_Implicit")
+            .Where(m => m.ReturnType == to)
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == from)
+            .Any())
+            return true;
+
+        if (to.GetMethods()
+            .Where(m => m.Name == "op_Explicit")
+            .Where(m => m.ReturnType == to)
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == from)
+            .Any())
+            return true;
+
+        return false;
+    }
 }
