@@ -150,6 +150,9 @@ internal static class TypeHelpers
     /// <returns>Wheter or not a conversion from <paramref name="from"/> to <paramref name="to"/> exists.</returns>
     public static bool CanBeConverted(Type from, Type to)
     {
+        if (from == to)
+            return true;
+
         if (from.GetMethods()
             .Where(m => m.Name == "op_Implicit")
             .Where(m => m.ReturnType == to)

@@ -187,12 +187,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (field.FieldType != t)
             {
-                EmitErrorMessage(
-                    value.Start.Line,
-                    value.Start.Column,
-                    value.GetText().Length,
-                    DS0054_WrongFieldType,
-                    $"Expected expression of type '{field.FieldType.FullName}', but got type '{t.FullName}'.");
+                if (CanBeConverted(t, field.FieldType))
+                    EmitConversionOperator(t, field.FieldType);
+
+                else
+                {
+                    EmitErrorMessage(
+                        value.Start.Line,
+                        value.Start.Column,
+                        value.GetText().Length,
+                        DS0054_WrongFieldType,
+                        $"Expected expression of type '{field.FieldType.FullName}', but got type '{t.FullName}'.");
+                }
             }
 
             if (field.IsStatic)
@@ -2742,6 +2748,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Parameter
                 };
 
+                //EmitConversionOperator(ret, s.Type());
+
                 if (CurrentMethod.ShouldLoadAddressIfValueType)
                     s.LoadAddressIfValueType();
                 else
@@ -2757,6 +2765,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     Local = l,
                     SymbolType = SymbolInfo.SymType.Local
                 };
+
+                //EmitConversionOperator(ret, s.Type());
 
                 if (CurrentMethod.ShouldLoadAddressIfValueType)
                     s.LoadAddressIfValueType();
@@ -2781,6 +2791,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (f.IsStatic)
                 {
                     EmitLdloc(tempIndex);
+                    EmitConversionOperator(ret, f.FieldType);
                     CurrentMethod.IL.Emit(OpCodes.Stsfld, f);
                 }
 
@@ -2788,6 +2799,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 {
                     CurrentMethod.IL.Emit(OpCodes.Ldarg_0);
                     EmitLdloc(tempIndex);
+                    EmitConversionOperator(ret, f.FieldType);
                     CurrentMethod.IL.Emit(OpCodes.Stfld, f);
                 }
 
@@ -2956,6 +2968,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     }
 
                     EmitLdloc(tempIndex);
+                    EmitConversionOperator(ret, f.FieldType);
                     EmitStfld(f);
                     CurrentMethod.SkipPop = true;
                 }
@@ -2987,6 +3000,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     }
 
                     EmitLdloc(tempIndex);
+                    EmitConversionOperator(ret, p.PropertyType);
                     EmitCall(t, p.GetSetMethod());
                 }
                 else

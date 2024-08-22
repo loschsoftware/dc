@@ -381,6 +381,9 @@ internal static class EmitHelpers
 
     public static void EmitConversionOperator(Type from, Type to)
     {
+        if (from == to)
+            return;
+
         IEnumerable<MethodInfo> implicitConversions = from.GetMethods()
             .Where(m => m.Name == "op_Implicit")
             .Where(m => m.ReturnType == to)

@@ -33,8 +33,15 @@ internal class LoweringListener : DassieParserBaseListener
 
     public StringBuilder Replace(string text, ParserRuleContext rule)
     {
-        int start = Text.ToString().IndexOf(GetTextForRule(rule), rule.Start.StartIndex);
-        return Text.Replace(GetTextForRule(rule), text, start, GetTextForRule(rule).Length);
+        try
+        {
+            int start = Text.ToString().IndexOf(GetTextForRule(rule), rule.Start.StartIndex);
+            return Text.Replace(GetTextForRule(rule), text, start, GetTextForRule(rule).Length);
+        }
+        catch
+        {
+            return Text;
+        }
     }
 
     public override void EnterAssignment([NotNull] DassieParser.AssignmentContext context)
@@ -49,7 +56,7 @@ internal class LoweringListener : DassieParserBaseListener
 
     public override void EnterAccess_modifier_member_group([NotNull] DassieParser.Access_modifier_member_groupContext context)
     {
-        if (context.member_access_modifier().Global() != null)
+        if (context.member_access_modifier() != null && context.member_access_modifier().Global() != null)
         {
             EmitWarningMessage(
                 context.member_access_modifier().Start.Line,
