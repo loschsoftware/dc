@@ -684,14 +684,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         if (Context.Files.Count > 0)
         {
-            if ((context.expression().Length == 0 && Context.FilePaths.Count < 2) || (Context.FilePaths.Last() == CurrentFile.Path && Context.ShouldThrowDS0027))
+            if ((context.expression().Length == 0 && Context.FilePaths.Count < 2) || (context.expression().Length == 0 && Context.FilePaths.Last() == CurrentFile.Path && Context.ShouldThrowDS0027))
             {
                 EmitErrorMessage(0, 0, context.GetText().Length, DS0027_EmptyProgram, "The program does not contain any executable code.");
                 return typeof(void);
             }
 
-            else if (context.expression().Length == 0)
-                Context.ShouldThrowDS0027 = true;
+            Context.ShouldThrowDS0027 = context.expression().Length == 0;
         }
 
         if (context.children == null)
@@ -3148,16 +3147,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (t2 != t)
             {
-                MethodInfo implicitConversion = t.GetMethod("op_Implicit", new Type[] { t2 }, null);
-                if (implicitConversion != null)
-                {
-                    EmitCall(t, implicitConversion);
-                }
+                if (CanBeConverted(t, t2))
+                    EmitConversionOperator(t, t2);
                 else if (t2 == typeof(object))
                 {
                     CurrentMethod.IL.Emit(OpCodes.Box, t);
                 }
-                else if (t.MakeByRefType() == t2) { }
+                else if (!t.IsByRef && t.MakeByRefType() == t2) { }
+                else if (!t.IsByRef && CanBeConverted(t.MakeByRefType(), t2))
+                    EmitConversionOperator(t.MakeByRefType(), t2);
                 else
                 {
                     EmitErrorMessage(
