@@ -26,6 +26,10 @@ internal class AotCommandLineBuilder
     private string _os;
     private string _architecture;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="AotCommandLineBuilder"/> based on the specified AOT configuration.
+    /// </summary>
+    /// <param name="config">The configuration for the current AOT compilation.</param>
     public AotCommandLineBuilder(AotConfig config)
     {
         _config = config;

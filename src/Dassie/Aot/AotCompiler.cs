@@ -1,20 +1,8 @@
 ﻿using Dassie.Configuration;
 using Dassie.Packages;
-using NuGet.Common;
-using NuGet.Packaging;
-using NuGet.Packaging.Core;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-using NuGet.Versioning;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Dassie.Aot;
 
@@ -27,6 +15,11 @@ internal class AotCompiler
     private readonly AotConfig _config;
     private AotCommandLineBuilder _cmdLineBuilder;
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="AotCompiler"/> type.
+    /// </summary>
+    /// <param name="cfg">The compiler configuration for the project to be compiled.</param>
+    /// <param name="projectFilePath">A path to the configuration file represented by <paramref name="cfg"/>.</param>
     public AotCompiler(DassieConfig cfg, string projectFilePath)
     {
         if (string.IsNullOrEmpty(cfg.RuntimeIdentifier))
@@ -39,6 +32,10 @@ internal class AotCompiler
         };
     }
 
+    /// <summary>
+    /// Compiles a .NET assembly using the .NET ahead-of-time compiler.
+    /// </summary>
+    /// <returns></returns>
     public bool Compile()
     {
         if (Context.Configuration.Verbosity >= 1)

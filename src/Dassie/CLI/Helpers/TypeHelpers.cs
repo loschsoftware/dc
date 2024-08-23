@@ -5,8 +5,16 @@ using System.Reflection.Emit;
 
 namespace Dassie.CLI.Helpers;
 
+/// <summary>
+/// Provides helper methods regarding data types.
+/// </summary>
 internal static class TypeHelpers
 {
+    /// <summary>
+    /// Removes the 'ByRef' modifier from a type if the specified type is a ByRef type.
+    /// </summary>
+    /// <param name="t">The type to remove the modifier from.</param>
+    /// <returns>A type representing <paramref name="t"/> without a ByRef modifier.</returns>
     public static Type RemoveByRef(this Type t)
     {
         if (t.IsByRef /*|| t.IsByRefLike*/)
@@ -15,6 +23,12 @@ internal static class TypeHelpers
         return t;
     }
 
+    /// <summary>
+    /// Gets the IL instruction to load a value of the specified type indirectly.
+    /// </summary>
+    /// <param name="t">The type to load indirectly.</param>
+    /// <returns>The <c>ldind.X</c> opcode corresponding to the specified type.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static OpCode GetLoadIndirectOpCode(this Type t)
     {
         if (t == typeof(byte) || t == typeof(sbyte))
@@ -44,6 +58,12 @@ internal static class TypeHelpers
         throw new InvalidOperationException();
     }
 
+    /// <summary>
+    /// Gets the IL instruction to set a value of the specified type indirectly.
+    /// </summary>
+    /// <param name="t">The type to set indirectly.</param>
+    /// <returns>The <c>stind.X</c> opcode corresponding to the specified type.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static OpCode GetSetIndirectOpCode(this Type t)
     {
         if (t == typeof(byte) || t == typeof(sbyte))
@@ -73,6 +93,10 @@ internal static class TypeHelpers
         throw new InvalidOperationException();
     }
 
+    /// <summary>
+    /// Emits an <c>ldind</c> instruction if the specified type is a ByRef type.
+    /// </summary>
+    /// <param name="t">The type to load indirectly.</param>
     public static void LoadIndirectlyIfPossible(this Type t)
     {
         if (!t.IsByRef /*&& !t.IsByRefLike*/)

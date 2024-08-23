@@ -60,9 +60,13 @@ public static class Compiler
     {
         DassieConfig cfg = config ?? new();
 
-        Context = new();
-        Context.Configuration = cfg;
-        Context.ConfigurationPath = configFileName;
+        Context = new()
+        {
+            Configuration = cfg,
+            ConfigurationPath = configFileName
+        };
+
+        Context.FilePaths.AddRange(sourceFiles);
 
         if (config.Verbosity >= 1)
             EmitBuildLogMessage($"Compilation started at {DateTime.Now:HH:mm:ss} on {DateTime.Now.ToShortDateString()} at log verbosity level {config.Verbosity}.");

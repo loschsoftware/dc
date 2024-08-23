@@ -718,7 +718,7 @@ internal static class SymbolResolver
                     goto FoundType;
             }
 
-            foreach (string originalName in CurrentFile.Aliases.Where(a => a.Alias == name).Select(a => a.Name))
+            foreach (string originalName in CurrentFile.Aliases.Concat(Context.GlobalAliases).Where(a => a.Alias == name).Select(a => a.Name))
             {
                 type = Type.GetType(originalName);
 
@@ -760,7 +760,7 @@ internal static class SymbolResolver
 
     private static bool TryGetGlobalMember(string name, out object members, int row, int col, int len)
     {
-        foreach (string type in CurrentFile.ImportedTypes)
+        foreach (string type in CurrentFile.ImportedTypes.Concat(Context.GlobalTypeImports))
         {
             if (TryGetType(type, out Type t, row, col, len, true))
             {

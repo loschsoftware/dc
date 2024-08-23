@@ -13,8 +13,6 @@ using Dassie.Text;
 using Dassie.Text.Tooltips;
 using Dassie.Unmanaged;
 using Dassie.Validation;
-using Microsoft.Build.Utilities;
-using NuGet.Packaging.PackageExtraction;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -813,7 +811,7 @@ internal static class CliHelpers
                     goto FoundType;
             }
 
-            foreach (string originalName in CurrentFile.Aliases.Where(a => a.Alias == name).Select(a => a.Name))
+            foreach (string originalName in CurrentFile.Aliases.Concat(Context.GlobalAliases).Where(a => a.Alias == name).Select(a => a.Name))
             {
                 type = Type.GetType(originalName);
 

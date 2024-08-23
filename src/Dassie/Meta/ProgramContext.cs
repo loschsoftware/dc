@@ -1,6 +1,5 @@
 ﻿using Dassie.Configuration;
 using Dassie.Errors;
-using Dassie.Text.FragmentStore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,17 +13,19 @@ internal class ProgramContext
     
     public static ProgramContext VisitorStep1 { get; set; }
 
-    public List<FileContext> Files { get; } = new();
+    public List<FileContext> Files { get; } = [];
 
-    public List<TypeContext> Types { get; } = new();
+    public List<string> FilePaths { get; } = [];
 
-    public List<string> GlobalImports { get; } = new();
+    public List<TypeContext> Types { get; } = [];
 
-    public List<string> GlobalTypeImports { get; } = new();
+    public List<string> GlobalImports { get; } = [];
 
-    public List<Assembly> ReferencedAssemblies { get; } = new();
+    public List<string> GlobalTypeImports { get; } = [];
 
-    public List<(string Name, string Alias)> GlobalAliases { get; } = new();
+    public List<Assembly> ReferencedAssemblies { get; } = [];
+
+    public List<(string Name, string Alias)> GlobalAliases { get; } = [];
 
     public PersistedAssemblyBuilder Assembly { get; set; }
 

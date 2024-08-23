@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Platforms>AnyCPU;x64</Platforms>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Deterministic>false</Deterministic>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Dassie.Configuration\Dassie.Configuration.csproj" />
+	  <ProjectReference Include="..\Dassie\Dassie.csproj" />
+	</ItemGroup>
+</Project>

@@ -611,11 +611,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         foreach (var id in context.full_identifier())
         {
             string ns = id.GetText();
+            SymbolResolver.TryGetType(ns, out Type t, 0, 0, 0, true);
 
-            if (Type.GetType(ns) != null)
+            if (t != null)
             {
-                Type t = Type.GetType(ns);
-
                 if (!(t.IsAbstract && t.IsSealed))
                 {
                     EmitErrorMessage(
@@ -685,7 +684,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         if (Context.Files.Count > 0)
         {
-            if ((context.expression().Length == 0 && Context.Files.Count < 2) || (Context.Files.Last() == CurrentFile && Context.ShouldThrowDS0027))
+            if ((context.expression().Length == 0 && Context.FilePaths.Count < 2) || (Context.FilePaths.Last() == CurrentFile.Path && Context.ShouldThrowDS0027))
             {
                 EmitErrorMessage(0, 0, context.GetText().Length, DS0027_EmptyProgram, "The program does not contain any executable code.");
                 return typeof(void);
