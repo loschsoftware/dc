@@ -4,10 +4,12 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Deterministic>false</Deterministic>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<Platform>x64</Platform>
+		<Platforms>x64</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Dassie.Configuration\Dassie.Configuration.csproj" />
+	  <ProjectReference Include="..\Dassie.Core\Dassie.Core.csproj" />
+	  <ProjectReference Include="..\Dassie.Text\Dassie.Text.csproj" />
 	  <ProjectReference Include="..\Dassie\Dassie.csproj" />
 	</ItemGroup>
 </Project>
