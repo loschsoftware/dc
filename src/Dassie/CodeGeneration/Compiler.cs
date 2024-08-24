@@ -2,11 +2,13 @@
 using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis.Structure;
 using Dassie.Configuration;
+using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Parser;
 using Dassie.Text.FragmentStore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -49,14 +51,7 @@ public static class Compiler
         return CompileSource(Directory.EnumerateFiles(rootDirectory, "*.ds", includeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToArray(), config);
     }
 
-    /// <summary>
-    /// Compiles the specified Dassie source code.
-    /// </summary>
-    /// <param name="sourceFiles">An array of paths to the files to compile.</param>
-    /// <param name="config">Optional configuration for the compiler.</param>
-    /// <param name="configFileName">The file path to the configuration file.</param>
-    /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
-    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = "dsconfig.xml")
+    internal static IEnumerable<ErrorInfo[]> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = "dsconfig.xml")
     {
         DassieConfig cfg = config ?? new();
 
@@ -66,14 +61,14 @@ public static class Compiler
             ConfigurationPath = configFileName
         };
 
-        Context.FilePaths.AddRange(sourceFiles);
+        Context.FilePaths.AddRange(documents.Select(d => d.Name));
 
         if (config.Verbosity >= 1)
             EmitBuildLogMessage($"Compilation started at {DateTime.Now:HH:mm:ss} on {DateTime.Now.ToShortDateString()} at log verbosity level {config.Verbosity}.");
 
         string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
-        AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(sourceFiles[0]) : config.AssemblyName);
+        AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(documents.First().Name) : config.AssemblyName);
         //PersistedAssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, PersistedAssemblyBuilderAccess.RunAndSave);
         PersistedAssemblyBuilder ab = new(name, typeof(object).Assembly);
 
@@ -84,8 +79,8 @@ public static class Compiler
 
         List<ErrorInfo[]> errors = new();
 
-        foreach (string file in sourceFiles)
-            errors.Add(FileCompiler.CompileSingleFile(file, cfg));
+        foreach (InputDocument doc in documents)
+            errors.Add(DocumentCompiler.CompileDocument(doc, cfg));
 
         if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet)
         {
@@ -97,6 +92,18 @@ public static class Compiler
         }
 
         return errors;
+    }
+
+    /// <summary>
+    /// Compiles the specified Dassie source code.
+    /// </summary>
+    /// <param name="sourceFiles">An array of paths to the files to compile.</param>
+    /// <param name="config">Optional configuration for the compiler.</param>
+    /// <param name="configFileName">The file path to the configuration file.</param>
+    /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
+    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = "dsconfig.xml")
+    {
+        return CompileSource(sourceFiles.Select(s => new InputDocument(File.ReadAllText(s), s)), config, configFileName);
     }
 
     /// <summary>

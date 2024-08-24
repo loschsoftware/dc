@@ -785,10 +785,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         Type t = Visit(context.expression()[0]);
         EnsureBoolean(t, throwError: false);
-        
+
         Type t2 = Visit(context.expression()[1]);
         EnsureBoolean(t2, throwError: false);
-        
+
         MethodInfo op_eq = t.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
         MethodInfo op_ineq = t.GetMethod("op_Inequality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 

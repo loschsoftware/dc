@@ -551,8 +551,8 @@ internal static class SymbolResolver
         argumentTypes ??= Type.EmptyTypes;
 
         MethodInfo[] methods = tc.Methods.Select(m => m.Builder)
-            .Where(m => m.Name == name)
-            .Where(m => m.GetParameters().Length == argumentTypes.Length)
+            .Where(m => m != null && m.Name == name)
+            .Where(m => m != null && m.GetParameters().Length == argumentTypes.Length)
             .ToArray();
 
         if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))

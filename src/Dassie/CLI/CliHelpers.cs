@@ -5,6 +5,7 @@ using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
 using Dassie.Configuration.Macros;
+using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -214,15 +215,18 @@ internal static class CliHelpers
                 File.Copy("dsconfig.xml", Path.Combine(".cache", "dsconfig.xml"), true);
         }
 
+        List<InputDocument> documents = files.Select(f => new InputDocument(File.ReadAllText(f), f)).ToList();
+        documents.AddRange(DocumentCommandLineManager.ExtractDocuments(args));
+
         // Step 1
-        CompileSource(files, config);
+        CompileSource(documents, config);
         VisitorStep1 = Context;
 
         if (config.Verbosity >= 1)
             EmitBuildLogMessage("Performing second pass.");
 
         // Step 2
-        IEnumerable<ErrorInfo[]> errors = CompileSource(files, config);
+        IEnumerable<ErrorInfo[]> errors = CompileSource(documents, config);
 
         string resFile = "";
 
