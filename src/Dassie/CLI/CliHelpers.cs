@@ -929,8 +929,10 @@ internal static class CliHelpers
     }
 
     private static ILGenerator _il = null;
+    private static int _localIndex;
     public static void RedirectEmitterToNullStream()
     {
+        _localIndex = CurrentMethod.LocalIndex;
         TypeBuilder tb = Context.BogusModule.DefineType($"Bogus{bogusCounter++}");
         Context.BogusType = tb;
 
@@ -943,6 +945,7 @@ internal static class CliHelpers
     public static void ResetNullStream()
     {
         CurrentMethod.IL = _il;
+        CurrentMethod.LocalIndex = _localIndex;
     }
 
     public static FieldAttributes GetFieldAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, bool isReadOnly)
