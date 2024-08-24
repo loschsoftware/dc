@@ -437,7 +437,7 @@ public enum ErrorKind
     /// </summary>
     DS0103_NetworkError,
     /// <summary>
-    /// Invalid when a package reference contains an invalid name or version number.
+    /// Emitted when a package reference contains an invalid name or version number.
     /// </summary>
     DS0104_InvalidPackageReference
 }
