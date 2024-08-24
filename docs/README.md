@@ -4,6 +4,7 @@ This directory contains documentation about how to configure and work with the D
 
 |**Table of contents**|
 |---|
+|[Compiler API](https://github.com/loschsoftware/dc/blob/main/docs/API.md)|
 |[Command line arguments](./CLI.md)|
 |[Error codes](./Errors.md)|
 |[Extending the compiler with custom commands](./Extensions.md)|
