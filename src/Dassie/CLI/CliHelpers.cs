@@ -426,7 +426,13 @@ internal static class CliHelpers
         if (File.Exists("dsconfig.xml"))
         {
             foreach (ErrorInfo error in ConfigValidation.Validate("dsconfig.xml"))
-                EmitGeneric(error);
+            {
+                if (error.Severity == Severity.Error)
+                {
+                    EmitGeneric(error);
+                    return -1;
+                }
+            }
 
             XmlSerializer xmls = new(typeof(DassieConfig));
             using StreamReader sr = new("dsconfig.xml");
