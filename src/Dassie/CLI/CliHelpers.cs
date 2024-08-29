@@ -433,7 +433,7 @@ internal static class CliHelpers
             config = (DassieConfig)xmls.Deserialize(sr);
         }
 
-        string defaultPath = $"{Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Last()}.dll";
+        string defaultPath = Path.Combine(Directory.GetCurrentDirectory(), "build", $"{Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Last()}.dll");
         bool isNative = false;
         string assemblyPath;
 
@@ -458,7 +458,7 @@ internal static class CliHelpers
             if (!string.IsNullOrEmpty(config.AssemblyName))
                 assemblyName = config.AssemblyName;
 
-            string dir = Directory.GetCurrentDirectory();
+            string dir = Path.Combine(Directory.GetCurrentDirectory(), "build");
             if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
                 dir = config.BuildOutputDirectory;
 
