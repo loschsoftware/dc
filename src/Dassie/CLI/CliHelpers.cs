@@ -440,9 +440,9 @@ internal static class CliHelpers
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
 
-        if (args.Length > 0)
+        if (args.Length > 0 && args.Any(a => !a.StartsWith("--")))
         {
-            string profileName = args[0];
+            string profileName = args.First(a => !a.StartsWith("--"));
 
             if (config.BuildProfiles.Any(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase)))
             {
