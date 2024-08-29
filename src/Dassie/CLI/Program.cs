@@ -39,6 +39,7 @@ internal class Program
             {
                 ["config"] => CliHelpers.BuildDassieConfig(),
                 ["build", ..] => CliHelpers.CompileAll(args[1..]),
+                ["run", ..] => CliHelpers.Run(args[1..]),
                 ["check" or "verify"] => CliHelpers.CheckAll(),
                 ["check" or "verify", ..] => CliHelpers.Check(args[1..]),
                 ["interactive" or "repl"] => InteractiveShell.Start(),
@@ -273,6 +274,9 @@ internal class Program
 
         sb.Append("    build [BuildProfile]".PadRight(50));
         sb.Append(FormatLines("Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified."));
+
+        sb.Append("    run [Arguments]".PadRight(50));
+        sb.Append(FormatLines("Executes the output executable of the current project with the specified arguments. Does not recompile the project."));
 
         sb.Append("    watch, auto".PadRight(50));
         sb.Append(FormatLines("Watches all .ds files in the current folder structure and automatically recompiles when files are changed."));

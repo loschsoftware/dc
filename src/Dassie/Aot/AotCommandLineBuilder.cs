@@ -114,7 +114,7 @@ internal class AotCommandLineBuilder
 
     private void AddCustomReferences()
     {
-        foreach (Reference reference in _config.Config.References)
+        foreach (Reference reference in _config.Config.References ?? [])
         {
             if (reference is AssemblyReference a)
             {

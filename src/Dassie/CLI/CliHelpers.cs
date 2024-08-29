@@ -419,6 +419,97 @@ internal static class CliHelpers
         return errors.Select(e => e.Length).Sum() == 0 ? 0 : -1;
     }
 
+    public static int Run(string[] args)
+    {
+        DassieConfig config = null;
+
+        if (File.Exists("dsconfig.xml"))
+        {
+            foreach (ErrorInfo error in ConfigValidation.Validate("dsconfig.xml"))
+                EmitGeneric(error);
+
+            XmlSerializer xmls = new(typeof(DassieConfig));
+            using StreamReader sr = new("dsconfig.xml");
+            config = (DassieConfig)xmls.Deserialize(sr);
+        }
+
+        string defaultPath = $"{Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Last()}.dll";
+        bool isNative = false;
+        string assemblyPath;
+
+        if (config == null)
+        {
+            if (!File.Exists(defaultPath))
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0105_DCRunInsufficientInfo,
+                    "Insufficient information for 'dc run': The files to execute could not be determined. Create a project file (dsconfig.xml) and set the required properties 'BuildDirectory' and 'AssemblyFileName' to enable this command.",
+                    "dc");
+
+                return -1;
+            }
+
+            assemblyPath = defaultPath;
+        }
+        else
+        {
+            string assemblyName = Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Last();
+            if (!string.IsNullOrEmpty(config.AssemblyName))
+                assemblyName = config.AssemblyName;
+
+            string dir = Directory.GetCurrentDirectory();
+            if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
+                dir = config.BuildOutputDirectory;
+
+            if (config.Runtime == Configuration.Runtime.Aot)
+            {
+                isNative = true;
+                dir = Path.Combine(dir, "aot");
+            }
+
+            string extension = ".dll";
+            if (config.Runtime == Configuration.Runtime.Aot)
+            {
+                extension = "";
+                if (OperatingSystem.IsWindows())
+                    extension = ".exe";
+            }
+
+            assemblyPath = Path.Combine(dir, $"{assemblyName}{extension}");
+        }
+
+        assemblyPath = Path.GetFullPath(assemblyPath);
+        if (!File.Exists(assemblyPath))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0105_DCRunInsufficientInfo,
+                $"No files to execute found. Compile the project before running.",
+                "dc");
+
+            return -1;
+        }
+
+        string process = "dotnet";
+        string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. args]);
+
+        if (isNative)
+        {
+            process = assemblyPath;
+            arglist = string.Join(' ', arglist.Split(' ').Skip(1));
+        }
+
+        ProcessStartInfo psi = new()
+        {
+            FileName = process,
+            Arguments = arglist
+        };
+
+        Process.Start(psi).WaitForExit();
+        return 0;
+    }
+
     public static int CompileAll(string[] args)
     {
         DassieConfig config = null;
@@ -941,7 +1032,7 @@ internal static class CliHelpers
         _il = CurrentMethod.IL;
         CurrentMethod.IL = bogus.GetILGenerator();
     }
-    
+
     public static void ResetNullStream()
     {
         CurrentMethod.IL = _il;

@@ -439,5 +439,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a package reference contains an invalid name or version number.
     /// </summary>
-    DS0104_InvalidPackageReference
+    DS0104_InvalidPackageReference,
+    /// <summary>
+    /// Emitted when the 'dc run' command is invoked with insufficient information.
+    /// </summary>
+    DS0105_DCRunInsufficientInfo
 }
