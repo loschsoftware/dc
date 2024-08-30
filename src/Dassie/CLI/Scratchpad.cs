@@ -191,8 +191,8 @@ internal static class Scratchpad
 
         int result = CliHelpers.HandleArgs([file]);
 
-        string asm = Path.ChangeExtension(file, "dll");
-        string outDir = dir;
+        string outDir = Path.Combine(dir, "build");
+        string asm = Path.Combine(outDir, Path.ChangeExtension(Path.GetFileName(file), "dll"));
 
         if (cfg != null)
         {
@@ -202,7 +202,7 @@ internal static class Scratchpad
                     outDir = cfg.BuildOutputDirectory;
 
                 else // relative path
-                    outDir = Path.Combine(outDir, cfg.BuildOutputDirectory);
+                    outDir = Path.Combine(dir, cfg.BuildOutputDirectory);
 
                 asm = Path.Combine(outDir, Path.ChangeExtension(file, "dll"));
             }
@@ -215,8 +215,8 @@ internal static class Scratchpad
         {
             ProcessStartInfo psi = new()
             {
-                FileName = "cmd.exe",
-                Arguments = $"/c dotnet {asm}",
+                FileName = "dotnet",
+                Arguments = asm,
                 CreateNoWindow = false,
                 WindowStyle = ProcessWindowStyle.Normal
             };
