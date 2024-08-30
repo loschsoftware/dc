@@ -264,7 +264,7 @@ internal class Program
         sb.Append("        console".PadRight(25).PadRight(50));
         sb.AppendLine("Specifies a command-line application.");
         sb.Append("        library".PadRight(25).PadRight(50));
-        sb.AppendLine("Specifies a dynamic linked library.");
+        sb.AppendLine("Specifies a dynamic link library.");
         sb.AppendLine();
 
         sb.Append("    build [BuildProfile]".PadRight(50));
