@@ -745,11 +745,6 @@ internal static class CliHelpers
         return Check(filesToCompile);
     }
 
-    public static int InterpretFiles(string[] args)
-    {
-        return 0;
-    }
-
     public static int BuildDassieConfig()
     {
         if (File.Exists("dsconfig.xml"))
@@ -1326,60 +1321,6 @@ internal static class CliHelpers
         (type?.GetElementType() ?? (typeof(IEnumerable).IsAssignableFrom(type)
             ? type.GenericTypeArguments.FirstOrDefault()
             : null))!;
-
-    public static int CallMethod(string[] args)
-    {
-        if (args.Length < 3)
-        {
-            Console.WriteLine("Specify an assembly name, a method name and optional command line arguments.");
-            return -1;
-        }
-
-        if (!File.Exists(args[1]))
-        {
-            Console.WriteLine("The specified assembly does not exist.");
-            return -1;
-        }
-
-        Assembly a = Assembly.LoadFile(Path.GetFullPath(args[1]));
-
-        string type = string.Join(".", args[2].Split('.')[0..^1]);
-        Type t = a.GetType(type);
-
-        if (t == null)
-        {
-            Console.WriteLine($"The type '{type}' does not exist.");
-            return -1;
-        }
-
-        MethodInfo m;
-
-        try
-        {
-            m = t.GetMethod(args[2].Split('.').Last(), BindingFlags.NonPublic | BindingFlags.Static);
-        }
-        catch (Exception)
-        {
-            Console.WriteLine("An error occured.");
-            return -1;
-        }
-
-        if (m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string[]) && args.Length > 3)
-        {
-            m.Invoke(null, new object[] { args[3..] });
-            return 0;
-        }
-        else if (m.GetParameters().Length == 0)
-        {
-            m.Invoke(null, Array.Empty<object>());
-            return 0;
-        }
-        else
-        {
-            m.Invoke(null, new object[] { Array.Empty<string>() });
-            return 0;
-        }
-    }
 
     public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources, string asmName, bool makePdb)
     {

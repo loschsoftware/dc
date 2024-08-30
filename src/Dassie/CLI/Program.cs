@@ -1,17 +1,15 @@
 ﻿using Dassie.Configuration;
-using Dassie.CLI.Interactive;
+using Dassie.Extensions;
+using Dassie.Meta;
 using Dassie.Templates;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using Dassie.Extensions;
-using System.Diagnostics.Tracing;
-using System.Text;
 using System.Linq;
-using Dassie.Meta;
+using System.Reflection;
+using System.Text;
+using System.Xml.Serialization;
 
 namespace Dassie.CLI;
 
@@ -42,15 +40,11 @@ internal class Program
                 ["run", ..] => CliHelpers.Run(args[1..]),
                 ["check" or "verify"] => CliHelpers.CheckAll(),
                 ["check" or "verify", ..] => CliHelpers.Check(args[1..]),
-                ["interactive" or "repl"] => InteractiveShell.Start(),
-                ["interpret" or "run", ..] => CliHelpers.InterpretFiles(args),
                 ["make" or "new", ..] => DSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => WatchForFileChanges(args),
-                ["call", ..] => CliHelpers.CallMethod(args),
                 ["scratchpad", ..] => Scratchpad.HandleScratchpadCommands(args[1..]),
                 ["package", ..] => ExtensionManagerCommandLine.HandleArgs(args[1..]),
                 ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
-                ["-viewfrags", ..] => CliHelpers.ViewFragments(args),
                 ["quit"] => QuitWatching(),
                 [] or ["help" or "?"] => DisplayHelpMessage(commandDescriptions),
                 _ => CliHelpers.HandleArgs(args)
