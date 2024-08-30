@@ -19,6 +19,7 @@ internal class Program
     {
         try
         {
+            Console.OutputEncoding = Encoding.Unicode;
             GetOrCreateToolPathsFile();
 
             List<IPackage> extensions = ExtensionLoader.LoadInstalledExtensions();
