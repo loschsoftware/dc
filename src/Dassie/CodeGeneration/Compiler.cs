@@ -53,6 +53,15 @@ public static class Compiler
 
     internal static IEnumerable<ErrorInfo[]> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = "dsconfig.xml")
     {
+        if (!documents.Any())
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0106_NoInputFiles,
+                "No input files specified.",
+                "dc");
+        }
+
         DassieConfig cfg = config ?? new();
 
         Context = new()

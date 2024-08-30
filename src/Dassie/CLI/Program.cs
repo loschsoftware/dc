@@ -46,7 +46,7 @@ internal class Program
                 ["package", ..] => ExtensionManagerCommandLine.HandleArgs(args[1..]),
                 ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
                 ["quit"] => QuitWatching(),
-                [] or ["help" or "?"] => DisplayHelpMessage(commandDescriptions),
+                [] or ["help" or "?" or "-h" or "--help" or "/?" or "/help"] => DisplayHelpMessage(commandDescriptions),
                 _ => CliHelpers.HandleArgs(args)
             };
         }

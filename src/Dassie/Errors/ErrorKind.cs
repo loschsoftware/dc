@@ -443,5 +443,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the 'dc run' command is invoked with insufficient information.
     /// </summary>
-    DS0105_DCRunInsufficientInfo
+    DS0105_DCRunInsufficientInfo,
+    /// <summary>
+    /// Emitted when no input source files are specified.
+    /// </summary>
+    DS0106_NoInputFiles
 }
