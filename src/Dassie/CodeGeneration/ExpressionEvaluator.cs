@@ -5,7 +5,9 @@ using Dassie.Runtime;
 using Dassie.Text;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Dassie.CodeGeneration;
@@ -35,7 +37,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
             return new(typeof(string), verbatimText.Replace("\"\"", "\""));
         }
 
-        Regex escapeSequenceRegex = new(@"\^(?:['""^0abfnrtv]|[0-9A-Fa-f]{1,4})");
+        Regex escapeSequenceRegex = new(@"\^(?:['""^0abefnrtv]|[0-9A-Fa-f]{1,4})");
         foreach (Match match in escapeSequenceRegex.Matches(text))
         {
             CurrentFile.Fragments.Add(new()
@@ -47,22 +49,69 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
             });
         }
 
-        string rawText = context.GetText()[1..^1]
-            .Replace("^'", "'")
-            .Replace("^\"", "\"")
-            .Replace("^^", "^")
-            .Replace("^0", "\0")
-            .Replace("^a", "\a")
-            .Replace("^b", "\b")
-            .Replace("^f", "\f")
-            .Replace("^n", "\n")
-            .Replace("^r", "\r")
-            .Replace("^t", "\t")
-            .Replace("^v", "\v");
+        StringReader sr = new(context.GetText()[1..^1]);
+        StringBuilder sb = new();
 
-        // TODO: Handle Hex and Unicode escape sequences
+        while (sr.Peek() != -1)
+        {
+            char c = (char)sr.Read();
 
-        return new(typeof(string), rawText);
+            if (c != '^')
+                sb.Append(c);
+            else
+            {
+                char escapeChar = (char)sr.Read();
+                sb.Append(escapeChar switch
+                {
+                    '0' => '\0',
+                    'a' => '\a',
+                    'b' => '\b',
+                    'e' => '\x1b',
+                    'f' => '\f',
+                    'n' => '\n',
+                    'r' => '\r',
+                    't' => '\t',
+                    'v' => '\v',
+                    'u' => HandleUtf16EscapeSequence(sr),
+                    'U' => HandleUtf32EscapeSequence(sr),
+                    'x' => HandleVariableLengthUnicodeEscapeSequence(sr),
+                    _ => escapeChar
+                });
+            }
+        }
+
+        return new(typeof(string), sb.ToString());
+    }
+
+    private static char GetChar(StringReader reader, int count)
+    {
+        StringBuilder sequence = new();
+        for (int i = 0; i < count; i++)
+            sequence.Append((char)reader.Read());
+
+        return (char)int.Parse(sequence.ToString(), NumberStyles.HexNumber);
+    }
+
+    private static char HandleUtf16EscapeSequence(StringReader reader) => GetChar(reader, 4);
+    private static char HandleUtf32EscapeSequence(StringReader reader) => GetChar(reader, 8);
+
+    private static char HandleVariableLengthUnicodeEscapeSequence(StringReader reader)
+    {
+        StringBuilder sequence = new();
+
+        char c = (char)reader.Read();
+        char[] hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+        
+        while (hexDigits.Contains(char.ToUpperInvariant(c)))
+        {
+            sequence.Append(c);
+            c = (char)reader.Read();
+        }
+
+        while (sequence.Length < 4)
+            sequence.Insert(0, '0');
+
+        return (char)int.Parse(sequence.ToString(), NumberStyles.HexNumber);
     }
 
     public override Expression VisitCharacter_atom([NotNull] DassieParser.Character_atomContext context)

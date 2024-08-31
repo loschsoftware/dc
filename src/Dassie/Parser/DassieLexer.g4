@@ -172,6 +172,7 @@ fragment SimpleEscapeSequence
 	| '^0'
 	| '^a'
 	| '^b'
+	| '^e'
 	| '^f'
 	| '^n'
 	| '^r'
