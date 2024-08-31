@@ -49,38 +49,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
             });
         }
 
-        StringReader sr = new(context.GetText()[1..^1]);
-        StringBuilder sb = new();
-
-        while (sr.Peek() != -1)
-        {
-            char c = (char)sr.Read();
-
-            if (c != '^')
-                sb.Append(c);
-            else
-            {
-                char escapeChar = (char)sr.Read();
-                sb.Append(escapeChar switch
-                {
-                    '0' => '\0',
-                    'a' => '\a',
-                    'b' => '\b',
-                    'e' => '\x1b',
-                    'f' => '\f',
-                    'n' => '\n',
-                    'r' => '\r',
-                    't' => '\t',
-                    'v' => '\v',
-                    'u' => HandleUtf16EscapeSequence(sr),
-                    'U' => HandleUtf32EscapeSequence(sr),
-                    'x' => HandleVariableLengthUnicodeEscapeSequence(sr),
-                    _ => escapeChar
-                });
-            }
-        }
-
-        return new(typeof(string), sb.ToString());
+        return new(typeof(string), GetRawString(context.GetText()[1..^1]));
     }
 
     private static char GetChar(StringReader reader, int count)
@@ -114,6 +83,42 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         return (char)int.Parse(sequence.ToString(), NumberStyles.HexNumber);
     }
 
+    private static string GetRawString(string str)
+    {
+        StringReader sr = new(str);
+        StringBuilder sb = new();
+
+        while (sr.Peek() != -1)
+        {
+            char c = (char)sr.Read();
+
+            if (c != '^')
+                sb.Append(c);
+            else
+            {
+                char escapeChar = (char)sr.Read();
+                sb.Append(escapeChar switch
+                {
+                    '0' => '\0',
+                    'a' => '\a',
+                    'b' => '\b',
+                    'e' => '\x1b',
+                    'f' => '\f',
+                    'n' => '\n',
+                    'r' => '\r',
+                    't' => '\t',
+                    'v' => '\v',
+                    'u' => HandleUtf16EscapeSequence(sr),
+                    'U' => HandleUtf32EscapeSequence(sr),
+                    'x' => HandleVariableLengthUnicodeEscapeSequence(sr),
+                    _ => escapeChar
+                });
+            }
+        }
+
+        return sb.ToString();
+    }
+
     public override Expression VisitCharacter_atom([NotNull] DassieParser.Character_atomContext context)
     {
         if (context.GetText().Length < 3)
@@ -128,20 +133,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
             return new(typeof(char), ' ');
         }
 
-        char rawChar = char.Parse(context.GetText()
-            .Replace("^'", "'")
-            .Replace("^\"", "\"")
-            .Replace("^^", "^")
-            .Replace("^0", "\0")
-            .Replace("^a", "\a")
-            .Replace("^b", "\b")
-            .Replace("^f", "\f")
-            .Replace("^n", "\n")
-            .Replace("^r", "\r")
-            .Replace("^t", "\t")
-            .Replace("^v", "\v")[1..^1]);
-
-        return new(typeof(char), rawChar);
+        return new(typeof(char), GetRawString(context.GetText()[1..^1])[0]);
     }
 
     public override Expression VisitInteger_atom([NotNull] DassieParser.Integer_atomContext context)
