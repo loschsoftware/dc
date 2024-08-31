@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -102,7 +103,7 @@ internal static class TypeHelpers
         if (!t.IsByRef /*&& !t.IsByRefLike*/)
             return;
 
-        if (!CliHelpers.IsNumericType(t.RemoveByRef()))
+        if (!IsNumericType(t.RemoveByRef()))
             return;
 
         CurrentMethod.IL.Emit(GetLoadIndirectOpCode(t.RemoveByRef()));
@@ -195,4 +196,77 @@ internal static class TypeHelpers
 
         return false;
     }
+
+    public static bool IsNumericType(Type type)
+    {
+        Type[] numerics =
+        {
+            typeof(byte),
+            typeof(sbyte),
+            typeof(short),
+            typeof(ushort),
+            typeof(int),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
+            typeof(float),
+            typeof(double),
+            typeof(decimal),
+            typeof(nint),
+            typeof(nuint),
+            typeof(char)
+        };
+
+        return numerics.Contains(type.RemoveByRef());
+    }
+
+    public static bool IsIntegerType(Type type)
+    {
+        Type[] numerics =
+        {
+            typeof(byte),
+            typeof(sbyte),
+            typeof(short),
+            typeof(ushort),
+            typeof(int),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
+            typeof(nint),
+            typeof(nuint),
+            typeof(char)
+        };
+
+        return numerics.Contains(type.RemoveByRef());
+    }
+
+    public static bool IsUnsignedIntegerType(Type type)
+    {
+        Type[] numerics =
+        {
+            typeof(byte),
+            typeof(ushort),
+            typeof(uint),
+            typeof(ulong),
+            typeof(nuint)
+        };
+
+        return numerics.Contains(type.RemoveByRef());
+    }
+
+    public static bool IsFloatingPointType(Type type)
+    {
+        Type[] floats =
+        {
+            typeof(float),
+            typeof(double)
+        };
+
+        return floats.Contains(type.RemoveByRef());
+    }
+
+    public static Type GetEnumeratedType(this Type type) =>
+        (type?.GetElementType() ?? (typeof(IEnumerable).IsAssignableFrom(type)
+            ? type.GenericTypeArguments.FirstOrDefault()
+            : null))!;
 }

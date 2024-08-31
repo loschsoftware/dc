@@ -792,15 +792,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         MethodInfo op_eq = t.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
         MethodInfo op_ineq = t.GetMethod("op_Inequality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
-        if ((op_eq == null && op_ineq == null) || (CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2)))
+        if ((op_eq == null && op_ineq == null) || (IsNumericType(t) && IsNumericType(t2)))
         {
-            if ((CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2)) || (IsBoolean(t) && IsBoolean(t2)))
+            if ((IsNumericType(t) && IsNumericType(t2)) || (IsBoolean(t) && IsBoolean(t2)))
             {
-                if (CliHelpers.IsFloatingPointType(t) && !CliHelpers.IsFloatingPointType(t2))
+                if (IsFloatingPointType(t) && !IsFloatingPointType(t2))
                 {
                     CurrentMethod.IL.Emit(OpCodes.Conv_R8);
                 }
-                else if (CliHelpers.IsFloatingPointType(t2) && !CliHelpers.IsFloatingPointType(t))
+                else if (IsFloatingPointType(t2) && !IsFloatingPointType(t))
                 {
                     CurrentMethod.IL.Emit(OpCodes.Pop);
                     CurrentMethod.IL.Emit(OpCodes.Conv_R8);
@@ -862,13 +862,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2))
+        if (IsNumericType(t) && IsNumericType(t2))
         {
-            if (CliHelpers.IsFloatingPointType(t) && !CliHelpers.IsFloatingPointType(t2))
+            if (IsFloatingPointType(t) && !IsFloatingPointType(t2))
             {
                 CurrentMethod.IL.Emit(OpCodes.Conv_R8);
             }
-            else if (CliHelpers.IsFloatingPointType(t2) && !CliHelpers.IsFloatingPointType(t))
+            else if (IsFloatingPointType(t2) && !IsFloatingPointType(t))
             {
                 CurrentMethod.IL.Emit(OpCodes.Pop);
                 CurrentMethod.IL.Emit(OpCodes.Conv_R8);
@@ -1071,7 +1071,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(bool);
         }
 
-        if (CliHelpers.IsNumericType(t))
+        if (IsNumericType(t))
         {
             CurrentMethod.IL.Emit(OpCodes.Or);
             return t;
@@ -1111,7 +1111,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(bool);
         }
 
-        if (CliHelpers.IsNumericType(t))
+        if (IsNumericType(t))
         {
             CurrentMethod.IL.Emit(OpCodes.And);
             return t;
@@ -1142,7 +1142,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsNumericType(t))
+        if (IsNumericType(t))
         {
             CurrentMethod.IL.Emit(OpCodes.Xor);
             return t;
@@ -1172,7 +1172,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         Type t = Visit(context.expression());
 
-        if (CliHelpers.IsNumericType(t))
+        if (IsNumericType(t))
         {
             CurrentMethod.IL.Emit(OpCodes.Not);
             return t;
@@ -1203,7 +1203,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsNumericType(t))
+        if (IsNumericType(t))
         {
             EmitMul(t);
             return t;
@@ -1234,7 +1234,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsNumericType(t))
+        if (IsNumericType(t))
         {
             EmitDiv(t);
             return t;
@@ -1265,7 +1265,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsNumericType(t) && CliHelpers.IsNumericType(t2))
+        if (IsNumericType(t) && IsNumericType(t2))
         {
             EmitAdd(t);
             return t;
@@ -1335,7 +1335,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsNumericType(t))
+        if (IsNumericType(t))
         {
             EmitSub(t);
             return t;
@@ -1366,7 +1366,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsNumericType(t))
+        if (IsNumericType(t))
         {
             EmitRem(t);
             return t;
@@ -1427,7 +1427,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsIntegerType(t))
+        if (IsIntegerType(t))
         {
             CurrentMethod.IL.Emit(OpCodes.Shl);
             return t;
@@ -1458,7 +1458,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (CliHelpers.IsIntegerType(t))
+        if (IsIntegerType(t))
         {
             EmitShr(t);
             return t;
