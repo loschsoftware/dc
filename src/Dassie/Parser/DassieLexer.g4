@@ -153,7 +153,6 @@ Real_Literal: (Minus | Plus)? ([0-9] ('\''* [0-9])*)? '.' [0-9] ('\''* [0-9])* E
 
 Character_Literal: '\'' (~[^'\r\n\u0085\u2028\u2029] | CommonCharacter)? '\'';
 String_Literal: '"' (~[^"\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
-Interpolated_String_Literal: '$"' (~[^"\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
 Verbatim_String_Literal: '^"' (~'"' | '""')* '"';
 
 fragment Integer_Suffix: [sS][bB] | [bB] | [sS] | [uU][sS] | [uU] | [lL] | [uU][lL] | [nN] | [uU][nN];
@@ -163,6 +162,7 @@ fragment CommonCharacter
 	: SimpleEscapeSequence
 	| HexEscapeSequence
 	| UnicodeEscapeSequence
+	| InterpolationEscapeSequence
 	;
 
 fragment SimpleEscapeSequence
@@ -185,6 +185,10 @@ fragment HexEscapeSequence
 	| '^x' HexDigit HexDigit
 	| '^x' HexDigit HexDigit HexDigit
 	| '^x' HexDigit HexDigit HexDigit HexDigit
+	;
+
+fragment InterpolationEscapeSequence
+	: '^{' (~[\r\n\u0085\u2028\u2029])* '}'
 	;
 
 fragment Whitespace
