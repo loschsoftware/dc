@@ -8,6 +8,8 @@ To get started with Dassie development, either download a binary from the 'Relea
 
 After the compilation is completed, the directory ``build`` will contain the compiler executables. It is recommended to add this directory to the ``Path`` environment variable to allow access to the compiler from anywhere.
 
+You can also try out the language without downloading the compiler by using the online editor at [RyuGod](https://ryugod.com/pages/ide/dassie).
+
 ## Using the compiler
 Here is the classic "Hello World" program in Dassie:
 ````dassie
