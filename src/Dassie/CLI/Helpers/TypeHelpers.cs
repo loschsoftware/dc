@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 
 namespace Dassie.CLI.Helpers;
 
@@ -269,4 +269,45 @@ internal static class TypeHelpers
         (type?.GetElementType() ?? (typeof(IEnumerable).IsAssignableFrom(type)
             ? type.GenericTypeArguments.FirstOrDefault()
             : null))!;
+
+    private static string GetTypeNameOrAlias(Type type)
+    {
+        string name = type.FullName;
+
+        if (type.IsGenericType)
+            name = name.Split('`')[0];
+
+        if (CurrentFile.Aliases.Any(a => a.Name == name))
+            return CurrentFile.Aliases.First(a => a.Name == name).Alias;
+
+        return name.Split('.').Last();
+    }
+
+    /// <summary>
+    /// Formats the specified type name to be used in error messages.
+    /// </summary>
+    /// <param name="type">The type to format.</param>
+    /// <returns>The formatted type name.</returns>
+    public static string Format(Type type)
+    {
+        StringBuilder name = new(GetTypeNameOrAlias(type));
+
+        if (type.IsGenericType)
+        {
+            name.Clear();
+            name.Append(GetTypeNameOrAlias(type));
+            name.Append('[');
+
+            foreach (Type typeArg in type.GetGenericArguments()[..^1])
+            {
+                name.Append(Format(typeArg));
+                name.Append(", ");
+            }
+
+            name.Append(Format(type.GetGenericArguments().Last()));
+            name.Append(']');
+        }
+
+        return name.ToString();
+    }
 }

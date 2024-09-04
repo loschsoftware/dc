@@ -1,4 +1,5 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Errors;
+using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Text.Tooltips;
 using System;
@@ -135,7 +136,7 @@ internal static class SymbolResolver
             return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors);
 
         // 0. Constructors
-        if (name == type.Name)
+        if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
         {
             argumentTypes ??= Type.EmptyTypes;
 
@@ -366,12 +367,13 @@ internal static class SymbolResolver
 
         if (throwErrors)
         {
-            EmitErrorMessage(
-                row,
-                col,
-                len,
-                DS0002_MethodNotFound,
-                $"Type '{type.FullName}' has no compatible member called '{name}'.");
+            IEnumerable<MethodBase> overloads = type.GetMethods()
+                .Where(m => m.Name == name);
+
+            if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
+                overloads = type.GetConstructors();
+
+            ErrorMessageHelpers.EmitDS0002Error(row, col, len, name, type, overloads, argumentTypes);
         }
 
         return null;
@@ -396,7 +398,7 @@ internal static class SymbolResolver
         TypeContext tc = types.First();
 
         // 0. Constructors
-        if (name == tb.Name)
+        if (name == tb.Name || name == tb.FullName)
         {
             argumentTypes ??= Type.EmptyTypes;
 
@@ -408,14 +410,7 @@ internal static class SymbolResolver
                 CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
 
             if (!cons.Any() && throwErrors)
-            {
-                EmitErrorMessage(
-                    row, col, len,
-                    DS0002_MethodNotFound,
-                    $"The type '{name}' has no constructor with the specified argument types.");
-
-                return null;
-            }
+                goto Error;
 
             ConstructorInfo final = null;
 
@@ -588,7 +583,7 @@ internal static class SymbolResolver
 
                         if (possibleMethod.GetParameters()[i].ParameterType.IsByRef)
                             CurrentMethod.ByRefArguments.Add(i);
-                        
+
                         if (i == possibleMethod.GetParameters().Length - 1)
                         {
                             final = possibleMethod;
@@ -643,12 +638,13 @@ internal static class SymbolResolver
 
         if (throwErrors)
         {
-            EmitErrorMessage(
-                row,
-                col,
-                len,
-                DS0002_MethodNotFound,
-                $"Type '{tc.Builder.FullName}' has no compatible member called '{name}'.");
+            IEnumerable<MethodBase> overloads = tc.Methods.Select(m => m.Builder)
+                .Where(m => m != null && m.Name == name || m.IsConstructor);
+
+            if (name == tb.Name || name == tb.FullName)
+                overloads = tc.Builder.GetConstructors();
+
+            ErrorMessageHelpers.EmitDS0002Error(row, col, len, name, tc.Builder, overloads, argumentTypes);
         }
 
         return false;

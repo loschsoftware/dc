@@ -1965,14 +1965,27 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
+        string typeName = context.full_identifier().Identifier().Last().GetText();
+        if (typeArgs != null && typeArgs.Length > 0)
+            typeName = $"{typeName}`{typeArgs.Length}";
+
+        bool handleCtor = false;
+
         ITerminalNode[] nextNodes = [];
-        if (context.full_identifier().Identifier().Last().GetText() == t.Name)
+        if (typeName == t.Name)
+        {
             nextNodes = [(context.full_identifier().Identifier().Last())];
+            handleCtor = true;
+        }
         else
             nextNodes = context.full_identifier().Identifier()[firstIndex..];
 
         foreach (ITerminalNode identifier in nextNodes)
         {
+            string memberName = identifier.GetText();
+            if (handleCtor)
+                memberName = t.FullName;
+
             Type[] _params = null;
 
             if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null)
@@ -1989,7 +2002,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             object member = SymbolResolver.ResolveMember(
                 t,
-                identifier.GetText(),
+                memberName,
                 identifier.Symbol.Line,
                 identifier.Symbol.Column,
                 identifier.GetText().Length,
