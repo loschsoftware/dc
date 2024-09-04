@@ -40,7 +40,7 @@ internal class ErrorMessageHelpers
 
         else
         {
-            errorMsgBuilder.AppendLine($"Wrong argument types provided to member '{name}':");
+            errorMsgBuilder.AppendLine($"Wrong argument types passed to member '{name}':");
             errorMsgBuilder.Append($"    * Expected: {GenerateParamList(overloads.First())}");
 
             if (overloads.Count() > 1)

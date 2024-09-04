@@ -109,7 +109,20 @@ internal class MethodContext
 
     public bool SkipPop { get; set; }
 
-    public List<Type> ArgumentTypesForNextMethodCall { get; } = new();
+    public List<Type> ArgumentTypesForNextMethodCall { get; } = [];
+
+    private Type[] _typeArgs = [];
+    public Type[] TypeArgumentsForNextMethodCall
+    {
+        get
+        {
+            Type[] result = _typeArgs;
+            TypeArgumentsForNextMethodCall = [];
+            return result;
+        }
+
+        set => _typeArgs = value;
+    }
 
     private bool _shouldLoadAddressIfValueType = false;
     public bool ShouldLoadAddressIfValueType

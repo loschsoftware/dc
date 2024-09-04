@@ -272,7 +272,7 @@ internal static class TypeHelpers
 
     private static string GetTypeNameOrAlias(Type type)
     {
-        string name = type.FullName;
+        string name = type.FullName ?? type.Name;
 
         if (type.IsGenericType)
             name = name.Split('`')[0];

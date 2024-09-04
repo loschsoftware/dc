@@ -129,6 +129,8 @@ internal static class SymbolResolver
     {
         memberIndex++;
 
+        Type[] typeArgs = Type.EmptyTypes;
+
         if (type.IsByRef)
             type = type.GetElementType();
 
@@ -293,8 +295,10 @@ internal static class SymbolResolver
         {
             MethodInfo final = null;
 
-            foreach (MethodInfo possibleMethod in methods)
+            foreach (MethodInfo candidate in methods)
             {
+                MethodInfo possibleMethod = candidate;
+
                 if (final != null)
                     break;
 
@@ -304,9 +308,14 @@ internal static class SymbolResolver
                     break;
                 }
 
+                typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
+                
+                if (possibleMethod.IsGenericMethod)
+                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs);
+
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
-                    if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
+                    if (possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
                     {
                         if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                         {
@@ -368,7 +377,8 @@ internal static class SymbolResolver
         if (throwErrors)
         {
             IEnumerable<MethodBase> overloads = type.GetMethods()
-                .Where(m => m.Name == name);
+                .Where(m => m.Name == name)
+                .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs) : m);
 
             if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
                 overloads = type.GetConstructors();
@@ -382,6 +392,8 @@ internal static class SymbolResolver
     private static object ResolveMember(TypeBuilder tb, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true)
     {
         TypeContext[] types = Context.Types.Where(c => c.Builder == tb).ToArray();
+
+        Type[] typeArgs = Type.EmptyTypes;
 
         if (types.Length == 0 && throwErrors)
         {
@@ -557,8 +569,10 @@ internal static class SymbolResolver
         {
             MethodInfo final = null;
 
-            foreach (MethodInfo possibleMethod in methods)
+            foreach (MethodInfo candidate in methods)
             {
+                MethodInfo possibleMethod = candidate;
+
                 if (final != null)
                     break;
 
@@ -568,13 +582,18 @@ internal static class SymbolResolver
                     break;
                 }
 
+                typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
+
+                if (possibleMethod.IsGenericMethod)
+                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs);
+
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
                     Type pType = possibleMethod.GetParameters()[i].ParameterType;
                     if (pType.IsByRef)
                         pType = pType.GetElementType();
 
-                    if (argumentTypes[i] == pType || pType.IsAssignableFrom(argumentTypes[i]))
+                    if (pType.IsAssignableFrom(argumentTypes[i]))
                     {
                         if (pType == typeof(object))
                         {
@@ -639,7 +658,8 @@ internal static class SymbolResolver
         if (throwErrors)
         {
             IEnumerable<MethodBase> overloads = tc.Methods.Select(m => m.Builder)
-                .Where(m => m != null && m.Name == name || m.IsConstructor);
+                .Where(m => m != null && m.Name == name || m.IsConstructor)
+                .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs) : m);
 
             if (name == tb.Name || name == tb.FullName)
                 overloads = tc.Builder.GetConstructors();

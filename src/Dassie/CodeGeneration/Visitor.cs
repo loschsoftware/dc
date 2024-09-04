@@ -1742,6 +1742,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 typeArgs[i] = CliHelpers.ResolveTypeName(context.type_arg_list().type_name()[i]);
         }
 
+        CurrentMethod.TypeArgumentsForNextMethodCall = typeArgs;
+
         if (context.full_identifier().Identifier().Length > 1)
             CurrentMethod.ShouldLoadAddressIfValueType = true;
 
