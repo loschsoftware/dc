@@ -32,9 +32,9 @@ internal static class SymbolResolver
         sb.Append($"`{typeArgs.Length}[");
 
         foreach (Type t in typeArgs[0..^1])
-            sb.Append($"{t.ToString()},");
+            sb.Append($"[{t.AssemblyQualifiedName}],");
 
-        sb.Append(typeArgs.Last().ToString());
+        sb.Append($"[{typeArgs.Last().AssemblyQualifiedName}]");
         sb.Append(']');
         return sb.ToString();
     }
