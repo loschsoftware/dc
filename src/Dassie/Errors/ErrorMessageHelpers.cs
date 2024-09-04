@@ -58,4 +58,27 @@ internal class ErrorMessageHelpers
             DS0002_MethodNotFound,
             errorMsgBuilder.ToString());
     }
+
+    public static void EmitDS0002ErrorIfInvalid(int row, int col, int len, string name, Type type, MethodBase overload, Type[] providedArgs)
+    {
+        bool error = false;
+
+        if (overload.GetParameters().Length != providedArgs.Length)
+            error = true;
+
+        else
+        {
+            for (int i = 0; i < overload.GetParameters().Length; i++)
+            {
+                if (!overload.GetParameters()[i].ParameterType.IsAssignableFrom(providedArgs[i]))
+                {
+                    error = true;
+                    break;
+                }
+            }
+        }
+
+        if (error)
+            EmitDS0002Error(row, col, len, name, type, [overload], providedArgs);
+    }
 }

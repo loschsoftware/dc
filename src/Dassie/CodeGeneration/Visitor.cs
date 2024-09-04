@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Color = Dassie.Text.Color;
 using static Dassie.CLI.Helpers.TypeHelpers;
+using Dassie.Errors;
 
 namespace Dassie.CodeGeneration;
 
@@ -1866,6 +1867,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (context.arglist() != null)
                     Visit(context.arglist());
+
+                ErrorMessageHelpers.EmitDS0002ErrorIfInvalid(
+                    context.full_identifier().Identifier()[0].Symbol.Line,
+                    context.full_identifier().Identifier()[0].Symbol.Column,
+                    context.full_identifier().Identifier()[0].GetText().Length,
+                    m.Name,
+                    m.DeclaringType,
+                    m,
+                    CurrentMethod.ArgumentTypesForNextMethodCall.ToArray());
 
                 CurrentMethod.AllowTailCallEmission = allowTailCall;
 
