@@ -804,11 +804,11 @@ internal static class CliHelpers
                 $"An array cannot have more than 32 dimensions.");
         }
 
-        if (name.type_name() != null && name.type_name().Length > 0)
-        {
-            Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
-            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
-        }
+        //if (name.type_name() != null && name.type_name().Length > 0)
+        //{
+        //    Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
+        //    return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+        //}
 
         if (name.identifier_atom() != null)
         {
@@ -825,8 +825,9 @@ internal static class CliHelpers
         {
             Type[] typeParams = name.type_arg_list().type_name().Select(t => ResolveTypeName(t, noEmitFragments)).ToArray();
 
-            if (name.identifier_atom().Identifier() != null)
-                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
+            DassieParser.Type_nameContext childName = (DassieParser.Type_nameContext)name.children[0];
+            if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
+                return ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
         }
 
         // TODO: Implement other kinds of types
