@@ -23,7 +23,7 @@ internal static class SymbolResolver
         public Type EnumType { get; set; }
     }
 
-    private static string GetTypeArgumentListSuffix(Type[] typeArgs)
+    public static string GetTypeArgumentListSuffix(Type[] typeArgs)
     {
         static string Name(Type t)
         {

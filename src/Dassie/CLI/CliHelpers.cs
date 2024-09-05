@@ -836,15 +836,8 @@ internal static class CliHelpers
 
     public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0)
     {
-        if (typeParams != null)
-        {
-            name += $"`{typeParams.Length}[";
-
-            foreach (Type param in typeParams[0..^1])
-                name += $"[{param.AssemblyQualifiedName}], ";
-
-            name += $"[{typeParams.Last().AssemblyQualifiedName}]]";
-        }
+        if (typeParams != null && typeParams.Length > 0)
+            name += $"`{typeParams.Length}";
 
         Type type = Type.GetType(name);
 
@@ -930,6 +923,11 @@ internal static class CliHelpers
         }
         else
         {
+            TypeHelpers.CheckGenericTypeCompatibility(type, typeParams, row, col, len, true);
+
+            if (typeParams != null)
+                type = type.MakeGenericType(typeParams);
+
             if (!noEmitFragments)
             {
                 CurrentFile.Fragments.Add(new()
