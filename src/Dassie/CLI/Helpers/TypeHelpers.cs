@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 
@@ -309,5 +311,155 @@ internal static class TypeHelpers
         }
 
         return name.ToString();
+    }
+
+    // List<int> -> List<>
+    public static Type DeconstructGenericType(Type type)
+    {
+        if (!type.IsGenericType)
+            return type;
+
+        string name = type.AssemblyQualifiedName;
+        string[] parts = name.Split('`');
+
+        int braceIndex = parts[1].IndexOf('[');
+        int typeParamCount = int.Parse(parts[1][0..braceIndex]);
+
+        return Type.GetType($"{parts[0]}`{typeParamCount}{name.Split(']').Last()}");
+    }
+
+    /// <summary>
+    /// Checks if the specified generic type can be initialized with the specified type arguments.
+    /// </summary>
+    /// <param name="genericType">The uninitialized generic type.</param>
+    /// <param name="typeArgs">The type arguments to initialize the specified generic type with.</param>
+    /// <param name="row"/>
+    /// <param name="col"/>
+    /// <param name="len"/>
+    /// <param name="emitErrors"/>
+    /// <returns>Wheter or not the specified generic type can be initialized with the specified type arguments.</returns>
+    public static bool CheckGenericTypeCompatibility(Type genericType, Type[] typeArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
+    {
+        if (!genericType.IsGenericType)
+            return true;
+
+        Type[] typeParams = genericType.GetGenericArguments();
+        return CheckGenericCompatibility(typeParams, typeArgs, row, col, len, emitErrors);
+    }
+
+    /// <summary>
+    /// Checks if the specified generic method can be initialized with the specified type arguments.
+    /// </summary>
+    /// <param name="method">The uninitialized generic method.</param>
+    /// <param name="typeArgs">The type arguments to initialize the specified generic type with.</param>
+    /// <param name="row"/>
+    /// <param name="col"/>
+    /// <param name="len"/>
+    /// <param name="emitErrors"/>
+    /// <returns>Wheter or not the specified generic type can be initialized with the specified type arguments.</returns>
+    public static bool CheckGenericMethodCompatibility(MethodBase method, Type[] typeArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
+    {
+        if (!method.IsGenericMethod)
+            return true;
+
+        Type[] typeParams = method.GetGenericArguments();
+        return CheckGenericCompatibility(typeParams, typeArgs, row, col, len, emitErrors);
+    }
+
+    private static bool CheckGenericCompatibility(Type[] parameters, Type[] arguments, int row, int col, int len, bool emitErrors)
+    {
+        if (parameters.Length != arguments.Length)
+            throw new InvalidOperationException("Generic type argument count does not match.");
+
+        bool result = true;
+
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            if (!MeetsGenericConstraints(parameters[i], arguments[i], row, col, len, emitErrors))
+                result = false;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Checks wheter or not <paramref name="arg"/> can be used as an argument for the generic parameter <paramref name="param"/>.
+    /// </summary>
+    /// <param name="param"></param>
+    /// <param name="arg"></param>
+    /// <param name="row"/>
+    /// <param name="col"/>
+    /// <param name="len"/>
+    /// <param name="throwErrors"/>
+    /// <returns></returns>
+    private static bool MeetsGenericConstraints(Type param, Type arg, int row, int col, int len, bool throwErrors)
+    {
+        string errMsgStart = $"Generic argument '{Format(arg)}' is incompatible with generic parameter '{Format(param)}': ";
+        GenericParameterAttributes attributes = param.GenericParameterAttributes;
+
+        if (attributes.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint))
+        {
+            if (!arg.IsClass)
+            {
+                if (throwErrors)
+                {
+                    EmitErrorMessage(
+                        row, col, len,
+                        DS0107_GenericTypeConstraintViolation,
+                        $"{errMsgStart}'{Format(param)}' only allows reference types.");
+                }
+
+                return false;
+            }
+        }
+
+        if (attributes.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint))
+        {
+            if (!arg.IsValueType)
+            {
+                if (throwErrors)
+                {
+                    EmitErrorMessage(
+                        row, col, len,
+                        DS0107_GenericTypeConstraintViolation,
+                        $"{errMsgStart}'{Format(param)}' only allows value types.");
+                }
+
+                return false;
+            }
+        }
+
+        if (attributes.HasFlag(GenericParameterAttributes.DefaultConstructorConstraint))
+        {
+            if (arg.GetConstructor([]) == null && !arg.IsValueType)
+            {
+                if (throwErrors)
+                {
+                    EmitErrorMessage(
+                        row, col, len,
+                        DS0107_GenericTypeConstraintViolation,
+                        $"{errMsgStart}The generic argument needs to define a parameterless constructor.");
+                }
+
+                return false;
+            }
+        }
+
+        bool result = true;
+
+        foreach (Type constraint in param.GetGenericParameterConstraints())
+        {
+            if (!constraint.IsAssignableFrom(arg) && !CanBeConverted(arg, constraint))
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0107_GenericTypeConstraintViolation,
+                    $"{errMsgStart}'{Format(arg)}' violates constraint '{Format(constraint)}'.");
+
+                result = false;
+            }
+        }
+
+        return result;
     }
 }

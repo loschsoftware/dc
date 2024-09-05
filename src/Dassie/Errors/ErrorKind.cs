@@ -447,5 +447,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when no input source files are specified.
     /// </summary>
-    DS0106_NoInputFiles
+    DS0106_NoInputFiles,
+    /// <summary>
+    /// Emitted when a generic constraint is violated.
+    /// </summary>
+    DS0107_GenericTypeConstraintViolation
 }

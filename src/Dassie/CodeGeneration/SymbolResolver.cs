@@ -1,4 +1,5 @@
-﻿using Dassie.Errors;
+﻿using Dassie.CLI.Helpers;
+using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Text.Tooltips;
@@ -24,6 +25,14 @@ internal static class SymbolResolver
 
     private static string GetTypeArgumentListSuffix(Type[] typeArgs)
     {
+        static string Name(Type t)
+        {
+            if (t is TypeBuilder)
+                return t.FullName;
+
+            return t.AssemblyQualifiedName;
+        }
+
         if (typeArgs == null || typeArgs.Length == 0)
             return "";
 
@@ -32,9 +41,9 @@ internal static class SymbolResolver
         sb.Append($"`{typeArgs.Length}[");
 
         foreach (Type t in typeArgs[0..^1])
-            sb.Append($"[{t.AssemblyQualifiedName}],");
+            sb.Append($"[{Name(t)}],");
 
-        sb.Append($"[{typeArgs.Last().AssemblyQualifiedName}]");
+        sb.Append($"[{Name(typeArgs.Last())}]");
         sb.Append(']');
         return sb.ToString();
     }
@@ -48,8 +57,16 @@ internal static class SymbolResolver
 
         for (int i = 0; i < parts.Length; i++)
         {
-            typeString = string.Join(".", parts[0..(i + 1)]) + GetTypeArgumentListSuffix(typeArgs);
+            string regularType = string.Join(".", parts[0..(i + 1)]);
+            typeString = string.Join(".", regularType + GetTypeArgumentListSuffix(typeArgs));
             firstUnusedPart++;
+
+            if (typeArgs != null && typeArgs.Length > 0)
+            {
+                string uninitializedGenericTypeName = $"{regularType}`{typeArgs.Length}";
+                if (ResolveIdentifier(uninitializedGenericTypeName, row, col, len, true) is Type uninitializedGenericType)
+                    TypeHelpers.CheckGenericTypeCompatibility(uninitializedGenericType, typeArgs, row, col, len, true);
+            }
 
             if (ResolveIdentifier(typeString, row, col, len, true) is Type t)
             {
@@ -302,16 +319,19 @@ internal static class SymbolResolver
                 if (final != null)
                     break;
 
+                typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
+
+                if (possibleMethod.IsGenericMethod)
+                {
+                    TypeHelpers.CheckGenericMethodCompatibility(possibleMethod, typeArgs, row, col, len, throwErrors);
+                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs);
+                }
+
                 if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
                 {
                     final = possibleMethod;
                     break;
                 }
-
-                typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
-                
-                if (possibleMethod.IsGenericMethod)
-                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs);
 
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
