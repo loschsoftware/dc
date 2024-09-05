@@ -153,4 +153,8 @@ internal class MethodContext
     public bool AllowTailCallEmission { get; set; }
 
     public bool EmitTailCall { get; set; }
+
+    public List<int> Scopes { get; set; } = [0];
+
+    public int CurrentScope { get; set; }
 }

@@ -2281,6 +2281,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitCode_block([NotNull] DassieParser.Code_blockContext context)
     {
+        CurrentMethod.CurrentScope = CurrentMethod.Scopes.Max() + 1;
+
         CurrentFile.FoldingRegions.Add(new()
         {
             StartLine = context.Open_Brace().Symbol.Line,
@@ -2332,6 +2334,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type ret = Visit(context.expression().Last());
 
         CurrentMethod.IL.EndScope();
+        CurrentMethod.Scopes.Add(CurrentMethod.CurrentScope);
+        CurrentMethod.CurrentScope = CurrentMethod.Scopes[^2];
 
         return ret;
     }
@@ -3078,6 +3082,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (sym is not null)
         {
+            if (sym.SymbolType == SymbolInfo.SymType.Local && sym.Local.Scope != CurrentMethod.CurrentScope)
+            {
+                EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.GetText().Length,
+                    DS0109_LocalDefinedInDifferentScope,
+                    $"The local '{sym.Name()}' cannot be defined here, because it is already defined in a different scope.");
+
+                return sym.Type();
+            }
+
             if (!sym.IsMutable())
             {
                 EmitErrorMessage(
@@ -3698,7 +3714,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Visit(tree);
 
             foreach (LocalInfo loc in invalidationList)
-                loc.IsAvailable = false;
+                loc.Scope = int.MaxValue;
 
             invalidationList.Clear();
         }

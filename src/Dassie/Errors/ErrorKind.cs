@@ -455,5 +455,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a generic method is called without arguments.
     /// </summary>
-    DS0108_GenericMethodCalledWithoutGenericArguments
+    DS0108_GenericMethodCalledWithoutGenericArguments,
+    /// <summary>
+    /// Emitted when a local is defined with a name that already exists in a different scope.
+    /// </summary>
+    DS0109_LocalDefinedInDifferentScope
 }

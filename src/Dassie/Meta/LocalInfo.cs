@@ -7,13 +7,17 @@ namespace Dassie.Meta;
 
 internal class LocalInfo : IEquatable<LocalInfo>
 {
-    public LocalInfo(string name, LocalBuilder builder, bool isConstant, int index, UnionValue union)
+    public LocalInfo(string name, LocalBuilder builder, bool isConstant, int index, UnionValue union, int scope = -1)
     {
+        if (scope == -1)
+            scope = CurrentMethod.CurrentScope;
+
         Name = name;
         Builder = builder;
         IsConstant = isConstant;
         Index = index;
         Union = union;
+        Scope = scope;
     }
 
     public LocalInfo() { }
@@ -28,7 +32,7 @@ internal class LocalInfo : IEquatable<LocalInfo>
 
     public UnionValue Union { get; set; }
 
-    public bool IsAvailable { get; set; } = true;
+    public int Scope { get; set; }
 
     public override bool Equals(object obj)
     {

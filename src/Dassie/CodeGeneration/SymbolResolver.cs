@@ -109,7 +109,7 @@ internal static class SymbolResolver
         {
             LocalInfo loc = CurrentMethod.Locals.First(p => p.Name == text);
 
-            if (!loc.IsAvailable && throwErrors)
+            if (loc.Scope > CurrentMethod.CurrentScope && throwErrors)
             {
                 EmitErrorMessage(
                     row,
