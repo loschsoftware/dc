@@ -308,6 +308,8 @@ internal static class SymbolResolver
         if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
             CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
 
+        typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
+
         if (methods.Any())
         {
             MethodInfo final = null;
@@ -318,8 +320,6 @@ internal static class SymbolResolver
 
                 if (final != null)
                     break;
-
-                typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
 
                 if (possibleMethod.IsGenericMethod)
                 {
