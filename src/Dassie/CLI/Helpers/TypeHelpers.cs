@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -344,7 +343,7 @@ internal static class TypeHelpers
             return true;
 
         Type[] typeParams = genericType.GetGenericArguments();
-        return CheckGenericCompatibility(typeParams, typeArgs, row, col, len, emitErrors);
+        return CheckGenericCompatibility(genericType.FullName, true, typeParams, typeArgs, row, col, len, emitErrors);
     }
 
     /// <summary>
@@ -363,13 +362,23 @@ internal static class TypeHelpers
             return true;
 
         Type[] typeParams = method.GetGenericArguments();
-        return CheckGenericCompatibility(typeParams, typeArgs, row, col, len, emitErrors);
+        return CheckGenericCompatibility(method.Name, false, typeParams, typeArgs, row, col, len, emitErrors);
     }
 
-    private static bool CheckGenericCompatibility(Type[] parameters, Type[] arguments, int row, int col, int len, bool emitErrors)
+    private static bool CheckGenericCompatibility(string name, bool isType, Type[] parameters, Type[] arguments, int row, int col, int len, bool emitErrors)
     {
-        if (parameters.Length != arguments.Length)
-            throw new InvalidOperationException("Generic type argument count does not match.");
+        if (arguments == null || parameters.Length != arguments.Length)
+        {
+            arguments ??= [];
+            int count = arguments.Length;
+
+            EmitErrorMessage(
+                row, col, len,
+                DS0107_GenericTypeConstraintViolation,
+                $"The generic {(isType ? "type" : "function")} '{name}' requires {parameters.Length} generic argument{(parameters.Length > 1 ? "s" : "")}, but {(count == 0 ? "none" : count.ToString())} {(count == 1 ? "was" : "were")} specified.");
+
+            return false;
+        }
 
         bool result = true;
 

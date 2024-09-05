@@ -451,5 +451,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a generic constraint is violated.
     /// </summary>
-    DS0107_GenericTypeConstraintViolation
+    DS0107_GenericTypeConstraintViolation,
+    /// <summary>
+    /// Emitted when a generic method is called without arguments.
+    /// </summary>
+    DS0108_GenericMethodCalledWithoutGenericArguments
 }

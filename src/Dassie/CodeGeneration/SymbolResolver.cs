@@ -299,6 +299,7 @@ internal static class SymbolResolver
 
         // 3. Methods
         argumentTypes ??= Type.EmptyTypes;
+        argumentTypes = argumentTypes.Where(t => t != null).ToArray();
 
         MethodInfo[] methods = type.GetMethods()
             .Where(m => m.Name == name)
