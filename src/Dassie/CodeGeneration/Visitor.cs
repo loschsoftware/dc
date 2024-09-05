@@ -2281,7 +2281,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitCode_block([NotNull] DassieParser.Code_blockContext context)
     {
+        int prevScope = CurrentMethod.CurrentScope;
         CurrentMethod.CurrentScope = CurrentMethod.Scopes.Max() + 1;
+        CurrentMethod.Scopes.Add(CurrentMethod.CurrentScope);
 
         CurrentFile.FoldingRegions.Add(new()
         {
@@ -2334,9 +2336,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type ret = Visit(context.expression().Last());
 
         CurrentMethod.IL.EndScope();
-        CurrentMethod.Scopes.Add(CurrentMethod.CurrentScope);
-        CurrentMethod.CurrentScope = CurrentMethod.Scopes[^2];
-
+        CurrentMethod.CurrentScope = prevScope;
         return ret;
     }
 
