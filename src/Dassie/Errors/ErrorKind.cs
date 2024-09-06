@@ -491,5 +491,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a variance modifier is applied to a type parameter of a type other than a <c>template</c>.
     /// </summary>
-    DS0117_VarianceModifierOnConcreteType
+    DS0117_VarianceModifierOnConcreteType,
+    /// <summary>
+    /// Emitted when variant type parameters are used in invalid ways.
+    /// </summary>
+    DS0118_InvalidVariance
 }

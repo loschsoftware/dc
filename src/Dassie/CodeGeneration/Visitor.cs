@@ -503,6 +503,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     param.Index--;
             }
 
+            if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
+            {
+                if (tReturn.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant))
+                {
+                    EmitErrorMessage(
+                        context.type_name().Start.Line,
+                        context.type_name().Start.Column,
+                        context.type_name().GetText().Length,
+                        DS0118_InvalidVariance,
+                        $"Invalid variance: The type parameter '{tReturn.Name}' must be covariantly valid on '{mb.Name}'. '{tReturn.Name}' is contravariant.");
+                }
+            }
+
             if (context.expression() == null)
             {
                 if (!attrib.HasFlag(MethodAttributes.Abstract))
@@ -706,6 +719,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     ToolTip = TooltipGenerator.Type(t.GetTypeInfo(), true, true)
                 });
             }
+        }
+
+        if (t.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant))
+        {
+            EmitErrorMessage(
+                param.type_name().Start.Line,
+                param.type_name().Start.Column,
+                param.type_name().GetText().Length,
+                DS0118_InvalidVariance,
+                $"Invalid variance: The type parameter '{t.Name}' must be contravariantly valid on '{CurrentMethod.Builder.Name}'. '{t.Name}' is covariant.");
         }
 
         CurrentFile.Fragments.Add(new()
