@@ -66,6 +66,13 @@ internal static class SymbolResolver
                 string uninitializedGenericTypeName = $"{regularType}`{typeArgs.Length}";
                 if (ResolveIdentifier(uninitializedGenericTypeName, row, col, len, true) is Type uninitializedGenericType)
                     TypeHelpers.CheckGenericTypeCompatibility(uninitializedGenericType, typeArgs, row, col, len, true);
+
+                else
+                {
+                    // For some weird reason, some generic types don't use the ` syntax???
+                    if (ResolveIdentifier(regularType, row, col, len, true) is Type genericTypeWithoutBacktick)
+                        TypeHelpers.CheckGenericTypeCompatibility(genericTypeWithoutBacktick, typeArgs, row, col, len, true);
+                }
             }
 
             if (ResolveIdentifier(typeString, row, col, len, true, typeArgs: typeArgs) is Type t)
@@ -160,9 +167,24 @@ internal static class SymbolResolver
         {
             argumentTypes ??= Type.EmptyTypes;
 
-            ConstructorInfo[] cons = type.GetConstructors()
-                .Where(c => c.GetParameters().Length == argumentTypes.Length)
-                .ToArray();
+            List<ConstructorInfo> cons = [];
+
+            if (type.GetType().Name == "TypeBuilderInstantiation" && type.IsGenericType)
+            {
+                Type deconstructed = TypeHelpers.DeconstructGenericType(type);
+                ConstructorInfo[] _constructors = deconstructed.GetConstructors()
+                    .Where(c => c.GetParameters().Length == argumentTypes.Length)
+                    .ToArray();
+
+                foreach (ConstructorInfo con in _constructors)
+                    cons.Add(TypeBuilder.GetConstructor(type, con));
+            }
+            else
+            {
+                cons = type.GetConstructors()
+                    .Where(c => c.GetParameters().Length == argumentTypes.Length)
+                    .ToList();
+            }
 
             if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
                 CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
@@ -721,6 +743,10 @@ internal static class SymbolResolver
             if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name))
             {
                 type = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name).Builder;
+
+                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+                    type = type.MakeGenericType(typeArgs);
+
                 return true;
             }
 
@@ -732,7 +758,7 @@ internal static class SymbolResolver
             {
                 type = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName).Builder;
 
-                if (typeArgs != null)
+                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
                     type = type.MakeGenericType(typeArgs);
 
                 return true;
@@ -745,6 +771,9 @@ internal static class SymbolResolver
             if (assemblies.Any())
             {
                 type = assemblies.First().GetType(name);
+
+                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+                    type = type.MakeGenericType(typeArgs);
 
                 if (!noEmitFragments)
                 {
@@ -768,7 +797,12 @@ internal static class SymbolResolver
                 type = Type.GetType(n);
 
                 if (type != null)
+                {
+                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+                        type = type.MakeGenericType(typeArgs);
+
                     goto FoundType;
+                }
 
                 List<Assembly> _allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
                 _allAssemblies.AddRange(Context.ReferencedAssemblies);
@@ -777,17 +811,30 @@ internal static class SymbolResolver
                 if (_assemblies.Any())
                 {
                     type = _assemblies.First().GetType(n);
+
+                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+                        type = type.MakeGenericType(typeArgs);
+
                     goto FoundType;
                 }
 
                 if (Context.Types.Any(t => t.FullName == n))
                 {
                     type = Context.Types.First(t => t.FullName == n).Builder;
+
+                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+                        type = type.MakeGenericType(typeArgs);
+
                     goto FoundType;
                 }
 
                 if (type != null)
+                {
+                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+                        type = type.MakeGenericType(typeArgs);
+
                     goto FoundType;
+                }
             }
 
             foreach (string originalName in CurrentFile.Aliases.Concat(Context.GlobalAliases).Where(a => a.Alias == name).Select(a => a.Name))
@@ -795,7 +842,12 @@ internal static class SymbolResolver
                 type = Type.GetType(originalName);
 
                 if (type != null)
+                {
+                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+                        type = type.MakeGenericType(typeArgs);
+
                     goto FoundType;
+                }
             }
         }
 
@@ -814,17 +866,17 @@ internal static class SymbolResolver
         }
         else
         {
-            if (!noEmitFragments)
-            {
-                CurrentFile.Fragments.Add(new()
-                {
-                    Line = row,
-                    Column = col,
-                    Length = name.Length,
-                    Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
-                    ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
-                });
-            }
+            //if (!noEmitFragments)
+            //{
+            //    CurrentFile.Fragments.Add(new()
+            //    {
+            //        Line = row,
+            //        Column = col,
+            //        Length = name.Length,
+            //        Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+            //        ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
+            //    });
+            //}
 
             return true;
         }

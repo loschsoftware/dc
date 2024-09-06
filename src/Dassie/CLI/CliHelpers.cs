@@ -834,7 +834,7 @@ internal static class CliHelpers
         return null;
     }
 
-    public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0)
+    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0)
     {
         if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
             return CurrentMethod.TypeParameters.First(t => t.Name == name).Builder;
@@ -1151,7 +1151,7 @@ internal static class CliHelpers
                 "Redundant modifier 'static'.");
         }
 
-        if (!isStatic && (oopModifier == null || oopModifier.Closed() == null))
+        if (!isStatic && (oopModifier == null || oopModifier.Closed() == null) && !(specialModifiers != null && specialModifiers.Any(s => s.Abstract() != null)))
             baseAttributes |= MethodAttributes.Virtual;
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(MethodAttributes.Static))
@@ -1193,7 +1193,7 @@ internal static class CliHelpers
         if (typeKind.Module() != null)
             baseAttributes |= TypeAttributes.Abstract | TypeAttributes.Sealed;
 
-        else if (modifiers == null || modifiers.Open() == null)
+        else if (!baseAttributes.HasFlag(TypeAttributes.Interface) && (modifiers == null || modifiers.Open() == null))
             baseAttributes |= TypeAttributes.Sealed;
 
         if (typeAccess != null)

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using System.Threading;
 using System.Xml.Linq;
 
 namespace Dassie.CLI.Helpers;
@@ -321,6 +322,12 @@ internal static class TypeHelpers
         if (!closedGenericTypeString.Contains('['))
             return closedGenericTypeString;
 
+        if (!closedGenericTypeString.Contains('`'))
+        {
+            int _brIndex = closedGenericTypeString.IndexOf('[');
+            return $"{closedGenericTypeString[0.._brIndex]}";
+        }
+
         string[] parts = closedGenericTypeString.Split('`');
         int braceIndex = parts[1].IndexOf('[');
         int typeParamCount = int.Parse(parts[1][0..braceIndex]);
@@ -333,7 +340,8 @@ internal static class TypeHelpers
         if (!type.IsGenericType)
             return type;
 
-        return Type.GetType(GetOpenGenericTypeString(type.AssemblyQualifiedName));
+        string typeName = GetOpenGenericTypeString(type.AssemblyQualifiedName);
+        return CliHelpers.ResolveTypeName(typeName);
     }
 
     /// <summary>
