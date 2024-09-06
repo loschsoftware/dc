@@ -1182,13 +1182,13 @@ internal static class CliHelpers
     {
         TypeAttributes baseAttributes = TypeAttributes.Class;
 
+        if (typeKind.Template() != null)
+            baseAttributes = TypeAttributes.Interface | TypeAttributes.Abstract;
+
         if (isNested)
             baseAttributes |= TypeAttributes.NestedPublic;
         else
             baseAttributes |= TypeAttributes.Public;
-
-        if (typeKind.Template() != null)
-            baseAttributes = TypeAttributes.Interface | TypeAttributes.Abstract;
 
         if (typeKind.Module() != null)
             baseAttributes |= TypeAttributes.Abstract | TypeAttributes.Sealed;

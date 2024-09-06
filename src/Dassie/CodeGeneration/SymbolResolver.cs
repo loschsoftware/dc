@@ -86,7 +86,7 @@ internal static class SymbolResolver
                 return t;
             }
         }
-        
+
         firstUnusedPart = Math.Min(1, fullId.Identifier().Length - 1);
 
         // First part of full_id could also be parameter, local, member of current class.
@@ -718,6 +718,12 @@ internal static class SymbolResolver
 
         if (type == null)
         {
+            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name))
+            {
+                type = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name).Builder;
+                return true;
+            }
+
             string nonGenericName = name;
             if (name.Contains('`'))
                 nonGenericName = name.Split('`')[0];
