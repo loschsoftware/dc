@@ -836,6 +836,12 @@ internal static class CliHelpers
 
     public static Type ResolveTypeName(string name, int row, int col, int len, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0)
     {
+        if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
+            return CurrentMethod.TypeParameters.First(t => t.Name == name).Builder;
+
+        if (TypeContext.Current != null && TypeContext.Current.TypeParameters.Any(t => t.Name == name))
+            return TypeContext.Current.TypeParameters.First(t => t.Name == name).Builder;
+
         if (typeParams != null && typeParams.Length > 0)
             name += $"`{typeParams.Length}";
 
@@ -1130,6 +1136,9 @@ internal static class CliHelpers
 
             if (modifier.Extern() != null)
                 baseAttributes |= MethodAttributes.PinvokeImpl;
+
+            if (modifier.Abstract() != null)
+                baseAttributes |= MethodAttributes.Abstract;
         }
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(MethodAttributes.Static))

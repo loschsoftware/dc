@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Dassie.Meta;
+using Dassie.Parser;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Dassie.CLI.Helpers;
 
@@ -312,19 +316,24 @@ internal static class TypeHelpers
         return name.ToString();
     }
 
+    public static string GetOpenGenericTypeString(string closedGenericTypeString)
+    {
+        if (!closedGenericTypeString.Contains('['))
+            return closedGenericTypeString;
+
+        string[] parts = closedGenericTypeString.Split('`');
+        int braceIndex = parts[1].IndexOf('[');
+        int typeParamCount = int.Parse(parts[1][0..braceIndex]);
+        return $"{parts[0]}`{typeParamCount}{closedGenericTypeString.Split(']').Last()}";
+    }
+
     // List<int> -> List<>
     public static Type DeconstructGenericType(Type type)
     {
         if (!type.IsGenericType)
             return type;
 
-        string name = type.AssemblyQualifiedName;
-        string[] parts = name.Split('`');
-
-        int braceIndex = parts[1].IndexOf('[');
-        int typeParamCount = int.Parse(parts[1][0..braceIndex]);
-
-        return Type.GetType($"{parts[0]}`{typeParamCount}{name.Split(']').Last()}");
+        return Type.GetType(GetOpenGenericTypeString(type.AssemblyQualifiedName));
     }
 
     /// <summary>
@@ -470,5 +479,141 @@ internal static class TypeHelpers
         }
 
         return result;
+    }
+
+    public static TypeParameterContext BuildTypeParameter(DassieParser.Type_parameterContext context)
+    {
+        string name = context.Identifier().GetText();
+        GenericParameterAttributes attribs = GenericParameterAttributes.None;
+        List<Type> interfaceConstraints = [];
+        Type baseTypeConstraint = null;
+
+        if (context.type_parameter_variance() != null)
+        {
+            if (context.type_parameter_variance().Plus() != null)
+                attribs |= GenericParameterAttributes.Covariant;
+
+            if (context.type_parameter_variance().Minus() != null)
+                attribs |= GenericParameterAttributes.Contravariant;
+            
+            if (context.type_parameter_variance().Equals() == null && !TypeContext.Current.Builder.IsInterface)
+            {
+                EmitErrorMessage(
+                    context.type_parameter_variance().Start.Line,
+                    context.type_parameter_variance().Start.Column,
+                    context.type_parameter_variance().GetText().Length,
+                    DS0117_VarianceModifierOnConcreteType,
+                    $"The variance modifier '{context.type_parameter_variance().GetText()}' is invalid on type '{Format(TypeContext.Current.Builder)}'. Only type parameters of template types can have variance modifiers.");
+            }
+        }
+
+        if (context.type_parameter_attribute() != null)
+        {
+            foreach (var attrib in context.type_parameter_attribute())
+            {
+                bool duplicate = false;
+
+                if (attrib.Ref() != null)
+                {
+                    if (attribs.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint))
+                        duplicate = true;
+
+                    attribs |= GenericParameterAttributes.ReferenceTypeConstraint;
+                }
+
+                if (attrib.Val() != null)
+                {
+                    if (attribs.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint))
+                        duplicate = true;
+
+                    attribs |= GenericParameterAttributes.NotNullableValueTypeConstraint;
+                }
+
+                if (attrib.Default() != null)
+                {
+                    if (attribs.HasFlag(GenericParameterAttributes.DefaultConstructorConstraint))
+                    {
+                        duplicate = true;
+                        continue;
+                    }
+
+                    attribs |= GenericParameterAttributes.DefaultConstructorConstraint;
+                }
+
+                if (duplicate)
+                {
+                    EmitErrorMessage(
+                        attrib.Start.Line,
+                        attrib.Start.Column,
+                        attrib.GetText().Length,
+                        DS0110_DuplicateTypeParameterAttributes,
+                        $"Duplicate attribute '{attrib.GetText()}'.");
+                }
+            }
+
+            if (attribs.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint) && attribs.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint))
+            {
+                EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.GetText().Length,
+                    DS0113_InvalidTypeParameterAttributes,
+                    $"The type parameter attributes 'ref' and 'val' are mutually exclusive.");
+            }
+        }
+
+        bool removeNone = context.type_parameter_variance() != null
+            || context.type_parameter_attribute() != null;
+
+        if (removeNone)
+            attribs &= ~GenericParameterAttributes.None;
+
+        if (context.type_name() != null)
+        {
+            foreach (var type in context.type_name())
+            {
+                Type constraint = CliHelpers.ResolveTypeName(type);
+
+                if (constraint.IsClass)
+                {
+                    if (baseTypeConstraint != null)
+                    {
+                        EmitErrorMessage(
+                            type.Start.Line,
+                            type.Start.Column,
+                            type.GetText().Length,
+                            DS0111_DuplicateTypeParameterConstraint,
+                            $"Duplicate base type constraint '{Format(constraint)}': A generic type parameter can only define one base type.");
+
+                        continue;
+                    }
+
+                    baseTypeConstraint = constraint;
+                    continue;
+                }
+
+                if (interfaceConstraints.Contains(constraint))
+                {
+                    EmitErrorMessage(
+                        type.Start.Line,
+                        type.Start.Column,
+                        type.GetText().Length,
+                        DS0111_DuplicateTypeParameterConstraint,
+                        $"Duplicate type constraint '{Format(constraint)}'");
+
+                    continue;
+                }
+
+                interfaceConstraints.Add(constraint);
+            }
+        }
+
+        return new()
+        {
+            Name = name,
+            Attributes = attribs,
+            InterfaceConstraints = interfaceConstraints,
+            BaseTypeConstraint = baseTypeConstraint
+        };
     }
 }

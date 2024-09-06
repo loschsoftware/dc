@@ -4,6 +4,7 @@ using Antlr4.Runtime.Tree;
 using Dassie.CLI;
 using Dassie.CLI.Helpers;
 using Dassie.Core;
+using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
@@ -14,9 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Color = Dassie.Text.Color;
 using static Dassie.CLI.Helpers.TypeHelpers;
-using Dassie.Errors;
+using Color = Dassie.Text.Color;
 
 namespace Dassie.CodeGeneration;
 
@@ -137,6 +137,41 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         };
 
         tc.FilesWhereDefined.Add(CurrentFile.Path);
+
+        if (context.type_parameter_list() != null)
+        {
+            List<TypeParameterContext> typeParamContexts = [];
+
+            foreach (DassieParser.Type_parameterContext typeParam in context.type_parameter_list().type_parameter())
+            {
+                if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetText()))
+                {
+                    EmitErrorMessage(
+                        typeParam.Start.Line,
+                        typeParam.Start.Column,
+                        typeParam.GetText().Length,
+                        DS0112_DuplicateTypeParameter,
+                        $"Duplicate type parameter '{typeParam.GetText()}'.");
+
+                    continue;
+                }
+
+                typeParamContexts.Add(BuildTypeParameter(typeParam));
+            }
+
+            GenericTypeParameterBuilder[] typeParams = tb.DefineGenericParameters(typeParamContexts.Select(t => t.Name).ToArray());
+            foreach (GenericTypeParameterBuilder typeParam in typeParams)
+            {
+                TypeParameterContext ctx = typeParamContexts.First(c => c.Name == typeParam.Name);
+                typeParam.SetGenericParameterAttributes(ctx.Attributes);
+                typeParam.SetBaseTypeConstraint(ctx.BaseTypeConstraint);
+                typeParam.SetInterfaceConstraints(ctx.InterfaceConstraints.ToArray());
+
+                ctx.Builder = typeParam;
+            }
+
+            tc.TypeParameters = typeParamContexts;
+        }
 
         foreach (DassieParser.TypeContext nestedType in context.type_block().type())
             VisitType(nestedType, tb);
@@ -364,17 +399,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.parameter_list() != null || _tReturn == typeof(void))
         {
-            Type tReturn = _tReturn; // TODO: Add proper type inference
-
-            if (context.type_name() != null)
-                tReturn = CliHelpers.ResolveTypeName(context.type_name());
-
             CallingConventions callingConventions = CallingConventions.HasThis;
 
             if (context.member_special_modifier().Any(m => m.Static() != null) || (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract))
                 callingConventions = CallingConventions.Standard;
-
-            var paramTypes = ResolveParameterList(context.parameter_list());
 
             MethodAttributes attrib = CliHelpers.GetMethodAttributes(
                     context.member_access_modifier(),
@@ -386,23 +414,78 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 // TODO: Implement P/Invoke methods
                 //MethodBuilder pInvokeMethod = TypeContext.Current.Builder.DefinePInvokeMethod();
 
-                return tReturn;
+                return typeof(object);
             }
 
             MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
                 context.Identifier().GetText(),
                 attrib,
-                callingConventions,
-                tReturn,
-                paramTypes.Select(p => p.Type).ToArray());
+                callingConventions);
 
             CurrentMethod = new()
             {
-                Builder = mb,
-                IL = mb.GetILGenerator()
+                Builder = mb
             };
 
+            if (!attrib.HasFlag(MethodAttributes.Abstract))
+                CurrentMethod.IL = mb.GetILGenerator();
+
+            if (context.type_parameter_list() != null)
+            {
+                List<TypeParameterContext> typeParamContexts = [];
+
+                foreach (DassieParser.Type_parameterContext typeParam in context.type_parameter_list().type_parameter())
+                {
+                    if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetText()))
+                    {
+                        EmitErrorMessage(
+                            typeParam.Start.Line,
+                            typeParam.Start.Column,
+                            typeParam.GetText().Length,
+                            DS0112_DuplicateTypeParameter,
+                            $"Duplicate type parameter '{typeParam.GetText()}'.");
+
+                        continue;
+                    }
+
+                    if (TypeContext.Current.TypeParameters.Any(t => t.Name == typeParam.Identifier().GetText()))
+                    {
+                        EmitErrorMessage(
+                            typeParam.Start.Line,
+                            typeParam.Start.Column,
+                            typeParam.GetText().Length,
+                            DS0114_TypeParameterIsDefinedInContainingScope,
+                            $"The type parameter '{typeParam.Identifier().GetText()}' is already declared by the containing type '{TypeHelpers.Format(TypeContext.Current.Builder)}'.");
+                    }
+
+                    typeParamContexts.Add(BuildTypeParameter(typeParam));
+                }
+
+                GenericTypeParameterBuilder[] typeParams = mb.DefineGenericParameters(typeParamContexts.Select(t => t.Name).ToArray());
+                foreach (GenericTypeParameterBuilder typeParam in typeParams)
+                {
+                    TypeParameterContext tpc = typeParamContexts.First(c => c.Name == typeParam.Name);
+                    typeParam.SetGenericParameterAttributes(tpc.Attributes);
+                    typeParam.SetBaseTypeConstraint(tpc.BaseTypeConstraint);
+                    typeParam.SetInterfaceConstraints(tpc.InterfaceConstraints.ToArray());
+
+                    tpc.Builder = typeParam;
+                }
+
+                CurrentMethod.TypeParameters = typeParamContexts;
+            }
+
+            Type tReturn = _tReturn; // TODO: Add proper type inference
+
+            if (context.type_name() != null)
+                tReturn = CliHelpers.ResolveTypeName(context.type_name());
+
+            mb.SetReturnType(tReturn);
+
             CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
+
+            var paramTypes = ResolveParameterList(context.parameter_list());
+            mb.SetParameters(paramTypes.Select(p => p.Type).ToArray());
 
             foreach (var param in paramTypes)
             {
@@ -418,6 +501,35 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 foreach (var param in CurrentMethod.Parameters)
                     param.Index--;
+            }
+
+            if (context.expression() == null)
+            {
+                if (!attrib.HasFlag(MethodAttributes.Abstract))
+                {
+                    EmitErrorMessage(
+                        context.Start.Line,
+                        context.Start.Column,
+                        context.GetText().Length,
+                        DS0115_NonAbstractMethodHasNoBody,
+                        $"The non-abstract member '{mb.Name}' needs to define a body.");
+
+                    CurrentMethod.IL.Emit(OpCodes.Ret);
+                }
+
+                return typeof(void);
+            }
+
+            if (attrib.HasFlag(MethodAttributes.Abstract))
+            {
+                EmitErrorMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.GetText().Length,
+                    DS0116_AbstractMethodHasBody,
+                    $"The abstract member '{mb.Name}' cannot define a body.");
+
+                return typeof(void);
             }
 
             object ctx = context.expression();
@@ -1854,9 +1966,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (o is MethodBuilder m)
             {
-                for (int i = 0; i < m.GetParameters().Length; i++)
+                MethodInfo meth = m;
+
+                if (m.IsGenericMethod)
+                    meth = m.MakeGenericMethod(typeArgs);
+
+                for (int i = 0; i < meth.GetParameters().Length; i++)
                 {
-                    ParameterInfo param = m.GetParameters()[i];
+                    ParameterInfo param = meth.GetParameters()[i];
 
                     if (param.ParameterType.IsByRef /*|| param.ParameterType.IsByRefLike*/)
                         CurrentMethod.ByRefArguments.Add(i);
@@ -1872,26 +1989,26 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.full_identifier().Identifier()[0].Symbol.Line,
                     context.full_identifier().Identifier()[0].Symbol.Column,
                     context.full_identifier().Identifier()[0].GetText().Length,
-                    m.Name,
-                    m.DeclaringType,
-                    m,
+                    meth.Name,
+                    meth.DeclaringType,
+                    meth,
                     CurrentMethod.ArgumentTypesForNextMethodCall.ToArray());
 
                 CurrentMethod.AllowTailCallEmission = allowTailCall;
 
                 EmitTailcall();
-                EmitCall(m.DeclaringType, m);
+                EmitCall(meth.DeclaringType, meth);
 
-                if (m.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
+                if (meth.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
                 {
-                    CurrentMethod.IL.DeclareLocal(m.ReturnType);
+                    CurrentMethod.IL.DeclareLocal(meth.ReturnType);
                     CurrentMethod.LocalIndex++;
                     EmitStloc(CurrentMethod.LocalIndex);
                     EmitLdloca(CurrentMethod.LocalIndex);
                 }
 
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
-                t = m.ReturnType;
+                t = meth.ReturnType;
             }
 
             // Global method

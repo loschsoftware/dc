@@ -1069,15 +1069,25 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitType_parameter([NotNull] DassieParser.Type_parameterContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_constraint"/>.
+	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterType_parameter_constraint([NotNull] DassieParser.Type_parameter_constraintContext context);
+	void EnterType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_constraint"/>.
+	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitType_parameter_constraint([NotNull] DassieParser.Type_parameter_constraintContext context);
+	void ExitType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.inheritance_list"/>.
 	/// </summary>

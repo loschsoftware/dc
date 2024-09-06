@@ -459,5 +459,37 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a local is defined with a name that already exists in a different scope.
     /// </summary>
-    DS0109_LocalDefinedInDifferentScope
+    DS0109_LocalDefinedInDifferentScope,
+    /// <summary>
+    /// Emitted when a type parameter has multiple of the same attribute.
+    /// </summary>
+    DS0110_DuplicateTypeParameterAttributes,
+    /// <summary>
+    /// Emitted when a type parameter has multiple of the same type constraints.
+    /// </summary>
+    DS0111_DuplicateTypeParameterConstraint,
+    /// <summary>
+    /// Emitted when a type defines multiple type parameters with the same name.
+    /// </summary>
+    DS0112_DuplicateTypeParameter,
+    /// <summary>
+    /// Emitted when a type parameter defines an invalid set of attributes.
+    /// </summary>
+    DS0113_InvalidTypeParameterAttributes,
+    /// <summary>
+    /// Emitted when a generic method defines a type parameter that is already defined by the containing type.
+    /// </summary>
+    DS0114_TypeParameterIsDefinedInContainingScope,
+    /// <summary>
+    /// Emitted when a non-abstract method does not have a body.
+    /// </summary>
+    DS0115_NonAbstractMethodHasNoBody,
+    /// <summary>
+    /// Emitted when an abstract method has a body.
+    /// </summary>
+    DS0116_AbstractMethodHasBody,
+    /// <summary>
+    /// Emitted when a variance modifier is applied to a type parameter of a type other than a <c>template</c>.
+    /// </summary>
+    DS0117_VarianceModifierOnConcreteType
 }

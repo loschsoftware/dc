@@ -31,7 +31,7 @@ Partial: 'partial';
 Open: 'open';
 Closed: 'closed';
 Auto: 'auto';
-Virtual: 'virtual';
+Abstract: 'abstract';
 Extern: 'extern';
 
 // Result: 'result';
@@ -55,6 +55,8 @@ True: 'true';
 False: 'false';
 
 This: 'this';
+
+Default: 'default';
 
 Open_Paren: '(';
 Close_Paren: ')';

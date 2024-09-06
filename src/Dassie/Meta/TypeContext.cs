@@ -16,23 +16,25 @@ internal class TypeContext
 
     public static TypeContext Current { get; set; }
 
-    public List<(FieldBuilder Field, DassieParser.ExpressionContext Value)> FieldInitializers { get; set; } = new();
+    public List<(FieldBuilder Field, DassieParser.ExpressionContext Value)> FieldInitializers { get; set; } = [];
 
-    public List<DassieParser.Type_memberContext> Constructors { get; set; } = new();
+    public List<DassieParser.Type_memberContext> Constructors { get; set; } = [];
 
     public string FullName { get; set; }
 
-    public List<string> FilesWhereDefined { get; } = new();
+    public List<string> FilesWhereDefined { get; } = [];
 
     public TypeBuilder Builder { get; set; }
 
-    public List<MethodContext> Methods { get; } = new();
+    public List<MethodContext> Methods { get; } = [];
 
-    public List<MetaFieldInfo> Fields { get; } = new();
+    public List<MetaFieldInfo> Fields { get; } = [];
 
-    public List<PropertyBuilder> Properties { get; } = new();
+    public List<PropertyBuilder> Properties { get; } = [];
     
-    public List<MethodContext> ConstructorContexts { get; } = new();
+    public List<MethodContext> ConstructorContexts { get; } = [];
 
-    public List<TypeContext> Children { get; } = new();
+    public List<TypeContext> Children { get; } = [];
+
+    public List<TypeParameterContext> TypeParameters { get; set; } = [];
 }

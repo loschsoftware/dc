@@ -646,11 +646,17 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType_parameter([NotNull] DassieParser.Type_parameterContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_constraint"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitType_parameter_constraint([NotNull] DassieParser.Type_parameter_constraintContext context);
+	Result VisitType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.inheritance_list"/>.
 	/// </summary>

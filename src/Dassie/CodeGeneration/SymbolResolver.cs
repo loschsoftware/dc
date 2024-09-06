@@ -68,7 +68,7 @@ internal static class SymbolResolver
                     TypeHelpers.CheckGenericTypeCompatibility(uninitializedGenericType, typeArgs, row, col, len, true);
             }
 
-            if (ResolveIdentifier(typeString, row, col, len, true) is Type t)
+            if (ResolveIdentifier(typeString, row, col, len, true, typeArgs: typeArgs) is Type t)
             {
                 if (!noEmitFragments)
                 {
@@ -86,7 +86,7 @@ internal static class SymbolResolver
                 return t;
             }
         }
-
+        
         firstUnusedPart = Math.Min(1, fullId.Identifier().Length - 1);
 
         // First part of full_id could also be parameter, local, member of current class.
@@ -95,10 +95,11 @@ internal static class SymbolResolver
             row,
             col,
             len,
-            noEmitFragments);
+            noEmitFragments,
+            typeArgs: typeArgs);
     }
 
-    public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false, bool throwErrors = true)
+    public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false, bool throwErrors = true, Type[] typeArgs = null)
     {
         // 1. Parameters
         if (CurrentMethod.Parameters.Any(p => p.Name == text))
@@ -134,7 +135,7 @@ internal static class SymbolResolver
             return globals;
 
         // 5. Other classes, including aliases
-        if (TryGetType(text, out Type t, row, col, len, noEmitFragments))
+        if (TryGetType(text, out Type t, row, col, len, noEmitFragments, typeArgs))
             return t;
 
         // 6. Members of other classes
@@ -435,6 +436,14 @@ internal static class SymbolResolver
         {
             argumentTypes ??= Type.EmptyTypes;
 
+            if (tc.ConstructorContexts.Count == 0)
+            {
+                if (argumentTypes.Length != 0)
+                    goto Error;
+
+                return tb.GetConstructor([]);
+            }
+
             ConstructorInfo[] cons = tc.ConstructorContexts.Select(c => c.ConstructorBuilder)
                 .Where(c => c.GetParameters().Length == argumentTypes.Length)
                 .ToArray();
@@ -691,15 +700,35 @@ internal static class SymbolResolver
         return false;
     }
 
-    public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false)
+    public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false, Type[] typeArgs = null)
     {
+        if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
+        {
+            type = CurrentMethod.TypeParameters.First(t => t.Name == name).Builder;
+            return true;
+        }
+
+        if (TypeContext.Current != null && TypeContext.Current.TypeParameters.Any(t => t.Name == name))
+        {
+            type = TypeContext.Current.TypeParameters.First(t => t.Name == name).Builder;
+            return true;
+        }
+
         type = Type.GetType(name);
 
         if (type == null)
         {
-            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name))
+            string nonGenericName = name;
+            if (name.Contains('`'))
+                nonGenericName = name.Split('`')[0];
+
+            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName))
             {
-                type = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name).Builder;
+                type = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName).Builder;
+
+                if (typeArgs != null)
+                    type = type.MakeGenericType(typeArgs);
+
                 return true;
             }
 

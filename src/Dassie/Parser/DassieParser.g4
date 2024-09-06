@@ -250,12 +250,19 @@ type_parameter_list
     ;
 
 type_parameter
-    : Identifier (Colon type_parameter_constraint)?
+    : type_parameter_attribute* type_parameter_variance? Identifier (Colon type_name (Comma type_name)*)?
     ;
 
-type_parameter_constraint
-    : type_kind
-    | type_name
+type_parameter_attribute
+    : Ref
+    | Val
+    | Default
+    ;
+
+type_parameter_variance
+    : Plus                  // covariant
+    | Minus                 // contravariant
+    | Equals                // invariant
     ;
 
 inheritance_list
@@ -285,6 +292,7 @@ member_special_modifier
     | Infix
     | Inline
     | Static
+    | Abstract
     ;
 
 type_member

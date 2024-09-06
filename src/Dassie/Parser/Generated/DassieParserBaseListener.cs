@@ -1260,17 +1260,29 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType_parameter([NotNull] DassieParser.Type_parameterContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_constraint"/>.
+	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterType_parameter_constraint([NotNull] DassieParser.Type_parameter_constraintContext context) { }
+	public virtual void EnterType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_constraint"/>.
+	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitType_parameter_constraint([NotNull] DassieParser.Type_parameter_constraintContext context) { }
+	public virtual void ExitType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.inheritance_list"/>.
 	/// <para>The default implementation does nothing.</para>

@@ -67,7 +67,7 @@ internal class MethodContext
 
     public ILGenerator IL { get; set; }
 
-    public List<string> FilesWhereDefined { get; } = new();
+    public List<string> FilesWhereDefined { get; } = [];
 
     public MethodBuilder Builder { get; set; }
 
@@ -93,11 +93,11 @@ internal class MethodContext
 
     public int ParameterIndex { get; set; } = 0;
 
-    public List<LocalInfo> Locals { get; } = new();
+    public List<LocalInfo> Locals { get; } = [];
 
-    public List<ParamInfo> Parameters { get; } = new();
+    public List<ParamInfo> Parameters { get; } = [];
 
-    public List<SymbolInfo> AvailableSymbols { get; } = new();
+    public List<SymbolInfo> AvailableSymbols { get; } = [];
 
     public UnionValue CurrentUnion { get; set; } = new(null, typeof(object));
 
@@ -140,7 +140,7 @@ internal class MethodContext
 
     public bool IgnoreTypesInSymbolResolve { get; set; } = false;
     
-    public Dictionary<int, List<int>> ParameterBoxIndices { get; set; } = new();
+    public Dictionary<int, List<int>> ParameterBoxIndices { get; set; } = [];
 
     public List<int> ByRefArguments { get; set; } = [];
 
@@ -148,7 +148,7 @@ internal class MethodContext
 
     public bool BoxCallingType { get; set; }
 
-    public List<TypeContext> ClosureTypes { get; } = new();
+    public List<TypeContext> ClosureTypes { get; } = [];
 
     public bool AllowTailCallEmission { get; set; }
 
@@ -157,4 +157,6 @@ internal class MethodContext
     public List<int> Scopes { get; set; } = [0];
 
     public int CurrentScope { get; set; }
+
+    public List<TypeParameterContext> TypeParameters { get; set; } = [];
 }
