@@ -1990,9 +1990,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             else if (o is MethodBuilder m)
             {
                 MethodInfo meth = m;
+                List<Type> typeParams = [];
 
                 if (m.IsGenericMethod)
+                {
+                    foreach (Type typeParam in m.GetGenericArguments())
+                        typeParams.Add(typeParam);
+
                     meth = m.MakeGenericMethod(typeArgs);
+                }
 
                 for (int i = 0; i < meth.GetParameters().Length; i++)
                 {
@@ -2031,7 +2037,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
 
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+
                 t = meth.ReturnType;
+
+                if (typeParams.Contains(t))
+                    t = typeArgs[typeParams.IndexOf(t)];
             }
 
             // Global method
