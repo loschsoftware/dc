@@ -205,7 +205,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         foreach (DassieParser.TypeContext nestedType in context.type_block().type())
+        {
             VisitType(nestedType, tb);
+            tc.Children.Add(TypeContext.Current);
+        }
+
+        TypeContext.Current = tc;
 
         foreach (DassieParser.Type_memberContext member in context.type_block().type_member())
             Visit(member);
@@ -2212,6 +2217,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (member == null)
                 return null;
+
+            if (member is Type nestedType)
+            {
+                t = nestedType;
+                continue;
+            }
 
             if (member is FieldInfo f)
             {

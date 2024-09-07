@@ -188,6 +188,10 @@ internal static class SymbolResolver
         if (type.GetType().Name == "TypeBuilderInstantiation" && type.IsGenericType)
             deconstructedGenericType = TypeHelpers.DeconstructGenericType(type);
 
+        // -1. Nested types
+        if (type.GetNestedTypes().Any(t => t.Name == name))
+            return type.GetNestedType(name);
+
         // 0. Constructors
         if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
         {
@@ -514,6 +518,10 @@ internal static class SymbolResolver
 
         TypeContext tc = types.First();
 
+        // -1. Nested types
+        if (types != null && types.First().Children.Any(t => t.Builder.Name == name))
+            return types.First().Children.First(t => t.Builder.Name == name);
+
         // 0. Constructors
         if (name == tb.Name || name == tb.FullName)
         {
@@ -822,7 +830,10 @@ internal static class SymbolResolver
                 if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
                     type = type.MakeGenericType(typeArgs);
 
-                return true;
+                if (type.IsGenericType)
+                    return true;
+
+                type = null;
             }
 
             List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
