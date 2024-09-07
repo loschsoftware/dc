@@ -26,6 +26,7 @@ using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -781,6 +782,15 @@ internal static class CliHelpers
         return (null, Array.Empty<MethodInfo>());
     }
 
+    public static Type ResolveAttributeTypeName(string name, bool noEmitFragments = false)
+    {
+        Type t;
+        if ((t = ResolveTypeName(name, noEmitFragments: noEmitFragments)) != null)
+            return t;
+
+        return ResolveTypeName($"{name}Attribute", noEmitFragments: noEmitFragments);
+    }
+
     public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false)
     {
         if (name.Ampersand() != null)
@@ -1102,9 +1112,10 @@ internal static class CliHelpers
         return baseAttributes;
     }
 
-    public static MethodAttributes GetMethodAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers)
+    public static (MethodAttributes, MethodImplAttributes) GetMethodAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, DassieParser.AttributeContext[] attribs)
     {
         MethodAttributes baseAttributes;
+        MethodImplAttributes implementationFlags = MethodImplAttributes.Managed;
 
         if (accessModifier == null || accessModifier.Global() != null)
             baseAttributes = MethodAttributes.Public;
@@ -1139,6 +1150,9 @@ internal static class CliHelpers
 
             if (modifier.Abstract() != null)
                 baseAttributes |= MethodAttributes.Abstract;
+
+            if (modifier.Inline() != null)
+                implementationFlags |= MethodImplAttributes.AggressiveInlining;
         }
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(MethodAttributes.Static))
@@ -1151,7 +1165,7 @@ internal static class CliHelpers
                 "Redundant modifier 'static'.");
         }
 
-        if (!isStatic && (oopModifier == null || oopModifier.Closed() == null) && !(specialModifiers != null && specialModifiers.Any(s => s.Abstract() != null)))
+        if (!isStatic && (oopModifier == null || oopModifier.Closed() == null))
             baseAttributes |= MethodAttributes.Virtual;
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(MethodAttributes.Static))
@@ -1160,7 +1174,13 @@ internal static class CliHelpers
             baseAttributes &= ~MethodAttributes.Virtual;
         }
 
-        return baseAttributes;
+        if (TypeContext.Current.Builder.IsInterface)
+        {
+            baseAttributes |= MethodAttributes.HideBySig;
+            baseAttributes |= MethodAttributes.NewSlot;
+        }
+
+        return (baseAttributes, implementationFlags);
     }
 
     public static ParameterAttributes GetParameterAttributes(DassieParser.Parameter_modifierContext modifier, bool hasDefault)
@@ -1183,7 +1203,7 @@ internal static class CliHelpers
         TypeAttributes baseAttributes = TypeAttributes.Class;
 
         if (typeKind.Template() != null)
-            baseAttributes = TypeAttributes.Interface | TypeAttributes.Abstract;
+            baseAttributes = TypeAttributes.Interface | TypeAttributes.Abstract | TypeAttributes.BeforeFieldInit;
 
         if (isNested)
             baseAttributes |= TypeAttributes.NestedPublic;

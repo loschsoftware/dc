@@ -296,8 +296,8 @@ member_special_modifier
     ;
 
 type_member
-    : attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals expression)?
-    | attribute? member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? Colon type_name
+    : attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals expression)?
+    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? Colon type_name
     ;
 
 access_modifier_member_group

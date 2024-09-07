@@ -110,6 +110,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
         }
 
+        if (context.type_kind().Template() != null)
+            parent = null;
+
         TypeBuilder tb;
 
         if (enclosingType == null)
@@ -167,6 +170,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             FullName = tb.FullName
         };
 
+        tc.ImplementedInterfaces.AddRange(interfaces);
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
         if (context.type_parameter_list() != null)
@@ -297,11 +301,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         var paramTypes = ResolveParameterList(context.parameter_list());
 
-        MethodAttributes attribs = CliHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier());
+        (MethodAttributes attribs, MethodImplAttributes implementationFlags) = CliHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.attribute());
         if (attribs.HasFlag(MethodAttributes.Virtual))
             attribs &= ~MethodAttributes.Virtual;
 
         ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(attribs, callingConventions, paramTypes.Select(p => p.Type).ToArray());
+        cb.SetImplementationFlags(implementationFlags);
 
         CurrentMethod = new()
         {
@@ -439,11 +444,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (context.member_special_modifier().Any(m => m.Static() != null) || (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract))
                 callingConventions = CallingConventions.Standard;
-
-            MethodAttributes attrib = CliHelpers.GetMethodAttributes(
+            
+            (MethodAttributes attrib, MethodImplAttributes implementationFlags) = CliHelpers.GetMethodAttributes(
                     context.member_access_modifier(),
                     context.member_oop_modifier(),
-                    context.member_special_modifier());
+                    context.member_special_modifier(),
+                    context.attribute());
 
             if (attrib.HasFlag(MethodAttributes.PinvokeImpl))
             {
@@ -453,10 +459,27 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 return typeof(object);
             }
 
+            if (VisitorStep1 != null)
+            {
+                MethodInfo[] interfaceMethods = TypeContext.Current.ImplementedInterfaces.Select(t => t.GetMethods()).SelectMany(m => m).ToArray();
+                foreach (MethodInfo method in interfaceMethods)
+                {
+                    if (method.IsAbstract && method.GetParameters().Select(p => p.ParameterType).SequenceEqual(VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
+                    {
+                        attrib |= MethodAttributes.Final;
+                        attrib |= MethodAttributes.HideBySig;
+                        attrib |= MethodAttributes.NewSlot;
+                        attrib |= MethodAttributes.Virtual;
+                    }
+                }
+            }
+
             MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
                 context.Identifier().GetText(),
                 attrib,
                 callingConventions);
+
+            mb.SetImplementationFlags(implementationFlags);
 
             CurrentMethod = new()
             {
@@ -642,46 +665,49 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (context.attribute() != null)
             {
-                Type attribType = null;
-
-                if (context.attribute().type_name().GetText() == "EntryPoint")
-                    attribType = typeof(EntryPointAttribute);
-                else
-                    attribType = CliHelpers.ResolveTypeName(context.attribute().type_name());
-
-                if (attribType == typeof(EntryPointAttribute))
+                foreach (DassieParser.AttributeContext attribute in context.attribute())
                 {
-                    if (Context.EntryPointIsSet)
+                    Type attribType = null;
+
+                    if (attribute.type_name().GetText() == "EntryPoint")
+                        attribType = typeof(EntryPointAttribute);
+                    else
+                        attribType = CliHelpers.ResolveTypeName(attribute.type_name());
+
+                    if (attribType == typeof(EntryPointAttribute))
                     {
-                        EmitErrorMessage(
-                            context.attribute().Start.Line,
-                            context.attribute().Start.Column,
-                            context.attribute().GetText().Length,
-                            DS0055_MultipleEntryPoints,
-                            "Only one function can be declared as an entry point.");
+                        if (Context.EntryPointIsSet)
+                        {
+                            EmitErrorMessage(
+                                attribute.Start.Line,
+                                attribute.Start.Column,
+                                attribute.GetText().Length,
+                                DS0055_MultipleEntryPoints,
+                                "Only one function can be declared as an entry point.");
+                        }
+
+                        if (!mb.IsStatic)
+                        {
+                            EmitErrorMessage(
+                                context.Identifier().Symbol.Line,
+                                context.Identifier().Symbol.Column,
+                                context.Identifier().GetText().Length,
+                                DS0035_EntryPointNotStatic,
+                                "The application entry point must be static.");
+                        }
+
+                        Context.EntryPointIsSet = true;
+
+                        Context.EntryPoint = mb;
+
+                        CurrentMethod.Builder.SetCustomAttribute(new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
                     }
 
-                    if (!mb.IsStatic)
+                    else if (attribType != null)
                     {
-                        EmitErrorMessage(
-                            context.Identifier().Symbol.Line,
-                            context.Identifier().Symbol.Column,
-                            context.Identifier().GetText().Length,
-                            DS0035_EntryPointNotStatic,
-                            "The application entry point must be static.");
+                        // TODO: Support attributes on functions
+                        //CurrentMethod.Builder.SetCustomAttribute(cab);
                     }
-
-                    Context.EntryPointIsSet = true;
-
-                    Context.EntryPoint = mb;
-
-                    CurrentMethod.Builder.SetCustomAttribute(new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
-                }
-
-                else if (attribType != null)
-                {
-                    // TODO: Support attributes on functions
-                    //CurrentMethod.Builder.SetCustomAttribute(cab);
                 }
             }
 

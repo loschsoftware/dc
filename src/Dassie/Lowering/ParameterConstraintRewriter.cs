@@ -74,7 +74,15 @@ internal class ParameterConstraintRewriter : ITreeToStringRewriter
         if (member.type_name() != null)
             typeName = $"{member.Colon().Symbol.Text} {listener.GetTextForRule(member.type_name())}";
 
-        sb.Append($"{listener.GetTextForRule(member.attribute())} {val}{var} {listener.GetTextForRule(member.member_access_modifier())} {listener.GetTextForRule(member.member_oop_modifier())} {specialModsText} {ovr} {member.Identifier().Symbol.Text} {listener.GetTextForRule(member.type_parameter_list())} {paramListBuilder.ToString()} {typeName}");
+        StringBuilder attribsText = new();
+
+        if (member.attribute() != null)
+        {
+            foreach (var attrib in member.attribute())
+                attribsText.Append(listener.GetTextForRule(attrib));
+        }
+
+        sb.Append($"{attribsText.ToString()} {val}{var} {listener.GetTextForRule(member.member_access_modifier())} {listener.GetTextForRule(member.member_oop_modifier())} {specialModsText} {ovr} {member.Identifier().Symbol.Text} {listener.GetTextForRule(member.type_parameter_list())} {paramListBuilder.ToString()} {typeName}");
         sb.Append("= {");
 
         foreach (var param in member.parameter_list().parameter())

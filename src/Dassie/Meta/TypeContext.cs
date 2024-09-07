@@ -1,4 +1,5 @@
 ﻿using Dassie.Parser;
+using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
@@ -37,4 +38,6 @@ internal class TypeContext
     public List<TypeContext> Children { get; } = [];
 
     public List<TypeParameterContext> TypeParameters { get; set; } = [];
+
+    public List<Type> ImplementedInterfaces { get; } = [];
 }
