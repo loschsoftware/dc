@@ -495,5 +495,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when variant type parameters are used in invalid ways.
     /// </summary>
-    DS0118_InvalidVariance
+    DS0118_InvalidVariance,
+    /// <summary>
+    /// Emitted when two types of the same name are defined.
+    /// </summary>
+    DS0119_DuplicateTypeName,
+    /// <summary>
+    /// Emitted when two types of the same name with different type parameters are defined.
+    /// </summary>
+    DS0120_DuplicateGenericTypeName
 }

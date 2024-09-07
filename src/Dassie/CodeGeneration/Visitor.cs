@@ -130,6 +130,37 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         foreach (Type _interface in interfaces)
             tb.AddInterfaceImplementation(_interface);
 
+        if (Context.Types.Any(t => t.FullName == tb.FullName))
+        {
+            TypeContext duplicate = Context.Types.First(t => t.FullName == tb.FullName);
+            if (duplicate.TypeParameters != null && context.type_parameter_list() != null && duplicate.TypeParameters.Count != context.type_parameter_list().type_parameter().Length)
+            {
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0120_DuplicateGenericTypeName,
+                    $"Currently, the Dassie compiler does not allow creating types of the same name with different type parameters. This functionality might be added in the future. If you desperately need it, consider opening an issue on GitHub.");
+            }
+            else
+            {
+                string errMsg = "";
+                if (string.IsNullOrEmpty(CurrentFile.ExportedNamespace))
+                    errMsg = $"The global namespace";
+                else
+                    errMsg = $"The namespace '{CurrentFile.ExportedNamespace}'";
+
+                errMsg += $" already contains a definition for the type '{tb.Name}'.";
+
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0119_DuplicateTypeName,
+                    errMsg);
+            }
+        }
+
         TypeContext tc = new()
         {
             Builder = tb,
