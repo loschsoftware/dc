@@ -2118,13 +2118,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
         string typeName = context.full_identifier().Identifier().Last().GetText();
+        string backtickedTypeName = typeName;
         if (typeArgs != null && typeArgs.Length > 0)
-            typeName = $"{typeName}`{typeArgs.Length}";
+            backtickedTypeName = $"{typeName}`{typeArgs.Length}";
 
         bool handleCtor = false;
 
         ITerminalNode[] nextNodes = [];
-        if (typeName == t.Name)
+        if (backtickedTypeName == t.Name || typeName == t.Name)
         {
             nextNodes = [(context.full_identifier().Identifier().Last())];
             handleCtor = true;

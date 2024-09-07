@@ -23,7 +23,7 @@ internal static class SymbolResolver
         public Type EnumType { get; set; }
     }
 
-    public static string GetTypeArgumentListSuffix(Type[] typeArgs)
+    public static string GetTypeArgumentListSuffix(Type[] typeArgs, bool includeBacktick)
     {
         static string Name(Type t)
         {
@@ -38,7 +38,10 @@ internal static class SymbolResolver
 
         StringBuilder sb = new();
 
-        sb.Append($"`{typeArgs.Length}[");
+        if (includeBacktick)
+            sb.Append($"`{typeArgs.Length}");
+
+        sb.Append('[');
 
         foreach (Type t in typeArgs[0..^1])
             sb.Append($"[{Name(t)}],");
@@ -58,7 +61,9 @@ internal static class SymbolResolver
         for (int i = 0; i < parts.Length; i++)
         {
             string regularType = string.Join(".", parts[0..(i + 1)]);
-            typeString = string.Join(".", regularType + GetTypeArgumentListSuffix(typeArgs));
+            typeString = string.Join(".", regularType + GetTypeArgumentListSuffix(typeArgs, true));
+            string typeStringNoBacktick = string.Join(".", regularType + GetTypeArgumentListSuffix(typeArgs, false));
+
             firstUnusedPart++;
 
             if (typeArgs != null && typeArgs.Length > 0)
@@ -69,7 +74,6 @@ internal static class SymbolResolver
 
                 else
                 {
-                    // For some weird reason, some generic types don't use the ` syntax???
                     if (ResolveIdentifier(regularType, row, col, len, true) is Type genericTypeWithoutBacktick)
                         TypeHelpers.CheckGenericTypeCompatibility(genericTypeWithoutBacktick, typeArgs, row, col, len, true);
                 }
@@ -91,6 +95,24 @@ internal static class SymbolResolver
                 }
 
                 return t;
+            }
+
+            if (ResolveIdentifier(typeStringNoBacktick, row, col, len, true, typeArgs: typeArgs) is Type _t)
+            {
+                if (!noEmitFragments)
+                {
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = len,
+                        Color = TooltipGenerator.ColorForType(_t.GetTypeInfo()),
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.Type(_t.GetTypeInfo(), false, true)
+                    });
+                }
+
+                return _t;
             }
         }
 
@@ -162,6 +184,10 @@ internal static class SymbolResolver
         if (type is TypeBuilder tb)
             return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors);
 
+        Type deconstructedGenericType = null;
+        if (type.GetType().Name == "TypeBuilderInstantiation" && type.IsGenericType)
+            deconstructedGenericType = TypeHelpers.DeconstructGenericType(type);
+
         // 0. Constructors
         if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
         {
@@ -169,10 +195,9 @@ internal static class SymbolResolver
 
             List<ConstructorInfo> cons = [];
 
-            if (type.GetType().Name == "TypeBuilderInstantiation" && type.IsGenericType)
+            if (deconstructedGenericType != null)
             {
-                Type deconstructed = TypeHelpers.DeconstructGenericType(type);
-                ConstructorInfo[] _constructors = deconstructed.GetConstructors()
+                ConstructorInfo[] _constructors = deconstructedGenericType.GetConstructors()
                     .Where(c => c.GetParameters().Length == argumentTypes.Length)
                     .ToArray();
 
@@ -258,7 +283,21 @@ internal static class SymbolResolver
         }
 
         // 1. Fields
-        FieldInfo f = f = type.GetField(name/*, flags*/);
+        FieldInfo f;
+
+        if (deconstructedGenericType != null)
+        {
+            FieldInfo _f = deconstructedGenericType.GetField(name/*, flags*/);
+
+            if (_f == null)
+                f = _f;
+
+            else
+                f = TypeBuilder.GetField(type, _f);
+        }
+        else
+            f = type.GetField(name/*, flags*/);
+
         if (f != null)
         {
             if (type.IsEnum)
@@ -301,7 +340,7 @@ internal static class SymbolResolver
         }
 
         // 2. Properties
-        PropertyInfo p = type.GetProperty(name/*, flags*/);
+        PropertyInfo p = null; // type.GetProperty(name/*, flags*/);
         if (p != null)
         {
             if (!noEmitFragments)
@@ -324,10 +363,24 @@ internal static class SymbolResolver
         argumentTypes ??= Type.EmptyTypes;
         argumentTypes = argumentTypes.Where(t => t != null).ToArray();
 
-        MethodInfo[] methods = type.GetMethods()
-            .Where(m => m.Name == name)
-            .Where(m => m.GetParameters().Length == argumentTypes.Length)
-            .ToArray();
+        List<MethodInfo> methods = [];
+
+        if (deconstructedGenericType != null)
+        {
+            MethodInfo[] _constructors = deconstructedGenericType.GetMethods()
+                .Where(m => m.Name == name)
+                .Where(c => c.GetParameters().Length == argumentTypes.Length)
+                .ToArray();
+
+            foreach (MethodInfo meth in _constructors)
+                methods.Add(TypeBuilder.GetMethod(type, meth));
+        }
+        else
+        {
+            methods = type.GetMethods()
+                .Where(c => c.GetParameters().Length == argumentTypes.Length)
+                .ToList();
+        }
 
         if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
             CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
