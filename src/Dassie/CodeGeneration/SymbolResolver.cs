@@ -229,7 +229,7 @@ internal static class SymbolResolver
             type = type.GetElementType();
 
         if (type is TypeBuilder tb)
-            return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors);
+            return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors, getDefaultOverload);
 
         Type deconstructedGenericType = null;
         if (type.GetType().Name == "TypeBuilderInstantiation" && type.IsGenericType)
@@ -772,7 +772,8 @@ internal static class SymbolResolver
                     if (pType.IsByRef)
                         pType = pType.GetElementType();
 
-                    if (pType.IsAssignableFrom(argumentTypes[i]))
+                    if (pType.IsAssignableFrom(argumentTypes[i])
+                        || argumentTypes[i] == typeof(Wildcard))
                     {
                         if (pType == typeof(object))
                         {

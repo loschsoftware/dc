@@ -1936,7 +1936,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         List<FieldBuilder> flds = [];
 
         for (int i = 0; i < fieldTypes.Count; i++)
-            flds.Add(tb.DefineField($"_{i}", fieldTypes[i], FieldAttributes.Static));
+            flds.Add(tb.DefineField($"_{i}", fieldTypes[i], FieldAttributes.Public | FieldAttributes.Static));
 
         fields = flds;
     }
@@ -1946,12 +1946,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return VisitFull_identifier_member_access_expression(context, false).Type;
     }
 
-    public MethodInfo GetFunctionPointerTarget(DassieParser.Full_identifier_member_access_expressionContext context)
+    public MethodInfo GetFunctionPointerTarget(DassieParser.Full_identifier_member_access_expressionContext context, out FieldInfo instance, out MethodInfo target)
     {
         List<Type> argumentTypes = [];
         List<int> wildcardIndices = [];
         TypeBuilder containerType = null;
         List<FieldBuilder> fields = null;
+        instance = null;
 
         if (context.arglist() != null)
         {
@@ -2004,10 +2005,28 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.arglist() != null)
             _args = argumentTypes.ToArray();
 
+        CurrentMethod.CaptureSymbols = true;
         MethodInfo method = VisitFull_identifier_member_access_expression(context, true, _args).Result;
+        CurrentMethod.CaptureSymbols = false;
+
+        target = method;
 
         if (context.arglist() == null)
+        {
+            CurrentMethod.CapturedSymbols.Clear();
             return method;
+        }
+
+        if (!method.IsStatic)
+        {
+            instance = containerType.DefineField($"{method.Name}$_BaseInstance", method.DeclaringType, FieldAttributes.Public | FieldAttributes.Static);
+
+            var symbols = CurrentMethod.CapturedSymbols.Where(s => s.Type() == method.DeclaringType);
+            if (symbols.Any())
+                CurrentMethod.AdditionalStorageLocations.Add(symbols.Last(), instance);
+        }
+
+        CurrentMethod.CapturedSymbols.Clear();
 
         int wildcardIndex = 0;
         ParameterInfo[] originalParams = method.GetParameters();
@@ -2015,6 +2034,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         MethodBuilder result = containerType.DefineMethod("Invoke", MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard, method.ReturnType, wildcardParams);
 
         ILGenerator il = result.GetILGenerator();
+
+        if (!method.IsStatic)
+            il.Emit(OpCodes.Ldsfld, instance);
 
         for (int i = 0; i < argumentTypes.Count; i++)
         {
@@ -2369,7 +2391,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 flags,
                 getDefaultOverload: ignoreParams);
 
-            if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null)
+            if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null && !getFunctionPointerTarget)
             {
                 Visit(context.arglist());
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
@@ -4154,17 +4176,37 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context)
     {
+        MethodInfo pointerTarget = null;
         MethodInfo m = null;
         Type delegateType = null;
+        FieldInfo instanceField = null;
 
         if ((((List<Type>)[typeof(DassieParser.Member_access_expressionContext), typeof(DassieParser.Full_identifier_member_access_expressionContext)]).Contains(context.expression().GetType())))
         {
             if (context.expression().GetType() == typeof(DassieParser.Full_identifier_member_access_expressionContext))
-                m = GetFunctionPointerTarget(context.expression() as DassieParser.Full_identifier_member_access_expressionContext);
+                m = GetFunctionPointerTarget(context.expression() as DassieParser.Full_identifier_member_access_expressionContext, out instanceField, out pointerTarget);
+        }
+
+        if (!pointerTarget.IsStatic)
+        {
+            if (instanceField != null)
+            {
+                CurrentMethod.IL.Emit(OpCodes.Stsfld, instanceField);
+                CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
+            }
         }
 
         if (m.IsStatic)
             CurrentMethod.IL.Emit(OpCodes.Ldnull);
+        else
+        {
+            if (instanceField != null)
+            {
+                CurrentMethod.IL.Emit(OpCodes.Stsfld, instanceField);
+                CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
+                CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
+            }
+        }
 
         EmitLdftn(m);
 
