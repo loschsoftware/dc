@@ -2556,7 +2556,7 @@ public partial class DassieParser : Parser {
 				State = 245;
 				Match(Dollar_Backslash);
 				State = 246;
-				expression(30);
+				expression(29);
 				}
 				break;
 			case 6:
@@ -2598,7 +2598,7 @@ public partial class DassieParser : Parser {
 				State = 255;
 				assignment_operator();
 				State = 256;
-				expression(28);
+				expression(27);
 				}
 				break;
 			case 7:
@@ -3417,50 +3417,50 @@ public partial class DassieParser : Parser {
 						break;
 					case 17:
 						{
-						_localctx = new Implementation_query_expressionContext(new ExpressionContext(_parentctx, _parentState));
+						_localctx = new Index_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 487;
-						if (!(Precpred(Context, 29))) throw new FailedPredicateException(this, "Precpred(Context, 29)");
+						if (!(Precpred(Context, 31))) throw new FailedPredicateException(this, "Precpred(Context, 31)");
 						State = 488;
-						Match(Double_Dot_Question_Mark);
+						Match(Double_Colon);
 						State = 489;
-						expression(30);
+						expression(32);
 						}
 						break;
 					case 18:
 						{
-						_localctx = new Right_pipe_expressionContext(new ExpressionContext(_parentctx, _parentState));
+						_localctx = new Implementation_query_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 490;
-						if (!(Precpred(Context, 27))) throw new FailedPredicateException(this, "Precpred(Context, 27)");
+						if (!(Precpred(Context, 28))) throw new FailedPredicateException(this, "Precpred(Context, 28)");
 						State = 491;
-						Match(Arrow_Right);
+						Match(Double_Dot_Question_Mark);
 						State = 492;
-						expression(28);
+						expression(29);
 						}
 						break;
 					case 19:
 						{
-						_localctx = new Left_pipe_expressionContext(new ExpressionContext(_parentctx, _parentState));
+						_localctx = new Right_pipe_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 493;
 						if (!(Precpred(Context, 26))) throw new FailedPredicateException(this, "Precpred(Context, 26)");
 						State = 494;
-						Match(Arrow_Left);
+						Match(Arrow_Right);
 						State = 495;
 						expression(27);
 						}
 						break;
 					case 20:
 						{
-						_localctx = new Index_expressionContext(new ExpressionContext(_parentctx, _parentState));
+						_localctx = new Left_pipe_expressionContext(new ExpressionContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expression);
 						State = 496;
-						if (!(Precpred(Context, 24))) throw new FailedPredicateException(this, "Precpred(Context, 24)");
+						if (!(Precpred(Context, 25))) throw new FailedPredicateException(this, "Precpred(Context, 25)");
 						State = 497;
-						Match(Double_Colon);
+						Match(Arrow_Left);
 						State = 498;
-						expression(25);
+						expression(26);
 						}
 						break;
 					case 21:
@@ -8001,10 +8001,10 @@ public partial class DassieParser : Parser {
 		case 13: return Precpred(Context, 35);
 		case 14: return Precpred(Context, 34);
 		case 15: return Precpred(Context, 33);
-		case 16: return Precpred(Context, 29);
-		case 17: return Precpred(Context, 27);
+		case 16: return Precpred(Context, 31);
+		case 17: return Precpred(Context, 28);
 		case 18: return Precpred(Context, 26);
-		case 19: return Precpred(Context, 24);
+		case 19: return Precpred(Context, 25);
 		case 20: return Precpred(Context, 2);
 		case 21: return Precpred(Context, 21);
 		case 22: return Precpred(Context, 19);
@@ -8154,9 +8154,9 @@ public partial class DassieParser : Parser {
 		5,46,0,0,235,15,1,0,0,0,236,237,6,8,-1,0,237,238,5,108,0,0,238,434,3,16,
 		8,50,239,240,5,64,0,0,240,434,3,16,8,47,241,242,5,82,0,0,242,434,3,16,
 		8,32,243,244,5,73,0,0,244,434,3,40,20,0,245,246,5,75,0,0,246,434,3,16,
-		8,30,247,249,7,0,0,0,248,247,1,0,0,0,248,249,1,0,0,0,249,250,1,0,0,0,250,
+		8,29,247,249,7,0,0,0,248,247,1,0,0,0,248,249,1,0,0,0,249,250,1,0,0,0,250,
 		253,5,118,0,0,251,252,5,53,0,0,252,254,3,40,20,0,253,251,1,0,0,0,253,254,
-		1,0,0,0,254,255,1,0,0,0,255,256,3,124,62,0,256,257,3,16,8,28,257,434,1,
+		1,0,0,0,254,255,1,0,0,0,255,256,3,124,62,0,256,257,3,16,8,27,257,434,1,
 		0,0,0,258,434,3,58,29,0,259,261,3,64,32,0,260,259,1,0,0,0,261,262,1,0,
 		0,0,262,260,1,0,0,0,262,263,1,0,0,0,263,264,1,0,0,0,264,265,3,16,8,23,
 		265,434,1,0,0,0,266,270,3,44,22,0,267,269,5,2,0,0,268,267,1,0,0,0,269,
@@ -8223,9 +8223,9 @@ public partial class DassieParser : Parser {
 		36,0,0,476,477,5,85,0,0,477,525,3,16,8,37,478,479,10,35,0,0,479,480,5,
 		76,0,0,480,525,3,16,8,36,481,482,10,34,0,0,482,483,5,79,0,0,483,525,3,
 		16,8,35,484,485,10,33,0,0,485,486,5,71,0,0,486,525,3,16,8,34,487,488,10,
-		29,0,0,488,489,5,51,0,0,489,525,3,16,8,30,490,491,10,27,0,0,491,492,5,
-		115,0,0,492,525,3,16,8,28,493,494,10,26,0,0,494,495,5,116,0,0,495,525,
-		3,16,8,27,496,497,10,24,0,0,497,498,5,55,0,0,498,525,3,16,8,25,499,500,
+		31,0,0,488,489,5,55,0,0,489,525,3,16,8,32,490,491,10,28,0,0,491,492,5,
+		51,0,0,492,525,3,16,8,29,493,494,10,26,0,0,494,495,5,115,0,0,495,525,3,
+		16,8,27,496,497,10,25,0,0,497,498,5,116,0,0,498,525,3,16,8,26,499,500,
 		10,2,0,0,500,501,3,124,62,0,501,502,3,16,8,3,502,525,1,0,0,0,503,504,10,
 		21,0,0,504,525,3,46,23,0,505,506,10,19,0,0,506,525,3,56,28,0,507,508,10,
 		7,0,0,508,525,5,2,0,0,509,510,10,6,0,0,510,525,5,57,0,0,511,514,10,3,0,

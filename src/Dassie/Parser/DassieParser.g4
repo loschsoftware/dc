@@ -60,6 +60,7 @@ expression
     | expression Double_Bar expression #logical_or_expression
     | expression Caret expression #xor_expression
     | Ampersand expression #byref_expression
+    | expression Double_Colon expression #index_expression
     | Caret_Backslash type_name  #typeof_expression
     | Dollar_Backslash expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
@@ -68,7 +69,6 @@ expression
     | expression Arrow_Left expression #left_pipe_expression
     /*| expression Dot Identifier #dotted_expression*/
     | range #range_expression
-    | expression Double_Colon expression #index_expression
     | attribute+ expression #attributed_expression
     | if_branch NewLine* elif_branch* NewLine* else_branch? #prefix_if_expression
     | expression postfix_if_branch #postfix_if_expression
