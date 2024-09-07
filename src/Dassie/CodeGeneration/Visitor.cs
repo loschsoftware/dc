@@ -721,7 +721,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
         }
 
-        if (t.IsGenericType && t.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant))
+        if (t.IsGenericTypeParameter && t.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant))
         {
             EmitErrorMessage(
                 param.type_name().Start.Line,

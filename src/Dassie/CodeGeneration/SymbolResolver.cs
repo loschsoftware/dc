@@ -340,7 +340,14 @@ internal static class SymbolResolver
         }
 
         // 2. Properties
-        PropertyInfo p = null; // type.GetProperty(name/*, flags*/);
+        PropertyInfo p = null;
+
+        try
+        {
+            p = type.GetProperty(name/*, flags*/);
+        }
+        catch { }
+
         if (p != null)
         {
             if (!noEmitFragments)
@@ -378,6 +385,7 @@ internal static class SymbolResolver
         else
         {
             methods = type.GetMethods()
+                .Where(m => m.Name == name)
                 .Where(c => c.GetParameters().Length == argumentTypes.Length)
                 .ToList();
         }
