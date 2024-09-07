@@ -444,7 +444,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (context.member_special_modifier().Any(m => m.Static() != null) || (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract))
                 callingConventions = CallingConventions.Standard;
-            
+
             (MethodAttributes attrib, MethodImplAttributes implementationFlags) = CliHelpers.GetMethodAttributes(
                     context.member_access_modifier(),
                     context.member_oop_modifier(),
@@ -1928,7 +1928,111 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     int memberIndex = -1;
     bool notLoadAddress = false;
 
+    private static void MakeFunctionPointerContainerType(string functionName, List<Type> fieldTypes, out TypeBuilder tb, out List<FieldBuilder> fields)
+    {
+        tb = Context.Module.DefineType(
+            $"{functionName}$", TypeAttributes.Sealed | TypeAttributes.Abstract);
+
+        List<FieldBuilder> flds = [];
+
+        for (int i = 0; i < fieldTypes.Count; i++)
+            flds.Add(tb.DefineField($"_{i}", fieldTypes[i], FieldAttributes.Static));
+
+        fields = flds;
+    }
+
     public override Type VisitFull_identifier_member_access_expression([NotNull] DassieParser.Full_identifier_member_access_expressionContext context)
+    {
+        return VisitFull_identifier_member_access_expression(context, false).Type;
+    }
+
+    public MethodInfo GetFunctionPointerTarget(DassieParser.Full_identifier_member_access_expressionContext context)
+    {
+        List<Type> argumentTypes = [];
+        List<int> wildcardIndices = [];
+        TypeBuilder containerType = null;
+        List<FieldBuilder> fields = null;
+
+        if (context.arglist() != null)
+        {
+            string funcName = context.full_identifier().GetText();
+            string containerTypeName = $"{funcName}$";
+
+            List<Type> argTypes = [];
+
+            CliHelpers.RedirectEmitterToNullStream();
+
+            foreach (DassieParser.ExpressionContext argument in context.arglist().expression())
+            {
+                if (!TreeHelpers.IsType<DassieParser.Wildcard_atomContext>(argument))
+                    argTypes.Add(Visit(argument));
+            }
+
+            CliHelpers.ResetNullStream();
+
+            MakeFunctionPointerContainerType(funcName, argTypes, out containerType, out fields);
+
+            DassieParser.ExpressionContext[] args = context.arglist().expression();
+
+            CurrentMethod.CaptureSymbols = true;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                DassieParser.ExpressionContext argument = args[i];
+                if (TreeHelpers.IsType<DassieParser.Wildcard_atomContext>(argument))
+                {
+                    argumentTypes.Add(typeof(Wildcard));
+                    wildcardIndices.Add(i);
+                }
+                else
+                {
+                    FieldInfo fld = fields.First(f => f.Name == $"_{i}");
+                    Type t = Visit(argument);
+                    CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
+                    argumentTypes.Add(t);
+
+                    if (CurrentMethod.CapturedSymbols.Count > 0)
+                        CurrentMethod.AdditionalStorageLocations.Add(CurrentMethod.CapturedSymbols.Last(), fld);
+                }
+            }
+
+            CurrentMethod.CaptureSymbols = false;
+            CurrentMethod.CapturedSymbols.Clear();
+        }
+
+        Type[] _args = null;
+        if (context.arglist() != null)
+            _args = argumentTypes.ToArray();
+
+        MethodInfo method = VisitFull_identifier_member_access_expression(context, true, _args).Result;
+
+        if (context.arglist() == null)
+            return method;
+
+        int wildcardIndex = 0;
+        ParameterInfo[] originalParams = method.GetParameters();
+        Type[] wildcardParams = originalParams.Where(p => wildcardIndices.Contains(p.Position)).Select(p => p.ParameterType).ToArray();
+        MethodBuilder result = containerType.DefineMethod("Invoke", MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard, method.ReturnType, wildcardParams);
+
+        ILGenerator il = result.GetILGenerator();
+
+        for (int i = 0; i < argumentTypes.Count; i++)
+        {
+            if (argumentTypes[i] == typeof(Wildcard))
+                il.Emit(OpCodes.Ldarg_S, (byte)wildcardIndex++);
+            else
+                il.Emit(OpCodes.Ldsfld, fields.First(f => f.Name == $"_{i}"));
+        }
+
+        il.Emit(OpCodes.Call, method);
+
+        il.Emit(OpCodes.Ret);
+
+        containerType?.CreateType();
+        return result;
+    }
+
+    public (Type Type, MethodInfo Result) VisitFull_identifier_member_access_expression([NotNull] DassieParser.Full_identifier_member_access_expressionContext context, bool getFunctionPointerTarget, Type[] functionPointerParams = null, Type functionPointerRet = null)
     {
         memberIndex++;
 
@@ -1951,7 +2055,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             context.full_identifier().Identifier().Last().Symbol.Line,
             context.full_identifier().Identifier().Last().Symbol.Column,
             context.full_identifier().Identifier().Last().GetText().Length))
-            return typeof(void);
+            return (typeof(void), null);
 
         object o = SymbolResolver.GetSmallestTypeFromLeft(
             context.full_identifier(),
@@ -1961,6 +2065,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             context.full_identifier().GetText().Length,
             out int firstIndex);
 
+        MethodInfo result = null;
         Type t = null;
         bool exitEarly = true;
 
@@ -1980,7 +2085,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     DS0056_SymbolResolveError,
                     $"The name '{context.full_identifier().Identifier()[0].GetText()}' could not be resolved.");
 
-                return null;
+                return (null, null);
             }
 
             if (o is ParamInfo p)
@@ -2027,7 +2132,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (TryGetConstantValue(f, out object v))
                 {
                     EmitConst(v);
-                    return f.FieldType;
+                    return (f.FieldType, null);
                 }
 
                 if (f.IsStatic)
@@ -2073,8 +2178,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 bool allowTailCall = CurrentMethod.AllowTailCallEmission;
                 CurrentMethod.AllowTailCallEmission = false;
 
-                if (context.arglist() != null)
+                if (context.arglist() != null && !getFunctionPointerTarget)
                     Visit(context.arglist());
+
+                Type[] argTypes = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
+
+                if (getFunctionPointerTarget)
+                {
+                    if (functionPointerParams != null)
+                        argTypes = functionPointerParams;
+                    else
+                        argTypes = null;
+                }
 
                 ErrorMessageHelpers.EmitDS0002ErrorIfInvalid(
                     context.full_identifier().Identifier()[0].Symbol.Line,
@@ -2083,14 +2198,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     meth.Name,
                     meth.DeclaringType,
                     meth,
-                    CurrentMethod.ArgumentTypesForNextMethodCall.ToArray());
+                    argTypes);
 
                 CurrentMethod.AllowTailCallEmission = allowTailCall;
 
-                EmitTailcall();
-                EmitCall(meth.DeclaringType, meth);
+                if (!getFunctionPointerTarget)
+                {
+                    EmitTailcall();
+                    EmitCall(meth.DeclaringType, meth);
+                }
 
-                if (meth.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
+                if (meth.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress && !getFunctionPointerTarget)
                 {
                     CurrentMethod.IL.DeclareLocal(meth.ReturnType);
                     CurrentMethod.LocalIndex++;
@@ -2100,6 +2218,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
 
+                result = meth;
                 t = meth.ReturnType;
 
                 if (typeParams.Contains(t))
@@ -2109,12 +2228,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // Global method
             else if (o is List<MethodInfo> methods)
             {
-                //int boxMemberIndex = memberIndex;
+                if (getFunctionPointerTarget && functionPointerParams == null && functionPointerRet == null && methods.Count > 0)
+                {
+                    MethodInfo fptr = methods.First();
+                    return (fptr.ReturnType, fptr);
+                }
 
                 bool allowTailCall = CurrentMethod.AllowTailCallEmission;
                 CurrentMethod.AllowTailCallEmission = false;
 
-                if (context.arglist() != null)
+                if (context.arglist() != null && !getFunctionPointerTarget)
                     Visit(context.arglist());
 
                 CurrentMethod.AllowTailCallEmission = allowTailCall;
@@ -2123,7 +2246,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
                 MethodInfo final = null;
 
-                if (methods.Any())
+                if (getFunctionPointerTarget && functionPointerParams != null)
+                    argumentTypes = functionPointerParams;
+
+                if (methods.Count > 0)
                 {
                     foreach (MethodInfo possibleMethod in methods)
                     {
@@ -2179,13 +2305,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     });
                 }
 
-                EmitCall(final.DeclaringType, final);
-                return final.ReturnType;
+                if (!getFunctionPointerTarget)
+                    EmitCall(final.DeclaringType, final);
+
+                return (final.ReturnType, final);
             }
         }
 
         if (context.full_identifier().Identifier().Length == 1 && exitEarly)
-            return t;
+            return (t, result);
 
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
@@ -2225,6 +2353,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
             }
 
+            if (functionPointerParams != null)
+                _params = functionPointerParams;
+
+            bool ignoreParams = getFunctionPointerTarget && functionPointerParams == null;
+
             object member = SymbolResolver.ResolveMember(
                 t,
                 memberName,
@@ -2233,7 +2366,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 identifier.GetText().Length,
                 false,
                 _params,
-                flags);
+                flags,
+                getDefaultOverload: ignoreParams);
 
             if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null)
             {
@@ -2242,7 +2376,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
 
             if (member == null)
-                return null;
+                return (null, null);
 
             if (member is Type nestedType)
             {
@@ -2320,8 +2454,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     //EmitLdloca(CurrentMethod.LocalIndex);
                 }
 
-                EmitTailcall();
-                EmitCall(t, m);
+                if (!getFunctionPointerTarget || identifier != nextNodes.Last())
+                {
+                    EmitTailcall();
+                    EmitCall(t, m);
+                }
+
+                if (identifier == nextNodes.Last())
+                    result = m;
+
                 t = m.ReturnType;
 
                 if (VisitorStep1CurrentMethod != null)
@@ -2330,7 +2471,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         //CurrentMethod.ParameterBoxIndices.Clear();
-        return t;
+        return (t, result);
     }
 
     public override Type VisitMember_access_expression([NotNull] DassieParser.Member_access_expressionContext context)
@@ -4009,5 +4150,65 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitSeparated_expression([NotNull] DassieParser.Separated_expressionContext context)
     {
         return Visit(context.expression());
+    }
+
+    public override Type VisitFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context)
+    {
+        MethodInfo m = null;
+        Type delegateType = null;
+
+        if ((((List<Type>)[typeof(DassieParser.Member_access_expressionContext), typeof(DassieParser.Full_identifier_member_access_expressionContext)]).Contains(context.expression().GetType())))
+        {
+            if (context.expression().GetType() == typeof(DassieParser.Full_identifier_member_access_expressionContext))
+                m = GetFunctionPointerTarget(context.expression() as DassieParser.Full_identifier_member_access_expressionContext);
+        }
+
+        if (m.IsStatic)
+            CurrentMethod.IL.Emit(OpCodes.Ldnull);
+
+        EmitLdftn(m);
+
+        ParameterInfo[] parameters = m.GetParameters();
+
+        if (parameters.Length > 16)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                DS0121_FunctionPointerTooManyArguments,
+                $"The function '{m.Name}' has {parameters.Length} parameters, which is more than the maximum supported amount of parameters for function pointers, which is 16.");
+        }
+
+        if (m.ReturnType == typeof(void))
+        {
+            if (parameters.Length == 0)
+                delegateType = typeof(Action);
+            else
+            {
+                string openActionName = $"System.Action`{parameters.Length}";
+                Type openActionType = Type.GetType(openActionName);
+
+                delegateType = openActionType.MakeGenericType(parameters.Select(p => p.ParameterType).ToArray());
+            }
+        }
+        else
+        {
+            string openFuncName = $"System.Func`{parameters.Length + 1}";
+            Type openFuncType = Type.GetType(openFuncName);
+
+            List<Type> typeArgs = [];
+            if (parameters.Length != 0)
+                typeArgs.AddRange(parameters.Select(p => p.ParameterType));
+            typeArgs.Add(m.ReturnType);
+
+            delegateType = openFuncType.MakeGenericType(typeArgs.ToArray());
+        }
+
+        ConstructorInfo con = delegateType.GetConstructor([typeof(object), typeof(nint)]);
+        if (con != null)
+            CurrentMethod.IL.Emit(OpCodes.Newobj, con);
+
+        return delegateType;
     }
 }

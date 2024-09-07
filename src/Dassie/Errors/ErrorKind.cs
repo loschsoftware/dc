@@ -503,5 +503,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when two types of the same name with different type parameters are defined.
     /// </summary>
-    DS0120_DuplicateGenericTypeName
+    DS0120_DuplicateGenericTypeName,
+    /// <summary>
+    /// Emitted when a function pointer is created for a function with more than 16 arguments.
+    /// </summary>
+    DS0121_FunctionPointerTooManyArguments
 }

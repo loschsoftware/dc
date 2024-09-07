@@ -4,6 +4,7 @@ using Dassie.Text;
 using Dassie.Text.Tooltips;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Dassie.Meta;
@@ -181,6 +182,12 @@ internal class SymbolInfo
                     CurrentMethod.IL.Emit(OpCodes.Stfld, Field.Builder);
                 }
                 break;
+        }
+
+        if (CurrentMethod.AdditionalStorageLocations.TryGetValue(this, out FieldInfo fld))
+        {
+            Load();
+            CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
         }
     }
 

@@ -61,6 +61,7 @@ expression
     | expression Caret expression #xor_expression
     | Ampersand expression #byref_expression
     | expression Double_Colon expression #index_expression
+    | Func function_pointer_parameter_list expression #function_pointer_expression
     | Caret_Backslash type_name  #typeof_expression
     | Dollar_Backslash expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression
@@ -95,6 +96,7 @@ expression
     | expression (Dot Identifier)+ type_arg_list? arglist? #member_access_expression
     | expression assignment_operator expression #assignment
     | Backslash parameter_list (Colon type_name)? Equals expression #anonymous_function_expression
+    // | Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals expression)? #local_function_expression
     ;
 
 atom
@@ -366,3 +368,7 @@ assignment_operator
 	| Dot_Equals
 	| Double_Question_Mark_Equals
 	;
+
+function_pointer_parameter_list
+    : (Open_Paren type_name (Comma type_name)* Close_Paren)? (Colon type_name)?
+    ;

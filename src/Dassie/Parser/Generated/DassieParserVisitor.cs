@@ -92,6 +92,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitCode_block([NotNull] DassieParser.Code_blockContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>function_pointer_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>subtraction_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -765,5 +772,11 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitAssignment_operator([NotNull] DassieParser.Assignment_operatorContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.function_pointer_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFunction_pointer_parameter_list([NotNull] DassieParser.Function_pointer_parameter_listContext context);
 }
 } // namespace Dassie.Parser

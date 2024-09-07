@@ -129,6 +129,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitCode_block([NotNull] DassieParser.Code_blockContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>function_pointer_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>function_pointer_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>subtraction_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -1268,5 +1280,15 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitAssignment_operator([NotNull] DassieParser.Assignment_operatorContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.function_pointer_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterFunction_pointer_parameter_list([NotNull] DassieParser.Function_pointer_parameter_listContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.function_pointer_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitFunction_pointer_parameter_list([NotNull] DassieParser.Function_pointer_parameter_listContext context);
 }
 } // namespace Dassie.Parser

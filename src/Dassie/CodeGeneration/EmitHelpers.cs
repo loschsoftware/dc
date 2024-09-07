@@ -303,6 +303,14 @@ internal static class EmitHelpers
             CurrentMethod.SkipPop = true;
     }
 
+    public static void EmitLdftn(MethodInfo m)
+    {
+        if (m.IsStatic || m.DeclaringType.IsValueType)
+            CurrentMethod.IL.Emit(OpCodes.Ldftn, m);
+        else
+            CurrentMethod.IL.Emit(OpCodes.Ldvirtftn, m);
+    }
+
     public static bool TryGetConstantValue(FieldInfo field, out object value)
     {
         try

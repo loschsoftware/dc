@@ -2,6 +2,7 @@
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Runtime;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using System.Threading;
 
 namespace Dassie.CodeGeneration;
 
@@ -132,7 +134,30 @@ internal static class SymbolResolver
     {
         // 1. Parameters
         if (CurrentMethod.Parameters.Any(p => p.Name == text))
-            return CurrentMethod.Parameters.First(p => p.Name == text);
+        {
+            ParamInfo param = CurrentMethod.Parameters.First(p => p.Name == text);
+
+            if (CurrentMethod.CaptureSymbols)
+            {
+                CurrentMethod.CapturedSymbols.Add(new()
+                {
+                    Parameter = param
+                });
+            }
+
+            return param;
+        }
+
+        if (CurrentMethod.IsLocalFunction && CurrentMethod.Parent.Parameters.Any(p => p.Name == text))
+        {
+            ParamInfo param = CurrentMethod.Parameters.First(p => p.Name == text);
+            CurrentMethod.CapturedSymbols.Add(new()
+            {
+                Parameter = param
+            });
+
+            return param;
+        }
 
         // 2. Locals
         if (CurrentMethod.Locals.Any(p => p.Name == text))
@@ -148,6 +173,28 @@ internal static class SymbolResolver
                     DS0062_LocalOutsideScope,
                     $"The local '{loc.Name}' is not in scope.");
             }
+
+            if (CurrentMethod.CaptureSymbols)
+            {
+                CurrentMethod.CapturedSymbols.Add(new()
+                {
+                    Local = loc
+                });
+            }
+
+            return loc;
+        }
+
+        if (CurrentMethod.IsLocalFunction && CurrentMethod.Parent.Locals.Any(p => p.Name == text))
+        {
+            LocalInfo loc = CurrentMethod.Parent.Locals.First(p => p.Name == text);
+
+            // TODO: Check scoping
+
+            CurrentMethod.CapturedSymbols.Add(new()
+            {
+                Local = loc
+            });
 
             return loc;
         }
@@ -172,7 +219,7 @@ internal static class SymbolResolver
     }
 
     static int memberIndex = -1;
-    public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true)
+    public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true, bool getDefaultOverload = false)
     {
         memberIndex++;
 
@@ -189,8 +236,12 @@ internal static class SymbolResolver
             deconstructedGenericType = TypeHelpers.DeconstructGenericType(type);
 
         // -1. Nested types
-        if (type.GetNestedTypes().Any(t => t.Name == name))
-            return type.GetNestedType(name);
+        try
+        {
+            if (type.GetNestedTypes().Any(t => t.Name == name))
+                return type.GetNestedType(name);
+        }
+        catch { }
 
         // 0. Constructors
         if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
@@ -374,25 +425,27 @@ internal static class SymbolResolver
         argumentTypes ??= Type.EmptyTypes;
         argumentTypes = argumentTypes.Where(t => t != null).ToArray();
 
-        List<MethodInfo> methods = [];
+        IEnumerable<MethodInfo> methods = [];
 
         if (deconstructedGenericType != null)
         {
             MethodInfo[] _constructors = deconstructedGenericType.GetMethods()
                 .Where(m => m.Name == name)
-                .Where(c => c.GetParameters().Length == argumentTypes.Length)
                 .ToArray();
 
             foreach (MethodInfo meth in _constructors)
-                methods.Add(TypeBuilder.GetMethod(type, meth));
+                methods = methods.Append(TypeBuilder.GetMethod(type, meth));
         }
         else
         {
             methods = type.GetMethods()
-                .Where(m => m.Name == name)
-                .Where(c => c.GetParameters().Length == argumentTypes.Length)
-                .ToList();
+                .Where(m => m.Name == name);
         }
+
+        if (getDefaultOverload && methods.Any())
+            return methods.First();
+
+        methods = methods.Where(c => c.GetParameters().Length == argumentTypes.Length);
 
         if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
             CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
@@ -424,7 +477,8 @@ internal static class SymbolResolver
 
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
-                    if (possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
+                    if (possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i])
+                        || possibleMethod.GetParameters()[i].ParameterType == typeof(Wildcard))
                     {
                         if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                         {
@@ -498,7 +552,7 @@ internal static class SymbolResolver
         return null;
     }
 
-    private static object ResolveMember(TypeBuilder tb, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true)
+    private static object ResolveMember(TypeBuilder tb, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true, bool getDefaultOverload = false)
     {
         TypeContext[] types = Context.Types.Where(c => c.Builder == tb).ToArray();
 
@@ -560,7 +614,8 @@ internal static class SymbolResolver
 
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
-                    if (argumentTypes[i] == possibleMethod.GetParameters()[i].ParameterType || possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i]))
+                    if (possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i])
+                        || possibleMethod.GetParameters()[i].ParameterType == typeof(Wildcard))
                     {
                         if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
                         {
@@ -678,10 +733,13 @@ internal static class SymbolResolver
         // 3. Methods
         argumentTypes ??= Type.EmptyTypes;
 
-        MethodInfo[] methods = tc.Methods.Select(m => m.Builder)
-            .Where(m => m != null && m.Name == name)
-            .Where(m => m != null && m.GetParameters().Length == argumentTypes.Length)
-            .ToArray();
+        IEnumerable<MethodInfo> methods = tc.Methods.Select(m => m.Builder)
+            .Where(m => m != null && m.Name == name);
+
+        if (getDefaultOverload && methods.Any())
+            return methods.First();
+
+        methods = methods.Where(m => m != null && m.GetParameters().Length == argumentTypes.Length);
 
         if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
             CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());

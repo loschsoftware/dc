@@ -56,6 +56,7 @@ False: 'false';
 
 This: 'this';
 
+Func: 'func';
 Default: 'default';
 
 Open_Paren: '(';

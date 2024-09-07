@@ -1,4 +1,5 @@
 ﻿using Dassie.CLI.Helpers;
+using Dassie.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,6 +62,9 @@ internal class ErrorMessageHelpers
 
     public static void EmitDS0002ErrorIfInvalid(int row, int col, int len, string name, Type type, MethodBase overload, Type[] providedArgs)
     {
+        if (providedArgs == null)
+            return;
+
         bool error = false;
 
         if (overload.GetParameters().Length != providedArgs.Length)
@@ -72,6 +76,9 @@ internal class ErrorMessageHelpers
             {
                 if (!overload.GetParameters()[i].ParameterType.IsAssignableFrom(providedArgs[i]))
                 {
+                    if (providedArgs[i] == typeof(Wildcard))
+                        continue;
+
                     error = true;
                     break;
                 }

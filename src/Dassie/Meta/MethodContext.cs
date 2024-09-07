@@ -159,4 +159,18 @@ internal class MethodContext
     public int CurrentScope { get; set; }
 
     public List<TypeParameterContext> TypeParameters { get; set; } = [];
+
+    public List<SymbolInfo> CapturedSymbols { get; set; } = [];
+
+    public List<MethodContext> LocalFunctions { get; set; } = [];
+
+    public bool IsLocalFunction { get; set; }
+    
+    public MethodContext Parent { get; set; }
+
+    public TypeContext LocalFunctionContainerType { get; set; }
+
+    public bool CaptureSymbols { get; set; }
+
+    public Dictionary<SymbolInfo, FieldInfo> AdditionalStorageLocations { get; set; } = [];
 }

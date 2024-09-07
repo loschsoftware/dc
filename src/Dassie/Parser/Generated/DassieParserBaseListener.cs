@@ -152,6 +152,20 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitCode_block([NotNull] DassieParser.Code_blockContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>function_pointer_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>function_pointer_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>subtraction_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -1499,6 +1513,18 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAssignment_operator([NotNull] DassieParser.Assignment_operatorContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.function_pointer_parameter_list"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterFunction_pointer_parameter_list([NotNull] DassieParser.Function_pointer_parameter_listContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.function_pointer_parameter_list"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitFunction_pointer_parameter_list([NotNull] DassieParser.Function_pointer_parameter_listContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>
