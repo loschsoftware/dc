@@ -3580,7 +3580,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (sym is not null)
         {
-            if (sym.SymbolType == SymbolInfo.SymType.Local && sym.Local.Scope != CurrentMethod.CurrentScope)
+            if (sym.SymbolType == SymbolInfo.SymType.Local && sym.Local.Scope > CurrentMethod.CurrentScope)
             {
                 EmitErrorMessage(
                     context.Start.Line,
