@@ -507,5 +507,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a function pointer is created for a function with more than 16 arguments.
     /// </summary>
-    DS0121_FunctionPointerTooManyArguments
+    DS0121_FunctionPointerTooManyArguments,
+    /// <summary>
+    /// Emitted when a function pointer is created for an invalid expression.
+    /// </summary>
+    DS0122_InvalidFunctionPointerTargetExpression
 }

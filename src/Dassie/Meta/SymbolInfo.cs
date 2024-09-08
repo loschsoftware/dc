@@ -85,22 +85,47 @@ internal class SymbolInfo
             return;
         }
 
-        switch (SymbolType)
+        if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
         {
-            case SymType.Local:
-                EmitLdloc(Local.Index);
-                break;
+            FieldInfo fld = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
 
-            case SymType.Parameter:
-                EmitLdarg(Parameter.Index);
-                break;
+            try
+            {
+                CurrentMethod.IL.Emit(OpCodes.Ldsfld, fld);
+            }
+            catch { } // No idea why, but sometimes it throws a NullReferenceException somewhere deep inside Emit()...
+        }
 
-            default:
-                if (!Field.Builder.IsStatic)
-                    EmitLdarg0IfCurrentType(Field.Builder.FieldType);
+        else if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
+        {
+            FieldInfo fld = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
 
-                CurrentMethod.IL.Emit(Field.Builder.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, Field.Builder);
-                break;
+            try
+            {
+                CurrentMethod.IL.Emit(OpCodes.Ldsfld, fld);
+            }
+            catch { } // No idea why, but sometimes it throws a NullReferenceException somewhere deep inside Emit()...
+        }
+
+        else
+        {
+            switch (SymbolType)
+            {
+                case SymType.Local:
+                    EmitLdloc(Local.Index);
+                    break;
+
+                case SymType.Parameter:
+                    EmitLdarg(Parameter.Index);
+                    break;
+
+                default:
+                    if (!Field.Builder.IsStatic)
+                        EmitLdarg0IfCurrentType(Field.Builder.FieldType);
+
+                    CurrentMethod.IL.Emit(Field.Builder.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, Field.Builder);
+                    break;
+            }
         }
 
         if (Type().IsByRef /*|| Type().IsByRefLike*/)
@@ -109,6 +134,20 @@ internal class SymbolInfo
 
     public void LoadAddress()
     {
+        if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
+        {
+            FieldInfo fld = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            CurrentMethod.IL.Emit(OpCodes.Ldsflda, fld);
+            return;
+        }
+
+        if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
+        {
+            FieldInfo fld = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            CurrentMethod.IL.Emit(OpCodes.Ldsflda, fld);
+            return;
+        }
+
         switch (SymbolType)
         {
             case SymType.Local:
@@ -163,6 +202,20 @@ internal class SymbolInfo
             return;
         }
 
+        if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
+        {
+            FieldInfo fld = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
+            return;
+        }
+
+        if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
+        {
+            FieldInfo fld = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
+            return;
+        }
+
         switch (SymbolType)
         {
             case SymType.Local:
@@ -184,11 +237,11 @@ internal class SymbolInfo
                 break;
         }
 
-        if (CurrentMethod.AdditionalStorageLocations.TryGetValue(this, out FieldInfo fld))
-        {
-            Load();
-            CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
-        }
+        //if (CurrentMethod.AdditionalStorageLocations.TryGetValue(this, out FieldInfo fld))
+        //{
+        //    Load();
+        //    CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
+        //}
     }
 
     public bool IsMutable() => SymbolType switch
@@ -205,7 +258,7 @@ internal class SymbolInfo
         _ => Field.Builder.Name
     };
 
-    public static bool operator==(SymbolInfo left, SymbolInfo right)
+    public static bool operator ==(SymbolInfo left, SymbolInfo right)
     {
         if (left is null || right is null) return false;
 
@@ -221,7 +274,7 @@ internal class SymbolInfo
     public override bool Equals(object obj)
     {
         if (obj == null) return false;
-        if (obj is not  SymbolInfo) return false;
+        if (obj is not SymbolInfo) return false;
 
         return this == (SymbolInfo)obj;
     }

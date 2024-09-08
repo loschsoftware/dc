@@ -364,51 +364,51 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         });
     }
 
-    public override Type VisitAnonymous_function_expression([NotNull] DassieParser.Anonymous_function_expressionContext context)
-    {
-        TypeBuilder closureType = TypeContext.Current.Builder.DefineNestedType(
-            GetClosureTypeName(CurrentMethod.ClosureIndex),
-            TypeAttributes.NestedPrivate | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit | TypeAttributes.AutoClass);
+    //public override Type VisitAnonymous_function_expression([NotNull] DassieParser.Anonymous_function_expressionContext context)
+    //{
+    //    TypeBuilder closureType = TypeContext.Current.Builder.DefineNestedType(
+    //        GetClosureTypeName(CurrentMethod.ClosureIndex),
+    //        TypeAttributes.NestedPrivate | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit | TypeAttributes.AutoClass);
 
-        TypeContext.Current.Children.Add(new()
-        {
-            Builder = closureType
-        });
+    //    TypeContext.Current.Children.Add(new()
+    //    {
+    //        Builder = closureType
+    //    });
 
-        foreach (var local in CurrentMethod.Locals)
-            closureType.DefineField(local.Name, local.Builder.LocalType, FieldAttributes.Public);
+    //    foreach (var local in CurrentMethod.Locals)
+    //        closureType.DefineField(local.Name, local.Builder.LocalType, FieldAttributes.Public);
 
-        Type ret = typeof(object); // TODO: Add type inference
+    //    Type ret = typeof(object); // TODO: Add type inference
 
-        if (context.type_name() != null)
-            ret = CliHelpers.ResolveTypeName(context.type_name());
+    //    if (context.type_name() != null)
+    //        ret = CliHelpers.ResolveTypeName(context.type_name());
 
-        var paramList = ResolveParameterList(context.parameter_list());
+    //    var paramList = ResolveParameterList(context.parameter_list());
 
-        MethodBuilder invokeMethod = closureType.DefineMethod(
-            "Invoke",
-            MethodAttributes.Assembly | MethodAttributes.HideBySig,
-            CallingConventions.HasThis,
-            ret,
-            paramList.Select(p => p.Type).ToArray());
+    //    MethodBuilder invokeMethod = closureType.DefineMethod(
+    //        "Invoke",
+    //        MethodAttributes.Assembly | MethodAttributes.HideBySig,
+    //        CallingConventions.HasThis,
+    //        ret,
+    //        paramList.Select(p => p.Type).ToArray());
 
-        MethodContext current = CurrentMethod;
+    //    MethodContext current = CurrentMethod;
 
-        CurrentMethod = new()
-        {
-            Builder = invokeMethod,
-            IL = invokeMethod.GetILGenerator()
-        };
+    //    CurrentMethod = new()
+    //    {
+    //        Builder = invokeMethod,
+    //        IL = invokeMethod.GetILGenerator()
+    //    };
 
-        Visit(context.expression());
-        CurrentMethod.IL.Emit(OpCodes.Ret);
+    //    Visit(context.expression());
+    //    CurrentMethod.IL.Emit(OpCodes.Ret);
 
-        closureType.CreateType();
+    //    closureType.CreateType();
 
-        CurrentMethod = current;
-        CurrentMethod.ClosureIndex++;
-        return ret;
-    }
+    //    CurrentMethod = current;
+    //    CurrentMethod.ClosureIndex++;
+    //    return ret;
+    //}
 
     public override Type VisitType_member([NotNull] DassieParser.Type_memberContext context)
     {
@@ -534,13 +534,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.TypeParameters = typeParamContexts;
             }
 
-            Type tReturn = _tReturn; // TODO: Add proper type inference
-
-            if (context.type_name() != null)
-                tReturn = CliHelpers.ResolveTypeName(context.type_name());
-
-            mb.SetReturnType(tReturn);
-
             CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
 
             var paramTypes = ResolveParameterList(context.parameter_list());
@@ -560,19 +553,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 foreach (var param in CurrentMethod.Parameters)
                     param.Index--;
-            }
-
-            if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
-            {
-                if (tReturn.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant))
-                {
-                    EmitErrorMessage(
-                        context.type_name().Start.Line,
-                        context.type_name().Start.Column,
-                        context.type_name().GetText().Length,
-                        DS0118_InvalidVariance,
-                        $"Invalid variance: The type parameter '{tReturn.Name}' must be covariantly valid on '{mb.Name}'. '{tReturn.Name}' is contravariant.");
-                }
             }
 
             if (context.expression() == null)
@@ -616,6 +596,24 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.AllowTailCallEmission = allowTailCall || ctx is DassieParser.Block_expressionContext;
 
             _tReturn = Visit(context.expression());
+            mb.SetReturnType(_tReturn);
+
+            Type tReturn = _tReturn;
+            if (context.type_name() != null)
+                tReturn = CliHelpers.ResolveTypeName(context.type_name());
+
+            if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
+            {
+                if (tReturn.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant))
+                {
+                    EmitErrorMessage(
+                        context.type_name().Start.Line,
+                        context.type_name().Start.Column,
+                        context.type_name().GetText().Length,
+                        DS0118_InvalidVariance,
+                        $"Invalid variance: The type parameter '{tReturn.Name}' must be covariantly valid on '{mb.Name}'. '{tReturn.Name}' is contravariant.");
+                }
+            }
 
             if (_tReturn != tReturn)
             {
@@ -1941,6 +1939,124 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         fields = flds;
     }
 
+    public MethodInfo HandleAnonymousFunction([NotNull] DassieParser.Anonymous_function_expressionContext context)
+    {
+        Type ret = null;
+        string name = CurrentMethod.GetAnonymousFunctionName(++CurrentMethod.AnonymousFunctionIndex);
+
+        List<(Type Type, string Name, bool IsMutable)> parameters = [];
+
+        foreach (var param in context.parameter_list().parameter())
+        {
+            Type paramType = typeof(object);
+
+            if (param.type_name() != null)
+                paramType = CliHelpers.ResolveTypeName(param.type_name());
+
+            parameters.Add((paramType, param.Identifier().GetText(), param.Var() != null));
+        }
+
+        var locals = CurrentMethod.Locals;
+
+        Disabled = true;
+        CliHelpers.CreateFakeMethod();
+        CurrentMethod.CaptureSymbols = true;
+
+        for (int i = 0; i < parameters.Count; i++)
+        {
+            (Type Type, string Name, bool IsMutable) param = parameters[i];
+
+            LocalBuilder lb = CurrentMethod.IL.DeclareLocal(param.Type);
+            CurrentMethod.Locals.Add(new()
+            {
+                Builder = lb,
+                Index = i,
+                IsConstant = !param.IsMutable,
+                Name = param.Name,
+                Scope = 0,
+                Union = default
+            });
+        }
+
+        CurrentMethod.Locals.AddRange(locals);
+
+        Visit(context.expression());
+
+        List<Type> fieldTypes = [];
+        SymbolInfo[] capturedSymbols = CurrentMethod.CapturedSymbols.DistinctBy(s => s.Name()).Where(s => !parameters.Select(p => p.Name).Contains(s.Name())).ToArray();
+
+        foreach (var sym in capturedSymbols)
+            fieldTypes.Add(sym.Type());
+
+        CliHelpers.ResetFakeMethod();
+        Disabled = false;
+
+        MakeFunctionPointerContainerType(name, fieldTypes, out TypeBuilder closureType, out List<FieldBuilder> fields);
+        Dictionary<SymbolInfo, FieldInfo> alternativeLocations = [];
+
+        for (int i = 0; i < fields.Count; i++)
+            alternativeLocations.Add(capturedSymbols[i], fields[i]);
+
+        foreach (var loc in alternativeLocations)
+            CurrentMethod.AdditionalStorageLocations.Add(loc.Key, loc.Value);
+
+        if (context.type_name() != null)
+            ret = CliHelpers.ResolveTypeName(context.type_name());
+
+        MethodContext parentMethod = CurrentMethod;
+
+        MethodBuilder invokeFunction = closureType.DefineMethod("Invoke", MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard);
+        CurrentMethod = new()
+        {
+            Builder = invokeFunction,
+            IL = invokeFunction.GetILGenerator()
+        };
+
+        invokeFunction.SetParameters(parameters.Select(p => p.Type).ToArray());
+        for (int i = 0; i < parameters.Count; i++)
+        {
+            ParameterBuilder pb = invokeFunction.DefineParameter(i, ParameterAttributes.None, parameters[i].Name);
+            CurrentMethod.Parameters.Add(new()
+            {
+                Builder = pb,
+                Index = i,
+                IsMutable = parameters[i].IsMutable,
+                Name = parameters[i].Name,
+                Type = parameters[i].Type,
+                Union = default
+            });
+        }
+
+        foreach (var sym in capturedSymbols)
+        {
+            LocalBuilder lb = CurrentMethod.IL.DeclareLocal(sym.Type());
+            CurrentMethod.Locals.Add(new()
+            {
+                Builder = lb,
+                Index = sym.Index(),
+                IsConstant = !sym.IsMutable(),
+                Name = sym.Name(),
+                Scope = 0,
+                Union = default
+            });
+        }
+
+        foreach (var loc in alternativeLocations)
+            CurrentMethod.AdditionalStorageLocations.Add(loc.Key, loc.Value);
+
+        // Locals not available
+        Type tRet = Visit(context.expression());
+        ret ??= tRet;
+        CurrentMethod.IL.Emit(OpCodes.Ret);
+        invokeFunction.SetReturnType(ret);
+
+        SpecialStep1CurrentMethod = CurrentMethod;
+        CurrentMethod = parentMethod;
+        
+        closureType.CreateType();
+        return invokeFunction;
+    }
+
     public override Type VisitFull_identifier_member_access_expression([NotNull] DassieParser.Full_identifier_member_access_expressionContext context)
     {
         return VisitFull_identifier_member_access_expression(context, false).Type;
@@ -2026,7 +2142,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.AdditionalStorageLocations.Add(symbols.Last(), instance);
         }
 
-        CurrentMethod.CapturedSymbols.Clear();
+        //CurrentMethod.CapturedSymbols.Clear();
 
         int wildcardIndex = 0;
         ParameterInfo[] originalParams = method.GetParameters();
@@ -3611,6 +3727,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         CurrentMethod.LocalIndex++;
         CurrentMethod.Locals.Add(new(context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex, CurrentMethod.CurrentUnion));
 
+        SymbolInfo localSymbol = new()
+        {
+            Local = CurrentMethod.Locals.Last(),
+            SymbolType = SymbolInfo.SymType.Local
+        };
+
         if (t == typeof(UnionValue))
         {
             CurrentMethod.IL.Emit(OpCodes.Box, t1);
@@ -3640,9 +3762,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Newobj, constructor);
         }
 
-        EmitStloc(CurrentMethod.LocalIndex);
-
-        EmitLdloc(CurrentMethod.LocalIndex);
+        localSymbol.Set();
+        localSymbol.Load();
 
         return t;
     }
@@ -4181,10 +4302,25 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type delegateType = null;
         FieldInfo instanceField = null;
 
-        if ((((List<Type>)[typeof(DassieParser.Member_access_expressionContext), typeof(DassieParser.Full_identifier_member_access_expressionContext)]).Contains(context.expression().GetType())))
+        if (!((List<Type>)[typeof(DassieParser.Member_access_expressionContext), typeof(DassieParser.Full_identifier_member_access_expressionContext), typeof(DassieParser.Anonymous_function_expressionContext)]).Contains(context.expression().GetType()))
         {
-            if (context.expression().GetType() == typeof(DassieParser.Full_identifier_member_access_expressionContext))
-                m = GetFunctionPointerTarget(context.expression() as DassieParser.Full_identifier_member_access_expressionContext, out instanceField, out pointerTarget);
+            EmitErrorMessage(
+                context.expression().Start.Line,
+                context.expression().Start.Column,
+                context.expression().GetText().Length,
+                DS0122_InvalidFunctionPointerTargetExpression,
+                $"Invalid expression for function pointer.");
+
+            return typeof(void);
+        }
+
+        if (context.expression().GetType() == typeof(DassieParser.Full_identifier_member_access_expressionContext))
+            m = GetFunctionPointerTarget(context.expression() as DassieParser.Full_identifier_member_access_expressionContext, out instanceField, out pointerTarget);
+
+        if (context.expression().GetType() == typeof(DassieParser.Anonymous_function_expressionContext))
+        {
+            m = HandleAnonymousFunction((DassieParser.Anonymous_function_expressionContext)context.expression());
+            pointerTarget = m;
         }
 
         if (!pointerTarget.IsStatic)
@@ -4196,17 +4332,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
         }
 
-        if (m.IsStatic)
+        if (m.IsStatic && instanceField == null)
             CurrentMethod.IL.Emit(OpCodes.Ldnull);
-        else
-        {
-            if (instanceField != null)
-            {
-                CurrentMethod.IL.Emit(OpCodes.Stsfld, instanceField);
-                CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
-                CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
-            }
-        }
+        //else
+        //{
+        //    if (instanceField != null)
+        //    {
+        //        CurrentMethod.IL.Emit(OpCodes.Stsfld, instanceField);
+        //        CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
+        //        CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
+        //    }
+        //}
 
         EmitLdftn(m);
 

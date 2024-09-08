@@ -1022,8 +1022,11 @@ internal static class CliHelpers
     }
 
     static int bogusCounter = 0;
+    static MethodContext _currentMethod = null;
     public static void CreateFakeMethod()
     {
+        _currentMethod = CurrentMethod;
+
         TypeBuilder tb = Context.BogusModule.DefineType($"Bogus{bogusCounter++}");
         Context.BogusType = tb;
 
@@ -1033,6 +1036,11 @@ internal static class CliHelpers
             Builder = bogus,
             IL = bogus.GetILGenerator()
         };
+    }
+
+    public static void ResetFakeMethod()
+    {
+        CurrentMethod = _currentMethod;
     }
 
     private static ILGenerator _il = null;

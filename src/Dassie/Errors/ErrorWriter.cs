@@ -47,8 +47,16 @@ public static class ErrorWriter
     /// </summary>
     public static DassieConfig Config { get; set; } = new();
 
+    /// <summary>
+    /// Used to completely disable the error writer.
+    /// </summary>
+    public static bool Disabled { get; set; } = false;
+
     internal static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
     {
+        if (Disabled)
+            return;
+
         Context ??= new();
         Context.Configuration ??= new();
         Context.ConfigurationPath ??= "dsconfig.xml";

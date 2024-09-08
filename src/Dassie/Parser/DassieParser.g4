@@ -61,6 +61,7 @@ expression
     | expression Caret expression #xor_expression
     | Ampersand expression #byref_expression
     | expression Double_Colon expression #index_expression
+    | parameter_list (Colon type_name)? Equals_Greater expression #anonymous_function_expression
     | Func function_pointer_parameter_list expression #function_pointer_expression
     | Caret_Backslash type_name  #typeof_expression
     | Dollar_Backslash expression #nameof_expression
@@ -95,7 +96,6 @@ expression
     | full_identifier type_arg_list? arglist? #full_identifier_member_access_expression
     | expression (Dot Identifier)+ type_arg_list? arglist? #member_access_expression
     | expression assignment_operator expression #assignment
-    | Backslash parameter_list (Colon type_name)? Equals expression #anonymous_function_expression
     // | Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals expression)? #local_function_expression
     ;
 

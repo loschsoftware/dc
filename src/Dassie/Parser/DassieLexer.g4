@@ -130,6 +130,7 @@ Slash_Equals: '/=';
 Percent: '%';
 Percent_Equals: '%=';
 Equals: '=';
+Equals_Greater: '=>';
 
 Tilde: '~';
 Double_Tilde: '~~';

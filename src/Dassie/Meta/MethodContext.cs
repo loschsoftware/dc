@@ -17,8 +17,8 @@ internal class MethodContext
             TypeContext.Current.Methods.Add(this);
     }
 
-    public int ClosureIndex = 0;
-    public static string GetClosureTypeName(int index) => $"<>g_Anon{index}";
+    public int AnonymousFunctionIndex { get; set; } = -1;
+    public string GetAnonymousFunctionName(int index) => $"{Builder.DeclaringType.FullName}${Builder.Name}_f{index}$";
 
     public static string GetThrowawayCounterVariableName(int index)
     {
@@ -28,6 +28,8 @@ internal class MethodContext
     {
         return $"<>g_LoopArray{index}";
     }
+
+    public static MethodContext SpecialStep1CurrentMethod { get; set; }
 
     public static MethodContext VisitorStep1CurrentMethod
     {
@@ -50,12 +52,25 @@ internal class MethodContext
                     return constructor;
                 }
 
-                if (type.Methods.Any(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.ReturnType.FullName == CurrentMethod.Builder.ReturnType.FullName))
+                try
                 {
-                    MethodContext m = type.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.ReturnType.FullName == CurrentMethod.Builder.ReturnType.FullName);
+                    if (type.Methods.Any(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.ReturnType.FullName == CurrentMethod.Builder.ReturnType.FullName))
+                    {
+                        MethodContext m = type.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.ReturnType.FullName == CurrentMethod.Builder.ReturnType.FullName);
+                        return m;
+                    }
+                }
+                catch { }
+
+                if (type.Methods.Any(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType))))
+                {
+                    MethodContext m = type.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)));
                     return m;
                 }
             }
+
+            if (SpecialStep1CurrentMethod != null)
+                return SpecialStep1CurrentMethod;
 
             return null;
         }
@@ -139,7 +154,7 @@ internal class MethodContext
     public Type StaticCallType { get; set; }
 
     public bool IgnoreTypesInSymbolResolve { get; set; } = false;
-    
+
     public Dictionary<int, List<int>> ParameterBoxIndices { get; set; } = [];
 
     public List<int> ByRefArguments { get; set; } = [];
@@ -165,7 +180,7 @@ internal class MethodContext
     public List<MethodContext> LocalFunctions { get; set; } = [];
 
     public bool IsLocalFunction { get; set; }
-    
+
     public MethodContext Parent { get; set; }
 
     public TypeContext LocalFunctionContainerType { get; set; }
