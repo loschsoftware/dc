@@ -413,4 +413,16 @@ internal static class EmitHelpers
         if (explicitConversions.Any())
             EmitCall(from, explicitConversions.First());
     }
+
+    public static bool TryGetAlternativeLocation(SymbolInfo sym, out (FieldInfo field, string LocalName) result)
+    {
+        if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == sym.Name()))
+            result = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == sym.Name()).Value;
+
+        else if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == sym.Name()))
+            result = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == sym.Name()).Value;
+
+        result = default;
+        return result != default;
+    }
 }

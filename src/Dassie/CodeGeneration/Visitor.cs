@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using static Dassie.CLI.Helpers.TypeHelpers;
 using Color = Dassie.Text.Color;
 
@@ -595,6 +597,48 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.EmitTailCall = allowTailCall;
             CurrentMethod.AllowTailCallEmission = allowTailCall || ctx is DassieParser.Block_expressionContext;
 
+            if (VisitorStep1 != null)
+            {
+                if (VisitorStep1.Types.Any(t => t.FullName == TypeContext.Current.FullName)
+                    && VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName).Methods
+                    .Any(m => m.Builder.Name == CurrentMethod.Builder.Name
+                    && m.Parameters.Select(p => p.Type).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))))
+                {
+                    TypeContext step1Context = VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName);
+                    MethodContext step1Method = step1Context.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Parameters.Select(p => p.Type).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type)));
+
+                    if (step1Method.ClosureContainerType != null)
+                    {
+                        TypeBuilder closureType = step1Method.ClosureContainerType;
+
+                        LocalBuilder containerTypeInstance = CurrentMethod.IL.DeclareLocal(closureType);
+                        CurrentMethod.LocalIndex++;
+                        CurrentMethod.Locals.Add(new()
+                        {
+                            Index = CurrentMethod.LocalIndex,
+                            Builder = containerTypeInstance,
+                            Name = $"{closureType.FullName}$_field$",
+                            IsConstant = true,
+                            Scope = 0,
+                            Union = default
+                        });
+
+                        CurrentMethod.IL.Emit(OpCodes.Newobj, closureType.GetConstructor([]));
+                        EmitStloc(CurrentMethod.LocalIndex);
+
+                        foreach (SymbolInfo sym in step1Method.AdditionalStorageLocations.Keys)
+                        {
+                            if (!CurrentMethod.Parameters.Any(p => p.Name == sym.Name()))
+                                continue;
+
+                            EmitLdloc(CurrentMethod.LocalIndex);
+                            EmitLdarg(sym.Index());
+                            EmitStfld(step1Method.AdditionalStorageLocations[sym].Field);
+                        }
+                    }
+                }
+            }
+
             _tReturn = Visit(context.expression());
             mb.SetReturnType(_tReturn);
 
@@ -709,6 +753,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
             }
 
+            CurrentMethod.ClosureContainerType?.CreateType();
             return typeof(void);
         }
 
@@ -1926,20 +1971,39 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     int memberIndex = -1;
     bool notLoadAddress = false;
 
-    private static void MakeFunctionPointerContainerType(string functionName, List<Type> fieldTypes, out TypeBuilder tb, out List<FieldBuilder> fields)
+    private static void MakeOrGetClosureContainerType(List<Type> fieldTypes, out TypeBuilder tb, out List<FieldBuilder> fields)
     {
-        tb = Context.Module.DefineType(
-            $"{functionName}$", TypeAttributes.Sealed | TypeAttributes.Abstract);
+        if (CurrentMethod.ClosureContainerType != null)
+        {
+            tb = CurrentMethod.ClosureContainerType;
+            fields = CurrentMethod.ClosureCapturedFields;
+            return;
+        }
+
+        MakeClosureContainerType(fieldTypes, out tb, out fields);
+    }
+
+    private static void MakeClosureContainerType(List<Type> fieldTypes, out TypeBuilder tb, out List<FieldBuilder> fields)
+    {
+        tb = TypeContext.Current.Builder.DefineNestedType(
+            $"{CurrentMethod.UniqueMethodName}$Closure");
+
+        tb.SetCustomAttribute(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes), []);
 
         List<FieldBuilder> flds = [];
 
         for (int i = 0; i < fieldTypes.Count; i++)
-            flds.Add(tb.DefineField($"_{i}", fieldTypes[i], FieldAttributes.Public | FieldAttributes.Static));
+            flds.Add(tb.DefineField($"_{i}", fieldTypes[i], FieldAttributes.Public));
 
         fields = flds;
+
+        CurrentMethod.ClosureContainerType = tb;
+        CurrentMethod.ClosureCapturedFields = fields;
     }
 
-    public MethodInfo HandleAnonymousFunction([NotNull] DassieParser.Anonymous_function_expressionContext context)
+    int _anonFunctionIndex = 0;
+
+    public MethodInfo HandleAnonymousFunction([NotNull] DassieParser.Anonymous_function_expressionContext context, out TypeBuilder closureType)
     {
         Type ret = null;
         string name = CurrentMethod.GetAnonymousFunctionName(++CurrentMethod.AnonymousFunctionIndex);
@@ -1957,15 +2021,33 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         var locals = CurrentMethod.Locals;
+        var _params = CurrentMethod.Parameters;
 
         Disabled = true;
         CliHelpers.CreateFakeMethod();
         CurrentMethod.CaptureSymbols = true;
 
+        // Lambda parameters
         for (int i = 0; i < parameters.Count; i++)
         {
             (Type Type, string Name, bool IsMutable) param = parameters[i];
 
+            LocalBuilder lb = CurrentMethod.IL.DeclareLocal(param.Type);
+            CurrentMethod.Locals.Add(new()
+            {
+                Builder = lb,
+                Index = i,
+                IsConstant = !param.IsMutable,
+                Name = param.Name,
+                Scope = 0,
+                Union = default
+            });
+        }
+
+        // Parameters of enclosing function
+        for (int i = 0; i < _params.Count; i++)
+        {
+            ParamInfo param = _params[i];
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(param.Type);
             CurrentMethod.Locals.Add(new()
             {
@@ -1991,25 +2073,29 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         CliHelpers.ResetFakeMethod();
         Disabled = false;
 
-        MakeFunctionPointerContainerType(name, fieldTypes, out TypeBuilder closureType, out List<FieldBuilder> fields);
-        Dictionary<SymbolInfo, FieldInfo> alternativeLocations = [];
+        MakeOrGetClosureContainerType(fieldTypes, out closureType, out List<FieldBuilder> fields);
+        Dictionary<SymbolInfo, (FieldInfo Type, string LocalName)> alternativeLocations = [];
 
         for (int i = 0; i < fields.Count; i++)
-            alternativeLocations.Add(capturedSymbols[i], fields[i]);
+            alternativeLocations.Add(capturedSymbols[i], (fields[i], $"{closureType.FullName}$_field$"));
 
         foreach (var loc in alternativeLocations)
-            CurrentMethod.AdditionalStorageLocations.Add(loc.Key, loc.Value);
+        {
+            if (!CurrentMethod.AdditionalStorageLocations.ContainsKey(loc.Key))
+                CurrentMethod.AdditionalStorageLocations.Add(loc.Key, loc.Value);
+        }
 
         if (context.type_name() != null)
             ret = CliHelpers.ResolveTypeName(context.type_name());
 
         MethodContext parentMethod = CurrentMethod;
 
-        MethodBuilder invokeFunction = closureType.DefineMethod("Invoke", MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard);
+        MethodBuilder invokeFunction = closureType.DefineMethod($"func'{_anonFunctionIndex++}", MethodAttributes.Public, CallingConventions.HasThis);
         CurrentMethod = new()
         {
             Builder = invokeFunction,
-            IL = invokeFunction.GetILGenerator()
+            IL = invokeFunction.GetILGenerator(),
+            IsClosureInvocationFunction = true
         };
 
         invokeFunction.SetParameters(parameters.Select(p => p.Type).ToArray());
@@ -2019,7 +2105,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.Parameters.Add(new()
             {
                 Builder = pb,
-                Index = i,
+                Index = i + 1,
                 IsMutable = parameters[i].IsMutable,
                 Name = parameters[i].Name,
                 Type = parameters[i].Type,
@@ -2052,8 +2138,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         SpecialStep1CurrentMethod = CurrentMethod;
         CurrentMethod = parentMethod;
-        
-        closureType.CreateType();
+
         return invokeFunction;
     }
 
@@ -2062,18 +2147,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return VisitFull_identifier_member_access_expression(context, false).Type;
     }
 
-    public MethodInfo GetFunctionPointerTarget(DassieParser.Full_identifier_member_access_expressionContext context, out FieldInfo instance, out MethodInfo target)
+    public MethodInfo GetFunctionPointerTarget(DassieParser.Full_identifier_member_access_expressionContext context, out TypeBuilder containerType, out FieldInfo instance, out MethodInfo target)
     {
         List<Type> argumentTypes = [];
         List<int> wildcardIndices = [];
-        TypeBuilder containerType = null;
+        containerType = null;
         List<FieldBuilder> fields = null;
         instance = null;
 
         if (context.arglist() != null)
         {
             string funcName = context.full_identifier().GetText();
-            string containerTypeName = $"{funcName}$";
 
             List<Type> argTypes = [];
 
@@ -2087,7 +2171,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             CliHelpers.ResetNullStream();
 
-            MakeFunctionPointerContainerType(funcName, argTypes, out containerType, out fields);
+            MakeOrGetClosureContainerType(argTypes, out containerType, out fields);
 
             DassieParser.ExpressionContext[] args = context.arglist().expression();
 
@@ -2109,7 +2193,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     argumentTypes.Add(t);
 
                     if (CurrentMethod.CapturedSymbols.Count > 0)
-                        CurrentMethod.AdditionalStorageLocations.Add(CurrentMethod.CapturedSymbols.Last(), fld);
+                        CurrentMethod.AdditionalStorageLocations.Add(CurrentMethod.CapturedSymbols.Last(), (fld, null));
                 }
             }
 
@@ -2139,7 +2223,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             var symbols = CurrentMethod.CapturedSymbols.Where(s => s.Type() == method.DeclaringType);
             if (symbols.Any())
-                CurrentMethod.AdditionalStorageLocations.Add(symbols.Last(), instance);
+                CurrentMethod.AdditionalStorageLocations.Add(symbols.Last(), (instance, null));
         }
 
         //CurrentMethod.CapturedSymbols.Clear();
@@ -2166,7 +2250,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         il.Emit(OpCodes.Ret);
 
-        containerType?.CreateType();
         return result;
     }
 
@@ -2249,6 +2332,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     Local = l,
                     SymbolType = SymbolInfo.SymType.Local
                 };
+
+                FieldInfo closureInstanceField = null;
+                string closureContainerLocalName = "";
+
+                if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(sm => sm.Key.Name() == s.Name()))
+                    (closureInstanceField, closureContainerLocalName) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(sm => sm.Key.Name() == s.Name()).Value;
+
+                if (CurrentMethod.AdditionalStorageLocations.Any(sm => sm.Key.Name() == s.Name()))
+                    (closureInstanceField, closureContainerLocalName) = CurrentMethod.AdditionalStorageLocations.First(sm => sm.Key.Name() == s.Name()).Value;
+
+                if (CurrentMethod.Locals.Any(l => l.Name == closureContainerLocalName))
+                    EmitLdloc(CurrentMethod.Locals.First(l => l.Name == closureContainerLocalName).Index);
+                else if (closureInstanceField != null)
+                    EmitLdarg(0);
 
                 if ((CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress) || (l.Builder.LocalType.IsValueType && context.full_identifier().Identifier().Length > 1))
                     s.LoadAddressIfValueType();
@@ -3576,6 +3673,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 "A try block cannot be used as an expression.");
         }
 
+        FieldInfo closureInstanceField = null;
+        string closureContainerLocalName = "";
         SymbolInfo sym = CliHelpers.GetSymbol(context.Identifier().GetText());
 
         if (sym is not null)
@@ -3609,6 +3708,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/)
                 EmitLdarg(sym.Index());
+
+            if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == sym.Name()))
+                (closureInstanceField, closureContainerLocalName) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == sym.Name()).Value;
+
+            if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == sym.Name()))
+                (closureInstanceField, closureContainerLocalName) = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == sym.Name()).Value;
+
+            if (CurrentMethod.Locals.Any(l => l.Name == closureContainerLocalName))
+                EmitLdloc(CurrentMethod.Locals.First(l => l.Name == closureContainerLocalName).Index);
+            else if (closureInstanceField != null)
+                EmitLdarg(0);
 
             Type type = Visit(context.expression());
 
@@ -3665,6 +3775,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (sym.Field != null && !sym.Field.Builder.IsStatic)
                 EmitLdarg(0);
 
+            if (CurrentMethod.Locals.Any(l => l.Name == closureContainerLocalName))
+                EmitLdloc(CurrentMethod.Locals.First(l => l.Name == closureContainerLocalName).Index);
+            else if (closureInstanceField != null)
+                EmitLdarg(0);
+
             sym.Load();
 
             CurrentFile.Fragments.Add(sym.GetFragment(
@@ -3675,6 +3790,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             return sym.Type();
         }
+
+        if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == context.Identifier().GetText()))
+            (closureInstanceField, closureContainerLocalName) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == context.Identifier().GetText()).Value;
+
+        if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == context.Identifier().GetText()))
+            (closureInstanceField, closureContainerLocalName) = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == context.Identifier().GetText()).Value;
+
+        if (CurrentMethod.Locals.Any(l => l.Name == closureContainerLocalName))
+            EmitLdloc(CurrentMethod.Locals.First(l => l.Name == closureContainerLocalName).Index);
+        else if (closureInstanceField != null)
+            EmitLdarg(0);
 
         Type t = Visit(context.expression());
 
@@ -3763,7 +3889,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         localSymbol.Set();
-        localSymbol.Load();
+        localSymbol.Load(!string.IsNullOrEmpty(closureContainerLocalName), closureContainerLocalName);
 
         return t;
     }
@@ -4301,6 +4427,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         MethodInfo m = null;
         Type delegateType = null;
         FieldInfo instanceField = null;
+        TypeBuilder closureType = null;
 
         if (!((List<Type>)[typeof(DassieParser.Member_access_expressionContext), typeof(DassieParser.Full_identifier_member_access_expressionContext), typeof(DassieParser.Anonymous_function_expressionContext)]).Contains(context.expression().GetType()))
         {
@@ -4315,25 +4442,30 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         if (context.expression().GetType() == typeof(DassieParser.Full_identifier_member_access_expressionContext))
-            m = GetFunctionPointerTarget(context.expression() as DassieParser.Full_identifier_member_access_expressionContext, out instanceField, out pointerTarget);
+            m = GetFunctionPointerTarget(context.expression() as DassieParser.Full_identifier_member_access_expressionContext, out closureType, out instanceField, out pointerTarget);
 
         if (context.expression().GetType() == typeof(DassieParser.Anonymous_function_expressionContext))
         {
-            m = HandleAnonymousFunction((DassieParser.Anonymous_function_expressionContext)context.expression());
+            m = HandleAnonymousFunction((DassieParser.Anonymous_function_expressionContext)context.expression(), out closureType);
             pointerTarget = m;
         }
 
-        if (!pointerTarget.IsStatic)
-        {
-            if (instanceField != null)
-            {
-                CurrentMethod.IL.Emit(OpCodes.Stsfld, instanceField);
-                CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
-            }
-        }
+        CurrentMethod.ClosureContainerType = closureType;
 
-        if (m.IsStatic && instanceField == null)
-            CurrentMethod.IL.Emit(OpCodes.Ldnull);
+        //if (!pointerTarget.IsStatic)
+        //{
+        //    if (instanceField != null)
+        //    {
+        //        CurrentMethod.IL.Emit(OpCodes.Stsfld, instanceField);
+        //        CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
+        //    }
+        //}
+
+        EmitLdloc(0);
+        CurrentMethod.IL.Emit(OpCodes.Dup);
+
+        //if (m.IsStatic && instanceField == null)
+        //    CurrentMethod.IL.Emit(OpCodes.Ldnull);
         //else
         //{
         //    if (instanceField != null)

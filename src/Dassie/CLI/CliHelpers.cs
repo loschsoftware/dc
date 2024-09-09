@@ -14,6 +14,7 @@ using Dassie.Text;
 using Dassie.Text.Tooltips;
 using Dassie.Unmanaged;
 using Dassie.Validation;
+using Microsoft.NET.HostModel.AppHost;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 
 namespace Dassie.CLI;
@@ -349,6 +351,20 @@ internal static class CliHelpers
             FileStream fs = new(Path.GetFileName(assembly), FileMode.Create, FileAccess.Write);
             peBlob.WriteContentTo(fs);
             fs.Dispose();
+
+            if (config.GenerateNativeAppHost)
+            {
+                string executableExtension = OperatingSystem.IsWindows() ? "exe" : "";
+                string frameworkBaseDir = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk")).Last();
+                string asmPath = Path.GetFileName(assembly);
+
+                HostWriter.CreateAppHost(
+                    Directory.GetFiles(Path.Combine(frameworkBaseDir, "AppHostTemplate")).First(),
+                    Path.ChangeExtension(asmPath, executableExtension),
+                    asmPath,
+                    config.ApplicationType == ApplicationType.WinExe,
+                    asmPath);
+            }
 
             if (Context.Configuration.Runtime == Configuration.Runtime.Aot)
             {

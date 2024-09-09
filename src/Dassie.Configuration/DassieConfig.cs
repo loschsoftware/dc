@@ -118,6 +118,10 @@ public sealed class DassieConfig
     [XmlElement]
     public bool GenerateILFiles { get; set; } = false;
 
+    [DefaultValue(true)]
+    [XmlElement]
+    public bool GenerateNativeAppHost { get; set; } = true;
+
     [XmlArray("IgnoredMessages")]
     [XmlArrayItem(typeof(Message))]
     [XmlArrayItem(typeof(Warning))]

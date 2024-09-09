@@ -69,7 +69,7 @@ internal class SymbolInfo
         ToolTip = GetToolTip()
     };
 
-    public void Load()
+    public void Load(bool implicitLoadClosureContainerInstanceField = false, string localName = "")
     {
         if (CurrentMethod.ByRefArguments.Contains(CurrentMethod.CurrentArg))
         {
@@ -85,24 +85,29 @@ internal class SymbolInfo
             return;
         }
 
+        if (implicitLoadClosureContainerInstanceField && CurrentMethod.Locals.Any(l => l.Name == localName))
+            EmitLdloc(CurrentMethod.Locals.First(l => l.Name == localName).Index);
+        else if (implicitLoadClosureContainerInstanceField)
+            EmitLdarg(0);
+
         if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
         {
-            FieldInfo fld = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            (FieldInfo fld, _) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
 
             try
             {
-                CurrentMethod.IL.Emit(OpCodes.Ldsfld, fld);
+                CurrentMethod.IL.Emit(OpCodes.Ldfld, fld);
             }
             catch { } // No idea why, but sometimes it throws a NullReferenceException somewhere deep inside Emit()...
         }
 
         else if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
         {
-            FieldInfo fld = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            (FieldInfo fld, _) = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
 
             try
             {
-                CurrentMethod.IL.Emit(OpCodes.Ldsfld, fld);
+                CurrentMethod.IL.Emit(OpCodes.Ldfld, fld);
             }
             catch { } // No idea why, but sometimes it throws a NullReferenceException somewhere deep inside Emit()...
         }
@@ -132,19 +137,24 @@ internal class SymbolInfo
             CurrentMethod.IL.Emit(Type().GetElementType().GetLoadIndirectOpCode());
     }
 
-    public void LoadAddress()
+    public void LoadAddress(bool implicitLoadClosureContainerInstanceField = false, string localName = "")
     {
+        if (implicitLoadClosureContainerInstanceField && CurrentMethod.Locals.Any(l => l.Name == localName))
+            EmitLdloc(CurrentMethod.Locals.First(l => l.Name == localName).Index);
+        else if (implicitLoadClosureContainerInstanceField)
+            EmitLdarg(0);
+
         if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
         {
-            FieldInfo fld = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
-            CurrentMethod.IL.Emit(OpCodes.Ldsflda, fld);
+            (FieldInfo fld, _) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            CurrentMethod.IL.Emit(OpCodes.Ldflda, fld);
             return;
         }
 
         if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
         {
-            FieldInfo fld = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
-            CurrentMethod.IL.Emit(OpCodes.Ldsflda, fld);
+            (FieldInfo fld, _) = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            CurrentMethod.IL.Emit(OpCodes.Ldflda, fld);
             return;
         }
 
@@ -194,7 +204,7 @@ internal class SymbolInfo
         }
     }
 
-    public void Set()
+    public void Set(bool implicitLoadClosureContainerInstanceField = false, string localName = "")
     {
         if (Type().IsByRef /*|| Type().IsByRefLike*/)
         {
@@ -202,17 +212,22 @@ internal class SymbolInfo
             return;
         }
 
+        if (implicitLoadClosureContainerInstanceField && CurrentMethod.Locals.Any(l => l.Name == localName))
+            EmitLdloc(CurrentMethod.Locals.First(l => l.Name == localName).Index);
+        else if (implicitLoadClosureContainerInstanceField)
+            EmitLdarg(0);
+
         if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
         {
-            FieldInfo fld = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
-            CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
+            (FieldInfo fld, _) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            CurrentMethod.IL.Emit(OpCodes.Stfld, fld);
             return;
         }
 
         if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == Name()))
         {
-            FieldInfo fld = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
-            CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
+            (FieldInfo fld, _) = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == Name()).Value;
+            CurrentMethod.IL.Emit(OpCodes.Stfld, fld);
             return;
         }
 

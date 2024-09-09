@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 
 namespace Dassie.Meta;
 
@@ -79,6 +80,28 @@ internal class MethodContext
     public static string GetTempVariableName(int index) => $"<>g_Temp{index}";
 
     public static MethodContext CurrentMethod { get; set; }
+
+    public string UniqueMethodName
+    {
+        get
+        {
+            MethodInfo[] methods = TypeContext.Current.Methods.Select(m => m.Builder).Where(b => b.Name == Builder.Name).ToArray();
+
+            StringBuilder name = new();
+            name.Append($"{Builder.Name}'");
+
+            for (int i = 0; i < methods.Length; i++)
+            {
+                if (methods[i] == Builder)
+                {
+                    name.Append(i);
+                    break;
+                }
+            }
+
+            return name.ToString();
+        }
+    }
 
     public ILGenerator IL { get; set; }
 
@@ -187,5 +210,10 @@ internal class MethodContext
 
     public bool CaptureSymbols { get; set; }
 
-    public Dictionary<SymbolInfo, FieldInfo> AdditionalStorageLocations { get; set; } = [];
+    public Dictionary<SymbolInfo, (FieldInfo Field, string LocalName)> AdditionalStorageLocations { get; set; } = [];
+
+    public TypeBuilder ClosureContainerType { get; set; }
+    public List<FieldBuilder> ClosureCapturedFields { get; set; }
+
+    public bool IsClosureInvocationFunction { get; set; }
 }
