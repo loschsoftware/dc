@@ -597,47 +597,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.EmitTailCall = allowTailCall;
             CurrentMethod.AllowTailCallEmission = allowTailCall || ctx is DassieParser.Block_expressionContext;
 
-            if (VisitorStep1 != null)
-            {
-                if (VisitorStep1.Types.Any(t => t.FullName == TypeContext.Current.FullName)
-                    && VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName).Methods
-                    .Any(m => m.Builder.Name == CurrentMethod.Builder.Name
-                    && m.Parameters.Select(p => p.Type).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))))
-                {
-                    TypeContext step1Context = VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName);
-                    MethodContext step1Method = step1Context.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Parameters.Select(p => p.Type).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type)));
-
-                    if (step1Method.ClosureContainerType != null)
-                    {
-                        TypeBuilder closureType = step1Method.ClosureContainerType;
-
-                        LocalBuilder containerTypeInstance = CurrentMethod.IL.DeclareLocal(closureType);
-                        CurrentMethod.LocalIndex++;
-                        CurrentMethod.Locals.Add(new()
-                        {
-                            Index = CurrentMethod.LocalIndex,
-                            Builder = containerTypeInstance,
-                            Name = $"{closureType.FullName}$_field$",
-                            IsConstant = true,
-                            Scope = 0,
-                            Union = default
-                        });
-
-                        CurrentMethod.IL.Emit(OpCodes.Newobj, closureType.GetConstructor([]));
-                        EmitStloc(CurrentMethod.LocalIndex);
-
-                        foreach (SymbolInfo sym in step1Method.AdditionalStorageLocations.Keys)
-                        {
-                            if (!CurrentMethod.Parameters.Any(p => p.Name == sym.Name()))
-                                continue;
-
-                            EmitLdloc(CurrentMethod.LocalIndex);
-                            EmitLdarg(sym.Index());
-                            EmitStfld(step1Method.AdditionalStorageLocations[sym].Field);
-                        }
-                    }
-                }
-            }
+            InjectClosureParameterInitializers();
 
             _tReturn = Visit(context.expression());
             mb.SetReturnType(_tReturn);
@@ -963,12 +923,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         };
 
         mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(0, ParameterAttributes.None, "args"), 0, default, false));
-
         mc.FilesWhereDefined.Add(CurrentFile.Path);
-
         tc.Methods.Add(mc);
-
         Context.Types.Add(tc);
+
+        InjectClosureParameterInitializers();
 
         foreach (IParseTree child in context.children.Take(context.children.Count - 1))
         {
@@ -1003,6 +962,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         Context.EntryPoint = mb;
 
+        CurrentMethod.ClosureContainerType?.CreateType();
         tb.CreateType();
         return ret;
     }
