@@ -305,10 +305,14 @@ internal static class EmitHelpers
 
     public static void EmitLdftn(MethodInfo m)
     {
-        if (m.IsStatic || m.DeclaringType.IsValueType)
-            CurrentMethod.IL.Emit(OpCodes.Ldftn, m);
-        else
-            CurrentMethod.IL.Emit(OpCodes.Ldvirtftn, m);
+        try
+        {
+            if (m.IsStatic || m.DeclaringType.IsValueType)
+                CurrentMethod.IL.Emit(OpCodes.Ldftn, m);
+            else
+                CurrentMethod.IL.Emit(OpCodes.Ldvirtftn, m);
+        }
+        catch { }
     }
 
     public static bool TryGetConstantValue(FieldInfo field, out object value)

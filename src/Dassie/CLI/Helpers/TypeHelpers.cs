@@ -392,7 +392,7 @@ internal static class TypeHelpers
             EmitErrorMessage(
                 row, col, len,
                 DS0107_GenericTypeConstraintViolation,
-                $"The generic {(isType ? "type" : "function")} '{name}' requires {parameters.Length} generic argument{(parameters.Length > 1 ? "s" : "")}, but {(count == 0 ? "none" : count.ToString())} {(count == 1 ? "was" : "were")} specified.");
+                $"The generic {(isType ? "type" : "function")} '{name}' requires {parameters.Length} type argument{(parameters.Length > 1 ? "s" : "")}, but {(count == 0 ? "none" : count.ToString())} {(count == 1 ? "was" : "were")} specified.");
 
             return false;
         }

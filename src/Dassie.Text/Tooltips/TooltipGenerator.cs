@@ -392,15 +392,109 @@ public static class TooltipGenerator
     /// <returns>Returns the generated tooltip.</returns>
     public static Tooltip Type(TypeInfo type, bool showBaseType, bool omitNamespace = false, bool noModifiers = false, Tooltip doc = null, bool ignoreBuiltinAliases = false)
     {
-        ObservableCollection<Word> words = [];
-
-        if (!ignoreBuiltinAliases && builtinTypeAliases.ContainsKey(type.AsType()))
+        try
         {
-            words.Add(new()
+            ObservableCollection<Word> words = [];
+
+            if (!ignoreBuiltinAliases && builtinTypeAliases.ContainsKey(type.AsType()))
             {
-                Fragment = new() { Color = Color.Word },
-                Text = builtinTypeAliases[type.AsType()]
-            });
+                words.Add(new()
+                {
+                    Fragment = new() { Color = Color.Word },
+                    Text = builtinTypeAliases[type.AsType()]
+                });
+
+                return new()
+                {
+                    Words = words,
+                    IconResourceName = ResourceNameForType(type)
+                };
+            }
+
+            if (!noModifiers)
+            {
+                if (type.IsInterface)
+                    words.Add(BuildWord("template ", Color.Word));
+                else if (type.IsSealed && type.IsAbstract)
+                    words.Add(BuildWord("module ", Color.Word));
+                else
+                {
+                    if (!type.IsSealed)
+                        words.Add(BuildWord("open ", Color.Word));
+
+                    if (type.IsAbstract)
+                        words.Add(BuildWord("abstract ", Color.Word));
+
+                    words.Add(BuildWord(type.IsValueType ? "val type " : "ref type ", Color.Word));
+                }
+            }
+
+            words.Add(BuildWord(omitNamespace ? "" : (type.Namespace + ".")));
+            words.Add(BuildWord(type.Name.Split('`')[0], ColorForType(type)));
+
+            if (type.GenericTypeArguments.Length > 0)
+            {
+                words.Add(BuildWord("["));
+
+                if (type.GenericTypeArguments.Length > 1)
+                {
+                    foreach (Type param in type.GenericTypeArguments[..^1])
+                    {
+                        foreach (Word word in Type(param.GetTypeInfo(), false, omitNamespace, true).Words)
+                            words.Add(word);
+
+                        words.Add(BuildWord(", "));
+                    }
+                }
+
+                foreach (Word word in Type(type.GenericTypeArguments.Last().GetTypeInfo(), false, omitNamespace, true).Words)
+                    words.Add(word);
+
+                words.Add(BuildWord("]"));
+            }
+
+            if (type.IsByRef)
+                words.Add(BuildWord("&"));
+
+            else if (showBaseType && type.BaseType != null)
+            {
+                if (type.BaseType != typeof(ValueType) && type.BaseType != typeof(object) || type.ImplementedInterfaces.Count() > 0)
+                    words.Add(BuildWord(": ", Color.Default));
+
+                if (type.BaseType != typeof(ValueType) && type.BaseType != typeof(object))
+                {
+                    foreach (Word word in Type(type.BaseType.GetTypeInfo(), false, omitNamespace, true).Words)
+                        words.Add(word);
+
+                    if (type.ImplementedInterfaces.Count() >= 1)
+                        words.Add(BuildWord(", "));
+                }
+
+                if (type.ImplementedInterfaces.Count() > 1)
+                {
+                    foreach (Type t in type.ImplementedInterfaces.ToArray()[..^1])
+                    {
+                        foreach (Word word in Type(t.GetTypeInfo(), false, omitNamespace, true).Words)
+                            words.Add(word);
+
+                        words.Add(BuildWord(", "));
+                    }
+                }
+
+                if (type.ImplementedInterfaces.Count() > 0)
+                {
+                    foreach (Word word in Type(type.ImplementedInterfaces.Last().GetTypeInfo(), false, omitNamespace, true).Words)
+                        words.Add(word);
+                }
+            }
+
+            if (doc != null)
+            {
+                words.Add(BuildWord(Environment.NewLine));
+
+                foreach (Word word in doc.Words)
+                    words.Add(word);
+            }
 
             return new()
             {
@@ -408,97 +502,10 @@ public static class TooltipGenerator
                 IconResourceName = ResourceNameForType(type)
             };
         }
-
-        if (!noModifiers)
+        catch (Exception)
         {
-            if (type.IsInterface)
-                words.Add(BuildWord("template ", Color.Word));
-            else if (type.IsSealed && type.IsAbstract)
-                words.Add(BuildWord("module ", Color.Word));
-            else
-            {
-                if (!type.IsSealed)
-                    words.Add(BuildWord("open ", Color.Word));
-
-                if (type.IsAbstract)
-                    words.Add(BuildWord("abstract ", Color.Word));
-
-                words.Add(BuildWord(type.IsValueType ? "val type " : "ref type ", Color.Word));
-            }
+            return new();
         }
-
-        words.Add(BuildWord(omitNamespace ? "" : (type.Namespace + ".")));
-        words.Add(BuildWord(type.Name.Split('`')[0], ColorForType(type)));
-
-        if (type.GenericTypeArguments.Length > 0)
-        {
-            words.Add(BuildWord("["));
-
-            if (type.GenericTypeArguments.Length > 1)
-            {
-                foreach (Type param in type.GenericTypeArguments[..^1])
-                {
-                    foreach (Word word in Type(param.GetTypeInfo(), false, omitNamespace, true).Words)
-                        words.Add(word);
-
-                    words.Add(BuildWord(", "));
-                }
-            }
-
-            foreach (Word word in Type(type.GenericTypeArguments.Last().GetTypeInfo(), false, omitNamespace, true).Words)
-                words.Add(word);
-
-            words.Add(BuildWord("]"));
-        }
-
-        if (type.IsByRef)
-            words.Add(BuildWord("&"));
-
-        else if (showBaseType && type.BaseType != null)
-        {
-            if (type.BaseType != typeof(ValueType) && type.BaseType != typeof(object) || type.ImplementedInterfaces.Count() > 0)
-                words.Add(BuildWord(": ", Color.Default));
-
-            if (type.BaseType != typeof(ValueType) && type.BaseType != typeof(object))
-            {
-                foreach (Word word in Type(type.BaseType.GetTypeInfo(), false, omitNamespace, true).Words)
-                    words.Add(word);
-
-                if (type.ImplementedInterfaces.Count() >= 1)
-                    words.Add(BuildWord(", "));
-            }
-
-            if (type.ImplementedInterfaces.Count() > 1)
-            {
-                foreach (Type t in type.ImplementedInterfaces.ToArray()[..^1])
-                {
-                    foreach (Word word in Type(t.GetTypeInfo(), false, omitNamespace, true).Words)
-                        words.Add(word);
-
-                    words.Add(BuildWord(", "));
-                }
-            }
-
-            if (type.ImplementedInterfaces.Count() > 0)
-            {
-                foreach (Word word in Type(type.ImplementedInterfaces.Last().GetTypeInfo(), false, omitNamespace, true).Words)
-                    words.Add(word);
-            }
-        }
-
-        if (doc != null)
-        {
-            words.Add(BuildWord(Environment.NewLine));
-
-            foreach (Word word in doc.Words)
-                words.Add(word);
-        }
-
-        return new()
-        {
-            Words = words,
-            IconResourceName = ResourceNameForType(type)
-        };
     }
 
     private static Word BuildWord(string text, Color color = Color.Default) => new()
