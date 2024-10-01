@@ -145,7 +145,7 @@ internal class Program
         {
             ConsoleColor prev = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Increase the console width for better viewing experience.");
+            Console.WriteLine("Increase the console width for a better viewing experience.");
             Console.ForegroundColor = prev;
         }
 
