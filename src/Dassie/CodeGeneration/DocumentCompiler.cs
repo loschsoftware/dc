@@ -6,6 +6,7 @@ using Dassie.Errors;
 using Dassie.Lowering;
 using Dassie.Parser;
 using Dassie.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -47,12 +48,14 @@ internal static class DocumentCompiler
             EmitBuildLogMessage("    Parsing...");
 
         ICharStream charStream = CharStreams.fromString(lowered);
-        ITokenSource lexer = new DassieLexer(charStream);
+        DassieLexer lexer = new DassieLexer(charStream);
         ITokenStream tokens = new CommonTokenStream(lexer);
-
         DassieParser parser = new(tokens);
+
+        lexer.RemoveErrorListeners();
+        lexer.AddErrorListener(new LexerErrorListener());
         parser.RemoveErrorListeners();
-        parser.AddErrorListener(new SyntaxErrorListener());
+        parser.AddErrorListener(new ParserErrorListener());
 
         Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
         var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));

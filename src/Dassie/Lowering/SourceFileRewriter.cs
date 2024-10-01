@@ -9,10 +9,11 @@ internal static class SourceFileRewriter
     public static string Rewrite(string source)
     {
         ICharStream charStream = CharStreams.fromString(source);
-        ITokenSource lexer = new DassieLexer(charStream);
+        DassieLexer lexer = new DassieLexer(charStream);
         ITokenStream tokens = new CommonTokenStream(lexer);
-
         DassieParser parser = new(tokens);
+
+        lexer.RemoveErrorListeners();        
         parser.RemoveErrorListeners();
 
         IParseTree compilationUnit = parser.compilation_unit();

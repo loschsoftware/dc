@@ -57,12 +57,14 @@ public static class FileCompiler
             GlobalConfig.DisableDebugInfo = true;
 
             ICharStream charStream = CharStreams.fromString(source);
-            ITokenSource lexer = new DassieLexer(charStream);
+            DassieLexer lexer = new DassieLexer(charStream);
             ITokenStream tokens = new CommonTokenStream(lexer);
-
             DassieParser parser = new(tokens);
+
+            lexer.RemoveErrorListeners();
+            lexer.AddErrorListener(new LexerErrorListener());
             parser.RemoveErrorListeners();
-            parser.AddErrorListener(new SyntaxErrorListener());
+            parser.AddErrorListener(new ParserErrorListener());
 
             Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
             var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
