@@ -1,5 +1,6 @@
 ﻿using Dassie.Cli.Commands;
 using Dassie.Configuration;
+using Dassie.Core;
 using Dassie.Extensions;
 using Dassie.Templates;
 using System;
@@ -15,6 +16,7 @@ namespace Dassie.Cli;
 
 internal class Program
 {
+    [EntryPoint]
     internal static int Main(string[] args)
     {
         try
