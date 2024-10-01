@@ -78,16 +78,18 @@ internal static partial class CliCommands
         }
 
         assemblyPath = Path.GetFullPath(assemblyPath);
-        if (!File.Exists(assemblyPath))
-        {
-            EmitErrorMessage(
-                0, 0, 0,
-                DS0105_DCRunInsufficientInfo,
-                $"No files to execute found. Compile the project before running.",
-                "dc");
 
-            return -1;
+        bool recompile = !File.Exists(assemblyPath);
+        FileInfo[] sourceFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)).ToArray();
+
+        if (!recompile)
+        {
+            DateTime assemblyModifiedTime = new FileInfo(assemblyPath).LastWriteTime;
+            recompile = sourceFiles.Any(f => f.LastWriteTime > assemblyModifiedTime);
         }
+
+        if (recompile)
+            CompileAll([]);
 
         string process = "dotnet";
         string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. args]);
