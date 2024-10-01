@@ -1,4 +1,5 @@
-﻿using Dassie.Configuration;
+﻿using Dassie.Cli.Commands;
+using Dassie.Configuration;
 using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Templates;
@@ -11,7 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace Dassie.CLI;
+namespace Dassie.Cli;
 
 internal class Program
 {
@@ -36,11 +37,11 @@ internal class Program
 
             return args switch
             {
-                ["config"] => CliHelpers.BuildDassieConfig(),
-                ["build", ..] => CliHelpers.CompileAll(args[1..]),
-                ["run", ..] => CliHelpers.Run(args[1..]),
-                ["check" or "verify"] => CliHelpers.CheckAll(),
-                ["check" or "verify", ..] => CliHelpers.Check(args[1..]),
+                ["config"] => CliCommands.BuildDassieConfig(),
+                ["build", ..] => CliCommands.CompileAll(args[1..]),
+                ["run", ..] => CliCommands.Run(args[1..]),
+                ["check" or "verify"] => CliCommands.CheckAll(),
+                ["check" or "verify", ..] => CliCommands.Check(args[1..]),
                 ["make" or "new", ..] => DSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => WatchForFileChanges(args),
                 ["scratchpad", ..] => Scratchpad.HandleScratchpadCommands(args[1..]),
@@ -48,7 +49,7 @@ internal class Program
                 ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
                 ["quit"] => QuitWatching(),
                 [] or ["help" or "?" or "-h" or "--help" or "/?" or "/help"] => DisplayHelpMessage(commandDescriptions),
-                _ => CliHelpers.HandleArgs(args)
+                _ => CliCommands.Compile(args)
             };
         }
         catch (Exception ex)

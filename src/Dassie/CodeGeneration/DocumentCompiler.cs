@@ -1,6 +1,5 @@
-﻿using Antlr4.Runtime.Tree;
-using Antlr4.Runtime;
-using Dassie.CLI;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using Dassie.Configuration;
 using Dassie.Data;
 using Dassie.Errors;
@@ -19,7 +18,7 @@ internal static class DocumentCompiler
         if (config.Verbosity >= 1)
             EmitBuildLogMessage($"Compiling source file '{document.Name}'.");
 
-        CliHelpers.SetupBogusAssembly();
+        SetupBogusAssembly();
 
         Context.Files.Add(new(document.Name));
         CurrentFile = Context.GetFile(document.Name);

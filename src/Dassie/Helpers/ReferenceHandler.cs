@@ -1,11 +1,12 @@
-﻿using Dassie.Configuration;
+﻿using Dassie.Cli.Commands;
+using Dassie.Configuration;
 using Dassie.Packages;
 using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace Dassie.CLI.Helpers;
+namespace Dassie.Helpers;
 
 /// <summary>
 /// Provides tools for handling project and package references.
@@ -35,7 +36,7 @@ internal static class ReferenceHandler
         string dir = Directory.GetCurrentDirectory();
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
-        int errCode = CliHelpers.CompileAll(Array.Empty<string>());
+        int errCode = CliCommands.CompileAll(Array.Empty<string>());
 
         if (errCode != 0)
             return false;

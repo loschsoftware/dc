@@ -1,4 +1,5 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Cli;
+using Dassie.Meta;
 using Dassie.Parser;
 using System;
 using System.Collections;
@@ -7,10 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
-using System.Threading;
-using System.Xml.Linq;
 
-namespace Dassie.CLI.Helpers;
+namespace Dassie.Helpers;
 
 /// <summary>
 /// Provides helper methods regarding data types.
@@ -112,7 +111,7 @@ internal static class TypeHelpers
         if (!IsNumericType(t.RemoveByRef()))
             return;
 
-        CurrentMethod.IL.Emit(GetLoadIndirectOpCode(t.RemoveByRef()));
+        CurrentMethod.IL.Emit(t.RemoveByRef().GetLoadIndirectOpCode());
     }
 
     /// <summary>
@@ -341,7 +340,7 @@ internal static class TypeHelpers
             return type;
 
         string typeName = GetOpenGenericTypeString(type.AssemblyQualifiedName);
-        return CliHelpers.ResolveTypeName(typeName);
+        return SymbolResolver.ResolveTypeName(typeName);
     }
 
     /// <summary>
@@ -503,7 +502,7 @@ internal static class TypeHelpers
 
             if (context.type_parameter_variance().Minus() != null)
                 attribs |= GenericParameterAttributes.Contravariant;
-            
+
             if (context.type_parameter_variance().Equals() == null && !TypeContext.Current.Builder.IsInterface)
             {
                 EmitErrorMessage(
@@ -580,7 +579,7 @@ internal static class TypeHelpers
         {
             foreach (var type in context.type_name())
             {
-                Type constraint = CliHelpers.ResolveTypeName(type);
+                Type constraint = SymbolResolver.ResolveTypeName(type);
 
                 if (constraint.IsClass)
                 {
@@ -623,5 +622,37 @@ internal static class TypeHelpers
             InterfaceConstraints = interfaceConstraints,
             BaseTypeConstraint = baseTypeConstraint
         };
+    }
+
+    public static List<Type> GetInheritedTypes(DassieParser.Inheritance_listContext context)
+    {
+        List<Type> types = [];
+        int classCount = 0;
+
+        foreach (DassieParser.Type_nameContext typeName in context.type_name())
+        {
+            Type t = SymbolResolver.ResolveTypeName(typeName);
+
+            if (t != null)
+            {
+                types.Add(t);
+
+                if (t.IsClass)
+                    classCount++;
+            }
+
+            if (classCount > 1)
+            {
+                EmitErrorMessage(
+                    typeName.Start.Line,
+                    typeName.Start.Column,
+                    typeName.GetText().Length,
+                    DS0051_MoreThanOneClassInInheritanceList,
+                    "A type can only extend one base type."
+                    );
+            }
+        }
+
+        return types;
     }
 }

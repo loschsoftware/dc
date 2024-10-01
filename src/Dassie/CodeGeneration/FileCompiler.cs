@@ -1,6 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using Dassie.CLI;
+using Dassie.Cli;
 using Dassie.Configuration;
 using Dassie.Errors;
 using Dassie.Meta;
@@ -51,7 +51,7 @@ public static class FileCompiler
 
             Context.Configuration = config;
 
-            CliHelpers.SetupBogusAssembly();
+            SetupBogusAssembly();
             Context.Module = Context.BogusModule;
 
             GlobalConfig.DisableDebugInfo = true;

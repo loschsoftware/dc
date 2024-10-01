@@ -45,7 +45,10 @@ public static class DSTemplates
         ns.Add("", "");
 
         XmlSerializer xmls = new(typeof(DassieConfig));
-        DassieConfig config = new();
+        DassieConfig config = new()
+        {
+            AssemblyName = args[2]
+        };
 
         switch (args[1])
         {

@@ -1,15 +1,18 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Helpers;
+using Dassie.Meta;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using static Dassie.CLI.Helpers.TypeHelpers;
+using static Dassie.Helpers.TypeHelpers;
 
 namespace Dassie.CodeGeneration;
 
 internal static class EmitHelpers
 {
+    public static OpCode GetCallOpCode(Type type) => type.IsValueType ? OpCodes.Call : OpCodes.Callvirt;
+
     public static void EmitAdd(Type type, bool doOverflowCheck = false)
     {
         if (IsUnsignedIntegerType(type))
@@ -363,7 +366,7 @@ internal static class EmitHelpers
     }
 
     /// <summary>
-    /// Converts a type into a <see cref="bool"/> according to the rules specified in <see cref="Dassie.CLI.Helpers.TypeHelpers.IsBoolean(Type)"/>.
+    /// Converts a type into a <see cref="bool"/> according to the rules specified in <see cref="TypeHelpers.IsBoolean(Type)"/>.
     /// </summary>
     /// <param name="t">The type to perform the conversion on.</param>
     public static void EmitBoolConversion(Type t)
@@ -473,5 +476,56 @@ internal static class EmitHelpers
                 }
             }
         }
+    }
+
+    public static void SetupBogusAssembly()
+    {
+        AssemblyBuilder ab = AssemblyBuilder.DefineDynamicAssembly(new("Bogus"), AssemblyBuilderAccess.Run);
+        Context.BogusAssembly = ab;
+
+        ModuleBuilder mb = ab.DefineDynamicModule("Bogus");
+        Context.BogusModule = mb;
+    }
+
+    static int bogusCounter = 0;
+    static MethodContext _currentMethod = null;
+    public static void CreateFakeMethod()
+    {
+        _currentMethod = CurrentMethod;
+
+        TypeBuilder tb = Context.BogusModule.DefineType($"Bogus{bogusCounter++}");
+        Context.BogusType = tb;
+
+        MethodBuilder bogus = tb.DefineMethod("x", MethodAttributes.Public);
+        CurrentMethod = new()
+        {
+            Builder = bogus,
+            IL = bogus.GetILGenerator()
+        };
+    }
+
+    public static void ResetFakeMethod()
+    {
+        CurrentMethod = _currentMethod;
+    }
+
+    private static ILGenerator _il = null;
+    private static int _localIndex;
+    public static void RedirectEmitterToNullStream()
+    {
+        _localIndex = CurrentMethod.LocalIndex;
+        TypeBuilder tb = Context.BogusModule.DefineType($"Bogus{bogusCounter++}");
+        Context.BogusType = tb;
+
+        MethodBuilder bogus = tb.DefineMethod("x", MethodAttributes.Public);
+
+        _il = CurrentMethod.IL;
+        CurrentMethod.IL = bogus.GetILGenerator();
+    }
+
+    public static void ResetNullStream()
+    {
+        CurrentMethod.IL = _il;
+        CurrentMethod.LocalIndex = _localIndex;
     }
 }

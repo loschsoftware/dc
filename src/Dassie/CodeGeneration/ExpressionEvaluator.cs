@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Misc;
-using Dassie.CLI;
+using Dassie.Cli;
+using Dassie.Helpers;
 using Dassie.Parser;
 using Dassie.Runtime;
 using Dassie.Text;

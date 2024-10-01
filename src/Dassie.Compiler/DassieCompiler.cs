@@ -1,4 +1,5 @@
-﻿using Dassie.CLI;
+﻿using Dassie.Cli;
+using Dassie.Cli.Commands;
 using Dassie.Errors;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ public static class DassieCompiler
         foreach (SourceDocument doc in context.Documents)
             arglist.Add($"--Document:{doc.SymbolicName}:{doc.SourceText}");
 
-        int result = CliHelpers.HandleArgs(arglist.ToArray(), context.Configuration);
+        int result = CliCommands.Compile(arglist.ToArray(), context.Configuration);
         bool success = result == 0 && !ErrorWriter.messages.Where(m => m.Severity == Severity.Error).Any();
         return new(success, ErrorWriter.messages);
     }
@@ -38,7 +39,7 @@ public static class DassieCompiler
             throw new FileNotFoundException();
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(projectFilePath));
-        int result = CliHelpers.CompileAll(args);
+        int result = CliCommands.CompileAll(args);
         bool success = result == 0 && !ErrorWriter.messages.Where(m => m.Severity == Severity.Error).Any();
         return new(success, ErrorWriter.messages);
     }

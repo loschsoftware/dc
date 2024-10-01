@@ -1,12 +1,11 @@
 ﻿using Dassie.Configuration;
-using Dassie.Errors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 
-namespace Dassie.CLI;
+namespace Dassie.Cli;
 
 /// <summary>
 /// Parses command-line options for the '&lt;FileName&gt; [FileNames] [Options]' command of dc.

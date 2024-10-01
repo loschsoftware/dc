@@ -1,4 +1,4 @@
-﻿using Dassie.CLI.Helpers;
+﻿using Antlr4.Runtime.Tree;
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -12,7 +12,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 
-namespace Dassie.CodeGeneration;
+namespace Dassie.Helpers;
 
 internal static class SymbolResolver
 {
@@ -327,7 +327,7 @@ internal static class SymbolResolver
                         Line = row,
                         Column = col,
                         Length = len,
-                        Color = Dassie.Text.Color.Function,
+                        Color = Text.Color.Function,
                         IsNavigationTarget = false,
                         ToolTip = TooltipGenerator.Constructor(final)
                     });
@@ -364,7 +364,7 @@ internal static class SymbolResolver
                         Line = row,
                         Column = col,
                         Length = len,
-                        Color = Dassie.Text.Color.EnumField,
+                        Color = Text.Color.EnumField,
                         IsNavigationTarget = false,
                         ToolTip = TooltipGenerator.EnumField(f)
                     });
@@ -385,7 +385,7 @@ internal static class SymbolResolver
                     Line = row,
                     Column = col,
                     Length = len,
-                    Color = Dassie.Text.Color.Field,
+                    Color = Text.Color.Field,
                     IsNavigationTarget = false,
                     ToolTip = TooltipGenerator.Field(f)
                 });
@@ -412,7 +412,7 @@ internal static class SymbolResolver
                     Line = row,
                     Column = col,
                     Length = len,
-                    Color = Dassie.Text.Color.Property,
+                    Color = Text.Color.Property,
                     IsNavigationTarget = false,
                     ToolTip = TooltipGenerator.Property(p)
                 });
@@ -526,7 +526,7 @@ internal static class SymbolResolver
                     Line = row,
                     Column = col,
                     Length = len,
-                    Color = Dassie.Text.Color.Function,
+                    Color = Text.Color.Function,
                     IsNavigationTarget = false,
                     ToolTip = TooltipGenerator.Function(final)
                 });
@@ -656,7 +656,7 @@ internal static class SymbolResolver
                     Line = row,
                     Column = col,
                     Length = len,
-                    Color = Dassie.Text.Color.Function,
+                    Color = Text.Color.Function,
                     IsNavigationTarget = false,
                     ToolTip = TooltipGenerator.Constructor(final)
                 });
@@ -679,7 +679,7 @@ internal static class SymbolResolver
                         Line = row,
                         Column = col,
                         Length = len,
-                        Color = Dassie.Text.Color.EnumField,
+                        Color = Text.Color.EnumField,
                         IsNavigationTarget = false,
                         ToolTip = TooltipGenerator.EnumField(f.Builder)
                     });
@@ -700,7 +700,7 @@ internal static class SymbolResolver
                     Line = row,
                     Column = col,
                     Length = len,
-                    Color = Dassie.Text.Color.Field,
+                    Color = Text.Color.Field,
                     IsNavigationTarget = false,
                     ToolTip = TooltipGenerator.Field(f.Builder)
                 });
@@ -721,7 +721,7 @@ internal static class SymbolResolver
                     Line = row,
                     Column = col,
                     Length = len,
-                    Color = Dassie.Text.Color.Property,
+                    Color = Text.Color.Property,
                     IsNavigationTarget = false,
                     ToolTip = TooltipGenerator.Property(p)
                 });
@@ -824,7 +824,7 @@ internal static class SymbolResolver
                     Line = row,
                     Column = col,
                     Length = len,
-                    Color = Dassie.Text.Color.Function,
+                    Color = Text.Color.Function,
                     IsNavigationTarget = false,
                     ToolTip = TooltipGenerator.Function(final)
                 });
@@ -1044,5 +1044,248 @@ internal static class SymbolResolver
 
         members = null;
         return false;
+    }
+
+    public static (Type Type, MethodInfo[] Methods) ResolveGlobalMethod(string name, int row, int col, int len)
+    {
+        foreach (string type in CurrentFile.ImportedTypes)
+        {
+            Type t = ResolveTypeName(type, row, col, len, true);
+
+            if (t.GetMethods().Where(m => m.Name == name).Any())
+                return (t, t.GetMethods().Where(m => m.Name == name).ToArray());
+        }
+
+        return (null, Array.Empty<MethodInfo>());
+    }
+
+    public static Type ResolveAttributeTypeName(string name, bool noEmitFragments = false)
+    {
+        Type t;
+        if ((t = ResolveTypeName(name, noEmitFragments: noEmitFragments)) != null)
+            return t;
+
+        return ResolveTypeName($"{name}Attribute", noEmitFragments: noEmitFragments);
+    }
+
+    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false)
+    {
+        if (name.Ampersand() != null)
+            return ResolveTypeName(name.type_name().First(), noEmitFragments).MakeByRefType();
+
+        int arrayDims = 0;
+
+        if (name.array_type_specifier() != null)
+        {
+            arrayDims = (name.array_type_specifier().Comma() ?? Array.Empty<ITerminalNode>()).Length + 1;
+            arrayDims += (name.array_type_specifier().Double_Comma() ?? Array.Empty<ITerminalNode>()).Length * 2;
+        }
+
+        if (arrayDims > 32)
+        {
+            EmitErrorMessage(
+                name.Start.Line,
+                name.Start.Column,
+                name.GetText().Length,
+                DS0079_ArrayTooManyDimensions,
+                $"An array cannot have more than 32 dimensions.");
+        }
+
+        //if (name.type_name() != null && name.type_name().Length > 0)
+        //{
+        //    Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
+        //    return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+        //}
+
+        if (name.identifier_atom() != null)
+        {
+            if (name.identifier_atom().Identifier() != null)
+                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+
+            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+        }
+
+        if (name.Open_Paren() != null)
+            return typeof(UnionValue);
+
+        if (name.type_arg_list() != null)
+        {
+            Type[] typeParams = name.type_arg_list().type_name().Select(t => ResolveTypeName(t, noEmitFragments)).ToArray();
+
+            DassieParser.Type_nameContext childName = (DassieParser.Type_nameContext)name.children[0];
+            if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
+                return ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
+        }
+
+        // TODO: Implement other kinds of types
+        return null;
+    }
+
+    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0)
+    {
+        if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
+            return CurrentMethod.TypeParameters.First(t => t.Name == name).Builder;
+
+        if (TypeContext.Current != null && TypeContext.Current.TypeParameters.Any(t => t.Name == name))
+            return TypeContext.Current.TypeParameters.First(t => t.Name == name).Builder;
+
+        if (typeParams != null && typeParams.Length > 0)
+            name += $"`{typeParams.Length}";
+
+        Type type = Type.GetType(name);
+
+        if (type == null)
+        {
+            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name))
+                return Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name).Builder;
+
+            List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+            allAssemblies.AddRange(Context.ReferencedAssemblies);
+
+            List<Assembly> assemblies = allAssemblies.Where(_a => _a.GetType(name) != null).ToList();
+            if (assemblies.Any())
+            {
+                type = assemblies.First().GetType(name);
+
+                if (!noEmitFragments)
+                {
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = name.Length,
+                        Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+                        ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
+                    });
+                }
+
+                if (arrayDimensions > 0)
+                    type = type.MakeArrayType(arrayDimensions);
+
+                return type;
+            }
+
+            foreach (string ns in CurrentFile.Imports.Concat(Context.GlobalImports))
+            {
+                string n = $"{ns}.{name}";
+
+                type = Type.GetType(n);
+
+                if (type != null)
+                    goto FoundType;
+
+                List<Assembly> _allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+                _allAssemblies.AddRange(Context.ReferencedAssemblies);
+
+                List<Assembly> _assemblies = _allAssemblies.Where(a => a.GetType(n) != null).ToList();
+                if (_assemblies.Any())
+                {
+                    type = _assemblies.First().GetType(n);
+                    goto FoundType;
+                }
+
+                if (Context.Types.Any(t => t.FullName == n))
+                {
+                    type = Context.Types.First(t => t.FullName == n).Builder;
+                    goto FoundType;
+                }
+
+                if (type != null)
+                    goto FoundType;
+            }
+
+            foreach (string originalName in CurrentFile.Aliases.Concat(Context.GlobalAliases).Where(a => a.Alias == name).Select(a => a.Name))
+            {
+                type = Type.GetType(originalName);
+
+                if (type != null)
+                    goto FoundType;
+            }
+        }
+
+    FoundType:
+
+        if (type == null)
+        {
+            EmitErrorMessage(
+                row,
+                col,
+                len,
+                DS0009_TypeNotFound,
+                $"The name '{name}' could not be resolved.");
+        }
+        else
+        {
+            TypeHelpers.CheckGenericTypeCompatibility(type, typeParams, row, col, len, true);
+
+            if (typeParams != null)
+                type = type.MakeGenericType(typeParams);
+
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = name.Length,
+                    Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+                    ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
+                });
+            }
+        }
+
+        if (arrayDimensions > 1)
+            type = type.MakeArrayType(arrayDimensions);
+
+        else if (arrayDimensions == 1)
+            type = type.MakeArrayType();
+
+        return type;
+    }
+
+    public static (int Type, int Index) GetLocalOrParameterIndex(string name)
+    {
+        if (CurrentMethod.Locals.Any(l => l.Name == name))
+            return (0, CurrentMethod.Locals.First(l => l.Name == name).Index);
+
+        else if (CurrentMethod.Parameters.Any(p => p.Name == name))
+            return (1, CurrentMethod.Parameters.First(p => p.Name == name).Index);
+
+        return (-1, -1);
+    }
+
+    public static SymbolInfo GetSymbol(string name)
+    {
+        if (CurrentMethod.Locals.Any(l => l.Name == name))
+        {
+            LocalInfo l = CurrentMethod.Locals.First(l => l.Name == name);
+            return new()
+            {
+                SymbolType = SymbolInfo.SymType.Local,
+                Local = l
+            };
+        }
+
+        else if (CurrentMethod.Parameters.Any(p => p.Name == name))
+        {
+            ParamInfo p = CurrentMethod.Parameters.First(p => p.Name == name);
+            return new()
+            {
+                SymbolType = SymbolInfo.SymType.Parameter,
+                Parameter = p
+            };
+        }
+
+        else if (TypeContext.Current.Fields.Any(f => f.Name == name))
+        {
+            MetaFieldInfo f = TypeContext.Current.Fields.First(f => f.Name == name);
+            return new()
+            {
+                SymbolType = SymbolInfo.SymType.Field,
+                Field = f
+            };
+        }
+
+        return null;
     }
 }

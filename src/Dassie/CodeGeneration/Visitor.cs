@@ -1,10 +1,11 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Dassie.CLI;
-using Dassie.CLI.Helpers;
+using Dassie.Cli;
 using Dassie.Core;
 using Dassie.Errors;
+using Dassie.Helpers;
+using Dassie.Intrinsics;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
@@ -17,7 +18,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
-using static Dassie.CLI.Helpers.TypeHelpers;
+using static Dassie.Helpers.TypeHelpers;
 using Color = Dassie.Text.Color;
 
 namespace Dassie.CodeGeneration;
@@ -101,7 +102,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.inheritance_list() != null)
         {
-            List<Type> inherited = CliHelpers.GetInheritedTypes(context.inheritance_list());
+            List<Type> inherited = TypeHelpers.GetInheritedTypes(context.inheritance_list());
 
             foreach (Type type in inherited)
             {
@@ -121,14 +122,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             tb = Context.Module.DefineType(
                 $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetText()}",
-                CliHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false),
+                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false),
                 parent);
         }
         else
         {
             tb = enclosingType.DefineNestedType(
                 context.Identifier().GetText(),
-                CliHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true),
+                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true),
                 parent);
         }
 
@@ -303,7 +304,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         var paramTypes = ResolveParameterList(context.parameter_list());
 
-        (MethodAttributes attribs, MethodImplAttributes implementationFlags) = CliHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.attribute());
+        (MethodAttributes attribs, MethodImplAttributes implementationFlags) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.attribute());
         if (attribs.HasFlag(MethodAttributes.Virtual))
             attribs &= ~MethodAttributes.Virtual;
 
@@ -323,7 +324,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             ParameterBuilder pb = cb.DefineParameter(
                 CurrentMethod.ParameterIndex++,
-                CliHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
+                AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                 param.Context.Identifier().GetText());
 
             CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new(), param.Context.Var() != null));
@@ -447,7 +448,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (context.member_special_modifier().Any(m => m.Static() != null) || (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract))
                 callingConventions = CallingConventions.Standard;
 
-            (MethodAttributes attrib, MethodImplAttributes implementationFlags) = CliHelpers.GetMethodAttributes(
+            (MethodAttributes attrib, MethodImplAttributes implementationFlags) = AttributeHelpers.GetMethodAttributes(
                     context.member_access_modifier(),
                     context.member_oop_modifier(),
                     context.member_special_modifier(),
@@ -545,7 +546,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 ParameterBuilder pb = mb.DefineParameter(
                     CurrentMethod.ParameterIndex++ + 1, // Add 1 so parameter indices start at 1 -> 0 is always the current instance of the containing type
-                    CliHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
+                    AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                     param.Context.Identifier().GetText());
 
                 CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new(), param.Context.Var() != null));
@@ -604,7 +605,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             Type tReturn = _tReturn;
             if (context.type_name() != null)
-                tReturn = CliHelpers.ResolveTypeName(context.type_name());
+                tReturn = SymbolResolver.ResolveTypeName(context.type_name());
 
             if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
             {
@@ -674,7 +675,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     if (attribute.type_name().GetText() == "EntryPoint")
                         attribType = typeof(EntryPointAttribute);
                     else
-                        attribType = CliHelpers.ResolveTypeName(attribute.type_name());
+                        attribType = SymbolResolver.ResolveTypeName(attribute.type_name());
 
                     if (attribType == typeof(EntryPointAttribute))
                     {
@@ -717,7 +718,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        CliHelpers.CreateFakeMethod();
+        CreateFakeMethod();
 
         Type _type = typeof(object);
 
@@ -727,12 +728,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type type = _type;
 
         if (context.type_name() != null)
-            type = CliHelpers.ResolveTypeName(context.type_name());
+            type = SymbolResolver.ResolveTypeName(context.type_name());
 
         FieldBuilder fb = TypeContext.Current.Builder.DefineField(
             context.Identifier().GetText(),
             type,
-            CliHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.Val() != null));
+            AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.Val() != null));
 
         TypeContext.Current.Fields.Add(new(context.Identifier().GetText(), fb, default));
 
@@ -771,7 +772,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (param.type_name() != null)
         {
-            t = CliHelpers.ResolveTypeName(param.type_name());
+            t = SymbolResolver.ResolveTypeName(param.type_name());
 
             if (t != null)
             {
@@ -1485,7 +1486,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitLdloca(CurrentMethod.LocalIndex);
 
                 MethodInfo toString = t2.GetMethod("ToString", Array.Empty<Type>());
-                CurrentMethod.IL.EmitCall(CliHelpers.GetCallOpCode(t2), toString, null);
+                CurrentMethod.IL.EmitCall(GetCallOpCode(t2), toString, null);
             }
             else if (t != typeof(string))
             {
@@ -1500,7 +1501,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitLdloca(CurrentMethod.LocalIndex);
 
                 MethodInfo toString = t.GetMethod("ToString", Array.Empty<Type>());
-                CurrentMethod.IL.EmitCall(CliHelpers.GetCallOpCode(t), toString, null);
+                CurrentMethod.IL.EmitCall(GetCallOpCode(t), toString, null);
 
                 Visit(context.expression()[1]);
             }
@@ -1695,7 +1696,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Length = context.Caret_Backslash().GetText().Length,
         });
 
-        Type t = CliHelpers.ResolveTypeName(context.type_name());
+        Type t = SymbolResolver.ResolveTypeName(context.type_name());
         CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
 
         MethodInfo typeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
@@ -1975,7 +1976,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Type paramType = typeof(object);
 
             if (param.type_name() != null)
-                paramType = CliHelpers.ResolveTypeName(param.type_name());
+                paramType = SymbolResolver.ResolveTypeName(param.type_name());
 
             parameters.Add((paramType, param.Identifier().GetText(), param.Var() != null));
         }
@@ -1984,7 +1985,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         var _params = CurrentMethod.Parameters;
 
         Disabled = true;
-        CliHelpers.CreateFakeMethod();
+        CreateFakeMethod();
         CurrentMethod.CaptureSymbols = true;
 
         // Lambda parameters
@@ -2030,7 +2031,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         foreach (var sym in capturedSymbols)
             fieldTypes.Add(sym.Type());
 
-        CliHelpers.ResetFakeMethod();
+        ResetFakeMethod();
         Disabled = false;
 
         MakeOrGetClosureContainerType(fieldTypes, out closureType, out List<FieldBuilder> fields);
@@ -2046,7 +2047,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         if (context.type_name() != null)
-            ret = CliHelpers.ResolveTypeName(context.type_name());
+            ret = SymbolResolver.ResolveTypeName(context.type_name());
 
         MethodContext parentMethod = CurrentMethod;
 
@@ -2121,7 +2122,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             List<Type> argTypes = [];
 
-            CliHelpers.RedirectEmitterToNullStream();
+            RedirectEmitterToNullStream();
 
             foreach (DassieParser.ExpressionContext argument in context.arglist().expression())
             {
@@ -2129,7 +2130,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     argTypes.Add(Visit(argument));
             }
 
-            CliHelpers.ResetNullStream();
+            ResetNullStream();
 
             MakeOrGetClosureContainerType(argTypes, out containerType, out fields);
 
@@ -2222,7 +2223,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             typeArgs = new Type[context.type_arg_list().type_name().Length];
             for (int i = 0; i < context.type_arg_list().type_name().Length; i++)
-                typeArgs[i] = CliHelpers.ResolveTypeName(context.type_arg_list().type_name()[i]);
+                typeArgs[i] = SymbolResolver.ResolveTypeName(context.type_arg_list().type_name()[i]);
         }
 
         CurrentMethod.TypeArgumentsForNextMethodCall = typeArgs;
@@ -2230,7 +2231,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.full_identifier().Identifier().Length > 1)
             CurrentMethod.ShouldLoadAddressIfValueType = true;
 
-        if (CliHelpers.HandleSpecialFunction(
+        if (IntrinsicFunctionHandler.HandleSpecialFunction(
             context.full_identifier().Identifier().Last().GetText(),
             context.arglist(),
             context.full_identifier().Identifier().Last().Symbol.Line,
@@ -2540,9 +2541,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 notLoadAddress = true;
 
-                CliHelpers.RedirectEmitterToNullStream();
+                RedirectEmitterToNullStream();
                 Visit(context.arglist());
-                CliHelpers.ResetNullStream();
+                ResetNullStream();
 
                 _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
@@ -2693,9 +2694,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (identifier == context.Identifier().Last() && context.arglist() != null)
             {
-                CliHelpers.RedirectEmitterToNullStream();
+                RedirectEmitterToNullStream();
                 Visit(context.arglist());
-                CliHelpers.ResetNullStream();
+                ResetNullStream();
 
                 _params = CurrentMethod.ArgumentTypesForNextMethodCall.ToArray();
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
@@ -3635,7 +3636,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         FieldInfo closureInstanceField = null;
         string closureContainerLocalName = "";
-        SymbolInfo sym = CliHelpers.GetSymbol(context.Identifier().GetText());
+        SymbolInfo sym = SymbolResolver.GetSymbol(context.Identifier().GetText());
 
         if (sym is not null)
         {
@@ -4327,7 +4328,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitCatch_branch([NotNull] DassieParser.Catch_branchContext context)
     {
-        Type t = context.type_name() != null ? CliHelpers.ResolveTypeName(context.type_name()) : typeof(object);
+        Type t = context.type_name() != null ? SymbolResolver.ResolveTypeName(context.type_name()) : typeof(object);
 
         CurrentMethod.IL.BeginCatchBlock(t);
 

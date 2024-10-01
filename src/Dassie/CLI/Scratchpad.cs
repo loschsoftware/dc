@@ -1,4 +1,5 @@
-﻿using Dassie.Configuration;
+﻿using Dassie.Cli.Commands;
+using Dassie.Configuration;
 using Dassie.Errors;
 using System;
 using System.Diagnostics;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace Dassie.CLI;
+namespace Dassie.Cli;
 
 /// <summary>
 /// Provides tools for managing and starting "scratchpad" sessions, which allow the user to compile and execute applications using source code from standard input.
@@ -189,7 +190,7 @@ internal static class Scratchpad
             cfg = (DassieConfig)xmls.Deserialize(sr);
         }
 
-        int result = CliHelpers.HandleArgs([file]);
+        int result = CliCommands.Compile([file]);
 
         string outDir = Path.Combine(dir, "build");
         string asm = Path.Combine(outDir, Path.ChangeExtension(Path.GetFileName(file), "dll"));
