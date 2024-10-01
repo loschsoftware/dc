@@ -1,7 +1,6 @@
 ﻿using Dassie.Cli.Commands;
 using Dassie.Configuration;
 using Dassie.Extensions;
-using Dassie.Meta;
 using Dassie.Templates;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,7 @@ internal class Program
         try
         {
             Console.OutputEncoding = Encoding.Unicode;
-            GetOrCreateToolPathsFile();
+            ToolPaths.GetOrCreateToolPathsFile();
 
             List<IPackage> extensions = ExtensionLoader.LoadInstalledExtensions();
             Dictionary<string, Func<string[], int>> customCommands = ExtensionLoader.GetAllCommands(extensions);
@@ -43,11 +42,11 @@ internal class Program
                 ["check" or "verify"] => CliCommands.CheckAll(),
                 ["check" or "verify", ..] => CliCommands.Check(args[1..]),
                 ["make" or "new", ..] => DSTemplates.CreateStructure(args),
-                ["watch" or "auto", ..] => WatchForFileChanges(args),
+                ["watch" or "auto", ..] => CliCommands.WatchForFileChanges(args),
                 ["scratchpad", ..] => Scratchpad.HandleScratchpadCommands(args[1..]),
                 ["package", ..] => ExtensionManagerCommandLine.HandleArgs(args[1..]),
-                ["-watch-indefinetly"] => WatchIndefinetly(string.Join(" ", args)),
-                ["quit"] => QuitWatching(),
+                ["-watch-indefinetly"] => CliCommands.WatchIndefinetly(),
+                ["quit"] => CliCommands.QuitWatching(),
                 [] or ["help" or "?" or "-h" or "--help" or "/?" or "/help"] => DisplayHelpMessage(commandDescriptions),
                 _ => CliCommands.Compile(args)
             };
@@ -86,102 +85,6 @@ internal class Program
 
             return -1;
         }
-    }
-
-    static Process watchProcess = null;
-
-    static int WatchForFileChanges(string[] args)
-    {
-        string _args = string.Join(" ", args);
-
-        LogOut.Write("Watching file changes. Use ");
-
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("dc quit");
-        Console.ForegroundColor = ConsoleColor.Gray;
-
-        LogOut.WriteLine(" to stop watching changes.");
-
-        watchProcess = new Process();
-        watchProcess.StartInfo.FileName = "dc.exe";
-        watchProcess.StartInfo.Arguments = $"build {_args}";
-        watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        watchProcess.StartInfo.CreateNoWindow = true;
-        watchProcess.Start();
-        watchProcess.WaitForExit();
-
-        watchProcess = new Process();
-        watchProcess.StartInfo.FileName = "dc.exe";
-        watchProcess.StartInfo.Arguments = "-watch-indefinetly";
-        watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        watchProcess.StartInfo.CreateNoWindow = true;
-        watchProcess.Start();
-
-        return 0;
-    }
-
-    static int QuitWatching()
-    {
-        LogOut.WriteLine("No longer watching file changes.");
-
-        watchProcess = new Process();
-        watchProcess.StartInfo.FileName = "taskkill.exe";
-        watchProcess.StartInfo.Arguments = "/f /im dc.exe";
-        watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        watchProcess.StartInfo.CreateNoWindow = true;
-        watchProcess.Start();
-        return 0;
-    }
-
-    static int WatchIndefinetly(string args)
-    {
-        while (true)
-        {
-            FileSystemWatcher watcher = new(Directory.GetCurrentDirectory(), "*.ds")
-            {
-                EnableRaisingEvents = true,
-                IncludeSubdirectories = true
-            };
-
-            string cmd = $"build {args}";
-
-            watcher.Changed += Compile;
-            watcher.Created += Compile;
-            watcher.Deleted += Compile;
-
-            void Compile(object sender, FileSystemEventArgs e)
-            {
-                var buildProcess = new Process();
-                buildProcess.StartInfo.FileName = "dc.exe";
-                buildProcess.StartInfo.Arguments = cmd;
-                buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                buildProcess.Start();
-                buildProcess.WaitForExit();
-            }
-
-            watcher.WaitForChanged(WatcherChangeTypes.All);
-        }
-    }
-
-    private static void GetOrCreateToolPathsFile()
-    {
-        XmlSerializer xmls = new(typeof(ToolPaths));
-
-        Directory.CreateDirectory(Path.GetDirectoryName(ToolPaths.ToolPathsFile));
-        if (File.Exists(ToolPaths.ToolPathsFile))
-        {
-            using StreamReader sr = new(ToolPaths.ToolPathsFile);
-            GlobalConfig.ExternalToolPaths = (ToolPaths)xmls.Deserialize(sr);
-            return;
-        }
-
-        GlobalConfig.ExternalToolPaths = new()
-        {
-            Tools = []
-        };
-
-        using StreamWriter sw = new(ToolPaths.ToolPathsFile);
-        xmls.Serialize(sw, GlobalConfig.ExternalToolPaths);
     }
 
     public static void DisplayLogo()
@@ -234,7 +137,7 @@ internal class Program
         return sb.ToString();
     }
 
-    static int DisplayHelpMessage(Dictionary<string, string> installedCommands)
+    private static int DisplayHelpMessage(Dictionary<string, string> installedCommands)
     {
         if (Console.BufferWidth - 50 - 5 < 30)
         {
