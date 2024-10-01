@@ -15,7 +15,7 @@ Here is the classic "Hello World" program in Dassie:
 ````dassie
 println "Hello World!"
 ````
-Assuming the above code is contained in a file called ``hello.ds``, the compiler can be invoked using the command ``dc hello.ds``, yielding a .NET assembly called ``hello.dll``, which can be executed using the .NET command line. To automatically compile all ``.dc`` source files in the current folder structure, the command ``dc build`` is used.
+Assuming the above code is contained in a file called ``hello.ds``, the compiler can be invoked using the command ``dc hello.ds``, yielding a .NET assembly called ``hello.dll``, which can be executed using the .NET command line. To automatically compile all ``.ds`` source files in the current folder structure, the command ``dc build`` is used.
 
 ## Project system
 For configuring compiler behavior and to simplify the build process of larger projects, the Dassie compiler includes a built-in project system. Here's how to initialize a new project:
