@@ -12,9 +12,10 @@ internal static partial class CliCommands
         if (File.Exists("dsconfig.xml"))
         {
             LogOut.Write("The file dsconfig.xml already exists. Overwrite [Y/N]? ");
-            string input = Console.ReadLine();
+            string input = Console.ReadKey().KeyChar.ToString();
+            Console.WriteLine();
 
-            if (input.ToLowerInvariant() != "y")
+            if (!input.Equals("y", StringComparison.OrdinalIgnoreCase))
                 return -1;
         }
 

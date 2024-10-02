@@ -5,6 +5,7 @@ using Dassie.Extensions;
 using Dassie.Templates;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -30,7 +31,7 @@ internal class Program
 
             args ??= [];
             if (args.Length == 0)
-                return DisplayHelpMessage(commandDescriptions);
+                return DisplayHelpMessage([], commandDescriptions);
 
             string command = args[0];
             if (customCommands.TryGetValue(command, out Func<string[], int> cmd))
@@ -49,7 +50,7 @@ internal class Program
                 ["package", ..] => ExtensionManagerCommandLine.HandleArgs(args[1..]),
                 ["-watch-indefinetly"] => CliCommands.WatchIndefinetly(),
                 ["quit"] => CliCommands.QuitWatching(),
-                [] or ["help" or "?" or "-h" or "--help" or "/?" or "/help"] => DisplayHelpMessage(commandDescriptions),
+                [] or ["help" or "?" or "-h" or "--help" or "/?" or "/help", ..] => DisplayHelpMessage(args[1..], commandDescriptions),
                 _ => CliCommands.Compile(args)
             };
         }
@@ -139,6 +140,60 @@ internal class Program
         return sb.ToString();
     }
 
+    private static string GetPropertyTypeName(Type t)
+    {
+        if (t == typeof(bool))
+            return "Bool";
+
+        if (t == typeof(string))
+            return "String";
+
+        if (t == typeof(int))
+            return "Int";
+
+        if (t.IsArray)
+            return $"List<{GetPropertyTypeName(t.GetElementType())}>";
+
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))
+            return $"List<{GetPropertyTypeName(t.GetGenericArguments().First())}>";
+
+        if (t.IsEnum)
+            return "Enum";
+
+        return "Object";
+    }
+
+    private static int DisplayHelpMessage(string[] args, Dictionary<string, string> installedCommands)
+    {
+        DisplayLogo();
+
+        if (args.Any(a => a == "-o" || a == "--options"))
+        {
+            string header = $"{"Name",-40}{"Type",-20}{"Default"}";
+            Console.WriteLine();
+            Console.WriteLine(header);
+            Console.WriteLine(new string('-', header.Length));
+
+            PropertyInfo[] properties = typeof(DassieConfig).GetProperties();
+
+            foreach (PropertyInfo property in properties)
+            {
+                string defaultVal = "";
+
+                DefaultValueAttribute defaultValAttrib = property.GetCustomAttribute<DefaultValueAttribute>();
+                if (defaultValAttrib != null)
+                    defaultVal = (defaultValAttrib.Value ?? "").ToString();
+
+                string prop = $"{property.Name,-40}{GetPropertyTypeName(property.PropertyType),-20}{defaultVal}";
+                Console.WriteLine(prop);
+            }
+
+            return 0;
+        }
+
+        return DisplayHelpMessage(installedCommands);
+    }
+
     private static int DisplayHelpMessage(Dictionary<string, string> installedCommands)
     {
         if (Console.BufferWidth - 50 - 5 < 30)
@@ -222,7 +277,6 @@ internal class Program
         sb.Append("    --<PropertyName>::<ChildProperty>=<Value>".PadRight(50));
         sb.Append(FormatLines("For setting child properties of more complex objects. Object names are recognized by first characters. Example: --VersionInfo::Description=\"Application\""));
 
-        DisplayLogo();
         LogOut.Write(sb.ToString());
         return 0;
     }

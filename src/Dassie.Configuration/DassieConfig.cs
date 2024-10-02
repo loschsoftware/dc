@@ -80,6 +80,7 @@ public sealed class DassieConfig
     public bool MeasureElapsedTime { get; set; }
 
     [XmlElement("Configuration")]
+    [DefaultValue(ApplicationConfiguration.Debug)]
     public ApplicationConfiguration Configuration { get; set; }
 
     [DefaultValue(false)]
