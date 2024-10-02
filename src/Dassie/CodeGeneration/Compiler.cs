@@ -81,7 +81,7 @@ public static class Compiler
         //PersistedAssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, PersistedAssemblyBuilderAccess.RunAndSave);
         PersistedAssemblyBuilder ab = new(name, typeof(object).Assembly);
 
-        ModuleBuilder mb = ab.DefineDynamicModule(config.AssemblyName);
+        ModuleBuilder mb = ab.DefineDynamicModule(name.Name);
 
         Context.Assembly = ab;
         Context.Module = mb;
