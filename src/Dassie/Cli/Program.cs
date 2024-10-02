@@ -252,8 +252,8 @@ internal class Program
         sb.Append("    package [Command] [Options]".PadRight(50));
         sb.Append(FormatLines("Used to install and manage compiler extensions. Use 'dc package help' to display available commands."));
 
-        sb.Append("    help, ?".PadRight(50));
-        sb.Append(FormatLines("Shows this page."));
+        sb.Append("    help, ? [-o, --options]".PadRight(50));
+        sb.Append(FormatLines("Shows this page. Use the -o flag to display all available options."));
 
         if (installedCommands.Count > 0)
         {
