@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using System;
+using System.Collections.Generic;
 
 namespace Dassie.Cli.Commands;
 
@@ -80,7 +81,10 @@ internal static partial class CliCommands
         assemblyPath = Path.GetFullPath(assemblyPath);
 
         bool recompile = !File.Exists(assemblyPath);
-        FileInfo[] sourceFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)).ToArray();
+        List<FileInfo> sourceFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)).ToList();
+
+        if (File.Exists("dsconfig.xml"))
+            sourceFiles.Add(new("dsconfig.xml"));
 
         if (!recompile)
         {

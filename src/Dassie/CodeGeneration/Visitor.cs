@@ -3256,7 +3256,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitAssignment([NotNull] DassieParser.AssignmentContext context)
     {
         if (context.expression()[0].GetType() != typeof(DassieParser.Full_identifier_member_access_expressionContext)
-            && context.expression()[0].GetType() != typeof(DassieParser.Member_access_expressionContext))
+            && context.expression()[0].GetType() != typeof(DassieParser.Member_access_expressionContext)
+            && context.expression()[0].GetType() != typeof(DassieParser.Index_expressionContext))
         {
             EmitErrorMessage(
                 context.expression()[0].Start.Line,
@@ -3283,12 +3284,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         dynamic con = context.expression()[0] as DassieParser.Member_access_expressionContext;
         con ??= context.expression()[0] as DassieParser.Full_identifier_member_access_expressionContext;
+        con ??= (context.expression()[0] as DassieParser.Index_expressionContext).expression()[0];
+
+        bool indexAssignment = context.expression()[0] is DassieParser.Index_expressionContext;
+
+        // TODO: Implement index assignment
 
         object o = null;
         int firstIndex = 0;
         bool exitEarly = true;
 
-        if (context.expression()[0].GetType() == typeof(DassieParser.Full_identifier_member_access_expressionContext))
+        if (context.expression()[0].GetType() == typeof(DassieParser.Full_identifier_member_access_expressionContext)
+            || con.GetType() == typeof(DassieParser.Full_identifier_member_access_expressionContext))
         {
             o = SymbolResolver.GetSmallestTypeFromLeft(
             con.full_identifier(),
