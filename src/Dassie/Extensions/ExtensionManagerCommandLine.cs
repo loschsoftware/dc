@@ -43,6 +43,9 @@ internal static class ExtensionManagerCommandLine
         if (command == "update" && args.Length > 1)
             return Update(args[1]);
 
+        if (command == "source")
+            return ExtensionSourceManager.HandleArgs(args);
+
         return ShowUsage();
     }
 
@@ -196,6 +199,7 @@ internal static class ExtensionManagerCommandLine
         sb.Append($"{"    import <Path> [-o]",-35}{Program.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
         sb.Append($"{"    remove <Name>",-35}{Program.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
         sb.Append($"{"    update <Name>",-35}{Program.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
+        sb.Append($"{"    source [Command] [Options]",-35}{Program.FormatLines("Manages extension sources. Use 'dc package source help' for a list of commands.", indentWidth: 35)}");
         sb.Append($"{"    help",-35}{Program.FormatLines("Shows this list.", indentWidth: 35)}");
 
         Program.DisplayLogo();

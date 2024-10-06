@@ -42,8 +42,6 @@ internal class Program
                 ["config"] => CliCommands.BuildDassieConfig(),
                 ["build", ..] => CliCommands.CompileAll(args[1..]),
                 ["run", ..] => CliCommands.Run(args[1..]),
-                ["check" or "verify"] => CliCommands.CheckAll(),
-                ["check" or "verify", ..] => CliCommands.Check(args[1..]),
                 ["make" or "new", ..] => DSTemplates.CreateStructure(args),
                 ["watch" or "auto", ..] => CliCommands.WatchForFileChanges(args),
                 ["scratchpad", ..] => Scratchpad.HandleScratchpadCommands(args[1..]),
@@ -209,7 +207,7 @@ internal class Program
         sb.AppendLine();
         sb.AppendLine("Usage:");
 
-        sb.Append("    dc <Command> [Options]".PadRight(50));
+        sb.Append("    dc [Command] [Options]".PadRight(50));
         sb.Append(FormatLines("Executes a command from the list below."));
 
         sb.Append("    dc <FileNames> [Options]".PadRight(50));
@@ -232,7 +230,7 @@ internal class Program
         sb.Append(FormatLines("Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified."));
 
         sb.Append("    run [Arguments]".PadRight(50));
-        sb.Append(FormatLines("Executes the output executable of the current project with the specified arguments. Does not recompile the project."));
+        sb.Append(FormatLines("Automatically compiles using the default profile and then runs the output executable with the specified arguments."));
 
         sb.Append("    watch, auto".PadRight(50));
         sb.Append(FormatLines("Watches all .ds files in the current folder structure and automatically recompiles when files are changed."));
@@ -242,9 +240,6 @@ internal class Program
 
         sb.Append("    scratchpad [Command] [Options]".PadRight(50));
         sb.Append(FormatLines("Allows compiling and running Dassie source code from the console. Use 'dc scratchpad help' to display available commands."));
-
-        sb.Append("    check, verify [FileNames]".PadRight(50));
-        sb.Append(FormatLines("Checks the specified files, or all .ds files in the current folder structure, for syntax errors."));
 
         sb.Append("    config".PadRight(50));
         sb.Append(FormatLines("Creates a new dsconfig.xml file with default values."));
