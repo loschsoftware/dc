@@ -486,12 +486,12 @@ internal static partial class CliCommands
 
         if (matchingFiles.Length == 0)
         {
-            if (pattern.All(char.IsLetter))
+            if (pattern.All(c => char.IsLetter(c) || c == '-'))
             {
                 EmitErrorMessage(
                     0, 0, 0,
                     DS0100_InvalidCommand,
-                    $"Invalid command '{pattern}'. Use 'dc help' for a list of available commands.",
+                    $"Unrecognized command '{pattern}'. Use 'dc help' for a list of available commands.",
                     "dc");
 
                 Environment.Exit(-1);
