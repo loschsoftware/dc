@@ -72,8 +72,8 @@ public sealed class DassieConfig
     public bool TreatWarningsAsErrors { get; set; }
 
     [DefaultValue(true)]
-    [XmlElement("IlOptimizations")]
-    public bool IlOptimizations { get; set; } = true;
+    [XmlElement("ILOptimizations")]
+    public bool ILOptimizations { get; set; } = true;
 
     [DefaultValue(false)]
     [XmlElement("MeasureElapsedTime")]

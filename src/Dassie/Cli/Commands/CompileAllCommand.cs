@@ -34,9 +34,9 @@ internal static partial class CliCommands
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
 
-        if (args.Length > 0 && args.Any(a => !a.StartsWith("--")))
+        if (args.Length > 0 && args.TakeWhile(a => !a.StartsWith('-')).Any())
         {
-            string profileName = args.First(a => !a.StartsWith("--"));
+            string profileName = args.First(a => !a.StartsWith('-'));
 
             if (config.BuildProfiles.Any(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase)))
             {

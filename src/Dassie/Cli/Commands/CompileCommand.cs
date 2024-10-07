@@ -58,7 +58,7 @@ internal static partial class CliCommands
         config ??= new();
         config.AssemblyName ??= asmName;
 
-        CommandLineOptionParser.ParseOptions(args, config);
+        CommandLineOptionParser.ParseOptions(ref args, config);
 
         if (overrideSettings != null)
             config = overrideSettings;

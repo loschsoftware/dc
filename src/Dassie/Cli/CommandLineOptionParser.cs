@@ -12,12 +12,64 @@ namespace Dassie.Cli;
 /// </summary>
 internal static class CommandLineOptionParser
 {
-    public static void ParseOptions(string[] args, DassieConfig config)
+    public static readonly Dictionary<string, string> Aliases = new()
     {
-        //args = args.Where(a => a.StartsWith("--") && a.Count(c => c == '=') == 1).Select(a => a[2..]);
-        args = args.Where(a => a.StartsWith("--")).ToArray();
+        ["O"] = "BuildDirectory",
+        ["T"] = "ApplicationType",
+        ["A"] = "AssemblyName",
+        ["R"] = "Runtime",
+        ["M"] = "ILOptimizations",
+        ["L"] = "MeasureElapsedTime",
+        ["I"] = "GenerateILFiles",
+        ["H"] = "GenerateNativeAppHost",
+        ["C"] = "CacheSourceFiles"
+    };
 
-        if (!args.Any())
+    private static readonly List<string> BooleanAliases = ["M", "L", "I", "H", "C"];
+
+    public static void ParseOptions(ref string[] args, DassieConfig config)
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (!args[i].StartsWith('-'))
+                continue;
+
+            string arg = args[i][1..].ToUpperInvariant();
+
+            if (Aliases.TryGetValue(arg, out string option))
+            {
+                if (BooleanAliases.Contains(arg))
+                {
+                    args = [
+                        .. args[..i],
+                        $"--{option}=1",
+                        .. args[(i + 1)..]
+                    ];
+
+                    continue;
+                }
+
+                else if (args[i] == args.Last() || args[i + 1].StartsWith('-'))
+                {
+                    EmitErrorMessage(0, 0, 0,
+                        DS0089_InvalidDSConfigProperty,
+                        $"Expected argument for option '{arg.ToLowerInvariant()}'.",
+                        "dc");
+
+                    continue;
+                }
+
+                args = [
+                    .. args[..i],
+                    $"--{option}={args[i+1]}",
+                    .. args[(i + 2)..]
+                    ];
+            }
+        }
+
+        string[] options = args.Where(a => a.StartsWith("--")).ToArray();
+        
+        if (!options.Any())
             return;
 
         Dictionary<string, PropertyInfo> propNames = [];
@@ -40,7 +92,7 @@ internal static class CommandLineOptionParser
             propNames.Add(prop.Name.ToLowerInvariant(), prop);
         }
 
-        foreach (string arg in args)
+        foreach (string arg in options)
         {
             if (arg.Contains("::")) // Accessing a property of a more complex element (e.g. version info)
             {

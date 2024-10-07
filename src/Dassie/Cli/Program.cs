@@ -167,25 +167,46 @@ internal class Program
 
         if (args.Any(a => a == "-o" || a == "--options"))
         {
-            string header = $"{"Name",-40}{"Type",-20}{"Default"}";
-            Console.WriteLine();
-            Console.WriteLine(header);
-            Console.WriteLine(new string('-', header.Length));
+            StringBuilder outputBuilder = new();
+
+            string header = $"{"A "}{"Name",-40}{"Type",-20}{"Default"}";
+            outputBuilder.AppendLine();
+            outputBuilder.AppendLine(header);
+            outputBuilder.AppendLine(new string('-', header.Length));
 
             PropertyInfo[] properties = typeof(DassieConfig).GetProperties();
+            List<(string PropertyName, string Text)> propertyLines = [];
 
             foreach (PropertyInfo property in properties)
             {
+                string name = property.Name;
+
+                XmlElementAttribute element = property.GetCustomAttribute<XmlElementAttribute>();
+                XmlAttributeAttribute attrib = property.GetCustomAttribute<XmlAttributeAttribute>();
+
+                if (element != null && !string.IsNullOrEmpty(element.ElementName))
+                    name = element.ElementName;
+
+                if (attrib != null && !string.IsNullOrEmpty(attrib.AttributeName))
+                    name = attrib.AttributeName;
+
                 string defaultVal = "";
 
                 DefaultValueAttribute defaultValAttrib = property.GetCustomAttribute<DefaultValueAttribute>();
                 if (defaultValAttrib != null)
                     defaultVal = (defaultValAttrib.Value ?? "").ToString();
 
-                string prop = $"{property.Name,-40}{GetPropertyTypeName(property.PropertyType),-20}{defaultVal}";
-                Console.WriteLine(prop);
+                string alias = "";
+                if (CommandLineOptionParser.Aliases.ContainsValue(name))
+                    alias = CommandLineOptionParser.Aliases.First(a => a.Value == name).Key.ToLowerInvariant();
+
+                propertyLines.Add((name, $"{alias,-1} {property.Name,-40}{GetPropertyTypeName(property.PropertyType),-20}{defaultVal}"));
             }
 
+            foreach (string prop in propertyLines.OrderBy(p => p.PropertyName).Select(p => p.Text))
+                outputBuilder.AppendLine(prop);
+
+            Console.WriteLine(outputBuilder.ToString());
             return 0;
         }
 
