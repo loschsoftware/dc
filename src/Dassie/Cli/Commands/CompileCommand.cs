@@ -275,7 +275,7 @@ internal static partial class CliCommands
             peBlob.WriteContentTo(fs);
             fs.Dispose();
 
-            if (config.GenerateNativeAppHost)
+            if (config.ApplicationType != ApplicationType.Library && config.GenerateNativeAppHost)
             {
                 string executableExtension = OperatingSystem.IsWindows() ? "exe" : "";
                 string frameworkBaseDir = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk")).Last();

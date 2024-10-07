@@ -1,7 +1,5 @@
 ﻿using Dassie.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace Dassie.Templates;
@@ -15,7 +13,6 @@ public static class DSTemplates
     /// Contains a template for a console application.
     /// </summary>
     public static readonly string Console =
-
 @"println ""Hello World!""";
 
     /// <summary>
@@ -47,18 +44,23 @@ public static class DSTemplates
         XmlSerializer xmls = new(typeof(DassieConfig));
         DassieConfig config = new()
         {
+            FormatVersion = "1.0",
             AssemblyName = args[2]
         };
 
         switch (args[1])
         {
             case "console":
-                {
-                    AddSourceFile(Path.Combine(srcDir, "main.ds"), Console);
-                    xmls.Serialize(configFile, config, ns);
-                    break;
-                }
+                AddSourceFile(Path.Combine(srcDir, "main.ds"), Console);
+                break;
+
+            case "library":
+                AddSourceFile(Path.Combine(srcDir, "Type1.ds"), Library);
+                config.ApplicationType = ApplicationType.Library;
+                break;
         }
+
+        xmls.Serialize(configFile, config, ns);
 
         System.Console.WriteLine($"Built new project in {rootDir} based on template '{args[1]}'.");
 
