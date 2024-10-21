@@ -4,6 +4,7 @@ using Dassie.Helpers;
 using Dassie.Parser;
 using Dassie.Runtime;
 using Dassie.Text;
+using NuGet.Protocol;
 using System;
 using System.Globalization;
 using System.IO;
@@ -213,7 +214,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
                 context.Start.Column,
                 context.GetText().Length,
                 DS0075_Overflow,
-                $"The integer literal is too large for type '{literalType.FullName}'.");
+                $"The literal is too large or too small for type '{literalType.FullName}'.");
         }
 
         return new(typeof(int), 1);
