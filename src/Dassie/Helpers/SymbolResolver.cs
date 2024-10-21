@@ -1091,11 +1091,11 @@ internal static class SymbolResolver
                 $"An array cannot have more than 32 dimensions.");
         }
 
-        //if (name.type_name() != null && name.type_name().Length > 0)
-        //{
-        //    Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
-        //    return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
-        //}
+        if (name.type_name() != null && name.type_name().Length > 0)
+        {
+            Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
+            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+        }
 
         if (name.identifier_atom() != null)
         {
