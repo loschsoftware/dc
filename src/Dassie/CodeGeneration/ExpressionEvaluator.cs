@@ -245,42 +245,44 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
     public override Expression VisitType_name([NotNull] DassieParser.Type_nameContext context)
     {
-        if (context.Ampersand() != null)
-            return new(typeof(Type), VisitType_name(context.type_name().First()).Value.MakeByRefType());
+        return new(typeof(Type), SymbolResolver.ResolveTypeName(context));
 
-        if (context.identifier_atom() != null)
-        {
-            bool success = SymbolResolver.TryGetType(
-                              context.identifier_atom().GetText(),
-                              out Type t,
-                              context.identifier_atom().Start.Line,
-                              context.identifier_atom().Start.Column,
-                              context.identifier_atom().GetText().Length);
+        //if (context.Ampersand() != null)
+        //    return new(typeof(Type), VisitType_name(context.type_name().First()).Value.MakeByRefType());
 
-            if (success)
-                return new(typeof(Type), t);
-        }
+        //if (context.identifier_atom() != null)
+        //{
+        //    bool success = SymbolResolver.TryGetType(
+        //                      context.identifier_atom().GetText(),
+        //                      out Type t,
+        //                      context.identifier_atom().Start.Line,
+        //                      context.identifier_atom().Start.Column,
+        //                      context.identifier_atom().GetText().Length);
 
-        if (context.Bar() != null)
-        {
-            UnionValue union = new(null, context.type_name().Select(VisitType_name).Select(e => (Type)e.Value).ToArray());
-            CurrentMethod.CurrentUnion = union;
+        //    if (success)
+        //        return new(typeof(Type), t);
+        //}
 
-            if (union.AllowedTypes.Distinct().Count() < union.AllowedTypes.Length)
-            {
-                EmitWarningMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.GetText().Length,
-                    DS0047_UnionTypeDuplicate,
-                    "The union type contains duplicate cases.");
-            }
+        //if (context.Bar() != null)
+        //{
+        //    UnionValue union = new(null, context.type_name().Select(VisitType_name).Select(e => (Type)e.Value).ToArray());
+        //    CurrentMethod.CurrentUnion = union;
 
-            return new(union.GetType(), union.GetType());
-        }
+        //    if (union.AllowedTypes.Distinct().Count() < union.AllowedTypes.Length)
+        //    {
+        //        EmitWarningMessage(
+        //            context.Start.Line,
+        //            context.Start.Column,
+        //            context.GetText().Length,
+        //            DS0047_UnionTypeDuplicate,
+        //            "The union type contains duplicate cases.");
+        //    }
 
-        // TODO: Implement the other types
-        return new(typeof(object), typeof(object));
+        //    return new(union.GetType(), union.GetType());
+        //}
+
+        //// TODO: Implement the other types
+        //return new(typeof(object), typeof(object));
     }
 
     public override Expression VisitEmpty_atom([NotNull] DassieParser.Empty_atomContext context)
