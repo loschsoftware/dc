@@ -142,70 +142,83 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
     {
         string text = context.GetText();
         Type literalType = typeof(int);
+        NumberStyles style = NumberStyles.Integer;
+
+        if (context.Hex_Integer_Literal() != null)
+        {
+            style = NumberStyles.HexNumber;
+            text = text[2..];
+        }
+
+        if (context.Binary_Integer_Literal() != null)
+        {
+            style = NumberStyles.BinaryNumber;
+            text = text[2..];
+        }
 
         try
         {
             if (text.EndsWith("sb", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(sbyte);
-                return new(typeof(sbyte), sbyte.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(sbyte), sbyte.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("b", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(byte);
                 text += "0";
-                return new(typeof(byte), byte.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(byte), byte.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("us", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(ushort);
-                return new(typeof(ushort), ushort.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(ushort), ushort.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("s", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(short);
                 text += "0";
-                return new(typeof(short), short.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(short), short.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("ul", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(ulong);
-                return new(typeof(ulong), ulong.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(ulong), ulong.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("u", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(uint);
                 text += "0";
-                return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("l", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(long);
                 text += "0";
-                return new(typeof(long), long.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(long), long.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("un", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(uint);
-                return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("n", StringComparison.OrdinalIgnoreCase))
             {
                 literalType = typeof(int);
                 text += "0";
-                return new(typeof(int), int.Parse(text[0..^2].Replace("'", "")));
+                return new(typeof(int), int.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             text += "00";
-            return new(typeof(int), int.Parse(text[0..^2].Replace("'", "")));
+            return new(typeof(int), int.Parse(text[0..^2].Replace("'", ""), style));
         }
         catch (OverflowException)
         {

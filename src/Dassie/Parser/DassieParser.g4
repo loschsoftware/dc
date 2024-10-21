@@ -121,6 +121,8 @@ expression_atom
 
 integer_atom
     : Integer_Literal
+    | Binary_Integer_Literal
+    | Hex_Integer_Literal
     ;
 
 real_atom
