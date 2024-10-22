@@ -26,6 +26,7 @@ build command
 
     public int Invoke(string[] args)
     {
+        args = args[1..];
         DassieConfig config = null;
 
         if (File.Exists("dsconfig.xml"))
