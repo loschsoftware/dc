@@ -1,14 +1,27 @@
-﻿using System;
+﻿using Dassie.Extensions;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
 namespace Dassie.Cli.Commands;
 
-internal static partial class CliCommands
+internal class WatchCommand : ICompilerCommand
 {
-    private static Process watchProcess = null;
+    internal static Process watchProcess = null;
 
-    public static int WatchForFileChanges(string[] args)
+    public string Command => "watch";
+
+    public string UsageString => "watch, auto";
+
+    public string Description => "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.";
+
+    public string Help => @"
+watch command";
+
+    public List<string> Aliases() => ["auto"];
+
+    public int Invoke(string[] args)
     {
         LogOut.Write("Watching file changes. Use ");
 
@@ -25,19 +38,6 @@ internal static partial class CliCommands
         watchProcess.StartInfo.CreateNoWindow = true;
         watchProcess.Start();
 
-        return 0;
-    }
-
-    public static int QuitWatching()
-    {
-        LogOut.WriteLine("No longer watching file changes.");
-
-        watchProcess = new Process();
-        watchProcess.StartInfo.FileName = "taskkill.exe";
-        watchProcess.StartInfo.Arguments = "/f /im dc.exe";
-        watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        watchProcess.StartInfo.CreateNoWindow = true;
-        watchProcess.Start();
         return 0;
     }
     

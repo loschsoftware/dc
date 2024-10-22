@@ -1,5 +1,5 @@
 ﻿using Dassie.Cli;
-using Dassie.Errors;
+using Dassie.Cli.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +8,18 @@ using System.Text;
 
 namespace Dassie.Extensions;
 
-internal static class ExtensionManagerCommandLine
+internal class ExtensionManagerCommandLine : ICompilerCommand
 {
-    public static int HandleArgs(string[] args)
+    public string Command => "package";
+
+    public string UsageString => "package [Command] [Options]";
+
+    public string Description => "Used to install and manage compiler extensions. Use 'dc package help' to display available commands.";
+
+    public string Help => @"
+package command";
+
+    public int Invoke(string[] args)
     {
         args ??= [];
 
@@ -59,7 +68,7 @@ internal static class ExtensionManagerCommandLine
             return 0;
         }
 
-        Program.DisplayLogo();
+        HelpCommand.DisplayLogo();
         Console.WriteLine();
         Console.WriteLine("Installed extensions:");
         Console.WriteLine();
@@ -89,7 +98,7 @@ internal static class ExtensionManagerCommandLine
 
         IPackage package = packages.First(p => p.Metadata.Name == name);
 
-        Program.DisplayLogo();
+        HelpCommand.DisplayLogo();
         Console.WriteLine();
         Console.WriteLine("Extension info:");
         Console.WriteLine();
@@ -193,16 +202,16 @@ internal static class ExtensionManagerCommandLine
 
         sb.AppendLine();
         sb.AppendLine("Available commands:");
-        sb.Append($"{"    list",-35}{Program.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
-        sb.Append($"{"    info <Name>",-35}{Program.FormatLines("Displays advanced information about the specified extension.", indentWidth: 35)}");
-        sb.Append($"{"    install <Name>",-35}{Program.FormatLines("Installs the specified extension from the package repository.", indentWidth: 35)}");
-        sb.Append($"{"    import <Path> [-o]",-35}{Program.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
-        sb.Append($"{"    remove <Name>",-35}{Program.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
-        sb.Append($"{"    update <Name>",-35}{Program.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
-        sb.Append($"{"    source [Command] [Options]",-35}{Program.FormatLines("Manages extension sources. Use 'dc package source help' for a list of commands.", indentWidth: 35)}");
-        sb.Append($"{"    help",-35}{Program.FormatLines("Shows this list.", indentWidth: 35)}");
+        sb.Append($"{"    list",-35}{HelpCommand.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
+        sb.Append($"{"    info <Name>",-35}{HelpCommand.FormatLines("Displays advanced information about the specified extension.", indentWidth: 35)}");
+        sb.Append($"{"    install <Name>",-35}{HelpCommand.FormatLines("Installs the specified extension from the package repository.", indentWidth: 35)}");
+        sb.Append($"{"    import <Path> [-o]",-35}{HelpCommand.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
+        sb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
+        sb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
+        sb.Append($"{"    source [Command] [Options]",-35}{HelpCommand.FormatLines("Manages extension sources. Use 'dc package source help' for a list of commands.", indentWidth: 35)}");
+        sb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
 
-        Program.DisplayLogo();
+        HelpCommand.DisplayLogo();
         Console.Write(sb.ToString());
         return 0;
     }

@@ -1,4 +1,5 @@
-﻿using Dassie.Cli.Commands;
+﻿using Dassie.Cli;
+using Dassie.Cli.Commands;
 using Dassie.Configuration;
 using Dassie.Packages;
 using System;
@@ -36,7 +37,7 @@ internal static class ReferenceHandler
         string dir = Directory.GetCurrentDirectory();
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
-        int errCode = CliCommands.CompileAll(Array.Empty<string>());
+        int errCode = DefaultCommandManager.CompileAllCommand.Invoke(Array.Empty<string>());
 
         if (errCode != 0)
             return false;

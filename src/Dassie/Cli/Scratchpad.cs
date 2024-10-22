@@ -138,7 +138,7 @@ internal static class Scratchpad
     /// <returns>The exit code.</returns>
     private static int CompileFromStdIn(string[] args)
     {
-        Program.DisplayLogo();
+        HelpCommand.DisplayLogo();
         Console.WriteLine();
         Console.WriteLine("To mark the end of the input, press Ctrl+Z in an empty line and hit Enter.");
         Console.WriteLine();
@@ -190,7 +190,7 @@ internal static class Scratchpad
             cfg = (DassieConfig)xmls.Deserialize(sr);
         }
 
-        int result = CliCommands.Compile([file]);
+        int result = CompileCommand.Compile([file]);
 
         string outDir = Path.Combine(dir, "build");
         string asm = Path.Combine(outDir, Path.ChangeExtension(Path.GetFileName(file), "dll"));
@@ -241,18 +241,18 @@ internal static class Scratchpad
 
         sb.AppendLine();
         sb.AppendLine("Available commands:");
-        sb.Append($"{"    new [Options]",-35}{Program.FormatLines("Creates a new scratch.", indentWidth: 35)}");
-        sb.Append($"{"        --name=<Name>",-35}{Program.FormatLines("Specifies the name of the scratch.", indentWidth: 35)}");
-        sb.Append($"{"        --config=<Path>",-35}{Program.FormatLines("The compiler configuration (dsconfig.xml) file to use.", indentWidth: 35)}");
+        sb.Append($"{"    new [Options]",-35}{HelpCommand.FormatLines("Creates a new scratch.", indentWidth: 35)}");
+        sb.Append($"{"        --name=<Name>",-35}{HelpCommand.FormatLines("Specifies the name of the scratch.", indentWidth: 35)}");
+        sb.Append($"{"        --config=<Path>",-35}{HelpCommand.FormatLines("The compiler configuration (dsconfig.xml) file to use.", indentWidth: 35)}");
         sb.AppendLine();
 
-        sb.Append($"{"    load <Name>",-35}{Program.FormatLines("Loads the specified scratch.", indentWidth: 35)}");
-        sb.Append($"{"    list",-35}{Program.FormatLines("Lists all saved scratches.", indentWidth: 35)}");
-        sb.Append($"{"    delete <Name>",-35}{Program.FormatLines("Deletes the specified scratch.", indentWidth: 35)}");
-        sb.Append($"{"    clear",-35}{Program.FormatLines("Deletes all saved scratches.", indentWidth: 35)}");
-        sb.Append($"{"    help",-35}{Program.FormatLines("Shows this list.", indentWidth: 35)}");
+        sb.Append($"{"    load <Name>",-35}{HelpCommand.FormatLines("Loads the specified scratch.", indentWidth: 35)}");
+        sb.Append($"{"    list",-35}{HelpCommand.FormatLines("Lists all saved scratches.", indentWidth: 35)}");
+        sb.Append($"{"    delete <Name>",-35}{HelpCommand.FormatLines("Deletes the specified scratch.", indentWidth: 35)}");
+        sb.Append($"{"    clear",-35}{HelpCommand.FormatLines("Deletes all saved scratches.", indentWidth: 35)}");
+        sb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
 
-        Program.DisplayLogo();
+        HelpCommand.DisplayLogo();
         Console.WriteLine(sb.ToString());
         return 0;
     }

@@ -1,19 +1,30 @@
-﻿using Dassie.Configuration.Macros;
-using Dassie.Configuration;
+﻿using Dassie.Configuration;
+using Dassie.Configuration.Macros;
+using Dassie.Errors;
+using Dassie.Extensions;
 using Dassie.Validation;
+using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
-using System;
-using Dassie.Errors;
-using System.Diagnostics;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace Dassie.Cli.Commands;
 
-internal static partial class CliCommands
+internal class CompileAllCommand : ICompilerCommand
 {
-    public static int CompileAll(string[] args)
+    public string Command => "build";
+
+    public string UsageString => "build [BuildProfile]";
+
+    public string Description => "Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.";
+
+    public string Help => @"
+build command
+";
+
+    public int Invoke(string[] args)
     {
         DassieConfig config = null;
 
@@ -69,7 +80,7 @@ internal static partial class CliCommands
             return -1;
         }
 
-        return Compile(filesToCompile.Concat(args).ToArray());
+        return CompileCommand.Compile(filesToCompile.Concat(args).ToArray());
     }
 
     private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config)
@@ -140,7 +151,7 @@ internal static partial class CliCommands
         }
 
         if (!string.IsNullOrEmpty(profile.Arguments))
-            Compile(profile.Arguments.Split(' '), config);
+            CompileCommand.Compile(profile.Arguments.Split(' '), config);
 
         if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
         {

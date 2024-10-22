@@ -1,18 +1,29 @@
 ﻿using Dassie.Configuration;
 using Dassie.Errors;
+using Dassie.Extensions;
 using Dassie.Validation;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using System;
-using System.Collections.Generic;
 
 namespace Dassie.Cli.Commands;
 
-internal static partial class CliCommands
+internal class RunCommand : ICompilerCommand
 {
-    public static int Run(string[] args)
+    public string Command => "run";
+
+    public string UsageString => "run [Arguments]";
+
+    public string Description => "Automatically compiles using the default profile and then runs the output executable with the specified arguments.";
+
+    public string Help => @"
+run command
+";
+
+    public int Invoke(string[] args)
     {
         DassieConfig config = null;
 
@@ -93,7 +104,7 @@ internal static partial class CliCommands
         }
 
         if (recompile)
-            CompileAll([]);
+            DefaultCommandManager.CompileAllCommand.Invoke([]);
 
         string process = "dotnet";
         string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. args]);

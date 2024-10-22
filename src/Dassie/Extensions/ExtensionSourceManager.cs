@@ -1,6 +1,7 @@
 ﻿using Dassie.Cli;
 using System.Text;
 using System;
+using Dassie.Cli.Commands;
 
 namespace Dassie.Extensions;
 
@@ -30,12 +31,12 @@ static class ExtensionSourceManager
 
         sb.AppendLine();
         sb.AppendLine("Available commands:");
-        sb.Append($"{"    list",-35}{Program.FormatLines("Lists all enabled extension sources.", indentWidth: 35)}");
-        sb.Append($"{"    add <Url> [Name]",-35}{Program.FormatLines("Adds a new extension source with an optional name.", indentWidth: 35)}");
-        sb.Append($"{"    remove <Url|Name>",-35}{Program.FormatLines("Removes the specified extension source.", indentWidth: 35)}");
-        sb.Append($"{"    help",-35}{Program.FormatLines("Shows this list.", indentWidth: 35)}");
+        sb.Append($"{"    list",-35}{HelpCommand.FormatLines("Lists all enabled extension sources.", indentWidth: 35)}");
+        sb.Append($"{"    add <Url> [Name]",-35}{HelpCommand.FormatLines("Adds a new extension source with an optional name.", indentWidth: 35)}");
+        sb.Append($"{"    remove <Url|Name>",-35}{HelpCommand.FormatLines("Removes the specified extension source.", indentWidth: 35)}");
+        sb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
 
-        Program.DisplayLogo();
+        HelpCommand.DisplayLogo();
         Console.Write(sb.ToString());
         return 0;
     }

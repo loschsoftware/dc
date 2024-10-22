@@ -24,7 +24,8 @@ using System.Xml.Serialization;
 
 namespace Dassie.Cli.Commands;
 
-internal static partial class CliCommands
+// Does not implement ICompilerCommand because it is not actually a proper command (has no name)
+internal static class CompileCommand
 {
     public static int Compile(string[] args, DassieConfig overrideSettings = null)
     {

@@ -1,7 +1,9 @@
-﻿namespace Dassie.Extensions;
+﻿using System.Collections.Generic;
+
+namespace Dassie.Extensions;
 
 /// <summary>
-/// Defines an external command used to add additional features to the Dassie compiler.
+/// Defines a command used to add additional features to the Dassie compiler.
 /// </summary>
 public interface ICompilerCommand
 {
@@ -9,6 +11,11 @@ public interface ICompilerCommand
     /// The name used to invoke the command in the console.
     /// </summary>
     public string Command { get; }
+
+    /// <summary>
+    /// A list of alternative command names.
+    /// </summary>
+    public virtual List<string> Aliases() => [];
 
     /// <summary>
     /// A usage hint displayed in the compiler help screen.
@@ -19,6 +26,11 @@ public interface ICompilerCommand
     /// A short description of the command.
     /// </summary>
     public string Description { get; }
+
+    /// <summary>
+    /// An extended help text displayed when using the 'dc help &lt;Command&gt;' command.
+    /// </summary>
+    public virtual string Help() => "";
 
     /// <summary>
     /// The method that is executed when the command is invoked.

@@ -1,13 +1,24 @@
 ﻿using Dassie.Configuration;
+using Dassie.Extensions;
+using System;
 using System.IO;
 using System.Xml.Serialization;
-using System;
 
 namespace Dassie.Cli.Commands;
 
-internal static partial class CliCommands
+internal class ConfigCommand : ICompilerCommand
 {
-    public static int BuildDassieConfig()
+    public string Command => "config";
+
+    public string UsageString => "config";
+
+    public string Description => "Creates a new dsconfig.xml file with default values.";
+
+    public string Help => @"
+config command
+";
+
+    public int Invoke(string[] args)
     {
         if (File.Exists("dsconfig.xml"))
         {
