@@ -146,7 +146,7 @@ internal static class Scratchpad
         string src = Console.In.ReadToEnd();
         Console.WriteLine();
 
-        string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Dassie", "Scratchpad");
+        string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Dassie", "Scratchpad")).FullName;
         string scratchName = "scratch";
         int lowestAvailableScratchIndex = 0;
         foreach (string scratchDir in Directory.GetDirectories(dir).Select(d => d.Split(Path.DirectorySeparatorChar).Last()))
