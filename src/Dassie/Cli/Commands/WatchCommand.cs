@@ -15,9 +15,14 @@ internal class WatchCommand : ICompilerCommand
     public string UsageString => "watch, auto";
 
     public string Description => "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.";
+    
+    public WatchCommand()
+    {
+        _help = CommandHelpStringBuilder.GenerateHelpString(this);
+    }
 
-    public string Help => @"
-watch command";
+    private readonly string _help;
+    public string Help() => _help;
 
     public List<string> Aliases() => ["auto"];
 

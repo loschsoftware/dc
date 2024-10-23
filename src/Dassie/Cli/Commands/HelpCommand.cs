@@ -14,7 +14,11 @@ internal class HelpCommand : ICompilerCommand
 {
     private readonly Dictionary<string, string> _installedCommands;
 
-    public HelpCommand(Dictionary<string, string> commands) => _installedCommands = commands;
+    public HelpCommand(Dictionary<string, string> commands)
+    {
+        _installedCommands = commands;
+        _help = CommandHelpStringBuilder.GenerateHelpString(this);
+    }
 
     public string Command => "help";
 
@@ -24,10 +28,19 @@ internal class HelpCommand : ICompilerCommand
 
     public string Description => "Shows this page. Use the -o flag to display all available options.";
 
-    public string Help => @"
-help command";
+    private readonly string _help;
+    public string Help() => _help;
 
-    public int Invoke(string[] args) => DisplayHelpMessage(args, _installedCommands);
+    public int Invoke(string[] args)
+    {
+        if (args.Length > 0 && (args[0] == "help" || args[0] == "?"))
+            args = args[1..];
+
+        if (args.Any(a => !a.StartsWith('-')))
+            return DisplayHelpForCommand(args.First(a => !a.StartsWith('-')));
+
+        return DisplayHelpMessage(args, _installedCommands);
+    }
 
     public static void DisplayLogo()
     {
@@ -178,39 +191,11 @@ help command";
         sb.AppendLine();
         sb.AppendLine("Commands:");
 
-        sb.Append("    new <Type> <Name>".PadRight(50));
-
-        sb.AppendLine("Creates the file structure of a Dassie project.");
-
-        sb.Append("        console".PadRight(25).PadRight(50));
-        sb.AppendLine("Specifies a command-line application.");
-        sb.Append("        library".PadRight(25).PadRight(50));
-        sb.AppendLine("Specifies a dynamic link library.");
-        sb.AppendLine();
-
-        sb.Append("    build [BuildProfile]".PadRight(50));
-        sb.Append(FormatLines("Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified."));
-
-        sb.Append("    run [Arguments]".PadRight(50));
-        sb.Append(FormatLines("Automatically compiles using the default profile and then runs the output executable with the specified arguments."));
-
-        sb.Append("    watch, auto".PadRight(50));
-        sb.Append(FormatLines("Watches all .ds files in the current folder structure and automatically recompiles when files are changed."));
-
-        sb.Append("    quit".PadRight(50));
-        sb.Append(FormatLines("Stops all file watchers."));
-
-        sb.Append("    scratchpad [Command] [Options]".PadRight(50));
-        sb.Append(FormatLines("Allows compiling and running Dassie source code from the console. Use 'dc scratchpad help' to display available commands."));
-
-        sb.Append("    config".PadRight(50));
-        sb.Append(FormatLines("Creates a new dsconfig.xml file with default values."));
-
-        sb.Append("    package [Command] [Options]".PadRight(50));
-        sb.Append(FormatLines("Used to install and manage compiler extensions. Use 'dc package help' to display available commands."));
-
-        sb.Append("    help, ? [-o, --options]".PadRight(50));
-        sb.Append(FormatLines("Shows this page. Use the -o flag to display all available options."));
+        foreach (ICompilerCommand command in DefaultCommandManager.DefaultCommands.OrderBy(c => c.Command))
+        {
+            sb.Append($"    {command.UsageString}".PadRight(50));
+            sb.Append(FormatLines(command.Description));
+        }
 
         if (installedCommands.Count > 0)
         {
@@ -235,6 +220,22 @@ help command";
         sb.Append(FormatLines("For setting child properties of more complex objects. Object names are recognized by first characters. Example: --VersionInfo::Description=\"Application\""));
 
         LogOut.Write(sb.ToString());
+        return 0;
+    }
+
+    private static int DisplayHelpForCommand(string name)
+    {
+        if (!DefaultCommandManager.DefaultCommands.Any(c => c.Command == name || c.Aliases().Contains(name)))
+        {
+            Console.WriteLine($"Could not load help for command '{name}' because it does not exist.");
+            return 1;
+        }
+
+        DisplayLogo();
+        LogOut.WriteLine();
+
+        ICompilerCommand command = DefaultCommandManager.DefaultCommands.First(c => c.Command == name || c.Aliases().Contains(name));
+        LogOut.WriteLine(command.Help());
         return 0;
     }
 }

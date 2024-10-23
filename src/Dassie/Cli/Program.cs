@@ -27,11 +27,12 @@ internal class Program
             Dictionary<string, string> commandDescriptions = ExtensionLoader.GetCommandDescriptions(extensions);
 
             List<ICompilerCommand> defaultCommands = DefaultCommandManager.DefaultCommands;
-            defaultCommands.Add(new HelpCommand(commandDescriptions));
+            HelpCommand helpCommand = new(commandDescriptions);
+            defaultCommands.Add(helpCommand);
 
             args ??= [];
             if (args.Length == 0)
-                return defaultCommands.Last().Invoke(args);
+                return helpCommand.Invoke(args);
 
             string command = args[0];
             if (customCommands.TryGetValue(command, out Func<string[], int> cmd))
@@ -43,16 +44,14 @@ internal class Program
                 return selectedCommand.Invoke(args);
             }
 
+            string[] helpCommands = ["?", "-h", "--help", "-?", "/?", "/help"];
+            if (helpCommands.Contains(command.ToLowerInvariant()))
+                return helpCommand.Invoke([]);
+
             return CompileCommand.Compile(args);
         }
         catch (Exception ex)
         {
-            if (ex is IOException ioEx)
-                EmitErrorMessage(0, 0, 0, DS0029_FileAccessDenied, $"File access denied.");
-
-            else if (ex is UnauthorizedAccessException uaEx)
-                EmitErrorMessage(0, 0, 0, DS0029_FileAccessDenied, $"File access denied.");
-
             if (messages.Count == 0)
             {
                 EmitErrorMessage(0, 0, 0, DS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "dc.exe");

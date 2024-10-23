@@ -130,7 +130,7 @@ public static class ErrorWriter
             };
 
             string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
-            string codePos = "(~)";
+            string codePos = "\b";
 
             if (!error.HideCodePosition)
                 codePos = $"({error.CodePosition.Item1},{error.CodePosition.Item2})";

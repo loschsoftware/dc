@@ -11,8 +11,13 @@ internal class QuitCommand : ICompilerCommand
 
     public string Description => "Stops all file watchers.";
 
-    public string Help => @"
-quit command";
+    public QuitCommand()
+    {
+        _help = CommandHelpStringBuilder.GenerateHelpString(this);
+    }
+
+    private readonly string _help;
+    public string Help() => _help;
 
     public int Invoke(string[] args)
     {

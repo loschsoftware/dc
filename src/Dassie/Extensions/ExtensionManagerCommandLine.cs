@@ -1,5 +1,4 @@
-﻿using Dassie.Cli;
-using Dassie.Cli.Commands;
+﻿using Dassie.Cli.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +15,20 @@ internal class ExtensionManagerCommandLine : ICompilerCommand
 
     public string Description => "Used to install and manage compiler extensions. Use 'dc package help' to display available commands.";
 
-    public string Help => @"
-package command";
+    public ExtensionManagerCommandLine()
+    {
+        _help = CommandHelpStringBuilder.GenerateHelpString(this);
+    }
+
+    private readonly string _help;
+    public string Help() => _help;
 
     public int Invoke(string[] args)
     {
         args ??= [];
+
+        if (args.Length > 0 && args[0] == "package")
+            args = args[1..];
 
         if (args.Length == 0)
             args = ["help"];

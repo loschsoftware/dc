@@ -14,9 +14,13 @@ internal class ConfigCommand : ICompilerCommand
 
     public string Description => "Creates a new dsconfig.xml file with default values.";
 
-    public string Help => @"
-config command
-";
+    public ConfigCommand()
+    {
+        _help = CommandHelpStringBuilder.GenerateHelpString(this);
+    }
+
+    private readonly string _help;
+    public string Help() => _help;
 
     public int Invoke(string[] args)
     {

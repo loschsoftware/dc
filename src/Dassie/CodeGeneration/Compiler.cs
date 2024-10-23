@@ -53,7 +53,7 @@ public static class Compiler
 
     internal static IEnumerable<ErrorInfo[]> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = "dsconfig.xml")
     {
-        if (!documents.Any())
+        if (!documents.Any() && messages.Count == 0)
         {
             EmitErrorMessage(
                 0, 0, 0,

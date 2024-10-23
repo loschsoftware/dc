@@ -18,13 +18,20 @@ internal class RunCommand : ICompilerCommand
     public string UsageString => "run [Arguments]";
 
     public string Description => "Automatically compiles using the default profile and then runs the output executable with the specified arguments.";
+    
+    public RunCommand()
+    {
+        _help = CommandHelpStringBuilder.GenerateHelpString(this);
+    }
 
-    public string Help => @"
-run command
-";
+    private readonly string _help;
+    public string Help() => _help;
 
     public int Invoke(string[] args)
     {
+        if (args.Length > 0 && args[0] == "run")
+            args = args[1..];
+
         DassieConfig config = null;
 
         if (File.Exists("dsconfig.xml"))

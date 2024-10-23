@@ -14,19 +14,25 @@ namespace Dassie.Cli.Commands;
 
 internal class CompileAllCommand : ICompilerCommand
 {
+    public CompileAllCommand()
+    {
+        _help = CommandHelpStringBuilder.GenerateHelpString(this);
+    }
+
     public string Command => "build";
 
     public string UsageString => "build [BuildProfile]";
 
     public string Description => "Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.";
 
-    public string Help => @"
-build command
-";
+    private readonly string _help;
+    public string Help() => _help;
 
     public int Invoke(string[] args)
     {
-        args = args[1..];
+        if (args.Length > 0 && args[0] == "build")
+            args = args[1..];
+
         DassieConfig config = null;
 
         if (File.Exists("dsconfig.xml"))

@@ -68,9 +68,20 @@ internal static class CommandLineOptionParser
         }
 
         string[] options = args.Where(a => a.StartsWith("--")).ToArray();
-        
-        if (!options.Any())
+
+        if (options.Length == 0)
+        {
+            foreach (string flag in args.Where(a => a.StartsWith('-')))
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0089_InvalidDSConfigProperty,
+                    $"Invalid flag '{flag[1..]}'.",
+                    "dc");
+            }
+
             return;
+        }
 
         Dictionary<string, PropertyInfo> propNames = [];
         foreach (PropertyInfo prop in typeof(DassieConfig).GetProperties())
@@ -95,21 +106,21 @@ internal static class CommandLineOptionParser
         foreach (string arg in options)
         {
             if (arg.Contains("::")) // Accessing a property of a more complex element (e.g. version info)
-            {
                 ParseObjectOption(arg, config);
-                continue;
-            }
 
-            if (arg.Count(c => c == '=') == 1) // Normal option of type bool, string or enum -> no array or complex object
-            {
+            else if (arg.Count(c => c == '=') == 1) // Normal option of type bool, string or enum -> no array or complex object
                 ParseRegularOption(arg, propNames, config);
-                continue;
-            }
 
-            if (arg.Contains('+')) // Adding an element to an array
-            {
+            else if (arg.Contains('+')) // Adding an element to an array
                 ParseArrayOption(arg, config);
-                continue;
+
+            else
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0089_InvalidDSConfigProperty,
+                    $"Invalid option '{arg[2..]}'.",
+                    "dc");
             }
         }
     }
@@ -159,7 +170,14 @@ internal static class CommandLineOptionParser
             }
 
             prop.SetValue(config, val);
+            return;
         }
+
+        EmitErrorMessage(
+            0, 0, 0,
+            DS0089_InvalidDSConfigProperty,
+            $"Invalid option '{identifier}'.",
+            "dc");
     }
 
     public static void ParseArrayOption(string arg, DassieConfig config)
