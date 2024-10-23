@@ -16,7 +16,7 @@ internal static class CommandLineOptionParser
     {
         ["O"] = "BuildDirectory",
         ["T"] = "ApplicationType",
-        ["A"] = "AssemblyName",
+        ["A"] = "AssemblyFileName",
         ["R"] = "Runtime",
         ["M"] = "ILOptimizations",
         ["L"] = "MeasureElapsedTime",

@@ -59,6 +59,9 @@ internal static class CompileCommand
         config ??= new();
         config.AssemblyName ??= asmName;
 
+        string[] documentArgs = args.Where(a => a.StartsWith("--Document:")).ToArray();
+        args = args.Where(a => !documentArgs.Contains(a)).ToArray();
+
         CommandLineOptionParser.ParseOptions(ref args, config);
 
         if (overrideSettings != null)
@@ -143,7 +146,7 @@ internal static class CompileCommand
         }
 
         List<InputDocument> documents = files.Select(f => new InputDocument(File.ReadAllText(f), f)).ToList();
-        documents.AddRange(DocumentCommandLineManager.ExtractDocuments(args));
+        documents.AddRange(DocumentCommandLineManager.ExtractDocuments(documentArgs));
 
         // Step 1
         CompileSource(documents, config);
