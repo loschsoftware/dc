@@ -71,7 +71,7 @@ internal static class CommandLineOptionParser
 
         if (options.Length == 0)
         {
-            foreach (string flag in args.Where(a => a.StartsWith('-')))
+            foreach (string flag in args.Where(a => a.StartsWith('-') && Aliases.ContainsKey(a)))
             {
                 EmitErrorMessage(
                     0, 0, 0,
