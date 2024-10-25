@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace Dassie.Cli.Commands;
 
@@ -37,20 +38,22 @@ internal class WatchCommand : ICompilerCommand
         LogOut.WriteLine(" to stop watching changes.");
 
         watchProcess = new Process();
-        watchProcess.StartInfo.FileName = "dc.exe";
-        watchProcess.StartInfo.Arguments = "-watch-indefinetly";
+        watchProcess.StartInfo.FileName = "dotnet";
+        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} -watch-indefinetly";
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;
         watchProcess.Start();
 
+        using StreamWriter sw = File.AppendText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "pid.txt"));
+        sw.WriteLine(watchProcess.Id);
         return 0;
     }
     
     public static int WatchIndefinetly()
     {
         watchProcess = new Process();
-        watchProcess.StartInfo.FileName = "dc.exe";
-        watchProcess.StartInfo.Arguments = $"build";
+        watchProcess.StartInfo.FileName = "dotnet";
+        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} build";
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;
         watchProcess.Start();
@@ -64,7 +67,7 @@ internal class WatchCommand : ICompilerCommand
                 IncludeSubdirectories = true
             };
 
-            string cmd = "build";
+            string cmd = $"{Assembly.GetCallingAssembly().Location} build";
 
             watcher.Changed += Compile;
             watcher.Created += Compile;
@@ -73,7 +76,7 @@ internal class WatchCommand : ICompilerCommand
             void Compile(object sender, FileSystemEventArgs e)
             {
                 var buildProcess = new Process();
-                buildProcess.StartInfo.FileName = "dc.exe";
+                buildProcess.StartInfo.FileName = "dotnet";
                 buildProcess.StartInfo.Arguments = cmd;
                 buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 buildProcess.Start();

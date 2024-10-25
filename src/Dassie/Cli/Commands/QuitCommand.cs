@@ -1,5 +1,7 @@
 ﻿using Dassie.Extensions;
+using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Dassie.Cli.Commands;
 
@@ -21,14 +23,11 @@ internal class QuitCommand : ICompilerCommand
 
     public int Invoke(string[] args)
     {
-        LogOut.WriteLine("No longer watching file changes.");
+        string pidFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "pid.txt");
+        File.ReadAllLines(pidFilePath).Select(int.Parse).ToList().ForEach(i => Process.GetProcessById(i).Kill());
+        File.Delete(pidFilePath);
 
-        WatchCommand.watchProcess = new Process();
-        WatchCommand.watchProcess.StartInfo.FileName = "taskkill.exe";
-        WatchCommand.watchProcess.StartInfo.Arguments = "/f /im dc.exe";
-        WatchCommand.watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        WatchCommand.watchProcess.StartInfo.CreateNoWindow = true;
-        WatchCommand.watchProcess.Start();
+        LogOut.WriteLine("No longer watching file changes.");
         return 0;
     }
 }

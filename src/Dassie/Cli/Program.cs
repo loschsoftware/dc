@@ -35,6 +35,9 @@ internal class Program
                 return helpCommand.Invoke(args);
 
             string command = args[0];
+            if (command == "-watch-indefinetly")
+                return WatchCommand.WatchIndefinetly();
+
             if (customCommands.TryGetValue(command, out Func<string[], int> cmd))
                 return cmd(args[1..]);
 
@@ -54,7 +57,7 @@ internal class Program
         {
             if (messages.Count == 0)
             {
-                EmitErrorMessage(0, 0, 0, DS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "dc.exe");
+                EmitErrorMessage(0, 0, 0, DS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "dc");
                 Console.WriteLine();
             }
 
