@@ -120,7 +120,7 @@ The ``<IgnoredMessages>`` object is used to disable specific compiler error code
 ````
 
 ## References
-References are used to declare dependencies on assemblies, other Dassie projects or NuGet packages (not yet supported). Here is an example:
+References are used to declare dependencies on assemblies, other Dassie projects or NuGet packages. Here is an example:
 ````xml
 <References>
   <FileReference>C:\libs\sdk.dll</FileReference>
