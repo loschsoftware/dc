@@ -35,7 +35,6 @@ internal class Program
                 return helpCommand.Invoke(args);
 
             string command = args[0];
-
             if (customCommands.TryGetValue(command, out Func<string[], int> cmd))
                 return cmd(args[1..]);
 
@@ -44,10 +43,6 @@ internal class Program
                 ICompilerCommand selectedCommand = defaultCommands.First(c => c.Command == command || c.Aliases().Any(a => a == command));
                 return selectedCommand.Invoke(args);
             }
-
-            string[] helpCommands = ["?", "-h", "--help", "-?", "/?", "/help"];
-            if (helpCommands.Contains(command.ToLowerInvariant()))
-                return helpCommand.Invoke([]);
 
             return CompileCommand.Compile(args);
         }

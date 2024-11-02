@@ -22,7 +22,7 @@ internal class HelpCommand : ICompilerCommand
 
     public string Command => "help";
 
-    public List<string> Aliases() => ["?"];
+    public List<string> Aliases() => ["?", "-h", "--help", "-?", "/?", "/help"];
 
     public string UsageString => "help, ? [-o, --options]";
 
@@ -33,7 +33,7 @@ internal class HelpCommand : ICompilerCommand
 
     public int Invoke(string[] args)
     {
-        if (args.Length > 0 && (args[0] == "help" || args[0] == "?"))
+        if (args.Length > 0 && (args[0] == Command || Aliases().Contains(args[0])))
             args = args[1..];
 
         if (args.Any(a => !a.StartsWith('-')))
