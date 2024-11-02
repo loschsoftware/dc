@@ -33,6 +33,12 @@ public interface ICompilerCommand
     public virtual string Help() => "";
 
     /// <summary>
+    /// Determines wheter or not the command is hidden, which makes it not visible on the help page.
+    /// </summary>
+    /// <returns>Returns <see langword="false"/> by default.</returns>
+    public virtual bool Hidden() => false;
+
+    /// <summary>
     /// The method that is executed when the command is invoked.
     /// </summary>
     /// <param name="args">Command-line arguments passed to the command, excluding the command name itself.</param>

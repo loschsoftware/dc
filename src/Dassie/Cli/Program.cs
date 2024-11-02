@@ -35,8 +35,6 @@ internal class Program
                 return helpCommand.Invoke(args);
 
             string command = args[0];
-            if (command == "-watch-indefinetly")
-                return WatchCommand.WatchIndefinetly();
 
             if (customCommands.TryGetValue(command, out Func<string[], int> cmd))
                 return cmd(args[1..]);

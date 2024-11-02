@@ -15,7 +15,8 @@ internal static class DefaultCommandManager
         new ScratchpadCommand(),
         new ExtensionManagerCommandLine(),
         new WatchCommand(),
-        new NewCommand()
+        new NewCommand(),
+        new WatchIndefinetlyCommand()
     ];
 
     public static ICompilerCommand CompileAllCommand => DefaultCommands[0];

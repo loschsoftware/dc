@@ -191,7 +191,7 @@ internal class HelpCommand : ICompilerCommand
         sb.AppendLine();
         sb.AppendLine("Commands:");
 
-        foreach (ICompilerCommand command in DefaultCommandManager.DefaultCommands.OrderBy(c => c.Command))
+        foreach (ICompilerCommand command in DefaultCommandManager.DefaultCommands.OrderBy(c => c.Command).Where(c => !c.Hidden()))
         {
             sb.Append($"    {command.UsageString}".PadRight(50));
             sb.Append(FormatLines(command.Description));

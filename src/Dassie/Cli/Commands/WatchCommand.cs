@@ -39,7 +39,7 @@ internal class WatchCommand : ICompilerCommand
 
         watchProcess = new Process();
         watchProcess.StartInfo.FileName = "dotnet";
-        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} -watch-indefinetly";
+        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} watch-indefinetly";
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;
         watchProcess.Start();
