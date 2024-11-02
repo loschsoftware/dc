@@ -38,7 +38,7 @@ internal class Program
             if (customCommands.TryGetValue(command, out Func<string[], int> cmd))
                 return cmd(args[1..]);
 
-            else if (defaultCommands.Any(c => c.Command == command || c.Aliases().Any(a => a == command)))
+            if (defaultCommands.Any(c => c.Command == command || c.Aliases().Any(a => a == command)))
             {
                 ICompilerCommand selectedCommand = defaultCommands.First(c => c.Command == command || c.Aliases().Any(a => a == command));
                 return selectedCommand.Invoke(args);
