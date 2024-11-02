@@ -44,20 +44,21 @@ internal class HelpCommand : ICompilerCommand
 
     public static void DisplayLogo()
     {
+        StringBuilder logoBuilder = new();
+
         Version v = Assembly.GetExecutingAssembly().GetName().Version;
 
         // 8517 -> Days between 01/01/2000 and 27/04/2023, on which development on dc was started
         Version version = new(v.Major, v.Minor, v.Build - 8517);
         DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
 
+        logoBuilder.AppendLine();
+        logoBuilder.AppendLine($"Dassie Command Line Compiler for .NET {typeof(object).Assembly.GetName().Version.ToString(2)}");
+        logoBuilder.AppendLine($"Version {version.ToString(2)}, Build {version.Build} ({buildDate.ToShortDateString()})");
+
         ConsoleColor def = Console.ForegroundColor;
-
         Console.ForegroundColor = ConsoleColor.Yellow;
-
-        LogOut.WriteLine();
-        LogOut.WriteLine("Dassie Command Line Compiler for .NET");
-        LogOut.WriteLine($"Version {version.ToString(2)}, Build {version.Build} ({buildDate.ToShortDateString()})");
-
+        LogOut.Write(logoBuilder.ToString());
         Console.ForegroundColor = def;
     }
 
