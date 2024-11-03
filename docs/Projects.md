@@ -120,17 +120,17 @@ The ``<IgnoredMessages>`` object is used to disable specific compiler error code
 ````
 
 ## References
-References are used to declare dependencies on assemblies, other Dassie projects or NuGet packages (not yet supported). Here is an example:
+References are used to declare dependencies on assemblies, other Dassie projects or NuGet packages. Here is an example:
 ````xml
 <References>
-  <FileReference>C:\libs\sdk.dll</FileReference>
-  <ProjectReference>%userprofile%\Projects\Library</ProjectReference>
+  <AssemblyReference>C:\libs\sdk.dll</AssemblyReference>
+  <ProjectReference>%userprofile%\Projects\Library\dsconfig.xml</ProjectReference>
   <PackageReference Version="2.4.1">Package01</PackageReference>
 </References>
 ````
 The structure of these elements is described below.
 
-**``<FileReference>`` object**
+**``<AssemblyReference>`` object**
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``CopyToOutput``|Attribute|``true`` or ``false``|Determines wheter or not to copy the referenced file to the build output directory. ``true`` by default.|
@@ -140,7 +140,7 @@ The structure of these elements is described below.
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``CopyToOutput``|Attribute|``true`` or ``false``|Determines wheter or not to copy the output of the referenced project to the build output directory. ``true`` by default.|
-||Text|Any string|The root directory of the referenced project.|
+||Text|Any string|The project file of the referenced project.|
 
 **``<PackageReference>`` object**
 |Name|Type|Allowed values|Description|
