@@ -8,7 +8,7 @@ namespace Dassie.Cli;
 internal static class DefaultCommandManager
 {
     public static List<ICompilerCommand> DefaultCommands { get; } = [
-        new CompileAllCommand(),
+        new BuildCommand(),
         new ConfigCommand(),
         new QuitCommand(),
         new RunCommand(),

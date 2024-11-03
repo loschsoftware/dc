@@ -12,9 +12,9 @@ using System.Xml.Serialization;
 
 namespace Dassie.Cli.Commands;
 
-internal class CompileAllCommand : ICompilerCommand
+internal class BuildCommand : ICompilerCommand
 {
-    public CompileAllCommand()
+    public BuildCommand()
     {
         _help = CommandHelpStringBuilder.GenerateHelpString(this);
     }
