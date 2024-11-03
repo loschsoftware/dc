@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration;
+using Dassie.Configuration.Macros;
 using Dassie.Errors;
 using Dassie.Extensions;
 using Dassie.Validation;
@@ -71,6 +72,21 @@ internal class RunCommand : ICompilerCommand
         }
         else
         {
+            MacroParser parser = new();
+            parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
+            parser.Normalize(config);
+
+            if (config.ApplicationType == ApplicationType.Library)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0124_DCRunInvalidProjectType,
+                    "The current project is not executable. Projects with an application type of 'Library' cannot be executed.",
+                    "dc");
+
+                return -1;
+            }
+
             string assemblyName = Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Last();
             if (!string.IsNullOrEmpty(config.AssemblyName))
                 assemblyName = config.AssemblyName;

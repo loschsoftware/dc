@@ -515,5 +515,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an installed compiler extension is invalid.
     /// </summary>
-    DS0123_InvalidExtensionPackage
+    DS0123_InvalidExtensionPackage,
+    /// <summary>
+    /// Emitted when the 'dc run' command is called on a project that is not executable.
+    /// </summary>
+    DS0124_DCRunInvalidProjectType
 }
