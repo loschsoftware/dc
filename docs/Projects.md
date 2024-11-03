@@ -205,6 +205,8 @@ Macros are identifiers that are replaced with a specific value by the compiler b
 |``$(TimeExact)``|The current time at the start of the build, formatted as ``HH:mm:ss.ffff``.|
 |``$(Date)``|The current date.|
 |``$(Year)``|The current year.|
+|``$(CompilerDirectory)``|The path to the directory containing the Dassie Compiler executable.|
+|``$(CompilerPath)``|The path to the Dassie Compiler executable (dc.dll).|
 |``$(ProjectDir)``|The absolute path to the root directory of the current project.|
 |``$(ProjectName)``|The name of the current project.|
 |``$(OutputDir)``|The absolute path to the build output directory of the current project.|
