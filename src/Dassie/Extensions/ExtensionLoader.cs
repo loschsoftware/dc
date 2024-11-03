@@ -48,12 +48,22 @@ internal static class ExtensionLoader
     public static List<IPackage> LoadInstalledExtensions(string assembly)
     {
         List<IPackage> packages = [];
-
         Assembly extensionAssembly = Assembly.LoadFile(assembly);
-        Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPackage))).ToArray();
 
-        foreach (Type t in packageTypes)
-            packages.Add((IPackage)Activator.CreateInstance(t));
+        try
+        {
+            Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPackage))).ToArray();
+
+            foreach (Type t in packageTypes)
+                packages.Add((IPackage)Activator.CreateInstance(t));
+        }
+        catch (ReflectionTypeLoadException)
+        {
+            EmitWarningMessage(0, 0, 0,
+                DS0123_InvalidExtensionPackage,
+                $"Extension package '{extensionAssembly.GetName().Name}' is malformed and will be ignored.",
+                "dc");
+        }
 
         return packages;
     }

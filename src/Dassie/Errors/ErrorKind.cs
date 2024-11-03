@@ -511,5 +511,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a function pointer is created for an invalid expression.
     /// </summary>
-    DS0122_InvalidFunctionPointerTargetExpression
+    DS0122_InvalidFunctionPointerTargetExpression,
+    /// <summary>
+    /// Emitted when an installed compiler extension is invalid.
+    /// </summary>
+    DS0123_InvalidExtensionPackage
 }
