@@ -33,7 +33,7 @@ internal class MacroParser
             { "date", DateTime.Now.ToShortDateString() },
             { "year", DateTime.Now.Year.ToString() },
             { "compilerdirectory", Path.GetDirectoryName(typeof(MacroParser).Assembly.Location) + Path.DirectorySeparatorChar },
-            { "compilerpath", typeof(MacroParser).Assembly.Location + Path.DirectorySeparatorChar }
+            { "compilerpath", typeof(MacroParser).Assembly.Location }
         };
 
         foreach (var macro in macros)
