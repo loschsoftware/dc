@@ -22,7 +22,7 @@ internal class HelpCommand : ICompilerCommand
 
     public string Command => "help";
 
-    public List<string> Aliases() => ["?", "-h", "--help", "-?", "/?", "/help"];
+    public List<string> Aliases() => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
 
     public string UsageString => "help, ? [-o, --options]";
 
