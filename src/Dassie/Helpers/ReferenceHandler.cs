@@ -29,7 +29,7 @@ internal static class ReferenceHandler
                 0, 0, 0,
                 DS0081_InvalidProjectReference,
                 $"The referenced project file '{reference.ProjectFile}' could not be found.",
-                "dsconfig.xml");
+                ProjectConfigurationFileName);
 
             return false;
         }

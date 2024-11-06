@@ -41,12 +41,12 @@ internal class Program
             if (Debugger.IsAttached)
                 throw;
 
-            if (File.Exists("dsconfig.xml"))
+            if (File.Exists(ProjectConfigurationFileName))
             {
                 try
                 {
                     XmlSerializer xmls = new(typeof(DassieConfig));
-                    using StreamReader sr = new("dsconfig.xml");
+                    using StreamReader sr = new(ProjectConfigurationFileName);
 
                     DassieConfig config = (DassieConfig)xmls.Deserialize(sr);
 

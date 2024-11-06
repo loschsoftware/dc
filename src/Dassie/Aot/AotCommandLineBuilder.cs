@@ -34,11 +34,11 @@ internal class AotCommandLineBuilder
     {
         _config = config;
 
-        //_tempOutputDirectory = Path.Combine(Path.GetFullPath(_config.Config.BuildOutputDirectory), ".temp", "aot");
-        //_outputDirectory = Path.Combine(Path.GetFullPath(_config.Config.BuildOutputDirectory), "aot");
+        //_tempOutputDirectory = Path.Combine(Path.GetFullPath(_config.Config.BuildOutputDirectory), TemporaryBuildDirectoryName, AotBuildDirectoryName);
+        //_outputDirectory = Path.Combine(Path.GetFullPath(_config.Config.BuildOutputDirectory), AotBuildDirectoryName);
 
-        _tempOutputDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), ".temp", "aot")).FullName;
-        _outputDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "aot")).FullName;
+        _tempOutputDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), TemporaryBuildDirectoryName, AotBuildDirectoryName)).FullName;
+        _outputDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), AotBuildDirectoryName)).FullName;
 
         _objectFile = Path.Combine(_tempOutputDirectory, $"{_config.Config.AssemblyName}.obj");
         _exportsFile = Path.Combine(_tempOutputDirectory, $"{_config.Config.AssemblyName}.def");

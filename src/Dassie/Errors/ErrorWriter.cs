@@ -59,7 +59,7 @@ public static class ErrorWriter
 
         Context ??= new();
         Context.Configuration ??= new();
-        Context.ConfigurationPath ??= "dsconfig.xml";
+        Context.ConfigurationPath ??= ProjectConfigurationFileName;
         Context.Configuration.IgnoredMessages ??= Array.Empty<Ignore>();
 
         if (Context.Configuration.IgnoredMessages.Any(i => i.Code == error.ErrorCode.ToString().Split('_')[0]))
@@ -76,7 +76,7 @@ public static class ErrorWriter
                     loc.Length,
                     DS0071_IllegalIgnoredMessage,
                     $"The error code {error.ErrorCode.ToString().Split('_')[0]} cannot be ignored.",
-                    "dsconfig.xml");
+                    ProjectConfigurationFileName);
             }
 
             else

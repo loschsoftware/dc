@@ -59,7 +59,7 @@ internal static class ConfigValidation
                 0, 0, 0,
                 DS0001_SyntaxError,
                 $"Malformed document: {xmlEx.Message}",
-                "dsconfig.xml");
+                ProjectConfigurationFileName);
 
             return errors;
         }
@@ -75,7 +75,7 @@ internal static class ConfigValidation
                     ErrorCode = DS0089_InvalidDSConfigProperty,
                     Severity = Severity.Warning,
                     ErrorMessage = $"Invalid property '{element.Name.LocalName}'.",
-                    File = "dsconfig.xml"
+                    File = ProjectConfigurationFileName
                 });
             }
         }

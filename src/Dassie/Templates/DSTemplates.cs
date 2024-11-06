@@ -36,7 +36,7 @@ public static class DSTemplates
         string srcDir = Directory.CreateDirectory(Path.Combine(rootDir, "src")).FullName;
         string buildDir = Directory.CreateDirectory(Path.Combine(rootDir, "build")).FullName;
 
-        FileStream configFile = File.Create(Path.Combine(rootDir, "dsconfig.xml"));
+        FileStream configFile = File.Create(Path.Combine(rootDir, ProjectConfigurationFileName));
 
         XmlSerializerNamespaces ns = new();
         ns.Add("", "");

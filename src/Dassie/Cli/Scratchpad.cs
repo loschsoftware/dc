@@ -183,9 +183,9 @@ internal static class Scratchpad
         Directory.SetCurrentDirectory(dir);
 
         DassieConfig cfg = null;
-        if (File.Exists("dsconfig.xml"))
+        if (File.Exists(ProjectConfigurationFileName))
         {
-            using StreamReader sr = new("dsconfig.xml");
+            using StreamReader sr = new(ProjectConfigurationFileName);
             XmlSerializer xmls = new(typeof(DassieConfig));
             cfg = (DassieConfig)xmls.Deserialize(sr);
         }

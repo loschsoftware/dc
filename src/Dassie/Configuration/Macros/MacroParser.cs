@@ -88,7 +88,7 @@ internal class MacroParser
                         0, 0, 0,
                         DS0082_InvalidDSConfigMacro,
                         $"The macro '{match.Value[2..^1]}' does not exist and will be ignored.",
-                        "dsconfig.xml");
+                        ProjectConfigurationFileName);
 
                     val = val.Replace(match.Value, "");
 

@@ -27,9 +27,9 @@ internal class RunCommand : ICompilerCommand
     {
         DassieConfig config = null;
 
-        if (File.Exists("dsconfig.xml"))
+        if (File.Exists(ProjectConfigurationFileName))
         {
-            foreach (ErrorInfo error in ConfigValidation.Validate("dsconfig.xml"))
+            foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
             {
                 if (error.Severity == Severity.Error)
                 {
@@ -39,7 +39,7 @@ internal class RunCommand : ICompilerCommand
             }
 
             XmlSerializer xmls = new(typeof(DassieConfig));
-            using StreamReader sr = new("dsconfig.xml");
+            using StreamReader sr = new(ProjectConfigurationFileName);
             config = (DassieConfig)xmls.Deserialize(sr);
         }
 
@@ -90,7 +90,7 @@ internal class RunCommand : ICompilerCommand
             if (config.Runtime == Configuration.Runtime.Aot)
             {
                 isNative = true;
-                dir = Path.Combine(dir, "aot");
+                dir = Path.Combine(dir, AotBuildDirectoryName);
             }
 
             string extension = ".dll";
@@ -109,8 +109,8 @@ internal class RunCommand : ICompilerCommand
         bool recompile = !File.Exists(assemblyPath);
         List<FileInfo> sourceFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)).ToList();
 
-        if (File.Exists("dsconfig.xml"))
-            sourceFiles.Add(new("dsconfig.xml"));
+        if (File.Exists(ProjectConfigurationFileName))
+            sourceFiles.Add(new(ProjectConfigurationFileName));
 
         if (!recompile)
         {

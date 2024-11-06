@@ -19,7 +19,7 @@ internal class ConfigCommand : ICompilerCommand
 
     public int Invoke(string[] args)
     {
-        if (File.Exists("dsconfig.xml"))
+        if (File.Exists(ProjectConfigurationFileName))
         {
             LogOut.Write("The file dsconfig.xml already exists. Overwrite [Y/N]? ");
             string input = Console.ReadKey().KeyChar.ToString();
@@ -29,7 +29,7 @@ internal class ConfigCommand : ICompilerCommand
                 return -1;
         }
 
-        using StreamWriter configWriter = new("dsconfig.xml");
+        using StreamWriter configWriter = new(ProjectConfigurationFileName);
 
         XmlSerializerNamespaces ns = new();
         ns.Add("", "");

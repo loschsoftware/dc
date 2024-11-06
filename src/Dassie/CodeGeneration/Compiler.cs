@@ -51,7 +51,7 @@ public static class Compiler
         return CompileSource(Directory.EnumerateFiles(rootDirectory, "*.ds", includeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToArray(), config);
     }
 
-    internal static IEnumerable<ErrorInfo[]> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = "dsconfig.xml")
+    internal static IEnumerable<ErrorInfo[]> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
     {
         if (!documents.Any() && messages.Count == 0)
         {
@@ -110,7 +110,7 @@ public static class Compiler
     /// <param name="config">Optional configuration for the compiler.</param>
     /// <param name="configFileName">The file path to the configuration file.</param>
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
-    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = "dsconfig.xml")
+    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
     {
         return CompileSource(sourceFiles.Select(s => new InputDocument(File.ReadAllText(s), s)), config, configFileName);
     }

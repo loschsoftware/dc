@@ -40,8 +40,8 @@ internal static class DocumentCompiler
 
         string lowered = SourceFileRewriter.Rewrite(document.Text);
 
-        Directory.CreateDirectory(".temp");
-        string intermediatePath = Path.Combine(".temp", Path.GetFileNameWithoutExtension(document.Name) + ".i.ds");
+        Directory.CreateDirectory(TemporaryBuildDirectoryName);
+        string intermediatePath = Path.Combine(TemporaryBuildDirectoryName, Path.GetFileNameWithoutExtension(document.Name) + ".i.ds");
         File.WriteAllText(intermediatePath, lowered);
 
         if (config.Verbosity >= 1)
@@ -78,7 +78,7 @@ internal static class DocumentCompiler
             if (File.Exists(intermediatePath))
                 File.Delete(intermediatePath);
 
-            Directory.Delete(".temp", true);
+            Directory.Delete(TemporaryBuildDirectoryName, true);
         }
 
         return CurrentFile.Errors.ToArray();

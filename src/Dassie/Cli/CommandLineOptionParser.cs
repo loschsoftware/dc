@@ -202,7 +202,7 @@ internal static class CommandLineOptionParser
                 return;
             }
 
-            if (Path.GetFileName(value) == "dsconfig.xml")
+            if (Path.GetFileName(value) == ProjectConfigurationFileName)
             {
                 config.References =
                 [

@@ -27,13 +27,13 @@ internal class BuildCommand : ICompilerCommand
     {
         DassieConfig config = null;
 
-        if (File.Exists("dsconfig.xml"))
+        if (File.Exists(ProjectConfigurationFileName))
         {
-            foreach (ErrorInfo error in ConfigValidation.Validate("dsconfig.xml"))
+            foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
                 EmitGeneric(error);
 
             XmlSerializer xmls = new(typeof(DassieConfig));
-            using StreamReader sr = new("dsconfig.xml");
+            using StreamReader sr = new(ProjectConfigurationFileName);
             config = (DassieConfig)xmls.Deserialize(sr);
         }
 
@@ -58,7 +58,7 @@ internal class BuildCommand : ICompilerCommand
                 0, 0, 0,
                 DS0087_InvalidProfile,
                 $"The build profile '{profileName}' could not be found.",
-                "dsconfig.xml");
+                ProjectConfigurationFileName);
 
             return -1;
         }
@@ -66,7 +66,7 @@ internal class BuildCommand : ICompilerCommand
             return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"), config);
 
         string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ds", SearchOption.AllDirectories).ToArray();
-        filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != ".temp").ToArray();
+        filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();
 
         if (filesToCompile.Length < 1)
         {
@@ -133,7 +133,7 @@ internal class BuildCommand : ICompilerCommand
                             0, 0, 0,
                             DS0087_InvalidProfile,
                             errMsg,
-                            "dsconfig.xml");
+                            ProjectConfigurationFileName);
 
                         return -1;
                     }
@@ -143,7 +143,7 @@ internal class BuildCommand : ICompilerCommand
                             0, 0, 0,
                             DS0087_InvalidProfile,
                             errMsg,
-                            "dsconfig.xml");
+                            ProjectConfigurationFileName);
                     }
                 }
             }
@@ -190,7 +190,7 @@ internal class BuildCommand : ICompilerCommand
                             0, 0, 0,
                             DS0087_InvalidProfile,
                             errMsg,
-                            "dsconfig.xml");
+                            ProjectConfigurationFileName);
 
                         return -1;
                     }
@@ -200,7 +200,7 @@ internal class BuildCommand : ICompilerCommand
                             0, 0, 0,
                             DS0087_InvalidProfile,
                             errMsg,
-                            "dsconfig.xml");
+                            ProjectConfigurationFileName);
                     }
                 }
             }

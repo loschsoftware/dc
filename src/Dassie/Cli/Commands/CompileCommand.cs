@@ -46,10 +46,10 @@ internal class CompileCommand : ICompilerCommand
 
         DassieConfig config = null;
 
-        if (File.Exists("dsconfig.xml"))
+        if (File.Exists(ProjectConfigurationFileName))
         {
             XmlSerializer xmls = new(typeof(DassieConfig));
-            using StreamReader sr = new("dsconfig.xml");
+            using StreamReader sr = new(ProjectConfigurationFileName);
 
             try
             {
@@ -60,7 +60,7 @@ internal class CompileCommand : ICompilerCommand
                 // If file is invalid, it will get caught in ConfigValidation.Validate
             }
 
-            foreach (ErrorInfo error in ConfigValidation.Validate("dsconfig.xml"))
+            foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
                 EmitGeneric(error);
         }
 
@@ -127,8 +127,8 @@ internal class CompileCommand : ICompilerCommand
 
         if (config.CacheSourceFiles)
         {
-            if (File.Exists("dsconfig.xml"))
-                files = files.Append("dsconfig.xml").ToArray();
+            if (File.Exists(ProjectConfigurationFileName))
+                files = files.Append(ProjectConfigurationFileName).ToArray();
 
             if (Directory.Exists(".cache")
                 && Directory.GetFiles(".cache").Select(Path.GetFileName).SequenceEqual(files.Select(Path.GetFileName)))
@@ -153,8 +153,8 @@ internal class CompileCommand : ICompilerCommand
             foreach (string file in files)
                 File.Copy(file, Path.Combine(".cache", Path.GetFileName(file)), true);
 
-            if (File.Exists("dsconfig.xml"))
-                File.Copy("dsconfig.xml", Path.Combine(".cache", "dsconfig.xml"), true);
+            if (File.Exists(ProjectConfigurationFileName))
+                File.Copy(ProjectConfigurationFileName, Path.Combine(".cache", ProjectConfigurationFileName), true);
         }
 
         List<InputDocument> documents = files.Select(f => new InputDocument(File.ReadAllText(f), f)).ToList();
@@ -182,7 +182,7 @@ internal class CompileCommand : ICompilerCommand
                     0, 0, 0,
                     DS0068_MultipleUnmanagedResources,
                     "An assembly can only contain one unmanaged resource file.",
-                    "dsconfig.xml");
+                    ProjectConfigurationFileName);
             }
         }
         else if (Context.Configuration.VersionInfo != null)
@@ -191,7 +191,7 @@ internal class CompileCommand : ICompilerCommand
                 0, 0, 0,
                 DS0070_AvoidVersionInfoTag,
                 $"Using the 'VersionInfo' tag in dsconfig.xml worsens compilation performance. Consider precompiling your version info and including it as an unmanaged resource.",
-                "dsconfig.xml");
+                ProjectConfigurationFileName);
 
             string rc = WinSdkHelper.GetToolPath("rc.exe");
 
@@ -201,7 +201,7 @@ internal class CompileCommand : ICompilerCommand
                     0, 0, 0,
                     DS0069_WinSdkToolNotFound,
                     $"The Windows SDK tool 'rc.exe' could not be located. Setting version information failed. Consider precompiling your version info and including it as an unmanaged resource.",
-                    "dsconfig.xml");
+                    ProjectConfigurationFileName);
 
                 return -1;
             }
@@ -235,7 +235,7 @@ internal class CompileCommand : ICompilerCommand
                    0, 0, 0,
                    DS0069_WinSdkToolNotFound,
                    $"The specified icon file '{Context.Configuration.VersionInfo.ApplicationIcon}' could not be found.",
-                   "dsconfig.xml");
+                   ProjectConfigurationFileName);
 
                 return -1;
             }
@@ -307,7 +307,7 @@ internal class CompileCommand : ICompilerCommand
 
             if (Context.Configuration.Runtime == Configuration.Runtime.Aot)
             {
-                AotCompiler compiler = new(Context.Configuration, "dsconfig.xml");
+                AotCompiler compiler = new(Context.Configuration, ProjectConfigurationFileName);
                 compiler.Compile();
             }
         }
@@ -342,8 +342,8 @@ internal class CompileCommand : ICompilerCommand
         if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
             File.Delete(resFile);
 
-        if (Directory.Exists(".temp") && !Context.Configuration.KeepIntermediateFiles)
-            Directory.Delete(".temp", true);
+        if (Directory.Exists(TemporaryBuildDirectoryName) && !Context.Configuration.KeepIntermediateFiles)
+            Directory.Delete(TemporaryBuildDirectoryName, true);
 
         if (Context.Configuration.GenerateILFiles)
         {
@@ -351,7 +351,7 @@ internal class CompileCommand : ICompilerCommand
 
             if (File.Exists(ildasm))
             {
-                DirectoryInfo dir = Directory.CreateDirectory("cil");
+                DirectoryInfo dir = Directory.CreateDirectory(ILFilesDirectoryName);
 
                 ProcessStartInfo psi = new()
                 {
@@ -435,7 +435,7 @@ internal class CompileCommand : ICompilerCommand
                 0, 0, 0,
                 DS0067_ResourceFileNotFound,
                 $"The resource file '{res.Path}' could not be located.",
-                "dsconfig.xml");
+                ProjectConfigurationFileName);
         }
 
         else if (res is UnmanagedResource)
@@ -451,7 +451,7 @@ internal class CompileCommand : ICompilerCommand
                     0, 0, 0,
                     DS0068_MultipleUnmanagedResources,
                     "An assembly can only contain one unmanaged resource file.",
-                    "dsconfig.xml");
+                    ProjectConfigurationFileName);
             }
         }
 
