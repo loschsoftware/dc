@@ -184,7 +184,7 @@ internal class HelpCommand : ICompilerCommand
         IEnumerable<ICompilerCommand> internalCommands = CommandRegistry.Commands.OrderBy(c => c.Command).Where(c => !c.Hidden()
             && c.GetType().Assembly == Assembly.GetExecutingAssembly());
 
-        IEnumerable<ICompilerCommand> externalCommands = CommandRegistry.Commands.Except(internalCommands);
+        IEnumerable<ICompilerCommand> externalCommands = CommandRegistry.Commands.Where(c => !c.Hidden()).Except(internalCommands);
 
         foreach (ICompilerCommand command in internalCommands)
         {
@@ -192,13 +192,13 @@ internal class HelpCommand : ICompilerCommand
             sb.Append(FormatLines(command.Description));
         }
 
-        if (externalCommands.Count() > 0)
+        if (externalCommands.Any())
         {
             sb.AppendLine();
             sb.AppendLine("External commands:");
 
             foreach (ICompilerCommand cmd in externalCommands)
-                sb.Append($"{$"    {cmd.UsageString}",-50}{FormatLines(cmd.Description.Replace(Environment.NewLine, " "))}");
+                sb.Append($"{$"    {cmd.UsageString}",-50}{FormatLines(cmd.Description)}");
         }
 
         sb.AppendLine();
