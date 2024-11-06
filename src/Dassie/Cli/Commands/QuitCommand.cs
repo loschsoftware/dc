@@ -18,8 +18,15 @@ internal class QuitCommand : ICompilerCommand
 
     public int Invoke(string[] args)
     {
+        Process[] processes = Process.GetProcesses();
+
         string pidFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "pid.txt");
-        File.ReadAllLines(pidFilePath).Select(int.Parse).ToList().ForEach(i => Process.GetProcessById(i).Kill());
+        File.ReadAllLines(pidFilePath).Select(int.Parse).ToList().ForEach(i =>
+        {
+            if (processes.Any(p => p.Id == i))
+                Process.GetProcessById(i).Kill();
+        });
+
         File.Delete(pidFilePath);
 
         LogOut.WriteLine("No longer watching file changes.");
