@@ -1,34 +1,26 @@
-﻿using Dassie.Cli.Commands;
+﻿using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Dassie.Extensions;
+namespace Dassie.Cli.Commands;
 
-internal class ExtensionManagerCommandLine : ICompilerCommand
+internal class PackageCommand : ICompilerCommand
 {
+    private static PackageCommand _instance;
+    public static PackageCommand Instance => _instance ??= new();
+
     public string Command => "package";
 
     public string UsageString => "package [Command] [Options]";
 
     public string Description => "Used to install and manage compiler extensions. Use 'dc package help' to display available commands.";
 
-    public ExtensionManagerCommandLine()
-    {
-        _help = CommandHelpStringBuilder.GenerateHelpString(this);
-    }
-
-    private readonly string _help;
-    public string Help() => _help;
-
     public int Invoke(string[] args)
     {
         args ??= [];
-
-        if (args.Length > 0 && args[0] == "package")
-            args = args[1..];
 
         if (args.Length == 0)
             args = ["help"];
@@ -95,33 +87,36 @@ internal class ExtensionManagerCommandLine : ICompilerCommand
 
     private static int Info(string name)
     {
+        StringBuilder sb = new();
         List<IPackage> packages = ExtensionLoader.LoadInstalledExtensions();
 
         if (!packages.Any(p => p.Metadata.Name == name))
         {
-            Console.WriteLine("The specified extension could not be found.");
+            sb.AppendLine("The specified extension could not be found.");
             return -1;
         }
 
         IPackage package = packages.First(p => p.Metadata.Name == name);
 
         HelpCommand.DisplayLogo();
-        Console.WriteLine();
-        Console.WriteLine("Extension info:");
-        Console.WriteLine();
+        sb.AppendLine();
+        sb.AppendLine("Extension info:");
+        sb.AppendLine();
 
-        Console.WriteLine($"{"Name:",-30}{package.Metadata.Name}");
-        Console.WriteLine($"{"Description:",-30}{package.Metadata.Description}");
-        Console.WriteLine($"{"Author:",-30}{package.Metadata.Author}");
-        Console.WriteLine($"{"Version:",-30}{package.Metadata.Version}");
-        Console.WriteLine($"{"File:",-30}{package.GetType().Assembly.Location}");
+        sb.AppendLine($"{"Name:",-30}{package.Metadata.Name}");
+        sb.AppendLine($"{"Description:",-30}{package.Metadata.Description}");
+        sb.AppendLine($"{"Author:",-30}{package.Metadata.Author}");
+        sb.AppendLine($"{"Version:",-30}{package.Metadata.Version}");
+        sb.AppendLine($"{"File:",-30}{package.GetType().Assembly.Location}");
 
-        Console.WriteLine();
-        Console.WriteLine("Defined commands:");
+        sb.AppendLine();
+        sb.AppendLine("Defined commands:");
 
-        foreach (KeyValuePair<string, string> command in ExtensionLoader.GetCommandDescriptions([package]))
-            Console.WriteLine($"{$"{command.Key}",-30}{command.Value}");
+        IEnumerable<ICompilerCommand> definedCommands = CommandRegistry.Commands.Where(c => c.GetType().Assembly == package.GetType().Assembly);
+        foreach (ICompilerCommand cmd in definedCommands)
+            sb.AppendLine($"{$"{cmd.UsageString}",-30}{cmd.Description}");
 
+        Console.WriteLine(sb.ToString());
         return 0;
     }
 

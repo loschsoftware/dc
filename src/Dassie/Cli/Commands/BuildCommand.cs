@@ -14,10 +14,8 @@ namespace Dassie.Cli.Commands;
 
 internal class BuildCommand : ICompilerCommand
 {
-    public BuildCommand()
-    {
-        _help = CommandHelpStringBuilder.GenerateHelpString(this);
-    }
+    private static BuildCommand _instance;
+    public static BuildCommand Instance => _instance ??= new();
 
     public string Command => "build";
 
@@ -25,14 +23,8 @@ internal class BuildCommand : ICompilerCommand
 
     public string Description => "Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.";
 
-    private readonly string _help;
-    public string Help() => _help;
-
     public int Invoke(string[] args)
     {
-        if (args.Length > 0 && args[0] == "build")
-            args = args[1..];
-
         DassieConfig config = null;
 
         if (File.Exists("dsconfig.xml"))
@@ -87,7 +79,7 @@ internal class BuildCommand : ICompilerCommand
             return -1;
         }
 
-        return CompileCommand.Compile(filesToCompile.Concat(args).ToArray());
+        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray());
     }
 
     private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config)
@@ -158,7 +150,7 @@ internal class BuildCommand : ICompilerCommand
         }
 
         if (!string.IsNullOrEmpty(profile.Arguments))
-            CompileCommand.Compile(profile.Arguments.Split(' '), config);
+            CompileCommand.Instance.Invoke(profile.Arguments.Split(' '), config);
 
         if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
         {

@@ -68,43 +68,21 @@ internal static class ExtensionLoader
         return packages;
     }
 
-    public static Dictionary<string, string> GetCommandDescriptions(List<IPackage> packages)
+    public static List<ICompilerCommand> GetAllCommands(List<IPackage> packages)
     {
-        Dictionary<string, string> commands = [];
-
-        foreach (IPackage package in packages)
-        {
-            foreach (Type commandType in package.Commands)
-            {
-                ICompilerCommand cmd = (ICompilerCommand)Activator.CreateInstance(commandType);
-
-                if (!commands.ContainsKey(cmd.UsageString))
-                    commands.Add(cmd.UsageString, cmd.Description);
-            }
-        }
-
-        return commands;
-    }
-
-    public static Dictionary<string, Func<string[], int>> GetAllCommands(List<IPackage> packages)
-    {
-        Dictionary<string, (IPackage package, Func<string[], int> func)> commands = [];
+        List<ICompilerCommand> commands = [];
 
         foreach (IPackage package in packages)
         {
             var cmds = GetCommands(package);
 
-            foreach (KeyValuePair<string, Func<string[], int>> cmd in cmds)
+            foreach (ICompilerCommand cmd in cmds)
             {
-                if (commands.TryGetValue(cmd.Key, out (IPackage package, Func<string[], int> func) value))
+                if (commands.Any(c => c.Command == cmd.Command || c.Aliases().Intersect(cmd.Aliases()).Any()))
                 {
-                    IPackage prevPackage = value.package;
-
                     StringBuilder errMsg = new();
-                    errMsg.AppendLine($"Ambiguous command: The command '{cmd.Key}' is defined by multiple extensions:");
-                    errMsg.AppendLine($"    - {prevPackage.Metadata.Name}, version {prevPackage.Metadata.Version}");
-                    errMsg.AppendLine($"    - {package.Metadata.Name}, version {package.Metadata.Version}");
-                    errMsg.AppendLine($"The command defined in '{prevPackage.Metadata.Name}, version {prevPackage.Metadata.Version}' will be used.");
+                    errMsg.Append($"Ambiguous command: The command '{cmd.Command}' is defined by multiple extensions. ");
+                    errMsg.AppendLine($"The command defined in '{package.Metadata.Name}, version {package.Metadata.Version}' will be used.");
 
                     EmitWarningMessage(
                         0, 0, 0,
@@ -113,22 +91,26 @@ internal static class ExtensionLoader
                         "dc");
                 }
 
-                else
-                    commands.Add(cmd.Key, (package, cmd.Value));
+                commands.Add(cmd);
             }
         }
 
-        return commands.Select(c => new KeyValuePair<string, Func<string[], int>>(c.Key, c.Value.func)).ToDictionary();
+        return commands;
     }
 
-    public static Dictionary<string, Func<string[], int>> GetCommands(IPackage package)
+    public static List<ICompilerCommand> GetCommands(IPackage package)
     {
-        Dictionary<string, Func<string[], int>> commands = [];
+        List<ICompilerCommand> commands = [];
 
         foreach (var command in package.Commands)
         {
-            ICompilerCommand instance = (ICompilerCommand)Activator.CreateInstance(command);
-            commands.Add(instance.Command, instance.Invoke);
+            PropertyInfo instanceProp = command.GetProperty("Instance");
+            ICompilerCommand instance = null;
+
+            if (instanceProp != null)
+                instance = (ICompilerCommand)instanceProp.GetValue(null);
+
+            commands.Add(instance ?? (ICompilerCommand)Activator.CreateInstance(command));
         }
 
         return commands;

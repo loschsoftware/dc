@@ -1,23 +1,18 @@
-﻿using Dassie.Cli.Commands;
-using Dassie.Extensions;
+﻿using Dassie.Extensions;
+using Dassie.Templates;
 
-namespace Dassie.Templates;
+namespace Dassie.Cli.Commands;
 
 internal class NewCommand : ICompilerCommand
 {
+    private static NewCommand _instance;
+    public static NewCommand Instance => _instance ??= new();
+
     public string Command => "new";
 
     public string UsageString => "new <Type> <Name>";
 
     public string Description => "Creates the file structure of a Dassie project.";
-    
-    public NewCommand()
-    {
-        _help = CommandHelpStringBuilder.GenerateHelpString(this);
-    }
-
-    private readonly string _help;
-    public string Help() => _help;
 
     public int Invoke(string[] args) => DSTemplates.CreateStructure(args);
 }

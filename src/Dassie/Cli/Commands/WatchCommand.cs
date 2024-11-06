@@ -9,6 +9,9 @@ namespace Dassie.Cli.Commands;
 
 internal class WatchCommand : ICompilerCommand
 {
+    private static WatchCommand _instance;
+    public static WatchCommand Instance => _instance ??= new();
+
     internal static Process watchProcess = null;
 
     public string Command => "watch";
@@ -16,14 +19,6 @@ internal class WatchCommand : ICompilerCommand
     public string UsageString => "watch, auto";
 
     public string Description => "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.";
-    
-    public WatchCommand()
-    {
-        _help = CommandHelpStringBuilder.GenerateHelpString(this);
-    }
-
-    private readonly string _help;
-    public string Help() => _help;
 
     public List<string> Aliases() => ["auto"];
 

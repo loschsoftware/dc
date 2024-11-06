@@ -190,7 +190,7 @@ internal static class Scratchpad
             cfg = (DassieConfig)xmls.Deserialize(sr);
         }
 
-        int result = CompileCommand.Compile([file]);
+        int result = CompileCommand.Instance.Invoke([file]);
 
         string outDir = Path.Combine(dir, "build");
         string asm = Path.Combine(outDir, Path.ChangeExtension(Path.GetFileName(file), "dll"));

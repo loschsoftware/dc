@@ -8,19 +8,14 @@ namespace Dassie.Cli.Commands;
 
 internal class ConfigCommand : ICompilerCommand
 {
+    private static ConfigCommand _instance;
+    public static ConfigCommand Instance => _instance ??= new();
+
     public string Command => "config";
 
     public string UsageString => "config";
 
     public string Description => "Creates a new dsconfig.xml file with default values.";
-
-    public ConfigCommand()
-    {
-        _help = CommandHelpStringBuilder.GenerateHelpString(this);
-    }
-
-    private readonly string _help;
-    public string Help() => _help;
 
     public int Invoke(string[] args)
     {

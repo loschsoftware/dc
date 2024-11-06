@@ -1,12 +1,9 @@
 ﻿using Dassie.Cli.Commands;
 using Dassie.Configuration;
 using Dassie.Core;
-using Dassie.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -21,30 +18,17 @@ internal class Program
         {
             Console.OutputEncoding = Encoding.Unicode;
             ToolPaths.GetOrCreateToolPathsFile();
-
-            List<IPackage> extensions = ExtensionLoader.LoadInstalledExtensions();
-            Dictionary<string, Func<string[], int>> customCommands = ExtensionLoader.GetAllCommands(extensions);
-            Dictionary<string, string> commandDescriptions = ExtensionLoader.GetCommandDescriptions(extensions);
-
-            List<ICompilerCommand> defaultCommands = DefaultCommandManager.DefaultCommands;
-            HelpCommand helpCommand = new(commandDescriptions);
-            defaultCommands.Add(helpCommand);
+            CommandRegistry.InitializeDefaults();
 
             args ??= [];
             if (args.Length == 0)
-                return helpCommand.Invoke(args);
+                return HelpCommand.Instance.Invoke(args);
 
             string command = args[0];
-            if (customCommands.TryGetValue(command, out Func<string[], int> cmd))
-                return cmd(args[1..]);
+            if (CommandRegistry.TryInvoke(command, args[1..], out int ret))
+                return ret;
 
-            if (defaultCommands.Any(c => c.Command == command || c.Aliases().Any(a => a == command)))
-            {
-                ICompilerCommand selectedCommand = defaultCommands.First(c => c.Command == command || c.Aliases().Any(a => a == command));
-                return selectedCommand.Invoke(args);
-            }
-
-            return CompileCommand.Compile(args);
+            return CompileCommand.Instance.Invoke(args);
         }
         catch (Exception ex)
         {

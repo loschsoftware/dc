@@ -12,13 +12,8 @@ namespace Dassie.Cli.Commands;
 
 internal class HelpCommand : ICompilerCommand
 {
-    private readonly Dictionary<string, string> _installedCommands;
-
-    public HelpCommand(Dictionary<string, string> commands)
-    {
-        _installedCommands = commands;
-        _help = CommandHelpStringBuilder.GenerateHelpString(this);
-    }
+    private static HelpCommand _instance;
+    public static HelpCommand Instance => _instance ??= new();
 
     public string Command => "help";
 
@@ -28,18 +23,12 @@ internal class HelpCommand : ICompilerCommand
 
     public string Description => "Shows this page. Use the -o flag to display all available options.";
 
-    private readonly string _help;
-    public string Help() => _help;
-
     public int Invoke(string[] args)
     {
-        if (args.Length > 0 && (args[0] == Command || Aliases().Contains(args[0])))
-            args = args[1..];
-
         if (args.Any(a => !a.StartsWith('-')))
             return DisplayHelpForCommand(args.First(a => !a.StartsWith('-')));
 
-        return DisplayHelpMessage(args, _installedCommands);
+        return DisplayHelpMessage(args);
     }
 
     public static void DisplayLogo()
@@ -116,7 +105,7 @@ internal class HelpCommand : ICompilerCommand
         return "Object";
     }
 
-    private static int DisplayHelpMessage(string[] args, Dictionary<string, string> installedCommands)
+    private static int DisplayHelpMessage(string[] args)
     {
         DisplayLogo();
 
@@ -165,10 +154,10 @@ internal class HelpCommand : ICompilerCommand
             return 0;
         }
 
-        return DisplayHelpMessage(installedCommands);
+        return DisplayHelpMessage();
     }
 
-    private static int DisplayHelpMessage(Dictionary<string, string> installedCommands)
+    private static int DisplayHelpMessage()
     {
         if (Console.BufferWidth - 50 - 5 < 30)
         {
@@ -192,19 +181,24 @@ internal class HelpCommand : ICompilerCommand
         sb.AppendLine();
         sb.AppendLine("Commands:");
 
-        foreach (ICompilerCommand command in DefaultCommandManager.DefaultCommands.OrderBy(c => c.Command).Where(c => !c.Hidden()))
+        IEnumerable<ICompilerCommand> internalCommands = CommandRegistry.Commands.OrderBy(c => c.Command).Where(c => !c.Hidden()
+            && c.GetType().Assembly == Assembly.GetExecutingAssembly());
+
+        IEnumerable<ICompilerCommand> externalCommands = CommandRegistry.Commands.Except(internalCommands);
+
+        foreach (ICompilerCommand command in internalCommands)
         {
             sb.Append($"    {command.UsageString}".PadRight(50));
             sb.Append(FormatLines(command.Description));
         }
 
-        if (installedCommands.Count > 0)
+        if (externalCommands.Count() > 0)
         {
             sb.AppendLine();
             sb.AppendLine("External commands:");
 
-            foreach (KeyValuePair<string, string> cmd in installedCommands)
-                sb.Append($"{$"    {cmd.Key}",-50}{FormatLines(cmd.Value.Replace(Environment.NewLine, " "))}");
+            foreach (ICompilerCommand cmd in externalCommands)
+                sb.Append($"{$"    {cmd.UsageString}",-50}{FormatLines(cmd.Description.Replace(Environment.NewLine, " "))}");
         }
 
         sb.AppendLine();
@@ -226,17 +220,7 @@ internal class HelpCommand : ICompilerCommand
 
     private static int DisplayHelpForCommand(string name)
     {
-        if (!DefaultCommandManager.DefaultCommands.Any(c => c.Command == name || c.Aliases().Contains(name)))
-        {
-            Console.WriteLine($"Could not load help for command '{name}' because it does not exist.");
-            return 1;
-        }
-
-        DisplayLogo();
-        LogOut.WriteLine();
-
-        ICompilerCommand command = DefaultCommandManager.DefaultCommands.First(c => c.Command == name || c.Aliases().Contains(name));
-        LogOut.WriteLine(command.Help());
+        LogOut.WriteLine("Command-specific help is not yet available. Refer to the online documentation for help.");
         return 0;
     }
 }

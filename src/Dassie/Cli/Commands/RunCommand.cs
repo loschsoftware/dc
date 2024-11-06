@@ -14,25 +14,17 @@ namespace Dassie.Cli.Commands;
 
 internal class RunCommand : ICompilerCommand
 {
+    private static RunCommand _instance;
+    public static RunCommand Instance => _instance ??= new();
+
     public string Command => "run";
 
     public string UsageString => "run [Arguments]";
 
     public string Description => "Automatically compiles using the default profile and then runs the output executable with the specified arguments.";
-    
-    public RunCommand()
-    {
-        _help = CommandHelpStringBuilder.GenerateHelpString(this);
-    }
-
-    private readonly string _help;
-    public string Help() => _help;
 
     public int Invoke(string[] args)
     {
-        if (args.Length > 0 && args[0] == "run")
-            args = args[1..];
-
         DassieConfig config = null;
 
         if (File.Exists("dsconfig.xml"))
@@ -127,7 +119,7 @@ internal class RunCommand : ICompilerCommand
         }
 
         if (recompile)
-            DefaultCommandManager.CompileAllCommand.Invoke([]);
+            BuildCommand.Instance.Invoke([]);
 
         string process = "dotnet";
         string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. args]);

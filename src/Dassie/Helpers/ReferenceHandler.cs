@@ -37,7 +37,7 @@ internal static class ReferenceHandler
         string dir = Directory.GetCurrentDirectory();
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
-        int errCode = DefaultCommandManager.CompileAllCommand.Invoke(Array.Empty<string>());
+        int errCode = BuildCommand.Instance.Invoke([]);
 
         if (errCode != 0)
             return false;

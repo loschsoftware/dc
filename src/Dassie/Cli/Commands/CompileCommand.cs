@@ -4,6 +4,7 @@ using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Data;
 using Dassie.Errors;
+using Dassie.Extensions;
 using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Unmanaged;
@@ -24,10 +25,21 @@ using System.Xml.Serialization;
 
 namespace Dassie.Cli.Commands;
 
-// Does not implement ICompilerCommand because it is not actually a proper command (has no name)
-internal static class CompileCommand
+internal class CompileCommand : ICompilerCommand
 {
-    public static int Compile(string[] args, DassieConfig overrideSettings = null)
+    private static CompileCommand _instance;
+    public static CompileCommand Instance => _instance ??= new();
+
+    // All empty because this command can never be called like a regular command
+    public string Command => "";
+    public string UsageString => "";
+    public string Description => "";
+    public bool Hidden() => true;
+
+    public int Invoke(string[] args) => Compile(args);
+    public int Invoke(string[] args, DassieConfig overrideSettings) => Compile(args, overrideSettings);
+
+    private static int Compile(string[] args, DassieConfig overrideSettings = null)
     {
         Stopwatch sw = new();
         sw.Start();

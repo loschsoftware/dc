@@ -7,19 +7,14 @@ namespace Dassie.Cli.Commands;
 
 internal class QuitCommand : ICompilerCommand
 {
+    private static QuitCommand _instance;
+    public static QuitCommand Instance => _instance ??= new();
+
     public string Command => "quit";
 
     public string UsageString => "quit";
 
     public string Description => "Stops all file watchers.";
-
-    public QuitCommand()
-    {
-        _help = CommandHelpStringBuilder.GenerateHelpString(this);
-    }
-
-    private readonly string _help;
-    public string Help() => _help;
 
     public int Invoke(string[] args)
     {
