@@ -1,5 +1,6 @@
 ﻿using Dassie.Configuration;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace Dassie.Templates;
@@ -24,13 +25,20 @@ public static class DSTemplates
 
     internal static int CreateStructure(string[] args)
     {
-        if (args.Length < 3)
+        if (args.Length < 2)
         {
             System.Console.WriteLine("Specify an application type and name.");
             return -1;
         }
 
-        string rootDir = Path.Combine(Directory.GetCurrentDirectory(), args[2]);
+        string[] templates = ["console", "library"];
+        if (!templates.Contains(args[0]))
+        {
+            System.Console.WriteLine($"The project template '{args[0]}' does not exist. Valid values are 'console' and 'library'.");
+            return -1;
+        }
+
+        string rootDir = Path.Combine(Directory.GetCurrentDirectory(), args[1]);
         Directory.CreateDirectory(rootDir);
 
         string srcDir = Directory.CreateDirectory(Path.Combine(rootDir, "src")).FullName;
@@ -45,10 +53,10 @@ public static class DSTemplates
         DassieConfig config = new()
         {
             FormatVersion = "1.0",
-            AssemblyName = args[2]
+            AssemblyName = args[1]
         };
 
-        switch (args[1])
+        switch (args[0])
         {
             case "console":
                 AddSourceFile(Path.Combine(srcDir, "main.ds"), Console);
