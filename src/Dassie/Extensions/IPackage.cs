@@ -16,4 +16,9 @@ public interface IPackage
     /// An array of compiler commands added by this extension.
     /// </summary>
     public Type[] Commands { get; }
+
+    /// <summary>
+    /// An array of project templates added by this extension.
+    /// </summary>
+    public virtual IProjectTemplate[] ProjectTemplates() => [];
 }

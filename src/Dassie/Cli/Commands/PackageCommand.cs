@@ -59,7 +59,7 @@ internal class PackageCommand : ICompilerCommand
 
     private static int List()
     {
-        List<IPackage> packages = ExtensionLoader.LoadInstalledExtensions();
+        List<IPackage> packages = ExtensionLoader.InstalledExtensions;
 
         if (packages.Count == 0)
         {
@@ -88,7 +88,7 @@ internal class PackageCommand : ICompilerCommand
     private static int Info(string name)
     {
         StringBuilder sb = new();
-        List<IPackage> packages = ExtensionLoader.LoadInstalledExtensions();
+        List<IPackage> packages = ExtensionLoader.InstalledExtensions;
 
         if (!packages.Any(p => p.Metadata.Name == name))
         {
@@ -161,7 +161,7 @@ internal class PackageCommand : ICompilerCommand
 
     private static int Remove(string name)
     {
-        List<IPackage> installed = ExtensionLoader.LoadInstalledExtensions();
+        List<IPackage> installed = ExtensionLoader.InstalledExtensions;
 
         if (!installed.Any(p => p.Metadata.Name == name))
         {

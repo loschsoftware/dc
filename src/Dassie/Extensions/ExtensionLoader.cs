@@ -10,7 +10,10 @@ internal static class ExtensionLoader
 {
     public static readonly string DefaultExtensionSource = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Extensions")).FullName;
 
-    public static List<IPackage> LoadInstalledExtensions()
+    private static readonly List<IPackage> _installedExtensions = LoadInstalledExtensions();
+    public static List<IPackage> InstalledExtensions => _installedExtensions;
+
+    private static List<IPackage> LoadInstalledExtensions()
     {
         if (File.Exists(Path.Combine(DefaultExtensionSource, "RemovalList.txt")))
         {

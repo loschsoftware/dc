@@ -1,4 +1,6 @@
 ﻿using Dassie.Configuration;
+using Dassie.Extensions;
+using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -29,6 +31,12 @@ public static class DSTemplates
         {
             System.Console.WriteLine("Specify an application type and name.");
             return -1;
+        }
+
+        if (ExtensionLoader.InstalledExtensions.Select(p => p.ProjectTemplates()).SelectMany(p => p).Any(t => t.Name == args[0]))
+        {
+            CreateStructure(ExtensionLoader.InstalledExtensions.Select(p => p.ProjectTemplates()).SelectMany(p => p).First(t => t.Name == args[0]));
+            return 0;
         }
 
         string[] templates = ["console", "library"];
@@ -79,5 +87,10 @@ public static class DSTemplates
     {
         using StreamWriter sw = new(path);
         sw.WriteLine(contents);
+    }
+
+    internal static void CreateStructure(IProjectTemplate template)
+    {
+        throw new NotImplementedException();
     }
 }

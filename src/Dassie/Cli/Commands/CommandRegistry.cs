@@ -19,7 +19,7 @@ internal static class CommandRegistry
     /// </summary>
     public static void InitializeDefaults()
     {
-        List<IPackage> packages = ExtensionLoader.LoadInstalledExtensions();
+        List<IPackage> packages = ExtensionLoader.InstalledExtensions;
         packages.Add(DefaultCommandPackage.Instance);
         Commands = ExtensionLoader.GetAllCommands(packages);
     }
