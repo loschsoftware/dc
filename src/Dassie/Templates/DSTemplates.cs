@@ -52,7 +52,7 @@ public static class DSTemplates
         XmlSerializer xmls = new(typeof(DassieConfig));
         DassieConfig config = new()
         {
-            FormatVersion = "1.0",
+            FormatVersion = DassieConfig.CurrentFormatVersion,
             AssemblyName = args[1]
         };
 
