@@ -60,6 +60,7 @@ public static class ErrorWriter
             return;
 
         Context ??= new();
+        Context.Configuration = ProjectFileDeserializer.DassieConfig;
         Context.Configuration ??= new();
         Context.ConfigurationPath ??= ProjectConfigurationFileName;
         Context.Configuration.IgnoredMessages ??= Array.Empty<Ignore>();
