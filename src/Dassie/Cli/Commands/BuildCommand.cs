@@ -1,14 +1,10 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Macros;
-using Dassie.Errors;
 using Dassie.Extensions;
-using Dassie.Validation;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Xml.Serialization;
 
 namespace Dassie.Cli.Commands;
 
@@ -25,18 +21,7 @@ internal class BuildCommand : ICompilerCommand
 
     public int Invoke(string[] args)
     {
-        DassieConfig config = null;
-
-        if (File.Exists(ProjectConfigurationFileName))
-        {
-            foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
-                EmitGeneric(error);
-
-            XmlSerializer xmls = new(typeof(DassieConfig));
-            using StreamReader sr = new(ProjectConfigurationFileName);
-            config = (DassieConfig)xmls.Deserialize(sr);
-        }
-
+        DassieConfig config = ProjectFileDeserializer.DassieConfig;
         config ??= new();
         config.BuildProfiles ??= [];
 

@@ -44,25 +44,7 @@ internal class CompileCommand : ICompilerCommand
         Stopwatch sw = new();
         sw.Start();
 
-        DassieConfig config = null;
-
-        if (File.Exists(ProjectConfigurationFileName))
-        {
-            XmlSerializer xmls = new(typeof(DassieConfig));
-            using StreamReader sr = new(ProjectConfigurationFileName);
-
-            try
-            {
-                config = (DassieConfig)xmls.Deserialize(sr);
-            }
-            catch
-            {
-                // If file is invalid, it will get caught in ConfigValidation.Validate
-            }
-
-            foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
-                EmitGeneric(error);
-        }
+        DassieConfig config = ProjectFileDeserializer.DassieConfig;
 
         string asmName = "";
         if (args.Where(File.Exists).Any())

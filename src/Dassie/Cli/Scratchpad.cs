@@ -182,13 +182,7 @@ internal static class Scratchpad
 
         Directory.SetCurrentDirectory(dir);
 
-        DassieConfig cfg = null;
-        if (File.Exists(ProjectConfigurationFileName))
-        {
-            using StreamReader sr = new(ProjectConfigurationFileName);
-            XmlSerializer xmls = new(typeof(DassieConfig));
-            cfg = (DassieConfig)xmls.Deserialize(sr);
-        }
+        DassieConfig cfg = ProjectFileDeserializer.DassieConfig;
 
         int result = CompileCommand.Instance.Invoke([file]);
 

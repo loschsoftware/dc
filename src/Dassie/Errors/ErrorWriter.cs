@@ -121,13 +121,29 @@ public static class ErrorWriter
                 outStream.Write($"[{DateTime.Now}] ");
             }
 
-            Console.ForegroundColor = error.Severity switch
+            // Legacy colors
+            if (Context.Configuration.MessageColorMode == MessageColorMode.Classic)
             {
-                Severity.Error => ConsoleColor.Red,
-                Severity.Warning => ConsoleColor.Yellow,
-                Severity.Information => ConsoleColor.Cyan,
-                _ => ConsoleColor.Gray
-            };
+                Console.ForegroundColor = error.Severity switch
+                {
+                    Severity.Error => ConsoleColor.Red,
+                    Severity.Warning => ConsoleColor.Yellow,
+                    Severity.Information => ConsoleColor.Cyan,
+                    _ => ConsoleColor.Gray
+                };
+            }
+
+            // Modern colors
+            if (Context.Configuration.MessageColorMode == MessageColorMode.Modern && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
+            {
+                Console.Write($"\x1b[38;2;{error.Severity switch
+                {
+                    Severity.Error => "254;74;73",
+                    Severity.Warning => "255;165;0",
+                    Severity.Information => "30;144;255",
+                    _ => "204;204;204"
+                }}m");
+            }
 
             string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
             string codePos = "\b";
@@ -200,6 +216,9 @@ public static class ErrorWriter
                 CurrentFile.Errors.Add(error);
 
             messages.Add(error);
+
+            if (Context.Configuration.MessageColorMode == MessageColorMode.Modern && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
+                Console.Write($"\x1b[0m");
         }
         catch (IOException)
         {

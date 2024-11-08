@@ -23,6 +23,8 @@ public class ErrorTextWriter : TextWriter
         _writers = writers;
     }
 
+    public TextWriter[] Writers => _writers;
+
     public override Encoding Encoding => throw new NotImplementedException();
 
     public override void Write(string value)
