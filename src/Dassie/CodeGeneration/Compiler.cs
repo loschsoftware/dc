@@ -91,7 +91,7 @@ public static class Compiler
         foreach (InputDocument doc in documents)
             errors.Add(DocumentCompiler.CompileDocument(doc, cfg));
 
-        if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet)
+        if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !messages.Any(m => m.ErrorCode == DS0027_EmptyProgram))
         {
             EmitErrorMessage(
                 0, 0, 0,
