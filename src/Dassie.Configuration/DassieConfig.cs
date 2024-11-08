@@ -161,6 +161,18 @@ public sealed class DassieConfig
     [DefaultValue(MessageColorMode.Classic)]
     [XmlElement]
     public MessageColorMode MessageColorMode { get; set; }
+
+    [DefaultValue(null)]
+    [XmlElement]
+    public string ErrorColor { get; set; }
+
+    [DefaultValue(null)]
+    [XmlElement]
+    public string WarningColor { get; set; }
+
+    [DefaultValue(null)]
+    [XmlElement]
+    public string MessageColor { get; set; }
 }
 
 [Serializable]
