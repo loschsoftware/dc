@@ -199,14 +199,14 @@ public static class ErrorWriter
                 ResetColor();
             }
 
+            outStream.Write(outBuilder.ToString());
+            outBuilder.Clear();
+
             if (!string.IsNullOrEmpty(error.Tip) && Context.Configuration.EnableTips)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 InfoOut.WriteLine(error.Tip);
             }
-
-            outStream.Write(outBuilder.ToString());
-            outBuilder.Clear();
 
             Console.ForegroundColor = defaultColor;
 
