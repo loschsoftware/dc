@@ -46,8 +46,8 @@ internal static class DocumentCompiler
         if (config.Verbosity >= 1)
             EmitBuildLogMessage("    Parsing...");
 
-        ICharStream charStream = CharStreams.fromString(lowered);
-        DassieLexer lexer = new DassieLexer(charStream);
+        CurrentFile.CharStream = CharStreams.fromString(lowered);
+        DassieLexer lexer = new DassieLexer(CurrentFile.CharStream);
         ITokenStream tokens = new CommonTokenStream(lexer);
         DassieParser parser = new(tokens);
 

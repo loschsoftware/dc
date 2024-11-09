@@ -1,4 +1,5 @@
-﻿using Dassie.Errors;
+﻿using Antlr4.Runtime;
+using Dassie.Errors;
 using Dassie.Text;
 using Dassie.Text.Regions;
 using System;
@@ -78,4 +79,6 @@ internal class FileContext
     public Dictionary<string, Dictionary<string, string>> FunctionParameterConstraints { get; } = [];
 
     public ISymbolDocumentWriter SymbolDocumentWriter { get; set; }
+
+    public ICharStream CharStream { get; set; }
 }

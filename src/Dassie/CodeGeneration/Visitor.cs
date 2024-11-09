@@ -933,7 +933,24 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Type _t = Visit(child);
 
             if (_t != typeof(void) && !CurrentMethod.SkipPop)
+            {
+#if ENABLE_DS0125
+                ParserRuleContext rule = (ParserRuleContext)tree;
+                string text = CurrentFile.CharStream.GetText(new(rule.Start.StartIndex, rule.Stop.StopIndex)).Trim();
+
+                if (rule is not DassieParser.AssignmentContext and not DassieParser.Local_declaration_or_assignmentContext)
+                {
+                    EmitWarningMessage(
+                        rule.Start.Line,
+                        rule.Start.Column,
+                        text.Length,
+                        DS0125_UnusedValue,
+                        $"Result of expression '{text}' is not used. Use 'ignore' to explicitly discard a value.");
+                }
+#endif // ENABLE_DS0125
+
                 CurrentMethod.IL.Emit(OpCodes.Pop);
+            }
 
             if (CurrentMethod.SkipPop)
                 CurrentMethod.SkipPop = false;
@@ -2865,7 +2882,24 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Type _t = Visit(tree);
 
             if (_t != typeof(void) && !CurrentMethod.SkipPop)
+            {
+#if ENABLE_DS0125
+                ParserRuleContext rule = (ParserRuleContext)tree;
+                string text = CurrentFile.CharStream.GetText(new(rule.Start.StartIndex, rule.Stop.StopIndex)).Trim();
+
+                if (rule is not DassieParser.AssignmentContext and not DassieParser.Local_declaration_or_assignmentContext)
+                {
+                    EmitWarningMessage(
+                        rule.Start.Line,
+                        rule.Start.Column,
+                        text.Length,
+                        DS0125_UnusedValue,
+                        $"Result of expression '{text}' is not used. Use 'ignore' to explicitly discard a value.");
+                }
+#endif // ENABLE_DS0125
+
                 CurrentMethod.IL.Emit(OpCodes.Pop);
+            }
 
             if (CurrentMethod.SkipPop)
                 CurrentMethod.SkipPop = false;

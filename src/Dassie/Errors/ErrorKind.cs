@@ -519,5 +519,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the 'dc run' command is called on a project that is not executable.
     /// </summary>
-    DS0124_DCRunInvalidProjectType
+    DS0124_DCRunInvalidProjectType,
+    /// <summary>
+    /// Emitted when a value is ignored implicitly.
+    /// </summary>
+    DS0125_UnusedValue
 }
