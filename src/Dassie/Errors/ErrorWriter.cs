@@ -66,6 +66,15 @@ public static class ErrorWriter
         Context.ConfigurationPath ??= ProjectConfigurationFileName;
         Context.Configuration.IgnoredMessages ??= Array.Empty<Ignore>();
 
+        if (Context.Configuration.IgnoreMessages && (error.Severity == Severity.Information || error.Severity == Severity.BuildLogMessage))
+            return;
+
+        if (Context.Configuration.IgnoreWarnings && error.Severity == Severity.Warning)
+            return;
+
+        if (Context.Configuration.TreatWarningsAsErrors && error.Severity == Severity.Warning)
+            error.Severity = Severity.Error;
+
         if (Context.Configuration.IgnoredMessages.Any(i => i.Code == error.ErrorCode.ToString().Split('_')[0]))
         {
             if (error.Severity == Severity.Error)
@@ -370,9 +379,6 @@ public static class ErrorWriter
             }
         };
 
-        if (Context.Configuration.IgnoreWarnings)
-            return;
-
         ErrorInfo err = new()
         {
             CodePosition = (ln, col),
@@ -389,12 +395,6 @@ public static class ErrorWriter
                 IconResourceName = Context.Configuration.TreatWarningsAsErrors ? "CodeErrorRule" : "CodeWarningRule"
             }
         };
-
-        if (Context.Configuration.TreatWarningsAsErrors)
-        {
-            EmitErrorMessage(err);
-            return;
-        }
 
         EmitWarningMessage(err, treatAsError);
     }
@@ -413,9 +413,6 @@ public static class ErrorWriter
                 Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
             }
         };
-
-        if (Context.Configuration.IgnoreMessages)
-            return;
 
         EmitMessage(new ErrorInfo()
         {
