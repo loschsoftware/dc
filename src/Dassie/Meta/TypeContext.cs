@@ -32,7 +32,7 @@ internal class TypeContext
     public List<MetaFieldInfo> Fields { get; } = [];
 
     public List<PropertyBuilder> Properties { get; } = [];
-    
+
     public List<MethodContext> ConstructorContexts { get; } = [];
 
     public List<TypeContext> Children { get; } = [];

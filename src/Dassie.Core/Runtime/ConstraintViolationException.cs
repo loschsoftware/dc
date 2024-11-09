@@ -8,10 +8,10 @@ namespace Dassie.Runtime;
 [Serializable]
 public class ConstraintViolationException : Exception
 {
-	/// <summary>
-	/// Creates a new instance of <see cref="ConstraintViolationException"/>.
-	/// </summary>
-	public ConstraintViolationException() { }
+    /// <summary>
+    /// Creates a new instance of <see cref="ConstraintViolationException"/>.
+    /// </summary>
+    public ConstraintViolationException() { }
 
     /// <summary>
     /// The name of the parameter that violates a constraint.

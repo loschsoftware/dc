@@ -7,6 +7,6 @@ internal class SymbolListener : DassieParserBaseListener
 {
     public override void EnterType([NotNull] DassieParser.TypeContext context)
     {
-        
+
     }
 }

@@ -3,10 +3,8 @@ using Dassie.Configuration;
 using Dassie.Errors;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
 
 namespace Dassie.Cli;
 

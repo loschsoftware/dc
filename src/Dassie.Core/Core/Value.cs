@@ -55,7 +55,7 @@ public static class Value
 
         if (a < b)
             return -1;
-        
+
         return 1;
     }
 }

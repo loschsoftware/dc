@@ -105,7 +105,7 @@ public static class ErrorWriter
             };
 
             StringBuilder outBuilder = new();
-            
+
             void SetColorRgb(byte r, byte g, byte b)
             {
                 if (Context.Configuration.MessageColorMode == MessageColorMode.Modern && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))

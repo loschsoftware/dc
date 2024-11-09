@@ -12,7 +12,7 @@ public class CompilationContext
     /// The source documents to compile.
     /// </summary>
     public IEnumerable<SourceDocument> Documents { get; }
-    
+
     /// <summary>
     /// Configuration for the current compilation.
     /// </summary>

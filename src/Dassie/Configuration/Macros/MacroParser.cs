@@ -46,7 +46,7 @@ internal class MacroParser
     }
 
     private void Normalize(object obj)
-    {   
+    {
         if (obj == null)
             return;
 

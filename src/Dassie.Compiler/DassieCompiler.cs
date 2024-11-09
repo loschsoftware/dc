@@ -1,5 +1,4 @@
-﻿using Dassie.Cli;
-using Dassie.Cli.Commands;
+﻿using Dassie.Cli.Commands;
 using Dassie.Errors;
 using System;
 using System.Collections.Generic;

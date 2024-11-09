@@ -16,7 +16,7 @@ internal static class RuntimeConfigWriter
     {
         Version version = typeof(object).Assembly.GetName().Version;
         string target = version.ToString(2);
-        
+
         File.WriteAllText(path, $@"{{
     ""runtimeOptions"": {{
         ""tfm"": ""net{target}"",

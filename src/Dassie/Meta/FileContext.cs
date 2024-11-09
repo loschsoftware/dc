@@ -14,7 +14,7 @@ internal class FileContext
         Path = path;
         AvailableTypes = new(path);
     }
-    
+
     public static FileContext CurrentFile { get; set; }
 
     public TypeRegistry AvailableTypes { get; }
@@ -70,7 +70,7 @@ internal class FileContext
     public List<ErrorInfo> Errors { get; } = new();
 
     public List<FoldingRegion> FoldingRegions { get; } = new();
-    
+
     public List<GuideLine> GuideLines { get; } = new();
 
     public bool CheckType(Type type) => AvailableTypes.Contains(type);

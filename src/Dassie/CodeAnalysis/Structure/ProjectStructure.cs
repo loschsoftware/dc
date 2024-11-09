@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Dassie.CodeAnalysis.Structure;
+﻿namespace Dassie.CodeAnalysis.Structure;
 
 /// <summary>
 /// Represents the code structure of a Dassie project. Used by LSEdit for generating structure views.

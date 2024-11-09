@@ -60,7 +60,7 @@ public struct Fragment : IEquatable<Fragment>
     /// The color of the fragment.
     /// </summary>
     public Color Color { get; set; }
-    
+
     /// <summary>
     /// If the desired color is not contained in the <see cref="Dassie.Text.Color"/> enumeration, this property is used to set a specific color.
     /// </summary>
@@ -70,7 +70,7 @@ public struct Fragment : IEquatable<Fragment>
     /// A tooltip corresponding to the fragment.
     /// </summary>
     public Tooltip ToolTip { get; set; }
-    
+
     /// <summary>
     /// Specifies wheter the fragment can be reached by a navigation command. Supports the "Go to definition" feature of many editors.
     /// </summary>
@@ -105,7 +105,7 @@ public struct Fragment : IEquatable<Fragment>
     /// </summary>
     /// <param name="other">An object to compare with this object.</param>
     /// <returns><see langword="true"/> if the current object is equal to the other parameter; otherwise, <see langword="false"/>.</returns>
-    public readonly bool Equals(Fragment other) => 
+    public readonly bool Equals(Fragment other) =>
         Line == other.Line
         && Column == other.Column
         && Length == other.Length

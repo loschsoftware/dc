@@ -1,6 +1,5 @@
 ﻿using Dassie.Configuration;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Dassie.Validation;
 

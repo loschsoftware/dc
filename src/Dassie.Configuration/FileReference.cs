@@ -8,7 +8,7 @@ public class FileReference : Reference
 {
     [XmlText]
     public string FileName { get; set; }
-    
+
     [XmlAttribute("CopyToOutput")]
     public bool CopyToOutput { get; set; }
 }

@@ -8,7 +8,6 @@ using Dassie.Extensions;
 using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Unmanaged;
-using Dassie.Validation;
 using Microsoft.NET.HostModel.AppHost;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,6 @@ using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
-using System.Xml.Serialization;
 
 namespace Dassie.Cli.Commands;
 

@@ -1,6 +1,5 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using Dassie.Cli;
 using Dassie.Configuration;
 using Dassie.Errors;
 using Dassie.Meta;

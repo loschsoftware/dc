@@ -60,7 +60,7 @@ internal static class PackageDownloader
         {
             if (versions.Any(v => v.ToFullString() == version))
                 targetVersion = versions.First(v => v.ToFullString() == version);
-            
+
             else
             {
                 EmitWarningMessage(

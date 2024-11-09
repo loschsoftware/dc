@@ -43,7 +43,7 @@ internal class WatchCommand : ICompilerCommand
         sw.WriteLine(watchProcess.Id);
         return 0;
     }
-    
+
     public static int WatchIndefinetly()
     {
         watchProcess = new Process();

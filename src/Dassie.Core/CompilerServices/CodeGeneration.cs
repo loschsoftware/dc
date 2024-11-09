@@ -60,7 +60,7 @@ public static class CodeGeneration
     /// <param name="code">The error code.</param>
     /// <param name="message">The actual error message.</param>
     public static void warn(string code, string message) { }
-    
+
     /// <summary>
     /// Emits a message.
     /// </summary>

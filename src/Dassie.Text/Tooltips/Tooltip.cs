@@ -45,7 +45,7 @@ public class Tooltip : IEquatable<Tooltip>
     /// <param name="left">The first tooltip.</param>
     /// <param name="right">The second tooltip.</param>
     /// <returns>Wheter the tooltips are not equal.</returns>
-    public static bool operator!=(Tooltip left, Tooltip right) => !(left == right);
+    public static bool operator !=(Tooltip left, Tooltip right) => !(left == right);
 
     /// <summary>
     /// The resource name of the icon associated with the tooltip. Used by LSEdit.
@@ -77,7 +77,7 @@ public class Tooltip : IEquatable<Tooltip>
     /// <returns>Wheter the tooltips are equal.</returns>
     public bool Equals(Tooltip other) => this == other;
 
-    #pragma warning disable CS1591
+#pragma warning disable CS1591
     public override int GetHashCode()
     {
         int hashCode = 164038694;

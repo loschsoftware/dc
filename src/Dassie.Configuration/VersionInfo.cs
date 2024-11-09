@@ -30,7 +30,7 @@ public class VersionInfo
 
     [XmlElement("Description")]
     public string Description { get; set; }
-    
+
     [XmlElement("InternalName")]
     public string InternalName { get; set; }
 }

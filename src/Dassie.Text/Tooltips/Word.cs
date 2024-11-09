@@ -22,7 +22,7 @@ public struct Word : IEquatable<Word>
     /// The fragment containing styling information associated with the word.
     /// </summary>
     public Fragment Fragment { get; set; }
-    
+
     /// <summary>
     /// The text of the word.
     /// </summary>
@@ -34,7 +34,7 @@ public struct Word : IEquatable<Word>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>Wheter the words are equal.</returns>
-    public static bool operator==(Word left, Word right) => left.Fragment == right.Fragment && left.Text == right.Text;
+    public static bool operator ==(Word left, Word right) => left.Fragment == right.Fragment && left.Text == right.Text;
 
     /// <summary>
     /// Compares two instances of <see cref="Word"/>.
@@ -42,7 +42,7 @@ public struct Word : IEquatable<Word>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>Wheter the words are not equal.</returns>
-    public static bool operator!=(Word left, Word right) => !(left == right);
+    public static bool operator !=(Word left, Word right) => !(left == right);
 
     /// <summary>
     /// Compares the current instance of <see cref="Word"/> with any object.
@@ -64,7 +64,7 @@ public struct Word : IEquatable<Word>
     /// <returns>Wheter the words are equal.</returns>
     public readonly bool Equals(Word other) => this == other;
 
-    #pragma warning disable CS1591
+#pragma warning disable CS1591
     public override readonly int GetHashCode()
     {
         int hashCode = 1848792547;

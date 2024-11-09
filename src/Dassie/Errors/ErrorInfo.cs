@@ -26,7 +26,7 @@ public class ErrorInfo
     /// The path to the source file the error occured in.
     /// </summary>
     public string File { get; set; }
-    
+
     /// <summary>
     /// The starting position of the error in the file. The first tuple item represents the row, the second the column of the error.
     /// </summary>

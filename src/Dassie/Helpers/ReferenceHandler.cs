@@ -1,5 +1,4 @@
-﻿using Dassie.Cli;
-using Dassie.Cli.Commands;
+﻿using Dassie.Cli.Commands;
 using Dassie.Configuration;
 using Dassie.Packages;
 using System;

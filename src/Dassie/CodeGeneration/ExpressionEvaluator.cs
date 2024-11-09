@@ -1,10 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
-using Dassie.Cli;
 using Dassie.Helpers;
 using Dassie.Parser;
-using Dassie.Runtime;
 using Dassie.Text;
-using NuGet.Protocol;
 using System;
 using System.Globalization;
 using System.IO;
@@ -72,7 +69,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
         char c = (char)reader.Read();
         char[] hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
-        
+
         while (hexDigits.Contains(char.ToUpperInvariant(c)))
         {
             sequence.Append(c);

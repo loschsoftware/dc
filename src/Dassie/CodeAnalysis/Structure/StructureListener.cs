@@ -9,7 +9,7 @@ internal class StructureListener(ProjectStructure prevStructure, string filePath
     public ProjectStructure Structure { get; } = prevStructure;
     private string _namespaceId;
     private Namespace _namespace;
-    
+
     public override void EnterExport_directive([NotNull] DassieParser.Export_directiveContext context)
     {
         _namespaceId = context.full_identifier().GetText();

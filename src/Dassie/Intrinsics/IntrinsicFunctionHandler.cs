@@ -1,9 +1,9 @@
 ﻿using Dassie.Errors;
 using Dassie.Parser;
-using Dassie.Text.Tooltips;
-using System.Reflection.Emit;
-using System;
 using Dassie.Text;
+using Dassie.Text.Tooltips;
+using System;
+using System.Reflection.Emit;
 
 namespace Dassie.Intrinsics;
 

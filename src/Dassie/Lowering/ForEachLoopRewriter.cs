@@ -12,7 +12,7 @@ internal class ForEachLoopRewriter : ITreeToStringRewriter
     {
         string indexVarName = $"_{Guid.NewGuid():N}";
         string exprVarName = $"_{Guid.NewGuid():N}";
-        
+
         DassieParser.Foreach_loopContext loop = (DassieParser.Foreach_loopContext)tree;
 
         string elementNameIdentifier = loop.Identifier().Length == 2

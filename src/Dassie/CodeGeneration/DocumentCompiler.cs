@@ -6,7 +6,6 @@ using Dassie.Errors;
 using Dassie.Lowering;
 using Dassie.Parser;
 using Dassie.Validation;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 

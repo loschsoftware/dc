@@ -42,7 +42,7 @@ public struct UnionValue : IEquatable<UnionValue>, IDisposable
         {
             if (value == null)
                 return;
-            
+
             if (!AllowedTypes.Contains(value.GetType()))
                 throw new InvalidOperationException($"A value of type '{value.GetType()}' is not supported by the union type.");
 

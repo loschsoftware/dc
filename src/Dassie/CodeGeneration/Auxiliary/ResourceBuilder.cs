@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -33,7 +32,7 @@ internal class ResourceBuilder : ResourceSectionBuilder
 
         uint realOffset = 16;
 
-        for (int i = 0; i <  _resources.Length; i++)
+        for (int i = 0; i < _resources.Length; i++)
         {
             //uint offset = (uint)location.PointerToRawData;
 

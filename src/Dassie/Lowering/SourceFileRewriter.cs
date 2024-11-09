@@ -13,7 +13,7 @@ internal static class SourceFileRewriter
         ITokenStream tokens = new CommonTokenStream(lexer);
         DassieParser parser = new(tokens);
 
-        lexer.RemoveErrorListeners();        
+        lexer.RemoveErrorListeners();
         parser.RemoveErrorListeners();
 
         IParseTree compilationUnit = parser.compilation_unit();

@@ -403,5 +403,4 @@ FodyWeavers.xsd
 launchSettings.json
 
 build/
-.editorconfig
 /.editorconfig

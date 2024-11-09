@@ -1,7 +1,6 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.Parser;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 
 namespace Dassie.Lowering;

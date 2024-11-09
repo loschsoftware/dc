@@ -1,7 +1,6 @@
-﻿using Dassie.Cli;
-using System.Text;
+﻿using Dassie.Cli.Commands;
 using System;
-using Dassie.Cli.Commands;
+using System.Text;
 
 namespace Dassie.Extensions;
 

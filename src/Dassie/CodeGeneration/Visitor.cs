@@ -1,7 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Dassie.Cli;
 using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Helpers;
@@ -17,7 +16,6 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 using static Dassie.Helpers.TypeHelpers;
 using Color = Dassie.Text.Color;
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Numerics;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
