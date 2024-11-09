@@ -4208,7 +4208,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             context.expression().First().Start.Column,
             context.expression().First().Start.Text.Length,
             DS0043_PossiblyUnintentionalInfiniteLoop,
-            "The condition of the while loop is not a boolean. This loop will run indefinetly.");
+            "The loop condition is not boolean. The loop will run indefinetly.");
 
         CurrentMethod.IL.Emit(OpCodes.Pop);
 
