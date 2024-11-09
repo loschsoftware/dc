@@ -1,4 +1,5 @@
-﻿using Dassie.Configuration;
+﻿using Dassie.Cli;
+using Dassie.Configuration;
 using Dassie.Configuration.Analysis;
 using Dassie.Meta;
 using Dassie.Text.Tooltips;
@@ -108,7 +109,7 @@ public static class ErrorWriter
 
             void SetColorRgb(byte r, byte g, byte b)
             {
-                if (Context.Configuration.MessageColorMode == MessageColorMode.Modern && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
+                if (ConsoleHelper.AnsiEscapeSequenceSupported && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
                     outBuilder.Append($"\x1b[38;2;{r};{g};{b}m");
             }
 
@@ -131,7 +132,7 @@ public static class ErrorWriter
 
             void ResetColor()
             {
-                if (Context.Configuration.MessageColorMode == MessageColorMode.Modern && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
+                if (ConsoleHelper.AnsiEscapeSequenceSupported && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
                     outBuilder.Append($"\x1b[0m");
             }
 
@@ -158,7 +159,7 @@ public static class ErrorWriter
             string codePos = "\b";
 
             // Legacy colors
-            if (Context.Configuration.MessageColorMode == MessageColorMode.Classic && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
+            if (!ConsoleHelper.AnsiEscapeSequenceSupported && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
             {
                 Console.ForegroundColor = error.Severity switch
                 {

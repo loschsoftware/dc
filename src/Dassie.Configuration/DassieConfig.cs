@@ -157,10 +157,6 @@ public sealed class DassieConfig
     [XmlArray]
     public DebugProfile[] DebugProfiles { get; set; }
 
-    [DefaultValue(MessageColorMode.Classic)]
-    [XmlElement]
-    public MessageColorMode MessageColorMode { get; set; }
-
     [DefaultValue(null)]
     [XmlElement]
     public string ErrorColor { get; set; }
@@ -195,11 +191,4 @@ public enum Runtime
 {
     Jit,
     Aot
-}
-
-[Serializable]
-public enum MessageColorMode
-{
-    Classic,
-    Modern
 }
