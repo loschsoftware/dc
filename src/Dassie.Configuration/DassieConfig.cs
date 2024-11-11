@@ -44,6 +44,10 @@ public sealed class DassieConfig
     public Runtime Runtime { get; set; }
 
     [XmlElement]
+    [DefaultValue(Platform.Auto)]
+    public Platform Platform { get; set; }
+
+    [XmlElement]
     [DefaultValue("")]
     public string RuntimeIdentifier { get; set; }
 
@@ -191,4 +195,14 @@ public enum Runtime
 {
     Jit,
     Aot
+}
+
+[Serializable]
+public enum Platform
+{
+    Auto,
+    x86,
+    x64,
+    Arm32,
+    Arm64
 }

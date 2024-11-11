@@ -262,7 +262,12 @@ internal class CompileCommand : ICompilerCommand
                 }];
             }
 
-            ManagedPEBuilder peBuilder = CreatePEBuilder(Context.EntryPoint, resources, assembly, config.Configuration == ApplicationConfiguration.Debug || config.CreatePdb);
+            ManagedPEBuilder peBuilder = CreatePEBuilder(
+                Context.EntryPoint,
+                resources,
+                assembly,
+                config.Configuration == ApplicationConfiguration.Debug || config.CreatePdb,
+                config.Platform == Platform.x86);
 
             BlobBuilder peBlob = new();
             peBuilder.Serialize(peBlob);
@@ -355,7 +360,7 @@ internal class CompileCommand : ICompilerCommand
         return errors.Select(e => e.Length).Sum() == 0 ? 0 : -1;
     }
 
-    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources, string asmName, bool makePdb)
+    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources, string asmName, bool makePdb, bool is32Bit)
     {
         MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData, out MetadataBuilder pdbBuilder);
         PEHeaderBuilder headerBuilder = new(
@@ -381,6 +386,11 @@ internal class CompileCommand : ICompilerCommand
         if (makePdb)
             dbgBuilder = GeneratePdb(pdbBuilder, mb.GetRowCounts(), handle, Path.ChangeExtension(Path.GetFileName(asmName), "pdb"));
 
+        CorFlags runtimeFlags = CorFlags.ILOnly;
+
+        if (is32Bit)
+            runtimeFlags |= CorFlags.Prefers32Bit;
+
         ManagedPEBuilder peBuilder = new(
             header: headerBuilder,
             metadataRootBuilder: new(mb),
@@ -388,7 +398,8 @@ internal class CompileCommand : ICompilerCommand
             mappedFieldData,
             entryPoint: handle,
             nativeResources: rsb,
-            debugDirectoryBuilder: dbgBuilder);
+            debugDirectoryBuilder: dbgBuilder,
+            flags: runtimeFlags);
 
         return peBuilder;
     }
