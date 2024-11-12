@@ -523,5 +523,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a value is ignored implicitly.
     /// </summary>
-    DS0125_UnusedValue
+    DS0125_UnusedValue,
+    /// <summary>
+    /// Emitted when a non-nested type is declared as 'local'.
+    /// </summary>
+    DS0126_TopLevelTypeLocal
 }
