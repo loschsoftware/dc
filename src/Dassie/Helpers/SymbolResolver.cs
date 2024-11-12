@@ -247,7 +247,8 @@ internal static class SymbolResolver
         {
             argumentTypes ??= Type.EmptyTypes;
 
-            List<ConstructorInfo> cons = [];
+            List<ConstructorInfo> allCons = [];
+            IEnumerable<ConstructorInfo> cons = [];
 
             if (deconstructedGenericType != null)
             {
@@ -256,13 +257,17 @@ internal static class SymbolResolver
                     .ToArray();
 
                 foreach (ConstructorInfo con in _constructors)
-                    cons.Add(TypeBuilder.GetConstructor(type, con));
+                    allCons.Add(TypeBuilder.GetConstructor(type, con));
+
+                cons = GetAvailableMembers(deconstructedGenericType, allCons).ToList();
             }
             else
             {
-                cons = type.GetConstructors()
+                allCons = type.GetConstructors()
                     .Where(c => c.GetParameters().Length == argumentTypes.Length)
                     .ToList();
+
+                cons = GetAvailableMembers(type, allCons).ToList();
             }
 
             if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
@@ -334,6 +339,14 @@ internal static class SymbolResolver
 
                 return final;
             }
+
+            if (allCons.Count > 0)
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0127_AccessModifiersTooRestrictive,
+                    $"'{name}' cannot be called because its access modifiers are too restrictive.");
+            }
         }
 
         // 1. Fields
@@ -354,6 +367,14 @@ internal static class SymbolResolver
 
         if (f != null)
         {
+            if (!IsFieldAvailable(type, f))
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0127_AccessModifiersTooRestrictive,
+                    $"Field '{type.Name}.{f.Name}' cannot be accessed because its access modifiers are too restrictive.");
+            }
+
             if (type.IsEnum)
             {
                 if (!noEmitFragments)
@@ -668,6 +689,14 @@ internal static class SymbolResolver
         if (tc.Fields.Any(f => f.Name == name))
         {
             MetaFieldInfo f = tc.Fields.First(f => f.Name == name);
+
+            if (!IsFieldAvailable(tc.Builder, f.Builder))
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0127_AccessModifiersTooRestrictive,
+                    $"Field '{tc.Builder.Name}.{f.Builder.Name}' cannot be accessed because its access modifiers are too restrictive.");
+            }
 
             if (f.Builder.FieldType.IsEnum)
             {
@@ -1286,5 +1315,66 @@ internal static class SymbolResolver
         }
 
         return null;
+    }
+
+    private static IEnumerable<MethodInfo> GetAvailableMembers(Type type, IEnumerable<MethodInfo> members)
+    {
+        if (type == TypeContext.Current.Builder)
+            return members;
+
+        if (TypeContext.Current.Builder.BaseType == type)
+        {
+            IEnumerable<MethodInfo> mems = members.Where(m => m.IsPublic || m.IsFamily || m.IsFamilyOrAssembly);
+
+            if (type.Assembly == Context.Assembly)
+                mems = members.Where(m => m.IsFamilyAndAssembly).Union(mems);
+
+            return mems;
+        }
+
+        if (type.Assembly == Context.Assembly)
+            return members.Where(m => m.IsPublic || m.IsAssembly || m.IsFamilyOrAssembly);
+
+        return members.Where(m => m.IsPublic);
+    }
+
+    private static IEnumerable<ConstructorInfo> GetAvailableMembers(Type type, IEnumerable<ConstructorInfo> members)
+    {
+        if (type == TypeContext.Current.Builder)
+            return members;
+
+        if (TypeContext.Current.Builder.BaseType == type)
+        {
+            IEnumerable<ConstructorInfo> mems = members.Where(m => m.IsPublic || m.IsFamily || m.IsFamilyOrAssembly);
+
+            if (type.Assembly == Context.Assembly)
+                mems = members.Where(m => m.IsFamilyAndAssembly).Union(mems);
+
+            return mems;
+        }
+
+        if (type.Assembly == Context.Assembly)
+            return members.Where(m => m.IsPublic || m.IsAssembly || m.IsFamilyOrAssembly);
+
+        return members.Where(m => m.IsPublic);
+    }
+
+    private static bool IsFieldAvailable(Type callingType, FieldInfo field)
+    {
+        if (field.IsPublic)
+            return true;
+
+        if (TypeContext.Current.Builder.BaseType == callingType)
+        {
+            if (callingType.Assembly == Context.Assembly)
+                return field.IsFamily || field.IsFamilyOrAssembly || field.IsFamilyAndAssembly;
+
+            return field.IsFamily || field.IsFamilyOrAssembly;
+        }
+
+        if (callingType.Assembly == Context.Assembly)
+            return field.IsAssembly;
+
+        return callingType == TypeContext.Current.Builder;
     }
 }

@@ -527,5 +527,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a non-nested type is declared as 'local'.
     /// </summary>
-    DS0126_TopLevelTypeLocal
+    DS0126_TopLevelTypeLocal,
+    /// <summary>
+    /// Emitted when a member cannot be accessed because of too restrictive access modifiers.
+    /// </summary>
+    DS0127_AccessModifiersTooRestrictive
 }
