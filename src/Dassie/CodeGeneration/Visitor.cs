@@ -345,7 +345,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Equals().Symbol.Column,
                 context.expression().Start.Column - context.Equals().Symbol.Column,
                 DS0093_ConstructorReturnsValue,
-                $"Expected expression of type 'null' but found type '{t.FullName}'.");
+                $"Expected expression of type 'null' but found type '{t.FullName}'. A constructor can never return a value.");
         }
 
         CurrentMethod.IL.Emit(OpCodes.Ret);
