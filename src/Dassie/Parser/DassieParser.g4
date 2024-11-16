@@ -84,7 +84,6 @@ expression
     | Raise #rethrow_exception
     | At_Open_Bracket (expression (Comma expression)*)? Close_Bracket #array_expression
     | Open_Bracket (expression (Comma expression)*)? Close_Bracket #list_initializer_expression
-    | Open_Paren expression (Comma expression)+ Close_Paren #tuple_expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
     | atom #atom_expression
     // | NewLine expression #prefix_newlined_expression
@@ -96,6 +95,7 @@ expression
     | full_identifier type_arg_list? arglist? #full_identifier_member_access_expression
     | expression (Dot Identifier)+ type_arg_list? arglist? #member_access_expression
     | expression assignment_operator expression #assignment
+    | Open_Paren expression (Comma expression)+ Close_Paren #tuple_expression
     // | Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals expression)? #local_function_expression
     ;
 
