@@ -39,8 +39,7 @@ internal class CompileCommand : ICompilerCommand
 
     private static int Compile(string[] args, DassieConfig overrideSettings = null)
     {
-        Stopwatch sw = new();
-        sw.Start();
+        long stopwatchTimeStamp = Stopwatch.GetTimestamp();
 
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
 
@@ -120,10 +119,8 @@ internal class CompileCommand : ICompilerCommand
 
                 if (cachedFiles.SequenceEqual(currentFiles) && File.Exists(assembly))
                 {
-                    sw.Stop();
-
                     if (args.Any(a => a == "-elapsed") || config.MeasureElapsedTime)
-                        Console.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
+                        Console.WriteLine($"\r\nElapsed time: {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms");
 
                     return 0;
                 }
@@ -324,8 +321,6 @@ internal class CompileCommand : ICompilerCommand
 
         RuntimeConfigWriter.GenerateRuntimeConfigFile(Path.GetFileNameWithoutExtension(assembly) + ".runtimeconfig.json");
 
-        sw.Stop();
-
         if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
             File.Delete(resFile);
 
@@ -353,7 +348,7 @@ internal class CompileCommand : ICompilerCommand
         }
 
         if (Context.Configuration.MeasureElapsedTime)
-            InfoOut.WriteLine($"\r\nElapsed time: {sw.Elapsed.TotalMilliseconds} ms");
+            InfoOut.WriteLine($"\r\nElapsed time: {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms");
 
         InfoOut?.Dispose();
         WarnOut?.Dispose();
