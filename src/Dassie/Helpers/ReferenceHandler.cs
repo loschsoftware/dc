@@ -19,9 +19,14 @@ internal static class ReferenceHandler
     /// <param name="reference">The project reference to handle.</param>
     /// <param name="currentConfig">Compiler configuration for the current project.</param>
     /// <param name="destDir">The directory to copy build output files to.</param>
+    /// <param name="referenceResolverBaseDir">The directory used as a reference point to resolve relative paths. By default, is the current directory.</param>
     /// <returns>Wheter or not the compilation of the project reference was successful.</returns>
-    public static bool HandleProjectReference(ProjectReference reference, DassieConfig currentConfig, string destDir)
+    public static bool HandleProjectReference(ProjectReference reference, DassieConfig currentConfig, string destDir, string referenceResolverBaseDir = null)
     {
+        reference.ProjectFile = Path.GetFullPath(Path.Combine(referenceResolverBaseDir ?? Directory.GetCurrentDirectory(), reference.ProjectFile));
+        if (Directory.Exists(reference.ProjectFile))
+            reference.ProjectFile = Path.Combine(reference.ProjectFile, ProjectConfigurationFileName);
+
         if (!File.Exists(reference.ProjectFile))
         {
             EmitErrorMessage(

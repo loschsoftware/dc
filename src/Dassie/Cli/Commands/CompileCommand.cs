@@ -78,6 +78,8 @@ internal class CompileCommand : ICompilerCommand
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
 
+        string referenceResolverBaseDir = Directory.GetCurrentDirectory();
+
         if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
         {
             Directory.CreateDirectory(config.BuildOutputDirectory);
@@ -98,7 +100,7 @@ internal class CompileCommand : ICompilerCommand
             {
                 MessagePrefix = Path.GetDirectoryName(projRef.ProjectFile).Split('\\').Last();
 
-                if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath(".\\")))
+                if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath(".\\"), referenceResolverBaseDir))
                     return -1;
             }
 
