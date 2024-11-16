@@ -11,6 +11,9 @@ internal static class ProjectFileDeserializer
     private static DassieConfig _config;
     public static DassieConfig DassieConfig => _config ??= Deserialize();
 
+    public static void Reload() => _config = Deserialize();
+    public static void Set(DassieConfig cfg) => _config = cfg;
+
     private static DassieConfig Deserialize()
     {
         if (!File.Exists(ProjectConfigurationFileName))

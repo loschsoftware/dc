@@ -107,10 +107,16 @@ internal class RunCommand : ICompilerCommand
         assemblyPath = Path.GetFullPath(assemblyPath);
 
         bool recompile = !File.Exists(assemblyPath);
-        List<FileInfo> sourceFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)).ToList();
+        List<FileInfo> sourceFiles = [];
 
-        if (File.Exists(ProjectConfigurationFileName))
-            sourceFiles.Add(new(ProjectConfigurationFileName));
+        foreach (string dir in config.References.Where(r => r is ProjectReference).Cast<ProjectReference>().Select(p => Path.GetDirectoryName(p.ProjectFile)).Append(Directory.GetCurrentDirectory()))
+        {
+            sourceFiles.AddRange(Directory.GetFiles(dir, "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)));
+
+            string projectFile = Path.Combine(dir, ProjectConfigurationFileName);
+            if (File.Exists(projectFile))
+                sourceFiles.Add(new(projectFile));
+        }
 
         if (!recompile)
         {
@@ -119,7 +125,11 @@ internal class RunCommand : ICompilerCommand
         }
 
         if (recompile)
-            BuildCommand.Instance.Invoke([]);
+        {
+            int ret = BuildCommand.Instance.Invoke([]);
+            if (ret != 0 || messages.Where(m => m.Severity == Severity.Error).Any())
+                return -1;
+        }
 
         string process = "dotnet";
         string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. args]);

@@ -34,6 +34,8 @@ internal static class ReferenceHandler
         }
 
         string dir = Directory.GetCurrentDirectory();
+        DassieConfig prevConfig = ProjectFileDeserializer.DassieConfig;
+        ProjectFileDeserializer.Reload();
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
         int errCode = BuildCommand.Instance.Invoke([]);
@@ -41,11 +43,7 @@ internal static class ReferenceHandler
         if (errCode != 0)
             return false;
 
-        using StreamReader sr = new(reference.ProjectFile);
-        XmlSerializer xmls = new(typeof(DassieConfig));
-        DassieConfig projConfig = (DassieConfig)xmls.Deserialize(sr);
-
-        if (string.IsNullOrEmpty(projConfig.AssemblyName))
+        if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.AssemblyName))
         {
             EmitErrorMessage(
                 0, 0, 0,
@@ -56,7 +54,7 @@ internal static class ReferenceHandler
             return false;
         }
 
-        if (string.IsNullOrEmpty(projConfig.BuildOutputDirectory) && reference.CopyToOutput)
+        if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildOutputDirectory) && reference.CopyToOutput)
         {
             EmitErrorMessage(
                 0, 0, 0,
@@ -67,10 +65,10 @@ internal static class ReferenceHandler
             return false;
         }
 
-        string outFile = $"{projConfig.AssemblyName}{(projConfig.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
+        string outFile = $"{ProjectFileDeserializer.DassieConfig.AssemblyName}{(ProjectFileDeserializer.DassieConfig.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
-        if (!string.IsNullOrEmpty(projConfig.BuildOutputDirectory))
-            outFile = Path.Combine(projConfig.BuildOutputDirectory, outFile);
+        if (!string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildOutputDirectory))
+            outFile = Path.Combine(ProjectFileDeserializer.DassieConfig.BuildOutputDirectory, outFile);
 
         if (!reference.CopyToOutput)
         {
@@ -104,6 +102,7 @@ internal static class ReferenceHandler
         }
 
         Directory.SetCurrentDirectory(dir);
+        ProjectFileDeserializer.Set(prevConfig);
         return true;
     }
 
