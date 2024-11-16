@@ -97,8 +97,6 @@ internal class CompileCommand : ICompilerCommand
 
             foreach (ProjectReference projRef in config.References.Where(r => r is ProjectReference).Cast<ProjectReference>())
             {
-                MessagePrefix = Path.GetDirectoryName(projRef.ProjectFile).Split('\\').Last();
-
                 if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath(".\\"), referenceResolverBaseDir))
                     return -1;
             }

@@ -38,6 +38,8 @@ internal static class ReferenceHandler
             return false;
         }
 
+        MessagePrefix = Path.GetDirectoryName(reference.ProjectFile).Split(Path.DirectorySeparatorChar).Last();
+
         string dir = Directory.GetCurrentDirectory();
         DassieConfig prevConfig = ProjectFileDeserializer.DassieConfig;
         ProjectFileDeserializer.Reload();
