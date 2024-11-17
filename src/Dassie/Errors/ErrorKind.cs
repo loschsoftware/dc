@@ -547,5 +547,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when 'dc build' is used on a project group.
     /// </summary>
-    DS0131_DCBuildCalledOnProjectGroup
+    DS0131_DCBuildCalledOnProjectGroup,
+    /// <summary>
+    /// Emitted when 'dc clean' is called but the working directory contains no compiler configuration file.
+    /// </summary>
+    DS0132_DCCleanNoProjectFile
 }

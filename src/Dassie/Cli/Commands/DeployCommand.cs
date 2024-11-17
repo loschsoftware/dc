@@ -62,7 +62,8 @@ internal class DeployCommand : ICompilerCommand
             return -1;
         }
 
-        string tempDir = Path.Combine(Directory.GetCurrentDirectory(), ".temp");
+        string tempDir = Path.Combine(Directory.GetCurrentDirectory(), TemporaryBuildDirectoryName);
+        Directory.CreateDirectory(tempDir);
 
         foreach (Component component in group.Components)
         {

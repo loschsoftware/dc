@@ -73,7 +73,7 @@ internal class PackageCommand : ICompilerCommand
         Console.WriteLine();
 
         Console.WriteLine($"{"Name",-50}Version");
-        foreach (IPackage package in packages)
+        foreach (IPackage package in packages.Where(p => p.Metadata.Name != "Default"))
         {
             string packageDisplay = package.Metadata.Name;
             if (packageDisplay.Length > 45)
