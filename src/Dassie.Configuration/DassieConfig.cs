@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Dassie.Configuration.ProjectGroups;
 using System.ComponentModel;
-using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
 
@@ -17,6 +16,10 @@ public sealed class DassieConfig
     [XmlArray("MacroDefinitions")]
     [XmlArrayItem(Type = typeof(Define))]
     public Define[] MacroDefinitions { get; set; }
+
+    [DefaultValue(null)]
+    [XmlElement]
+    public ProjectGroup ProjectGroup { get; set; }
 
     [XmlArray("References")]
     [XmlArrayItem(Type = typeof(AssemblyReference))]

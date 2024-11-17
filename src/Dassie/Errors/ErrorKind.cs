@@ -531,5 +531,21 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a member cannot be accessed because of too restrictive access modifiers.
     /// </summary>
-    DS0127_AccessModifiersTooRestrictive
+    DS0127_AccessModifiersTooRestrictive,
+    /// <summary>
+    /// Emitted when the 'dc deploy' command is run on a config file that does not represent a project group.
+    /// </summary>
+    DS0128_DeployCommandInvalidProjectGroupFile,
+    /// <summary>
+    /// Emitted when a project group contains no projects.
+    /// </summary>
+    DS0129_ProjectGroupNoComponents,
+    /// <summary>
+    /// Emitted when a project group defines no targets.
+    /// </summary>
+    DS0130_ProjectGroupNoTargets,
+    /// <summary>
+    /// Emitted when 'dc build' is used on a project group.
+    /// </summary>
+    DS0131_DCBuildCalledOnProjectGroup
 }

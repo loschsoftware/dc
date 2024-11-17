@@ -1,7 +1,4 @@
-﻿using System;
-using System.Xml.Serialization;
-
-namespace Dassie.Configuration;
+﻿namespace Dassie.Configuration;
 
 [XmlRoot("Define")]
 [Serializable]

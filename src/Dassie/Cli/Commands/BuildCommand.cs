@@ -29,6 +29,17 @@ internal class BuildCommand : ICompilerCommand
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
 
+        if (config.ProjectGroup != null)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0131_DCBuildCalledOnProjectGroup,
+                $"'dc build' can only be called on single projects. Use 'dc deploy' to build and deploy a project group.",
+                ProjectConfigurationFileName);
+
+            return -1;
+        }
+
         if (args.Length > 0 && args.TakeWhile(a => !a.StartsWith('-')).Any())
         {
             string profileName = args.First(a => !a.StartsWith('-'));

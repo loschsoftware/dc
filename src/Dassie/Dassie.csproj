@@ -6,7 +6,7 @@
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<Platforms>AnyCPU;x64</Platforms>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<LangVersion>12</LangVersion>
+		<LangVersion>13</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Deterministic>false</Deterministic>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>

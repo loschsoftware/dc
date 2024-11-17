@@ -4,7 +4,7 @@ using Dassie.Packages;
 using System;
 using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
+using FileSystem = Microsoft.VisualBasic.FileIO.FileSystem;
 
 namespace Dassie.Helpers;
 
@@ -42,9 +42,9 @@ internal static class ReferenceHandler
 
         string dir = Directory.GetCurrentDirectory();
         DassieConfig prevConfig = ProjectFileDeserializer.DassieConfig;
+        Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
         ProjectFileDeserializer.Reload();
 
-        Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
         int errCode = BuildCommand.Instance.Invoke([]);
 
         if (errCode != 0)
@@ -72,7 +72,7 @@ internal static class ReferenceHandler
             return false;
         }
 
-        string outFile = $"{ProjectFileDeserializer.DassieConfig.AssemblyName}{(ProjectFileDeserializer.DassieConfig.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
+        string outFile = $"{ProjectFileDeserializer.DassieConfig.AssemblyName}.dll";
 
         if (!string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildOutputDirectory))
             outFile = Path.Combine(ProjectFileDeserializer.DassieConfig.BuildOutputDirectory, outFile);
@@ -86,11 +86,14 @@ internal static class ReferenceHandler
         }
         else
         {
-            foreach (string file in Directory.GetFiles(".\\"))
+            foreach (string fsEntry in Directory.GetFileSystemEntries(".\\"))
             {
                 try
                 {
-                    File.Copy(file, Path.Combine(destDir, Path.GetFileName(file)), true);
+                    if (Directory.Exists(fsEntry))
+                        FileSystem.CopyDirectory(fsEntry, Path.Combine(destDir, Path.GetDirectoryName(fsEntry)), true);
+                    else
+                        File.Copy(fsEntry, Path.Combine(destDir, Path.GetFileName(fsEntry)), true);
                 }
                 catch (IOException)
                 {
@@ -98,11 +101,11 @@ internal static class ReferenceHandler
                     continue;
                 }
 
-                if (Path.GetFileName(file) == Path.GetFileName(outFile))
+                if (Path.GetFileName(fsEntry) == Path.GetFileName(outFile))
                 {
                     currentConfig.References = currentConfig.References.Append(new AssemblyReference()
                     {
-                        AssemblyPath = Path.Combine(destDir, Path.GetFileName(file))
+                        AssemblyPath = Path.Combine(destDir, Path.GetFileName(fsEntry))
                     }).ToArray();
                 }
             }
