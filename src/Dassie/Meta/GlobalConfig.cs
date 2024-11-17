@@ -9,4 +9,6 @@ internal static class GlobalConfig
     public static ToolPaths ExternalToolPaths { get; set; }
 
     public static bool DisableDebugInfo { get; set; }
+
+    public static string RelativePathResolverDirectory { get; set; }
 }

@@ -4,6 +4,7 @@ using Dassie.Configuration;
 using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Lowering;
+using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Validation;
 using System.Linq;
@@ -57,7 +58,7 @@ internal static class DocumentCompiler
         parser.AddErrorListener(new ParserErrorListener());
 
         Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
-        var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom((r as AssemblyReference).AssemblyPath));
+        var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom(Path.GetFullPath(Path.Combine(GlobalConfig.RelativePathResolverDirectory, (r as AssemblyReference).AssemblyPath))));
 
         if (refsToAdd != null)
             Context.ReferencedAssemblies.AddRange(refsToAdd);

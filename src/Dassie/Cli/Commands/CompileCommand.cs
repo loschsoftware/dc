@@ -77,7 +77,8 @@ internal class CompileCommand : ICompilerCommand
         if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
 
-        string referenceResolverBaseDir = Directory.GetCurrentDirectory();
+        string relativePathResolverBaseDir = Directory.GetCurrentDirectory();
+        GlobalConfig.RelativePathResolverDirectory = relativePathResolverBaseDir;
 
         if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
         {
@@ -97,7 +98,7 @@ internal class CompileCommand : ICompilerCommand
 
             foreach (ProjectReference projRef in config.References.Where(r => r is ProjectReference).Cast<ProjectReference>())
             {
-                if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath(".\\"), referenceResolverBaseDir))
+                if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath(".\\"), relativePathResolverBaseDir))
                     return -1;
             }
 
@@ -152,6 +153,7 @@ internal class CompileCommand : ICompilerCommand
         if ((Context.Configuration.Resources ?? []).Any(r => r is UnmanagedResource))
         {
             resFile = ((UnmanagedResource)Context.Configuration.Resources.First(r => r is UnmanagedResource)).Path;
+            resFile = Path.GetFullPath(Path.Combine(relativePathResolverBaseDir, resFile));
 
             if ((Context.Configuration.Resources ?? []).Where(r => r is UnmanagedResource).Count() > 1)
             {
@@ -244,7 +246,7 @@ internal class CompileCommand : ICompilerCommand
         }
 
         foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
-            AddResource(res, Directory.GetCurrentDirectory());
+            AddResource(res, Directory.GetCurrentDirectory(), relativePathResolverBaseDir);
 
         if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
         {
@@ -413,8 +415,10 @@ internal class CompileCommand : ICompilerCommand
         return debugDirectoryBuilder;
     }
 
-    public static void AddResource(Resource res, string basePath)
+    public static void AddResource(Resource res, string basePath, string relativePathResolverBasePath)
     {
+        res.Path = Path.GetFullPath(Path.Combine(relativePathResolverBasePath, res.Path));
+
         if (!File.Exists(res.Path))
         {
             EmitErrorMessage(
