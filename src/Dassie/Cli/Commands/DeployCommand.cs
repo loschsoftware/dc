@@ -19,7 +19,9 @@ internal class DeployCommand : ICompilerCommand
 
     public string Description => "Builds and deploys a project group.";
 
-    public int Invoke(string[] args)
+    public int Invoke(string[] args) => Deploy(args, Directory.GetCurrentDirectory(), false);
+
+    private static int Deploy(string[] args, string baseDir, bool noDeleteTempDirectory)
     {
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
         config ??= new();
@@ -62,25 +64,51 @@ internal class DeployCommand : ICompilerCommand
             return -1;
         }
 
-        string tempDir = Path.Combine(Directory.GetCurrentDirectory(), TemporaryBuildDirectoryName);
+        string tempDir = Path.Combine(baseDir, TemporaryBuildDirectoryName);
         Directory.CreateDirectory(tempDir);
 
         foreach (Component component in group.Components)
         {
-            if (component is ProjectGroupComponent)
+            if (component is ProjectGroupComponent pg)
             {
+                string workingDir = Directory.GetCurrentDirectory();
+                pg.Path = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFullPath(pg.Path));
+
+                if (File.Exists(pg.Path))
+                    Directory.SetCurrentDirectory(Path.GetDirectoryName(pg.Path));
+
+                else if (Directory.Exists(pg.Path))
+                    Directory.SetCurrentDirectory(pg.Path);
+
+                else
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0128_DeployCommandInvalidProjectGroupFile,
+                        $"Component project group '{pg.Path}' could not be found.",
+                        ProjectConfigurationFileName);
+
+                    return -1;
+                }
+
+                Deploy(args, baseDir, true);
+                Directory.SetCurrentDirectory(workingDir);
                 continue;
             }
 
             Project project = (Project)component;
+            ProjectReference reference = new()
+            {
+                CopyToOutput = true,
+                ProjectFile = project.Path
+            };
+
+            DassieConfig projectConfig = new() { References = [] };
+
             bool result = ReferenceHandler.HandleProjectReference(
-                reference: new()
-                {
-                    CopyToOutput = true,
-                    ProjectFile = project.Path
-                },
-                currentConfig: new() { References = [] },
-                destDir: tempDir);
+                reference,
+                projectConfig,
+                tempDir);
 
             if (!result)
                 return -1;
@@ -105,7 +133,9 @@ internal class DeployCommand : ICompilerCommand
                 FileSystem.CopyDirectory(tempDir, dir.Path, true);
         }
 
-        Directory.Delete(tempDir, true);
+        if (!noDeleteTempDirectory)
+            Directory.Delete(tempDir, true);
+
         return 0;
     }
 }
