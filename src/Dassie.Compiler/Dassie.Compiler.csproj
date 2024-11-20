@@ -4,7 +4,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Deterministic>false</Deterministic>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<Platforms>x64</Platforms>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Dassie.Configuration\Dassie.Configuration.csproj" />
