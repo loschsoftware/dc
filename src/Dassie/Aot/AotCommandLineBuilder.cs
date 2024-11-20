@@ -1,8 +1,10 @@
 ﻿using Dassie.Configuration;
+using Dassie.Meta;
 using Dassie.Unmanaged;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -118,7 +120,7 @@ internal class AotCommandLineBuilder
         {
             if (reference is AssemblyReference a)
             {
-                _arglistBuilder.AppendLine($"-r:\"{a.AssemblyPath}\"");
+                _arglistBuilder.AppendLine($"-r:\"{Path.GetFullPath(Path.Combine(GlobalConfig.RelativePathResolverDirectory, a.AssemblyPath))}\"");
                 continue;
             }
 
