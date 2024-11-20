@@ -1,14 +1,18 @@
-﻿using NuGet.Common;
+﻿using Newtonsoft.Json.Linq;
+using NuGet.Common;
 using NuGet.Packaging;
+using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dassie.Packages;
 
@@ -71,13 +75,14 @@ internal static class PackageDownloader
             }
         }
 
-        using MemoryStream ms = new();
-
         string packageDir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages", packageId, targetVersion.ToFullString())).FullName;
         if (File.Exists(Path.Combine(packageDir, "[Content_Types].xml"))) // Just check if any file belonging to the package exists
             return targetVersion.ToFullString();
 
-        InfoOut.WriteLine($"Downloading package '{packageId}'...");
+        long bytes = GetPackageSizeFromCatalog(new(packageId, targetVersion), cache, repo, CancellationToken.None).Result.Value;
+        InfoOut.WriteLine($"Downloading package '{packageId}' ({FormatBytes(bytes)}).");
+
+        using MemoryStream ms = new();
 
         package.CopyNupkgToStreamAsync(
             packageId,
@@ -92,5 +97,34 @@ internal static class PackageDownloader
 
         ZipFile.ExtractToDirectory(ms, packageDir);
         return targetVersion.ToFullString();
+    }
+
+    private static async Task<long?> GetPackageSizeFromCatalog(PackageIdentity packageIdentity, SourceCacheContext cache, SourceRepository sourceRepository, CancellationToken token)
+    {
+        RegistrationResourceV3 registrationResource = await sourceRepository.GetResourceAsync<RegistrationResourceV3>();
+        JObject packageMetadata = await registrationResource.GetPackageMetadata(packageIdentity, cache, NullLogger.Instance, token);
+        string catalogItemUrl = packageMetadata.Value<string>("@id");
+
+        HttpSourceResource sourceResource = await sourceRepository.GetResourceAsync<HttpSourceResource>();
+        JObject catalogItem = await sourceResource.HttpSource.GetJObjectAsync(
+            new HttpSourceRequest(catalogItemUrl, NullLogger.Instance),
+            NullLogger.Instance,
+            token);
+
+        return catalogItem.Value<long>("packageSize");
+    }
+
+    private static string FormatBytes(long byteCount)
+    {
+        (double value, string suffix) = (double)byteCount switch
+        {
+            < 1e3 => (byteCount, "B"),
+            < 1e6 => (byteCount / 1e3, "KB"),
+            < 1e9 => (byteCount / 1e6, "MB"),
+            < 1e12 => (byteCount / 1e9, "GB"),
+            _ => (byteCount / 1e12, "TB")
+        };
+
+        return $"{value.ToString("#.##", CultureInfo.InvariantCulture)} {suffix}";
     }
 }
