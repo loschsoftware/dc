@@ -1362,5 +1362,15 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitMatch_case_expression([NotNull] DassieParser.Match_case_expressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.local_function"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterLocal_function([NotNull] DassieParser.Local_functionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.local_function"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitLocal_function([NotNull] DassieParser.Local_functionContext context);
 }
 } // namespace Dassie.Parser

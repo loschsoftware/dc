@@ -16,7 +16,7 @@ file_body
     ;
 
 top_level_statements
-    : (expression | NewLine)*
+    : (expression | local_function | NewLine)*
     ;
 
 full_program
@@ -398,4 +398,8 @@ match_default_case
 
 match_case_expression
     : expression
+    ;
+
+local_function
+    : (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? Equals expression
     ;

@@ -1611,6 +1611,18 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitMatch_case_expression([NotNull] DassieParser.Match_case_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.local_function"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLocal_function([NotNull] DassieParser.Local_functionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.local_function"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLocal_function([NotNull] DassieParser.Local_functionContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

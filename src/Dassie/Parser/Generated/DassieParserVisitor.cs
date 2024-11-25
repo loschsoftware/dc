@@ -821,5 +821,11 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitMatch_case_expression([NotNull] DassieParser.Match_case_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.local_function"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLocal_function([NotNull] DassieParser.Local_functionContext context);
 }
 } // namespace Dassie.Parser
