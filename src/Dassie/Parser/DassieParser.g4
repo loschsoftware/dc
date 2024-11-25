@@ -79,6 +79,7 @@ expression
     | At_Sign Open_Paren? ((Var | Val)? Identifier (Comma ((Var | Val)? Identifier))? Close_Paren? Colon_Greater_Than expression) Equals expression #foreach_loop
     | At_Sign expression Equals expression #while_loop
     | Exclamation_At expression Equals expression #until_loop
+    | match_expr #match_expression
     | try_branch catch_branch* fault_branch? finally_branch? #try_expression
     | Raise expression #raise_expression
     | Raise #rethrow_exception
@@ -373,4 +374,28 @@ assignment_operator
 
 function_pointer_parameter_list
     : (Open_Paren type_name (Comma type_name)* Close_Paren)? (Colon type_name)?
+    ;
+
+match_expr
+    : Dollar_Sign expression Equals match_block
+    ;
+
+match_block
+    : Open_Brace NewLine* (match_first_case NewLine*)? (match_alternative_case NewLine*)* match_default_case? NewLine* Close_Brace
+    ;
+
+match_first_case
+    : Question_Mark match_case_expression Equals expression
+    ;
+
+match_alternative_case
+    : Colon match_case_expression Equals expression
+    ;
+
+match_default_case
+    : Colon Equals expression
+    ;
+
+match_case_expression
+    : expression
     ;

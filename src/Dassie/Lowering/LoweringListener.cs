@@ -22,6 +22,7 @@ internal class LoweringListener : DassieParserBaseListener
     readonly ForEachLoopRewriter forEachLoopRewriter = new();
     readonly PipeRewriter pipeRewriter = new();
     readonly ParameterConstraintRewriter constraintRewriter = new();
+    readonly MatchExpressionRewriter matchExpressionRewriter = new();
 
     public string GetTextForRule(ParserRuleContext rule)
     {
@@ -92,5 +93,10 @@ internal class LoweringListener : DassieParserBaseListener
     public override void EnterType_member([NotNull] DassieParser.Type_memberContext context)
     {
         Text = Replace(constraintRewriter.Rewrite(context, this), context);
+    }
+
+    public override void EnterMatch_expression([NotNull] DassieParser.Match_expressionContext context)
+    {
+        Text = Replace(matchExpressionRewriter.Rewrite(context, this), context);
     }
 }

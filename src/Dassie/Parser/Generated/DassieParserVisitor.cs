@@ -239,6 +239,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitLeft_shift_expression([NotNull] DassieParser.Left_shift_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>match_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_expression([NotNull] DassieParser.Match_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>attributed_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -778,5 +785,41 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitFunction_pointer_parameter_list([NotNull] DassieParser.Function_pointer_parameter_listContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.match_expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_expr([NotNull] DassieParser.Match_exprContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.match_block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_block([NotNull] DassieParser.Match_blockContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.match_first_case"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_first_case([NotNull] DassieParser.Match_first_caseContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.match_alternative_case"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_alternative_case([NotNull] DassieParser.Match_alternative_caseContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.match_default_case"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_default_case([NotNull] DassieParser.Match_default_caseContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.match_case_expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_case_expression([NotNull] DassieParser.Match_case_expressionContext context);
 }
 } // namespace Dassie.Parser

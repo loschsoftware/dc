@@ -446,6 +446,20 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLeft_shift_expression([NotNull] DassieParser.Left_shift_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>match_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_expression([NotNull] DassieParser.Match_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>match_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_expression([NotNull] DassieParser.Match_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>attributed_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -1525,6 +1539,78 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitFunction_pointer_parameter_list([NotNull] DassieParser.Function_pointer_parameter_listContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.match_expr"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_expr([NotNull] DassieParser.Match_exprContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.match_expr"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_expr([NotNull] DassieParser.Match_exprContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.match_block"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_block([NotNull] DassieParser.Match_blockContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.match_block"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_block([NotNull] DassieParser.Match_blockContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.match_first_case"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_first_case([NotNull] DassieParser.Match_first_caseContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.match_first_case"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_first_case([NotNull] DassieParser.Match_first_caseContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.match_alternative_case"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_alternative_case([NotNull] DassieParser.Match_alternative_caseContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.match_alternative_case"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_alternative_case([NotNull] DassieParser.Match_alternative_caseContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.match_default_case"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_default_case([NotNull] DassieParser.Match_default_caseContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.match_default_case"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_default_case([NotNull] DassieParser.Match_default_caseContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.match_case_expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_case_expression([NotNull] DassieParser.Match_case_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.match_case_expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_case_expression([NotNull] DassieParser.Match_case_expressionContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>
