@@ -654,4 +654,6 @@ internal static class TypeHelpers
 
         return types;
     }
+
+    public static bool IsValueTuple(Type t) => t.IsGenericType && t.FullName.StartsWith("System.ValueTuple`");
 }

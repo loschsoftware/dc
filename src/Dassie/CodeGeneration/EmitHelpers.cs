@@ -528,4 +528,47 @@ internal static class EmitHelpers
         CurrentMethod.IL = _il;
         CurrentMethod.LocalIndex = _localIndex;
     }
+
+    public static void EmitTupleEquality(Type tupleType, bool equality)
+    {
+        LocalBuilder tuple1 = CurrentMethod.IL.DeclareLocal(tupleType);
+        int tuple1LocalIndex = ++CurrentMethod.LocalIndex;
+
+        LocalBuilder tuple2 = CurrentMethod.IL.DeclareLocal(tupleType);
+        int tuple2LocalIndex = ++CurrentMethod.LocalIndex;
+
+        Label comparisonFailed = CurrentMethod.IL.DefineLabel();
+        Label comparisonSucceeded = CurrentMethod.IL.DefineLabel();
+
+        EmitStloc(tuple2LocalIndex);
+        EmitStloc(tuple1LocalIndex);
+
+        foreach (FieldInfo field in tupleType.GetFields())
+        {
+            EmitLdloc(tuple1LocalIndex);
+            CurrentMethod.IL.Emit(OpCodes.Ldfld, field);
+
+            EmitLdloc(tuple2LocalIndex);
+            CurrentMethod.IL.Emit(OpCodes.Ldfld, field);
+
+            if (field.FieldType.IsValueType)
+                CurrentMethod.IL.Emit(OpCodes.Ceq);
+            else
+                CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetMethod("Equals", [typeof(object), typeof(object)]));
+
+            CurrentMethod.IL.Emit(OpCodes.Brfalse, comparisonFailed);
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Br, comparisonSucceeded);
+
+        CurrentMethod.IL.MarkLabel(comparisonFailed);
+        EmitLdcI4(0);
+        CurrentMethod.IL.Emit(OpCodes.Br, equality ? comparisonSucceeded : comparisonFailed);
+
+        CurrentMethod.IL.MarkLabel(comparisonSucceeded);
+        EmitLdcI4(1);
+
+        if (!equality)
+            CurrentMethod.IL.Emit(OpCodes.Not);
+    }
 }

@@ -1016,8 +1016,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t2 = Visit(context.expression()[1]);
         EnsureBoolean(t2, throwError: false);
 
-        MethodInfo op_eq = t.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
-        MethodInfo op_ineq = t.GetMethod("op_Inequality", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+        MethodInfo op_eq = t.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static, null, [t, t2], null);
+        MethodInfo op_ineq = t.GetMethod("op_Inequality", BindingFlags.Public | BindingFlags.Static, null, [t, t2], null);
+
+        // TODO: Enable once https://github.com/dotnet/runtime/issues/110247 is resolved
+        //if (IsValueTuple(t) && IsValueTuple(t2))
+        //{
+        //    EmitTupleEquality(t, context.op.Text == "==");
+        //    return typeof(bool);
+        //}
 
         if ((op_eq == null && op_ineq == null) || (IsNumericType(t) && IsNumericType(t2)))
         {
