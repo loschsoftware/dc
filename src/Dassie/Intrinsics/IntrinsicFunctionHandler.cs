@@ -3,6 +3,7 @@ using Dassie.Parser;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
 using System;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Dassie.Intrinsics;
@@ -10,8 +11,11 @@ namespace Dassie.Intrinsics;
 // TODO: Improve intrinsics system
 internal static class IntrinsicFunctionHandler
 {
-    public static bool HandleSpecialFunction(string name, DassieParser.ArglistContext args, int line, int column, int length)
+    public static bool HandleSpecialFunction(string name, DassieParser.ArglistContext args, int line, int column, int length, out Type retType, out MethodInfo method)
     {
+        retType = typeof(void);
+        method = null;
+
         if (typeof(Dassie.CompilerServices.CodeGeneration).GetMethod(name) == null)
             return false;
 
@@ -236,6 +240,12 @@ internal static class IntrinsicFunctionHandler
                 CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(NotImplementedException).GetConstructor(new[] { typeof(string) }));
                 CurrentMethod.IL.Emit(OpCodes.Throw);
 
+                return true;
+
+            case "line":
+                EmitLdcI4(line);
+                retType = typeof(int);
+                method = typeof(CompilerServices.CodeGeneration).GetMethod("line");
                 return true;
         }
 

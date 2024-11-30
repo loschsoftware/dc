@@ -80,4 +80,11 @@ public static class CodeGeneration
     /// </summary>
     /// <param name="message">The todo message to print.</param>
     public static void ptodo(string message) { }
+
+    /// <summary>
+    /// Returns the line number in the source code of the invocation.
+    /// </summary>
+    /// <remarks>This function has no effect on its own, as it is evaluated by the Dassie compiler at compile time.</remarks>
+    /// <returns>The line number of the invocation.</returns>
+    public static int line() => 0;
 }

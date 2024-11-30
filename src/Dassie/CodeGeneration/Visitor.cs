@@ -2268,8 +2268,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             context.arglist(),
             context.full_identifier().Identifier().Last().Symbol.Line,
             context.full_identifier().Identifier().Last().Symbol.Column,
-            context.full_identifier().Identifier().Last().GetText().Length))
-            return (typeof(void), null);
+            context.full_identifier().Identifier().Last().GetText().Length,
+            out Type ret,
+            out MethodInfo method))
+            return (ret, method);
 
         object o = SymbolResolver.GetSmallestTypeFromLeft(
             context.full_identifier(),
