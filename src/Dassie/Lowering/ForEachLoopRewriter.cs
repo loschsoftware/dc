@@ -25,7 +25,6 @@ internal class ForEachLoopRewriter : ITreeToStringRewriter
         StringBuilder sb = new();
 
         sb.AppendLine("{");
-
         sb.AppendLine($"var {indexVarName} = -1");
         sb.AppendLine($"{exprVarName} = {listener.GetTextForRule(loop.expression().First())}");
 

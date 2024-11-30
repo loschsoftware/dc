@@ -247,6 +247,42 @@ internal static class IntrinsicFunctionHandler
                 retType = typeof(int);
                 method = typeof(CompilerServices.CodeGeneration).GetMethod("line");
                 return true;
+
+            case "setLine":
+                if (args.expression().Length != 1)
+                {
+                    EmitErrorMessage(
+                        line,
+                        column,
+                        length,
+                        DS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function '{name}'. Expected 1 argument."
+                        );
+
+                    return true;
+                }
+
+                int _ln = int.Parse(args.expression()[0].GetText());
+                LineNumberOffset = _ln - line;
+                return true;
+
+            case "setLineOffset":
+                if (args.expression().Length != 1)
+                {
+                    EmitErrorMessage(
+                        line,
+                        column,
+                        length,
+                        DS0002_MethodNotFound,
+                        $"Invalid number of arguments for special function '{name}'. Expected 1 argument."
+                        );
+
+                    return true;
+                }
+
+                int offset = int.Parse(args.expression()[0].GetText());
+                LineNumberOffset = offset;
+                return true;
         }
 
         return false;

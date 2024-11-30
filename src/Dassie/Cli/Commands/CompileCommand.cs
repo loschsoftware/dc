@@ -141,6 +141,7 @@ internal class CompileCommand : ICompilerCommand
         // Step 1
         CompileSource(documents, config);
         VisitorStep1 = Context;
+        LineNumberOffset = 0;
 
         if (config.Verbosity >= 1)
             EmitBuildLogMessage("Performing second pass.");

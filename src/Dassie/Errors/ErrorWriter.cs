@@ -55,10 +55,17 @@ public static class ErrorWriter
     /// </summary>
     public static bool Disabled { get; set; } = false;
 
+    /// <summary>
+    /// A value added to the line number of every error message.
+    /// </summary>
+    public static int LineNumberOffset { get; set; } = 0;
+
     internal static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
     {
         if (Disabled)
             return;
+
+        error.CodePosition = (error.CodePosition.Item1 + LineNumberOffset, error.CodePosition.Item2);
 
         Context ??= new();
         Context.Configuration ??= ProjectFileDeserializer.DassieConfig;

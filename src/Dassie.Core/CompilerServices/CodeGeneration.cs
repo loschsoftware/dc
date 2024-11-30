@@ -87,4 +87,16 @@ public static class CodeGeneration
     /// <remarks>This function has no effect on its own, as it is evaluated by the Dassie compiler at compile time.</remarks>
     /// <returns>The line number of the invocation.</returns>
     public static int line() => 0;
+
+    /// <summary>
+    /// Sets the current line number.
+    /// </summary>
+    /// <param name="line">The line number to set to.</param>
+    public static void setLine(int line) { }
+
+    /// <summary>
+    /// Sets the line number offset.
+    /// </summary>
+    /// <param name="offset">The offset to set.</param>
+    public static void setLineOffset(int offset) { }
 }
