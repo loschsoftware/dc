@@ -375,7 +375,7 @@ internal static class SymbolResolver
                     $"Field '{type.Name}.{f.Name}' cannot be accessed because its access modifiers are too restrictive.");
             }
 
-            if (type.IsEnum)
+            if (type.GetType().Name != "TypeBuilderInstantiation" && type.IsEnum)
             {
                 if (!noEmitFragments)
                 {
