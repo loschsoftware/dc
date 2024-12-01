@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -40,7 +41,7 @@ public static class ObjectDump
 
         sb.AppendLine($"{{{obj.GetType().FullName}}}");
 
-        if (obj is IEnumerable or string || obj.GetType().IsPrimitive || obj.GetType().IsArray)
+        if (obj is IEnumerable or string || obj.GetType().IsPrimitive || obj.GetType().IsArray || obj.GetType().FullName.StartsWith("System.ValueTuple"))
             return Format(obj, depth);
 
         foreach (MemberInfo member in obj.GetType().GetMembers())
@@ -110,22 +111,45 @@ public static class ObjectDump
             StringBuilder sb = new();
 
             if (obj.GetType().IsArray)
-                sb.Append("@");
+                sb.Append('@');
 
-            sb.Append("[ ");
+            sb.Append('[');
             foreach (object item in enumerable.Cast<object>().Take(10))
             {
                 sb.Append(Format(item, prevDepth, true));
                 sb.Append(", ");
             }
 
-            if (enumerable.Cast<object>().Count() > 0)
+            if (enumerable.Cast<object>().Any())
                 sb.Remove(sb.Length - 2, 2);
 
             if (enumerable.Cast<object>().Count() > 10)
                 sb.Append(", ...");
 
-            sb.Append($" ]{(omitNL ? "" : Environment.NewLine)}");
+            sb.Append($"]{(omitNL ? "" : Environment.NewLine)}");
+            return sb.ToString();
+        }
+
+        if (obj.GetType().FullName.StartsWith("System.ValueTuple"))
+        {
+            StringBuilder sb = new();
+            sb.Append('(');
+
+            FieldInfo[] fields = obj.GetType().GetFields();
+
+            foreach (FieldInfo field in fields.Take(10))
+            {
+                sb.Append(Format(field.GetValue(obj), prevDepth, true));
+                sb.Append(", ");
+            }
+
+            if (fields.Length > 0)
+                sb.Remove(sb.Length - 2, 2);
+
+            if (fields.Length > 10)
+                sb.Append(", ...");
+
+            sb.Append($"){(omitNL ? "" : Environment.NewLine)}");
             return sb.ToString();
         }
 
