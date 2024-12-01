@@ -243,7 +243,7 @@ internal static class IntrinsicFunctionHandler
                 return true;
 
             case "line":
-                EmitLdcI4(line);
+                EmitLdcI4(line + LineNumberOffset);
                 retType = typeof(int);
                 method = typeof(CompilerServices.CodeGeneration).GetMethod("line");
                 return true;
