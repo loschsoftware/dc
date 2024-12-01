@@ -39,7 +39,7 @@ public static class ObjectDump
         if (!inline)
             sb.Append(new string(' ', depth * 2));
 
-        sb.AppendLine($"{{{obj.GetType().FullName}}}");
+        sb.AppendLine($"{{{GetTypeName(obj.GetType())}}}");
 
         if (obj is IEnumerable or string || obj.GetType().IsPrimitive || obj.GetType().IsArray || obj.GetType().FullName.StartsWith("System.ValueTuple"))
             return Format(obj, depth);
@@ -154,5 +154,21 @@ public static class ObjectDump
         }
 
         return Dump(obj, prevDepth + 1, true);
+    }
+
+    private static string GetTypeName(Type type)
+    {
+        if (!type.IsGenericType)
+            return type.FullName;
+
+        StringBuilder typeArgsBuilder = new();
+        typeArgsBuilder.Append('[');
+
+        foreach (Type typeArg in type.GetGenericArguments())
+            typeArgsBuilder.Append($"{GetTypeName(typeArg)}, ");
+
+        typeArgsBuilder.Remove(typeArgsBuilder.Length - 2, 2);
+        typeArgsBuilder.Append(']');
+        return $"{type.FullName.Split(type.FullName.Contains('`') ? '`' : '[')[0]}{typeArgsBuilder}";
     }
 }
