@@ -1,6 +1,8 @@
 ﻿using Dassie.Extensions;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -38,11 +40,15 @@ internal class PackageCommand : ICompilerCommand
 
         if (command == "import" && args.Length > 1)
         {
-            bool overwrite = false;
+            bool overwrite = false, globalTool = false;
+
             if (args.Length > 2 && args.Contains("-o"))
                 overwrite = true;
 
-            return Import(args[1], overwrite);
+            if (args.Length > 2 && args.Contains("-g"))
+                globalTool = true;
+
+            return Import(args[1], overwrite, globalTool);
         }
 
         if (command == "remove" && args.Length > 1)
@@ -125,8 +131,11 @@ internal class PackageCommand : ICompilerCommand
         throw new NotImplementedException("Installing and updating packages from the internet is not yet implemented.");
     }
 
-    private static int Import(string path, bool overwrite = false)
+    private static int Import(string path, bool overwrite = false, bool globalTool = false)
     {
+        if (globalTool)
+            return InstallGlobalTool(path);
+
         if (!File.Exists(path))
         {
             Console.WriteLine("The specified extension file could not be found.");
@@ -156,6 +165,30 @@ internal class PackageCommand : ICompilerCommand
         }
 
         File.Copy(path, dest);
+        return 0;
+    }
+
+    private static int InstallGlobalTool(string toolPath)
+    {
+        string toolDir = Directory.CreateDirectory(Path.Combine(ExtensionLoader.GlobalToolsPath, Path.GetFileNameWithoutExtension(toolPath))).FullName;
+
+        if (File.Exists(toolPath))
+            File.Copy(toolPath, Path.Combine(toolDir, Path.GetFileName(toolPath)));
+
+        else if (Directory.Exists(toolPath))
+            FileSystem.CopyDirectory(toolPath, toolDir, true);
+
+        else
+        {
+            Console.WriteLine("The specified tool path could not be found.");
+            return -1;
+        }
+
+        string currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+
+        if (!currentPath.Split(Path.PathSeparator).Contains(toolDir))
+            Environment.SetEnvironmentVariable("PATH", $"{currentPath}{Path.PathSeparator}{toolDir}", EnvironmentVariableTarget.User);
+
         return 0;
     }
 
@@ -206,8 +239,8 @@ internal class PackageCommand : ICompilerCommand
         sb.AppendLine("Available commands:");
         sb.Append($"{"    list",-35}{HelpCommand.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
         sb.Append($"{"    info <Name>",-35}{HelpCommand.FormatLines("Displays advanced information about the specified extension.", indentWidth: 35)}");
-        sb.Append($"{"    install <Name>",-35}{HelpCommand.FormatLines("Installs the specified extension from the package repository.", indentWidth: 35)}");
-        sb.Append($"{"    import <Path> [-o]",-35}{HelpCommand.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
+        sb.Append($"{"    install <Name> [-g]",-35}{HelpCommand.FormatLines("Installs the specified extension from the package repository. Use the -g flag to install the package as a globally accessible tool.", indentWidth: 35)}");
+        sb.Append($"{"    import <Path> [-o] [-g]",-35}{HelpCommand.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
         sb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
         sb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
         sb.Append($"{"    source [Command] [Options]",-35}{HelpCommand.FormatLines("Manages extension sources. Use 'dc package source help' for a list of commands.", indentWidth: 35)}");

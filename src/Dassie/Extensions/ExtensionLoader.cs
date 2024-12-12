@@ -9,6 +9,7 @@ namespace Dassie.Extensions;
 internal static class ExtensionLoader
 {
     public static readonly string DefaultExtensionSource = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Extensions")).FullName;
+    public static readonly string GlobalToolsPath = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")).FullName;
 
     private static readonly List<IPackage> _installedExtensions = LoadInstalledExtensions();
     public static List<IPackage> InstalledExtensions => _installedExtensions;
