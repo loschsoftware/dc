@@ -14,6 +14,8 @@ internal static class ExtensionLoader
     private static readonly List<IPackage> _installedExtensions = LoadInstalledExtensions();
     public static List<IPackage> InstalledExtensions => _installedExtensions;
 
+    public static IEnumerable<IConfigurationProvider> ConfigurationProviders => InstalledExtensions.Select(p => p.ConfigurationProviders()).SelectMany(p => p);
+
     private static List<IPackage> LoadInstalledExtensions()
     {
         if (File.Exists(Path.Combine(DefaultExtensionSource, "RemovalList.txt")))

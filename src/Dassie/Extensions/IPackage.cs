@@ -21,4 +21,9 @@ public interface IPackage
     /// An array of project templates added by this extension.
     /// </summary>
     public virtual IProjectTemplate[] ProjectTemplates() => [];
+
+    /// <summary>
+    /// An array of configuration providers added by this extension.
+    /// </summary>
+    public virtual IConfigurationProvider[] ConfigurationProviders() => [];
 }
