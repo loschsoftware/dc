@@ -2271,7 +2271,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             context.full_identifier().Identifier().Last().GetText().Length,
             out Type ret,
             out MethodInfo method))
+        {
+            CurrentMethod.ShouldLoadAddressIfValueType = false;
             return (ret, method);
+        }
 
         object o = SymbolResolver.GetSmallestTypeFromLeft(
             context.full_identifier(),
@@ -2301,6 +2304,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     DS0056_SymbolResolveError,
                     $"The name '{context.full_identifier().Identifier()[0].GetText()}' could not be resolved.");
 
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return (null, null);
             }
 
@@ -2362,6 +2366,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (TryGetConstantValue(f, out object v))
                 {
                     EmitConst(v);
+
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (f.FieldType, null);
                 }
 
@@ -2461,6 +2467,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (getFunctionPointerTarget && functionPointerParams == null && functionPointerRet == null && methods.Count > 0)
                 {
                     MethodInfo fptr = methods.First();
+
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (fptr.ReturnType, fptr);
                 }
 
@@ -2538,12 +2546,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (!getFunctionPointerTarget)
                     EmitCall(final.DeclaringType, final);
 
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return (final.ReturnType, final);
             }
         }
 
         if (context.full_identifier().Identifier().Length == 1 && exitEarly)
+        {
+            CurrentMethod.ShouldLoadAddressIfValueType = false;
             return (t, result);
+        }
 
         BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
@@ -2606,7 +2618,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
 
             if (member == null)
+            {
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return (null, null);
+            }
 
             if (member is Type nestedType)
             {
@@ -2701,6 +2716,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         //CurrentMethod.ParameterBoxIndices.Clear();
+        CurrentMethod.ShouldLoadAddressIfValueType = false;
         return (t, result);
     }
 
