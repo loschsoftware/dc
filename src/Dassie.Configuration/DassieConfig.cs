@@ -175,6 +175,10 @@ public sealed class DassieConfig
     [DefaultValue(null)]
     [XmlElement]
     public string MessageColor { get; set; }
+
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool EnableOverflowChecks { get; set; }
 }
 
 [Serializable]

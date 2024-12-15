@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using static Dassie.Helpers.TypeHelpers;
+using static Dassie.Configuration.ProjectFileDeserializer;
 
 namespace Dassie.CodeGeneration;
 
@@ -13,31 +14,37 @@ internal static class EmitHelpers
 {
     public static OpCode GetCallOpCode(Type type) => type.IsValueType ? OpCodes.Call : OpCodes.Callvirt;
 
-    public static void EmitAdd(Type type, bool doOverflowCheck = false)
+    public static void EmitAdd(Type type, bool? doOverflowCheck = null)
     {
+        doOverflowCheck ??= DassieConfig.EnableOverflowChecks;
+
         if (IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Add_Ovf_Un);
-        else if (doOverflowCheck)
+        else if (doOverflowCheck == true)
             CurrentMethod.IL.Emit(OpCodes.Add_Ovf);
         else
             CurrentMethod.IL.Emit(OpCodes.Add);
     }
 
-    public static void EmitSub(Type type, bool doOverflowCheck = false)
+    public static void EmitSub(Type type, bool? doOverflowCheck = null)
     {
+        doOverflowCheck ??= DassieConfig.EnableOverflowChecks;
+
         if (IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Sub_Ovf_Un);
-        else if (doOverflowCheck)
+        else if (doOverflowCheck == true)
             CurrentMethod.IL.Emit(OpCodes.Sub_Ovf);
         else
             CurrentMethod.IL.Emit(OpCodes.Sub);
     }
 
-    public static void EmitMul(Type type, bool doOverflowCheck = false)
+    public static void EmitMul(Type type, bool? doOverflowCheck = null)
     {
+        doOverflowCheck ??= DassieConfig.EnableOverflowChecks;
+
         if (IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Mul_Ovf_Un);
-        else if (doOverflowCheck)
+        else if (doOverflowCheck == true)
             CurrentMethod.IL.Emit(OpCodes.Mul_Ovf);
         else
             CurrentMethod.IL.Emit(OpCodes.Mul);
