@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using Dassie.CodeAnalysis.Default;
 using Dassie.Configuration;
 using Dassie.Data;
 using Dassie.Errors;
@@ -48,7 +49,7 @@ internal static class DocumentCompiler
             EmitBuildLogMessage("    Parsing...");
 
         CurrentFile.CharStream = CharStreams.fromString(lowered);
-        DassieLexer lexer = new DassieLexer(CurrentFile.CharStream);
+        DassieLexer lexer = new(CurrentFile.CharStream);
         ITokenStream tokens = new CommonTokenStream(lexer);
         DassieParser parser = new(tokens);
 

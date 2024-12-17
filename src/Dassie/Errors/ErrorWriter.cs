@@ -200,6 +200,13 @@ public static class ErrorWriter
                 outBuilder.Append(": ");
                 ResetColor();
 
+                if (error.Source != ErrorSource.Compiler)
+                {
+                    SetColorRgb(34, 139, 34);
+                    outBuilder.Append($"[{error.Source.ToString()}] ");
+                    ResetColor();
+                }
+
                 SetColor();
                 outBuilder.Append(error.Severity switch
                 {

@@ -134,9 +134,6 @@ public sealed class DassieConfig
     [XmlArrayItem(typeof(Warning))]
     public Ignore[] IgnoredMessages { get; set; }
 
-    [XmlArray("CodeAnalyzers")]
-    public CodeAnalyzer[] CodeAnalyzers { get; set; }
-
     [XmlElement]
     public string AssemblyManifest { get; set; }
 
@@ -179,6 +176,10 @@ public sealed class DassieConfig
     [DefaultValue(false)]
     [XmlElement]
     public bool EnableOverflowChecks { get; set; }
+
+    [DefaultValue(null)]
+    [XmlElement("CodeAnalysis")]
+    public CodeAnalysisConfiguration CodeAnalysisConfiguration { get; set; }
 }
 
 [Serializable]

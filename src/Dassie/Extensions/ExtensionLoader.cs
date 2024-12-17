@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Antlr4.Runtime.Tree;
+using Dassie.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,6 +17,7 @@ internal static class ExtensionLoader
     public static List<IPackage> InstalledExtensions => _installedExtensions;
 
     public static IEnumerable<IConfigurationProvider> ConfigurationProviders => InstalledExtensions.Select(p => p.ConfigurationProviders()).SelectMany(p => p);
+    public static IEnumerable<IAnalyzer<IParseTree>> CodeAnalyzers => InstalledExtensions.Select(a => a.CodeAnalyzers()).SelectMany(a => a);
 
     private static List<IPackage> LoadInstalledExtensions()
     {
@@ -120,5 +123,17 @@ internal static class ExtensionLoader
         }
 
         return commands;
+    }
+
+    public static bool TryGetAnalyzer(string name, out IAnalyzer<IParseTree> analyzer)
+    {
+        if (CodeAnalyzers.Any(a => a.Name == name))
+        {
+            analyzer = CodeAnalyzers.First(a => a.Name == name);
+            return true;
+        }
+
+        analyzer = null;
+        return false;
     }
 }

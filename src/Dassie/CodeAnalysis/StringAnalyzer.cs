@@ -8,6 +8,9 @@ namespace Dassie.CodeAnalysis;
 /// </summary>
 public class StringAnalyzer : IAnalyzer<string>
 {
+    /// <inheritdoc/>
+    public string Name => nameof(StringAnalyzer);
+
     /// <summary>
     /// Performs the analysis.
     /// </summary>

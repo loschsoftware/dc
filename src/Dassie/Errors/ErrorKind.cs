@@ -551,5 +551,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when 'dc clean' is called but the working directory contains no compiler configuration file.
     /// </summary>
-    DS0132_DCCleanNoProjectFile
+    DS0132_DCCleanNoProjectFile,
+    /// <summary>
+    /// Emitted when 'dc analyze' is called but the working directory contains no compiler configuration file.
+    /// </summary>
+    DS0133_DCAnalyzeNoProjectFile,
+    /// <summary>
+    /// Emitted when 'dc analyze' is called using an analyzer that could not be found.
+    /// </summary>
+    DS0134_DCAnalyzeInvalidAnalyzer
 }

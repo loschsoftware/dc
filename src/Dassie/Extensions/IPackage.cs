@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Antlr4.Runtime.Tree;
+using Dassie.CodeAnalysis;
+using System;
 
 namespace Dassie.Extensions;
 
@@ -26,4 +28,9 @@ public interface IPackage
     /// An array of configuration providers added by this extension.
     /// </summary>
     public virtual IConfigurationProvider[] ConfigurationProviders() => [];
+
+    /// <summary>
+    /// An array of code analyzers added by this extensions.
+    /// </summary>
+    public virtual IAnalyzer<IParseTree>[] CodeAnalyzers() => [];
 }
