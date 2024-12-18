@@ -18,7 +18,7 @@ internal class AnalyzeCommand : ICompilerCommand
 {
     public string Command => "analyze";
 
-    public string UsageString => "analyze <Options>";
+    public string UsageString => "analyze [Options]";
 
     public string Description => "Runs code analyzers on the current project. Use 'dc analyze --help' for more information.";
 
