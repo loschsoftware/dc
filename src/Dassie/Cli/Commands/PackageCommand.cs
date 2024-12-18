@@ -2,7 +2,6 @@
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -98,30 +97,57 @@ internal class PackageCommand : ICompilerCommand
 
         if (!packages.Any(p => p.Metadata.Name == name))
         {
-            sb.AppendLine("The specified extension could not be found.");
+            Console.WriteLine("The specified extension could not be found.");
             return -1;
         }
 
         IPackage package = packages.First(p => p.Metadata.Name == name);
 
-        HelpCommand.DisplayLogo();
-        sb.AppendLine();
-        sb.AppendLine("Extension info:");
-        sb.AppendLine();
+        void SetUnderline()
+        {
+            if (!ConsoleHelper.AnsiEscapeSequenceSupported)
+                return;
 
-        sb.AppendLine($"{"Name:",-30}{package.Metadata.Name}");
-        sb.AppendLine($"{"Description:",-30}{package.Metadata.Description}");
-        sb.AppendLine($"{"Author:",-30}{package.Metadata.Author}");
-        sb.AppendLine($"{"Version:",-30}{package.Metadata.Version}");
-        sb.AppendLine($"{"File:",-30}{package.GetType().Assembly.Location}");
+            sb.Append("\e[4m\e[1m");
+        }
+
+        void ResetUnderline()
+        {
+            if (!ConsoleHelper.AnsiEscapeSequenceSupported)
+                return;
+
+            sb.Append("\e[24m\e[22m");
+        }
+
+        void WriteHeading(string text)
+        {
+            SetUnderline();
+            sb.Append(text);
+            ResetUnderline();
+            sb.AppendLine(":");
+        }
 
         sb.AppendLine();
-        sb.AppendLine("Defined commands:");
+        WriteHeading("Details");
+
+        sb.AppendLine($"{"    Name:",-50}{package.Metadata.Name}");
+        sb.AppendLine($"{"    Description:",-50}{package.Metadata.Description}");
+        sb.AppendLine($"{"    Author:",-50}{package.Metadata.Author}");
+        sb.AppendLine($"{"    Version:",-50}{package.Metadata.Version}");
+        sb.AppendLine($"{"    File:",-50}{package.GetType().Assembly.Location}");
 
         IEnumerable<ICompilerCommand> definedCommands = CommandRegistry.Commands.Where(c => c.GetType().Assembly == package.GetType().Assembly);
-        foreach (ICompilerCommand cmd in definedCommands)
-            sb.AppendLine($"{$"{cmd.UsageString}",-30}{cmd.Description}");
 
+        if (definedCommands.Any())
+        {
+            sb.AppendLine();
+            WriteHeading("Commands");
+
+            foreach (ICompilerCommand cmd in definedCommands)
+                sb.AppendLine($"{$"    {cmd.UsageString}",-50}{cmd.Description}");
+        }
+
+        HelpCommand.DisplayLogo();
         Console.WriteLine(sb.ToString());
         return 0;
     }
