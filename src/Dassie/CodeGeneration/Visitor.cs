@@ -1472,6 +1472,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (IsNumericType(t))
         {
+            if (t != t2)
+                EmitConversionOperator(t2, t);
+
             EmitDiv(t);
             return t;
         }

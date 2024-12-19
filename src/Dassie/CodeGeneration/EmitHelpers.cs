@@ -400,8 +400,31 @@ internal static class EmitHelpers
         EmitCall(t, opTrue);
     }
 
+    private static readonly Dictionary<Type, OpCode> _conversionOperators = new()
+    {
+        [typeof(nint)] = OpCodes.Conv_I,
+        [typeof(nuint)] = OpCodes.Conv_U,
+        [typeof(sbyte)] = OpCodes.Conv_I1,
+        [typeof(byte)] = OpCodes.Conv_U1,
+        [typeof(short)] = OpCodes.Conv_I2,
+        [typeof(ushort)] = OpCodes.Conv_U2,
+        [typeof(int)] = OpCodes.Conv_I4,
+        [typeof(uint)] = OpCodes.Conv_U4,
+        [typeof(long)] = OpCodes.Conv_I8,
+        [typeof(ulong)] = OpCodes.Conv_U8,
+        [typeof(float)] = OpCodes.Conv_R4,
+        [typeof(double)] = OpCodes.Conv_R8
+    };
+
+
     public static void EmitConversionOperator(Type from, Type to)
     {
+        if (IsNumericType(from) && IsNumericType(to))
+        {
+            if (_conversionOperators.TryGetValue(to, out OpCode value))
+                CurrentMethod.IL.Emit(value);
+        }
+
         if (from == to)
             return;
 
