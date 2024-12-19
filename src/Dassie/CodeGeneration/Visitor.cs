@@ -1472,6 +1472,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (IsNumericType(t))
         {
+            // Emit conversion operators to support dividing numeric primitives of different types.
+            // t1 / t2 always returns t1.
+
             if (t != t2)
                 EmitConversionOperator(t2, t);
 
