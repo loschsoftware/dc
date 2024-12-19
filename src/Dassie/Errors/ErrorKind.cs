@@ -559,5 +559,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when 'dc analyze' is called using an analyzer that could not be found.
     /// </summary>
-    DS0134_DCAnalyzeInvalidAnalyzer
+    DS0134_DCAnalyzeInvalidAnalyzer,
+    /// <summary>
+    /// Emitted when attempting to divide by the constant value 0.
+    /// </summary>
+    DS0135_DivisionByConstantZero
 }

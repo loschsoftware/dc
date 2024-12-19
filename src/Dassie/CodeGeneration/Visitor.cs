@@ -1466,6 +1466,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitDivide_expression([NotNull] DassieParser.Divide_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
+
+        eval.RequireNonZeroValue = true;
         Type t2 = Visit(context.expression()[1]);
 
         if (IsNumericType(t))
@@ -1598,6 +1600,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitRemainder_expression([NotNull] DassieParser.Remainder_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
+
+        eval.RequireNonZeroValue = true;
         Type t2 = Visit(context.expression()[1]);
 
         if (IsNumericType(t))

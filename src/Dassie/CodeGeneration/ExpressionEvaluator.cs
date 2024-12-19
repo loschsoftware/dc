@@ -13,6 +13,22 @@ namespace Dassie.CodeGeneration;
 
 internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 {
+    private bool _requireNonZeroValue = false;
+
+    public bool RequireNonZeroValue
+    {
+        get
+        {
+            if (!_requireNonZeroValue)
+                return false;
+
+            _requireNonZeroValue = false;
+            return true;
+        }
+
+        set => _requireNonZeroValue = value;
+    }
+
     public override Expression VisitString_atom([NotNull] DassieParser.String_atomContext context)
     {
         string text = context.GetText()[1..^1];
@@ -137,6 +153,23 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
     public override Expression VisitInteger_atom([NotNull] DassieParser.Integer_atomContext context)
     {
+        Expression result = VisitInteger_atom_Impl(context);
+
+        if (RequireNonZeroValue && result.Value == 0)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                DS0135_DivisionByConstantZero,
+                "Division by constant zero.");
+        }
+
+        return result;
+    }
+
+    private Expression VisitInteger_atom_Impl([NotNull] DassieParser.Integer_atomContext context)
+    {
         string text = context.GetText();
         Type literalType = typeof(int);
         NumberStyles style = NumberStyles.Integer;
@@ -231,6 +264,23 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
     }
 
     public override Expression VisitReal_atom([NotNull] DassieParser.Real_atomContext context)
+    {
+        Expression result = VisitReal_atom_Impl(context);
+
+        if (RequireNonZeroValue && result.Value == 0)
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                DS0135_DivisionByConstantZero,
+                "Division by constant zero.");
+        }
+
+        return result;
+    }
+
+    private Expression VisitReal_atom_Impl([NotNull] DassieParser.Real_atomContext context)
     {
         string text = context.GetText();
 
