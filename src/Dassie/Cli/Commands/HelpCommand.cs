@@ -19,7 +19,7 @@ internal class HelpCommand : ICompilerCommand
 
     public List<string> Aliases() => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
 
-    public string UsageString => "help, ? [-o, --options]";
+    public string UsageString => "help, ? [(-o|--options)]";
 
     public string Description => "Shows this page. Use the -o flag to display all available options.";
 
