@@ -59,6 +59,7 @@ expression
     | expression Bar expression #or_expression
     | expression Double_Bar expression #logical_or_expression
     | expression Caret expression #xor_expression
+    | expression Less_Than_Colon type_name #conversion_expression
     | Ampersand expression #byref_expression
     | expression Double_Colon expression #index_expression
     | parameter_list (Colon type_name)? Equals_Greater expression #anonymous_function_expression

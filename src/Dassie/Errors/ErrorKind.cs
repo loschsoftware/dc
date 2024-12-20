@@ -563,5 +563,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when attempting to divide by the constant value 0.
     /// </summary>
-    DS0135_DivisionByConstantZero
+    DS0135_DivisionByConstantZero,
+    /// <summary>
+    /// Emitted when a conversion between two types is not possible.
+    /// </summary>
+    DS0136_InvalidConversion
 }

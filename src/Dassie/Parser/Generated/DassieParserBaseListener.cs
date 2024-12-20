@@ -334,6 +334,20 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitPower_expression([NotNull] DassieParser.Power_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>conversion_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterConversion_expression([NotNull] DassieParser.Conversion_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>conversion_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitConversion_expression([NotNull] DassieParser.Conversion_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>addition_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>

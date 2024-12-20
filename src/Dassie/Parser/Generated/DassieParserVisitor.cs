@@ -183,6 +183,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPower_expression([NotNull] DassieParser.Power_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>conversion_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitConversion_expression([NotNull] DassieParser.Conversion_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>addition_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>

@@ -285,6 +285,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitPower_expression([NotNull] DassieParser.Power_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>conversion_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterConversion_expression([NotNull] DassieParser.Conversion_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>conversion_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitConversion_expression([NotNull] DassieParser.Conversion_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>addition_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>

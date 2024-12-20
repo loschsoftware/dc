@@ -1439,6 +1439,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (IsNumericType(t))
         {
+            if (t != t2)
+                EmitConversionOperator(t2, t);
+
             EmitMul(t);
             return t;
         }
@@ -1509,6 +1512,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (IsNumericType(t) && IsNumericType(t2))
         {
+            if (t != t2)
+                EmitConversionOperator(t2, t);
+
             EmitAdd(t);
             return t;
         }
@@ -1579,6 +1585,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (IsNumericType(t))
         {
+            if (t != t2)
+                EmitConversionOperator(t2, t);
+
             EmitSub(t);
             return t;
         }
@@ -1612,6 +1621,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (IsNumericType(t))
         {
+            if (t != t2)
+                EmitConversionOperator(t2, t);
+
             EmitRem(t);
             return t;
         }
@@ -4565,5 +4577,23 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Newobj, con);
 
         return delegateType;
+    }
+
+    public override Type VisitConversion_expression([NotNull] DassieParser.Conversion_expressionContext context)
+    {
+        Type tSource = Visit(context.expression());
+        Type tTarget = SymbolResolver.ResolveTypeName(context.type_name());
+
+        if (!EmitConversionOperator(tSource, tTarget))
+        {
+            EmitErrorMessage(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                DS0136_InvalidConversion,
+                $"Unable to convert from type '{tSource.FullName}' to type '{tTarget.FullName}'.");
+        }
+
+        return tTarget;
     }
 }

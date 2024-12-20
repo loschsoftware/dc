@@ -416,16 +416,19 @@ internal static class EmitHelpers
         [typeof(double)] = OpCodes.Conv_R8
     };
 
-    public static void EmitConversionOperator(Type from, Type to)
+    public static bool EmitConversionOperator(Type from, Type to)
     {
         if (IsNumericType(from) && IsNumericType(to))
         {
             if (_conversionInstructions.TryGetValue(to, out OpCode value))
+            {
                 CurrentMethod.IL.Emit(value);
+                return true;
+            }
         }
 
         if (from == to)
-            return;
+            return true;
 
         IEnumerable<MethodInfo> implicitConversions = from.GetMethods()
             .Where(m => m.Name == "op_Implicit")
@@ -436,7 +439,7 @@ internal static class EmitHelpers
         if (implicitConversions.Any())
         {
             EmitCall(from, implicitConversions.First());
-            return;
+            return true;
         }
 
         IEnumerable<MethodInfo> explicitConversions = to.GetMethods()
@@ -447,7 +450,12 @@ internal static class EmitHelpers
 
         // TODO: Calling explicit conversions implicitly might be dangerous..?
         if (explicitConversions.Any())
+        {
             EmitCall(from, explicitConversions.First());
+            return true;
+        }
+
+        return false;
     }
 
     public static bool TryGetAlternativeLocation(SymbolInfo sym, out (FieldInfo field, string LocalName) result)
