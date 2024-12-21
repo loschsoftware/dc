@@ -117,7 +117,7 @@ Double_Greater_Than=116
 Double_Greater_Than_Equals=117
 Arrow_Right=118
 Arrow_Left=119
-Double_Backtick=120
+Backtick=120
 Identifier=121
 Integer_Literal=122
 Hex_Integer_Literal=123
@@ -240,4 +240,4 @@ Verbatim_String_Literal=128
 '>>='=117
 '->'=118
 '<-'=119
-'``'=120
+'`'=120

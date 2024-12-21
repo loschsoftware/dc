@@ -144,11 +144,11 @@ Double_Greater_Than_Equals: '>>=';
 Arrow_Right: '->';
 Arrow_Left: '<-';
 
-Double_Backtick: '``';
+Backtick: '`';
 
 Identifier
 	: IdentifierOrKeyword
-	| Double_Backtick IdentifierOrKeyword Double_Backtick
+	| Backtick .+? Backtick
 	;
 
 Integer_Literal: (Minus | Plus)? [0-9] ('\''* [0-9])* Integer_Suffix?;

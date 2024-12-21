@@ -119,7 +119,7 @@ null
 '>>='
 '->'
 '<-'
-'``'
+'`'
 null
 null
 null
@@ -250,7 +250,7 @@ Double_Greater_Than
 Double_Greater_Than_Equals
 Arrow_Right
 Arrow_Left
-Double_Backtick
+Backtick
 Identifier
 Integer_Literal
 Hex_Integer_Literal

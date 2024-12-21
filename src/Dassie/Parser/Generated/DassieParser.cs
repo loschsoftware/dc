@@ -63,7 +63,7 @@ public partial class DassieParser : Parser {
 		Slash=104, Backslash=105, Slash_Equals=106, Percent=107, Percent_Equals=108, 
 		Equals=109, Equals_Greater=110, Tilde=111, Double_Tilde=112, Tilde_Equals=113, 
 		Double_Less_Than=114, Double_Less_Than_Equals=115, Double_Greater_Than=116, 
-		Double_Greater_Than_Equals=117, Arrow_Right=118, Arrow_Left=119, Double_Backtick=120, 
+		Double_Greater_Than_Equals=117, Arrow_Right=118, Arrow_Left=119, Backtick=120, 
 		Identifier=121, Integer_Literal=122, Hex_Integer_Literal=123, Binary_Integer_Literal=124, 
 		Real_Literal=125, Character_Literal=126, String_Literal=127, Verbatim_String_Literal=128;
 	public const int
@@ -126,7 +126,7 @@ public partial class DassieParser : Parser {
 		"'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'+'", "'+='", "'-'", "'-='", 
 		"'*'", "'*='", "'**'", "'**='", "'/'", "'\\'", "'/='", "'%'", "'%='", 
 		"'='", "'=>'", "'~'", "'~~'", "'~='", "'<<'", "'<<='", "'>>'", "'>>='", 
-		"'->'", "'<-'", "'``'"
+		"'->'", "'<-'", "'`'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, "Ws", "NewLine", "Single_Line_Comment", "Delimited_Comment", "Documentation_Comment", 
@@ -151,7 +151,7 @@ public partial class DassieParser : Parser {
 		"Slash", "Backslash", "Slash_Equals", "Percent", "Percent_Equals", "Equals", 
 		"Equals_Greater", "Tilde", "Double_Tilde", "Tilde_Equals", "Double_Less_Than", 
 		"Double_Less_Than_Equals", "Double_Greater_Than", "Double_Greater_Than_Equals", 
-		"Arrow_Right", "Arrow_Left", "Double_Backtick", "Identifier", "Integer_Literal", 
+		"Arrow_Right", "Arrow_Left", "Backtick", "Identifier", "Integer_Literal", 
 		"Hex_Integer_Literal", "Binary_Integer_Literal", "Real_Literal", "Character_Literal", 
 		"String_Literal", "Verbatim_String_Literal"
 	};
