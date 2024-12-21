@@ -371,8 +371,8 @@ public static class TooltipGenerator
         [typeof(float)] = "float32",
         [typeof(double)] = "float64",
         [typeof(decimal)] = "decimal",
-        [typeof(IntPtr)] = "native",
-        [typeof(UIntPtr)] = "unative",
+        [typeof(nint)] = "native",
+        [typeof(nuint)] = "unative",
         [typeof(bool)] = "bool",
         [typeof(string)] = "string",
         [typeof(char)] = "char",
@@ -413,7 +413,9 @@ public static class TooltipGenerator
 
             if (!noModifiers)
             {
-                if (type.IsInterface)
+                if (type.IsEnum)
+                    words.Add(BuildWord("enum ", Color.Word));
+                else if (type.IsInterface)
                     words.Add(BuildWord("template ", Color.Word));
                 else if (type.IsSealed && type.IsAbstract)
                     words.Add(BuildWord("module ", Color.Word));
@@ -524,6 +526,9 @@ public static class TooltipGenerator
         if (type.IsInterface)
             return Color.TemplateType;
 
+        if (type.IsEnum)
+            return Color.EnumType;
+
         if (type.IsAbstract && type.IsSealed) // That's how static types are represented in the CLR...
             return Color.Module;
 
@@ -540,6 +545,7 @@ public static class TooltipGenerator
             Color.TemplateType => "Interface",
             Color.Module => "Module",
             Color.ValueType => "ValueType",
+            Color.EnumType => "Enumeration",
             _ => "Class"
         };
 
