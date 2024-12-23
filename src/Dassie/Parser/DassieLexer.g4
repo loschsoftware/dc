@@ -129,7 +129,9 @@ Slash: '/';
 Backslash: '\\';
 Slash_Equals: '/=';
 Percent: '%';
+Double_Percent: '%%';
 Percent_Equals: '%=';
+Double_Percent_Equals: '%%=';
 Equals: '=';
 Equals_Greater: '=>';
 

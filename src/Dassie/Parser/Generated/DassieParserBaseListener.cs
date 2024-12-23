@@ -488,6 +488,20 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAttributed_expression([NotNull] DassieParser.Attributed_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>modulus_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterModulus_expression([NotNull] DassieParser.Modulus_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>modulus_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitModulus_expression([NotNull] DassieParser.Modulus_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>equality_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>

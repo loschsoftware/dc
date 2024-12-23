@@ -260,6 +260,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAttributed_expression([NotNull] DassieParser.Attributed_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>modulus_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitModulus_expression([NotNull] DassieParser.Modulus_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>equality_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>

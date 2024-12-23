@@ -1648,6 +1648,55 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return t;
     }
 
+    // a %% b = (a % b + b) % b
+    public override Type VisitModulus_expression([NotNull] DassieParser.Modulus_expressionContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+
+        eval.RequireNonZeroValue = true;
+        Type t2 = Visit(context.expression()[1]);
+
+        if (IsNumericType(t))
+        {
+            if (t != t2)
+                EmitConversionOperator(t2, t);
+
+            LocalBuilder local = CurrentMethod.IL.DeclareLocal(t);
+            CurrentMethod.LocalIndex++;
+
+            EmitStloc(CurrentMethod.LocalIndex);
+
+            EmitLdloc(CurrentMethod.LocalIndex);
+            EmitRem(t);
+
+            EmitLdloc(CurrentMethod.LocalIndex);
+            EmitAdd(t);
+
+            EmitLdloc(CurrentMethod.LocalIndex);
+            EmitRem(t);
+            return t;
+        }
+
+        MethodInfo op = t.GetMethod("op_Modulus", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
+
+        if (op == null)
+        {
+            EmitErrorMessage(
+                context.Double_Percent().Symbol.Line,
+                context.Double_Percent().Symbol.Column,
+                context.Double_Percent().GetText().Length,
+                DS0002_MethodNotFound,
+                $"The type '{t.FullName}' does not implement a remainder operation with the operand type '{t2.FullName}'.",
+                Path.GetFileName(CurrentFile.Path));
+
+            return t;
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
+
+        return t;
+    }
+
     public override Type VisitPower_expression([NotNull] DassieParser.Power_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);

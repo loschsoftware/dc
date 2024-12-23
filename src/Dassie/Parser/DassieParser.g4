@@ -48,6 +48,7 @@ expression
     | expression Asterisk expression #multiply_expression
     | expression Slash expression #divide_expression
     | expression Percent expression #remainder_expression
+    | expression Double_Percent expression #modulus_expression
     | expression Plus expression #addition_expression
     | expression Minus expression #subtraction_expression
     | expression Double_Less_Than expression #left_shift_expression

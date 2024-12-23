@@ -395,6 +395,17 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// <return>The visitor result.</return>
 	public virtual Result VisitAttributed_expression([NotNull] DassieParser.Attributed_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by the <c>modulus_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitModulus_expression([NotNull] DassieParser.Modulus_expressionContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by the <c>equality_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>
