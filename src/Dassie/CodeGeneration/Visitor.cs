@@ -4285,6 +4285,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (VisitorStep1 == null)
             {
                 tReturn = _tReturn;
+
+                if (tReturn == typeof(void))
+                    tReturn = typeof(object);
+
                 CurrentMethod.LoopArrayTypeProbes.Add(CurrentMethod.LoopArrayTypeProbeIndex, _tReturn);
             }
 
@@ -4346,6 +4350,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (VisitorStep1 == null)
             {
                 tReturn = _tReturn;
+
+                if (tReturn == typeof(void))
+                    tReturn = typeof(object);
+
                 CurrentMethod.LoopArrayTypeProbes.Add(CurrentMethod.LoopArrayTypeProbeIndex, _tReturn);
             }
 
