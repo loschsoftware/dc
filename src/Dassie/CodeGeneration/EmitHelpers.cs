@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using static Dassie.Helpers.TypeHelpers;
 using static Dassie.Configuration.ProjectFileDeserializer;
+using static Dassie.Helpers.TypeHelpers;
 
 namespace Dassie.CodeGeneration;
 
@@ -418,6 +418,9 @@ internal static class EmitHelpers
 
     public static bool EmitConversionOperator(Type from, Type to)
     {
+        if (from == to)
+            return true;
+
         if (IsNumericType(from) && IsNumericType(to))
         {
             if (_conversionInstructions.TryGetValue(to, out OpCode value))
@@ -427,8 +430,17 @@ internal static class EmitHelpers
             }
         }
 
-        if (from == to)
+        if (to == typeof(object))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Box, from);
             return true;
+        }
+
+        if (from == typeof(object))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Unbox_Any, to);
+            return true;
+        }
 
         IEnumerable<MethodInfo> implicitConversions = from.GetMethods()
             .Where(m => m.Name == "op_Implicit")

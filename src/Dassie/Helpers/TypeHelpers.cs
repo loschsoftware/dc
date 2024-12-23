@@ -182,6 +182,9 @@ internal static class TypeHelpers
         if (from == to)
             return true;
 
+        if (to == typeof(object))
+            return true;
+
         if (IsNumericType(from) && IsNumericType(to))
             return true;
 
