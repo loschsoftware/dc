@@ -4229,8 +4229,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression().First());
         Type tReturn = null;
 
-        if (t == typeof(int))
+        if (IsIntegerType(t))
         {
+            if (t != typeof(int))
+                EmitConversionOperator(t, typeof(int));
+
             // Build the array of return values
             // (A for loop returns an array containing the return
             // values of every iteration of the loop)
