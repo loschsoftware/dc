@@ -436,6 +436,12 @@ internal static class EmitHelpers
             return true;
         }
 
+        if (from == typeof(object) && to.IsClass)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Castclass, to);
+            return true;
+        }
+
         if (from == typeof(object))
         {
             CurrentMethod.IL.Emit(OpCodes.Unbox_Any, to);
@@ -460,7 +466,6 @@ internal static class EmitHelpers
             .Where(m => m.GetParameters().Length == 1)
             .Where(m => m.GetParameters()[0].ParameterType == from);
 
-        // TODO: Calling explicit conversions implicitly might be dangerous..?
         if (explicitConversions.Any())
         {
             EmitCall(from, explicitConversions.First());
