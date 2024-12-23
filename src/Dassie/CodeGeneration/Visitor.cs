@@ -5,6 +5,7 @@ using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Helpers;
 using Dassie.Intrinsics;
+using Dassie.Lowering;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
@@ -4229,6 +4230,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression().First());
         Type tReturn = null;
 
+        CurrentMethod.LoopArrayTypeProbeIndex++;
+
+        if (VisitorStep1CurrentMethod != null)
+            tReturn = VisitorStep1CurrentMethod.LoopArrayTypeProbes[CurrentMethod.LoopArrayTypeProbeIndex];
+
+        if (tReturn == null || tReturn == typeof(void))
+            tReturn = typeof(object);
+
         if (IsIntegerType(t))
         {
             if (t != typeof(int))
@@ -4238,10 +4247,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // (A for loop returns an array containing the return
             // values of every iteration of the loop)
             // The length of the array is already on the stack
-            CurrentMethod.IL.Emit(OpCodes.Newarr, typeof(object));
+            CurrentMethod.IL.Emit(OpCodes.Newarr, tReturn);
 
             // A local that saves the returning array
-            LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(typeof(object).MakeArrayType());
+            LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(tReturn.MakeArrayType());
 
             CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++, new(null, typeof(int))));
 
@@ -4271,18 +4280,21 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // Index
             EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
 
-            tReturn = Visit(context.expression().Last());
+            Type _tReturn = Visit(context.expression().Last());
 
-            if (tReturn == typeof(void))
+            if (VisitorStep1 == null)
+            {
+                tReturn = _tReturn;
+                CurrentMethod.LoopArrayTypeProbes.Add(CurrentMethod.LoopArrayTypeProbeIndex, _tReturn);
+            }
+
+            if (_tReturn == typeof(void))
             {
                 CurrentMethod.IL.Emit(OpCodes.Ldnull);
                 CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
             }
             else
-            {
-                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
-                CurrentMethod.IL.Emit(OpCodes.Stelem, typeof(object));
-            }
+                CurrentMethod.IL.Emit(OpCodes.Stelem, tReturn);
 
             EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)1);
@@ -4298,19 +4310,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
             CurrentMethod.SkipPop = false;
 
-            return typeof(object[]);
+            return tReturn.MakeArrayType();
         }
 
-        if (TypeHelpers.IsBoolean(t))
+        if (IsBoolean(t))
         {
-            TypeHelpers.EnsureBoolean(t, 0, 0, 0);
+            Type listType = typeof(List<>).MakeGenericType(tReturn);
+
+            EnsureBoolean(t, 0, 0, 0);
 
             CurrentMethod.IL.Emit(OpCodes.Pop);
-
-            CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes));
+            CurrentMethod.IL.Emit(OpCodes.Newobj, listType.GetConstructor(Type.EmptyTypes));
 
             // A local that saves the returning list
-            LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(typeof(List<object>));
+            LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(listType);
 
             CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++, new(null, typeof(List<string>))));
 
@@ -4328,18 +4341,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.IL.MarkLabel(start);
 
             EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
-            tReturn = Visit(context.expression().Last());
+            Type _tReturn = Visit(context.expression().Last());
 
-            if (tReturn == typeof(void))
+            if (VisitorStep1 == null)
             {
+                tReturn = _tReturn;
+                CurrentMethod.LoopArrayTypeProbes.Add(CurrentMethod.LoopArrayTypeProbeIndex, _tReturn);
+            }
+
+            if (_tReturn == typeof(void))
                 CurrentMethod.IL.Emit(OpCodes.Ldnull);
-            }
-            else
-            {
-                CurrentMethod.IL.Emit(OpCodes.Box, tReturn);
-            }
 
-            CurrentMethod.IL.EmitCall(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add", new Type[] { typeof(object) }), null);
+            CurrentMethod.IL.EmitCall(OpCodes.Callvirt, listType.GetMethod("Add", [tReturn]), null);
 
             CurrentMethod.IL.MarkLabel(loop);
 
@@ -4349,7 +4362,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
             CurrentMethod.SkipPop = false;
 
-            return typeof(List<object>);
+            return listType;
         }
 
         EmitWarningMessage(

@@ -105,7 +105,7 @@ internal class MethodContext
 
     public ILGenerator IL { get; set; }
 
-    public List<string> FilesWhereDefined { get; } = [];
+    public List<string> FilesWhereDefined { get; private set; } = [];
 
     public MethodBuilder Builder { get; set; }
 
@@ -131,11 +131,11 @@ internal class MethodContext
 
     public int ParameterIndex { get; set; } = 0;
 
-    public List<LocalInfo> Locals { get; } = [];
+    public List<LocalInfo> Locals { get; private set; } = [];
 
-    public List<ParamInfo> Parameters { get; } = [];
+    public List<ParamInfo> Parameters { get; private set; } = [];
 
-    public List<SymbolInfo> AvailableSymbols { get; } = [];
+    public List<SymbolInfo> AvailableSymbols { get; private set; } = [];
 
     public UnionValue CurrentUnion { get; set; } = new(null, typeof(object));
 
@@ -147,7 +147,7 @@ internal class MethodContext
 
     public bool SkipPop { get; set; }
 
-    public List<Type> ArgumentTypesForNextMethodCall { get; } = [];
+    public List<Type> ArgumentTypesForNextMethodCall { get; private set; } = [];
 
     private Type[] _typeArgs = [];
     public Type[] TypeArgumentsForNextMethodCall
@@ -186,7 +186,7 @@ internal class MethodContext
 
     public bool BoxCallingType { get; set; }
 
-    public List<TypeContext> ClosureTypes { get; } = [];
+    public List<TypeContext> ClosureTypes { get; private set; } = [];
 
     public bool AllowTailCallEmission { get; set; }
 
@@ -216,4 +216,7 @@ internal class MethodContext
     public List<FieldBuilder> ClosureCapturedFields { get; set; }
 
     public bool IsClosureInvocationFunction { get; set; }
+    
+    public int LoopArrayTypeProbeIndex { get; set; } = 0;
+    public Dictionary<int, Type> LoopArrayTypeProbes { get; } = [];
 }
