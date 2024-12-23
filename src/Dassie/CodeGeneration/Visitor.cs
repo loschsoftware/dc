@@ -3878,6 +3878,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 if (CanBeConverted(t, t2))
                     EmitConversionOperator(t, t2);
+
                 else if (t2 == typeof(object))
                 {
                     CurrentMethod.IL.Emit(OpCodes.Box, t);
