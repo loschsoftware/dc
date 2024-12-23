@@ -523,18 +523,21 @@ public static class TooltipGenerator
     /// <returns>The appropriate color.</returns>
     public static Color ColorForType(TypeInfo type)
     {
-        if (type.IsInterface)
-            return Color.TemplateType;
+        try
+        {
+            if (type.IsInterface)
+                return Color.TemplateType;
 
-        if (type.IsEnum)
-            return Color.EnumType;
+            if (type.IsEnum)
+                return Color.EnumType;
 
-        if (type.IsAbstract && type.IsSealed) // That's how static types are represented in the CLR...
-            return Color.Module;
+            if (type.IsAbstract && type.IsSealed) // That's how static types are represented in the CLR...
+                return Color.Module;
 
-        if (type.IsValueType)
-            return Color.ValueType;
-
+            if (type.IsValueType)
+                return Color.ValueType;
+        }
+        catch (NotSupportedException) { }
         return Color.ReferenceType;
     }
 
