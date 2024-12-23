@@ -1661,7 +1661,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (t != t2)
                 EmitConversionOperator(t2, t);
 
-            LocalBuilder local = CurrentMethod.IL.DeclareLocal(t);
+            CurrentMethod.IL.DeclareLocal(t);
             CurrentMethod.LocalIndex++;
 
             EmitStloc(CurrentMethod.LocalIndex);
