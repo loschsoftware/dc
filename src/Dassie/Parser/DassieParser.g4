@@ -362,6 +362,7 @@ assignment_operator
 	| Slash_Equals
 	| Double_Asterisk_Equals
 	| Percent_Equals
+    | Double_Percent_Equals
 	| Tilde_Equals
 	| Double_Less_Than_Equals
 	| Double_Greater_Than_Equals
