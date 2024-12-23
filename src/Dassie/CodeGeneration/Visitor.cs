@@ -1651,14 +1651,21 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitPower_expression([NotNull] DassieParser.Power_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
+
+        if (t != typeof(double))
+            EmitConversionOperator(t, typeof(double));
+
         Type t2 = Visit(context.expression()[1]);
 
+        if (t2 != typeof(double))
+            EmitConversionOperator(t2, typeof(double));
+
         MethodInfo m = typeof(Math)
-            .GetMethod("Pow", new Type[]
-            {
-                t,
-                t2
-            });
+            .GetMethod("Pow",
+            [
+                typeof(double),
+                typeof(double)
+            ]);
 
         if (m == null)
         {
