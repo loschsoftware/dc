@@ -116,6 +116,27 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.type_kind().Template() != null)
             parent = null;
 
+        //if (parent.FullName.StartsWith("Dassie.Core.Enumeration`1")) // Marker type for enums
+        //{
+        //    enumerationMarkerType = parent;
+        //    parent = typeof(Enum);
+        //}
+
+        Type enumerationMarkerType = null;
+        if (context.attribute() != null)
+        {
+            foreach (DassieParser.AttributeContext attrib in context.attribute())
+            {
+                Type attribType = SymbolResolver.ResolveTypeName(attrib.type_name());
+
+                if (attribType.FullName.StartsWith("Dassie.Core.Enumeration"))
+                {
+                    enumerationMarkerType = attribType;
+                    parent = typeof(Enum);
+                }
+            }
+        }
+
         TypeBuilder tb;
 
         if (enclosingType == null)
@@ -141,6 +162,29 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Identifier().GetText(),
                 AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true),
                 parent);
+        }
+
+        if (enumerationMarkerType != null)
+        {
+            Type instanceFieldType = null;
+
+            if (enumerationMarkerType.GenericTypeArguments.Length > 0)
+                instanceFieldType = enumerationMarkerType.GenericTypeArguments[0];
+            else
+                instanceFieldType = typeof(int);
+
+            if (!IsIntegerType(instanceFieldType))
+            {
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0140_InvalidEnumerationType,
+                    $"Invalid enumeration type ''");
+            }
+
+            tb.DefineField("__value", instanceFieldType,
+                FieldAttributes.Public | FieldAttributes.RTSpecialName | FieldAttributes.SpecialName);
         }
 
         foreach (Type _interface in interfaces)
@@ -2715,7 +2759,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             string memberName = identifier.GetText();
             if (handleCtor)
-                memberName = t.FullName;
+                memberName = t.Name;
 
             Type[] _params = null;
 

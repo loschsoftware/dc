@@ -715,7 +715,7 @@ internal static class SymbolResolver
                     $"Field '{tc.Builder.Name}.{f.Builder.Name}' cannot be accessed because its access modifiers are too restrictive.");
             }
 
-            if (f.Builder.FieldType.IsEnum)
+            if (f.Builder.DeclaringType.IsEnum)
             {
                 if (!noEmitFragments)
                 {
@@ -733,8 +733,8 @@ internal static class SymbolResolver
                 return new EnumValueInfo()
                 {
                     Name = f.Name,
-                    Value = f.Builder.GetRawConstantValue(),
-                    EnumType = f.Builder.FieldType
+                    Value = f.ConstantValue,
+                    EnumType = f.Builder.DeclaringType
                 };
             }
 
@@ -1139,12 +1139,6 @@ internal static class SymbolResolver
                 $"An array cannot have more than 32 dimensions.");
         }
 
-        if (name.type_name() != null && name.type_name().Length > 0)
-        {
-            Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
-            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
-        }
-
         if (name.identifier_atom() != null)
         {
             if (name.identifier_atom().Identifier() != null)
@@ -1163,6 +1157,12 @@ internal static class SymbolResolver
             DassieParser.Type_nameContext childName = (DassieParser.Type_nameContext)name.children[0];
             if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
                 return ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
+        }
+
+        if (name.type_name() != null && name.type_name().Length > 0)
+        {
+            Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
+            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
         }
 
         // TODO: Implement other kinds of types

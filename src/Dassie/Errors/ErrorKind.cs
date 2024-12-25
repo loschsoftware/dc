@@ -579,5 +579,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when trying to instantiate a module.
     /// </summary>
-    DS0139_ModuleInstantiation
+    DS0139_ModuleInstantiation,
+    /// <summary>
+    /// Emitted when an enumeration is not an integer type.
+    /// </summary>
+    DS0140_InvalidEnumerationType
 }
