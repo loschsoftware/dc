@@ -183,7 +183,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     $"Invalid enumeration type '{instanceFieldType}'. The only allowed types are int8, uint8, int16, uint16, int, uint, int32, uint32, int64, uint64, native, unative.");
             }
 
-            tb.DefineField("__value", instanceFieldType,
+            tb.DefineField("value__", instanceFieldType,
                 FieldAttributes.Public | FieldAttributes.RTSpecialName | FieldAttributes.SpecialName);
         }
 
