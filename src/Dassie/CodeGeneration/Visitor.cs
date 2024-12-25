@@ -1385,7 +1385,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(bool);
         }
 
-        if (IsNumericType(t))
+        if (IsNumericType(t) || (t == t2 && t.IsEnum))
         {
             CurrentMethod.IL.Emit(OpCodes.Or);
             return t;
@@ -1425,7 +1425,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(bool);
         }
 
-        if (IsNumericType(t))
+        if (IsNumericType(t) || (t == t2 && t.IsEnum))
         {
             CurrentMethod.IL.Emit(OpCodes.And);
             return t;
@@ -1456,7 +1456,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
-        if (IsNumericType(t))
+        if (IsNumericType(t) || (t == t2 && t.IsEnum))
         {
             CurrentMethod.IL.Emit(OpCodes.Xor);
             return t;
@@ -1486,7 +1486,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         Type t = Visit(context.expression());
 
-        if (IsNumericType(t))
+        if (IsNumericType(t) || t.IsEnum)
         {
             CurrentMethod.IL.Emit(OpCodes.Not);
             return t;
