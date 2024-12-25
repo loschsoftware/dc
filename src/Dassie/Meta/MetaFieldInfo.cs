@@ -22,6 +22,8 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
 
     public UnionValue Union { get; set; }
 
+    public object ConstantValue { get; set; } = null;
+
     public override bool Equals(object obj)
     {
         return Equals(obj as MetaFieldInfo);

@@ -29,6 +29,16 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         set => _requireNonZeroValue = value;
     }
 
+    public override Expression VisitExpression_atom([NotNull] DassieParser.Expression_atomContext context)
+    {
+        return Visit(context.expression());
+    }
+
+    public override Expression VisitNewlined_expression([NotNull] DassieParser.Newlined_expressionContext context)
+    {
+        return Visit(context.expression());
+    }
+
     public override Expression VisitString_atom([NotNull] DassieParser.String_atomContext context)
     {
         string text = context.GetText()[1..^1];

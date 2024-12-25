@@ -13,6 +13,7 @@ using Dassie.Text;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -448,6 +449,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 "The modifier 'var' cannot be used on methods.");
         }
 
+        if (context.parameter_list() != null && context.member_special_modifier() != null && context.member_special_modifier().Any(s => s.Literal() != null))
+        {
+            ParserRuleContext rule = context.member_special_modifier().First(s => s.Literal != null);
+
+            EmitErrorMessage(
+                rule.Start.Line,
+                rule.Start.Column,
+                rule.GetText().Length,
+                DS0137_LiteralModifierOnMethod,
+                "The modifier 'literal' cannot be used on methods.");
+        }
+
         Type _tReturn = typeof(object);
 
         if (context.parameter_list() != null || _tReturn == typeof(void))
@@ -744,10 +757,32 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             type,
             AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.Val() != null));
 
-        TypeContext.Current.Fields.Add(new(context.Identifier().GetText(), fb, default));
+        MetaFieldInfo mfi = new(context.Identifier().GetText(), fb, default);
 
-        if (context.expression() != null)
+        if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+        {
+            Expression result = eval.Visit(context.expression());
+
+            if (result == null)
+            {
+                EmitErrorMessage(
+                    context.expression().Start.Line,
+                    context.expression().Start.Column,
+                    context.expression().GetText().Length,
+                    DS0138_CompileTimeConstantRequired,
+                    "Compile-time constant expected.");
+
+                return typeof(void);
+            }
+
+            mfi.ConstantValue = result.Value;
+            fb.SetConstant(result.Value);
+        }
+
+        else if (context.expression() != null)
             TypeContext.Current.FieldInitializers.Add((fb, context.expression()));
+
+        TypeContext.Current.Fields.Add(mfi);
 
         CurrentFile.Fragments.Add(new()
         {
@@ -2463,6 +2498,28 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 t = f.FieldType;
             }
 
+            else if (o is MetaFieldInfo mfi)
+            {
+                if (mfi.ConstantValue != null)
+                {
+                    EmitConst(mfi.ConstantValue);
+                    return (mfi.ConstantValue.GetType(), null);
+                }
+
+                FieldInfo fld = mfi.Builder;
+
+                if (fld.IsStatic)
+                    CurrentMethod.IL.Emit(OpCodes.Ldsfld, fld);
+
+                else if (TypeContext.Current.Fields.Any(_f => _f.Builder == fld))
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Ldarg_0);
+                    CurrentMethod.IL.Emit(OpCodes.Ldfld, fld);
+                }
+
+                t = fld.FieldType;
+            }
+
             else if (o is SymbolResolver.EnumValueInfo e)
             {
                 EmitLdcI4((int)e.Value);
@@ -2718,6 +2775,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 t = f.FieldType;
             }
 
+            else if (member is MetaFieldInfo mfi)
+            {
+                if (mfi.ConstantValue != null)
+                    EmitConst(mfi.ConstantValue);
+                else
+                    LoadField(mfi.Builder);
+
+                t = mfi.Builder.FieldType;
+            }
+
             else if (member is SymbolResolver.EnumValueInfo e)
             {
                 EmitLdcI4((int)e.Value);
@@ -2858,6 +2925,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     LoadField(f);
 
                 t = f.FieldType;
+            }
+
+            else if (member is MetaFieldInfo mfi)
+            {
+                if (mfi.ConstantValue != null)
+                    EmitConst(mfi.ConstantValue);
+                else
+                    LoadField(mfi.Builder);
+
+                t = mfi.Builder.FieldType;
             }
 
             else if (member is SymbolResolver.EnumValueInfo e)

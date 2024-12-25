@@ -300,6 +300,7 @@ member_special_modifier
     | Inline
     | Static
     | Abstract
+    | Literal
     ;
 
 type_member

@@ -203,7 +203,14 @@ internal static class SymbolResolver
             return TypeContext.Current.Methods.Select(m => m.Builder).First(m => m.Name == text);
 
         if (TypeContext.Current.Fields.Select(f => f.Builder).Where(f => f != null).Any(f => f.Name == text))
-            return TypeContext.Current.Fields.Select(f => f.Builder).First(f => f.Name == text);
+        {
+            MetaFieldInfo field = TypeContext.Current.Fields.First(f => f.Name == text);
+
+            if (field.ConstantValue == null)
+                return field.Builder;
+
+            return field;
+        }
 
         // 4. Members of type-imported types ("global members")
         if (TryGetGlobalMember(text, out object globals, row, col, len))
@@ -733,6 +740,9 @@ internal static class SymbolResolver
                     ToolTip = TooltipGenerator.Field(f.Builder)
                 });
             }
+
+            if (f.ConstantValue != null)
+                return f;
 
             return f.Builder;
         }

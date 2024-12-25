@@ -59,6 +59,8 @@ This: 'this';
 Func: 'func';
 Default: 'default';
 
+Literal: 'literal';
+
 Open_Paren: '(';
 Close_Paren: ')';
 Open_Paren_Bar: '(|';

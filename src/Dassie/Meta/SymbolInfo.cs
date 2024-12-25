@@ -125,6 +125,12 @@ internal class SymbolInfo
                     break;
 
                 default:
+                    if (Field.Builder.IsLiteral)
+                    {
+                        EmitConst(Field.Builder.GetRawConstantValue());
+                        break;
+                    }
+
                     if (!Field.Builder.IsStatic)
                         EmitLdarg0IfCurrentType(Field.Builder.FieldType);
 

@@ -567,5 +567,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a conversion between two types is not possible.
     /// </summary>
-    DS0136_InvalidConversion
+    DS0136_InvalidConversion,
+    /// <summary>
+    /// Emitted when the 'literal' modifier is applied to a method.
+    /// </summary>
+    DS0137_LiteralModifierOnMethod,
+    /// <summary>
+    /// Emitted when a compile-time constant value is expected but was not provided.
+    /// </summary>
+    DS0138_CompileTimeConstantRequired
 }

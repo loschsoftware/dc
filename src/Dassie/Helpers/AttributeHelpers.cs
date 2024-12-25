@@ -34,6 +34,15 @@ internal static class AttributeHelpers
         {
             if (modifier.Static() != null)
                 baseAttributes |= FieldAttributes.Static;
+
+            else if (modifier.Literal() != null)
+            {
+                baseAttributes |= FieldAttributes.Literal;
+
+                if (!baseAttributes.HasFlag(FieldAttributes.Static))
+                    baseAttributes |= FieldAttributes.Static;
+            }
+
             else
             {
                 EmitErrorMessage(
@@ -45,7 +54,7 @@ internal static class AttributeHelpers
             }
         }
 
-        if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(FieldAttributes.Static))
+        if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && specialModifiers.Any(s => s.Static() != null))
         {
             EmitMessage(
                 specialModifiers.First(s => s.GetText() == "static").Start.Line,
