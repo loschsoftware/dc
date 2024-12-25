@@ -606,6 +606,16 @@ internal static class SymbolResolver
         // 0. Constructors
         if (name == tb.Name || name == tb.FullName)
         {
+            if (tb.IsAbstract && tb.IsSealed)
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0139_ModuleInstantiation,
+                    $"Module '{name}' cannot be instantiated.");
+
+                return null;
+            }
+
             argumentTypes ??= Type.EmptyTypes;
 
             if (tc.ConstructorContexts.Count == 0)

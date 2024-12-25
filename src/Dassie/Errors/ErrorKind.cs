@@ -575,5 +575,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a compile-time constant value is expected but was not provided.
     /// </summary>
-    DS0138_CompileTimeConstantRequired
+    DS0138_CompileTimeConstantRequired,
+    /// <summary>
+    /// Emitted when trying to instantiate a module.
+    /// </summary>
+    DS0139_ModuleInstantiation
 }
