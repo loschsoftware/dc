@@ -180,7 +180,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetText().Length,
                     DS0140_InvalidEnumerationType,
-                    $"Invalid enumeration type ''");
+                    $"Invalid enumeration type '{instanceFieldType}'. The only allowed types are int8, uint8, int16, uint16, int, uint, int32, uint32, int64, uint64, native, unative.");
             }
 
             tb.DefineField("__value", instanceFieldType,
