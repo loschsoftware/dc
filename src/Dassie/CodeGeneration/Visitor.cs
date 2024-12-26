@@ -129,7 +129,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 Type attribType = SymbolResolver.ResolveTypeName(attrib.type_name());
 
-                if (attribType.FullName.StartsWith("Dassie.Core.Enumeration"))
+                if (attribType != null && attribType.FullName.StartsWith("Dassie.Core.Enumeration"))
                 {
                     enumerationMarkerType = attribType;
                     parent = typeof(Enum);
@@ -166,6 +166,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (enumerationMarkerType != null)
         {
+            tb.SetCustomAttribute(new(enumerationMarkerType.GetConstructor([]), []));
+
             Type instanceFieldType = null;
 
             if (enumerationMarkerType.GenericTypeArguments.Length > 0)
