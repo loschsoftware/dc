@@ -226,7 +226,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         TypeContext tc = new()
         {
             Builder = tb,
-            FullName = tb.FullName
+            FullName = tb.FullName,
+            IsEnumeration = enumerationMarkerType != null
         };
 
         tc.ImplementedInterfaces.AddRange(interfaces);
@@ -511,6 +512,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.parameter_list() != null || _tReturn == typeof(void))
         {
+            if (TypeContext.Current.IsEnumeration)
+            {
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0141_MethodInEnumeration,
+                    "Enumeration types cannot contain methods.");
+            }
+
             CallingConventions callingConventions = CallingConventions.HasThis;
 
             if (context.member_special_modifier().Any(m => m.Static() != null) || (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract))

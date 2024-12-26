@@ -40,4 +40,6 @@ internal class TypeContext
     public List<TypeParameterContext> TypeParameters { get; set; } = [];
 
     public List<Type> ImplementedInterfaces { get; } = [];
+
+    public bool IsEnumeration { get; set; }
 }

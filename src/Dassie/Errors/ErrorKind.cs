@@ -583,5 +583,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an enumeration is not an integer type.
     /// </summary>
-    DS0140_InvalidEnumerationType
+    DS0140_InvalidEnumerationType,
+    /// <summary>
+    /// Emitted when an enumeration type contains a method.
+    /// </summary>
+    DS0141_MethodInEnumeration
 }
