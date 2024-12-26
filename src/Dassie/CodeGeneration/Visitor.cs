@@ -1989,7 +1989,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitByref_expression([NotNull] DassieParser.Byref_expressionContext context)
     {
         Type t = Visit(context.expression());
-        return t;
+        return t.MakeByRefType();
     }
 
     public Type GetConstructorOrCast(Type cType, DassieParser.ArglistContext arglist, int line, int column, int length)
