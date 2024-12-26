@@ -587,5 +587,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an enumeration type contains a method.
     /// </summary>
-    DS0141_MethodInEnumeration
+    DS0141_MethodInEnumeration,
+    /// <summary>
+    /// Emitted when an enumeration type is defined using the 'ref' modifier.
+    /// </summary>
+    DS0142_EnumTypeExplicitlyRef,
+    /// <summary>
+    /// Emitted when an enumeration type defines a base type other than System.Enum.
+    /// </summary>
+    DS0143_EnumTypeBaseType,
+    /// <summary>
+    /// Emitted when an enumeration type implements a template.
+    /// </summary>
+    DS0144_EnumTypeImplementsTemplate
 }

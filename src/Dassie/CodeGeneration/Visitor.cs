@@ -94,6 +94,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return;
         }
 
+        bool explicitBaseType = false;
         Type parent = typeof(object);
         List<Type> interfaces = new();
 
@@ -107,7 +108,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             foreach (Type type in inherited)
             {
                 if (type.IsClass)
+                {
                     parent = type;
+                    explicitBaseType = true;
+                }
                 else
                     interfaces.Add(type);
             }
@@ -115,12 +119,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.type_kind().Template() != null)
             parent = null;
-
-        //if (parent.FullName.StartsWith("Dassie.Core.Enumeration`1")) // Marker type for enums
-        //{
-        //    enumerationMarkerType = parent;
-        //    parent = typeof(Enum);
-        //}
 
         Type enumerationMarkerType = null;
         if (context.attribute() != null)
@@ -132,6 +130,37 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (attribType != null && attribType.FullName.StartsWith("Dassie.Core.Enumeration"))
                 {
                     enumerationMarkerType = attribType;
+
+                    if (context.type_kind().Ref() != null)
+                    {
+                        EmitErrorMessage(
+                            context.type_kind().Ref().Symbol.Line,
+                            context.type_kind().Ref().Symbol.Column,
+                            3,
+                            DS0142_EnumTypeExplicitlyRef,
+                            "The modifier 'ref' is invalid for enumeration types. Enumerations are always value types.");
+                    }
+
+                    if (explicitBaseType && parent != null && parent != typeof(Enum))
+                    {
+                        EmitErrorMessage(
+                            context.inheritance_list().Start.Line,
+                            context.inheritance_list().Start.Column,
+                            context.inheritance_list().GetText().Length,
+                            DS0143_EnumTypeBaseType,
+                            "The only allowed base type for enumerations is 'System.Enum'.");
+                    }
+
+                    if (interfaces.Count > 0)
+                    {
+                        EmitErrorMessage(
+                            context.inheritance_list().Start.Line,
+                            context.inheritance_list().Start.Column,
+                            context.inheritance_list().GetText().Length,
+                            DS0144_EnumTypeImplementsTemplate,
+                            "Enumeration types cannot implement templates.");
+                    }
+
                     parent = typeof(Enum);
                 }
             }
@@ -354,6 +383,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     private void HandleConstructor(DassieParser.Type_memberContext context)
     {
+        if (TypeContext.Current.IsEnumeration)
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                DS0141_MethodInEnumeration,
+                "Enumeration types cannot contain constructors.");
+        }
+
         CallingConventions callingConventions = CallingConventions.HasThis;
 
         if (context.member_special_modifier().Any(m => m.Static() != null))
