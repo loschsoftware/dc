@@ -6,6 +6,7 @@ using Dassie.Runtime;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -886,7 +887,7 @@ internal static class SymbolResolver
         if (throwErrors)
         {
             IEnumerable<MethodBase> overloads = tc.Methods.Select(m => m.Builder)
-                .Where(m => m != null && m.Name == name || m.IsConstructor)
+                .Where(m => m != null && (m.Name == name || m.IsConstructor))
                 .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs) : m);
 
             if (name == tb.Name || name == tb.FullName)

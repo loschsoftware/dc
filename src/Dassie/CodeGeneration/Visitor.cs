@@ -407,10 +407,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(attribs, callingConventions, paramTypes.Select(p => p.Type).ToArray());
         cb.SetImplementationFlags(implementationFlags);
 
+        ILGenerator il = null;
+
+        if (!implementationFlags.HasFlag(MethodImplAttributes.Runtime))
+            il = cb.GetILGenerator();
+
         CurrentMethod = new()
         {
             ConstructorBuilder = cb,
-            IL = cb.GetILGenerator()
+            IL = il
         };
 
         CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
@@ -432,9 +437,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 param.Index--;
         }
 
-        HandleFieldInitializersAndDefaultConstructor();
+        if (CurrentMethod.IL != null)
+            HandleFieldInitializersAndDefaultConstructor();
 
-        Type t = Visit(context.expression());
+        Type t = typeof(void);
+
+        if (context.expression() != null)
+            t = Visit(context.expression());
 
         if (t != typeof(void))
         {
@@ -446,7 +455,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 $"Expected expression of type 'null' but found type '{t.FullName}'. A constructor can never return a value.");
         }
 
-        CurrentMethod.IL.Emit(OpCodes.Ret);
+        CurrentMethod.IL?.Emit(OpCodes.Ret);
 
         List<(Type, string)> _params = new();
         foreach (var param in paramTypes)
@@ -607,7 +616,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Builder = mb
             };
 
-            if (!attrib.HasFlag(MethodAttributes.Abstract))
+            if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime))
                 CurrentMethod.IL = mb.GetILGenerator();
 
             if (context.type_parameter_list() != null)
@@ -678,7 +687,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (context.expression() == null)
             {
-                if (!attrib.HasFlag(MethodAttributes.Abstract))
+                if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime))
                 {
                     EmitErrorMessage(
                         context.Start.Line,
@@ -690,7 +699,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     CurrentMethod.IL.Emit(OpCodes.Ret);
                 }
 
-                return typeof(void);
+                //return typeof(void);
             }
 
             if (attrib.HasFlag(MethodAttributes.Abstract))
@@ -718,12 +727,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             InjectClosureParameterInitializers();
 
-            _tReturn = Visit(context.expression());
-            mb.SetReturnType(_tReturn);
+            if (context.expression() != null)
+                _tReturn = Visit(context.expression());
 
             Type tReturn = _tReturn;
             if (context.type_name() != null)
                 tReturn = SymbolResolver.ResolveTypeName(context.type_name());
+
+            mb.SetReturnType(tReturn);
+
+            if (context.expression() == null)
+                _tReturn = tReturn;
 
             if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
             {
@@ -756,7 +770,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
             }
 
-            CurrentMethod.IL.Emit(OpCodes.Ret);
+            if (context.expression() != null)
+                CurrentMethod.IL.Emit(OpCodes.Ret);
 
             CurrentFile.FunctionParameterConstraints.TryGetValue(context.Identifier().GetText(), out Dictionary<string, string> constraintsForCurrentFunction);
             constraintsForCurrentFunction ??= [];
@@ -3123,8 +3138,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (boxedType.IsByRef /*|| boxedType.IsByRefLike*/)
                     boxedType = boxedType.GetElementType();
 
-                CurrentMethod.IL.Emit(OpCodes.Box, boxedType);
-                t = typeof(object);
+                try
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Box, boxedType);
+                    t = typeof(object);
+                }
+                catch (NullReferenceException) { }
             }
 
             CurrentMethod.ArgumentTypesForNextMethodCall.Add(t);
@@ -4772,8 +4791,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         //    }
         //}
 
-        EmitLdloc(0);
-        CurrentMethod.IL.Emit(OpCodes.Dup);
+        if (context.op.Text == "func")
+        {
+            EmitLdloc(0);
+            CurrentMethod.IL.Emit(OpCodes.Dup);
+        }
 
         //if (m.IsStatic && instanceField == null)
         //    CurrentMethod.IL.Emit(OpCodes.Ldnull);
@@ -4790,7 +4812,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         EmitLdftn(m);
 
         if (context.op.Text == "func&") // Get raw pointer instead of Func[T] delegate
+        {
             return typeof(nint);
+        }
 
         ParameterInfo[] parameters = m.GetParameters();
 

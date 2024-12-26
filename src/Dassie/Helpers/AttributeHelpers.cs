@@ -1,5 +1,7 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Core;
+using Dassie.Meta;
 using Dassie.Parser;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -139,6 +141,28 @@ internal static class AttributeHelpers
         {
             baseAttributes |= MethodAttributes.HideBySig;
             baseAttributes |= MethodAttributes.NewSlot;
+        }
+
+        if (attribs != null && attribs.Length > 0)
+        {
+            bool disableErrorWriter = Disabled;
+            Disabled = true;
+
+            foreach (DassieParser.AttributeContext attrib in attribs)
+            {
+                Type attribType = SymbolResolver.ResolveTypeName(attrib.type_name());
+
+                if (attribType == typeof(RuntimeImplemented))
+                    implementationFlags |= MethodImplAttributes.Runtime;
+
+                if (attribType == typeof(HideBySig) && !baseAttributes.HasFlag(MethodAttributes.HideBySig))
+                    baseAttributes |= MethodAttributes.HideBySig;
+
+                if (attribType == typeof(NewSlot) && !baseAttributes.HasFlag(MethodAttributes.NewSlot))
+                    baseAttributes |= MethodAttributes.NewSlot;
+            }
+
+            Disabled = false;
         }
 
         return (baseAttributes, implementationFlags);
