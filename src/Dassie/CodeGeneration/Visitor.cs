@@ -103,14 +103,42 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.inheritance_list() != null)
         {
-            List<Type> inherited = TypeHelpers.GetInheritedTypes(context.inheritance_list());
+            List<Type> inherited = GetInheritedTypes(context.inheritance_list());
 
             foreach (Type type in inherited)
             {
                 if (type.IsClass)
                 {
+                    if (context.type_kind().Val() != null)
+                    {
+                        EmitErrorMessage(
+                            context.inheritance_list().Start.Line,
+                            context.inheritance_list().Start.Column,
+                            context.inheritance_list().GetText().Length,
+                            DS0146_ValueTypeInheritsFromClass,
+                            $"Value types cannot inherit from reference types. Value types are only allowed to implement templates.");
+                    }
+                    else if (type == typeof(ValueType))
+                    {
+                        EmitErrorMessage(
+                            context.inheritance_list().Start.Line,
+                            context.inheritance_list().Start.Column,
+                            context.inheritance_list().GetText().Length,
+                            DS0145_ValueTypeInherited,
+                            $"Inheriting from 'System.ValueType' is not permitted. To declare a value type, use 'val type'.");
+                    }
+
                     parent = type;
                     explicitBaseType = true;
+                }
+                else if (type.IsValueType)
+                {
+                    EmitErrorMessage(
+                        context.inheritance_list().Start.Line,
+                        context.inheritance_list().Start.Column,
+                        context.inheritance_list().GetText().Length,
+                        DS0147_ValueTypeAsBaseType,
+                        $"Inheriting from value types is not permitted. Only reference types can be inherited.");
                 }
                 else
                     interfaces.Add(type);

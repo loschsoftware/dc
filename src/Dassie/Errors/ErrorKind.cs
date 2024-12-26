@@ -599,5 +599,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an enumeration type implements a template.
     /// </summary>
-    DS0144_EnumTypeImplementsTemplate
+    DS0144_EnumTypeImplementsTemplate,
+    /// <summary>
+    /// Emitted when a type explicitly inherits from 'System.ValueType'.
+    /// </summary>
+    DS0145_ValueTypeInherited,
+    /// <summary>
+    /// Emitted when the inheritance list of a value type contains a reference type.
+    /// </summary>
+    DS0146_ValueTypeInheritsFromClass,
+    /// <summary>
+    /// Emitted when inheriting from a value type.
+    /// </summary>
+    DS0147_ValueTypeAsBaseType
 }
