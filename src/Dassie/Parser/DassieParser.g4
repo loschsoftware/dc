@@ -64,7 +64,7 @@ expression
     | Ampersand expression #byref_expression
     | expression Double_Colon expression #index_expression
     | parameter_list (Colon type_name)? Equals_Greater expression #anonymous_function_expression
-    | Func function_pointer_parameter_list expression #function_pointer_expression
+    | op=(Func | Func_Ampersand) function_pointer_parameter_list expression #function_pointer_expression
     | Caret_Backslash type_name  #typeof_expression
     | Dollar_Backslash expression #nameof_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression

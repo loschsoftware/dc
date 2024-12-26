@@ -4789,6 +4789,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         EmitLdftn(m);
 
+        if (context.op.Text == "func&") // Get raw pointer instead of Func[T] delegate
+            return typeof(nint);
+
         ParameterInfo[] parameters = m.GetParameters();
 
         if (parameters.Length > 16)

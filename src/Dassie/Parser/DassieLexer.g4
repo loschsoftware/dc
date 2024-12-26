@@ -57,6 +57,7 @@ False: 'false';
 This: 'this';
 
 Func: 'func';
+Func_Ampersand: 'func&';
 Default: 'default';
 
 Literal: 'literal';
