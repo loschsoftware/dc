@@ -39,6 +39,211 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         return Visit(context.expression());
     }
 
+    public override Expression VisitAddition_expression([NotNull] DassieParser.Addition_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value + b.Value);
+    }
+
+    public override Expression VisitSubtraction_expression([NotNull] DassieParser.Subtraction_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value - b.Value);
+    }
+
+    public override Expression VisitMultiply_expression([NotNull] DassieParser.Multiply_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value * b.Value);
+    }
+
+    public override Expression VisitDivide_expression([NotNull] DassieParser.Divide_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value / b.Value);
+    }
+
+    public override Expression VisitRemainder_expression([NotNull] DassieParser.Remainder_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value % b.Value);
+    }
+
+    public override Expression VisitModulus_expression([NotNull] DassieParser.Modulus_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, (a.Value % b.Value + b.Value) % b.Value);
+    }
+
+    public override Expression VisitLeft_shift_expression([NotNull] DassieParser.Left_shift_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value << b.Value);
+    }
+
+    public override Expression VisitRight_shift_expression([NotNull] DassieParser.Right_shift_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value >> b.Value);
+    }
+
+    public override Expression VisitLogical_and_expression([NotNull] DassieParser.Logical_and_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value & b.Value);
+    }
+
+    public override Expression VisitAnd_expression([NotNull] DassieParser.And_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value & b.Value);
+    }
+
+    public override Expression VisitOr_expression([NotNull] DassieParser.Or_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value | b.Value);
+    }
+
+    public override Expression VisitLogical_or_expression([NotNull] DassieParser.Logical_or_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value | b.Value);
+    }
+
+    public override Expression VisitXor_expression([NotNull] DassieParser.Xor_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(a.Type, a.Value ^ b.Value);
+    }
+
+    public override Expression VisitPower_expression([NotNull] DassieParser.Power_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(typeof(double), Math.Pow(a.Value, b.Value));
+    }
+
+    public override Expression VisitEquality_expression([NotNull] DassieParser.Equality_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+        
+        if (context.op.Text == "==")
+            return a.Value == b.Value;
+
+        return new(typeof(bool), a.Value != b.Value);
+    }
+
+    public override Expression VisitComparison_expression([NotNull] DassieParser.Comparison_expressionContext context)
+    {
+        Expression a = Visit(context.expression()[0]);
+        Expression b = Visit(context.expression()[1]);
+
+        if (a == null || b == null)
+            return null;
+
+        return new(typeof(bool), context.op.Text switch
+        {
+            "<" => a.Value < b.Value,
+            ">" => a.Value > b.Value,
+            "<=" => a.Value <= b.Value,
+            _ => a.Value >= b.Value
+        });
+    }
+
+    public override Expression VisitBitwise_complement_expression([NotNull] DassieParser.Bitwise_complement_expressionContext context)
+    {
+        Expression a = Visit(context.expression());
+
+        if (a == null)
+            return null;
+
+        return new(a.Type, ~a.Value);
+    }
+
+    public override Expression VisitLogical_negation_expression([NotNull] DassieParser.Logical_negation_expressionContext context)
+    {
+        Expression a = Visit(context.expression());
+
+        if (a == null)
+            return null;
+
+        return new(a.Type, -a.Value);
+    }
+
     public override Expression VisitString_atom([NotNull] DassieParser.String_atomContext context)
     {
         string text = context.GetText()[1..^1];
