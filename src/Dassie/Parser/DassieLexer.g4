@@ -12,8 +12,8 @@ NewLine
 	: ('\r\n' | '\r' | '\n' | '\u0085' | '\u2028' | '\u2029');
 
 Single_Line_Comment: '#' InputCharacter* -> channel(Comments_Channel);
-Delimited_Comment: '#[' .*? ']#' -> channel(Comments_Channel);
-Documentation_Comment: '>#' InputCharacter* -> channel(Comments_Channel);
+Delimited_Comment: '#[' (Delimited_Comment | .)*? ']#' -> channel(Comments_Channel);
+Documentation_Comment: '##' InputCharacter* -> channel(Comments_Channel);
 
 Import: 'import';
 Export: 'export';

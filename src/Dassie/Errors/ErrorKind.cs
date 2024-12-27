@@ -611,5 +611,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when inheriting from a value type.
     /// </summary>
-    DS0147_ValueTypeAsBaseType
+    DS0147_ValueTypeAsBaseType,
+    /// <summary>
+    /// Emitted when an immutable value has a byref type.
+    /// </summary>
+    DS0148_ImmutableValueOfByRefType,
+    /// <summary>
+    /// Emitted when a nested byref type (e.g. int&amp;&amp;) is used.
+    /// </summary>
+    DS0149_NestedByRefType,
+    /// <summary>
+    /// Emitted when a field of a byref or byref-like type is declared outside of a byref-like type.
+    /// </summary>
+    DS0150_ByRefFieldInNonByRefLikeType
 }

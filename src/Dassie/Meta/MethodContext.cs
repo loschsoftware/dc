@@ -219,4 +219,12 @@ internal class MethodContext
     
     public int LoopArrayTypeProbeIndex { get; set; } = 0;
     public Dictionary<int, Type> LoopArrayTypeProbes { get; } = [];
+
+    public bool LoadReference { get; set; }
+    public bool LoadIndirectIfByRef { get; set; } = true;
+    
+    public bool LoadAddressForDirectObjectInit { get; set; }
+    public int DirectObjectInitIndex { get; set; }
+
+    public bool LocalSetExternally { get; set; }
 }

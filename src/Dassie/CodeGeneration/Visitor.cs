@@ -5,7 +5,6 @@ using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Helpers;
 using Dassie.Intrinsics;
-using Dassie.Lowering;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
@@ -13,7 +12,6 @@ using Dassie.Text;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -286,6 +284,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             FullName = tb.FullName,
             IsEnumeration = enumerationMarkerType != null
         };
+
+        // byref-like type ('ref struct' in C#)
+        if (context.type_kind().Ampersand() != null)
+        {
+            tc.IsByRefLike = true;
+            tb.SetCustomAttribute(new(typeof(IsByRefLikeAttribute).GetConstructor([]), []));
+        }
 
         tc.ImplementedInterfaces.AddRange(interfaces);
         tc.FilesWhereDefined.Add(CurrentFile.Path);
@@ -895,6 +900,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             context.Identifier().GetText(),
             type,
             AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.Val() != null));
+
+        if ((type.IsByRef || type.IsByRefLike) && !TypeContext.Current.IsByRefLike)
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                DS0150_ByRefFieldInNonByRefLikeType,
+                $"Invalid field type '{type}'. References are only valid as part of ByRef-like value types (val& type).");
+        }
 
         MetaFieldInfo mfi = new(context.Identifier().GetText(), fb, default);
 
@@ -2016,7 +2031,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitByref_expression([NotNull] DassieParser.Byref_expressionContext context)
     {
+        CurrentMethod.LoadReference = true;
+        CurrentMethod.LoadIndirectIfByRef = false;
+
         Type t = Visit(context.expression());
+
+        CurrentMethod.LoadReference = false;
+        CurrentMethod.LoadIndirectIfByRef = true;
+
+        if (t.IsByRef)
+            return t;
+
         return t.MakeByRefType();
     }
 
@@ -2575,6 +2600,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     s.Load();
 
                 t = s.Type();
+
+                if (t.IsByRef)
+                    t = t.GetElementType();
             }
 
             else if (o is LocalInfo l)
@@ -2962,6 +2990,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (VisitorStep1CurrentMethod != null)
                     CurrentMethod.ParameterBoxIndices.Clear();
+            }
+
+            else if (member is SymbolResolver.DirectlyInitializedValueType d)
+            {
+                if (CurrentMethod.LoadAddressForDirectObjectInit)
+                    EmitLdloca(CurrentMethod.DirectObjectInitIndex);
+
+                CurrentMethod.IL.Emit(OpCodes.Initobj, d.Type);
+                t = d.Type;
+
+                CurrentMethod.LocalSetExternally = true;
             }
 
             else if (member is MethodInfo m)
@@ -3997,6 +4036,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitLocal_declaration_or_assignment([NotNull] DassieParser.Local_declaration_or_assignmentContext context)
     {
+        bool skipLocalSet;
+
         if (context.expression() is DassieParser.Try_expressionContext)
         {
             EmitErrorMessage(
@@ -4041,7 +4082,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitLdarg(0);
 
             if (sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/)
-                EmitLdarg(sym.Index());
+            {
+                //EmitLdarg(sym.Index());
+                sym.Load(skipLdind: true);
+            }
 
             if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == sym.Name()))
                 (closureInstanceField, closureContainerLocalName) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == sym.Name()).Value;
@@ -4054,7 +4098,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             else if (closureInstanceField != null)
                 EmitLdarg(0);
 
+            CurrentMethod.LoadAddressForDirectObjectInit = true;
+            CurrentMethod.DirectObjectInitIndex = sym.Index();
+
             Type type = Visit(context.expression());
+
+            skipLocalSet = CurrentMethod.LocalSetExternally;
+            CurrentMethod.LocalSetExternally = false;
+
+            CurrentMethod.LoadAddressForDirectObjectInit = false;
 
             bool checkTypes = true;
             if (type != sym.Type() && !((sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/) && sym.Type().GetElementType() == type))
@@ -4066,7 +4118,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
             }
 
-            sym.Set();
+            if (!skipLocalSet)
+                sym.Set(setIndirectIfByRef: !type.IsByRef);
 
             if (checkTypes && type != sym.Type() && !((sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/) && sym.Type().GetElementType() == type))
             {
@@ -4136,7 +4189,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         else if (closureInstanceField != null)
             EmitLdarg(0);
 
+        CurrentMethod.LoadAddressForDirectObjectInit = true;
+        CurrentMethod.DirectObjectInitIndex = CurrentMethod.LocalIndex + 1;
+
         Type t = Visit(context.expression());
+
+        skipLocalSet = CurrentMethod.LocalSetExternally;
+        CurrentMethod.LocalSetExternally = false;
+
+        CurrentMethod.LoadAddressForDirectObjectInit = false;
 
         Type t1 = t;
 
@@ -4171,6 +4232,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
+
+        if (t.IsByRef && context.Var() == null)
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                DS0148_ImmutableValueOfByRefType,
+                $"The type '{t}' is invalid for '{context.Identifier().GetText()}' since it is an immutable value. Pointers and references are only supported by mutable variables.");
+        }
 
         CurrentFile.Fragments.Add(new()
         {
@@ -4223,7 +4294,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Newobj, constructor);
         }
 
-        localSymbol.Set();
+        if (!skipLocalSet)
+            localSymbol.Set(setIndirectIfByRef: !t.IsByRef);
+
         localSymbol.Load(!string.IsNullOrEmpty(closureContainerLocalName), closureContainerLocalName);
 
         return t;

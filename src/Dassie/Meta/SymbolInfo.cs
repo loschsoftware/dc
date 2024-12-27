@@ -69,9 +69,9 @@ internal class SymbolInfo
         ToolTip = GetToolTip()
     };
 
-    public void Load(bool implicitLoadClosureContainerInstanceField = false, string localName = "")
+    public void Load(bool implicitLoadClosureContainerInstanceField = false, string localName = "", bool skipLdind = false)
     {
-        if (CurrentMethod.ByRefArguments.Contains(CurrentMethod.CurrentArg))
+        if ((CurrentMethod.LoadReference && !Type().IsByRef) || CurrentMethod.ByRefArguments.Contains(CurrentMethod.CurrentArg))
         {
             if (!IsMutable())
             {
@@ -139,7 +139,7 @@ internal class SymbolInfo
             }
         }
 
-        if (Type().IsByRef /*|| Type().IsByRefLike*/)
+        if (CurrentMethod.LoadIndirectIfByRef && !skipLdind && Type().IsByRef /*|| Type().IsByRefLike*/)
             CurrentMethod.IL.Emit(Type().GetElementType().GetLoadIndirectOpCode());
     }
 
@@ -210,9 +210,9 @@ internal class SymbolInfo
         }
     }
 
-    public void Set(bool implicitLoadClosureContainerInstanceField = false, string localName = "")
+    public void Set(bool implicitLoadClosureContainerInstanceField = false, string localName = "", bool setIndirectIfByRef = true)
     {
-        if (Type().IsByRef /*|| Type().IsByRefLike*/)
+        if ((Type().IsByRef /*|| Type().IsByRefLike*/) && setIndirectIfByRef)
         {
             CurrentMethod.IL.Emit(Type().GetElementType().GetSetIndirectOpCode());
             return;

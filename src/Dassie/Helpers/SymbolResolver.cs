@@ -6,7 +6,6 @@ using Dassie.Runtime;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -23,6 +22,11 @@ internal static class SymbolResolver
         public object Value { get; set; }
 
         public Type EnumType { get; set; }
+    }
+
+    public class DirectlyInitializedValueType
+    {
+        public Type Type { get; init; }
     }
 
     public static string GetTypeArgumentListSuffix(Type[] typeArgs, bool includeBacktick)
@@ -280,6 +284,14 @@ internal static class SymbolResolver
 
             if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
                 CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
+            if (!cons.Any() && (argumentTypes == null || argumentTypes.Length == 0) && type.IsValueType)
+            {
+                return new DirectlyInitializedValueType()
+                {
+                    Type = type
+                };
+            }
 
             if (cons.Any())
             {
@@ -624,7 +636,18 @@ internal static class SymbolResolver
                 if (argumentTypes.Length != 0)
                     goto Error;
 
-                return tb.GetConstructor([]);
+                ConstructorInfo c = tb.GetConstructor([]);
+
+                if (c != null)
+                    return c;
+
+                if (tb.IsValueType)
+                {
+                    return new DirectlyInitializedValueType()
+                    {
+                        Type = tb
+                    };
+                }
             }
 
             ConstructorInfo[] cons = tc.ConstructorContexts.Select(c => c.ConstructorBuilder)
@@ -1117,10 +1140,46 @@ internal static class SymbolResolver
         return ResolveTypeName($"{name}Attribute", noEmitFragments: noEmitFragments);
     }
 
-    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false)
+    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false)
     {
+        if (name.Double_Ampersand() != null)
+        {
+            Type t = ResolveTypeName(name.type_name().First(), noEmitFragments, noEmitDS0149: true);
+
+            if (!noEmitDS0149)
+            {
+                EmitErrorMessage(
+                    name.Start.Line,
+                    name.Start.Column,
+                    name.GetText().Length,
+                    DS0149_NestedByRefType,
+                    $"Invalid type '{name.GetText()}': Nested references are not permitted.");
+            }
+
+            if (t.IsByRef)
+                return t;
+
+            return t.MakeByRefType();
+        }
+
         if (name.Ampersand() != null)
-            return ResolveTypeName(name.type_name().First(), noEmitFragments).MakeByRefType();
+        {
+            Type t = ResolveTypeName(name.type_name().First(), noEmitFragments, noEmitDS0149: true);
+
+            if (t.IsByRef)
+            {
+                EmitErrorMessage(
+                    name.Start.Line,
+                    name.Start.Column,
+                    name.GetText().Length,
+                    DS0149_NestedByRefType,
+                    $"Invalid type '{name.GetText()}': Nested references are not permitted.");
+
+                return t;
+            }
+
+            return t.MakeByRefType();
+        }
 
         int arrayDims = 0;
 

@@ -163,7 +163,7 @@ type_name
     | Open_Paren type_name (Bar type_name)+ Close_Paren
     | generic_identifier
     | type_name type_arg_list
-    | type_name Ampersand
+    | type_name (Ampersand | Double_Ampersand)
     | type_name array_type_specifier
     ;
 
@@ -278,7 +278,7 @@ inheritance_list
 
 type_kind
     : Ref? Type
-    | Val Type
+    | Val Ampersand? Type
     | Template
     | Module
     ;
