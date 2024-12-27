@@ -499,7 +499,7 @@ internal static class EmitHelpers
         {
             if (VisitorStep1.Types.Any(t => t.FullName == TypeContext.Current.FullName)
                 && VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName).Methods
-                .Any(m => m.Builder.Name == CurrentMethod.Builder.Name
+                .Any(m => m.Builder != null && m.Builder.Name == CurrentMethod.Builder.Name
                 && m.Parameters.Select(p => p.Type).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))))
             {
                 TypeContext step1Context = VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName);

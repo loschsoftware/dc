@@ -2663,6 +2663,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 //return f.FieldType;
                 t = f.FieldType;
+
+                if (t.IsGenericTypeParameter)
+                    t = f.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
             }
 
             else if (o is MetaFieldInfo mfi)
@@ -2685,6 +2688,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
 
                 t = fld.FieldType;
+
+                if (t.IsGenericTypeParameter)
+                    t = fld.FieldType.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
             }
 
             else if (o is SymbolResolver.EnumValueInfo e)
@@ -2759,6 +2765,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 result = meth;
                 t = meth.ReturnType;
+
+                if (t.IsGenericTypeParameter)
+                    t = m.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
                 if (typeParams.Contains(t))
                     t = typeArgs[typeParams.IndexOf(t)];
@@ -2940,6 +2949,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     LoadField(f);
 
                 t = f.FieldType;
+
+                if (t.IsGenericTypeParameter)
+                    t = f.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
             }
 
             else if (member is MetaFieldInfo mfi)
@@ -2950,6 +2962,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     LoadField(mfi.Builder);
 
                 t = mfi.Builder.FieldType;
+
+                if (t.IsGenericTypeParameter)
+                    t = mfi.Builder.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
             }
 
             else if (member is SymbolResolver.EnumValueInfo e)
@@ -3034,6 +3049,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 t = m.ReturnType;
 
+                if (t.IsGenericTypeParameter)
+                    t = m.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
+
                 if (VisitorStep1CurrentMethod != null)
                     CurrentMethod.ParameterBoxIndices.Clear();
             }
@@ -3103,6 +3121,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     LoadField(f);
 
                 t = f.FieldType;
+
+                if (t.IsGenericTypeParameter)
+                    t = f.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
             }
 
             else if (member is MetaFieldInfo mfi)
@@ -3113,6 +3134,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     LoadField(mfi.Builder);
 
                 t = mfi.Builder.FieldType;
+
+                if (t.IsGenericTypeParameter)
+                    t = mfi.Builder.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
             }
 
             else if (member is SymbolResolver.EnumValueInfo e)
@@ -3145,6 +3169,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitTailcall();
                 EmitCall(t, m);
                 t = m.ReturnType;
+
+                if (t.IsGenericTypeParameter)
+                    t = m.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
                 if (VisitorStep1CurrentMethod != null)
                     CurrentMethod.ParameterBoxIndices.Clear();
