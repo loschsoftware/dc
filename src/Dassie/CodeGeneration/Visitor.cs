@@ -735,7 +735,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 //return typeof(void);
             }
 
-            if (attrib.HasFlag(MethodAttributes.Abstract))
+            if (attrib.HasFlag(MethodAttributes.Abstract) && context.expression() != null)
             {
                 EmitErrorMessage(
                     context.Start.Line,
