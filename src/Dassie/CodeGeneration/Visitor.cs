@@ -901,7 +901,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             type,
             AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.Val() != null));
 
-        if ((type.IsByRef || type.IsByRefLike) && !TypeContext.Current.IsByRefLike)
+        if ((type.IsByRef /*|| type.IsByRefLike*/) && !TypeContext.Current.IsByRefLike)
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
