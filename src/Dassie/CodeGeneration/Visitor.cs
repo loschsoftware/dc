@@ -10,6 +10,7 @@ using Dassie.Parser;
 using Dassie.Runtime;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
+using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2970,10 +2971,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 flags,
                 getDefaultOverload: ignoreParams);
 
+            bool arglistVisited = false;
+
             if (identifier == context.full_identifier().Identifier().Last() && context.arglist() != null && !getFunctionPointerTarget)
             {
                 Visit(context.arglist());
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+                arglistVisited = true;
             }
 
             if (member == null)
@@ -3003,7 +3007,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (member is MetaFieldInfo mfi)
             {
-                if (mfi.IsFunctionPointer && context.arglist() != null && identifier == nextNodes.Last())
+                if (!arglistVisited && mfi.IsFunctionPointer && context.arglist() != null && identifier == nextNodes.Last())
                     Visit(context.arglist());
 
                 if (mfi.ConstantValue != null)
@@ -3160,10 +3164,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 _params,
                 flags);
 
+            bool arglistVisited = false;
+
             if (identifier == context.Identifier().Last() && context.arglist() != null)
             {
                 Visit(context.arglist());
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
+                arglistVisited = true;
             }
 
             if (member == null)
@@ -3184,7 +3191,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (member is MetaFieldInfo mfi)
             {
-                if (mfi.IsFunctionPointer && context.arglist() != null && identifier == context.Identifier().Last())
+                if (!arglistVisited && mfi.IsFunctionPointer && context.arglist() != null && identifier == context.Identifier().Last())
                     Visit(context.arglist());
 
                 if (mfi.ConstantValue != null)
@@ -3865,6 +3872,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (o is FieldInfo f)
             {
+                MetaFieldInfo mfi = null;
+                if (TypeContext.Current.Fields.Any(_f => _f.Builder == f))
+                    mfi = TypeContext.Current.Fields.First(_f => _f.Builder == f);
+
                 if (f.IsInitOnly)
                 {
                     EmitErrorMessage(
@@ -3882,12 +3893,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     CurrentMethod.IL.Emit(OpCodes.Stsfld, f);
                 }
 
-                else if (TypeContext.Current.Fields.Any(_f => _f.Builder == f))
+                else if (mfi != null)
                 {
                     CurrentMethod.IL.Emit(OpCodes.Ldarg_0);
                     EmitLdloc(tempIndex);
                     EmitConversionOperator(ret, f.FieldType);
                     CurrentMethod.IL.Emit(OpCodes.Stfld, f);
+                }
+
+                if (mfi != null && CurrentMethod.NextAssignmentIsFunctionPointer)
+                {
+                    mfi.IsFunctionPointer = true;
+                    mfi.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
+                    CurrentMethod.NextAssignmentIsFunctionPointer = false;
                 }
 
                 return ret;
@@ -4042,6 +4060,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (member is FieldInfo f)
             {
+                MetaFieldInfo mfi = null;
+                if (TypeContext.Current.Fields.Any(_f => _f.Builder == f))
+                    mfi = TypeContext.Current.Fields.First(_f => _f.Builder == f);
+
+                if (mfi != null && CurrentMethod.NextAssignmentIsFunctionPointer)
+                {
+                    mfi.IsFunctionPointer = true;
+                    mfi.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
+                    CurrentMethod.NextAssignmentIsFunctionPointer = false;
+                }
+
                 if (identifier == ids.Last())
                 {
                     if (f.IsInitOnly)

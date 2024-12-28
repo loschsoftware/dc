@@ -778,7 +778,7 @@ internal static class SymbolResolver
             if (f.ConstantValue != null)
                 return f;
 
-            return f.Builder;
+            return f;
         }
 
         // 2. Properties
