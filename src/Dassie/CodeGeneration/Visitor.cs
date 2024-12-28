@@ -292,6 +292,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             tb.SetCustomAttribute(new(typeof(IsByRefLikeAttribute).GetConstructor([]), []));
         }
 
+        // immutable value type ('readonly struct' in C#)
+        if (context.type_kind().Exclamation_Mark() != null)
+        {
+            tc.IsImmutable = true;
+            tb.SetCustomAttribute(new(typeof(IsReadOnlyAttribute).GetConstructor([]), []));
+        }
+
         tc.ImplementedInterfaces.AddRange(interfaces);
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
@@ -896,10 +903,22 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.type_name() != null)
             type = SymbolResolver.ResolveTypeName(context.type_name());
 
+        if (TypeContext.Current.IsImmutable && context.Var() != null)
+        {
+            EmitErrorMessage(
+                context.Var().Symbol.Line,
+                context.Var().Symbol.Column,
+                context.Var().GetText().Length,
+                DS0151_VarFieldInImmutableType,
+                $"The 'var' modifier is invalid on members of immutable value types. Fields of immutable types are not allowed to be mutable.");
+        }
+
+        bool isInitOnly = TypeContext.Current.IsImmutable || context.Val() != null;
+
         FieldBuilder fb = TypeContext.Current.Builder.DefineField(
             context.Identifier().GetText(),
             type,
-            AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.Val() != null));
+            AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), isInitOnly));
 
         if ((type.IsByRef /*|| type.IsByRefLike*/) && !TypeContext.Current.IsByRefLike)
         {

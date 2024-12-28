@@ -623,5 +623,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a field of a byref or byref-like type is declared outside of a byref-like type.
     /// </summary>
-    DS0150_ByRefFieldInNonByRefLikeType
+    DS0150_ByRefFieldInNonByRefLikeType,
+    /// <summary>
+    /// Emitted when an immutable value type (val! type) contains a field explicitly marked as 'var'.
+    /// </summary>
+    DS0151_VarFieldInImmutableType
 }

@@ -44,4 +44,6 @@ internal class TypeContext
     public bool IsEnumeration { get; set; }
 
     public bool IsByRefLike { get; set; }
+
+    public bool IsImmutable { get; set; }
 }

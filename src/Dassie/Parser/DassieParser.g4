@@ -278,7 +278,8 @@ inheritance_list
 
 type_kind
     : Ref? Type
-    | Val Ampersand? Type
+    | Val Exclamation_Mark? Ampersand? Type
+    | Val Ampersand? Exclamation_Mark? Type
     | Template
     | Module
     ;
