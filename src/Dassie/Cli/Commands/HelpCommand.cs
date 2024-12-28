@@ -42,7 +42,7 @@ internal class HelpCommand : ICompilerCommand
         DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
 
         logoBuilder.AppendLine();
-        logoBuilder.AppendLine($"Dassie Command Line Compiler for .NET {typeof(object).Assembly.GetName().Version.ToString(2)}");
+        logoBuilder.AppendLine($"Dassie Compiler Command Line for .NET {typeof(object).Assembly.GetName().Version.ToString(2)}");
         logoBuilder.AppendLine($"Version {version.ToString(2)}, Build {version.Build} ({buildDate.ToShortDateString()})");
 
         ConsoleColor def = Console.ForegroundColor;
