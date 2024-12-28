@@ -2614,7 +2614,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Parameter
                 };
 
-                if (s.IsFunctionPointer && context.arglist() != null)
+                if (s.IsFunctionPointer && context.arglist() != null && firstIndex == 0)
                     Visit(context.arglist());
 
                 if (CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
@@ -2627,7 +2627,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsByRef)
                     t = t.GetElementType();
 
-                if (s.IsFunctionPointer && (context.arglist() != null || (s.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)))
+                if (s.IsFunctionPointer && (context.arglist() != null || (s.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, s.FunctionPointerTarget.ReturnType, s.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
                     return (s.FunctionPointerTarget.ReturnType, s.FunctionPointerTarget);
@@ -2642,7 +2642,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Local
                 };
 
-                if (s.IsFunctionPointer && context.arglist() != null)
+                if (s.IsFunctionPointer && context.arglist() != null && firstIndex == 0)
                     Visit(context.arglist());
 
                 FieldInfo closureInstanceField = null;
@@ -2673,7 +2673,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.GetText().Length,
                     true));
 
-                if (s.IsFunctionPointer && (context.arglist() != null || (s.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)))
+                if (s.IsFunctionPointer && (context.arglist() != null || (s.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, s.FunctionPointerTarget.ReturnType, s.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
                     return (s.FunctionPointerTarget.ReturnType, s.FunctionPointerTarget);
@@ -2714,7 +2714,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     return (mfi.ConstantValue.GetType(), null);
                 }
 
-                if (mfi.IsFunctionPointer && context.arglist() != null)
+                if (mfi.IsFunctionPointer && context.arglist() != null && firstIndex == 0)
                     Visit(context.arglist());
 
                 FieldInfo fld = mfi.Builder;
@@ -2733,7 +2733,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsGenericTypeParameter)
                     t = fld.FieldType.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
-                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)))
+                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
                     return (mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget);
@@ -3003,7 +3003,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (member is MetaFieldInfo mfi)
             {
-                if (mfi.IsFunctionPointer && context.arglist() != null)
+                if (mfi.IsFunctionPointer && context.arglist() != null && identifier == nextNodes.Last())
                     Visit(context.arglist());
 
                 if (mfi.ConstantValue != null)
@@ -3016,7 +3016,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsGenericTypeParameter)
                     t = mfi.Builder.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
-                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)))
+                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && identifier == nextNodes.Last())
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
                     return (mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget);
@@ -3184,7 +3184,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (member is MetaFieldInfo mfi)
             {
-                if (mfi.IsFunctionPointer && context.arglist() != null)
+                if (mfi.IsFunctionPointer && context.arglist() != null && identifier == context.Identifier().Last())
                     Visit(context.arglist());
 
                 if (mfi.ConstantValue != null)
@@ -3197,7 +3197,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsGenericTypeParameter)
                     t = mfi.Builder.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
-                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)))
+                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && identifier == context.Identifier().Last())
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
                     return mfi.FunctionPointerTarget.ReturnType;
