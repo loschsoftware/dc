@@ -627,5 +627,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an immutable value type (val! type) contains a field explicitly marked as 'var'.
     /// </summary>
-    DS0151_VarFieldInImmutableType
+    DS0151_VarFieldInImmutableType,
+    /// <summary>
+    /// Emitted when a function pointer is created for an instance method.
+    /// </summary>
+    DS0152_FunctionPointerForInstanceMethod
 }

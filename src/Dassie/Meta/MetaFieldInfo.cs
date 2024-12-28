@@ -1,6 +1,7 @@
 ﻿using Dassie.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Dassie.Meta;
@@ -23,6 +24,10 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
     public UnionValue Union { get; set; }
 
     public object ConstantValue { get; set; } = null;
+
+    public bool IsFunctionPointer { get; set; }
+
+    public MethodInfo FunctionPointerTarget { get; set; }
 
     public override bool Equals(object obj)
     {

@@ -1,6 +1,7 @@
 ﻿using Dassie.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Dassie.Meta;
@@ -33,6 +34,10 @@ internal class LocalInfo : IEquatable<LocalInfo>
     public UnionValue Union { get; set; }
 
     public int Scope { get; set; }
+
+    public bool IsFunctionPointer { get; set; }
+
+    public MethodInfo FunctionPointerTarget { get; set; }
 
     public override bool Equals(object obj)
     {
