@@ -57,10 +57,7 @@ internal static class TypeHelpers
         if (t == typeof(nint) || t == typeof(nuint))
             return OpCodes.Ldind_I;
 
-        if (t.IsClass)
-            return OpCodes.Ldind_Ref;
-
-        throw new InvalidOperationException();
+        return OpCodes.Ldind_Ref;
     }
 
     /// <summary>
@@ -92,10 +89,7 @@ internal static class TypeHelpers
         if (t == typeof(nint) || t == typeof(nuint))
             return OpCodes.Stind_I;
 
-        if (t.IsClass)
-            return OpCodes.Stind_Ref;
-
-        throw new InvalidOperationException();
+        return OpCodes.Stind_Ref;
     }
 
     /// <summary>
