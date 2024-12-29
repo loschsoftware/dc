@@ -96,7 +96,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         bool explicitBaseType = false;
         Type parent = typeof(object);
-        List<Type> interfaces = new();
+        List<Type> interfaces = [];
 
         if (context.type_kind().Val() != null)
             parent = typeof(ValueType);
@@ -284,8 +284,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             Builder = tb,
             FullName = tb.FullName,
-            IsEnumeration = enumerationMarkerType != null
+            IsEnumeration = enumerationMarkerType != null,
         };
+
+        if (!tc.Builder.IsInterface)
+        {
+            // Get all abstract declarations from entire interface hierarchy
+
+            tc.RequiredInterfaceImplementations = interfaces
+                .SelectMany(t => t.GetInterfaces().Append(t))
+                .SelectMany(t => t.GetMethods())
+                .Where(m => m.IsAbstract)
+                .Distinct()
+                .ToList();
+        }
 
         // byref-like type ('ref struct' in C#)
         if (context.type_kind().Ampersand() != null)
@@ -381,6 +393,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             ToolTip = TooltipGenerator.Type(tb.CreateTypeInfo(), true, true),
             IsNavigationTarget = true
         });
+
+        if (TypeContext.Current.RequiredInterfaceImplementations.Count > 0)
+        {
+            foreach (MethodInfo method in TypeContext.Current.RequiredInterfaceImplementations)
+            {
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0156_RequiredInterfaceMembersNotImplemented,
+                    $"The type '{tc.FullName}' does not provide an implementation for the abstract template member '{method.FormatMethod()}'.");
+            }
+        }
     }
 
     private void HandleFieldInitializersAndDefaultConstructor()
@@ -792,6 +817,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         $"Invalid variance: The type parameter '{tReturn.Name}' must be covariantly valid on '{mb.Name}'. '{tReturn.Name}' is contravariant.");
                 }
             }
+
+            if (TypeContext.Current.RequiredInterfaceImplementations.Any(m => m.Name == CurrentMethod.Builder.Name && m.ReturnType == tReturn && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))))
+                TypeContext.Current.RequiredInterfaceImplementations.Remove(TypeContext.Current.RequiredInterfaceImplementations.First(m => m.Name == CurrentMethod.Builder.Name && m.ReturnType == tReturn && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))));
 
             if (_tReturn != tReturn)
             {

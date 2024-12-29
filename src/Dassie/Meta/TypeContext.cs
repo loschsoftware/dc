@@ -1,6 +1,7 @@
 ﻿using Dassie.Parser;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Dassie.Meta;
@@ -46,4 +47,6 @@ internal class TypeContext
     public bool IsByRefLike { get; set; }
 
     public bool IsImmutable { get; set; }
+
+    public List<MethodInfo> RequiredInterfaceImplementations { get; set; } = [];
 }

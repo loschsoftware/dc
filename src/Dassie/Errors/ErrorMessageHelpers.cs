@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Dassie.Errors;
 
-internal class ErrorMessageHelpers
+internal static class ErrorMessageHelpers
 {
     private static string GenerateParamList(Type[] types)
     {
@@ -87,5 +87,45 @@ internal class ErrorMessageHelpers
 
         if (error)
             EmitDS0002Error(row, col, len, name, type, [overload], providedArgs);
+    }
+
+    private static string FormatType(Type type)
+    {
+        string result = type.FullName;
+        if (CurrentFile.Aliases.Any(a => a.Name == result))
+            result = CurrentFile.Aliases.First(a => a.Name == result).Alias;
+
+        return result;
+    }
+
+    public static string FormatMethod(this MethodInfo method)
+    {
+        StringBuilder sb = new();
+
+        sb.Append($"{method.DeclaringType.FullName}.{method.Name} ");
+
+        if (method.IsGenericMethod)
+        {
+            sb.Append("[");
+            foreach (Type typeArg in method.GetGenericArguments()[..^1])
+                sb.Append($"{typeArg}, ");
+
+            sb.Append(method.GetGenericArguments().Last().ToString());
+            sb.Append("] ");
+        }
+
+        sb.Append('(');
+
+        if (method.GetParameters().Length > 0)
+        {
+            foreach (Type type in method.GetParameters()[..^1].Select(p => p.ParameterType))
+                sb.Append($"{FormatType(type)}, ");
+
+            sb.Append(FormatType(method.GetParameters().Last().ParameterType));
+        }
+
+        sb.Append(')');
+        sb.Append($": {FormatType(method.ReturnType)}");
+        return sb.ToString();
     }
 }

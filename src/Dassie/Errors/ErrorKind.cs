@@ -643,5 +643,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the operands of a range expression are not of type 'System.Index'.
     /// </summary>
-    DS0155_RangeInvalidOperands
+    DS0155_RangeInvalidOperands,
+    /// <summary>
+    /// Emitted when a type implementing a template does not implement a required, abstract template member.
+    /// </summary>
+    DS0156_RequiredInterfaceMembersNotImplemented
 }
