@@ -1522,6 +1522,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return t;
         }
 
+        // List union
+        // Same as concatenation (+), except duplicates get filtered out
+
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>) && t == t2)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("Concat").MakeGenericMethod(t.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethods().First(m => m.Name == "Distinct").MakeGenericMethod(t.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(t.GetGenericArguments()[0]));
+            return t;
+        }
+
         MethodInfo op = t.GetMethod("op_BitwiseOr", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
         if (op == null)
@@ -1562,6 +1573,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return t;
         }
 
+        // List intersection
+
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>) && t == t2)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethods().First(m => m.Name == "Intersect").MakeGenericMethod(t.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(t.GetGenericArguments()[0]));
+            return t;
+        }
+
         MethodInfo op = t.GetMethod("op_BitwiseAnd", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
         if (op == null)
@@ -1590,6 +1610,34 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (IsNumericType(t) || (t == t2 && t.IsEnum))
         {
             CurrentMethod.IL.Emit(OpCodes.Xor);
+            return t;
+        }
+
+        // Symmetric difference of lists
+        // ^(a, b) = Union(Except(a, b), Except(b, a))
+
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>) && t == t2)
+        {
+            // LocalIndex - 1: List 2
+            CurrentMethod.LocalIndex++;
+            CurrentMethod.IL.DeclareLocal(t2);
+            EmitStloc(CurrentMethod.LocalIndex);
+
+            // LocalIndex: List 1
+            CurrentMethod.LocalIndex++;
+            CurrentMethod.IL.DeclareLocal(t);
+            EmitStloc(CurrentMethod.LocalIndex);
+
+            EmitLdloc(CurrentMethod.LocalIndex);
+            EmitLdloc(CurrentMethod.LocalIndex - 1);
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethods().First(m => m.Name == "Except").MakeGenericMethod(t.GetGenericArguments()[0]));
+
+            EmitLdloc(CurrentMethod.LocalIndex - 1);
+            EmitLdloc(CurrentMethod.LocalIndex);
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethods().First(m => m.Name == "Except").MakeGenericMethod(t.GetGenericArguments()[0]));
+
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethods().First(m => m.Name == "Union").MakeGenericMethod(t.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(t.GetGenericArguments()[0]));
             return t;
         }
 
@@ -1769,6 +1817,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(string);
         }
 
+        // List concatenation
+        // [1, 2, 3] + [4, 5, 6] = [1, 2, 3, 4, 5, 6]
+
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>) && t == t2)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("Concat").MakeGenericMethod(t.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(t.GetGenericArguments()[0]));
+            return t;
+        }
+
         MethodInfo op = t.GetMethod("op_Addition", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
         if (op == null)
@@ -1800,6 +1858,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitConversionOperator(t2, t);
 
             EmitSub(t);
+            return t;
+        }
+
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>) && t == t2)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethods().First(m => m.Name == "Except").MakeGenericMethod(t.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(t.GetGenericArguments()[0]));
             return t;
         }
 
@@ -1956,6 +2021,30 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return t;
         }
 
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            Type listType = t.GetGenericArguments()[0];
+
+            if (t2 != listType)
+            {
+                if (CanBeConverted(t2, listType))
+                    EmitConversionOperator(t2, listType);
+                else
+                {
+                    EmitErrorMessage(
+                        context.expression()[1].Start.Line,
+                        context.expression()[1].Start.Column,
+                        context.expression()[1].GetText().Length,
+                        DS0154_ListAppendIncompatibleElement,
+                        $"An expression of type '{t2}' cannot be appended to a list of type '{t}'.");
+                }
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("Append").MakeGenericMethod(t.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(t.GetGenericArguments()[0]));
+            return t;
+        }
+
         MethodInfo op = t.GetMethod("op_LeftShift", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
         if (op == null)
@@ -1980,6 +2069,43 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
+
+        if (t2.IsGenericType && t2.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            Type listType = t2.GetGenericArguments()[0];
+
+            // LocalIndex - 1: List
+            CurrentMethod.LocalIndex++;
+            CurrentMethod.IL.DeclareLocal(t2);
+            EmitStloc(CurrentMethod.LocalIndex);
+
+            // LocalIndex: Item
+            CurrentMethod.LocalIndex++;
+            CurrentMethod.IL.DeclareLocal(t);
+            EmitStloc(CurrentMethod.LocalIndex);
+
+            EmitLdloc(CurrentMethod.LocalIndex - 1);
+            EmitLdloc(CurrentMethod.LocalIndex);
+
+            if (t != listType)
+            {
+                if (CanBeConverted(t, listType))
+                    EmitConversionOperator(t, listType);
+                else
+                {
+                    EmitErrorMessage(
+                        context.expression()[1].Start.Line,
+                        context.expression()[1].Start.Column,
+                        context.expression()[1].GetText().Length,
+                        DS0154_ListAppendIncompatibleElement,
+                        $"An expression of type '{t}' cannot be prepended to a list of type '{t2}'.");
+                }
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("Prepend").MakeGenericMethod(t2.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(t2.GetGenericArguments()[0]));
+            return t2;
+        }
 
         if (IsIntegerType(t))
         {
@@ -4557,6 +4683,55 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         return arrayType.MakeArrayType();
+    }
+
+    public override Type VisitList_initializer_expression([NotNull] DassieParser.List_initializer_expressionContext context)
+    {
+        if (context.expression().Length == 0)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor([]));
+            return typeof(List<object>);
+        }
+
+        Type itemType = Visit(context.expression()[0]);
+
+        CurrentMethod.LocalIndex++;
+        CurrentMethod.IL.DeclareLocal(itemType);
+        EmitStloc(CurrentMethod.LocalIndex);
+
+        Type listType = typeof(List<>).MakeGenericType(itemType);
+        CurrentMethod.IL.Emit(OpCodes.Newobj, listType.GetConstructor([]));
+        CurrentMethod.IL.Emit(OpCodes.Dup);
+
+        EmitLdloc(CurrentMethod.LocalIndex);
+        CurrentMethod.IL.Emit(OpCodes.Callvirt, listType.GetMethod("Add"));
+
+        foreach (ParserRuleContext expr in context.expression()[1..])
+        {
+            CurrentMethod.IL.Emit(OpCodes.Dup);
+
+            Type type = Visit(expr);
+
+            if (type != itemType)
+            {
+                if (type.IsAssignableTo(itemType) || CanBeConverted(type, itemType))
+                    EmitConversionOperator(type, itemType);
+
+                else
+                {
+                    EmitErrorMessage(
+                        expr.Start.Line,
+                        expr.Start.Column,
+                        expr.GetText().Length,
+                        DS0153_ListLiteralDifferentTypes,
+                        $"An item of type '{type}' cannot be added to a list of type '{listType}'.");
+                }
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Callvirt, listType.GetMethod("Add"));
+        }
+
+        return listType;
     }
 
     public override Type VisitEmpty_atom([NotNull] DassieParser.Empty_atomContext context)

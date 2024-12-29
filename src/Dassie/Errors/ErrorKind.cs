@@ -631,5 +631,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a function pointer is created for an instance method.
     /// </summary>
-    DS0152_FunctionPointerForInstanceMethod
+    DS0152_FunctionPointerForInstanceMethod,
+    /// <summary>
+    /// Emitted when a list literal contains incompatible types.
+    /// </summary>
+    DS0153_ListLiteralDifferentTypes,
+    /// <summary>
+    /// Emitted when an incompatible expression is appended to a list.
+    /// </summary>
+    DS0154_ListAppendIncompatibleElement
 }

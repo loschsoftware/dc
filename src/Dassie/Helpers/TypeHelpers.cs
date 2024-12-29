@@ -182,6 +182,9 @@ internal static class TypeHelpers
         if (IsNumericType(from) && IsNumericType(to))
             return true;
 
+        if (from.IsAssignableTo(to))
+            return true;
+
         if (from.GetMethods()
             .Where(m => m.Name == "op_Implicit")
             .Where(m => m.ReturnType == to)

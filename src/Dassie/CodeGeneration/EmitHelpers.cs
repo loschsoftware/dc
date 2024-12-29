@@ -569,10 +569,16 @@ internal static class EmitHelpers
         CurrentMethod = _currentMethod;
     }
 
+    private static bool _inNullMode = false;
     private static ILGenerator _il = null;
     private static int _localIndex;
     public static void RedirectEmitterToNullStream()
     {
+        if (_inNullMode)
+            return;
+
+        _inNullMode = true;
+
         _localIndex = CurrentMethod.LocalIndex;
         TypeBuilder tb = Context.BogusModule.DefineType($"Bogus{bogusCounter++}");
         Context.BogusType = tb;
@@ -585,6 +591,7 @@ internal static class EmitHelpers
 
     public static void ResetNullStream()
     {
+        _inNullMode = false;
         CurrentMethod.IL = _il;
         CurrentMethod.LocalIndex = _localIndex;
     }
