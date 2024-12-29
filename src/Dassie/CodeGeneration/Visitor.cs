@@ -636,9 +636,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 MethodInfo[] interfaceMethods = TypeContext.Current.ImplementedInterfaces.Select(t => t.GetMethods()).SelectMany(m => m).ToArray();
                 foreach (MethodInfo method in interfaceMethods)
                 {
-                    if (method.IsAbstract && method.GetParameters().Select(p => p.ParameterType).SequenceEqual(VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
+                    if (method.IsAbstract && method.GetParameters().Select(p => p.ParameterType).SequenceEqual(VisitorStep1CurrentMethod == null ? [] : VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
                     {
-                        attrib |= MethodAttributes.Final;
                         attrib |= MethodAttributes.HideBySig;
                         attrib |= MethodAttributes.NewSlot;
                         attrib |= MethodAttributes.Virtual;
