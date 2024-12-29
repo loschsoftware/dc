@@ -193,6 +193,22 @@ internal static class TypeHelpers
             .Any())
             return true;
 
+        if (from.GetMethods()
+            .Where(m => m.Name == "op_Explicit")
+            .Where(m => m.ReturnType == to)
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == from)
+            .Any())
+            return true;
+
+        if (to.GetMethods()
+            .Where(m => m.Name == "op_Implicit")
+            .Where(m => m.ReturnType == to)
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == from)
+            .Any())
+            return true;
+
         if (to.GetMethods()
             .Where(m => m.Name == "op_Explicit")
             .Where(m => m.ReturnType == to)

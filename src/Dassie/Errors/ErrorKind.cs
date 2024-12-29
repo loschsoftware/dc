@@ -639,5 +639,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an incompatible expression is appended to a list.
     /// </summary>
-    DS0154_ListAppendIncompatibleElement
+    DS0154_ListAppendIncompatibleElement,
+    /// <summary>
+    /// Emitted when the operands of a range expression are not of type 'System.Index'.
+    /// </summary>
+    DS0155_RangeInvalidOperands
 }

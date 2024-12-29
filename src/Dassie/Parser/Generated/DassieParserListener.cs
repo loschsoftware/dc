@@ -213,6 +213,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitLogical_or_expression([NotNull] DassieParser.Logical_or_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>open_ended_range_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterOpen_ended_range_expression([NotNull] DassieParser.Open_ended_range_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>open_ended_range_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitOpen_ended_range_expression([NotNull] DassieParser.Open_ended_range_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>raise_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -249,6 +261,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitNewlined_expression([NotNull] DassieParser.Newlined_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>closed_ended_range_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterClosed_ended_range_expression([NotNull] DassieParser.Closed_ended_range_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>closed_ended_range_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitClosed_ended_range_expression([NotNull] DassieParser.Closed_ended_range_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>foreach_loop</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -273,6 +297,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitPostfix_unless_expression([NotNull] DassieParser.Postfix_unless_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>delimited_range_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterDelimited_range_expression([NotNull] DassieParser.Delimited_range_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>delimited_range_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitDelimited_range_expression([NotNull] DassieParser.Delimited_range_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>power_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -296,6 +332,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitConversion_expression([NotNull] DassieParser.Conversion_expressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>range_index_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterRange_index_expression([NotNull] DassieParser.Range_index_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>range_index_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitRange_index_expression([NotNull] DassieParser.Range_index_expressionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>addition_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
@@ -549,18 +597,6 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitSeparated_expression([NotNull] DassieParser.Separated_expressionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>range_expression</c>
-	/// labeled alternative in <see cref="DassieParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterRange_expression([NotNull] DassieParser.Range_expressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>range_expression</c>
-	/// labeled alternative in <see cref="DassieParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitRange_expression([NotNull] DassieParser.Range_expressionContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>member_access_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -608,6 +644,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitBlock_expression([NotNull] DassieParser.Block_expressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>full_range_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterFull_range_expression([NotNull] DassieParser.Full_range_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>full_range_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitFull_range_expression([NotNull] DassieParser.Full_range_expressionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>left_pipe_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
@@ -976,26 +1024,6 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitPostfix_unless_branch([NotNull] DassieParser.Postfix_unless_branchContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.range"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterRange([NotNull] DassieParser.RangeContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.range"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitRange([NotNull] DassieParser.RangeContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.index"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterIndex([NotNull] DassieParser.IndexContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.index"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitIndex([NotNull] DassieParser.IndexContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.arglist"/>.
 	/// </summary>

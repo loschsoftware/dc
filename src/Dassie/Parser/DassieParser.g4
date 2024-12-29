@@ -72,7 +72,11 @@ expression
     | expression Arrow_Right expression #right_pipe_expression
     | expression Arrow_Left expression #left_pipe_expression
     /*| expression Dot Identifier #dotted_expression*/
-    | range #range_expression
+    | expression Double_Dot expression #delimited_range_expression
+    | expression Double_Dot #open_ended_range_expression
+    | Double_Dot expression #closed_ended_range_expression
+    | Double_Dot #full_range_expression
+    | Caret integer_atom #range_index_expression
     | attribute+ expression #attributed_expression
     | if_branch NewLine* elif_branch* NewLine* else_branch? #prefix_if_expression
     | expression postfix_if_branch #postfix_if_expression
@@ -197,14 +201,6 @@ else_unless_branch
 
 postfix_unless_branch
     : Exclamation_Question expression
-    ;
-
-range
-    : index? Double_Dot index?
-    ;
-
-index
-    : Caret? integer_atom
     ;
 
 arglist

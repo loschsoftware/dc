@@ -4776,43 +4776,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return t1;
     }
 
-    public override Type VisitRange_expression([NotNull] DassieParser.Range_expressionContext context)
-    {
-        return Visit(context.range());
-    }
-
-    public override Type VisitRange([NotNull] DassieParser.RangeContext context)
-    {
-        if (context.index().Length == 2)
-        {
-            Visit(context.index()[0]);
-            Visit(context.index()[1]);
-
-            CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Range).GetConstructor(new Type[] { typeof(Index), typeof(Index) }));
-
-            return typeof(Range);
-        }
-
-        if (context.index().Length == 0)
-        {
-            CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("get_All", Type.EmptyTypes), null);
-            return typeof(Range);
-        }
-
-        if (context.GetText().EndsWith(".."))
-        {
-            Visit(context.index()[0]);
-            CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("StartAt", new Type[] { typeof(Index) }), null);
-            return typeof(Range);
-        }
-
-        Visit(context.index()[0]);
-        CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("EndAt", new Type[] { typeof(Index) }), null);
-
-        return typeof(Range);
-    }
-
-    public override Type VisitIndex([NotNull] DassieParser.IndexContext context)
+    public override Type VisitRange_index_expression([NotNull] DassieParser.Range_index_expressionContext context)
     {
         Visit(context.integer_atom());
 
@@ -4820,6 +4784,110 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Index).GetConstructor(new Type[] { typeof(int), typeof(bool) }));
         return typeof(Index);
+    }
+
+    // ..
+    public override Type VisitFull_range_expression([NotNull] DassieParser.Full_range_expressionContext context)
+    {
+        CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("get_All", Type.EmptyTypes), null);
+        return typeof(Range);
+    }
+
+    // ..a
+    public override Type VisitOpen_ended_range_expression([NotNull] DassieParser.Open_ended_range_expressionContext context)
+    {
+        Type t = Visit(context.expression());
+
+        if (t != typeof(Index))
+        {
+            if (CanBeConverted(t, typeof(Index)))
+                EmitConversionOperator(t, typeof(Index));
+            else
+            {
+                EmitErrorMessage(
+                    context.expression().Start.Line,
+                    context.expression().Start.Column,
+                    context.expression().GetText().Length,
+                    DS0155_RangeInvalidOperands,
+                    $"Range expressions require operands of type 'System.Index'.");
+
+                return typeof(Range);
+            }
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("EndAt", [typeof(Index)]), null);
+        return typeof(Range);
+    }
+
+    // a..
+    public override Type VisitClosed_ended_range_expression([NotNull] DassieParser.Closed_ended_range_expressionContext context)
+    {
+        Type t = Visit(context.expression());
+
+        if (t != typeof(Index))
+        {
+            if (CanBeConverted(t, typeof(Index)))
+                EmitConversionOperator(t, typeof(Index));
+            else
+            {
+                EmitErrorMessage(
+                    context.expression().Start.Line,
+                    context.expression().Start.Column,
+                    context.expression().GetText().Length,
+                    DS0155_RangeInvalidOperands,
+                    $"Range expressions require operands of type 'System.Index'.");
+
+                return typeof(Range);
+            }
+        }
+
+        CurrentMethod.IL.EmitCall(OpCodes.Call, typeof(Range).GetMethod("StartAt", [typeof(Index)]), null);
+        return typeof(Range);
+    }
+
+    // a..b
+    public override Type VisitDelimited_range_expression([NotNull] DassieParser.Delimited_range_expressionContext context)
+    {
+        Type t1 = Visit(context.expression()[0]);
+
+        if (t1 != typeof(Index))
+        {
+            if (CanBeConverted(t1, typeof(Index)))
+                EmitConversionOperator(t1, typeof(Index));
+            else
+            {
+                EmitErrorMessage(
+                    context.expression()[0].Start.Line,
+                    context.expression()[0].Start.Column,
+                    context.expression()[0].GetText().Length,
+                    DS0155_RangeInvalidOperands,
+                    $"Range expressions require operands of type 'System.Index'.");
+
+                return typeof(Range);
+            }
+        }
+
+        Type t2 = Visit(context.expression()[1]);
+
+        if (t2 != typeof(Index))
+        {
+            if (CanBeConverted(t2, typeof(Index)))
+                EmitConversionOperator(t2, typeof(Index));
+            else
+            {
+                EmitErrorMessage(
+                    context.expression()[1].Start.Line,
+                    context.expression()[1].Start.Column,
+                    context.expression()[1].GetText().Length,
+                    DS0155_RangeInvalidOperands,
+                    $"Range expressions require operands of type 'System.Index'.");
+
+                return typeof(Range);
+            }
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Range).GetConstructor([typeof(Index), typeof(Index)]));
+        return typeof(Range);
     }
 
     public override Type VisitArray_element_assignment([NotNull] DassieParser.Array_element_assignmentContext context)

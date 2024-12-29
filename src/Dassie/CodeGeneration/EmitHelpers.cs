@@ -458,7 +458,12 @@ internal static class EmitHelpers
             .Where(m => m.Name == "op_Implicit")
             .Where(m => m.ReturnType == to)
             .Where(m => m.GetParameters().Length == 1)
-            .Where(m => m.GetParameters()[0].ParameterType == from);
+            .Where(m => m.GetParameters()[0].ParameterType == from)
+            .Concat(to.GetMethods()
+            .Where(m => m.Name == "op_Implicit")
+            .Where(m => m.ReturnType == to)
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == from));
 
         if (implicitConversions.Any())
         {
@@ -470,7 +475,12 @@ internal static class EmitHelpers
             .Where(m => m.Name == "op_Explicit")
             .Where(m => m.ReturnType == to)
             .Where(m => m.GetParameters().Length == 1)
-            .Where(m => m.GetParameters()[0].ParameterType == from);
+            .Where(m => m.GetParameters()[0].ParameterType == from)
+            .Concat(from.GetMethods()
+            .Where(m => m.Name == "op_Explicit")
+            .Where(m => m.ReturnType == to)
+            .Where(m => m.GetParameters().Length == 1)
+            .Where(m => m.GetParameters()[0].ParameterType == from));
 
         if (explicitConversions.Any())
         {

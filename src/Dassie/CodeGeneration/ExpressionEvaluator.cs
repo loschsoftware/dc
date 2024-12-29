@@ -566,9 +566,9 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         return new(typeof(object), null);
     }
 
-    public override Expression VisitIndex([NotNull] DassieParser.IndexContext context)
-    {
-        Expression a = Visit(context.integer_atom());
-        return new(typeof(Index), new Index(a.Value, context.Caret() != null));
-    }
+    //public override Expression VisitIndex([NotNull] DassieParser.IndexContext context)
+    //{
+    //    Expression a = Visit(context.integer_atom());
+    //    return new(typeof(Index), new Index(a.Value, context.Caret() != null));
+    //}
 }
