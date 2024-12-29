@@ -131,6 +131,9 @@ internal static class AttributeHelpers
         if (!isStatic && (oopModifier == null || oopModifier.Closed() == null))
             baseAttributes |= MethodAttributes.Virtual;
 
+        if (oopModifier != null && oopModifier.Closed() != null)
+            baseAttributes |= MethodAttributes.Final;
+
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(MethodAttributes.Static))
         {
             baseAttributes |= MethodAttributes.Static;
