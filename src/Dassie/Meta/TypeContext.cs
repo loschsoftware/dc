@@ -48,5 +48,5 @@ internal class TypeContext
 
     public bool IsImmutable { get; set; }
 
-    public List<MethodInfo> RequiredInterfaceImplementations { get; set; } = [];
+    public List<MockMethodInfo> RequiredInterfaceImplementations { get; set; } = [];
 }

@@ -6,6 +6,7 @@ using Dassie.Runtime;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -1216,7 +1217,16 @@ internal static class SymbolResolver
 
             DassieParser.Type_nameContext childName = (DassieParser.Type_nameContext)name.children[0];
             if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
-                return ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
+            {
+                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
+                
+                TypeHelpers.CheckGenericTypeCompatibility(result, typeParams, childName.Start.Line, childName.Start.Column, childName.GetText().Length, true);
+
+                if (typeParams != null && result.IsGenericTypeDefinition)
+                    result = result.MakeGenericType(typeParams);
+
+                return result;
+            }
         }
 
         if (name.type_name() != null && name.type_name().Length > 0)
@@ -1229,16 +1239,28 @@ internal static class SymbolResolver
         return null;
     }
 
-    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0)
+    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false)
     {
+        if (TypeContext.Current.FullName == name)
+            return TypeContext.Current.Builder;
+
         if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
             return CurrentMethod.TypeParameters.First(t => t.Name == name).Builder;
 
         if (TypeContext.Current != null && TypeContext.Current.TypeParameters.Any(t => t.Name == name))
             return TypeContext.Current.TypeParameters.First(t => t.Name == name).Builder;
 
-        if (typeParams != null && typeParams.Length > 0)
-            name += $"`{typeParams.Length}";
+        if (typeParams != null && typeParams.Length > 0 && !disableBacktickGenericResolve)
+        {
+            // Convention used by Microsoft compilers to allow "overloaded" generics
+            // e.g. A[T], A[T1, T2], A[T1, T2, T3]
+            // otherwise only one set of generic parameters would be possible
+
+            string backtickName = $"{name}`{typeParams.Length}";
+            Type t = ResolveTypeName(backtickName, row, col, len, noEmitFragments, typeParams, arrayDimensions, noErrors: true, disableBacktickGenericResolve: true);
+            if (t != null)
+                return t;
+        }
 
         Type type = Type.GetType(name);
 
@@ -1312,6 +1334,9 @@ internal static class SymbolResolver
         }
 
     FoundType:
+
+        if (type == null && noErrors)
+            return type;
 
         if (type == null)
         {

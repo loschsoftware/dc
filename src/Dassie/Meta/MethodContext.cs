@@ -63,11 +63,15 @@ internal class MethodContext
                 }
                 catch { }
 
-                if (type.Methods.Any(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType))))
+                try
                 {
-                    MethodContext m = type.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)));
-                    return m;
+                    if (type.Methods.Any(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType))))
+                    {
+                        MethodContext m = type.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Builder.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)));
+                        return m;
+                    }
                 }
+                catch { }
             }
 
             if (SpecialStep1CurrentMethod != null)

@@ -1,4 +1,5 @@
 ﻿using Dassie.Helpers;
+using Dassie.Meta;
 using Dassie.Runtime;
 using System;
 using System.Collections.Generic;
@@ -122,6 +123,37 @@ internal static class ErrorMessageHelpers
                 sb.Append($"{FormatType(type)}, ");
 
             sb.Append(FormatType(method.GetParameters().Last().ParameterType));
+        }
+
+        sb.Append(')');
+        sb.Append($": {FormatType(method.ReturnType)}");
+        return sb.ToString();
+    }
+
+    public static string FormatMethod(this MockMethodInfo method)
+    {
+        StringBuilder sb = new();
+
+        sb.Append($"{method.DeclaringType.FullName}.{method.Name} ");
+
+        if (method.IsGenericMethod)
+        {
+            sb.Append("[");
+            foreach (Type typeArg in method.GenericTypeArguments[..^1])
+                sb.Append($"{typeArg}, ");
+
+            sb.Append(method.GenericTypeArguments.Last().ToString());
+            sb.Append("] ");
+        }
+
+        sb.Append('(');
+
+        if (method.Parameters.Count > 0)
+        {
+            foreach (Type type in method.Parameters[..^1])
+                sb.Append($"{FormatType(type)}, ");
+
+            sb.Append(FormatType(method.Parameters.Last()));
         }
 
         sb.Append(')');

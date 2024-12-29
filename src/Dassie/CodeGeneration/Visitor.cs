@@ -94,6 +94,68 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return;
         }
 
+        TypeBuilder tb;
+
+        if (enclosingType == null)
+        {
+            if (context.nested_type_access_modifier() != null && context.nested_type_access_modifier().Local() != null)
+            {
+                EmitErrorMessage(
+                    context.nested_type_access_modifier().Local().Symbol.Line,
+                    context.nested_type_access_modifier().Local().Symbol.Column,
+                    context.nested_type_access_modifier().Local().GetText().Length,
+                    DS0126_TopLevelTypeLocal,
+                    "The 'local' access modifier is only valid for nested types.");
+            }
+
+            tb = Context.Module.DefineType(
+                $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetText()}",
+                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false));
+        }
+        else
+        {
+            tb = enclosingType.DefineNestedType(
+                context.Identifier().GetText(),
+                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true));
+        }
+
+        if (Context.Types.Any(t => t.FullName == tb.FullName))
+        {
+            TypeContext duplicate = Context.Types.First(t => t.FullName == tb.FullName);
+            if (duplicate.TypeParameters != null && context.type_parameter_list() != null && duplicate.TypeParameters.Count != context.type_parameter_list().type_parameter().Length)
+            {
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0120_DuplicateGenericTypeName,
+                    $"Currently, the Dassie compiler does not allow creating types of the same name with different type parameters. This functionality might be added in the future. If you desperately need it, consider opening an issue on GitHub.");
+            }
+            else
+            {
+                string errMsg = "";
+                if (string.IsNullOrEmpty(CurrentFile.ExportedNamespace))
+                    errMsg = $"The global namespace";
+                else
+                    errMsg = $"The namespace '{CurrentFile.ExportedNamespace}'";
+
+                errMsg += $" already contains a definition for the type '{tb.Name}'.";
+
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0119_DuplicateTypeName,
+                    errMsg);
+            }
+        }
+
+        TypeContext tc = new()
+        {
+            Builder = tb,
+            FullName = tb.FullName,
+        };
+
         bool explicitBaseType = false;
         Type parent = typeof(object);
         List<Type> interfaces = [];
@@ -194,32 +256,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
         }
 
-        TypeBuilder tb;
+        foreach (Type _interface in interfaces)
+            tb.AddInterfaceImplementation(_interface);
 
-        if (enclosingType == null)
-        {
-            if (context.nested_type_access_modifier() != null && context.nested_type_access_modifier().Local() != null)
-            {
-                EmitErrorMessage(
-                    context.nested_type_access_modifier().Local().Symbol.Line,
-                    context.nested_type_access_modifier().Local().Symbol.Column,
-                    context.nested_type_access_modifier().Local().GetText().Length,
-                    DS0126_TopLevelTypeLocal,
-                    "The 'local' access modifier is only valid for nested types.");
-            }
-
-            tb = Context.Module.DefineType(
-                $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetText()}",
-                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false),
-                parent);
-        }
-        else
-        {
-            tb = enclosingType.DefineNestedType(
-                context.Identifier().GetText(),
-                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true),
-                parent);
-        }
+        tc.IsEnumeration = enumerationMarkerType != null;
 
         if (enumerationMarkerType != null)
         {
@@ -246,54 +286,68 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 FieldAttributes.Public | FieldAttributes.RTSpecialName | FieldAttributes.SpecialName);
         }
 
-        foreach (Type _interface in interfaces)
-            tb.AddInterfaceImplementation(_interface);
-
-        if (Context.Types.Any(t => t.FullName == tb.FullName))
-        {
-            TypeContext duplicate = Context.Types.First(t => t.FullName == tb.FullName);
-            if (duplicate.TypeParameters != null && context.type_parameter_list() != null && duplicate.TypeParameters.Count != context.type_parameter_list().type_parameter().Length)
-            {
-                EmitErrorMessage(
-                    context.Identifier().Symbol.Line,
-                    context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
-                    DS0120_DuplicateGenericTypeName,
-                    $"Currently, the Dassie compiler does not allow creating types of the same name with different type parameters. This functionality might be added in the future. If you desperately need it, consider opening an issue on GitHub.");
-            }
-            else
-            {
-                string errMsg = "";
-                if (string.IsNullOrEmpty(CurrentFile.ExportedNamespace))
-                    errMsg = $"The global namespace";
-                else
-                    errMsg = $"The namespace '{CurrentFile.ExportedNamespace}'";
-
-                errMsg += $" already contains a definition for the type '{tb.Name}'.";
-
-                EmitErrorMessage(
-                    context.Identifier().Symbol.Line,
-                    context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
-                    DS0119_DuplicateTypeName,
-                    errMsg);
-            }
-        }
-
-        TypeContext tc = new()
-        {
-            Builder = tb,
-            FullName = tb.FullName,
-            IsEnumeration = enumerationMarkerType != null,
-        };
-
         if (!tc.Builder.IsInterface)
         {
             // Get all abstract declarations from entire interface hierarchy
 
+            // This absolutely ridiculous piece of shit is necessary because
+            // Microsoft could not be bothered to implement
+            // TypeBuilder.GetMethods() on constructed generic types...
+
             tc.RequiredInterfaceImplementations = interfaces
-                .SelectMany(t => t.GetInterfaces().Append(t))
-                .SelectMany(t => t.GetMethods())
+                .SelectMany(t =>
+                {
+                    if (!t.IsConstructedGenericType)
+                        return t.GetInterfaces().Append(t);
+
+                    return t.GetGenericTypeDefinition().GetInterfaces().Append(t);
+                })
+                .SelectMany(t =>
+                {
+                    if (!t.IsConstructedGenericType)
+                    {
+                        return t.GetMethods().Select(m => new MockMethodInfo()
+                        {
+                            Name = m.Name,
+                            ReturnType = m.ReturnType,
+                            Parameters = m.GetParameters().Select(p => p.ParameterType).ToList(),
+                            IsAbstract = m.IsAbstract,
+                            DeclaringType = t,
+                            IsGenericMethod = m.IsGenericMethod,
+                            GenericTypeArguments = m.GetGenericArguments().ToList()
+                        });
+                    }
+
+                    Type[] typeArgs = t.GenericTypeArguments;
+
+                    return t.GetGenericTypeDefinition().GetMethods().Select(m =>
+                    {
+                        MockMethodInfo method = new()
+                        {
+                            Name = m.Name,
+                            IsAbstract = m.IsAbstract,
+                            Parameters = [],
+                            DeclaringType = t,
+                            IsGenericMethod = m.IsGenericMethod,
+                            GenericTypeArguments = m.GetGenericArguments().ToList()
+                        };
+
+                        if (!m.ReturnType.IsGenericTypeParameter)
+                            method.ReturnType = m.ReturnType;
+                        else
+                            method.ReturnType = typeArgs[m.ReturnType.GenericParameterPosition];
+
+                        foreach (Type param in m.GetParameters().Select(p => p.ParameterType))
+                        {
+                            if (!param.IsGenericTypeParameter)
+                                method.Parameters.Add(param);
+                            else
+                                method.Parameters.Add(typeArgs[param.GenericParameterPosition]);
+                        }
+
+                        return method;
+                    });
+                })
                 .Where(m => m.IsAbstract)
                 .Distinct()
                 .ToList();
@@ -396,7 +450,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (TypeContext.Current.RequiredInterfaceImplementations.Count > 0)
         {
-            foreach (MethodInfo method in TypeContext.Current.RequiredInterfaceImplementations)
+            foreach (MockMethodInfo method in TypeContext.Current.RequiredInterfaceImplementations)
             {
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
@@ -658,10 +712,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (VisitorStep1 != null)
             {
-                MethodInfo[] interfaceMethods = TypeContext.Current.ImplementedInterfaces.Select(t => t.GetMethods()).SelectMany(m => m).ToArray();
-                foreach (MethodInfo method in interfaceMethods)
+                List<MockMethodInfo> interfaceMethods = TypeContext.Current.RequiredInterfaceImplementations;
+                foreach (MockMethodInfo method in interfaceMethods)
                 {
-                    if (method.IsAbstract && method.GetParameters().Select(p => p.ParameterType).SequenceEqual(VisitorStep1CurrentMethod == null ? [] : VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
+                    if (method.IsAbstract && method.Name == context.Identifier().GetText() && method.ReturnType == (VisitorStep1CurrentMethod == null ? typeof(DassieParser) : VisitorStep1CurrentMethod.Builder.ReturnType) && method.Parameters.SequenceEqual(VisitorStep1CurrentMethod == null ? [] : VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
                     {
                         attrib |= MethodAttributes.HideBySig;
                         attrib |= MethodAttributes.NewSlot;
@@ -669,6 +723,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     }
                 }
             }
+
+            // TODO: Static interface members
 
             MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
                 context.Identifier().GetText(),
@@ -818,8 +874,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
             }
 
-            if (TypeContext.Current.RequiredInterfaceImplementations.Any(m => m.Name == CurrentMethod.Builder.Name && m.ReturnType == tReturn && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))))
-                TypeContext.Current.RequiredInterfaceImplementations.Remove(TypeContext.Current.RequiredInterfaceImplementations.First(m => m.Name == CurrentMethod.Builder.Name && m.ReturnType == tReturn && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))));
+            if (TypeContext.Current.RequiredInterfaceImplementations.Any(m => m.Name == CurrentMethod.Builder.Name && m.ReturnType == tReturn && m.Parameters.SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))))
+                TypeContext.Current.RequiredInterfaceImplementations.Remove(TypeContext.Current.RequiredInterfaceImplementations.First(m => m.Name == CurrentMethod.Builder.Name && m.ReturnType == tReturn && m.Parameters.SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))));
 
             if (_tReturn != tReturn)
             {

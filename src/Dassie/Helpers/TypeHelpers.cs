@@ -395,7 +395,7 @@ internal static class TypeHelpers
         if (!method.IsGenericMethod)
             return true;
 
-        Type[] typeParams = method.GetGenericArguments();
+        Type[] typeParams = method.DeclaringType.GetGenericTypeDefinition().GetGenericArguments();
         return CheckGenericCompatibility(method.Name, false, typeParams, typeArgs, row, col, len, emitErrors);
     }
 
@@ -418,6 +418,9 @@ internal static class TypeHelpers
 
         for (int i = 0; i < parameters.Length; i++)
         {
+            if (arguments[i] == TypeContext.Current.Builder)
+                continue;
+
             if (!MeetsGenericConstraints(parameters[i], arguments[i], row, col, len, emitErrors))
                 result = false;
         }
@@ -437,6 +440,9 @@ internal static class TypeHelpers
     /// <returns></returns>
     private static bool MeetsGenericConstraints(Type param, Type arg, int row, int col, int len, bool throwErrors)
     {
+        if (!param.IsGenericParameter)
+            return true;
+
         string errMsgStart = $"Generic argument '{Format(arg)}' is incompatible with generic parameter '{Format(param)}': ";
         GenericParameterAttributes attributes = param.GenericParameterAttributes;
 
@@ -492,15 +498,19 @@ internal static class TypeHelpers
 
         foreach (Type constraint in param.GetGenericParameterConstraints())
         {
-            if (!constraint.IsAssignableFrom(arg) && !CanBeConverted(arg, constraint))
+            try
             {
-                EmitErrorMessage(
-                    row, col, len,
-                    DS0107_GenericTypeConstraintViolation,
-                    $"{errMsgStart}'{Format(arg)}' violates constraint '{Format(constraint)}'.");
+                if (!constraint.IsAssignableFrom(arg) && !CanBeConverted(arg, constraint))
+                {
+                    EmitErrorMessage(
+                        row, col, len,
+                        DS0107_GenericTypeConstraintViolation,
+                        $"{errMsgStart}'{Format(arg)}' violates constraint '{Format(constraint)}'.");
 
-                result = false;
+                    result = false;
+                }
             }
+            catch (NotSupportedException) { }
         }
 
         return result;
