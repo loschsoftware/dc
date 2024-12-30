@@ -35,10 +35,6 @@ internal class LocalInfo : IEquatable<LocalInfo>
 
     public int Scope { get; set; }
 
-    public bool IsFunctionPointer { get; set; }
-
-    public MethodInfo FunctionPointerTarget { get; set; }
-
     public override bool Equals(object obj)
     {
         return Equals(obj as LocalInfo);

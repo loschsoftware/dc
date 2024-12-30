@@ -169,6 +169,7 @@ type_name
     | type_name type_arg_list
     | type_name (Ampersand | Double_Ampersand)
     | type_name array_type_specifier
+    | Func Asterisk type_arg_list // Function pointer type
     ;
 
 array_type_specifier

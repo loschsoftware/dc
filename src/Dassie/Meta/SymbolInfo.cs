@@ -26,62 +26,6 @@ internal class SymbolInfo
 
     public MetaFieldInfo Field { get; set; }
 
-    public bool IsFunctionPointer
-    {
-        get => SymbolType switch
-        {
-            SymType.Local => Local.IsFunctionPointer,
-            SymType.Parameter => Parameter.IsFunctionPointer,
-            _ => Field.IsFunctionPointer
-        };
-
-        set
-        {
-            switch (SymbolType)
-            {
-                case SymType.Local:
-                    Local.IsFunctionPointer = value;
-                    break;
-
-                case SymType.Parameter:
-                    Parameter.IsFunctionPointer = value;
-                    break;
-
-                default:
-                    Field.IsFunctionPointer = value;
-                    break;
-            }
-        }
-    }
-
-    public MethodInfo FunctionPointerTarget
-    {
-        get => SymbolType switch
-        {
-            SymType.Local => Local.FunctionPointerTarget,
-            SymType.Parameter => Parameter.FunctionPointerTarget,
-            _ => Field.FunctionPointerTarget
-        };
-
-        set
-        {
-            switch (SymbolType)
-            {
-                case SymType.Local:
-                    Local.FunctionPointerTarget = value;
-                    break;
-
-                case SymType.Parameter:
-                    Parameter.FunctionPointerTarget = value;
-                    break;
-
-                default:
-                    Field.FunctionPointerTarget = value;
-                    break;
-            }
-        }
-    }
-
     public Type Type() => SymbolType switch
     {
         SymType.Local => Local.Builder.LocalType,

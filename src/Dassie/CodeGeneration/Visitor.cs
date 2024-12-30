@@ -2850,7 +2850,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Parameter
                 };
 
-                if (s.IsFunctionPointer && context.arglist() != null && firstIndex == 0)
+                if (s.Type().IsFunctionPointer && context.arglist() != null && firstIndex == 0)
                     Visit(context.arglist());
 
                 if (CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
@@ -2863,10 +2863,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsByRef)
                     t = t.GetElementType();
 
-                if (s.IsFunctionPointer && (context.arglist() != null || (s.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && firstIndex == 0)
+                if (s.Type().IsFunctionPointer && (context.arglist() != null || (s.Type().GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
-                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, s.FunctionPointerTarget.ReturnType, s.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
-                    return (s.FunctionPointerTarget.ReturnType, s.FunctionPointerTarget);
+                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, s.Type().GetFunctionPointerReturnType(), s.Type().GetFunctionPointerParameterTypes());
+                    return (s.Type().GetFunctionPointerReturnType(), null);
                 }
             }
 
@@ -2878,7 +2878,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     SymbolType = SymbolInfo.SymType.Local
                 };
 
-                if (s.IsFunctionPointer && context.arglist() != null && firstIndex == 0)
+                if (s.Type().IsFunctionPointer && context.arglist() != null && firstIndex == 0)
                     Visit(context.arglist());
 
                 FieldInfo closureInstanceField = null;
@@ -2909,10 +2909,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.GetText().Length,
                     true));
 
-                if (s.IsFunctionPointer && (context.arglist() != null || (s.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && firstIndex == 0)
+                if (s.Type().IsFunctionPointer && (context.arglist() != null || (s.Type().GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
-                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, s.FunctionPointerTarget.ReturnType, s.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
-                    return (s.FunctionPointerTarget.ReturnType, s.FunctionPointerTarget);
+                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, s.Type().GetFunctionPointerReturnType(), s.Type().GetFunctionPointerParameterTypes());
+                    return (s.Type().GetFunctionPointerReturnType(), null);
                 }
             }
 
@@ -2925,6 +2925,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (f.FieldType, null);
                 }
+
+                if (f.FieldType.IsFunctionPointer && context.arglist() != null && firstIndex == 0)
+                    Visit(context.arglist());
 
                 if (f.IsStatic)
                     CurrentMethod.IL.Emit(OpCodes.Ldsfld, f);
@@ -2940,6 +2943,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (t.IsGenericTypeParameter)
                     t = f.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
+
+                if (f.FieldType.IsFunctionPointer && (context.arglist() != null || (f.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && firstIndex == 0)
+                {
+                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, f.FieldType.GetFunctionPointerReturnType(), f.FieldType.GetFunctionPointerParameterTypes());
+                    return (f.FieldType.GetFunctionPointerReturnType(), null);
+                }
             }
 
             else if (o is MetaFieldInfo mfi)
@@ -2950,7 +2959,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     return (mfi.ConstantValue.GetType(), null);
                 }
 
-                if (mfi.IsFunctionPointer && context.arglist() != null && firstIndex == 0)
+                if (mfi.Builder.FieldType.IsFunctionPointer && context.arglist() != null && firstIndex == 0)
                     Visit(context.arglist());
 
                 FieldInfo fld = mfi.Builder;
@@ -2969,10 +2978,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsGenericTypeParameter)
                     t = fld.FieldType.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
-                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && firstIndex == 0)
+                if (mfi.Builder.FieldType.IsFunctionPointer && (context.arglist() != null || (mfi.Builder.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
-                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
-                    return (mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget);
+                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.Builder.FieldType.GetFunctionPointerReturnType(), mfi.Builder.FieldType.GetFunctionPointerParameterTypes());
+                    return (mfi.Builder.FieldType.GetFunctionPointerReturnType(), null);
                 }
             }
 
@@ -3229,6 +3238,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (member is FieldInfo f)
             {
+                if (!arglistVisited && f.FieldType.IsFunctionPointer && context.arglist() != null && identifier == nextNodes.Last())
+                    Visit(context.arglist());
+
                 if (TryGetConstantValue(f, out object v))
                     EmitConst(v);
                 else
@@ -3238,11 +3250,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (t.IsGenericTypeParameter)
                     t = f.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
+
+                if (f.FieldType.IsFunctionPointer && (context.arglist() != null || (f.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)))
+                {
+                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, f.FieldType.GetFunctionPointerReturnType(), f.FieldType.GetFunctionPointerParameterTypes());
+                    return (f.FieldType.GetFunctionPointerReturnType(), null);
+                }
             }
 
             else if (member is MetaFieldInfo mfi)
             {
-                if (!arglistVisited && mfi.IsFunctionPointer && context.arglist() != null && identifier == nextNodes.Last())
+                if (!arglistVisited && mfi.Builder.FieldType.IsFunctionPointer && context.arglist() != null && identifier == nextNodes.Last())
                     Visit(context.arglist());
 
                 if (mfi.ConstantValue != null)
@@ -3255,10 +3273,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsGenericTypeParameter)
                     t = mfi.Builder.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
-                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && identifier == nextNodes.Last())
+                if (mfi.Builder.FieldType.IsFunctionPointer && (context.arglist() != null || (mfi.Builder.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)))
                 {
-                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
-                    return (mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget);
+                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.Builder.FieldType.GetFunctionPointerReturnType(), mfi.Builder.FieldType.GetFunctionPointerParameterTypes());
+                    return (mfi.Builder.FieldType.GetFunctionPointerReturnType(), null);
                 }
             }
 
@@ -3413,6 +3431,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (member is FieldInfo f)
             {
+                if (!arglistVisited && f.FieldType.IsFunctionPointer && context.arglist() != null && identifier == context.Identifier().Last())
+                    Visit(context.arglist());
+
                 if (TryGetConstantValue(f, out object v))
                     EmitConst(v);
                 else
@@ -3422,11 +3443,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (t.IsGenericTypeParameter)
                     t = f.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
+
+                if (f.FieldType.IsFunctionPointer && (context.arglist() != null || (f.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && identifier == context.Identifier().Last())
+                {
+                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, f.FieldType.GetFunctionPointerReturnType(), f.FieldType.GetFunctionPointerParameterTypes());
+                    return f.FieldType.GetFunctionPointerReturnType();
+                }
             }
 
             else if (member is MetaFieldInfo mfi)
             {
-                if (!arglistVisited && mfi.IsFunctionPointer && context.arglist() != null && identifier == context.Identifier().Last())
+                if (!arglistVisited && mfi.Builder.FieldType.IsFunctionPointer && context.arglist() != null && identifier == context.Identifier().Last())
                     Visit(context.arglist());
 
                 if (mfi.ConstantValue != null)
@@ -3439,10 +3466,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsGenericTypeParameter)
                     t = mfi.Builder.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
-                if (mfi.IsFunctionPointer && (context.arglist() != null || (mfi.FunctionPointerTarget.GetParameters().Length == 0 && context.arglist() == null)) && identifier == context.Identifier().Last())
+                if (mfi.Builder.FieldType.IsFunctionPointer && (context.arglist() != null || (mfi.Builder.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && identifier == context.Identifier().Last())
                 {
-                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.FunctionPointerTarget.ReturnType, mfi.FunctionPointerTarget.GetParameters().Select(p => p.ParameterType).ToArray());
-                    return mfi.FunctionPointerTarget.ReturnType;
+                    CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.Builder.FieldType.GetFunctionPointerReturnType(), mfi.Builder.FieldType.GetFunctionPointerParameterTypes());
+                    return mfi.Builder.FieldType.GetFunctionPointerReturnType();
                 }
             }
 
@@ -4136,13 +4163,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     CurrentMethod.IL.Emit(OpCodes.Stfld, f);
                 }
 
-                if (mfi != null && CurrentMethod.NextAssignmentIsFunctionPointer)
-                {
-                    mfi.IsFunctionPointer = true;
-                    mfi.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
-                    CurrentMethod.NextAssignmentIsFunctionPointer = false;
-                }
-
                 return ret;
             }
 
@@ -4295,13 +4315,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (member is MetaFieldInfo mf)
             {
-                if (mf != null && CurrentMethod.NextAssignmentIsFunctionPointer)
-                {
-                    mf.IsFunctionPointer = true;
-                    mf.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
-                    CurrentMethod.NextAssignmentIsFunctionPointer = false;
-                }
-
                 if (identifier == ids.Last())
                 {
                     if (mf.Builder.IsInitOnly)
@@ -4331,13 +4344,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 MetaFieldInfo mfi = null;
                 if (TypeContext.Current.Fields.Any(_f => _f.Builder == f))
                     mfi = TypeContext.Current.Fields.First(_f => _f.Builder == f);
-
-                if (mfi != null && CurrentMethod.NextAssignmentIsFunctionPointer)
-                {
-                    mfi.IsFunctionPointer = true;
-                    mfi.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
-                    CurrentMethod.NextAssignmentIsFunctionPointer = false;
-                }
 
                 if (identifier == ids.Last())
                 {
@@ -4497,23 +4503,23 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             CurrentMethod.LoadAddressForDirectObjectInit = false;
 
-            if (CurrentMethod.NextAssignmentIsFunctionPointer && type == typeof(nint))
-            {
-                sym.IsFunctionPointer = true;
-                sym.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
+            //if (CurrentMethod.NextAssignmentIsFunctionPointer && type == typeof(nint))
+            //{
+            //    sym.IsFunctionPointer = true;
+            //    sym.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
 
-                if (!CurrentMethod.NextAssignmentFunctionPointerTarget.IsStatic)
-                {
-                    EmitErrorMessage(
-                        context.expression().Start.Line,
-                        context.expression().Start.Column,
-                        context.expression().GetText().Length,
-                        DS0152_FunctionPointerForInstanceMethod,
-                        $"Cannot create function pointer for instance method '{CurrentMethod.NextAssignmentFunctionPointerTarget.Name}'. Function pointers are only supported for static methods.");
-                }
-            }
+            //    if (!CurrentMethod.NextAssignmentFunctionPointerTarget.IsStatic)
+            //    {
+            //        EmitErrorMessage(
+            //            context.expression().Start.Line,
+            //            context.expression().Start.Column,
+            //            context.expression().GetText().Length,
+            //            DS0152_FunctionPointerForInstanceMethod,
+            //            $"Cannot create function pointer for instance method '{CurrentMethod.NextAssignmentFunctionPointerTarget.Name}'. Function pointers are only supported for static methods.");
+            //    }
+            //}
 
-            CurrentMethod.NextAssignmentIsFunctionPointer = false;
+            //CurrentMethod.NextAssignmentIsFunctionPointer = false;
 
             bool checkTypes = true;
             if (type != sym.Type() && !((sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/) && sym.Type().GetElementType() == type))
@@ -4672,21 +4678,21 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             SymbolType = SymbolInfo.SymType.Local
         };
 
-        if (CurrentMethod.NextAssignmentIsFunctionPointer && localSymbol.Type() == typeof(nint))
-        {
-            localSymbol.IsFunctionPointer = true;
-            localSymbol.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
+        //if (CurrentMethod.NextAssignmentIsFunctionPointer && localSymbol.Type() == typeof(nint))
+        //{
+        //    localSymbol.IsFunctionPointer = true;
+        //    localSymbol.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
 
-            if (!CurrentMethod.NextAssignmentFunctionPointerTarget.IsStatic)
-            {
-                EmitErrorMessage(
-                    context.expression().Start.Line,
-                    context.expression().Start.Column,
-                    context.expression().GetText().Length,
-                    DS0152_FunctionPointerForInstanceMethod,
-                    $"Cannot create function pointer for instance method '{CurrentMethod.NextAssignmentFunctionPointerTarget.Name}'. Function pointers are only supported for static methods.");
-            }
-        }
+        //    if (!CurrentMethod.NextAssignmentFunctionPointerTarget.IsStatic)
+        //    {
+        //        EmitErrorMessage(
+        //            context.expression().Start.Line,
+        //            context.expression().Start.Column,
+        //            context.expression().GetText().Length,
+        //            DS0152_FunctionPointerForInstanceMethod,
+        //            $"Cannot create function pointer for instance method '{CurrentMethod.NextAssignmentFunctionPointerTarget.Name}'. Function pointers are only supported for static methods.");
+        //    }
+        //}
 
         if (t == typeof(UnionValue))
         {
@@ -5454,8 +5460,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.op.Text == "func&") // Get raw pointer instead of Func[T] delegate
         {
-            CurrentMethod.NextAssignmentIsFunctionPointer = true;
-            CurrentMethod.NextAssignmentFunctionPointerTarget = m;
+            // TODO: Return proper function pointer type
             return typeof(nint);
         }
 

@@ -32,10 +32,6 @@ internal class ParamInfo : IEquatable<ParamInfo>
 
     public UnionValue Union { get; set; }
 
-    public bool IsFunctionPointer { get; set; }
-
-    public MethodInfo FunctionPointerTarget { get; set; }
-
     public override bool Equals(object obj)
     {
         return Equals(obj as ParamInfo);

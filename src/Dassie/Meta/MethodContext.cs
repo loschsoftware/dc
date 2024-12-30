@@ -231,7 +231,4 @@ internal class MethodContext
     public int DirectObjectInitIndex { get; set; }
 
     public bool LocalSetExternally { get; set; }
-
-    public bool NextAssignmentIsFunctionPointer { get; set; }
-    public MethodInfo NextAssignmentFunctionPointerTarget { get; set; }
 }

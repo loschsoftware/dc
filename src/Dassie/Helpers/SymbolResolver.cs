@@ -1143,6 +1143,26 @@ internal static class SymbolResolver
 
     public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false)
     {
+        if (name.Func() != null)
+        {
+            // Function pointer type
+            // e.g. func*[int, int, int] -> X (a: int, b: int): int
+
+            Type[] typeArgs = name.type_arg_list().type_name().Select(t => ResolveTypeName(t, noEmitFragments)).ToArray();
+
+            Type[] parameterTypes = typeArgs[..^1];
+            Type returnType = typeArgs[^1];
+
+            EmitErrorMessage(
+                name.Start.Line,
+                name.Start.Column,
+                name.GetText().Length,
+                DS0159_FrameworkLimitation,
+                $"Function pointer types are currently unsupported.");
+
+            return typeof(nint);
+        }
+
         if (name.Double_Ampersand() != null)
         {
             Type t = ResolveTypeName(name.type_name().First(), noEmitFragments, noEmitDS0149: true);

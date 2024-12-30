@@ -25,10 +25,6 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
 
     public object ConstantValue { get; set; } = null;
 
-    public bool IsFunctionPointer { get; set; }
-
-    public MethodInfo FunctionPointerTarget { get; set; }
-
     public override bool Equals(object obj)
     {
         return Equals(obj as MetaFieldInfo);

@@ -655,5 +655,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a template type contains an instance field.
     /// </summary>
-    DS0158_InstanceFieldInTemplate
+    DS0158_InstanceFieldInTemplate,
+    /// <summary>
+    /// Displayed when a feature is not available due to a framework limitation.
+    /// </summary>
+    DS0159_FrameworkLimitation
 }
