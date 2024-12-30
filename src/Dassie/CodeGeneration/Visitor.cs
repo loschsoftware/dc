@@ -5400,6 +5400,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context)
     {
+        bool isLambdaExpression = false;
         MethodInfo pointerTarget = null;
         MethodInfo m = null;
         Type delegateType = null;
@@ -5423,38 +5424,28 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.expression().GetType() == typeof(DassieParser.Anonymous_function_expressionContext))
         {
+            isLambdaExpression = true;
             m = HandleAnonymousFunction((DassieParser.Anonymous_function_expressionContext)context.expression(), out closureType);
             pointerTarget = m;
         }
 
         CurrentMethod.ClosureContainerType = closureType;
 
-        //if (!pointerTarget.IsStatic)
-        //{
-        //    if (instanceField != null)
-        //    {
-        //        CurrentMethod.IL.Emit(OpCodes.Stsfld, instanceField);
-        //        CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
-        //    }
-        //}
-
         if (context.op.Text == "func")
         {
-            EmitLdloc(0);
-            CurrentMethod.IL.Emit(OpCodes.Dup);
+            if (isLambdaExpression)
+            {
+                EmitLdloc(0);
+                CurrentMethod.IL.Emit(OpCodes.Dup);
+            }
+            else
+            {
+                if (m.IsStatic)
+                    CurrentMethod.IL.Emit(OpCodes.Ldnull);
+                else
+                    CurrentMethod.IL.Emit(OpCodes.Dup);
+            }
         }
-
-        //if (m.IsStatic && instanceField == null)
-        //    CurrentMethod.IL.Emit(OpCodes.Ldnull);
-        //else
-        //{
-        //    if (instanceField != null)
-        //    {
-        //        CurrentMethod.IL.Emit(OpCodes.Stsfld, instanceField);
-        //        CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
-        //        CurrentMethod.IL.Emit(OpCodes.Ldsfld, instanceField);
-        //    }
-        //}
 
         EmitLdftn(m);
 
