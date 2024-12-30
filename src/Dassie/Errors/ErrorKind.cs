@@ -651,5 +651,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when inheriting from a sealed type.
     /// </summary>
-    DS0157_InheritingFromSealedType
+    DS0157_InheritingFromSealedType,
+    /// <summary>
+    /// Emitted when a template type contains an instance field.
+    /// </summary>
+    DS0158_InstanceFieldInTemplate
 }

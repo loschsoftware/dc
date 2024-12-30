@@ -1021,6 +1021,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             type,
             AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), isInitOnly));
 
+        if (TypeContext.Current.Builder.IsInterface && !fb.IsStatic)
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                DS0158_InstanceFieldInTemplate,
+                $"Template types cannot contain instance fields.");
+        }
+
         if ((type.IsByRef /*|| type.IsByRefLike*/) && !TypeContext.Current.IsByRefLike)
         {
             EmitErrorMessage(
