@@ -647,5 +647,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a type implementing a template does not implement a required, abstract template member.
     /// </summary>
-    DS0156_RequiredInterfaceMembersNotImplemented
+    DS0156_RequiredInterfaceMembersNotImplemented,
+    /// <summary>
+    /// Emitted when inheriting from a sealed type.
+    /// </summary>
+    DS0157_InheritingFromSealedType
 }

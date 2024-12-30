@@ -171,7 +171,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 if (type.IsClass)
                 {
-                    if (context.type_kind().Val() != null)
+                    if (type.IsSealed)
+                    {
+                        EmitErrorMessage(
+                            context.inheritance_list().Start.Line,
+                            context.inheritance_list().Start.Column,
+                            context.inheritance_list().GetText().Length,
+                            DS0157_InheritingFromSealedType,
+                            $"Cannot inherit from type '{type.FullName}' because it is sealed.",
+                            tip: "If possible, mark the type as 'open' to allow inheritance.");
+                    }
+                    else if (context.type_kind().Val() != null)
                     {
                         EmitErrorMessage(
                             context.inheritance_list().Start.Line,
@@ -258,6 +268,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         foreach (Type _interface in interfaces)
             tb.AddInterfaceImplementation(_interface);
+
+        if (parent != null)
+            tb.SetParent(parent);
 
         tc.IsEnumeration = enumerationMarkerType != null;
 
