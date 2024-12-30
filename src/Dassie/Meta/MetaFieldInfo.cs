@@ -19,7 +19,7 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
 
     public string Name { get; set; }
 
-    public FieldBuilder Builder { get; set; }
+    public FieldInfo Builder { get; set; }
 
     public UnionValue Union { get; set; }
 
@@ -38,7 +38,7 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
     {
         return other is not null &&
                Name == other.Name &&
-               EqualityComparer<FieldBuilder>.Default.Equals(Builder, other.Builder) &&
+               EqualityComparer<FieldInfo>.Default.Equals(Builder, other.Builder) &&
                Union.Equals(other.Union);
     }
 
@@ -46,7 +46,7 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
     {
         int hashCode = 1355297754;
         hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-        hashCode = hashCode * -1521134295 + EqualityComparer<FieldBuilder>.Default.GetHashCode(Builder);
+        hashCode = hashCode * -1521134295 + EqualityComparer<FieldInfo>.Default.GetHashCode(Builder);
         hashCode = hashCode * -1521134295 + Union.GetHashCode();
         return hashCode;
     }

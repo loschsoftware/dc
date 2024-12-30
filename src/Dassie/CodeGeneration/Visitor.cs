@@ -270,7 +270,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             tb.AddInterfaceImplementation(_interface);
 
         if (parent != null)
+        {
+            TypeContext.Current.Fields.AddRange(InheritanceHelpers.GetInheritedFields(parent));
             tb.SetParent(parent);
+        }
 
         tc.IsEnumeration = enumerationMarkerType != null;
 
@@ -4279,6 +4282,39 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (member == null)
                 return null;
+
+            if (member is MetaFieldInfo mf)
+            {
+                if (mf != null && CurrentMethod.NextAssignmentIsFunctionPointer)
+                {
+                    mf.IsFunctionPointer = true;
+                    mf.FunctionPointerTarget = CurrentMethod.NextAssignmentFunctionPointerTarget;
+                    CurrentMethod.NextAssignmentIsFunctionPointer = false;
+                }
+
+                if (identifier == ids.Last())
+                {
+                    if (mf.Builder.IsInitOnly)
+                    {
+                        EmitErrorMessage(
+                            context.Start.Line,
+                            context.Start.Column,
+                            context.GetText().Length,
+                            DS0094_InitOnlyFieldAssignedOutsideOfConstructor,
+                            $"The field '{mf.Name}' is readonly and cannot be modified outside of a constructor.");
+                    }
+
+                    EmitLdloc(tempIndex);
+                    EmitConversionOperator(ret, mf.Builder.FieldType);
+                    EmitStfld(mf.Builder);
+                    CurrentMethod.SkipPop = true;
+                }
+                else
+                {
+                    LoadField(mf.Builder);
+                    t = mf.Builder.FieldType;
+                }
+            }
 
             if (member is FieldInfo f)
             {
