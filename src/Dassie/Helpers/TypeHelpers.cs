@@ -185,7 +185,7 @@ internal static class TypeHelpers
         if (from.IsAssignableTo(to))
             return true;
 
-        if (from.IsClass && to.IsClass && from.IsAssignableFrom(to))
+        if (from.IsAssignableFrom(to))
             return true;
 
         if (from.GetMethods()
