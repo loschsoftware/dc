@@ -185,6 +185,9 @@ internal static class TypeHelpers
         if (from.IsAssignableTo(to))
             return true;
 
+        if (from.IsClass && to.IsClass && from.IsAssignableFrom(to))
+            return true;
+
         if (from.GetMethods()
             .Where(m => m.Name == "op_Implicit")
             .Where(m => m.ReturnType == to)
