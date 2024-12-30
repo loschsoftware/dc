@@ -22,7 +22,7 @@ internal static class InheritanceHelpers
                 {
                     constant = field.GetRawConstantValue();
                 }
-                catch (NotSupportedException) { }
+                catch (Exception) { }
 
                 fields.Add(new MetaFieldInfo
                 {
