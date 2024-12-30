@@ -92,6 +92,16 @@ public static class ObjectDump
         if (obj is SelfReference s)
             return $"[self reference: {{{s.WrappedType.FullName}}}]{(omitNL ? "" : Environment.NewLine)}";
 
+        if (obj is char)
+            return $"'{obj.ToString()
+                .Replace("^", "^^")
+                .Replace("'", "^'")
+                .Replace("\r", "^r")
+                .Replace("\n", "^n")
+                .Replace("\v", "^v")
+                .Replace("\t", "^t")
+                .Replace("\b", "^b")}'{(omitNL ? "" : Environment.NewLine)}";
+
         if (obj.GetType().IsPrimitive)
             return $"{obj}{(omitNL ? "" : Environment.NewLine)}";
 
