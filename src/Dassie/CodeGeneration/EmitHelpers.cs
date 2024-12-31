@@ -421,6 +421,9 @@ internal static class EmitHelpers
         if (from == to)
             return true;
 
+        if (from == typeof(nint) && to.IsFunctionPointer)
+            return true;
+
         if (IsNumericType(from) && IsNumericType(to))
         {
             if (_conversionInstructions.TryGetValue(to, out OpCode value))

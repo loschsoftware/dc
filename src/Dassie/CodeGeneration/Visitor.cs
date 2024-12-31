@@ -4562,12 +4562,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     return sym.Union().GetType();
                 }
 
-                EmitErrorMessage(
-                    context.assignment_operator().Start.Line,
-                    context.assignment_operator().Start.Column,
-                    context.assignment_operator().GetText().Length,
-                    DS0006_VariableTypeChanged,
-                    $"Expected expression of type '{sym.Type().FullName}', but got type '{type.FullName}'.");
+                if (!EmitConversionOperator(type, sym.Type()))
+                {
+                    EmitErrorMessage(
+                        context.assignment_operator().Start.Line,
+                        context.assignment_operator().Start.Column,
+                        context.assignment_operator().GetText().Length,
+                        DS0006_VariableTypeChanged,
+                        $"Expected expression of type '{sym.Type().FullName}', but got type '{type.FullName}'.");
+                }
 
                 return type;
             }
