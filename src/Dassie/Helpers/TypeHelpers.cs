@@ -179,6 +179,9 @@ internal static class TypeHelpers
         if (from == typeof(nint) && to.IsFunctionPointer)
             return true;
 
+        if (from.IsFunctionPointer && to == typeof(nint))
+            return true;
+
         if (to == typeof(object))
             return true;
 
