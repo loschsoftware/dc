@@ -1153,14 +1153,17 @@ internal static class SymbolResolver
             Type[] parameterTypes = typeArgs[..^1];
             Type returnType = typeArgs[^1];
 
-            EmitErrorMessage(
-                name.Start.Line,
-                name.Start.Column,
-                name.GetText().Length,
-                DS0159_FrameworkLimitation,
-                $"Function pointer types are currently unsupported.");
+            //EmitErrorMessage(
+            //    name.Start.Line,
+            //    name.Start.Column,
+            //    name.GetText().Length,
+            //    DS0159_FrameworkLimitation,
+            //    $"Function pointer types are currently unsupported.");
 
-            return typeof(nint);
+            if (returnType == typeof(void))
+                return FunctionPointerHelpers.MakeGenericManagedCallVoidFunctionPointerType(parameterTypes);
+
+            return FunctionPointerHelpers.MakeGenericManagedCallFunctionPointerType((returnType, parameterTypes));
         }
 
         if (name.Double_Ampersand() != null)
