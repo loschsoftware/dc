@@ -1242,7 +1242,7 @@ internal static class SymbolResolver
             if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
             {
                 Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
-                
+
                 TypeHelpers.CheckGenericTypeCompatibility(result, typeParams, childName.Start.Line, childName.Start.Column, childName.GetText().Length, true);
 
                 if (typeParams != null && result.IsGenericTypeDefinition)
@@ -1504,5 +1504,41 @@ internal static class SymbolResolver
             return field.IsAssembly;
 
         return callingType == TypeContext.Current.Builder;
+    }
+
+    public static MethodInfo[] ResolveCustomOperatorOverloads(string methodName)
+    {
+        static IEnumerable<MethodInfo> GetOperatorsOfType(Type type)
+        {
+            if (type is TypeBuilder tb)
+            {
+                TypeContext tc = Context.Types.First(t => t.Builder == tb);
+                return tc.Methods.Where(mc => mc.IsCustomOperator && mc.Builder.IsPublic && mc.Builder.IsStatic)
+                    .Select(m => m.Builder);
+            }
+
+            return type.GetMethods(BindingFlags.Public | BindingFlags.Static).Where(m => m.GetCustomAttribute<OperatorAttribute>() != null);
+        }
+
+        IEnumerable<Type> allTypes = Context.Types.Select(t => t.Builder).Cast<Type>()
+            .Concat(Context.ReferencedAssemblies
+                .Select(a => a.GetTypes())
+                .SelectMany(a => a))
+            .Where(t => t.IsAbstract && t.IsSealed /*&& t.GetCustomAttribute<ContainsCustomOperatorsAttribute>() != null*/);
+
+        IEnumerable<(string Namespace, IEnumerable<MethodInfo> Operators)> ops = allTypes
+            .Select(a => (
+                a.Namespace,
+                Operators: GetOperatorsOfType(a)));
+
+        IEnumerable<MethodInfo> availableOperators = ops
+            .Where(o => string.IsNullOrEmpty(o.Namespace)
+                || CurrentFile.Imports.Contains(o.Namespace))
+            .SelectMany(m => m.Operators);
+
+        if (availableOperators.Any(o => o.Name == methodName))
+            return availableOperators.Where(o => o.Name == methodName).ToArray();
+
+        return null;
     }
 }

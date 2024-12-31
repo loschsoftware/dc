@@ -281,6 +281,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitMatch_expression([NotNull] DassieParser.Match_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>custom_operator_unary_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCustom_operator_unary_expression([NotNull] DassieParser.Custom_operator_unary_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>attributed_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -371,6 +378,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitMember_access_expression([NotNull] DassieParser.Member_access_expressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>custom_operator_binary_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCustom_operator_binary_expression([NotNull] DassieParser.Custom_operator_binary_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>remainder_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.

@@ -41,7 +41,9 @@ code_block
     ;
 
 expression
-    : Tilde expression #bitwise_complement_expression
+    : Custom_Operator expression #custom_operator_unary_expression
+    | expression Custom_Operator expression #custom_operator_binary_expression
+    | Tilde expression #bitwise_complement_expression
     | expression Open_Bracket expression Close_Bracket Equals expression #array_element_assignment
     | <assoc=right> expression Double_Asterisk expression #power_expression
     | Exclamation_Mark expression #logical_negation_expression
@@ -294,7 +296,6 @@ member_oop_modifier
 
 member_special_modifier
     : Extern
-    | Infix
     | Inline
     | Static
     | Abstract
@@ -304,6 +305,7 @@ member_special_modifier
 type_member
     : attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals NewLine* expression)?
     | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? Colon type_name
+    | attribute* member_access_modifier? Custom_Operator parameter_list (Colon type_name)? Equals NewLine* expression
     ;
 
 access_modifier_member_group

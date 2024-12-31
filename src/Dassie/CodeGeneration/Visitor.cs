@@ -660,6 +660,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (Context.Configuration.Verbosity >= 1)
             EmitBuildLogMessage($"    Generating code for '{TypeContext.Current.Builder.FullName}::{context.Identifier().GetText()}'...");
 
+        if (context.Custom_Operator() != null)
+        {
+            DefineCustomOperator(context);
+            return typeof(void);
+        }
+
         if (context.Identifier().GetText() == TypeContext.Current.Builder.Name)
         {
             // Defer constructors for field initializers
@@ -814,7 +820,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                     param.Context.Identifier().GetText());
 
-                CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new(), param.Context.Var() != null));
+                CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, new(), param.Context.Var() != null));
             }
 
             if (CurrentMethod.Builder.IsStatic)
@@ -5518,5 +5524,285 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         return tTarget;
+    }
+
+    private void DefineCustomOperator(DassieParser.Type_memberContext context)
+    {
+        if (!(TypeContext.Current.Builder.IsAbstract && TypeContext.Current.Builder.IsSealed))
+        {
+            EmitErrorMessage(
+                context.Custom_Operator().Symbol.Line,
+                context.Custom_Operator().Symbol.Column,
+                context.Custom_Operator().GetText().Length,
+                DS0160_CustomOperatorDefinedOutsideModule,
+                "Custom operators can only be defined inside of modules.");
+
+            return;
+        }
+
+        if (context.member_access_modifier() != null && context.member_access_modifier().Global() == null)
+        {
+            EmitErrorMessage(
+                context.member_access_modifier().Start.Line,
+                context.member_access_modifier().Start.Column,
+                context.member_access_modifier().GetText().Length,
+                DS0161_CustomOperatorNotGlobal,
+                "The only valid access modifier for a custom operator is 'global'.");
+
+            return;
+        }
+
+        if (context.parameter_list().parameter().Length > 2)
+        {
+            EmitErrorMessage(
+                context.parameter_list().Start.Line,
+                context.parameter_list().Start.Column,
+                context.parameter_list().GetText().Length,
+                DS0162_CustomOperatorTooManyParameters,
+                "A custom operator cannot have more than two operands.");
+
+            return;
+        }
+
+        if (context.expression() == null)
+        {
+            EmitErrorMessage(
+                context.Custom_Operator().Symbol.Line,
+                context.Custom_Operator().Symbol.Column,
+                context.Custom_Operator().GetText().Length,
+                DS0163_CustomOperatorNoMethodBody,
+                "Custom operators are required to have method bodies.");
+
+            return;
+        }
+
+        string operatorName = context.Custom_Operator().GetText()[1..^1];
+        string methodName = $"op_{string.Join('_', operatorName.ToCharArray()
+            .Select(c => $"{(int)c}"))}";
+
+        MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.SpecialName, CallingConventions.Standard);
+        CurrentMethod = new()
+        {
+            Builder = mb,
+            IL = mb.GetILGenerator(),
+            IsCustomOperator = true
+        };
+        CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
+
+        TypeContext.Current.Builder.SetCustomAttribute(new(typeof(ContainsCustomOperatorsAttribute).GetConstructor([]), []));
+        mb.SetCustomAttribute(new(typeof(OperatorAttribute).GetConstructor([]), []));
+
+        var paramTypes = ResolveParameterList(context.parameter_list());
+        mb.SetParameters(paramTypes.Select(p => p.Type).ToArray());
+
+        foreach (var param in paramTypes)
+        {
+            ParameterBuilder pb = mb.DefineParameter(
+                CurrentMethod.ParameterIndex++,
+                AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
+                param.Context.Identifier().GetText());
+
+            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, new(), param.Context.Var() != null));
+        }
+
+        Type _tReturn = typeof(object);
+
+        InjectClosureParameterInitializers();
+
+        if (context.expression() != null)
+            _tReturn = Visit(context.expression());
+
+        Type tReturn = _tReturn;
+        if (context.type_name() != null)
+            tReturn = SymbolResolver.ResolveTypeName(context.type_name());
+
+        mb.SetReturnType(tReturn);
+
+        if (context.expression() == null)
+            _tReturn = tReturn;
+
+        if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
+        {
+            if (tReturn.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant))
+            {
+                EmitErrorMessage(
+                    context.type_name().Start.Line,
+                    context.type_name().Start.Column,
+                    context.type_name().GetText().Length,
+                    DS0118_InvalidVariance,
+                    $"Invalid variance: The type parameter '{tReturn.Name}' must be covariantly valid on '{mb.Name}'. '{tReturn.Name}' is contravariant.");
+            }
+        }
+
+        if (_tReturn != tReturn)
+        {
+            if (tReturn == typeof(object))
+            {
+                if (_tReturn.IsValueType)
+                    CurrentMethod.IL.Emit(OpCodes.Box, _tReturn);
+            }
+            else
+            {
+                EmitErrorMessage(
+                    context.expression().Start.Line,
+                    context.expression().Start.Column,
+                    context.expression().GetText().Length,
+                    DS0053_WrongReturnType,
+                    $"Expected expression of type '{tReturn.FullName}', but got type '{_tReturn.FullName}'.");
+            }
+        }
+
+        if (context.expression() != null)
+            CurrentMethod.IL.Emit(OpCodes.Ret);
+
+        CurrentFile.FunctionParameterConstraints.TryGetValue(operatorName, out Dictionary<string, string> constraintsForCurrentFunction);
+        constraintsForCurrentFunction ??= [];
+
+        List<Parameter> _params = [];
+        foreach (var param in CurrentMethod.Parameters)
+        {
+            constraintsForCurrentFunction.TryGetValue(param.Name, out string constraint);
+
+            _params.Add(new()
+            {
+                Name = param.Name,
+                Type = param.Type,
+                Constraint = constraint
+            });
+        }
+
+        CurrentFile.Fragments.Add(new()
+        {
+            Color = Color.Function,
+            Line = context.Custom_Operator().Symbol.Line,
+            Column = context.Custom_Operator().Symbol.Column,
+            Length = context.Custom_Operator().GetText().Length,
+            ToolTip = TooltipGenerator.Function(operatorName, tReturn, _params.ToArray()),
+            IsNavigationTarget = true
+        });
+
+        CurrentMethod.ClosureContainerType?.CreateType();
+    }
+
+    private static MethodInfo[] GetOperatorMethods(dynamic context)
+    {
+        string fullName = context.Custom_Operator().GetText();
+        string operatorName = fullName[1..^1];
+        string methodName = $"op_{string.Join('_', operatorName.ToCharArray()
+            .Select(c => $"{(int)c}"))}";
+
+        MethodInfo[] operatorMethods = SymbolResolver.ResolveCustomOperatorOverloads(methodName);
+
+        if (operatorMethods == null)
+        {
+            EmitErrorMessage(
+                context.Custom_Operator().Symbol.Line,
+                context.Custom_Operator().Symbol.Column,
+                context.Custom_Operator().GetText().Length,
+                DS0164_CustomOperatorNotFound,
+                $"Could not resolve custom operator '{operatorName}'.");
+        }
+
+        return operatorMethods;
+    }
+
+    public override Type VisitCustom_operator_unary_expression([NotNull] DassieParser.Custom_operator_unary_expressionContext context)
+    {
+        MethodInfo[] methods = GetOperatorMethods(context);
+        if (methods == null)
+            return typeof(void);
+
+        Type tOperand = Visit(context.expression());
+        MethodInfo final = null;
+
+        foreach (MethodInfo candidate in methods)
+        {
+            if (candidate.GetParameters().Length != 1)
+                continue;
+
+            if (candidate.GetParameters()[0].ParameterType == tOperand)
+            {
+                final = candidate;
+                break;
+            }
+
+            if (CanBeConverted(tOperand, candidate.GetParameters()[0].ParameterType))
+            {
+                EmitConversionOperator(tOperand, candidate.GetParameters()[0].ParameterType);
+                final = candidate;
+                break;
+            }
+        }
+
+        if (final == null)
+        {
+            ErrorMessageHelpers.EmitDS0002Error(
+                context.Custom_Operator().Symbol.Line,
+                context.Custom_Operator().Symbol.Column,
+                context.Custom_Operator().GetText().Length,
+                context.Custom_Operator().GetText()[1..^1],
+                methods.First().DeclaringType,
+                methods,
+                [tOperand]);
+
+            return typeof(void);
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Call, final);
+        return final.ReturnType;
+    }
+
+    public override Type VisitCustom_operator_binary_expression([NotNull] DassieParser.Custom_operator_binary_expressionContext context)
+    {
+        MethodInfo[] methods = GetOperatorMethods(context);
+        if (methods == null)
+            return typeof(void);
+
+        Type t1 = Visit(context.expression()[0]);
+        Type t2 = Visit(context.expression()[1]);
+        MethodInfo final = null;
+
+        foreach (MethodInfo candidate in methods)
+        {
+            if (candidate.GetParameters().Length != 2)
+                continue;
+
+            if (candidate.GetParameters()[0].ParameterType == t1 && candidate.GetParameters()[1].ParameterType == t2)
+            {
+                final = candidate;
+                break;
+            }
+
+            if (CanBeConverted(t1, candidate.GetParameters()[0].ParameterType) && CanBeConverted(t2, candidate.GetParameters()[1].ParameterType))
+            {
+                CurrentMethod.LocalIndex++;
+                CurrentMethod.IL.DeclareLocal(t2);
+                EmitStloc(CurrentMethod.LocalIndex);
+
+                EmitConversionOperator(t1, candidate.GetParameters()[0].ParameterType);
+                EmitLdloc(CurrentMethod.LocalIndex);
+                EmitConversionOperator(t2, candidate.GetParameters()[1].ParameterType);
+
+                final = candidate;
+                break;
+            }
+        }
+
+        if (final == null)
+        {
+            ErrorMessageHelpers.EmitDS0002Error(
+                context.Custom_Operator().Symbol.Line,
+                context.Custom_Operator().Symbol.Column,
+                context.Custom_Operator().GetText().Length,
+                context.Custom_Operator().GetText()[1..^1],
+                methods.First().DeclaringType,
+                methods,
+                [t1, t2]);
+
+            return typeof(void);
+        }
+
+        CurrentMethod.IL.Emit(OpCodes.Call, final);
+        return final.ReturnType;
     }
 }

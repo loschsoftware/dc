@@ -530,6 +530,20 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitMatch_expression([NotNull] DassieParser.Match_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>custom_operator_unary_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterCustom_operator_unary_expression([NotNull] DassieParser.Custom_operator_unary_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>custom_operator_unary_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitCustom_operator_unary_expression([NotNull] DassieParser.Custom_operator_unary_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>attributed_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -711,6 +725,20 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitMember_access_expression([NotNull] DassieParser.Member_access_expressionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>custom_operator_binary_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterCustom_operator_binary_expression([NotNull] DassieParser.Custom_operator_binary_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>custom_operator_binary_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitCustom_operator_binary_expression([NotNull] DassieParser.Custom_operator_binary_expressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>remainder_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.

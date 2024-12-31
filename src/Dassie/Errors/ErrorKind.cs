@@ -659,5 +659,25 @@ public enum ErrorKind
     /// <summary>
     /// Displayed when a feature is not available due to a framework limitation.
     /// </summary>
-    DS0159_FrameworkLimitation
+    DS0159_FrameworkLimitation,
+    /// <summary>
+    /// Emitted when a custom operator is defined outside of a module.
+    /// </summary>
+    DS0160_CustomOperatorDefinedOutsideModule,
+    /// <summary>
+    /// Emitted when a custom operator has an access modifier other than 'global'.
+    /// </summary>
+    DS0161_CustomOperatorNotGlobal,
+    /// <summary>
+    /// Emitted when a custom operator has more than two operands.
+    /// </summary>
+    DS0162_CustomOperatorTooManyParameters,
+    /// <summary>
+    /// Emitted when a custom operator has no body.
+    /// </summary>
+    DS0163_CustomOperatorNoMethodBody,
+    /// <summary>
+    /// Emitted when a custom operator could not be resolved.
+    /// </summary>
+    DS0164_CustomOperatorNotFound
 }
