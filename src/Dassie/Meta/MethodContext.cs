@@ -1,4 +1,5 @@
-﻿using Dassie.Runtime;
+﻿using Dassie.Parser;
+using Dassie.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -233,4 +234,6 @@ internal class MethodContext
     public bool LocalSetExternally { get; set; }
 
     public bool IsCustomOperator { get; set; }
+
+    public Dictionary<string, Type> WhileLoopExpressionTypes { get; set; } = [];
 }

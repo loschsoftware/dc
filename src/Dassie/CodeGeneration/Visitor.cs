@@ -5060,7 +5060,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitWhile_loop([NotNull] DassieParser.While_loopContext context)
     {
-        Type t = Visit(context.expression().First());
+        Type t = null;
+
+        if (VisitorStep1CurrentMethod == null)
+        {
+            t = Visit(context.expression().First());
+            CurrentMethod.WhileLoopExpressionTypes.Add(context.GetText(), t);
+        }
+        else
+            t = VisitorStep1CurrentMethod.WhileLoopExpressionTypes[context.GetText()];
+
         Type tReturn = null;
 
         CurrentMethod.LoopArrayTypeProbeIndex++;
@@ -5073,6 +5082,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (IsIntegerType(t))
         {
+            if (VisitorStep1CurrentMethod != null)
+                Visit(context.expression().First());
+
             if (t != typeof(int))
                 EmitConversionOperator(t, typeof(int));
 
@@ -5156,7 +5168,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             EnsureBoolean(t, 0, 0, 0);
 
-            CurrentMethod.IL.Emit(OpCodes.Pop);
+            if (VisitorStep1CurrentMethod == null)
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+
             CurrentMethod.IL.Emit(OpCodes.Newobj, listType.GetConstructor(Type.EmptyTypes));
 
             // A local that saves the returning list
@@ -5212,6 +5226,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             context.expression().First().Start.Text.Length,
             DS0043_PossiblyUnintentionalInfiniteLoop,
             "The loop condition is not boolean. The loop will run indefinetly.");
+
+        if (VisitorStep1CurrentMethod != null)
+            Visit(context.expression().First());
 
         CurrentMethod.IL.Emit(OpCodes.Pop);
 
