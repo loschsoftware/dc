@@ -2,8 +2,11 @@
 using Dassie.Meta;
 using Dassie.Parser;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace Dassie.Helpers;
 
@@ -153,15 +156,15 @@ internal static class AttributeHelpers
 
             foreach (DassieParser.AttributeContext attrib in attribs)
             {
-                Type attribType = SymbolResolver.ResolveTypeName(attrib.type_name());
+                Type attribType = SymbolResolver.ResolveAttributeTypeName(attrib.type_name());
 
-                if (attribType == typeof(RuntimeImplemented))
+                if (attribType == typeof(RuntimeImplementedAttribute))
                     implementationFlags |= MethodImplAttributes.Runtime;
 
-                if (attribType == typeof(HideBySig) && !baseAttributes.HasFlag(MethodAttributes.HideBySig))
+                if (attribType == typeof(HideBySigAttribute) && !baseAttributes.HasFlag(MethodAttributes.HideBySig))
                     baseAttributes |= MethodAttributes.HideBySig;
 
-                if (attribType == typeof(NewSlot) && !baseAttributes.HasFlag(MethodAttributes.NewSlot))
+                if (attribType == typeof(NewSlotAttribute) && !baseAttributes.HasFlag(MethodAttributes.NewSlot))
                     baseAttributes |= MethodAttributes.NewSlot;
             }
 
@@ -230,5 +233,61 @@ internal static class AttributeHelpers
         }
 
         return baseAttributes;
+    }
+    
+    public static void AddAttributeToCurrentMethod(ConstructorInfo con, object[] args)
+    {
+        CustomAttributeBuilder cab = new(con, args);
+
+        if (!CurrentMethod.Attributes.Any(c => c.Constructor == con && c.Data == args))
+        {
+            CurrentMethod.Attributes.Add((con, args));
+            CurrentMethod.Builder.SetCustomAttribute(cab);
+        }
+    }
+
+    public static void AddAttributeToCurrentType(ConstructorInfo con, object[] args)
+    {
+        CustomAttributeBuilder cab = new(con, args);
+
+        if (!TypeContext.Current.Attributes.Any(c => c.Constructor == con && c.Data == args))
+        {
+            TypeContext.Current.Attributes.Add((con, args));
+            TypeContext.Current.Builder.SetCustomAttribute(cab);
+        }
+    }
+
+    public static void AddAttributeToCurrentAssembly(ConstructorInfo con, object[] args)
+    {
+        CustomAttributeBuilder cab = new(con, args);
+
+        if (!Context.Attributes.Any(c => c.Constructor == con && c.Data == args))
+        {
+            Context.Attributes.Add((con, args));
+            Context.Assembly.SetCustomAttribute(cab);
+        }
+    }
+
+    private static readonly List<Type> IgnoredAttributes =
+        [typeof(RuntimeImplementedAttribute),
+        typeof(HideBySigAttribute),
+        typeof(NewSlotAttribute)];
+
+    public static void EvaluateSpecialAttributeSemantics(ConstructorInfo con, object[] args, bool addToCurrentMethod)
+    {
+        Type attribType = con.DeclaringType;
+
+        if (IgnoredAttributes.Contains(attribType))
+            return;
+
+        if (addToCurrentMethod)
+            AddAttributeToCurrentMethod(con, args);
+
+        // Extension method
+        if (attribType == typeof(ExtensionAttribute))
+        {
+            AddAttributeToCurrentType(con, args);
+            AddAttributeToCurrentAssembly(con, args);
+        }
     }
 }

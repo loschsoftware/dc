@@ -10,7 +10,9 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Dassie.Helpers;
 
@@ -227,6 +229,104 @@ internal static class SymbolResolver
             return t;
 
         // 6. Members of other classes
+        return null;
+    }
+
+    private static MethodInfo GetOverload(Type type, IEnumerable<MethodInfo> methods, Type[] typeArgs, Type[] argumentTypes, int row, int col, int len, bool getDefaultOverload, bool noEmitFragments, bool throwErrors)
+    {
+        if (getDefaultOverload && methods.Any())
+            return methods.First();
+
+        methods = methods.Where(c => c.GetParameters().Length == argumentTypes.Length);
+
+        if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
+            CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+
+        typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
+
+        if (methods.Any())
+        {
+            MethodInfo final = null;
+
+            foreach (MethodInfo candidate in methods)
+            {
+                MethodInfo possibleMethod = candidate;
+
+                if (final != null)
+                    break;
+
+                if (possibleMethod.IsGenericMethod)
+                {
+                    TypeHelpers.CheckGenericMethodCompatibility(possibleMethod, typeArgs, row, col, len, throwErrors);
+                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs);
+                }
+
+                if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
+                {
+                    final = possibleMethod;
+                    break;
+                }
+
+                for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
+                {
+                    if (possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i])
+                        || possibleMethod.GetParameters()[i].ParameterType == typeof(Wildcard))
+                    {
+                        if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
+                        {
+                            CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
+                        }
+
+                        if (i == possibleMethod.GetParameters().Length - 1)
+                        {
+                            final = possibleMethod;
+                            break;
+                        }
+                    }
+
+                    else
+                        break;
+                }
+            }
+
+            if (final == null)
+                return null;
+
+            for (int i = 0; i < final.GetParameters().Length; i++)
+            {
+                try
+                {
+                    if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
+                                && final.GetParameters()[i].ParameterType != typeof(object))
+                    {
+                        CurrentMethod.ParameterBoxIndices.Remove(i);
+                    }
+                }
+                catch
+                {
+                    break;
+                }
+            }
+
+            if (type != typeof(object) && final.DeclaringType == typeof(object))
+                CurrentMethod.BoxCallingType = true;
+
+            if (!noEmitFragments)
+            {
+                CurrentFile.Fragments.Add(new()
+                {
+                    Line = row,
+                    Column = col,
+                    Length = len,
+                    Color = Text.Color.Function,
+                    IsNavigationTarget = false,
+                    ToolTip = TooltipGenerator.Function(final)
+                });
+            }
+
+            return final;
+        }
+
         return null;
     }
 
@@ -483,98 +583,20 @@ internal static class SymbolResolver
                 .Where(m => m.Name == name);
         }
 
-        if (getDefaultOverload && methods.Any())
-            return methods.First();
+        MethodInfo result = GetOverload(type, methods, typeArgs, argumentTypes, row, col, len, getDefaultOverload, noEmitFragments, throwErrors);
 
-        methods = methods.Where(c => c.GetParameters().Length == argumentTypes.Length);
+        if (result != null)
+            return result;
 
-        if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
-            CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
+        if (type.IsValueType)
+            CurrentMethod.IL.Emit(TypeHelpers.GetLoadIndirectOpCode(type));
 
-        typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
+        // 5. Extension methods
+        IEnumerable<MethodInfo> extMethods = GetExtensions(name);
+        result = GetOverload(type, extMethods, typeArgs, [type, ..argumentTypes], row, col, len, getDefaultOverload, noEmitFragments, throwErrors);
 
-        if (methods.Any())
-        {
-            MethodInfo final = null;
-
-            foreach (MethodInfo candidate in methods)
-            {
-                MethodInfo possibleMethod = candidate;
-
-                if (final != null)
-                    break;
-
-                if (possibleMethod.IsGenericMethod)
-                {
-                    TypeHelpers.CheckGenericMethodCompatibility(possibleMethod, typeArgs, row, col, len, throwErrors);
-                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs);
-                }
-
-                if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
-                {
-                    final = possibleMethod;
-                    break;
-                }
-
-                for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
-                {
-                    if (possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i])
-                        || possibleMethod.GetParameters()[i].ParameterType == typeof(Wildcard))
-                    {
-                        if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
-                        {
-                            CurrentMethod.ParameterBoxIndices[memberIndex].Add(i);
-                        }
-
-                        if (i == possibleMethod.GetParameters().Length - 1)
-                        {
-                            final = possibleMethod;
-                            break;
-                        }
-                    }
-
-                    else
-                        break;
-                }
-            }
-
-            if (final == null)
-                goto Error;
-
-            for (int i = 0; i < final.GetParameters().Length; i++)
-            {
-                try
-                {
-                    if (CurrentMethod.ParameterBoxIndices[memberIndex].Contains(i)
-                                && final.GetParameters()[i].ParameterType != typeof(object))
-                    {
-                        CurrentMethod.ParameterBoxIndices.Remove(i);
-                    }
-                }
-                catch
-                {
-                    break;
-                }
-            }
-
-            if (type != typeof(object) && final.DeclaringType == typeof(object))
-                CurrentMethod.BoxCallingType = true;
-
-            if (!noEmitFragments)
-            {
-                CurrentFile.Fragments.Add(new()
-                {
-                    Line = row,
-                    Column = col,
-                    Length = len,
-                    Color = Text.Color.Function,
-                    IsNavigationTarget = false,
-                    ToolTip = TooltipGenerator.Function(final)
-                });
-            }
-
-            return final;
-        }
+        if (result != null)
+            return result;
 
     Error:
 
@@ -1132,13 +1154,29 @@ internal static class SymbolResolver
         return (null, Array.Empty<MethodInfo>());
     }
 
-    public static Type ResolveAttributeTypeName(string name, bool noEmitFragments = false)
+    public static Type ResolveAttributeTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false)
+    {
+        return ResolveAttributeTypeName(
+            name.GetText(),
+            name.Start.Line,
+            name.Start.Column,
+            name.GetText().Length,
+            noEmitFragments);
+    }
+
+    public static Type ResolveAttributeTypeName(string name, int row, int col, int len, bool noEmitFragments = false)
     {
         Type t;
-        if ((t = ResolveTypeName(name, noEmitFragments: noEmitFragments)) != null)
+        if ((t = ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, noErrors: true)) != null)
             return t;
 
-        return ResolveTypeName($"{name}Attribute", noEmitFragments: noEmitFragments);
+        t = ResolveTypeName($"{name}Attribute", row, col, len, noEmitFragments: noEmitFragments, noErrors: true);
+
+        if (t != null)
+            return t;
+
+        ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments); // To display error
+        return t;
     }
 
     public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false)
@@ -1506,6 +1544,30 @@ internal static class SymbolResolver
         return callingType == TypeContext.Current.Builder;
     }
 
+    public static IEnumerable<MethodInfo> GetExtensions(string name)
+    {
+        IEnumerable<MethodInfo> extensionMethodsTypesFromCurrentAssembly = [];
+
+        if (Context.Attributes.Any(a => a.Constructor == typeof(ExtensionAttribute).GetConstructor([])))
+        {
+            extensionMethodsTypesFromCurrentAssembly = Context.Types.Where(t => t.Attributes.Any(a => a.Constructor == typeof(ExtensionAttribute).GetConstructor([])))
+                .SelectMany(t => t.Methods)
+                .Where(m => m.Attributes.Any(a => a.Constructor == typeof(ExtensionAttribute).GetConstructor([])))
+                .Select(m => m.Builder)
+                .Where(m => m.Name == name);
+        }
+
+        IEnumerable<MethodInfo> extensionMethodsFromReferencedAssemblies = Context.ReferencedAssemblies
+            .Where(a => a.GetCustomAttribute<ExtensionAttribute>() != null)
+            .SelectMany(a => a.GetTypes())
+            .Where(t => t.GetCustomAttribute<ExtensionAttribute>() != null)
+            .SelectMany(t => t.GetMethods())
+            .Where(m => m.GetCustomAttribute<ExtensionAttribute>() != null)
+            .Where(m => m.Name == name);
+
+        return extensionMethodsTypesFromCurrentAssembly.Concat(extensionMethodsFromReferencedAssemblies);
+    }
+
     public static MethodInfo[] ResolveCustomOperatorOverloads(string methodName)
     {
         static IEnumerable<MethodInfo> GetOperatorsOfType(Type type)
@@ -1524,7 +1586,7 @@ internal static class SymbolResolver
             .Concat(Context.ReferencedAssemblies
                 .Select(a => a.GetTypes())
                 .SelectMany(a => a));
-            /*.Where(t => t.IsAbstract && t.IsSealed && t.GetCustomAttribute<ContainsCustomOperatorsAttribute>() != null);*/
+        /*.Where(t => t.IsAbstract && t.IsSealed && t.GetCustomAttribute<ContainsCustomOperatorsAttribute>() != null);*/
 
         IEnumerable<(string Namespace, IEnumerable<MethodInfo> Operators)> ops = allTypes
             .Select(a => (

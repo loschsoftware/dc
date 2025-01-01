@@ -51,4 +51,6 @@ internal class TypeContext
     public List<MockMethodInfo> RequiredInterfaceImplementations { get; set; } = [];
 
     public bool ContainsCustomOperators { get; set; }
+
+    public List<(ConstructorInfo Constructor, object[] Data)> Attributes { get; set; } = [];
 }

@@ -279,8 +279,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (enumerationMarkerType != null)
         {
-            tb.SetCustomAttribute(new(enumerationMarkerType.GetConstructor([]), []));
-
+            AttributeHelpers.AddAttributeToCurrentType(enumerationMarkerType.GetConstructor([]), []);
             Type instanceFieldType = null;
 
             if (enumerationMarkerType.GenericTypeArguments.Length > 0)
@@ -373,14 +372,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.type_kind().Ampersand() != null)
         {
             tc.IsByRefLike = true;
-            tb.SetCustomAttribute(new(typeof(IsByRefLikeAttribute).GetConstructor([]), []));
+            AttributeHelpers.AddAttributeToCurrentType(typeof(IsByRefLikeAttribute).GetConstructor([]), []);
         }
 
         // immutable value type ('readonly struct' in C#)
         if (context.type_kind().Exclamation_Mark() != null)
         {
             tc.IsImmutable = true;
-            tb.SetCustomAttribute(new(typeof(IsReadOnlyAttribute).GetConstructor([]), []));
+            AttributeHelpers.AddAttributeToCurrentType(typeof(IsByRefLikeAttribute).GetConstructor([]), []);
         }
 
         tc.ImplementedInterfaces.AddRange(interfaces);
@@ -950,12 +949,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 foreach (DassieParser.AttributeContext attribute in context.attribute())
                 {
-                    Type attribType = null;
-
-                    if (attribute.type_name().GetText() == "EntryPoint")
-                        attribType = typeof(EntryPointAttribute);
-                    else
-                        attribType = SymbolResolver.ResolveTypeName(attribute.type_name());
+                    Type attribType = SymbolResolver.ResolveAttributeTypeName(attribute.type_name());
 
                     if (attribType == typeof(EntryPointAttribute))
                     {
@@ -983,13 +977,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                         Context.EntryPoint = mb;
 
-                        CurrentMethod.Builder.SetCustomAttribute(new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
+                        AttributeHelpers.AddAttributeToCurrentMethod(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>());
                     }
 
                     else if (attribType != null)
                     {
-                        // TODO: Support attributes on functions
-                        //CurrentMethod.Builder.SetCustomAttribute(cab);
+                        // TODO: Support attributes with parameters
+                        ConstructorInfo defaultConstructor = attribType.GetConstructor([]);
+                        if (defaultConstructor != null)
+                        {
+                            CustomAttributeBuilder cab = new(defaultConstructor, []);
+                            AttributeHelpers.EvaluateSpecialAttributeSemantics(defaultConstructor, [], true);
+                        }
                     }
                 }
             }
@@ -1245,10 +1244,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
         Context.EntryPointIsSet = true;
-        CustomAttributeBuilder entryPointAttribute = new(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>());
+        ConstructorInfo entryPointCon = typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes);
+        CustomAttributeBuilder entryPointAttribute = new(entryPointCon, []);
 
         MethodBuilder mb = tb.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard, typeof(int), new Type[] { typeof(string[]) });
-        mb.SetCustomAttribute(entryPointAttribute);
 
         ILGenerator il = mb.GetILGenerator();
         MethodContext mc = new()
@@ -1256,6 +1255,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Builder = mb,
             IL = il
         };
+
+        AttributeHelpers.AddAttributeToCurrentMethod(entryPointCon, []);
 
         mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(0, ParameterAttributes.None, "args"), 0, default, false));
         mc.FilesWhereDefined.Add(CurrentFile.Path);
@@ -2505,8 +2506,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         tb = TypeContext.Current.Builder.DefineNestedType(
             $"{CurrentMethod.UniqueMethodName}$Closure");
-
-        tb.SetCustomAttribute(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes), []);
+        
+        tb.SetCustomAttribute(new(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes), []));
 
         List<FieldBuilder> flds = [];
 

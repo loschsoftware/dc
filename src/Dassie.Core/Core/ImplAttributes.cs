@@ -8,16 +8,16 @@ namespace Dassie.Core;
 /// Sets the 'runtime' implementation flag.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-public class RuntimeImplemented : Attribute { }
+public class RuntimeImplementedAttribute : Attribute { }
 
 /// <summary>
 /// Sets the 'hidebysig' method attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-public class HideBySig : Attribute { }
+public class HideBySigAttribute : Attribute { }
 
 /// <summary>
 /// Sets the 'newslot' method attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-public class NewSlot : Attribute { }
+public class NewSlotAttribute : Attribute { }

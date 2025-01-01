@@ -236,4 +236,6 @@ internal class MethodContext
     public bool IsCustomOperator { get; set; }
 
     public Dictionary<string, Type> LoopExpressionTypes { get; set; } = [];
+
+    public List<(ConstructorInfo Constructor, object[] Data)> Attributes { get; set; } = [];
 }
