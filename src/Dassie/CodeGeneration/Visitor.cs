@@ -5065,10 +5065,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (VisitorStep1CurrentMethod == null)
         {
             t = Visit(context.expression().First());
-            CurrentMethod.WhileLoopExpressionTypes.Add(context.GetText(), t);
+            CurrentMethod.LoopExpressionTypes.Add(context.GetText(), t);
         }
         else
-            t = VisitorStep1CurrentMethod.WhileLoopExpressionTypes[context.GetText()];
+            t = VisitorStep1CurrentMethod.LoopExpressionTypes[context.GetText()];
 
         Type tReturn = null;
 

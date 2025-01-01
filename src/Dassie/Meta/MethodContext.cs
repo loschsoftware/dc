@@ -235,5 +235,5 @@ internal class MethodContext
 
     public bool IsCustomOperator { get; set; }
 
-    public Dictionary<string, Type> WhileLoopExpressionTypes { get; set; } = [];
+    public Dictionary<string, Type> LoopExpressionTypes { get; set; } = [];
 }
