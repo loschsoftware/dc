@@ -5526,6 +5526,41 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return tTarget;
     }
 
+    private static (string MethodName, string OperatorName) GetMethodNameForCustomOperator(ITerminalNode customOperator)
+    {
+        string fullName = customOperator.GetText();
+        string operatorName = fullName;
+
+        if (fullName.StartsWith('/') && fullName.EndsWith('/'))
+            operatorName = fullName[1..^1];
+
+        // Use same names for characters that F# uses to allow interop.
+        // Even though some of the names are weird (twiddle?)
+
+        string methodName = $"op_{string.Join("", operatorName.ToCharArray()
+            .Select(c => $"{c switch
+            {
+                '!' => "Bang",
+                '%' => "Percent",
+                '&' => "Amp",
+                '*' => "Multiply",
+                '+' => "Plus",
+                '-' => "Minus",
+                '.' => "Dot",
+                '/' => "Divide",
+                '<' => "Less",
+                '=' => "Equal",
+                '>' => "Greater",
+                '@' => "At",
+                '^' => "Hat",
+                '|' => "Bar",
+                '~' => "Twiddle",
+                _ => (int)c
+            }}"))}";
+
+        return (methodName, operatorName);
+    }
+
     private void DefineCustomOperator(DassieParser.Type_memberContext context)
     {
         if (!(TypeContext.Current.Builder.IsAbstract && TypeContext.Current.Builder.IsSealed))
@@ -5576,9 +5611,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return;
         }
 
-        string operatorName = context.Custom_Operator().GetText()[1..^1];
-        string methodName = $"op_{string.Join('_', operatorName.ToCharArray()
-            .Select(c => $"{(int)c}"))}";
+        (string methodName, string operatorName) = GetMethodNameForCustomOperator(context.Custom_Operator());
 
         MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.SpecialName, CallingConventions.Standard);
         CurrentMethod = new()
@@ -5689,21 +5722,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         CurrentMethod.ClosureContainerType?.CreateType();
     }
 
-    private static MethodInfo[] GetOperatorMethods(dynamic context)
+    private static MethodInfo[] GetOperatorMethods(ITerminalNode context)
     {
-        string fullName = context.Custom_Operator().GetText();
-        string operatorName = fullName[1..^1];
-        string methodName = $"op_{string.Join('_', operatorName.ToCharArray()
-            .Select(c => $"{(int)c}"))}";
-
+        (string methodName, string operatorName) = GetMethodNameForCustomOperator(context);
         MethodInfo[] operatorMethods = SymbolResolver.ResolveCustomOperatorOverloads(methodName);
 
         if (operatorMethods == null)
         {
             EmitErrorMessage(
-                context.Custom_Operator().Symbol.Line,
-                context.Custom_Operator().Symbol.Column,
-                context.Custom_Operator().GetText().Length,
+                context.Symbol.Line,
+                context.Symbol.Column,
+                context.GetText().Length,
                 DS0164_CustomOperatorNotFound,
                 $"Could not resolve custom operator '{operatorName}'.");
         }
@@ -5713,7 +5742,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitCustom_operator_unary_expression([NotNull] DassieParser.Custom_operator_unary_expressionContext context)
     {
-        MethodInfo[] methods = GetOperatorMethods(context);
+        MethodInfo[] methods = GetOperatorMethods(context.Custom_Operator());
         if (methods == null)
             return typeof(void);
 
@@ -5759,7 +5788,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitCustom_operator_binary_expression([NotNull] DassieParser.Custom_operator_binary_expressionContext context)
     {
-        MethodInfo[] methods = GetOperatorMethods(context);
+        MethodInfo[] methods = GetOperatorMethods(context.Custom_Operator());
         if (methods == null)
             return typeof(void);
 

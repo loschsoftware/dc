@@ -305,7 +305,7 @@ member_special_modifier
 type_member
     : attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals NewLine* expression)?
     | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? Colon type_name
-    | attribute* member_access_modifier? Custom_Operator parameter_list (Colon type_name)? Equals NewLine* expression
+    | attribute* member_access_modifier? (Custom_Operator | Open_Paren Custom_Operator Close_Paren) parameter_list (Colon type_name)? Equals NewLine* expression
     ;
 
 access_modifier_member_group

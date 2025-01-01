@@ -164,7 +164,29 @@ Character_Literal: '\'' (~[^'\r\n\u0085\u2028\u2029] | CommonCharacter)? '\'';
 String_Literal: '"' (~[^"\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
 Verbatim_String_Literal: '^"' (~'"' | '""')* '"';
 
-Custom_Operator: Slash (~[/\r\n\u0085\u2028\u2029])+ Slash;
+fragment CustomOperatorCharacter
+	: Exclamation_Mark
+	| Dollar_Sign
+	| Percent
+	| Ampersand
+	| Asterisk
+	| Plus
+	| Minus
+	| Dot
+	| Slash
+	| Less_Than
+	| Equals
+	| Greater_Than
+	| Question_Mark
+	| At_Sign
+	| Caret
+	| Bar
+	| Tilde
+	;
+
+Custom_Operator
+	: CustomOperatorCharacter+
+    | Slash (~[/\r\n\u0085\u2028\u2029])+ Slash;
 
 fragment Integer_Suffix: [sS][bB] | [bB] | [sS] | [uU][sS] | [uU] | [lL] | [uU][lL] | [nN] | [uU][nN];
 fragment ExponentPart: [eE] ('+' | '-')? [0-9] ('`'* [0-9])*;
