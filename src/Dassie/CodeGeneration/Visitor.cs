@@ -5526,13 +5526,54 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return tTarget;
     }
 
-    private static (string MethodName, string OperatorName) GetMethodNameForCustomOperator(ITerminalNode customOperator)
+    private static readonly Dictionary<string, string> UnaryOperatorSpecialNames = new()
+    {
+        ["+"] = "UnaryPlus",
+        ["-"] = "UnaryNegation",
+        ["!"] = "LogicalNot",
+        ["~"] = "OnesComplement",
+        ["++"] = "Increment",
+        ["--"] = "Decrement"
+    };
+
+    private static readonly Dictionary<string, string> BinaryOperatorSpecialNames = new()
+    {
+        ["+"] = "Addition",
+        ["-"] = "Subtraction",
+        ["*"] = "Multiply",
+        ["/"] = "Division",
+        ["%"] = "Modulus",
+        ["&"] = "BitwiseAnd",
+        ["|"] = "BitwiseOr",
+        ["^"] = "ExclusiveOr",
+        ["<<"] = "LeftShift",
+        [">>"] = "RightShift",
+        [">>>"] = "UnsignedRightShift",
+        ["=="] = "Equality",
+        ["!="] = "Inequality",
+        ["<"] = "LessThan",
+        [">"] = "GreaterThan",
+        ["<="] = "LessThanOrEqual",
+        [">="] = "GreaterThanOrEqual"
+    };
+
+    private static (string MethodName, string OperatorName) GetMethodNameForCustomOperator(ITerminalNode customOperator, bool isUnary = false)
     {
         string fullName = customOperator.GetText();
         string operatorName = fullName;
 
-        if (fullName.StartsWith('/') && fullName.EndsWith('/'))
+        if ((fullName.StartsWith('/') && fullName.EndsWith('/'))
+            || (fullName.StartsWith('(') && fullName.EndsWith(')')))
             operatorName = fullName[1..^1];
+
+        // Operators with special names (for C# interop)
+
+        string specialName = "";
+        _ = isUnary && UnaryOperatorSpecialNames.TryGetValue(operatorName, out specialName);
+        _ = !isUnary && BinaryOperatorSpecialNames.TryGetValue(operatorName, out specialName);
+
+        if (!string.IsNullOrEmpty(specialName))
+            return ($"op_{specialName}", operatorName);
 
         // Use same names for characters that F# uses to allow interop.
         // Even though some of the names are weird (twiddle?)
@@ -5732,9 +5773,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         CurrentMethod.ClosureContainerType?.CreateType();
     }
 
-    private static MethodInfo[] GetOperatorMethods(ITerminalNode context)
+    private static MethodInfo[] GetOperatorMethods(ITerminalNode context, bool isUnary = false)
     {
-        (string methodName, string operatorName) = GetMethodNameForCustomOperator(context);
+        (string methodName, string operatorName) = GetMethodNameForCustomOperator(context, isUnary);
         MethodInfo[] operatorMethods = SymbolResolver.ResolveCustomOperatorOverloads(methodName);
 
         if (operatorMethods == null)
@@ -5752,7 +5793,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitCustom_operator_unary_expression([NotNull] DassieParser.Custom_operator_unary_expressionContext context)
     {
-        MethodInfo[] methods = GetOperatorMethods(context.Custom_Operator());
+        MethodInfo[] methods = GetOperatorMethods(context.Custom_Operator(), true);
         if (methods == null)
             return typeof(void);
 
