@@ -152,7 +152,7 @@ Backtick: '`';
 
 Identifier
 	: IdentifierOrKeyword
-	| Backtick .+? Backtick
+	| Backtick (~[`\r\n\u0085\u2028\u2029])+? Backtick
 	;
 
 Integer_Literal: (Minus | Plus)? [0-9] ('\''* [0-9])* Integer_Suffix?;
