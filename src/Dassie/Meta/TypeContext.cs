@@ -49,4 +49,6 @@ internal class TypeContext
     public bool IsImmutable { get; set; }
 
     public List<MockMethodInfo> RequiredInterfaceImplementations { get; set; } = [];
+
+    public bool ContainsCustomOperators { get; set; }
 }

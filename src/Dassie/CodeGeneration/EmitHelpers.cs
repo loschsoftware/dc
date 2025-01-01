@@ -436,15 +436,15 @@ internal static class EmitHelpers
             }
         }
 
-        if (from.IsAssignableTo(to) || from.IsAssignableFrom(to))
-        {
-            CurrentMethod.IL.Emit(OpCodes.Castclass, to);
-            return true;
-        }
-
         if (to == typeof(object))
         {
             CurrentMethod.IL.Emit(OpCodes.Box, from);
+            return true;
+        }
+
+        if (from.IsAssignableTo(to) || from.IsAssignableFrom(to))
+        {
+            CurrentMethod.IL.Emit(OpCodes.Castclass, to);
             return true;
         }
 

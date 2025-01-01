@@ -5589,7 +5589,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         };
         CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
 
-        TypeContext.Current.Builder.SetCustomAttribute(new(typeof(ContainsCustomOperatorsAttribute).GetConstructor([]), []));
+        if (!TypeContext.Current.ContainsCustomOperators)
+        {
+            TypeContext.Current.Builder.SetCustomAttribute(new(typeof(ContainsCustomOperatorsAttribute).GetConstructor([]), []));
+            TypeContext.Current.ContainsCustomOperators = true;
+        }
+
         mb.SetCustomAttribute(new(typeof(OperatorAttribute).GetConstructor([]), []));
 
         var paramTypes = ResolveParameterList(context.parameter_list());
