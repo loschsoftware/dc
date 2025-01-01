@@ -1395,6 +1395,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
 
             CurrentMethod.IL.EmitCall(OpCodes.Call, op_eq, null);
+            return op_eq.ReturnType;
         }
         else
         {
@@ -1412,9 +1413,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
 
             CurrentMethod.IL.EmitCall(OpCodes.Call, op_ineq, null);
+            return op_ineq.ReturnType;
         }
-
-        return typeof(bool);
     }
 
     public override Type VisitComparison_expression([NotNull] DassieParser.Comparison_expressionContext context)
@@ -1473,8 +1473,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return typeof(bool);
+        return op.ReturnType;
     }
 
     //public override Type VisitUnary_negation_expression([NotNull] DassieParser.Unary_negation_expressionContext context)
@@ -1561,8 +1560,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     // TODO: Implement short-circuiting
@@ -1664,8 +1662,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitAnd_expression([NotNull] DassieParser.And_expressionContext context)
@@ -1713,8 +1710,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitXor_expression([NotNull] DassieParser.Xor_expressionContext context)
@@ -1772,8 +1768,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitBitwise_complement_expression([NotNull] DassieParser.Bitwise_complement_expressionContext context)
@@ -1802,8 +1797,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitMultiply_expression([NotNull] DassieParser.Multiply_expressionContext context)
@@ -1836,8 +1830,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitDivide_expression([NotNull] DassieParser.Divide_expressionContext context)
@@ -1875,8 +1868,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitAddition_expression([NotNull] DassieParser.Addition_expressionContext context)
@@ -1958,8 +1950,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitSubtraction_expression([NotNull] DassieParser.Subtraction_expressionContext context)
@@ -1999,8 +1990,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitRemainder_expression([NotNull] DassieParser.Remainder_expressionContext context)
@@ -2035,8 +2025,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     // a %% b = (a % b + b) % b
@@ -2084,8 +2073,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitPower_expression([NotNull] DassieParser.Power_expressionContext context)
@@ -2121,7 +2109,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
-
         return m.ReturnType;
     }
 
@@ -2176,8 +2163,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitRight_shift_expression([NotNull] DassieParser.Right_shift_expressionContext context)
@@ -2244,8 +2230,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         CurrentMethod.IL.EmitCall(OpCodes.Call, op, null);
-
-        return t;
+        return op.ReturnType;
     }
 
     public override Type VisitTypeof_expression([NotNull] DassieParser.Typeof_expressionContext context)
@@ -5604,17 +5589,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     private void DefineCustomOperator(DassieParser.Type_memberContext context)
     {
-        if (!(TypeContext.Current.Builder.IsAbstract && TypeContext.Current.Builder.IsSealed))
-        {
-            EmitErrorMessage(
-                context.Custom_Operator().Symbol.Line,
-                context.Custom_Operator().Symbol.Column,
-                context.Custom_Operator().GetText().Length,
-                DS0160_CustomOperatorDefinedOutsideModule,
-                "Custom operators can only be defined inside of modules.");
+        //if (!(TypeContext.Current.Builder.IsAbstract && TypeContext.Current.Builder.IsSealed))
+        //{
+        //    EmitErrorMessage(
+        //        context.Custom_Operator().Symbol.Line,
+        //        context.Custom_Operator().Symbol.Column,
+        //        context.Custom_Operator().GetText().Length,
+        //        DS0160_CustomOperatorDefinedOutsideModule,
+        //        "Custom operators can only be defined inside of modules.");
 
-            return;
-        }
+        //    return;
+        //}
 
         if (context.member_access_modifier() != null && context.member_access_modifier().Global() == null)
         {

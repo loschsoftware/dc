@@ -185,9 +185,10 @@ fragment CustomOperatorCharacter
 	;
 
 Custom_Operator
-	: CustomOperatorCharacter+
-	| Open_Paren CustomOperatorCharacter Close_Paren
-    | Slash (~[/\r\n\u0085\u2028\u2029])+ Slash;
+	: Open_Paren CustomOperatorCharacter Close_Paren
+	| CustomOperatorCharacter CustomOperatorCharacter+
+    | Slash (~[/\r\n\u0085\u2028\u2029])+ Slash
+	;
 
 fragment Integer_Suffix: [sS][bB] | [bB] | [sS] | [uU][sS] | [uU] | [lL] | [uU][lL] | [nN] | [uU][nN];
 fragment ExponentPart: [eE] ('+' | '-')? [0-9] ('`'* [0-9])*;

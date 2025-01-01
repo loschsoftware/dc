@@ -915,7 +915,7 @@ internal static class SymbolResolver
                 .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs) : m);
 
             if (name == tb.Name || name == tb.FullName)
-                overloads = tc.Builder.GetConstructors();
+                overloads = tc.ConstructorContexts.Select(c => c.ConstructorBuilder);
 
             ErrorMessageHelpers.EmitDS0002Error(row, col, len, name, tc.Builder, overloads, argumentTypes);
         }
@@ -1523,8 +1523,8 @@ internal static class SymbolResolver
         IEnumerable<Type> allTypes = Context.Types.Select(t => t.Builder).Cast<Type>()
             .Concat(Context.ReferencedAssemblies
                 .Select(a => a.GetTypes())
-                .SelectMany(a => a))
-            .Where(t => t.IsAbstract && t.IsSealed /*&& t.GetCustomAttribute<ContainsCustomOperatorsAttribute>() != null*/);
+                .SelectMany(a => a));
+            /*.Where(t => t.IsAbstract && t.IsSealed && t.GetCustomAttribute<ContainsCustomOperatorsAttribute>() != null);*/
 
         IEnumerable<(string Namespace, IEnumerable<MethodInfo> Operators)> ops = allTypes
             .Select(a => (
