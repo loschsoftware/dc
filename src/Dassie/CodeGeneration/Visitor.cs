@@ -5656,6 +5656,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         mb.SetReturnType(tReturn);
 
+        if (tReturn == typeof(void))
+        {
+            EmitErrorMessage(
+                context.Custom_Operator().Symbol.Line,
+                context.Custom_Operator().Symbol.Column,
+                context.Custom_Operator().GetText().Length,
+                DS0165_CustomOperatorNoReturnValue,
+                "A custom operator must return a value. 'null' is an invalid return type.");
+        }
+
         if (context.expression() == null)
             _tReturn = tReturn;
 

@@ -679,5 +679,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a custom operator could not be resolved.
     /// </summary>
-    DS0164_CustomOperatorNotFound
+    DS0164_CustomOperatorNotFound,
+    /// <summary>
+    /// Emitted when a custom operator returns no value.
+    /// </summary>
+    DS0165_CustomOperatorNoReturnValue
 }
