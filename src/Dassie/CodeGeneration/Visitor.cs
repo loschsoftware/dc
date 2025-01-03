@@ -390,7 +390,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.type_kind().Exclamation_Mark() != null)
         {
             tc.IsImmutable = true;
-            AttributeHelpers.AddAttributeToCurrentType(typeof(IsByRefLikeAttribute).GetConstructor([]), []);
+            AttributeHelpers.AddAttributeToCurrentType(typeof(IsReadOnlyAttribute).GetConstructor([]), []);
         }
 
         tc.ImplementedInterfaces.AddRange(interfaces);
