@@ -248,7 +248,7 @@ type_special_modifier
     ;
 
 type
-    : attribute* (type_access_modifier | nested_type_access_modifier)? type_special_modifier? type_kind Identifier type_parameter_list? inheritance_list? Equals type_block
+    : attribute* (type_access_modifier | nested_type_access_modifier)? type_special_modifier? type_kind Identifier type_parameter_list? parameter_list? inheritance_list? (Equals type_block)?
     ;
 
 type_parameter_list

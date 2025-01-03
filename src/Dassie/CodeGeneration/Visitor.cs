@@ -431,16 +431,75 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             tc.TypeParameters = typeParamContexts;
         }
 
-        foreach (DassieParser.TypeContext nestedType in context.type_block().type())
+        if (context.parameter_list() != null)
         {
-            VisitType(nestedType, tb);
-            tc.Children.Add(TypeContext.Current);
+            List<FieldInfo> fields = [];
+
+            foreach (DassieParser.ParameterContext param in context.parameter_list().parameter())
+            {
+                string paramName = param.Identifier().GetText();
+                string fieldName = $"_{char.ToLower(paramName[0])}{paramName[1..]}_BackingField";
+                Type paramType = SymbolResolver.ResolveTypeName(param.type_name());
+
+                FieldBuilder backingField = tc.Builder.DefineField(fieldName, paramType, FieldAttributes.Private);
+                PropertyBuilder prop = tc.Builder.DefineProperty(paramName, PropertyAttributes.None, paramType, []);
+                tc.Properties.Add(prop);
+
+                MethodBuilder getter = tc.Builder.DefineMethod($"get_{paramName}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, paramType, []);
+                ILGenerator ilGet = getter.GetILGenerator();
+                ilGet.Emit(OpCodes.Ldarg_0);
+                ilGet.Emit(OpCodes.Ldfld, backingField);
+                ilGet.Emit(OpCodes.Ret);
+                prop.SetGetMethod(getter);
+                
+                if (param.Var() != null)
+                {
+                    MethodBuilder setter = tc.Builder.DefineMethod($"set_{paramName}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, typeof(void), [paramType]);
+                    ILGenerator ilSet = setter.GetILGenerator();
+                    ilSet.Emit(OpCodes.Ldarg_0);
+                    ilSet.Emit(OpCodes.Ldarg_1);
+                    ilSet.Emit(OpCodes.Stfld, backingField);
+                    ilSet.Emit(OpCodes.Ret);
+                    prop.SetSetMethod(setter);
+                }
+
+                fields.Add(backingField);
+            }
+
+            ConstructorBuilder cb = tc.Builder.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, fields.Select(f => f.FieldType).ToArray());
+            ILGenerator il = cb.GetILGenerator();
+
+            MethodContext current = CurrentMethod;
+            tc.ConstructorContexts.Add(new()
+            {
+                IL = il,
+                ConstructorBuilder = cb
+            });
+
+            for (int i = 0; i < fields.Count; i++)
+            {
+                EmitLdarg(0);
+                EmitLdarg(i + 1);
+                il.Emit(OpCodes.Stfld, fields[i]); // Going through the property is unnecessary since the setters never have side effects
+            }
+
+            il.Emit(OpCodes.Ret);
+            CurrentMethod = current;
         }
 
-        TypeContext.Current = tc;
+        if (context.type_block() != null)
+        {
+            foreach (DassieParser.TypeContext nestedType in context.type_block().type())
+            {
+                VisitType(nestedType, tb);
+                tc.Children.Add(TypeContext.Current);
+            }
 
-        foreach (DassieParser.Type_memberContext member in context.type_block().type_member())
-            Visit(member);
+            TypeContext.Current = tc;
+
+            foreach (DassieParser.Type_memberContext member in context.type_block()?.type_member())
+                Visit(member);
+        }
 
         foreach (var ctor in TypeContext.Current.Constructors)
             HandleConstructor(ctor);
@@ -4384,17 +4443,21 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 {
                     if (p.GetSetMethod() == null)
                     {
-                        EmitErrorMessage(
-                            con.Identifier().Last().Symbol.Line,
-                            con.Identifier().Last().Symbol.Column,
-                            con.Identifier().Last().GetText().Length,
-                            DS0066_PropertyNoSuitableSetter,
-                            $"The property '{p.Name}' does not have a suitable setter.");
-                    }
+                        DassieParser.Full_identifierContext full_id = (DassieParser.Full_identifierContext)(con.full_identifier());
 
-                    EmitLdloc(tempIndex);
-                    EmitConversionOperator(ret, p.PropertyType);
-                    EmitCall(t, p.GetSetMethod());
+                        EmitErrorMessage(
+                            full_id.Identifier().Last().Symbol.Line,
+                            full_id.Identifier().Last().Symbol.Column,
+                            full_id.Identifier().Last().GetText().Length,
+                            DS0066_PropertyNoSuitableSetter,
+                            $"The property '{p.Name}' is immutable and cannot be assigned to.");
+                    }
+                    else
+                    {
+                        EmitLdloc(tempIndex);
+                        EmitConversionOperator(ret, p.PropertyType);
+                        EmitCall(t, p.GetSetMethod());
+                    }
                 }
                 else
                 {
