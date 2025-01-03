@@ -1085,6 +1085,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.type_name() != null)
             type = SymbolResolver.ResolveTypeName(context.type_name());
 
+        string memberKind = context.Auto() == null ? "field" : "property";
+        string memberKindPlural = context.Auto() == null ? "fields" : "properties";
+
         if (TypeContext.Current.IsImmutable && context.Var() != null)
         {
             EmitErrorMessage(
@@ -1092,24 +1095,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Var().Symbol.Column,
                 context.Var().GetText().Length,
                 DS0151_VarFieldInImmutableType,
-                $"The 'var' modifier is invalid on members of immutable value types. Fields of immutable types are not allowed to be mutable.");
+                $"The 'var' modifier is invalid on members of immutable value types. {memberKindPlural.ToUpper()} of immutable types are not allowed to be mutable.");
         }
 
         bool isInitOnly = TypeContext.Current.IsImmutable || context.Val() != null;
+        FieldAttributes fieldAttribs = AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), isInitOnly);
 
-        FieldBuilder fb = TypeContext.Current.Builder.DefineField(
-            context.Identifier().GetText(),
-            type,
-            AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), isInitOnly));
-
-        if (TypeContext.Current.Builder.IsInterface && !fb.IsStatic)
+        if (TypeContext.Current.Builder.IsInterface && !fieldAttribs.HasFlag(FieldAttributes.Static))
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetText().Length,
                 DS0158_InstanceFieldInTemplate,
-                $"Template types cannot contain instance fields.");
+                $"Template types cannot contain instance {memberKindPlural}.");
         }
 
         if ((type.IsByRef /*|| type.IsByRefLike*/) && !TypeContext.Current.IsByRefLike)
@@ -1119,8 +1118,78 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetText().Length,
                 DS0150_ByRefFieldInNonByRefLikeType,
-                $"Invalid field type '{type}'. References are only valid as part of ByRef-like value types (val& type).");
+                $"Invalid {memberKind} type '{type}'. References are only valid as part of ByRef-like value types (val& type).");
         }
+
+        // Auto-implemented property
+        if (context.Auto() != null)
+        {
+            if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+            {
+                ITerminalNode node = context.member_special_modifier().First(l => l.Literal() != null).Literal();
+
+                EmitErrorMessage(
+                    node.Symbol.Line,
+                    node.Symbol.Column,
+                    node.GetText().Length,
+                    DS0167_PropertyLiteral,
+                    "The modifier 'literal' is not valid on properties.");
+            }
+
+            string propName = context.Identifier().GetText();
+            FieldBuilder backingField = TypeContext.Current.Builder.DefineField(
+                $"_{char.ToLower(propName[0])}{propName[1..]}_BackingField",
+                type,
+                FieldAttributes.Private);
+
+            PropertyBuilder pb = TypeContext.Current.Builder.DefineProperty(
+                propName,
+                PropertyAttributes.None,
+                type, []);
+
+            TypeContext.Current.Properties.Add(pb);
+
+            (MethodAttributes attribs, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
+            attribs |= MethodAttributes.SpecialName;
+
+            if (!attribs.HasFlag(MethodAttributes.HideBySig))
+                attribs |= MethodAttributes.HideBySig;
+
+            MethodBuilder getter = TypeContext.Current.Builder.DefineMethod($"get_{propName}", attribs, type, []);
+            ILGenerator ilGet = getter.GetILGenerator();
+            ilGet.Emit(OpCodes.Ldarg_0);
+            ilGet.Emit(OpCodes.Ldfld, backingField);
+            ilGet.Emit(OpCodes.Ret);
+            pb.SetGetMethod(getter);
+
+            if (context.Var() != null)
+            {
+                MethodBuilder setter = TypeContext.Current.Builder.DefineMethod($"set_{propName}", attribs, typeof(void), [type]);
+                ILGenerator ilSet = setter.GetILGenerator();
+                ilSet.Emit(OpCodes.Ldarg_0);
+                ilSet.Emit(OpCodes.Ldarg_1);
+                ilSet.Emit(OpCodes.Stfld, backingField);
+                ilSet.Emit(OpCodes.Ret);
+                pb.SetSetMethod(setter);
+            }
+
+            CurrentFile.Fragments.Add(new()
+            {
+                Color = Color.Property,
+                Column = context.Identifier().Symbol.Column,
+                Line = context.Identifier().Symbol.Line,
+                Length = context.Identifier().GetText().Length,
+                ToolTip = TooltipGenerator.Property(pb),
+                IsNavigationTarget = true
+            });
+
+            return typeof(void);
+        }
+
+        FieldBuilder fb = TypeContext.Current.Builder.DefineField(
+            context.Identifier().GetText(),
+            type,
+            fieldAttribs);
 
         MetaFieldInfo mfi = new(context.Identifier().GetText(), fb, default);
 
@@ -2920,7 +2989,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (s.Type().IsFunctionPointer && context.arglist() != null && firstIndex == 0)
                     Visit(context.arglist());
-                
+
                 if (CurrentMethod.ShouldLoadAddressIfValueType)
                     s.LoadAddressIfValueType();
                 else

@@ -15,7 +15,8 @@ internal class SymbolInfo
     {
         Local,
         Parameter,
-        Field
+        Field,
+        Property
     }
 
     public SymType SymbolType { get; set; }
@@ -26,11 +27,14 @@ internal class SymbolInfo
 
     public MetaFieldInfo Field { get; set; }
 
+    public PropertyInfo Property { get; set; }
+
     public Type Type() => SymbolType switch
     {
         SymType.Local => Local.Builder.LocalType,
         SymType.Parameter => Parameter.Type,
-        _ => Field.Builder.FieldType
+        SymType.Field => Field.Builder.FieldType,
+        _ => Property.PropertyType
     };
 
     public int Index() => SymbolType switch
@@ -44,14 +48,16 @@ internal class SymbolInfo
     {
         SymType.Local => Local.Union,
         SymType.Parameter => Parameter.Union,
-        _ => Field.Union
+        SymType.Field => Field.Union,
+        _ => default
     };
 
     public Tooltip GetToolTip() => SymbolType switch
     {
         SymType.Local => TooltipGenerator.Local(Local.Name, !Local.IsConstant, Local.Builder),
         SymType.Parameter => TooltipGenerator.Parameter(Parameter.Name, Parameter.Type),
-        _ => TooltipGenerator.Field(Field.Builder)
+        SymType.Field => TooltipGenerator.Field(Field.Builder),
+        _ => TooltipGenerator.Property(Property)
     };
 
     public Fragment GetFragment(int line, int col, int length, bool navigable = false) => new(
@@ -62,7 +68,8 @@ internal class SymbolInfo
         {
             SymType.Local => Color.LocalVariable,
             SymType.Parameter => Color.LocalValue,
-            _ => Color.Field
+            SymType.Field => Color.Field,
+            _ => Color.Property
         },
         navigable)
     {
@@ -124,6 +131,10 @@ internal class SymbolInfo
                     EmitLdarg(Parameter.Index);
                     break;
 
+                case SymType.Property:
+                    EmitCall(Property.PropertyType, Property.GetGetMethod());
+                    break;
+
                 default:
                     if (Field.Builder.IsLiteral)
                     {
@@ -174,6 +185,10 @@ internal class SymbolInfo
                 EmitLdarga(Parameter.Index);
                 break;
 
+            case SymType.Property:
+                EmitCall(Property.PropertyType, Property.GetGetMethod());
+                break;
+
             default:
                 if (!Field.Builder.IsStatic)
                     EmitLdarg0IfCurrentType(Field.Builder.FieldType);
@@ -196,6 +211,13 @@ internal class SymbolInfo
 
             case SymType.Parameter:
                 if (Parameter.Type.IsValueType)
+                    LoadAddress();
+                else
+                    Load();
+                break;
+
+            case SymType.Property:
+                if (Property.PropertyType.IsValueType)
                     LoadAddress();
                 else
                     Load();
@@ -247,6 +269,10 @@ internal class SymbolInfo
                 EmitStarg(Parameter.Index);
                 break;
 
+            case SymType.Property:
+                EmitCall(Property.PropertyType, Property.GetSetMethod());
+                break;
+
             default:
                 if (Field.Builder.IsStatic)
                     CurrentMethod.IL.Emit(OpCodes.Stsfld, Field.Builder);
@@ -269,6 +295,7 @@ internal class SymbolInfo
     {
         SymType.Local => !Local.IsConstant,
         SymType.Parameter => Parameter.Builder.IsOut || Parameter.IsMutable,
+        SymType.Property => Property.GetSetMethod() != null,
         _ => true
     };
 
@@ -276,6 +303,7 @@ internal class SymbolInfo
     {
         SymType.Local => Local.Name,
         SymType.Parameter => Parameter.Name,
+        SymType.Property => Property.Name,
         _ => Field.Builder.Name
     };
 
@@ -286,6 +314,7 @@ internal class SymbolInfo
         if (left.Local != null && right.Local != null && left.Local == right.Local) return true;
         if (left.Parameter != null && right.Parameter != null && left.Parameter == right.Parameter) return true;
         if (left.Field != null && right.Field != null && left.Field == right.Field) return true;
+        if (left.Property != null && right.Property != null && left.Property == right.Property) return true;
 
         return false;
     }

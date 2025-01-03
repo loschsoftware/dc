@@ -1483,6 +1483,15 @@ internal static class SymbolResolver
             };
         }
 
+        else if (TypeContext.Current.Properties.Any(p => p.Name == name))
+        {
+            return new()
+            {
+                SymbolType = SymbolInfo.SymType.Property,
+                Property = TypeContext.Current.Properties.First(p => p.Name == name)
+            };
+        }
+
         return null;
     }
 

@@ -687,5 +687,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a module initializer does not fill all requirements.
     /// </summary>
-    DS0166_ModuleInitializerInvalid
+    DS0166_ModuleInitializerInvalid,
+    /// <summary>
+    /// Emitted when a property is declared as a compile-time constant.
+    /// </summary>
+    DS0167_PropertyLiteral
 }
