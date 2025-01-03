@@ -451,7 +451,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 ilGet.Emit(OpCodes.Ldfld, backingField);
                 ilGet.Emit(OpCodes.Ret);
                 prop.SetGetMethod(getter);
-                
+
                 if (param.Var() != null)
                 {
                     MethodBuilder setter = tc.Builder.DefineMethod($"set_{paramName}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, typeof(void), [paramType]);
@@ -483,8 +483,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 il.Emit(OpCodes.Stfld, fields[i]); // Going through the property is unnecessary since the setters never have side effects
             }
 
-            EmitLdarg(0);
-            il.Emit(OpCodes.Call, tc.Builder.BaseType.GetConstructor([]));
+            if (!tc.Builder.IsValueType)
+            {
+                EmitLdarg(0);
+                il.Emit(OpCodes.Call, tc.Builder.BaseType.GetConstructor([]));
+            }
+
             il.Emit(OpCodes.Ret);
             CurrentMethod = current;
         }
@@ -2578,7 +2582,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         tb = TypeContext.Current.Builder.DefineNestedType(
             $"{CurrentMethod.UniqueMethodName}$Closure");
-        
+
         tb.SetCustomAttribute(new(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes), []));
 
         List<FieldBuilder> flds = [];
@@ -2916,8 +2920,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (s.Type().IsFunctionPointer && context.arglist() != null && firstIndex == 0)
                     Visit(context.arglist());
-
-                if (CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress)
+                
+                if (CurrentMethod.ShouldLoadAddressIfValueType)
                     s.LoadAddressIfValueType();
                 else
                     s.Load();
@@ -3056,7 +3060,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 EmitCall(prop.DeclaringType, prop.GetGetMethod());
                 t = prop.PropertyType;
-                
+
                 if (firstIndex < (context.full_identifier().Identifier().Length - 1) && t.IsValueType)
                 {
                     CurrentMethod.IL.DeclareLocal(t);
