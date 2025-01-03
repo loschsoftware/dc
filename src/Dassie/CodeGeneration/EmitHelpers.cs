@@ -304,13 +304,17 @@ internal static class EmitHelpers
 
     public static void EmitCall(Type type, MethodInfo m)
     {
-        if (m.IsStatic || type.IsValueType)
-            CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
-        else
-            CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
+        try
+        {
+            if (m.IsStatic || type.IsValueType)
+                CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
+            else
+                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
 
-        if (m.ReturnType == typeof(void))
-            CurrentMethod.SkipPop = true;
+            if (m.ReturnType == typeof(void))
+                CurrentMethod.SkipPop = true;
+        }
+        catch (Exception) { }
     }
 
     public static void EmitLdftn(MethodInfo m)
@@ -519,7 +523,7 @@ internal static class EmitHelpers
                 && m.Parameters.Select(p => p.Type).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))))
             {
                 TypeContext step1Context = VisitorStep1.Types.First(t => t.FullName == TypeContext.Current.FullName);
-                MethodContext step1Method = step1Context.Methods.First(m => m.Builder.Name == CurrentMethod.Builder.Name && m.Parameters.Select(p => p.Type).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type)));
+                MethodContext step1Method = step1Context.Methods.First(m => m.Builder != null && m.Builder.Name == CurrentMethod.Builder.Name && m.Parameters.Select(p => p.Type).SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type)));
 
                 if (step1Method.ClosureContainerType != null)
                 {

@@ -220,6 +220,9 @@ internal static class SymbolResolver
             return field;
         }
 
+        if (TypeContext.Current.Properties.Any(p => p.Name == text))
+            return TypeContext.Current.Properties.First(p => p.Name == text);
+
         // 4. Members of type-imported types ("global members")
         if (TryGetGlobalMember(text, out object globals, row, col, len))
             return globals;

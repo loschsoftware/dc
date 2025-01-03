@@ -22,6 +22,9 @@ internal static class TypeHelpers
     /// <returns>A type representing <paramref name="t"/> without a ByRef modifier.</returns>
     public static Type RemoveByRef(this Type t)
     {
+        if (t == null)
+            return t;
+
         if (t.IsByRef /*|| t.IsByRefLike*/)
             t = t.GetElementType();
 

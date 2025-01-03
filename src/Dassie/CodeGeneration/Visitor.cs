@@ -483,6 +483,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 il.Emit(OpCodes.Stfld, fields[i]); // Going through the property is unnecessary since the setters never have side effects
             }
 
+            EmitLdarg(0);
+            il.Emit(OpCodes.Call, tc.Builder.BaseType.GetConstructor([]));
             il.Emit(OpCodes.Ret);
             CurrentMethod = current;
         }
@@ -3047,6 +3049,23 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
             }
 
+            else if (o is PropertyInfo prop)
+            {
+                if (!prop.GetGetMethod().IsStatic)
+                    EmitLdarg(0);
+
+                EmitCall(prop.DeclaringType, prop.GetGetMethod());
+                t = prop.PropertyType;
+                
+                if (firstIndex < (context.full_identifier().Identifier().Length - 1) && t.IsValueType)
+                {
+                    CurrentMethod.IL.DeclareLocal(t);
+                    CurrentMethod.LocalIndex++;
+                    EmitStloc(CurrentMethod.LocalIndex);
+                    EmitLdloca(CurrentMethod.LocalIndex);
+                }
+            }
+
             else if (o is SymbolResolver.EnumValueInfo e)
             {
                 EmitLdcI4((int)e.Value);
@@ -3415,7 +3434,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (!getFunctionPointerTarget || identifier != nextNodes.Last())
                 {
-                    EmitTailcall();
+                    //EmitTailcall();
                     EmitCall(t, m);
                 }
 
