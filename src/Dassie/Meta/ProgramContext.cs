@@ -54,4 +54,6 @@ internal class ProgramContext
     public List<ErrorKind> CompilerSuppressedMessages { get; } = [];
 
     public List<(ConstructorInfo Constructor, object[] Data)> Attributes { get; set; } = [];
+
+    public List<MethodInfo> ModuleInitializerParts { get; set; } = [];
 }

@@ -50,6 +50,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         Visit(context.file_body());
 
+        if (Context.ModuleInitializerParts.Count > 0)
+        {
+            MethodBuilder cctor = Context.Module.DefineGlobalMethod(".cctor", MethodAttributes.Private | MethodAttributes.Static | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, typeof(void), []);
+            ILGenerator il = cctor.GetILGenerator();
+
+            foreach (MethodInfo part in Context.ModuleInitializerParts)
+                il.Emit(OpCodes.Call, part);
+
+            il.Emit(OpCodes.Ret);
+        }
+
         return typeof(void);
     }
 
@@ -987,7 +998,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         if (defaultConstructor != null)
                         {
                             CustomAttributeBuilder cab = new(defaultConstructor, []);
-                            AttributeHelpers.EvaluateSpecialAttributeSemantics(defaultConstructor, [], true);
+                            AttributeHelpers.EvaluateSpecialAttributeSemantics(context, defaultConstructor, [], true);
                         }
                     }
                 }

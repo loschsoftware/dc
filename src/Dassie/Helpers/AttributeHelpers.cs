@@ -234,7 +234,7 @@ internal static class AttributeHelpers
 
         return baseAttributes;
     }
-    
+
     public static void AddAttributeToCurrentMethod(ConstructorInfo con, object[] args)
     {
         CustomAttributeBuilder cab = new(con, args);
@@ -273,7 +273,7 @@ internal static class AttributeHelpers
         typeof(HideBySigAttribute),
         typeof(NewSlotAttribute)];
 
-    public static void EvaluateSpecialAttributeSemantics(ConstructorInfo con, object[] args, bool addToCurrentMethod)
+    public static void EvaluateSpecialAttributeSemantics(DassieParser.Type_memberContext context, ConstructorInfo con, object[] args, bool addToCurrentMethod)
     {
         Type attribType = con.DeclaringType;
 
@@ -288,6 +288,66 @@ internal static class AttributeHelpers
         {
             AddAttributeToCurrentType(con, args);
             AddAttributeToCurrentAssembly(con, args);
+        }
+
+        // Module initializer (<Module>..cctor)
+        else if (attribType == typeof(ModuleInitializerAttribute))
+        {
+            CheckModuleInitializerCompatibility(context);
+            Context.ModuleInitializerParts.Add(CurrentMethod.Builder);
+        }
+    }
+
+    private static void CheckModuleInitializerCompatibility(DassieParser.Type_memberContext context)
+    {
+        if (!CurrentMethod.Builder.IsStatic)
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                DS0166_ModuleInitializerInvalid,
+                $"Module initializers must be defined inside of a module or explicitly marked as 'static'.");
+        }
+
+        if (CurrentMethod.Parameters.Count > 0)
+        {
+            EmitErrorMessage(
+                context.parameter_list().Start.Line,
+                context.parameter_list().Start.Column,
+                context.parameter_list().GetText().Length,
+                DS0166_ModuleInitializerInvalid,
+                $"Module initializers must be parameterless.");
+        }
+
+        if (CurrentMethod.Builder.ReturnType != typeof(void))
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                DS0166_ModuleInitializerInvalid,
+                $"Module initializers cannot return a value.");
+        }
+
+        if (CurrentMethod.TypeParameters.Count > 0)
+        {
+            EmitErrorMessage(
+                context.type_parameter_list().Start.Line,
+                context.type_parameter_list().Start.Column,
+                context.type_parameter_list().GetText().Length,
+                DS0166_ModuleInitializerInvalid,
+                $"Module initializers cannot be generic.");
+        }
+
+        if (TypeContext.Current.TypeParameters.Count > 0)
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                DS0166_ModuleInitializerInvalid,
+                $"Module initializers cannot be contained in generic types.");
         }
     }
 }

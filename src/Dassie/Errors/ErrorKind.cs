@@ -683,5 +683,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a custom operator returns no value.
     /// </summary>
-    DS0165_CustomOperatorNoReturnValue
+    DS0165_CustomOperatorNoReturnValue,
+    /// <summary>
+    /// Emitted when a module initializer does not fill all requirements.
+    /// </summary>
+    DS0166_ModuleInitializerInvalid
 }
