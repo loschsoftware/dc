@@ -1559,7 +1559,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.op.Column,
                         context.op.Text.Length,
                         DS0036_ArithmeticError,
-                        $"The type '{t.FullName}' does not implement an equality operation with the operand type '{t2.FullName}'.",
+                        $"The type '{t.FullName}' does not implement an equality operation with operand type '{t2.FullName}'.",
                         Path.GetFileName(CurrentFile.Path));
 
                 return typeof(bool);
@@ -1577,7 +1577,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.op.Column,
                         context.op.Text.Length,
                         DS0036_ArithmeticError,
-                        $"The type '{t.FullName}' does not implement an inequality operation with the operand type '{t2.FullName}'.",
+                        $"The type '{t.FullName}' does not implement an inequality operation with operand type '{t2.FullName}'.",
                         Path.GetFileName(CurrentFile.Path));
 
                 return typeof(bool);
@@ -1637,7 +1637,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.op.Column,
                     context.op.Text.Length,
                     DS0036_ArithmeticError,
-                    $"The type '{t.FullName}' does not implement a comparison operation with the operand type '{t2.FullName}'.",
+                    $"The type '{t.FullName}' does not implement a comparison operation with operand type '{t2.FullName}'.",
                     Path.GetFileName(CurrentFile.Path));
 
             return typeof(bool);
@@ -1826,7 +1826,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Bar().Symbol.Column,
                 context.Bar().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a bitwise or operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a bitwise or operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1874,7 +1874,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Ampersand().Symbol.Column,
                 context.Ampersand().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a bitwise and operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a bitwise and operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1932,7 +1932,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Caret().Symbol.Column,
                 context.Caret().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement an exclusive or operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement an exclusive or operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -1994,7 +1994,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Asterisk().Symbol.Column,
                 context.Asterisk().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a multiplication operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a multiplication operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2032,7 +2032,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Slash().Symbol.Column,
                 context.Slash().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a division operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a division operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2114,7 +2114,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Plus().Symbol.Column,
                 context.Plus().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement an addition operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement an addition operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2154,7 +2154,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Minus().Symbol.Column,
                 context.Minus().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a subtraction operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a subtraction operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2189,7 +2189,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Percent().Symbol.Column,
                 context.Percent().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a remainder operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a remainder operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2237,7 +2237,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Double_Percent().Symbol.Column,
                 context.Double_Percent().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a remainder operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a remainder operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2273,7 +2273,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Double_Asterisk().Symbol.Column,
                 context.Double_Asterisk().GetText().Length,
                 DS0036_ArithmeticError,
-                $"The type '{t.FullName}' does not implement a exponentiation operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a exponentiation operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2327,7 +2327,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Double_Less_Than().Symbol.Column,
                 context.Double_Less_Than().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a left shift operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a left shift operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2394,7 +2394,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Double_Greater_Than().Symbol.Column,
                 context.Double_Greater_Than().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a right shift operation with the operand type '{t2.FullName}'.",
+                $"The type '{t.FullName}' does not implement a right shift operation with operand type '{t2.FullName}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
