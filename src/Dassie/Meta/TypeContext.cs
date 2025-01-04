@@ -47,6 +47,8 @@ internal class TypeContext
     public bool IsByRefLike { get; set; }
 
     public bool IsImmutable { get; set; }
+    
+    public bool IsUnion { get; set; }
 
     public List<MockMethodInfo> RequiredInterfaceImplementations { get; set; } = [];
 

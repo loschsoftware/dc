@@ -167,6 +167,22 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             FullName = tb.FullName,
         };
 
+        List<Type> attributes = [];
+        if (context.attribute() != null)
+        {
+            foreach (DassieParser.AttributeContext attrib in context.attribute())
+            {
+                Type attribType = SymbolResolver.ResolveAttributeTypeName(attrib.type_name());
+                attributes.Add(attribType);
+            }
+        }
+
+        if (attributes.Contains(typeof(Union)))
+        {
+            UnionTypeCodeGeneration.GenerateUnionType(context);
+            return;
+        }
+
         bool explicitBaseType = false;
         Type parent = typeof(object);
         List<Type> interfaces = [];
@@ -232,48 +248,44 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             parent = null;
 
         Type enumerationMarkerType = null;
-        if (context.attribute() != null)
+
+        foreach (Type attribType in attributes)
         {
-            foreach (DassieParser.AttributeContext attrib in context.attribute())
+            if (attribType != null && attribType.FullName.StartsWith("Dassie.Core.Enumeration"))
             {
-                Type attribType = SymbolResolver.ResolveTypeName(attrib.type_name());
+                enumerationMarkerType = attribType;
 
-                if (attribType != null && attribType.FullName.StartsWith("Dassie.Core.Enumeration"))
+                if (context.type_kind().Ref() != null)
                 {
-                    enumerationMarkerType = attribType;
-
-                    if (context.type_kind().Ref() != null)
-                    {
-                        EmitErrorMessage(
-                            context.type_kind().Ref().Symbol.Line,
-                            context.type_kind().Ref().Symbol.Column,
-                            3,
-                            DS0142_EnumTypeExplicitlyRef,
-                            "The modifier 'ref' is invalid for enumeration types. Enumerations are always value types.");
-                    }
-
-                    if (explicitBaseType && parent != null && parent != typeof(Enum))
-                    {
-                        EmitErrorMessage(
-                            context.inheritance_list().Start.Line,
-                            context.inheritance_list().Start.Column,
-                            context.inheritance_list().GetText().Length,
-                            DS0143_EnumTypeBaseType,
-                            "The only allowed base type for enumerations is 'System.Enum'.");
-                    }
-
-                    if (interfaces.Count > 0)
-                    {
-                        EmitErrorMessage(
-                            context.inheritance_list().Start.Line,
-                            context.inheritance_list().Start.Column,
-                            context.inheritance_list().GetText().Length,
-                            DS0144_EnumTypeImplementsTemplate,
-                            "Enumeration types cannot implement templates.");
-                    }
-
-                    parent = typeof(Enum);
+                    EmitErrorMessage(
+                        context.type_kind().Ref().Symbol.Line,
+                        context.type_kind().Ref().Symbol.Column,
+                        3,
+                        DS0142_EnumTypeExplicitlyRef,
+                        "The modifier 'ref' is invalid for enumeration types. Enumerations are always value types.");
                 }
+
+                if (explicitBaseType && parent != null && parent != typeof(Enum))
+                {
+                    EmitErrorMessage(
+                        context.inheritance_list().Start.Line,
+                        context.inheritance_list().Start.Column,
+                        context.inheritance_list().GetText().Length,
+                        DS0143_EnumTypeBaseType,
+                        "The only allowed base type for enumerations is 'System.Enum'.");
+                }
+
+                if (interfaces.Count > 0)
+                {
+                    EmitErrorMessage(
+                        context.inheritance_list().Start.Line,
+                        context.inheritance_list().Start.Column,
+                        context.inheritance_list().GetText().Length,
+                        DS0144_EnumTypeImplementsTemplate,
+                        "Enumeration types cannot implement templates.");
+                }
+
+                parent = typeof(Enum);
             }
         }
 
