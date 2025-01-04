@@ -27,7 +27,7 @@ internal static class UnionTypeCodeGeneration
             TypeContext.Current = current;
         }
 
-        TypeContext.Current.Builder.CreateType();
+        TypeContext.Current.FinishedType = TypeContext.Current.Builder.CreateType();
     }
 
     public static void GenerateUnionTagType(DassieParser.Type_memberContext context)
@@ -127,6 +127,6 @@ internal static class UnionTypeCodeGeneration
             CurrentMethod = current;
         }
 
-        tagType.CreateType();
+        childContext.FinishedType = tagType.CreateType();
     }
 }

@@ -6,13 +6,11 @@ using Dassie.Runtime;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Xml.Linq;
 
 namespace Dassie.Helpers;
 
@@ -596,12 +594,12 @@ internal static class SymbolResolver
 
         // 5. Extension methods
         IEnumerable<MethodInfo> extMethods = GetExtensions(name);
-        result = GetOverload(type, extMethods, typeArgs, [type, ..argumentTypes], row, col, len, getDefaultOverload, noEmitFragments, throwErrors);
+        result = GetOverload(type, extMethods, typeArgs, [type, .. argumentTypes], row, col, len, getDefaultOverload, noEmitFragments, throwErrors);
 
         if (result != null)
             return result;
 
-    Error:
+        Error:
 
         if (throwErrors)
         {
@@ -968,7 +966,8 @@ internal static class SymbolResolver
         {
             if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name))
             {
-                type = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name).Builder;
+                TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name);
+                type = ctx.FinishedType ?? ctx.Builder;
 
                 if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
                     type = type.MakeGenericType(typeArgs);
@@ -982,7 +981,8 @@ internal static class SymbolResolver
 
             if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName))
             {
-                type = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName).Builder;
+                TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName);
+                type = ctx.FinishedType ?? ctx.Builder;
 
                 if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
                     type = type.MakeGenericType(typeArgs);
@@ -1049,7 +1049,8 @@ internal static class SymbolResolver
 
                 if (Context.Types.Any(t => t.FullName == n))
                 {
-                    type = Context.Types.First(t => t.FullName == n).Builder;
+                    TypeContext ctx = Context.Types.First(t => t.FullName == n);
+                    type = ctx.FinishedType ?? ctx.Builder;
 
                     if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
                         type = type.MakeGenericType(typeArgs);
@@ -1331,7 +1332,10 @@ internal static class SymbolResolver
         if (type == null)
         {
             if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name))
-                return Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name).Builder;
+            {
+                TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name);
+                return ctx.FinishedType ?? ctx.Builder;
+            }
 
             List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
             allAssemblies.AddRange(Context.ReferencedAssemblies);
@@ -1380,7 +1384,8 @@ internal static class SymbolResolver
 
                 if (Context.Types.Any(t => t.FullName == n))
                 {
-                    type = Context.Types.First(t => t.FullName == n).Builder;
+                    TypeContext ctx = Context.Types.First(t => t.FullName == n);
+                    type = ctx.FinishedType ?? ctx.Builder;
                     goto FoundType;
                 }
 

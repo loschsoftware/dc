@@ -549,7 +549,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Ret);
         }
 
-        tb.CreateType();
+        Type t = tb.CreateType();
+        TypeContext.Current.FinishedType = t;
 
         CurrentFile.Fragments.Add(new()
         {
@@ -1483,7 +1484,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Context.EntryPoint = mb;
 
         CurrentMethod.ClosureContainerType?.CreateType();
-        tb.CreateType();
+        TypeContext.Current.FinishedType = tb.CreateType();
         return ret;
     }
 

@@ -28,6 +28,8 @@ internal class TypeContext
 
     public TypeBuilder Builder { get; set; }
 
+    public Type FinishedType { get; set; } = null;
+
     public List<MethodContext> Methods { get; } = [];
 
     public List<MetaFieldInfo> Fields { get; } = [];
