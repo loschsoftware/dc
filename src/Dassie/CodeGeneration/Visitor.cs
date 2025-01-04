@@ -454,6 +454,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (param.Var() != null)
                 {
+                    if (tc.IsImmutable)
+                    {
+                        EmitErrorMessage(
+                            param.Var().Symbol.Line,
+                            param.Var().Symbol.Column,
+                            param.Var().GetText().Length,
+                            DS0151_VarFieldInImmutableType,
+                            $"The 'var' modifier is invalid on members of immutable value types. Properties of immutable types are not allowed to be mutable.");
+                    }
+
                     MethodBuilder setter = tc.Builder.DefineMethod($"set_{paramName}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, typeof(void), [paramType]);
                     ILGenerator ilSet = setter.GetILGenerator();
                     ilSet.Emit(OpCodes.Ldarg_0);
