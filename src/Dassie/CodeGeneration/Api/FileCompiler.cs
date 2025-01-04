@@ -1,5 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using Dassie.CodeGeneration.Helpers;
+using Dassie.CodeGeneration.Structure;
 using Dassie.Configuration;
 using Dassie.Errors;
 using Dassie.Meta;
@@ -11,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Dassie.CodeGeneration;
+namespace Dassie.CodeGeneration.Api;
 
 /// <summary>
 /// Provides functionality for compiling single Dassie source files.

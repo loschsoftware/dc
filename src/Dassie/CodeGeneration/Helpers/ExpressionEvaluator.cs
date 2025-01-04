@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Misc;
+using Dassie.CodeGeneration.Structure;
 using Dassie.Helpers;
 using Dassie.Parser;
 using Dassie.Text;
@@ -9,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Dassie.CodeGeneration;
+namespace Dassie.CodeGeneration.Helpers;
 
 internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 {
@@ -200,7 +201,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
         if (a == null || b == null)
             return null;
-        
+
         if (context.op.Text == "==")
             return a.Value == b.Value;
 
@@ -506,10 +507,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
             return new(typeof(double), double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
 
         if (text.EndsWith("m"))
-        {
-            // TODO: Apparently decimals are a pain in the ass... For now we'll cheat and emit doubles instead
-            return new(typeof(double), double.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
-        }
+            return new(typeof(decimal), decimal.Parse(text[0..^1].Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
 
         return new(typeof(double), double.Parse(text.Replace("'", ""), CultureInfo.GetCultureInfo("en-US")));
     }

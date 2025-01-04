@@ -3,7 +3,7 @@ using Dassie.Text.FragmentStore;
 using Dassie.Text.Regions;
 using System.Collections.Generic;
 
-namespace Dassie.CodeGeneration;
+namespace Dassie.CodeGeneration.Structure;
 
 /// <summary>
 /// File-specific metadata to support various IDE features.

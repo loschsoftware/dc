@@ -8,7 +8,7 @@ using System.Reflection.Emit;
 using static Dassie.Configuration.ProjectFileDeserializer;
 using static Dassie.Helpers.TypeHelpers;
 
-namespace Dassie.CodeGeneration;
+namespace Dassie.CodeGeneration.Helpers;
 
 internal static class EmitHelpers
 {
@@ -377,7 +377,7 @@ internal static class EmitHelpers
     }
 
     /// <summary>
-    /// Converts a type into a <see cref="bool"/> according to the rules specified in <see cref="TypeHelpers.IsBoolean(Type)"/>.
+    /// Converts a type into a <see cref="bool"/> according to the rules specified in <see cref="IsBoolean(Type)"/>.
     /// </summary>
     /// <param name="t">The type to perform the conversion on.</param>
     public static void EmitBoolConversion(Type t)

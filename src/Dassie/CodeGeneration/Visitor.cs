@@ -1,6 +1,8 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Dassie.CodeGeneration.Helpers;
+using Dassie.CodeGeneration.Structure;
 using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Helpers;
@@ -4151,8 +4153,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (expr.Type == typeof(float))
             CurrentMethod.IL.Emit(OpCodes.Ldc_R4, expr.Value);
-        else
+        else if (expr.Type == typeof(double))
             CurrentMethod.IL.Emit(OpCodes.Ldc_R8, expr.Value);
+        else
+            DecimalLiteralCodeGeneration.EmitDecimal(expr.Value);
 
         return expr.Type;
     }

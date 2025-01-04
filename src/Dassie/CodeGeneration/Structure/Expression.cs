@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dassie.CodeGeneration;
+namespace Dassie.CodeGeneration.Structure;
 
 internal class Expression
 {

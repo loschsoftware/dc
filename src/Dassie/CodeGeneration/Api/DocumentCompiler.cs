@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis.Default;
+using Dassie.CodeGeneration.Helpers;
 using Dassie.Configuration;
 using Dassie.Data;
 using Dassie.Errors;
@@ -11,7 +12,7 @@ using Dassie.Validation;
 using System.Linq;
 using System.Reflection;
 
-namespace Dassie.CodeGeneration;
+namespace Dassie.CodeGeneration.Api;
 
 internal static class DocumentCompiler
 {

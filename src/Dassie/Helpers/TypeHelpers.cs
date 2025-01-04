@@ -246,7 +246,6 @@ internal static class TypeHelpers
             typeof(ulong),
             typeof(float),
             typeof(double),
-            typeof(decimal),
             typeof(nint),
             typeof(nuint),
             typeof(char)

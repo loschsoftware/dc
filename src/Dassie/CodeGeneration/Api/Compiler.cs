@@ -12,7 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Dassie.CodeGeneration;
+namespace Dassie.CodeGeneration.Api;
 
 /// <summary>
 /// Provides functionality for compiling Dassie programs.
