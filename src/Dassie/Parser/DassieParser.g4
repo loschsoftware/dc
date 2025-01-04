@@ -406,5 +406,5 @@ match_case_expression
     ;
 
 local_function
-    : (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? Equals expression
+    : (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? Equals NewLine* expression
     ;
