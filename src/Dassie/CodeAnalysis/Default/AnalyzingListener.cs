@@ -3,6 +3,7 @@ using Dassie.CodeAnalysis.Rules;
 using Dassie.Configuration;
 using Dassie.Errors;
 using Dassie.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,7 +39,10 @@ internal class AnalyzingListener : DassieParserBaseListener
 
     public override void EnterType_member([NotNull] DassieParser.Type_memberContext context)
     {
-        if (!_isInModule && context.parameter_list() != null && !context.member_special_modifier().Any(m => m.Static() != null) && char.IsLower(context.Identifier().GetText()[0]))
+        string id = context.Identifier()?.GetText();
+        id ??= context.Custom_Operator().GetText();
+
+        if (!_isInModule && context.parameter_list() != null && (context.member_special_modifier() == null || !context.member_special_modifier().Any(m => m.Static() != null)) && char.IsLower(id[0]))
         {
             Messages.Add(ErrorHelper.GetError(
                 AnalysisErrorKind.DS5001_NamingConvention,
@@ -49,7 +53,7 @@ internal class AnalyzingListener : DassieParserBaseListener
                 config: Configuration));
         }
 
-        if (context.attribute().Any(a => a.type_name().GetText() == "EntryPoint") && context.Identifier().GetText() != "Main")
+        if (context.attribute().Any(a => a.type_name().GetText() == "EntryPoint") && id != "Main")
         {
             Messages.Add(ErrorHelper.GetError(
                 AnalysisErrorKind.DS5002_EntryPointWrongName,
@@ -85,6 +89,22 @@ internal class AnalyzingListener : DassieParserBaseListener
 
     public override void EnterParameter([NotNull] DassieParser.ParameterContext context)
     {
+        if (context.Parent.Parent is DassieParser.TypeContext)
+        {
+            if (char.IsLower(context.Identifier().GetText()[0]))
+            {
+                Messages.Add(ErrorHelper.GetError(
+                    AnalysisErrorKind.DS5001_NamingConvention,
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    $"'{context.Identifier().GetText()}': Naming convention violation: Global properties should use PascalCase capitalization.",
+                    config: Configuration));
+            }
+
+            return;
+        }
+
         if (char.IsUpper(context.Identifier().GetText()[0]))
         {
             Messages.Add(ErrorHelper.GetError(
