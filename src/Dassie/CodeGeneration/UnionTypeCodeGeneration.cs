@@ -1,4 +1,5 @@
-﻿using Dassie.Helpers;
+﻿using Dassie.Core;
+using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
 using System;
@@ -15,6 +16,7 @@ internal static class UnionTypeCodeGeneration
     {
         TypeContext current = TypeContext.Current;
         TypeContext.Current.IsUnion = true;
+        TypeContext.Current.Builder.SetCustomAttribute(new(typeof(Union).GetConstructor([]), []));
 
         if (context.type_block() == null || context.type_block().type_member() == null)
             return;
