@@ -691,5 +691,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a property is declared as a compile-time constant.
     /// </summary>
-    DS0167_PropertyLiteral
+    DS0167_PropertyLiteral,
+    /// <summary>
+    /// Emitted when the ':?' operator is used on a value type.
+    /// </summary>
+    DS0168_InstanceCheckOperatorOnValueType
 }

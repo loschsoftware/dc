@@ -442,6 +442,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPrefix_unless_expression([NotNull] DassieParser.Prefix_unless_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>isinstance_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIsinstance_expression([NotNull] DassieParser.Isinstance_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>

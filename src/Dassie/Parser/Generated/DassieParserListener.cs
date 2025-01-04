@@ -729,6 +729,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitPrefix_unless_expression([NotNull] DassieParser.Prefix_unless_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>isinstance_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterIsinstance_expression([NotNull] DassieParser.Isinstance_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>isinstance_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitIsinstance_expression([NotNull] DassieParser.Isinstance_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>local_declaration_or_assignment</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>

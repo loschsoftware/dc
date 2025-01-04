@@ -57,6 +57,7 @@ expression
     | expression Double_Greater_Than expression #right_shift_expression
     | expression op=(Double_Equals | Exclamation_Equals) expression #equality_expression
     | expression op=(Less_Than | Less_Equals | Greater_Than | Greater_Equals) expression #comparison_expression
+    | expression Colon_Question_Mark type_name #isinstance_expression
     | expression Ampersand expression #and_expression
     | expression Double_Ampersand expression #logical_and_expression
     | expression Bar expression #or_expression

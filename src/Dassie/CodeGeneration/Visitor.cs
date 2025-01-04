@@ -6069,4 +6069,24 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         CurrentMethod.IL.Emit(OpCodes.Call, final);
         return final.ReturnType;
     }
+
+    public override Type VisitIsinstance_expression([NotNull] DassieParser.Isinstance_expressionContext context)
+    {
+        Type t1 = Visit(context.expression());
+        if (t1.IsValueType)
+        {
+            EmitErrorMessage(
+                context.expression().Start.Line,
+                context.expression().Start.Column,
+                context.expression().GetText().Length,
+                DS0168_InstanceCheckOperatorOnValueType,
+                $"The ':?' operator is not valid on value types.");
+        }
+
+        Type comparedType = SymbolResolver.ResolveTypeName(context.type_name());
+        CurrentMethod.IL.Emit(OpCodes.Isinst, comparedType);
+        CurrentMethod.IL.Emit(OpCodes.Ldnull);
+        CurrentMethod.IL.Emit(OpCodes.Cgt);
+        return typeof(bool);
+    }
 }

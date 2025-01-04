@@ -80,6 +80,7 @@ Colon_Greater_Than: ':>';
 Less_Than_Colon: '<:';
 Double_Colon: '::';
 Triple_Colon: ':::';
+Colon_Question_Mark: ':?';
 Semicolon: ';';
 Underscore: '_';
 Single_Quote: '\'';
