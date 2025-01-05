@@ -5258,6 +5258,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return arrayType.GetEnumeratedType();
     }
 
+    private int _loopIndex = 0;
+
     public override Type VisitWhile_loop([NotNull] DassieParser.While_loopContext context)
     {
         Type t = null;
@@ -5265,10 +5267,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (VisitorStep1CurrentMethod == null)
         {
             t = Visit(context.expression().First());
-            CurrentMethod.LoopExpressionTypes.Add(context.GetText(), t);
+            CurrentMethod.LoopExpressionTypes.Add(_loopIndex++, t);
         }
         else
-            t = VisitorStep1CurrentMethod.LoopExpressionTypes[context.GetText()];
+        {
+            if (!VisitorStep1CurrentMethod.LoopExpressionTypes.TryGetValue(_loopIndex++, out t))
+                t = typeof(object);
+        }
 
         Type tReturn = null;
 
