@@ -971,14 +971,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             InjectClosureParameterInitializers();
 
+            Type tReturn = _tReturn;
+            if (context.type_name() != null)
+            {
+                tReturn = SymbolResolver.ResolveTypeName(context.type_name());
+                mb.SetReturnType(tReturn);
+            }
+
             if (context.expression() != null)
                 _tReturn = Visit(context.expression());
 
-            Type tReturn = _tReturn;
-            if (context.type_name() != null)
-                tReturn = SymbolResolver.ResolveTypeName(context.type_name());
-
-            mb.SetReturnType(tReturn);
+            if (context.type_name() == null)
+                mb.SetReturnType(_tReturn);
 
             if (context.expression() == null)
                 _tReturn = tReturn;
