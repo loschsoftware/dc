@@ -239,6 +239,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitIndex_expression([NotNull] DassieParser.Index_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>safe_conversion_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSafe_conversion_expression([NotNull] DassieParser.Safe_conversion_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>comparison_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>

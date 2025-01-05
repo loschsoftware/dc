@@ -1550,19 +1550,22 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
         }
 
+        MethodInfo equalsMethod = t.GetMethods().Where(m => m.Name == "Equals").First();
+
         if (context.op.Text == "==")
         {
             if (op_eq == null)
             {
-                EmitErrorMessage(
-                        context.op.Line,
-                        context.op.Column,
-                        context.op.Text.Length,
-                        DS0036_ArithmeticError,
-                        $"The type '{t.FullName}' does not implement an equality operation with operand type '{t2.FullName}'.",
-                        Path.GetFileName(CurrentFile.Path));
+                //EmitErrorMessage(
+                //        context.op.Line,
+                //        context.op.Column,
+                //        context.op.Text.Length,
+                //        DS0036_ArithmeticError,
+                //        $"The type '{t.FullName}' does not implement an equality operation with operand type '{t2.FullName}'.",
+                //        Path.GetFileName(CurrentFile.Path));
 
-                return typeof(bool);
+                CurrentMethod.IL.Emit(OpCodes.Callvirt, equalsMethod);
+                return equalsMethod.ReturnType;
             }
 
             CurrentMethod.IL.EmitCall(OpCodes.Call, op_eq, null);
@@ -1572,14 +1575,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             if (op_ineq == null)
             {
-                EmitErrorMessage(
-                        context.op.Line,
-                        context.op.Column,
-                        context.op.Text.Length,
-                        DS0036_ArithmeticError,
-                        $"The type '{t.FullName}' does not implement an inequality operation with operand type '{t2.FullName}'.",
-                        Path.GetFileName(CurrentFile.Path));
+                //EmitErrorMessage(
+                //        context.op.Line,
+                //        context.op.Column,
+                //        context.op.Text.Length,
+                //        DS0036_ArithmeticError,
+                //        $"The type '{t.FullName}' does not implement an inequality operation with operand type '{t2.FullName}'.",
+                //        Path.GetFileName(CurrentFile.Path));
 
+                CurrentMethod.IL.Emit(OpCodes.Callvirt, equalsMethod);
+                EmitLdcI4(0);
+                CurrentMethod.IL.Emit(OpCodes.Ceq);
                 return typeof(bool);
             }
 
@@ -6105,5 +6111,23 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         CurrentMethod.IL.Emit(OpCodes.Ldnull);
         CurrentMethod.IL.Emit(OpCodes.Cgt);
         return typeof(bool);
+    }
+
+    public override Type VisitSafe_conversion_expression([NotNull] DassieParser.Safe_conversion_expressionContext context)
+    {
+        Type t1 = Visit(context.expression());
+        if (t1.IsValueType)
+        {
+            EmitErrorMessage(
+                context.expression().Start.Line,
+                context.expression().Start.Column,
+                context.expression().GetText().Length,
+                DS0168_InstanceCheckOperatorOnValueType,
+                $"The '<?:' operator is not valid on value types.");
+        }
+
+        Type comparedType = SymbolResolver.ResolveTypeName(context.type_name());
+        CurrentMethod.IL.Emit(OpCodes.Isinst, comparedType);
+        return comparedType;
     }
 }

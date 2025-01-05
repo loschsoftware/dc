@@ -381,6 +381,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitIndex_expression([NotNull] DassieParser.Index_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>safe_conversion_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSafe_conversion_expression([NotNull] DassieParser.Safe_conversion_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>safe_conversion_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSafe_conversion_expression([NotNull] DassieParser.Safe_conversion_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>comparison_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
