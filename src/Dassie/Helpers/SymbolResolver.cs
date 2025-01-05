@@ -206,7 +206,7 @@ internal static class SymbolResolver
 
         // 3. Members of current class
         if (TypeContext.Current.Methods.Select(m => m.Builder).Where(m => m != null).Any(m => m.Name == text))
-            return TypeContext.Current.Methods.Select(m => m.Builder).First(m => m.Name == text);
+            return TypeContext.Current.Methods.Select(m => m.Builder).First(m => m != null && m.Name == text);
 
         if (TypeContext.Current.Fields.Select(f => f.Builder).Where(f => f != null).Any(f => f.Name == text))
         {
