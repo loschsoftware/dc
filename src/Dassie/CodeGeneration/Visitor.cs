@@ -1008,8 +1008,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (_tReturn != tReturn)
             {
-                if (CanBeConverted(_tReturn, tReturn))
-                    EmitConversionOperator(_tReturn, tReturn);
+                if (tReturn == typeof(object))
+                {
+                    if (_tReturn.IsValueType)
+                        CurrentMethod.IL.Emit(OpCodes.Box, _tReturn);
+                }
                 else
                 {
                     EmitErrorMessage(
@@ -1472,19 +1475,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (ret != typeof(void) && ret != typeof(int) && ret != null)
         {
-            if (CanBeConverted(ret, typeof(int)))
-            {
-                EmitConversionOperator(ret, typeof(int));
-                ret = typeof(int);
-            }
-            else
-            {
-                EmitErrorMessage(context.expression().Last().Start.Line,
-                    context.expression().Last().Start.Column,
-                    context.expression().Last().GetText().Length,
-                    DS0050_ExpectedIntegerReturnValue,
-                    $"Expected expression of type 'int32' or 'void', but got type '{ret.FullName}'.",
-                    tip: "You may use the function 'ignore' to discard a value and return 'void'.");
+            EmitErrorMessage(context.expression().Last().Start.Line,
+                context.expression().Last().Start.Column,
+                context.expression().Last().GetText().Length,
+                DS0050_ExpectedIntegerReturnValue,
+                $"Expected expression of type 'int32' or 'void', but got type '{ret.FullName}'.",
+                tip: "You may use the function 'ignore' to discard a value and return 'void'.");
 
                 return ret;
             }
@@ -5951,8 +5947,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (_tReturn != tReturn)
         {
-            if (CanBeConverted(_tReturn, tReturn))
-                EmitConversionOperator(_tReturn, tReturn);
+            if (tReturn == typeof(object))
+            {
+                if (_tReturn.IsValueType)
+                    CurrentMethod.IL.Emit(OpCodes.Box, _tReturn);
+            }
             else
             {
                 EmitErrorMessage(
