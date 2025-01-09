@@ -2,6 +2,7 @@
 using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ internal static class UnionTypeCodeGeneration
         tagType.SetParent(TypeContext.Current.Builder);
 
         string isPropName = $"Is{typeName}";
-        string isPropBackingFieldName = $"_is{typeName}BackingField";
+        string isPropBackingFieldName = SymbolNameGenerator.GetPropertyBackingFieldName(isPropName);
 
         FieldBuilder isPropBackingField = tc.Builder.DefineField(isPropBackingFieldName, typeof(bool), FieldAttributes.Private);
         PropertyBuilder isProp = tc.Builder.DefineProperty(isPropName, PropertyAttributes.None, typeof(bool), []);
@@ -68,7 +69,7 @@ internal static class UnionTypeCodeGeneration
             foreach (DassieParser.ParameterContext param in context.parameter_list().parameter())
             {
                 string paramName = param.Identifier().GetText();
-                string fieldName = $"_{char.ToLower(paramName[0])}{paramName[1..]}_BackingField";
+                string fieldName = SymbolNameGenerator.GetPropertyBackingFieldName(paramName);
                 Type paramType = SymbolResolver.ResolveTypeName(param.type_name());
 
                 FieldBuilder backingField = tagType.DefineField(fieldName, paramType, FieldAttributes.Private);

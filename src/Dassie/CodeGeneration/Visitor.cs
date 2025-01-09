@@ -10,6 +10,7 @@ using Dassie.Intrinsics;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
+using Dassie.Symbols;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
 using NuGet.Protocol.Plugins;
@@ -452,7 +453,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             foreach (DassieParser.ParameterContext param in context.parameter_list().parameter())
             {
                 string paramName = param.Identifier().GetText();
-                string fieldName = $"_{char.ToLower(paramName[0])}{paramName[1..]}_BackingField";
+                string fieldName = SymbolNameGenerator.GetPropertyBackingFieldName(paramName);
                 Type paramType = SymbolResolver.ResolveTypeName(param.type_name());
 
                 FieldBuilder backingField = tc.Builder.DefineField(fieldName, paramType, FieldAttributes.Private);
@@ -1170,7 +1171,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             string propName = context.Identifier().GetText();
             FieldBuilder backingField = TypeContext.Current.Builder.DefineField(
-                $"_{char.ToLower(propName[0])}{propName[1..]}_BackingField",
+                SymbolNameGenerator.GetPropertyBackingFieldName(propName),
                 type,
                 FieldAttributes.Private);
 
@@ -2696,14 +2697,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     private static void MakeClosureContainerType(List<Type> fieldTypes, out TypeBuilder tb, out List<FieldBuilder> fields)
     {
         tb = TypeContext.Current.Builder.DefineNestedType(
-            $"{CurrentMethod.UniqueMethodName}$Closure");
+            SymbolNameGenerator.GetClosureTypeName(CurrentMethod.UniqueMethodName));
 
         tb.SetCustomAttribute(new(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes), []));
 
         List<FieldBuilder> flds = [];
 
         for (int i = 0; i < fieldTypes.Count; i++)
-            flds.Add(tb.DefineField($"_{i}", fieldTypes[i], FieldAttributes.Public));
+            flds.Add(tb.DefineField(SymbolNameGenerator.GetClosureFieldName(i), fieldTypes[i], FieldAttributes.Public));
 
         fields = flds;
 
@@ -2787,7 +2788,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Dictionary<SymbolInfo, (FieldInfo Type, string LocalName)> alternativeLocations = [];
 
         for (int i = 0; i < fields.Count; i++)
-            alternativeLocations.Add(capturedSymbols[i], (fields[i], $"{closureType.FullName}$_field$"));
+            alternativeLocations.Add(capturedSymbols[i], (fields[i], SymbolNameGenerator.GetClosureLocalName(closureType.FullName)));
 
         foreach (var loc in alternativeLocations)
         {
@@ -2800,7 +2801,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         MethodContext parentMethod = CurrentMethod;
 
-        MethodBuilder invokeFunction = closureType.DefineMethod($"func'{_anonFunctionIndex++}", MethodAttributes.Public, CallingConventions.HasThis);
+        MethodBuilder invokeFunction = closureType.DefineMethod(SymbolNameGenerator.GetAnonymousFunctionName(_anonFunctionIndex++), MethodAttributes.Public, CallingConventions.HasThis);
         CurrentMethod = new()
         {
             Builder = invokeFunction,
@@ -2897,7 +2898,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
                 else
                 {
-                    FieldInfo fld = fields.First(f => f.Name == $"_{i}");
+                    FieldInfo fld = fields.First(f => f.Name == SymbolNameGenerator.GetClosureFieldName(i));
                     Type t = Visit(argument);
                     CurrentMethod.IL.Emit(OpCodes.Stsfld, fld);
                     argumentTypes.Add(t);
@@ -2929,7 +2930,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (!method.IsStatic)
         {
-            instance = containerType.DefineField($"{method.Name}$_BaseInstance", method.DeclaringType, FieldAttributes.Public | FieldAttributes.Static);
+            instance = containerType.DefineField(SymbolNameGenerator.GetBaseInstanceName(method.Name), method.DeclaringType, FieldAttributes.Public | FieldAttributes.Static);
 
             var symbols = CurrentMethod.CapturedSymbols.Where(s => s.Type() == method.DeclaringType);
             if (symbols.Any())
@@ -2953,7 +2954,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (argumentTypes[i] == typeof(Wildcard))
                 il.Emit(OpCodes.Ldarg_S, (byte)wildcardIndex++);
             else
-                il.Emit(OpCodes.Ldsfld, fields.First(f => f.Name == $"_{i}"));
+                il.Emit(OpCodes.Ldsfld, fields.First(f => f.Name == SymbolNameGenerator.GetClosureFieldName(i)));
         }
 
         il.Emit(OpCodes.Call, method);
