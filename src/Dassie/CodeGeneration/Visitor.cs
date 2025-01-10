@@ -1082,6 +1082,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                                 "The application entry point must be static.");
                         }
 
+                        if (tReturn != typeof(void) && tReturn != typeof(int) && tReturn != typeof(uint))
+                        {
+                            EmitErrorMessage(
+                                context.Equals().Symbol.Line,
+                                context.Equals().Symbol.Column,
+                                1,
+                                DS0050_ExpectedIntegerReturnValue,
+                                $"Expected expression of type 'int32', 'uint32' or 'null' for return value of application entry point, but got type '{tReturn.FullName}'.",
+                                tip: "You may use the function 'ignore' to discard a value and return 'null'.");
+
+                        }
+
                         Context.EntryPointIsSet = true;
 
                         Context.EntryPoint = mb;
@@ -1474,7 +1486,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         // Last expression is like return statement
         Type ret = Visit(context.children.Last());
 
-        if (ret != typeof(void) && ret != typeof(int) && ret != null)
+        if (ret != typeof(void) && ret != typeof(int) && ret != typeof(int) && ret != null)
         {
             if (CanBeConverted(ret, typeof(int)))
             {
@@ -1487,8 +1499,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.expression().Last().Start.Column,
                     context.expression().Last().GetText().Length,
                     DS0050_ExpectedIntegerReturnValue,
-                    $"Expected expression of type 'int32' or 'void', but got type '{ret.FullName}'.",
-                    tip: "You may use the function 'ignore' to discard a value and return 'void'.");
+                    $"Expected expression of type 'int32', 'uint32' or 'null', but got type '{ret.FullName}'.",
+                    tip: "You may use the function 'ignore' to discard a value and return 'null'.");
 
                 return ret;
             }
