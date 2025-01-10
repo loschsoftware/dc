@@ -33,4 +33,15 @@ public interface IPackage
     /// An array of code analyzers added by this extensions.
     /// </summary>
     public virtual IAnalyzer<IParseTree>[] CodeAnalyzers() => [];
+
+    /// <summary>
+    /// An array of build log writers.
+    /// </summary>
+    /// <returns></returns>
+    public virtual IBuildLogWriter[] BuildLogWriters() => [];
+
+    /// <summary>
+    /// An array of build log devices.
+    /// </summary>
+    public virtual IBuildLogDevice[] BuildLogDevices() => [];
 }

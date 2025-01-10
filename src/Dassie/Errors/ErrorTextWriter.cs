@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dassie.Errors;
 
@@ -14,7 +17,10 @@ namespace Dassie.Errors;
 /// </remarks>
 public class ErrorTextWriter : TextWriter
 {
-    private readonly TextWriter[] _writers;
+    private bool _isStored;
+    private TextWriter[] _store;
+
+    private TextWriter[] _writers;
     private bool _isDisposed;
 
     public ErrorTextWriter(TextWriter[] writers)
@@ -44,6 +50,24 @@ public class ErrorTextWriter : TextWriter
             writer.WriteLine(value);
     }
 
+    public override void Flush()
+    {
+        foreach (TextWriter writer in _writers)
+            writer.Flush();
+    }
+
+    public override async Task FlushAsync()
+    {
+        foreach (TextWriter writer in _writers)
+            await writer.FlushAsync();
+    }
+
+    public override async Task FlushAsync(CancellationToken cancellationToken)
+    {
+        foreach (TextWriter writer in _writers)
+            await writer.FlushAsync(cancellationToken);
+    }
+
     protected override void Dispose(bool disposing)
     {
         if (_isDisposed)
@@ -61,5 +85,43 @@ public class ErrorTextWriter : TextWriter
     public new void Dispose()
     {
         Dispose(true);
+    }
+
+    public void Store()
+    {
+        if (_isStored)
+            return;
+
+        _store = _writers;
+        _writers = [];
+        _isStored = true;
+    }
+
+    public void Restore()
+    {
+        if (_isStored)
+            return;
+
+        _writers = _store;
+    }
+
+    public void AddWriter(TextWriter writer)
+    {
+        _writers = _writers.Append(writer).ToArray();
+    }
+
+    public void AddWriters(TextWriter[] writer)
+    {
+        _writers = _writers.Concat(writer).ToArray();
+    }
+
+    public void SetWriters(TextWriter[] writers)
+    {
+        _writers = writers;
+    }
+
+    public void RemoveWriter(TextWriter writer)
+    {
+        _writers = _writers.Where(w => w != writer).ToArray();
     }
 }

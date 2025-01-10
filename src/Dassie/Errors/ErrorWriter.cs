@@ -1,6 +1,8 @@
 ﻿using Dassie.Cli;
 using Dassie.Configuration;
 using Dassie.Configuration.Analysis;
+using Dassie.Errors.Devices;
+using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Text.Tooltips;
 using System;
@@ -39,6 +41,11 @@ public static class ErrorWriter
     /// The output text writer used for information messages.
     /// </summary>
     public static ErrorTextWriter InfoOut { get; set; } = new([Console.Out]);
+
+    /// <summary>
+    /// A list of additional build log devices to use.
+    /// </summary>
+    public static List<BuildLogDeviceContext> BuildLogDevices { get; } = [];
 
     /// <summary>
     /// A prefix of all error messages, indicating which project the error is from.
@@ -225,6 +232,7 @@ public static class ErrorWriter
             }
 
             outStream.Write(outBuilder.ToString());
+            outStream.Flush();
             outBuilder.Clear();
 
             if (!string.IsNullOrEmpty(error.Tip) && Context.Configuration.EnableTips)
@@ -298,6 +306,9 @@ public static class ErrorWriter
             CurrentFile.Errors.Add(error);
             return;
         }
+
+        foreach ((IBuildLogDevice device, var attribs, var elems) in BuildLogDevices)
+            device.Log(error, attribs, elems);
     }
 
     /// <summary>

@@ -51,6 +51,7 @@ internal static class ExtensionLoader
         foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))
             packages.AddRange(LoadInstalledExtensions(file));
 
+        ActivateBuildLogWriters(packages);
         return packages;
     }
 
@@ -64,7 +65,10 @@ internal static class ExtensionLoader
             Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPackage))).ToArray();
 
             foreach (Type t in packageTypes)
-                packages.Add((IPackage)Activator.CreateInstance(t));
+            {
+                IPackage package = (IPackage)Activator.CreateInstance(t);
+                packages.Add(package);
+            }
         }
         catch (ReflectionTypeLoadException)
         {
@@ -135,5 +139,23 @@ internal static class ExtensionLoader
 
         analyzer = null;
         return false;
+    }
+
+    public static void ActivateBuildLogWriters(List<IPackage> packages)
+    {
+        if (packages == null)
+            return;
+
+        foreach (IBuildLogWriter writers in packages.Select(p => p.BuildLogWriters()).SelectMany(b => b))
+        {
+            if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Message))
+                InfoOut.AddWriters(writers.Writers);
+
+            if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Warning))
+                InfoOut.AddWriters(writers.Writers);
+
+            if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Error))
+                ErrorOut.AddWriters(writers.Writers);
+        }
     }
 }
