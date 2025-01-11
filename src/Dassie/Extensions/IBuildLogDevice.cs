@@ -15,6 +15,11 @@ public interface IBuildLogDevice
     public string Name { get; }
 
     /// <summary>
+    /// The error severities at which the log device is active.
+    /// </summary>
+    public BuildLogSeverity SeverityLevel { get; }
+
+    /// <summary>
     /// The method called when the build log device is initialized.
     /// </summary>
     /// <param name="attributes">The XML attributes passed to the log device.</param>

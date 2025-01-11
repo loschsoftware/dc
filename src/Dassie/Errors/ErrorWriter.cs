@@ -96,8 +96,20 @@ public static class ErrorWriter
         if (messages.Where(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition).Any())
             return;
 
+        BuildLogSeverity severity = error.Severity switch
+        {
+            Severity.Warning => BuildLogSeverity.Warning,
+            Severity.Error => BuildLogSeverity.Error,
+            _ => BuildLogSeverity.Message
+        };
+
         foreach (IBuildLogDevice device in BuildLogDevices)
+        {
+            if (!device.SeverityLevel.HasFlag(severity))
+                continue;
+
             device.Log(error);
+        }
 
         messages.Add(error);
     }

@@ -20,7 +20,7 @@ internal static class ExtensionLoader
     public static IEnumerable<IConfigurationProvider> ConfigurationProviders => InstalledExtensions.Select(p => p.ConfigurationProviders()).SelectMany(p => p);
     public static IEnumerable<IAnalyzer<IParseTree>> CodeAnalyzers => InstalledExtensions.Select(a => a.CodeAnalyzers()).SelectMany(a => a);
 
-    public static IEnumerable<IBuildLogDevice> BuildLogDevices => InstalledExtensions.Select(a => a.BuildLogDevices()).SelectMany(a => a).Append(TextWriterBuildLogDevice.Instance);
+    public static IEnumerable<IBuildLogDevice> BuildLogDevices => InstalledExtensions.Select(a => a.BuildLogDevices()).SelectMany(a => a).Append(TextWriterBuildLogDevice.Instance).Append(new FileBuildLogDevice());
 
     private static List<IPackage> LoadInstalledExtensions()
     {
@@ -151,13 +151,13 @@ internal static class ExtensionLoader
 
         foreach (IBuildLogWriter writers in packages.Select(p => p.BuildLogWriters()).SelectMany(b => b))
         {
-            if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Message))
+            if (writers.Severity.HasFlag(BuildLogSeverity.Message))
                 TextWriterBuildLogDevice.InfoOut.AddWriters(writers.Writers);
 
-            if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Warning))
+            if (writers.Severity.HasFlag(BuildLogSeverity.Warning))
                 TextWriterBuildLogDevice.InfoOut.AddWriters(writers.Writers);
 
-            if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Error))
+            if (writers.Severity.HasFlag(BuildLogSeverity.Error))
                 TextWriterBuildLogDevice.ErrorOut.AddWriters(writers.Writers);
         }
     }

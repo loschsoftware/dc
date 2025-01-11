@@ -703,5 +703,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an invalid build device is selected inside of a project file.
     /// </summary>
-    DS0170_InvalidBuildDeviceName
+    DS0170_InvalidBuildDeviceName,
+    /// <summary>
+    /// Emitted when the <c>&lt;File&gt;</c> build log device is used without specifying a file path.
+    /// </summary>
+    DS0171_FileBuildLogDeviceNoPathSpecified
 }

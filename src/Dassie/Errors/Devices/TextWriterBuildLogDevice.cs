@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Xml;
 
@@ -33,6 +32,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
     public static ErrorTextWriter InfoOut { get; set; } = new([Console.Out]);
 
     public string Name => "Default";
+    public BuildLogSeverity SeverityLevel => BuildLogSeverity.All;
 
     public void Initialize(List<XmlAttribute> attributes, List<XmlNode> elements) { }
 
@@ -46,24 +46,17 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
         Log(error, false, true);
     }
 
-    private static void Log(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
+    internal static void Log(ErrorInfo error, TextWriter output, bool treatAsError = false, bool addToErrorList = true, bool applyFormatting = false)
     {
         try
         {
             ConsoleColor defaultColor = Console.ForegroundColor;
 
-            var outStream = error.Severity switch
-            {
-                Severity.Error => ErrorOut,
-                Severity.Warning => WarnOut,
-                _ => InfoOut
-            };
-
             StringBuilder outBuilder = new();
 
             void SetColorRgb(byte r, byte g, byte b)
             {
-                if (ConsoleHelper.AnsiEscapeSequenceSupported && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
+                if (applyFormatting || (ConsoleHelper.AnsiEscapeSequenceSupported && (output == Console.Out || output == Console.Error)))
                     outBuilder.Append($"\x1b[38;2;{r};{g};{b}m");
             }
 
@@ -86,7 +79,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
 
             void ResetColor()
             {
-                if (ConsoleHelper.AnsiEscapeSequenceSupported && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
+                if (applyFormatting || (ConsoleHelper.AnsiEscapeSequenceSupported && (output == Console.Out || output == Console.Error)))
                     outBuilder.Append($"\x1b[0m");
             }
 
@@ -113,7 +106,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
             string codePos = "\b";
 
             // Legacy colors
-            if (!ConsoleHelper.AnsiEscapeSequenceSupported && (outStream.Writers.Contains(Console.Out) || outStream.Writers.Contains(Console.Error)))
+            if (!ConsoleHelper.AnsiEscapeSequenceSupported && (output == Console.Out || output == Console.Error))
             {
                 Console.ForegroundColor = error.Severity switch
                 {
@@ -162,8 +155,8 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 ResetColor();
             }
 
-            outStream.Write(outBuilder.ToString());
-            outStream.Flush();
+            output.Write(outBuilder.ToString());
+            output.Flush();
             outBuilder.Clear();
 
             if (!string.IsNullOrEmpty(error.Tip) && Context.Configuration.EnableTips)
@@ -189,7 +182,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                     outBuilder.Append(new string(' ', error.CodePosition.Item2));
 
                     ResetColor();
-                    outStream.Write(outBuilder.ToString());
+                    output.Write(outBuilder.ToString());
                     outBuilder.Clear();
 
                     Console.ForegroundColor = error.Severity switch
@@ -203,7 +196,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                     outBuilder.AppendLine(new string('~', Math.Max(error.Length, 0)));
 
                     ResetColor();
-                    outStream.Write(outBuilder.ToString());
+                    output.Write(outBuilder.ToString());
                     outBuilder.Clear();
 
                     Console.ForegroundColor = defaultColor;
@@ -228,12 +221,25 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 CurrentFile.Errors.Add(error);
 
             ResetColor();
-            outStream.Write(outBuilder.ToString());
+            output.Write(outBuilder.ToString());
         }
         catch (IOException)
         {
             CurrentFile.Errors.Add(error);
             return;
         }
+    }
+
+    internal static void Log(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true, bool applyFormatting = true)
+    {
+        var outStream = error.Severity switch
+        {
+            Severity.Error => ErrorOut,
+            Severity.Warning => WarnOut,
+            _ => InfoOut
+        };
+
+        foreach (TextWriter writer in outStream.Writers)
+            Log(error, writer);
     }
 }

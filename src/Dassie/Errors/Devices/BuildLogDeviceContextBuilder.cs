@@ -12,27 +12,10 @@ internal static class BuildLogDeviceContextBuilder
     public static void RegisterBuildLogDevices(DassieConfig config, string configPath)
     {
         IEnumerable<IBuildLogDevice> availableDevices = ExtensionLoader.BuildLogDevices;
-        List<IBuildLogDevice> devices = [];
+        List<IBuildLogDevice> devices = [TextWriterBuildLogDevice.Instance];
 
         if (config.BuildLogOptions == null)
             return;
-
-
-        if (config.BuildLogOptions.Elements.Count == 0)
-        {
-            // Effectively disables all error reporting, so emit an appropriate warning first
-            var loc = XmlLocationService.GetElementLocation(configPath, "BuildLogDevices");
-            EmitWarningMessage(
-                loc.Row,
-                loc.Column,
-                loc.Length,
-                DS0169_NoBuildLogDevices,
-                "<BuildLogDevices> element in project file is empty, effectively disabling any error reporting.",
-                ProjectConfigurationFileName);
-
-            BuildLogDevices.Clear();
-            return;
-        }
 
         foreach (XmlElement element in config.BuildLogOptions.Elements)
         {
