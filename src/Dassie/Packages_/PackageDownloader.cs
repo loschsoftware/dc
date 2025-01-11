@@ -80,7 +80,7 @@ internal static class PackageDownloader
             return targetVersion.ToFullString();
 
         long bytes = GetPackageSizeFromCatalog(new(packageId, targetVersion), cache, repo, CancellationToken.None).Result.Value;
-        InfoOut.WriteLine($"Downloading package '{packageId}' ({FormatBytes(bytes)}).");
+        WriteLine($"Downloading package '{packageId}' ({FormatBytes(bytes)}).");
 
         using MemoryStream ms = new();
 

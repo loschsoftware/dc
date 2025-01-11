@@ -1,7 +1,6 @@
 ﻿using Dassie.Errors;
-using Dassie.Errors.Devices;
-using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Dassie.Extensions;
 
@@ -16,20 +15,21 @@ public interface IBuildLogDevice
     public string Name { get; }
 
     /// <summary>
+    /// The method called when the build log device is initialized.
+    /// </summary>
+    /// <param name="attributes">The XML attributes passed to the log device.</param>
+    /// <param name="elements">The XML elements passed to the log device.</param>
+    public void Initialize(List<XmlAttribute> attributes, List<XmlNode> elements);
+
+    /// <summary>
     /// The method called when a compiler message is emitted.
     /// </summary>
     /// <param name="error">The compiler message that was emitted.</param>
-    /// <param name="attributes">The XML attribute values passed to the log device.</param>
-    /// <param name="elements">The XML element values passed to the log device.</param>
-    public void Log(ErrorInfo error, Dictionary<string, object> attributes, Dictionary<string, object> elements);
+    public void Log(ErrorInfo error);
 
     /// <summary>
-    /// A dictionary of XML attributes that can be applied to the build log device.
+    /// The method called when a string is written to the message output.
     /// </summary>
-    public virtual Dictionary<string, Type> Attributes => [];
-
-    /// <summary>
-    /// A dictionary of XML elements that can be used on the build log device.
-    /// </summary>
-    public virtual Dictionary<string, Type> Elements => [];
+    /// <param name="input">The string to write.</param>
+    public void WriteString(string input);
 }

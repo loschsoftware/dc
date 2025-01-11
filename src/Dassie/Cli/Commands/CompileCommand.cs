@@ -4,6 +4,7 @@ using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Data;
 using Dassie.Errors;
+using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using Dassie.Helpers;
 using Dassie.Meta;
@@ -57,14 +58,6 @@ internal class CompileCommand : ICompilerCommand
 
         if (overrideSettings != null)
             config = overrideSettings;
-
-        if (!string.IsNullOrEmpty(config.CompilerMessageRedirectionFile))
-        {
-            StreamWriter messageWriter = new(config.CompilerMessageRedirectionFile);
-            InfoOut = new([messageWriter]);
-            WarnOut = new([messageWriter]);
-            ErrorOut = new([messageWriter]);
-        }
 
         MacroParser parser = new();
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
@@ -349,11 +342,11 @@ internal class CompileCommand : ICompilerCommand
         }
 
         if (Context.Configuration.MeasureElapsedTime)
-            InfoOut.WriteLine($"\r\nElapsed time: {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms");
+            WriteLine($"\r\nElapsed time: {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms");
 
-        InfoOut?.Dispose();
-        WarnOut?.Dispose();
-        ErrorOut?.Dispose();
+        TextWriterBuildLogDevice.InfoOut?.Dispose();
+        TextWriterBuildLogDevice.WarnOut?.Dispose();
+        TextWriterBuildLogDevice.ErrorOut?.Dispose();
 
         return errors.Select(e => e.Length).Sum() == 0 ? 0 : -1;
     }

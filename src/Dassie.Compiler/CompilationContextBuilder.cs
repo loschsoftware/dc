@@ -1,5 +1,6 @@
 ﻿using Dassie.Configuration;
 using Dassie.Errors;
+using Dassie.Errors.Devices;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -190,9 +191,9 @@ public class CompilationContextBuilder
     public CompilationContextBuilder RedirectCompilerMessages(Func<Severity, TextWriter> messageResolver)
     {
         ArgumentNullException.ThrowIfNull(messageResolver);
-        ErrorWriter.InfoOut = new([messageResolver(Severity.Information)]);
-        ErrorWriter.WarnOut = new([messageResolver(Severity.Warning)]);
-        ErrorWriter.ErrorOut = new([messageResolver(Severity.Error)]);
+        TextWriterBuildLogDevice.InfoOut = new([messageResolver(Severity.Information)]);
+        TextWriterBuildLogDevice.WarnOut = new([messageResolver(Severity.Warning)]);
+        TextWriterBuildLogDevice.ErrorOut = new([messageResolver(Severity.Error)]);
         return this;
     }
 

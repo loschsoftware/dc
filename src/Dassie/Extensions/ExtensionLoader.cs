@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
+using Dassie.Errors.Devices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ internal static class ExtensionLoader
 
     public static IEnumerable<IConfigurationProvider> ConfigurationProviders => InstalledExtensions.Select(p => p.ConfigurationProviders()).SelectMany(p => p);
     public static IEnumerable<IAnalyzer<IParseTree>> CodeAnalyzers => InstalledExtensions.Select(a => a.CodeAnalyzers()).SelectMany(a => a);
+
+    public static IEnumerable<IBuildLogDevice> BuildLogDevices => InstalledExtensions.Select(a => a.BuildLogDevices()).SelectMany(a => a).Append(TextWriterBuildLogDevice.Instance);
 
     private static List<IPackage> LoadInstalledExtensions()
     {
@@ -149,13 +152,13 @@ internal static class ExtensionLoader
         foreach (IBuildLogWriter writers in packages.Select(p => p.BuildLogWriters()).SelectMany(b => b))
         {
             if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Message))
-                InfoOut.AddWriters(writers.Writers);
+                TextWriterBuildLogDevice.InfoOut.AddWriters(writers.Writers);
 
             if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Warning))
-                InfoOut.AddWriters(writers.Writers);
+                TextWriterBuildLogDevice.InfoOut.AddWriters(writers.Writers);
 
             if (writers.Severities.HasFlag(IBuildLogWriter.Severity.Error))
-                ErrorOut.AddWriters(writers.Writers);
+                TextWriterBuildLogDevice.ErrorOut.AddWriters(writers.Writers);
         }
     }
 }

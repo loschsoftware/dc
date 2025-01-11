@@ -1,4 +1,5 @@
 ﻿using Dassie.Errors;
+using Dassie.Errors.Devices;
 using Dassie.Validation;
 using System;
 using System.IO;
@@ -47,6 +48,7 @@ internal static class ProjectFileDeserializer
         foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
             EmitGeneric(error);
 
+        BuildLogDeviceContextBuilder.RegisterBuildLogDevices(config, ProjectConfigurationFileName);
         return config;
     }
 }

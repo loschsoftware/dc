@@ -695,5 +695,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the ':?' operator is used on a value type.
     /// </summary>
-    DS0168_InstanceCheckOperatorOnValueType
+    DS0168_InstanceCheckOperatorOnValueType,
+    /// <summary>
+    /// Warning emitted when a project file contains no build log devices, effectively disabling any error reporting.
+    /// </summary>
+    DS0169_NoBuildLogDevices,
+    /// <summary>
+    /// Emitted when an invalid build device is selected inside of a project file.
+    /// </summary>
+    DS0170_InvalidBuildDeviceName
 }

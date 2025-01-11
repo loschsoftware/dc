@@ -1,6 +1,7 @@
 ﻿using Dassie.Cli.Commands;
 using Dassie.Configuration;
 using Dassie.Core;
+using Dassie.Extensions;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -45,8 +46,16 @@ internal class Program
                     Console.WriteLine(ex);
             }
             catch { }
-
-            return -1;
         }
+        finally
+        {
+            foreach (IBuildLogDevice device in BuildLogDevices)
+            {
+                if (device is IDisposable d)
+                    d.Dispose();
+            }
+        }
+
+        return -1;
     }
 }

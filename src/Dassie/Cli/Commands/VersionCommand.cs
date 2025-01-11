@@ -52,7 +52,7 @@ internal class VersionCommand : ICompilerCommand
         output.AppendLine($"{"    - NuGet package storage:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages")}\"");
         output.AppendLine($"{"    - Tool paths file:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "tools.xml")}\"");
 
-        InfoOut.Write(output.ToString());
+        WriteOutString(output.ToString());
         return 0;
     }
 }

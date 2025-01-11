@@ -52,7 +52,7 @@ internal class MacroParser
 
         foreach (PropertyInfo prop in obj.GetType().GetProperties())
         {
-            if (prop.PropertyType != typeof(string) && prop.PropertyType.IsClass)
+            if (prop.PropertyType != typeof(string) && prop.PropertyType.IsClass && !prop.PropertyType.Namespace.StartsWith("System"))
             {
                 if (prop.PropertyType.IsArray)
                 {

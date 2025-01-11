@@ -117,9 +117,9 @@ public sealed class DassieConfig
     [XmlElement]
     public int Verbosity { get; set; } = 0;
 
-    [DefaultValue("")]
-    [XmlElement]
-    public string CompilerMessageRedirectionFile { get; set; }
+    [DefaultValue(null)]
+    [XmlElement("BuildLogDevices")]
+    public BuildLogOptions BuildLogOptions { get; set; }
 
     [DefaultValue(false)]
     [XmlElement]

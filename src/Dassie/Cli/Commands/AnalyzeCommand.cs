@@ -101,7 +101,7 @@ internal class AnalyzeCommand : ICompilerCommand
             EmitGeneric(error);
 
         if (errors.Count == 0)
-            InfoOut.WriteLine($"{Environment.NewLine}Analysis completed without messages.");
+            WriteLine($"{Environment.NewLine}Analysis completed without messages.");
 
         return 0;
     }
