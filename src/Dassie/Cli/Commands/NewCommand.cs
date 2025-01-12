@@ -14,5 +14,5 @@ internal class NewCommand : ICompilerCommand
 
     public string Description => "Creates the file structure of a Dassie project.";
 
-    public int Invoke(string[] args) => DSTemplates.CreateStructure(args);
+    public int Invoke(string[] args) => TemplateBuilder.CreateStructure(args);
 }

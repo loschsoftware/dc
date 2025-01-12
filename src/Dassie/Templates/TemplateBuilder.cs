@@ -9,11 +9,11 @@ using System.Xml.Serialization;
 namespace Dassie.Templates;
 
 /// <summary>
-/// Provides templates for commonly used Dassie project types.
+/// Provides mechanisms to create Dassie projects based on a project template.
 /// </summary>
-public static class DSTemplates
+internal static class TemplateBuilder
 {
-    internal static int CreateStructure(string[] args)
+    public static int CreateStructure(string[] args)
     {
         if (args.Length < 2)
         {
@@ -80,7 +80,7 @@ public static class DSTemplates
         return 0;
     }
 
-    static void BuildDirectoryStructure(ProjectTemplateDirectory dir, string baseDir, MacroParser parser)
+    private static void BuildDirectoryStructure(ProjectTemplateDirectory dir, string baseDir, MacroParser parser)
     {
         XmlSerializerNamespaces ns = new();
         ns.Add("", "");
