@@ -1,4 +1,6 @@
-﻿using Dassie.Extensions;
+﻿using Antlr4.Runtime.Tree;
+using Dassie.CodeAnalysis;
+using Dassie.Extensions;
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
@@ -145,6 +147,42 @@ internal class PackageCommand : ICompilerCommand
 
             foreach (ICompilerCommand cmd in definedCommands)
                 sb.AppendLine($"{$"    {cmd.UsageString}",-50}{cmd.Description}");
+        }
+
+        if (package.CodeAnalyzers().Length != 0)
+        {
+            sb.AppendLine();
+            WriteHeading("Code analyzers");
+
+            foreach (IAnalyzer<IParseTree> analyzer in package.CodeAnalyzers())
+                sb.AppendLine($"    {analyzer.Name}");
+        }
+
+        if (package.ConfigurationProviders().Length != 0)
+        {
+            sb.AppendLine();
+            WriteHeading("Configuration providers");
+
+            foreach (IConfigurationProvider provider in package.ConfigurationProviders())
+                sb.AppendLine($"    {provider.Name}");
+        }
+
+        if (package.ProjectTemplates().Length != 0)
+        {
+            sb.AppendLine();
+            WriteHeading("Project templates");
+
+            foreach (IProjectTemplate template in package.ProjectTemplates())
+                sb.AppendLine($"    {template.Name}");
+        }
+
+        if (package.BuildLogDevices().Length != 0)
+        {
+            sb.AppendLine();
+            WriteHeading("Build log devices");
+
+            foreach (IBuildLogDevice device in package.BuildLogDevices())
+                sb.AppendLine($"    {device.Name}");
         }
 
         HelpCommand.DisplayLogo();
