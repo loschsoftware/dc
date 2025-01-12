@@ -55,9 +55,12 @@ public static class DSTemplates
         {
             if (entry is ProjectFile p)
             {
+                DassieConfig cfg = p.Content ?? new();
+                parser.Normalize(cfg);
+
                 using StreamWriter sw = new(Path.Combine(rootDir, ProjectConfigurationFileName));
                 XmlSerializer xmls = new(typeof(DassieConfig));
-                xmls.Serialize(sw, p.Content ?? new(), ns);
+                xmls.Serialize(sw, cfg, ns);
                 continue;
             }
 
@@ -73,7 +76,7 @@ public static class DSTemplates
             BuildDirectoryStructure(dir, subDir, parser);
         }
 
-        WriteLine($"Built new project in {rootDir} based on template '{args[1]}'.");
+        WriteLine($"Built new project in {rootDir} based on template '{args[0]}'.");
         return 0;
     }
 
@@ -86,9 +89,12 @@ public static class DSTemplates
         {
             if (child is ProjectFile p)
             {
+                DassieConfig cfg = p.Content ?? new();
+                parser.Normalize(cfg);
+
                 using StreamWriter sw = new(Path.Combine(baseDir, ProjectConfigurationFileName));
                 XmlSerializer xmls = new(typeof(DassieConfig));
-                xmls.Serialize(sw, p.Content ?? new(), ns);
+                xmls.Serialize(sw, cfg, ns);
                 continue;
             }
 
