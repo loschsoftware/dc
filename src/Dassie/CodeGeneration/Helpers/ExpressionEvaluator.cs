@@ -302,7 +302,8 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         char c = (char)reader.Read();
         char[] hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
 
-        while (hexDigits.Contains(char.ToUpperInvariant(c)))
+        int count = 1;
+        while (count++ < 8 && hexDigits.Contains(char.ToUpperInvariant(c)))
         {
             sequence.Append(c);
             c = (char)reader.Read();
