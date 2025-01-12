@@ -1,6 +1,7 @@
 ﻿using Dassie.Configuration;
+using Dassie.Configuration.Macros;
 using Dassie.Extensions;
-using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -12,85 +13,95 @@ namespace Dassie.Templates;
 /// </summary>
 public static class DSTemplates
 {
-    /// <summary>
-    /// Contains a template for a console application.
-    /// </summary>
-    public static readonly string Console =
-@"println ""Hello World!""";
-
-    /// <summary>
-    /// Contains a template for a library application.
-    /// </summary>
-    public static readonly string Library =
-@"type Type1 = {
-}";
-
     internal static int CreateStructure(string[] args)
     {
         if (args.Length < 2)
         {
-            System.Console.WriteLine("Specify an application type and name.");
+            WriteLine("Specify a project template and name.");
             return -1;
         }
 
-        if (ExtensionLoader.InstalledExtensions.Select(p => p.ProjectTemplates()).SelectMany(p => p).Any(t => t.Name == args[0]))
-        {
-            CreateStructure(ExtensionLoader.InstalledExtensions.Select(p => p.ProjectTemplates()).SelectMany(p => p).First(t => t.Name == args[0]));
-            return 0;
-        }
+        IEnumerable<IProjectTemplate> availableTemplates = ExtensionLoader.ProjectTemplates;
 
-        string[] templates = ["console", "library"];
-        if (!templates.Contains(args[0]))
+        if (!availableTemplates.Any(t => string.Compare(t.Name, args[0], !t.IsCaseSensitive()) == 0))
         {
-            System.Console.WriteLine($"The project template '{args[0]}' does not exist. Valid values are 'console' and 'library'.");
+            WriteLine($"The project template '{args[0]}' is not installed. Installed templates are: {string.Join(", ", availableTemplates.Select(t => $"'{t.Name}'"))}.");
             return -1;
         }
+
+        IProjectTemplate selectedTemplate = availableTemplates.First(t => string.Compare(t.Name, args[0], !t.IsCaseSensitive()) == 0);
 
         string rootDir = Path.Combine(Directory.GetCurrentDirectory(), args[1]);
         Directory.CreateDirectory(rootDir);
 
-        string srcDir = Directory.CreateDirectory(Path.Combine(rootDir, "src")).FullName;
-        string buildDir = Directory.CreateDirectory(Path.Combine(rootDir, "build")).FullName;
+        DassieConfig config = null;
 
-        FileStream configFile = File.Create(Path.Combine(rootDir, ProjectConfigurationFileName));
+        if (selectedTemplate.Entries.Any(t => t is ProjectFile))
+            config = (selectedTemplate.Entries.First(t => t is ProjectFile) as ProjectFile).Content;
+
+        MacroParser parser = new(true);
+        parser.ImportMacros(new()
+        {
+            ["projectname"] = args[1],
+            ["projectdir"] = rootDir
+        });
+
+        parser.Normalize(config);
 
         XmlSerializerNamespaces ns = new();
         ns.Add("", "");
 
-        XmlSerializer xmls = new(typeof(DassieConfig));
-        DassieConfig config = new()
+        foreach (ProjectTemplateEntry entry in selectedTemplate.Entries ?? [])
         {
-            FormatVersion = DassieConfig.CurrentFormatVersion,
-            AssemblyName = args[1]
-        };
+            if (entry is ProjectFile p)
+            {
+                using StreamWriter sw = new(Path.Combine(rootDir, ProjectConfigurationFileName));
+                XmlSerializer xmls = new(typeof(DassieConfig));
+                xmls.Serialize(sw, p.Content ?? new(), ns);
+                continue;
+            }
 
-        switch (args[0])
-        {
-            case "console":
-                AddSourceFile(Path.Combine(srcDir, "main.ds"), Console);
-                break;
+            if (entry is ProjectTemplateFile f)
+            {
+                using StreamWriter sw = new(Path.Combine(rootDir, f.Name));
+                sw.Write(parser.Normalize(f.FormattedContent ?? ""));
+                continue;
+            }
 
-            case "library":
-                AddSourceFile(Path.Combine(srcDir, "Type1.ds"), Library);
-                config.ApplicationType = ApplicationType.Library;
-                break;
+            ProjectTemplateDirectory dir = entry as ProjectTemplateDirectory;
+            string subDir = Directory.CreateDirectory(Path.Combine(rootDir, dir.Name)).FullName;
+            BuildDirectoryStructure(dir, subDir, parser);
         }
 
-        xmls.Serialize(configFile, config, ns);
-
-        System.Console.WriteLine($"Built new project in {rootDir} based on template '{args[1]}'.");
-
+        WriteLine($"Built new project in {rootDir} based on template '{args[1]}'.");
         return 0;
     }
 
-    internal static void AddSourceFile(string path, string contents)
+    static void BuildDirectoryStructure(ProjectTemplateDirectory dir, string baseDir, MacroParser parser)
     {
-        using StreamWriter sw = new(path);
-        sw.WriteLine(contents);
-    }
+        XmlSerializerNamespaces ns = new();
+        ns.Add("", "");
 
-    internal static void CreateStructure(IProjectTemplate template)
-    {
-        throw new NotImplementedException();
+        foreach (ProjectTemplateEntry child in dir.Children ?? [])
+        {
+            if (child is ProjectFile p)
+            {
+                using StreamWriter sw = new(Path.Combine(baseDir, ProjectConfigurationFileName));
+                XmlSerializer xmls = new(typeof(DassieConfig));
+                xmls.Serialize(sw, p.Content ?? new(), ns);
+                continue;
+            }
+
+            if (child is ProjectTemplateFile f)
+            {
+                using StreamWriter sw = new(Path.Combine(baseDir, f.Name));
+                sw.Write(parser.Normalize(f.FormattedContent ?? ""));
+                continue;
+            }
+
+            ProjectTemplateDirectory sub = child as ProjectTemplateDirectory;
+            string newDir = Directory.CreateDirectory(Path.Combine(baseDir, sub.Name)).FullName;
+            BuildDirectoryStructure(sub, newDir, parser);
+        }
     }
 }

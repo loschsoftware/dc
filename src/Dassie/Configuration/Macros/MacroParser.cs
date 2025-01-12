@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Dassie.Configuration.Macros;
@@ -100,5 +102,42 @@ internal class MacroParser
 
             prop.SetValue(obj, val);
         }
+    }
+
+    public string Normalize(string str)
+    {
+        StringReader sr = new(str);
+        StringBuilder result = new();
+
+        while (sr.Peek() != -1)
+        {
+            char c = (char)sr.Read();
+
+            switch (c)
+            {
+                case '$':
+                    if ((char)sr.Peek() == '(')
+                    {
+                        sr.Read();
+                        StringBuilder macroNameBuilder = new();
+                        while ((char)sr.Peek() != ')')
+                            macroNameBuilder.Append((char)sr.Read());
+
+                        if (_macros.TryGetValue(macroNameBuilder.ToString(), out string value))
+                            result.Append(value);
+
+                        sr.Read();
+                        break;
+                    }
+
+                    goto default;
+
+                default:
+                    result.Append(c);
+                    break;
+            }
+        }
+
+        return result.ToString();
     }
 }
