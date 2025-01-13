@@ -1768,56 +1768,86 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return op.ReturnType;
     }
 
-    // TODO: Implement short-circuiting
     public override Type VisitLogical_and_expression([NotNull] DassieParser.Logical_and_expressionContext context)
     {
-        Type t = Visit(context.expression()[0]);
-        EnsureBoolean(t, throwError: false);
+        List<Type> types = [];
 
-        Type t2 = Visit(context.expression()[1]);
-        EnsureBoolean(t2, throwError: false);
+        Label falseLabel = CurrentMethod.IL.DefineLabel();
+        Label trueLabel = CurrentMethod.IL.DefineLabel();
 
-        if (IsBoolean(t) && IsBoolean(t2))
+        foreach (DassieParser.ExpressionContext expr in context.expression()[..^1])
         {
-            CurrentMethod.IL.Emit(OpCodes.And);
+            Type t = Visit(context.expression()[0]);
+            EnsureBoolean(t, throwError: false);
+
+            if (IsBoolean(t))
+                CurrentMethod.IL.Emit(OpCodes.Brfalse, falseLabel);
+
+            types.Add(t);
+        }
+
+        Type t2 = Visit(context.expression()[^1]);
+        EnsureBoolean(t2, throwError: false);
+        CurrentMethod.IL.Emit(OpCodes.Br, trueLabel);
+
+        if (types.All(IsBoolean))
+        {
+            CurrentMethod.IL.MarkLabel(falseLabel);
+            EmitLdcI4(0);
+            CurrentMethod.IL.MarkLabel(trueLabel);
             return typeof(bool);
         }
 
         EmitErrorMessage(
-            context.Double_Ampersand().Symbol.Line,
-            context.Double_Ampersand().Symbol.Column,
-            context.Double_Ampersand().GetText().Length,
+            context.Double_Ampersand()[0].Symbol.Line,
+            context.Double_Ampersand()[0].Symbol.Column,
+            context.Double_Ampersand()[0].GetText().Length,
             DS0002_MethodNotFound,
-            $"The logical and operation is only supported by the type '{typeof(bool).FullName}'.",
+            $"The 'logical and' operation is only supported for operands of type '{typeof(bool).FullName}'.",
             Path.GetFileName(CurrentFile.Path));
 
-        return t;
+        return types[^1];
     }
 
-    // TODO: Implement short-circuiting
     public override Type VisitLogical_or_expression([NotNull] DassieParser.Logical_or_expressionContext context)
     {
-        Type t = Visit(context.expression()[0]);
-        EnsureBoolean(t, throwError: false);
+        List<Type> types = [];
 
-        Type t2 = Visit(context.expression()[1]);
-        EnsureBoolean(t2, throwError: false);
+        Label trueLabel = CurrentMethod.IL.DefineLabel();
+        Label falseLabel = CurrentMethod.IL.DefineLabel();
 
-        if (IsBoolean(t) && IsBoolean(t2))
+        foreach (DassieParser.ExpressionContext expr in context.expression()[..^1])
         {
-            CurrentMethod.IL.Emit(OpCodes.Or);
+            Type t = Visit(context.expression()[0]);
+            EnsureBoolean(t, throwError: false);
+
+            if (IsBoolean(t))
+                CurrentMethod.IL.Emit(OpCodes.Brtrue, trueLabel);
+
+            types.Add(t);
+        }
+
+        Type t2 = Visit(context.expression()[^1]);
+        EnsureBoolean(t2, throwError: false);
+        CurrentMethod.IL.Emit(OpCodes.Br, falseLabel);
+
+        if (types.All(IsBoolean))
+        {
+            CurrentMethod.IL.MarkLabel(trueLabel);
+            EmitLdcI4(1);
+            CurrentMethod.IL.MarkLabel(falseLabel);
             return typeof(bool);
         }
 
         EmitErrorMessage(
-            context.Double_Bar().Symbol.Line,
-            context.Double_Bar().Symbol.Column,
-            context.Double_Bar().GetText().Length,
+            context.Double_Bar()[0].Symbol.Line,
+            context.Double_Bar()[0].Symbol.Column,
+            context.Double_Bar()[0].GetText().Length,
             DS0002_MethodNotFound,
-            $"The logical or operation is only supported by the type '{typeof(bool).FullName}'.",
+            $"The 'logical or' operation is only supported for operands of type '{typeof(bool).FullName}'.",
             Path.GetFileName(CurrentFile.Path));
 
-        return t;
+        return types[^1];
     }
 
     public override Type VisitOr_expression([NotNull] DassieParser.Or_expressionContext context)
