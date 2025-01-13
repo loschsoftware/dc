@@ -1951,9 +1951,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitXor_expression([NotNull] DassieParser.Xor_expressionContext context)
     {
         Type t = Visit(context.expression()[0]);
-        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t, throwError: false);
 
-        if (IsNumericType(t) || (t == t2 && t.IsEnum))
+        Type t2 = Visit(context.expression()[1]);
+        EnsureBoolean(t, throwError: false);
+
+        if (IsNumericType(t) || (t == t2 && t.IsEnum) || (IsBoolean(t) && IsBoolean(t2)))
         {
             CurrentMethod.IL.Emit(OpCodes.Xor);
             return t;
