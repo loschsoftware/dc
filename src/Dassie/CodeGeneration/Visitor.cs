@@ -3098,6 +3098,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (s.Type().IsFunctionPointer && (context.arglist() != null || (s.Type().GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, s.Type().GetFunctionPointerReturnType(), s.Type().GetFunctionPointerParameterTypes());
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (s.Type().GetFunctionPointerReturnType(), null);
                 }
             }
@@ -3127,7 +3128,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 else if (closureInstanceField != null)
                     EmitLdarg(0);
 
-                if ((CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress) || (l.Builder.LocalType.IsValueType && context.full_identifier().Identifier().Length > 1))
+                if ((CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress) && (l.Builder.LocalType.IsValueType && context.full_identifier().Identifier().Length > 1))
                     s.LoadAddressIfValueType();
                 else
                     s.Load();
@@ -3144,6 +3145,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (s.Type().IsFunctionPointer && (context.arglist() != null || (s.Type().GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, s.Type().GetFunctionPointerReturnType(), s.Type().GetFunctionPointerParameterTypes());
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (s.Type().GetFunctionPointerReturnType(), null);
                 }
             }
@@ -3179,6 +3181,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (f.FieldType.IsFunctionPointer && (context.arglist() != null || (f.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, f.FieldType.GetFunctionPointerReturnType(), f.FieldType.GetFunctionPointerParameterTypes());
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (f.FieldType.GetFunctionPointerReturnType(), null);
                 }
             }
@@ -3188,6 +3191,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (mfi.ConstantValue != null)
                 {
                     EmitConst(mfi.ConstantValue);
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (mfi.ConstantValue.GetType(), null);
                 }
 
@@ -3213,6 +3217,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (mfi.Builder.FieldType.IsFunctionPointer && (context.arglist() != null || (mfi.Builder.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && firstIndex == 0)
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.Builder.FieldType.GetFunctionPointerReturnType(), mfi.Builder.FieldType.GetFunctionPointerParameterTypes());
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (mfi.Builder.FieldType.GetFunctionPointerReturnType(), null);
                 }
             }
@@ -3503,6 +3508,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (f.FieldType.IsFunctionPointer && (context.arglist() != null || (f.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)))
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, f.FieldType.GetFunctionPointerReturnType(), f.FieldType.GetFunctionPointerParameterTypes());
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (f.FieldType.GetFunctionPointerReturnType(), null);
                 }
             }
@@ -3525,6 +3531,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (mfi.Builder.FieldType.IsFunctionPointer && (context.arglist() != null || (mfi.Builder.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)))
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.Builder.FieldType.GetFunctionPointerReturnType(), mfi.Builder.FieldType.GetFunctionPointerParameterTypes());
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return (mfi.Builder.FieldType.GetFunctionPointerReturnType(), null);
                 }
             }
@@ -3676,7 +3683,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
 
             if (member == null)
+            {
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return null;
+            }
 
             if (member is FieldInfo f)
             {
@@ -3696,6 +3706,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (f.FieldType.IsFunctionPointer && (context.arglist() != null || (f.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && identifier == context.Identifier().Last())
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, f.FieldType.GetFunctionPointerReturnType(), f.FieldType.GetFunctionPointerParameterTypes());
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return f.FieldType.GetFunctionPointerReturnType();
                 }
             }
@@ -3718,6 +3729,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (mfi.Builder.FieldType.IsFunctionPointer && (context.arglist() != null || (mfi.Builder.FieldType.GetFunctionPointerParameterTypes().Length == 0 && context.arglist() == null)) && identifier == context.Identifier().Last())
                 {
                     CurrentMethod.IL.EmitCalli(OpCodes.Calli, CallingConvention.Winapi, mfi.Builder.FieldType.GetFunctionPointerReturnType(), mfi.Builder.FieldType.GetFunctionPointerParameterTypes());
+                    CurrentMethod.ShouldLoadAddressIfValueType = false;
                     return mfi.Builder.FieldType.GetFunctionPointerReturnType();
                 }
             }
@@ -3762,6 +3774,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         //CurrentMethod.ParameterBoxIndices.Clear();
+        CurrentMethod.ShouldLoadAddressIfValueType = false;
         return t;
     }
 
@@ -4344,6 +4357,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     DS0056_SymbolResolveError,
                     $"The name '{con.full_identifier().Identifier()[0].GetText()}' could not be resolved.");
 
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return null;
             }
 
@@ -4414,6 +4428,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     CurrentMethod.IL.Emit(OpCodes.Stfld, f);
                 }
 
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return ret;
             }
 
@@ -4421,6 +4436,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 EmitLdcI4((int)e.Value);
 
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return ret;
             }
 
@@ -4440,7 +4456,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
 
                 CurrentMethod.ArgumentTypesForNextMethodCall.Clear();
-
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return m.ReturnType;
             }
 
@@ -4509,6 +4525,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
 
                 EmitCall(final.DeclaringType, final);
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return final.ReturnType;
             }
         }
@@ -4562,7 +4579,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 flags);
 
             if (member == null)
+            {
+                CurrentMethod.ShouldLoadAddressIfValueType = false;
                 return null;
+            }
 
             if (member is MetaFieldInfo mf)
             {
