@@ -152,7 +152,7 @@ internal class MethodContext
 
     public bool SkipPop { get; set; }
 
-    public List<Type> ArgumentTypesForNextMethodCall { get; private set; } = [];
+    public List<Type> ArgumentTypesForNextMethodCall { get; set; } = [];
 
     private Type[] _typeArgs = [];
     public Type[] TypeArgumentsForNextMethodCall

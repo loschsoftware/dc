@@ -2962,7 +2962,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             _args = argumentTypes.ToArray();
 
         CurrentMethod.CaptureSymbols = true;
+        // TODO: Store argument types for each method call individually
+        List<Type> paramTypes = new(CurrentMethod.ArgumentTypesForNextMethodCall);
         MethodInfo method = VisitFull_identifier_member_access_expression(context, true, _args).Result;
+        CurrentMethod.ArgumentTypesForNextMethodCall = paramTypes;
         CurrentMethod.CaptureSymbols = false;
 
         target = method;
