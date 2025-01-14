@@ -41,8 +41,8 @@ code_block
     ;
 
 expression
-    : Custom_Operator expression #custom_operator_unary_expression
-    | expression Custom_Operator expression #custom_operator_binary_expression
+    : expression Custom_Operator expression #custom_operator_binary_expression
+    // | Custom_Operator expression #custom_operator_unary_expression 
     | Tilde expression #bitwise_complement_expression
     | expression Open_Bracket expression Close_Bracket Equals expression #array_element_assignment
     | <assoc=right> expression Double_Asterisk expression #power_expression

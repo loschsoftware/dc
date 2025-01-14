@@ -6063,51 +6063,53 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return operatorMethods;
     }
 
-    public override Type VisitCustom_operator_unary_expression([NotNull] DassieParser.Custom_operator_unary_expressionContext context)
-    {
-        MethodInfo[] methods = GetOperatorMethods(context.Custom_Operator(), true);
-        if (methods == null)
-            return typeof(void);
+    // TODO: Readd once parsing is figured out
 
-        Type tOperand = Visit(context.expression());
-        MethodInfo final = null;
+    //public override Type VisitCustom_operator_unary_expression([NotNull] DassieParser.Custom_operator_unary_expressionContext context)
+    //{
+    //    MethodInfo[] methods = GetOperatorMethods(context.Custom_Operator(), true);
+    //    if (methods == null)
+    //        return typeof(void);
 
-        foreach (MethodInfo candidate in methods)
-        {
-            if (candidate.GetParameters().Length != 1)
-                continue;
+    //    Type tOperand = Visit(context.expression());
+    //    MethodInfo final = null;
 
-            if (candidate.GetParameters()[0].ParameterType == tOperand)
-            {
-                final = candidate;
-                break;
-            }
+    //    foreach (MethodInfo candidate in methods)
+    //    {
+    //        if (candidate.GetParameters().Length != 1)
+    //            continue;
 
-            if (CanBeConverted(tOperand, candidate.GetParameters()[0].ParameterType))
-            {
-                EmitConversionOperator(tOperand, candidate.GetParameters()[0].ParameterType);
-                final = candidate;
-                break;
-            }
-        }
+    //        if (candidate.GetParameters()[0].ParameterType == tOperand)
+    //        {
+    //            final = candidate;
+    //            break;
+    //        }
 
-        if (final == null)
-        {
-            ErrorMessageHelpers.EmitDS0002Error(
-                context.Custom_Operator().Symbol.Line,
-                context.Custom_Operator().Symbol.Column,
-                context.Custom_Operator().GetText().Length,
-                context.Custom_Operator().GetText()[1..^1],
-                methods.First().DeclaringType,
-                methods,
-                [tOperand]);
+    //        if (CanBeConverted(tOperand, candidate.GetParameters()[0].ParameterType))
+    //        {
+    //            EmitConversionOperator(tOperand, candidate.GetParameters()[0].ParameterType);
+    //            final = candidate;
+    //            break;
+    //        }
+    //    }
 
-            return typeof(void);
-        }
+    //    if (final == null)
+    //    {
+    //        ErrorMessageHelpers.EmitDS0002Error(
+    //            context.Custom_Operator().Symbol.Line,
+    //            context.Custom_Operator().Symbol.Column,
+    //            context.Custom_Operator().GetText().Length,
+    //            context.Custom_Operator().GetText()[1..^1],
+    //            methods.First().DeclaringType,
+    //            methods,
+    //            [tOperand]);
 
-        CurrentMethod.IL.Emit(OpCodes.Call, final);
-        return final.ReturnType;
-    }
+    //        return typeof(void);
+    //    }
+
+    //    CurrentMethod.IL.Emit(OpCodes.Call, final);
+    //    return final.ReturnType;
+    //}
 
     public override Type VisitCustom_operator_binary_expression([NotNull] DassieParser.Custom_operator_binary_expressionContext context)
     {
