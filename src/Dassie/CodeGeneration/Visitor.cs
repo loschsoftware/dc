@@ -3569,7 +3569,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     VisitorStep1CurrentMethod.BoxCallingType = false;
                 }
 
-                CurrentMethod.IL.Emit(OpCodes.Newobj, c);
+                try
+                {
+                    CurrentMethod.IL.Emit(OpCodes.Newobj, c);
+
+                }
+                catch { }
+
                 t = c.DeclaringType;
 
                 if (VisitorStep1CurrentMethod != null)
