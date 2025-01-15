@@ -1360,8 +1360,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 $"remove_{eventName}",
                 handlerMethodAttribs);
 
-            addMethod.SetReturnType(typeof(void));
-            addMethod.SetParameters(type);
+            removeMethod.SetReturnType(typeof(void));
+            removeMethod.SetParameters(type);
 
             ILGenerator removeMethodIL = removeMethod.GetILGenerator();
 
