@@ -6,6 +6,7 @@ using Dassie.Runtime;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -1593,7 +1594,19 @@ internal static class SymbolResolver
 
         IEnumerable<MethodInfo> extensionMethodsFromReferencedAssemblies = Context.ReferencedAssemblies
             .Where(a => a.GetCustomAttribute<ExtensionAttribute>() != null)
-            .SelectMany(a => a.GetTypes())
+            .SelectMany(a =>
+            {
+                Type[] types = [];
+
+                try
+                {
+                    types = a.GetTypes();
+                }
+                catch (ReflectionTypeLoadException) { }
+
+                return types;
+
+            })
             .Where(t => t.GetCustomAttribute<ExtensionAttribute>() != null)
             .SelectMany(t => t.GetMethods())
             .Where(m => m.GetCustomAttribute<ExtensionAttribute>() != null)
