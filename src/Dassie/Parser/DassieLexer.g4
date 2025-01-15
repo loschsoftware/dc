@@ -30,7 +30,6 @@ Protected: 'protected';
 Partial: 'partial';
 Open: 'open';
 Closed: 'closed';
-Auto: 'auto';
 Abstract: 'abstract';
 Extern: 'extern';
 
@@ -151,6 +150,11 @@ Arrow_Right: '->';
 Arrow_Left: '<-';
 
 Backtick: '`';
+
+Add_Handler: '@add';
+Remove_Handler: '@remove';
+Get: '@get';
+Set: '@set';
 
 Identifier
 	: IdentifierOrKeyword

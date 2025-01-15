@@ -878,5 +878,35 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLocal_function([NotNull] DassieParser.Local_functionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.add_handler"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAdd_handler([NotNull] DassieParser.Add_handlerContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.remove_handler"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRemove_handler([NotNull] DassieParser.Remove_handlerContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.property_getter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitProperty_getter([NotNull] DassieParser.Property_getterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.property_setter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitProperty_setter([NotNull] DassieParser.Property_setterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.property_or_event_block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitProperty_or_event_block([NotNull] DassieParser.Property_or_event_blockContext context);
 }
 } // namespace Dassie.Parser

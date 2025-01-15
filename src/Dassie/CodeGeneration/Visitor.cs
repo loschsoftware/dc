@@ -16,6 +16,7 @@ using Dassie.Text.Tooltips;
 using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -1130,8 +1131,48 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.type_name() != null)
             type = SymbolResolver.ResolveTypeName(context.type_name());
 
-        string memberKind = context.Auto() == null ? "field" : "property";
-        string memberKindPlural = context.Auto() == null ? "fields" : "properties";
+        bool isAutoEvent = false;
+        bool isAutoProperty = false;
+        List<CustomAttributeBuilder> customAttribs = [];
+
+        if (context.attribute() != null)
+        {
+            foreach (DassieParser.AttributeContext attribute in context.attribute())
+            {
+                Type attribType = SymbolResolver.ResolveAttributeTypeName(attribute.type_name());
+
+                if (attribType != null)
+                {
+                    // TODO: Support attributes with parameters
+                    ConstructorInfo defaultConstructor = attribType.GetConstructor([]);
+                    if (defaultConstructor != null)
+                    {
+                        CustomAttributeBuilder cab = new(defaultConstructor, []);
+                        AttributeHelpers.EvaluateSpecialAttributeSemantics(context, defaultConstructor, [], false);
+                        customAttribs.Add(cab);
+                    }
+
+                    if (attribType == typeof(EventAttribute))
+                        isAutoEvent = true;
+
+                    if (attribType == typeof(AutoAttribute))
+                        isAutoProperty = true;
+                }
+            }
+        }
+
+        if (isAutoEvent && isAutoProperty)
+        {
+            EmitErrorMessage(
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                DS0172_EventAndProperty,
+                $"The attributes '<Auto>' and '<Event>' cannot be combined.");
+        }
+
+        string memberKind = !isAutoProperty ? "field" : "property";
+        string memberKindPlural = !isAutoProperty ? "fields" : "properties";
 
         if (TypeContext.Current.IsImmutable && context.Var() != null)
         {
@@ -1167,7 +1208,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         // Auto-implemented property
-        if (context.Auto() != null)
+        if (isAutoProperty)
         {
             if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
             {
@@ -1231,10 +1272,132 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
+        if (isAutoEvent)
+        {
+            if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+            {
+                ITerminalNode node = context.member_special_modifier().First(l => l.Literal() != null).Literal();
+
+                EmitErrorMessage(
+                    node.Symbol.Line,
+                    node.Symbol.Column,
+                    node.GetText().Length,
+                    DS0167_PropertyLiteral,
+                    "The modifier 'literal' is not valid on events.");
+            }
+
+            if (!(type.BaseType == typeof(Delegate) || type.BaseType == typeof(MulticastDelegate)))
+            {
+                EmitErrorMessage(
+                    context.type_name().Start.Line,
+                    context.type_name().Start.Column,
+                    context.type_name().GetText().Length,
+                    DS0174_EventFieldTypeNotDelegate,
+                    "Event must be of a delegate type.");
+
+                return typeof(void);
+            }
+
+            FieldBuilder eventField = TypeContext.Current.Builder.DefineField(
+                context.Identifier().GetText(),
+                type,
+                fieldAttribs);
+
+            string eventName = context.Identifier().GetText();
+            EventBuilder eb = TypeContext.Current.Builder.DefineEvent(
+                eventName,
+                EventAttributes.None,
+                type);
+
+            MethodBuilder addMethod = TypeContext.Current.Builder.DefineMethod(
+                $"add_{eventName}",
+                MethodAttributes.Public | MethodAttributes.SpecialName);
+
+            addMethod.SetReturnType(typeof(void));
+            addMethod.SetParameters(type);
+
+            ILGenerator addMethodIL = addMethod.GetILGenerator();
+
+            MethodContext current = CurrentMethod;
+
+            MethodContext addContext = new()
+            {
+                Builder = addMethod,
+                IL = addMethodIL
+            };
+
+            if (context.property_or_event_block() != null && context.property_or_event_block().add_handler().Length > 0)
+            {
+                if (context.property_or_event_block().add_handler().Length > 1)
+                {
+                    EmitErrorMessage(
+                        context.property_or_event_block().add_handler()[1].Start.Line,
+                        context.property_or_event_block().add_handler()[1].Start.Column,
+                        context.property_or_event_block().add_handler()[1..].SelectMany(a => a.GetText()).Count(),
+                        DS0173_EventHasMultipleHandlers,
+                        "An event can only contain one 'add' handler.");
+                }
+
+                Visit(context.property_or_event_block().add_handler()[0].expression());
+                addMethodIL.Emit(OpCodes.Ret);
+            }
+            else
+                EventDefaultHandlerCodeGeneration.GenerateDefaultAddHandlerImplementation(eventField);
+
+            MethodBuilder removeMethod = TypeContext.Current.Builder.DefineMethod(
+                $"remove_{eventName}",
+                MethodAttributes.Public | MethodAttributes.SpecialName);
+
+            addMethod.SetReturnType(typeof(void));
+            addMethod.SetParameters(type);
+
+            ILGenerator removeMethodIL = removeMethod.GetILGenerator();
+
+            MethodContext removeContext = new()
+            {
+                Builder = removeMethod,
+                IL = removeMethodIL
+            };
+            
+            if (context.property_or_event_block() != null && context.property_or_event_block().remove_handler().Length > 0)
+            {
+                if (context.property_or_event_block().remove_handler().Length > 1)
+                {
+                    EmitErrorMessage(
+                        context.property_or_event_block().remove_handler()[1].Start.Line,
+                        context.property_or_event_block().remove_handler()[1].Start.Column,
+                        context.property_or_event_block().remove_handler()[1..].SelectMany(a => a.GetText()).Count(),
+                        DS0173_EventHasMultipleHandlers,
+                        "An event can only contain one 'remove' handler.");
+                }
+
+                Visit(context.property_or_event_block().remove_handler()[0].expression());
+                removeMethodIL.Emit(OpCodes.Ret);
+            }
+            else
+                EventDefaultHandlerCodeGeneration.GenerateDefaultRemoveHandlerImplementation(eventField);
+
+            if (context.property_or_event_block() != null && (context.property_or_event_block().add_handler().Length == 0 ^ context.property_or_event_block().remove_handler().Length == 0))
+            {
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0175_EventMissingHandlers,
+                    $"Event '{eventName}' is missing a{(context.property_or_event_block().add_handler().Length == 0 ? "n" : "")} '{(context.property_or_event_block().add_handler().Length == 0 ? "add" : "remove")}' handler.");
+            }
+
+            CurrentMethod = current;
+            return typeof(void);
+        }
+
         FieldBuilder fb = TypeContext.Current.Builder.DefineField(
             context.Identifier().GetText(),
             type,
             fieldAttribs);
+
+        foreach (CustomAttributeBuilder cab in customAttribs)
+            fb.SetCustomAttribute(cab);
 
         MetaFieldInfo mfi = new(context.Identifier().GetText(), fb, default);
 

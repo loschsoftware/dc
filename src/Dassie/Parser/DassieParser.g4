@@ -305,9 +305,14 @@ member_special_modifier
     ;
 
 type_member
+    // Method or field with initializer
     : attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals NewLine* expression)?
-    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? Auto? (Var | Val)? Identifier type_parameter_list? Colon type_name
+    // Field without initializer
+    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? Colon type_name
+    // Custom operator
     | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Custom_Operator | Open_Paren Custom_Operator Close_Paren) parameter_list (Colon type_name)? Equals NewLine* expression
+    // Property or event
+    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? (Colon type_name)? Equals NewLine* property_or_event_block
     ;
 
 access_modifier_member_group
@@ -408,4 +413,24 @@ match_case_expression
 
 local_function
     : (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? Equals NewLine* expression
+    ;
+
+add_handler
+    : Add_Handler Equals expression
+    ;
+
+remove_handler
+    : Remove_Handler Equals expression
+    ;
+
+property_getter
+    : Get Equals expression
+    ;
+
+property_setter
+    : Set Equals expression
+    ;
+
+property_or_event_block
+    : Open_Brace NewLine* ((add_handler | remove_handler | NewLine)+ | (property_getter | property_setter | NewLine)+) NewLine* Close_Brace
     ;

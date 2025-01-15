@@ -707,5 +707,21 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the <c>&lt;File&gt;</c> build log device is used without specifying a file path.
     /// </summary>
-    DS0171_FileBuildLogDeviceNoPathSpecified
+    DS0171_FileBuildLogDeviceNoPathSpecified,
+    /// <summary>
+    /// Emitted when a field has the <c>&lt;Event&gt;</c> and <c>&lt;Auto&gt;</c> attributes applied at the same time.
+    /// </summary>
+    DS0172_EventAndProperty,
+    /// <summary>
+    /// Emitted when an event has multiple 'add' or 'remove' handlers.
+    /// </summary>
+    DS0173_EventHasMultipleHandlers,
+    /// <summary>
+    /// Emitted when the field type of an event is not a delegate.
+    /// </summary>
+    DS0174_EventFieldTypeNotDelegate,
+    /// <summary>
+    /// Emitted when an event defines one of the required 'add' or 'remove' handlers, but not both.
+    /// </summary>
+    DS0175_EventMissingHandlers
 }

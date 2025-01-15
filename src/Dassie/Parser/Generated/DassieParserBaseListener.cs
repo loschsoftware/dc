@@ -1725,6 +1725,66 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLocal_function([NotNull] DassieParser.Local_functionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.add_handler"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAdd_handler([NotNull] DassieParser.Add_handlerContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.add_handler"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAdd_handler([NotNull] DassieParser.Add_handlerContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.remove_handler"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterRemove_handler([NotNull] DassieParser.Remove_handlerContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.remove_handler"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitRemove_handler([NotNull] DassieParser.Remove_handlerContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.property_getter"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterProperty_getter([NotNull] DassieParser.Property_getterContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.property_getter"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitProperty_getter([NotNull] DassieParser.Property_getterContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.property_setter"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterProperty_setter([NotNull] DassieParser.Property_setterContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.property_setter"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitProperty_setter([NotNull] DassieParser.Property_setterContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.property_or_event_block"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterProperty_or_event_block([NotNull] DassieParser.Property_or_event_blockContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.property_or_event_block"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitProperty_or_event_block([NotNull] DassieParser.Property_or_event_blockContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>
