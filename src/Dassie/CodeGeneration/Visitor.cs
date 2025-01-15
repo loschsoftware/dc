@@ -6438,6 +6438,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
+        if (t.IsValueType)
+        {
+            EmitErrorMessage(
+                context.expression()[0].Start.Line,
+                context.expression()[0].Start.Column,
+                context.expression()[0].GetText().Length,
+                DS0176_LockOnValueType,
+                $"The '$lock' statement is only valid on reference types ('{t}' is a value type).");
+        }
+
         int lockObjIndex = ++CurrentMethod.LocalIndex;
         int isTakenIndex = ++CurrentMethod.LocalIndex;
         Label end = CurrentMethod.IL.DefineLabel();

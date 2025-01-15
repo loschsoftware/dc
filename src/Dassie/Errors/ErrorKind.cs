@@ -723,5 +723,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an event defines one of the required 'add' or 'remove' handlers, but not both.
     /// </summary>
-    DS0175_EventMissingHandlers
+    DS0175_EventMissingHandlers,
+    /// <summary>
+    /// Emitted when the '$lock' statement is used on a value type.
+    /// </summary>
+    DS0176_LockOnValueType
 }
