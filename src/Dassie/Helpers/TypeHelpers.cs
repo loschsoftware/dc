@@ -299,6 +299,9 @@ internal static class TypeHelpers
         return floats.Contains(type.RemoveByRef());
     }
 
+    public static bool IsDelegateType(Type type) => type.BaseType == typeof(Delegate) || IsMulticastDelegate(type);
+    public static bool IsMulticastDelegate(Type type) => type.BaseType == typeof(MulticastDelegate);
+
     public static Type GetEnumeratedType(this Type type) =>
         (type?.GetElementType() ?? (typeof(IEnumerable).IsAssignableFrom(type)
             ? type.GenericTypeArguments.FirstOrDefault()

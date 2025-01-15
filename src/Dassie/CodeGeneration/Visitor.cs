@@ -1298,20 +1298,32 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 return typeof(void);
             }
 
+            string eventName = context.Identifier().GetText();
+
             FieldBuilder eventField = TypeContext.Current.Builder.DefineField(
-                context.Identifier().GetText(),
+                eventName,
                 type,
                 fieldAttribs);
 
-            string eventName = context.Identifier().GetText();
+            TypeContext.Current.Fields.Add(new()
+            {
+                Builder = eventField,
+                Name = eventName
+            });
+
             EventBuilder eb = TypeContext.Current.Builder.DefineEvent(
                 eventName,
                 EventAttributes.None,
                 type);
 
+            MethodAttributes handlerMethodAttribs = MethodAttributes.Public | MethodAttributes.SpecialName;
+
+            if (eventField.IsStatic)
+                handlerMethodAttribs |= MethodAttributes.Static;
+
             MethodBuilder addMethod = TypeContext.Current.Builder.DefineMethod(
                 $"add_{eventName}",
-                MethodAttributes.Public | MethodAttributes.SpecialName);
+                handlerMethodAttribs);
 
             addMethod.SetReturnType(typeof(void));
             addMethod.SetParameters(type);
@@ -1346,7 +1358,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             MethodBuilder removeMethod = TypeContext.Current.Builder.DefineMethod(
                 $"remove_{eventName}",
-                MethodAttributes.Public | MethodAttributes.SpecialName);
+                handlerMethodAttribs);
 
             addMethod.SetReturnType(typeof(void));
             addMethod.SetParameters(type);
@@ -1386,6 +1398,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     DS0175_EventMissingHandlers,
                     $"Event '{eventName}' is missing a{(context.property_or_event_block().add_handler().Length == 0 ? "n" : "")} '{(context.property_or_event_block().add_handler().Length == 0 ? "add" : "remove")}' handler.");
             }
+
+            eb.SetAddOnMethod(addMethod);
+            eb.SetRemoveOnMethod(removeMethod);
 
             CurrentMethod = current;
             return typeof(void);
