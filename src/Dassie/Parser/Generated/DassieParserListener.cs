@@ -837,6 +837,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitLogical_and_expression([NotNull] DassieParser.Logical_and_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>lock_statement</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterLock_statement([NotNull] DassieParser.Lock_statementContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>lock_statement</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitLock_statement([NotNull] DassieParser.Lock_statementContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>full_identifier_member_access_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>

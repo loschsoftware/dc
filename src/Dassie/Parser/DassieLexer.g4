@@ -43,11 +43,13 @@ Val: 'val';
 Base: 'base';
 Override: 'override';
 
-Try: 'try';
-Raise: 'throw';
-Catch: 'catch';
-Finally: 'finally';
-Fault: 'fault';
+Try: '$try';
+Raise: '$throw';
+Catch: '$catch';
+Finally: '$finally';
+Fault: '$fault';
+
+Lock: '$lock';
 
 True: 'true';
 False: 'false';

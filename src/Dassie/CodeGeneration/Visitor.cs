@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using static Dassie.Helpers.TypeHelpers;
 using Color = Dassie.Text.Color;
 
@@ -6408,5 +6409,65 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type comparedType = SymbolResolver.ResolveTypeName(context.type_name());
         CurrentMethod.IL.Emit(OpCodes.Isinst, comparedType);
         return comparedType;
+    }
+
+    public override Type VisitLock_statement([NotNull] DassieParser.Lock_statementContext context)
+    {
+        Type t = Visit(context.expression()[0]);
+
+        if (t == typeof(Lock))
+        {
+            int index = ++CurrentMethod.LocalIndex;
+            CurrentMethod.IL.DeclareLocal(typeof(Lock.Scope));
+
+            CurrentMethod.IL.Emit(OpCodes.Callvirt, t.GetMethod("EnterScope"));
+            EmitStloc(index);
+
+            CurrentMethod.IL.BeginExceptionBlock();
+
+            Type t2 = Visit(context.expression()[1]);
+
+            if (t2 != null && t2 != typeof(void))
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+
+            CurrentMethod.IL.BeginFinallyBlock();
+            EmitLdloca(index);
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Lock.Scope).GetMethod("Dispose"));
+
+            CurrentMethod.IL.EndExceptionBlock();
+            return typeof(void);
+        }
+
+        int lockObjIndex = ++CurrentMethod.LocalIndex;
+        int isTakenIndex = ++CurrentMethod.LocalIndex;
+        Label end = CurrentMethod.IL.DefineLabel();
+        CurrentMethod.IL.DeclareLocal(t);
+        CurrentMethod.IL.DeclareLocal(typeof(bool));
+
+        EmitStloc(lockObjIndex);
+        EmitLdcI4(0);
+        EmitStloc(isTakenIndex);
+
+        CurrentMethod.IL.BeginExceptionBlock();
+
+        EmitLdloc(lockObjIndex);
+        EmitLdloca(isTakenIndex);
+        CurrentMethod.IL.Emit(OpCodes.Call, typeof(Monitor).GetMethod("Enter", BindingFlags.Public | BindingFlags.Static, [typeof(object), typeof(bool).MakeByRefType()]));
+
+        Type _t2 = Visit(context.expression()[1]);
+
+        if (_t2 != null && _t2 != typeof(void))
+            CurrentMethod.IL.Emit(OpCodes.Pop);
+
+        CurrentMethod.IL.BeginFinallyBlock();
+
+        EmitLdloc(isTakenIndex);
+        CurrentMethod.IL.Emit(OpCodes.Brfalse, end);
+        EmitLdloc(lockObjIndex);
+        CurrentMethod.IL.Emit(OpCodes.Call, typeof(Monitor).GetMethod("Exit", BindingFlags.Public | BindingFlags.Static, [typeof(object)]));
+
+        CurrentMethod.IL.MarkLabel(end);
+        CurrentMethod.IL.EndExceptionBlock();
+        return typeof(void);
     }
 }

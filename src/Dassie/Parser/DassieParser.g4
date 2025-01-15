@@ -93,6 +93,7 @@ expression
     | try_branch catch_branch* fault_branch? finally_branch? #try_expression
     | Raise expression #raise_expression
     | Raise #rethrow_exception
+    | Lock expression Equals expression #lock_statement
     | At_Open_Bracket (expression (Comma expression)*)? Close_Bracket #array_expression
     | Open_Bracket (expression (Comma expression)*)? Close_Bracket #list_initializer_expression
     | Open_Bracket (Open_Bracket expression Comma expression Close_Bracket (Comma Open_Bracket expression Comma expression Close_Bracket)*)? Close_Bracket #dictionary_expression
