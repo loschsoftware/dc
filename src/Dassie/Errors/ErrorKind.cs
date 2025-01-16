@@ -727,5 +727,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the '$lock' statement is used on a value type.
     /// </summary>
-    DS0176_LockOnValueType
+    DS0176_LockOnValueType,
+    /// <summary>
+    /// Emitted when a type is used as an attribute that does not inherit from <see cref="Attribute"/>.
+    /// </summary>
+    DS0177_InvalidAttributeType
 }

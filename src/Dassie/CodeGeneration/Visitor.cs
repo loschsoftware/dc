@@ -1135,6 +1135,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         bool isAutoEvent = false;
         bool isAutoProperty = false;
         List<CustomAttributeBuilder> customAttribs = [];
+        List<Type> modreq = [];
+        List<Type> modopt = [];
 
         if (context.attribute() != null)
         {
@@ -1151,6 +1153,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         CustomAttributeBuilder cab = new(defaultConstructor, []);
                         AttributeHelpers.EvaluateSpecialAttributeSemantics(context, defaultConstructor, [], false);
                         customAttribs.Add(cab);
+
+                        if (attribType == typeof(VolatileAttribute))
+                        {
+                            modreq.Add(typeof(IsVolatile));
+                            customAttribs.Remove(cab);
+                        }
                     }
 
                     if (attribType == typeof(EventAttribute))
@@ -1410,6 +1418,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         FieldBuilder fb = TypeContext.Current.Builder.DefineField(
             context.Identifier().GetText(),
             type,
+            modreq.ToArray(),
+            modopt.ToArray(),
             fieldAttribs);
 
         foreach (CustomAttributeBuilder cab in customAttribs)

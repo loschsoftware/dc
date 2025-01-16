@@ -1189,10 +1189,16 @@ internal static class SymbolResolver
     public static Type ResolveAttributeTypeName(string name, int row, int col, int len, bool noEmitFragments = false)
     {
         Type t;
-        if ((t = ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, noErrors: true)) != null)
-            return t;
+        if ((t = ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, noErrors: true)) == null)
+            t = ResolveTypeName($"{name}Attribute", row, col, len, noEmitFragments: noEmitFragments, noErrors: true);
 
-        t = ResolveTypeName($"{name}Attribute", row, col, len, noEmitFragments: noEmitFragments, noErrors: true);
+        if (t != null && !t.IsAssignableTo(typeof(Attribute)))
+        {
+            EmitErrorMessage(
+                row, col, len,
+                DS0177_InvalidAttributeType,
+                $"The type '{t}' cannot be used as an attribute.");
+        }
 
         if (t != null)
             return t;
