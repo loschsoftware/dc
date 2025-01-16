@@ -1646,8 +1646,19 @@ internal static class SymbolResolver
 
         IEnumerable<Type> allTypes = Context.Types.Select(t => t.Builder).Cast<Type>()
             .Concat(Context.ReferencedAssemblies
-                .Select(a => a.GetTypes())
-                .SelectMany(a => a));
+                .SelectMany(a =>
+                {
+                    Type[] types = [];
+
+                    try
+                    {
+                        types = a.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException) { }
+
+                    return types;
+
+                }));
         /*.Where(t => t.IsAbstract && t.IsSealed && t.GetCustomAttribute<ContainsCustomOperatorsAttribute>() != null);*/
 
         IEnumerable<(string Namespace, IEnumerable<MethodInfo> Operators)> ops = allTypes
