@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace Dassie.Meta;
 
@@ -142,6 +143,9 @@ internal class SymbolInfo
                         break;
                     }
 
+                    if (Field.Builder.GetRequiredCustomModifiers().Contains(typeof(IsVolatile)))
+                        CurrentMethod.IL.Emit(OpCodes.Volatile);
+
                     if (!Field.Builder.IsStatic)
                         EmitLdarg0IfCurrentType(Field.Builder.FieldType);
 
@@ -190,6 +194,9 @@ internal class SymbolInfo
                 break;
 
             default:
+                if (Field.Builder.GetRequiredCustomModifiers().Contains(typeof(IsVolatile)))
+                    CurrentMethod.IL.Emit(OpCodes.Volatile);
+
                 if (!Field.Builder.IsStatic)
                     EmitLdarg0IfCurrentType(Field.Builder.FieldType);
 
@@ -274,6 +281,9 @@ internal class SymbolInfo
                 break;
 
             default:
+                if (Field.Builder.GetRequiredCustomModifiers().Contains(typeof(IsVolatile)))
+                    CurrentMethod.IL.Emit(OpCodes.Volatile);
+
                 if (Field.Builder.IsStatic)
                     CurrentMethod.IL.Emit(OpCodes.Stsfld, Field.Builder);
                 else
