@@ -90,7 +90,7 @@ internal class ParameterConstraintRewriter : ITreeToStringRewriter
                 continue;
 
             sb.Append($"? !({listener.GetTextForRule(param.parameter_constraint().expression())}) = {{");
-            sb.Append($"\tthrow Dassie.Runtime.ConstraintViolationException \"{param.Identifier().Symbol.Text}\", \"{listener.GetTextForRule(param.parameter_constraint().expression())}\"");
+            sb.Append($"\t$throw Dassie.Runtime.ConstraintViolationException \"{param.Identifier().Symbol.Text}\", \"{listener.GetTextForRule(param.parameter_constraint().expression())}\"");
             sb.Append("} : = {}");
 
             CurrentFile.FunctionParameterConstraints[member.Identifier().GetText()].Add(param.Identifier().GetText(), listener.GetTextForRule(param.parameter_constraint().expression()));
