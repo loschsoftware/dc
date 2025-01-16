@@ -1178,18 +1178,27 @@ internal static class SymbolResolver
 
     public static Type ResolveAttributeTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false)
     {
+        List<Type> typeArgs = [];
+
+        if (name.type_arg_list() != null)
+        {
+            foreach (DassieParser.Type_nameContext typeArg in name.type_arg_list().type_name())
+                typeArgs.Add(ResolveTypeName(typeArg));
+        }
+
         return ResolveAttributeTypeName(
             name.GetText(),
+            typeArgs.Count == 0 ? null : typeArgs.ToArray(),
             name.Start.Line,
             name.Start.Column,
             name.GetText().Length,
             noEmitFragments);
     }
 
-    public static Type ResolveAttributeTypeName(string name, int row, int col, int len, bool noEmitFragments = false)
+    public static Type ResolveAttributeTypeName(string name, Type[] typeParams, int row, int col, int len, bool noEmitFragments = false)
     {
         Type t;
-        if ((t = ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, noErrors: true)) == null)
+        if ((t = ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, noErrors: true, typeParams: typeParams)) == null)
             t = ResolveTypeName($"{name}Attribute", row, col, len, noEmitFragments: noEmitFragments, noErrors: true);
 
         if (t != null && !t.IsAssignableTo(typeof(Attribute)))
@@ -1203,7 +1212,7 @@ internal static class SymbolResolver
         if (t != null)
             return t;
 
-        ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments); // To display error
+        ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, typeParams: typeParams); // To display error
         return t;
     }
 

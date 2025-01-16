@@ -658,6 +658,12 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAttribute([NotNull] DassieParser.AttributeContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.attribute_target"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAttribute_target([NotNull] DassieParser.Attribute_targetContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.generic_identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

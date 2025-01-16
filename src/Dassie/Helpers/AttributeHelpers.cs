@@ -1,4 +1,7 @@
-﻿using Dassie.Core;
+﻿using Dassie.CodeGeneration.Helpers;
+using Dassie.CodeGeneration.Structure;
+using Dassie.Core;
+using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
 using System;
@@ -296,6 +299,96 @@ internal static class AttributeHelpers
             CheckModuleInitializerCompatibility(context);
             Context.ModuleInitializerParts.Add(CurrentMethod.Builder);
         }
+    }
+
+    public static List<(Type AttributeType, CustomAttributeBuilder Data, ConstructorInfo Ctor, object[] Args)> GetAttributeList(IEnumerable<DassieParser.AttributeContext> attributes, ExpressionEvaluator eval)
+    {
+        List<(Type AttributeType, CustomAttributeBuilder Data, ConstructorInfo Ctor, object[] Args)> attribs = [];
+
+        foreach (DassieParser.AttributeContext attribute in attributes)
+        {
+            Type attribType = SymbolResolver.ResolveAttributeTypeName(attribute.type_name());
+            (CustomAttributeBuilder cab, ConstructorInfo ctor, object[] data) = GetAttributeData(attribute, attribType, eval);
+
+            if (attribType != null)
+                attribs.Add((attribType, cab, ctor, data));
+        }
+
+        return attribs;
+    }
+
+    public static (CustomAttributeBuilder, ConstructorInfo, object[]) GetAttributeData(DassieParser.AttributeContext attrib, Type attribType, ExpressionEvaluator eval)
+    {
+        ConstructorInfo[] cons = attribType.GetConstructors();
+        List<(Type Type, dynamic Value)> args = [];
+
+        if (attrib.arglist() != null)
+        {
+            foreach (DassieParser.ExpressionContext expr in attrib.arglist().expression())
+            {
+                Expression value = eval.Visit(expr);
+
+                if (value == null)
+                {
+                    EmitErrorMessage(
+                        expr.Start.Line,
+                        expr.Start.Column,
+                        expr.GetText().Length,
+                        DS0178_InvalidAttributeArgument,
+                        "This expression cannot be used as an argument for an attribute, since its value is not known at compile-time.");
+                }
+
+                args.Add((value.Type, value.Value));
+            }
+        }
+
+        List<object> argValues = [];
+
+        foreach (ConstructorInfo ctor in cons)
+        {
+            argValues.Clear();
+
+            if (ctor.GetParameters().Length != args.Count)
+                continue;
+
+            foreach ((int i, Type param) in ctor.GetParameters().Select(p => p.ParameterType).Index())
+            {
+                object o = args[i].Value;
+
+                if (args[i].Type != param)
+                {
+                    try
+                    {
+                        o = Convert.ChangeType(args, param);
+                    }
+                    catch (InvalidCastException)
+                    {
+                        o = null;
+                    }
+
+                    if (o == null)
+                        break;
+                }
+
+                argValues.Add(o);
+            }
+
+            if (argValues.Count == ctor.GetParameters().Length)
+            {
+                return (new(ctor, argValues.ToArray()), ctor, argValues.ToArray());
+            }
+        }
+
+        ErrorMessageHelpers.EmitDS0002Error(
+            attrib.Start.Line,
+            attrib.Start.Column,
+            attrib.GetText().Length,
+            attribType.Name,
+            attribType,
+            cons,
+            args.Select(a => (Type)a.Value.GetType()).ToArray());
+
+        return (null, null, null);
     }
 
     private static void CheckModuleInitializerCompatibility(DassieParser.Type_memberContext context)

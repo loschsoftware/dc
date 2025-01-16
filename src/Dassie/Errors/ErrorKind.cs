@@ -731,5 +731,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a type is used as an attribute that does not inherit from <see cref="Attribute"/>.
     /// </summary>
-    DS0177_InvalidAttributeType
+    DS0177_InvalidAttributeType,
+    /// <summary>
+    /// Emitted when an expression used as an attribute argument is not a compile-time constant.
+    /// </summary>
+    DS0178_InvalidAttributeArgument
 }

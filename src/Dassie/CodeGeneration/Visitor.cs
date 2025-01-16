@@ -84,7 +84,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitFull_program([NotNull] DassieParser.Full_programContext context)
     {
-        foreach (IParseTree type in context.type())
+        foreach (IParseTree type in context.type() ?? [])
             Visit(type);
 
         return typeof(void);
@@ -173,12 +173,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         };
 
         List<Type> attributes = [];
+
         if (context.attribute() != null)
         {
-            foreach (DassieParser.AttributeContext attrib in context.attribute())
+            foreach ((Type attribType, CustomAttributeBuilder data, _, _) in AttributeHelpers.GetAttributeList(context.attribute(), eval))
             {
-                Type attribType = SymbolResolver.ResolveAttributeTypeName(attrib.type_name());
-                attributes.Add(attribType);
+                if (attribType != null)
+                {
+                    attributes.Add(attribType);
+                    tb.SetCustomAttribute(data);
+                }
             }
         }
 
@@ -1058,18 +1062,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (context.attribute() != null)
             {
-                foreach (DassieParser.AttributeContext attribute in context.attribute())
+                foreach ((int i, (Type attribType, CustomAttributeBuilder data, ConstructorInfo ctor, object[] attribData)) in AttributeHelpers.GetAttributeList(context.attribute(), eval).Index())
                 {
-                    Type attribType = SymbolResolver.ResolveAttributeTypeName(attribute.type_name());
-
                     if (attribType == typeof(EntryPointAttribute))
                     {
                         if (Context.EntryPointIsSet)
                         {
                             EmitErrorMessage(
-                                attribute.Start.Line,
-                                attribute.Start.Column,
-                                attribute.GetText().Length,
+                                context.attribute()[i].Start.Line,
+                                context.attribute()[i].Start.Column,
+                                context.attribute()[i].GetText().Length,
                                 DS0055_MultipleEntryPoints,
                                 "Only one function can be declared as an entry point.");
                         }
@@ -1102,17 +1104,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                         AttributeHelpers.AddAttributeToCurrentMethod(typeof(EntryPointAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>());
                     }
-
                     else if (attribType != null)
-                    {
-                        // TODO: Support attributes with parameters
-                        ConstructorInfo defaultConstructor = attribType.GetConstructor([]);
-                        if (defaultConstructor != null)
-                        {
-                            CustomAttributeBuilder cab = new(defaultConstructor, []);
-                            AttributeHelpers.EvaluateSpecialAttributeSemantics(context, defaultConstructor, [], true);
-                        }
-                    }
+                        AttributeHelpers.EvaluateSpecialAttributeSemantics(context, ctor, attribData, true);
                 }
             }
 
@@ -1140,25 +1133,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.attribute() != null)
         {
-            foreach (DassieParser.AttributeContext attribute in context.attribute())
+            foreach ((Type attribType, CustomAttributeBuilder data, _, _) in AttributeHelpers.GetAttributeList(context.attribute(), eval))
             {
-                Type attribType = SymbolResolver.ResolveAttributeTypeName(attribute.type_name());
-
                 if (attribType != null)
                 {
-                    // TODO: Support attributes with parameters
-                    ConstructorInfo defaultConstructor = attribType.GetConstructor([]);
-                    if (defaultConstructor != null)
-                    {
-                        CustomAttributeBuilder cab = new(defaultConstructor, []);
-                        AttributeHelpers.EvaluateSpecialAttributeSemantics(context, defaultConstructor, [], false);
-                        customAttribs.Add(cab);
+                    customAttribs.Add(data);
 
-                        if (attribType == typeof(VolatileAttribute))
-                        {
-                            modreq.Add(typeof(IsVolatile));
-                            customAttribs.Remove(cab);
-                        }
+                    if (attribType == typeof(VolatileAttribute))
+                    {
+                        modreq.Add(typeof(IsVolatile));
+                        customAttribs.Remove(data);
                     }
 
                     if (attribType == typeof(EventAttribute))
@@ -1379,7 +1363,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Builder = removeMethod,
                 IL = removeMethodIL
             };
-            
+
             if (context.property_or_event_block() != null && context.property_or_event_block().remove_handler().Length > 0)
             {
                 if (context.property_or_event_block().remove_handler().Length > 1)

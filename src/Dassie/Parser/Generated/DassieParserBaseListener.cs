@@ -1284,6 +1284,18 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAttribute([NotNull] DassieParser.AttributeContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.attribute_target"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAttribute_target([NotNull] DassieParser.Attribute_targetContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.attribute_target"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAttribute_target([NotNull] DassieParser.Attribute_targetContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.generic_identifier"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

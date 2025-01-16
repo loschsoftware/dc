@@ -20,7 +20,7 @@ top_level_statements
     ;
 
 full_program
-    : type NewLine* (type | NewLine)*
+    : (type | attribute | NewLine)+
     ;
 
 import_directive
@@ -214,7 +214,18 @@ arglist
     ;
 
 attribute
-    : Less_Than type_name arglist? Greater_Than NewLine*
+    : Less_Than attribute_target? type_name arglist? Greater_Than NewLine*
+    ;
+
+attribute_target
+    : Assembly_Target
+    | Module_Target
+    | Type_Target
+    | Field_Target
+    | Property_Target
+    | Method_Target
+    | Parameter_Target
+    | Return_Target
     ;
 
 generic_identifier
