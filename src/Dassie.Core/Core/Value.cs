@@ -41,21 +41,4 @@ public static class Value
 
         return val;
     }
-
-    /// <summary>
-    /// Compares two integers and returns a value indicating whether the first is less than, equal to, or greater than the second one.
-    /// </summary>
-    /// <param name="a">The first integer to compare.</param>
-    /// <param name="b">The second integer to compare.</param>
-    /// <returns>0 if the numbers are equal, 1 if the first number is greater than the second, and -1 if the second number is greater.</returns>
-    public static int compare(int a, int b)
-    {
-        if (a == b)
-            return 0;
-
-        if (a < b)
-            return -1;
-
-        return 1;
-    }
 }
