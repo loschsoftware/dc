@@ -1636,9 +1636,6 @@ internal static class SymbolResolver
     {
         static IEnumerable<MethodInfo> GetOperatorsOfType(Type type)
         {
-            if (type == typeof(Operators))
-                ;
-
             if (type is TypeBuilder tb)
             {
                 TypeContext tc = Context.Types.First(t => t.Builder == tb);
