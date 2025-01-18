@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 #pragma warning disable CS8981
 #pragma warning disable IDE1006
@@ -74,7 +75,13 @@ public static class stdout
     /// Prints the specified object followed by a newline character to the standard output.
     /// </summary>
     /// <param name="msg">The object to print.</param>
-    public static void println(object msg) => Console.WriteLine(msg);
+    public static void println(object msg)
+    {
+        if (msg is IEnumerable)
+            msg = ObjectDump.Dump(msg).TrimEnd();
+
+        Console.WriteLine(msg);
+    }
 
     /// <summary>
     /// Prints the specified string to the standard output.
@@ -110,21 +117,27 @@ public static class stdout
     /// Prints the specified object to the standard output.
     /// </summary>
     /// <param name="msg">The object to print.</param>
-    public static void print(object msg) => Console.Write(msg);
+    public static void print(object msg)
+    {
+        if (msg is IEnumerable)
+            msg = ObjectDump.Dump(msg).TrimEnd();
+
+        Console.Write(msg);
+    }
 
     /// <summary>
     /// Formats the provided string using the specified arguments and prints it to the standard output.
     /// </summary>
     /// <param name="format">The string to format and print.</param>
     /// <param name="args">The format arguments.</param>
-    public static void printf(string format, params object[] args) => Console.Write(string.Format(format, args));
+    public static void printf(string format, params object[] args) => print(string.Format(format, args));
 
     /// <summary>
     /// Formats the provided string using the specified arguments and prints it, followed by a newline character, to the standard output.
     /// </summary>
     /// <param name="format">The string to format and print.</param>
     /// <param name="args">The format arguments.</param>
-    public static void printfn(string format, params object[] args) => Console.WriteLine(string.Format(format, args));
+    public static void printfn(string format, params object[] args) => printfn(string.Format(format, args));
 
     /// <summary>
     /// Dumps the properties of the specified object.
