@@ -1,5 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
+using Dassie.Core;
 using Dassie.Errors;
+using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
@@ -1607,7 +1609,7 @@ internal static class SymbolResolver
                 .Where(m => m.Name == name);
         }
 
-        IEnumerable<MethodInfo> extensionMethodsFromReferencedAssemblies = Context.ReferencedAssemblies
+        IEnumerable<MethodInfo> extensionMethodsFromReferencedAssemblies = Context.ReferencedAssemblies.Append(typeof(stdout).Assembly)
             .Where(a => a.GetCustomAttribute<ExtensionAttribute>() != null)
             .SelectMany(a =>
             {
@@ -1634,6 +1636,9 @@ internal static class SymbolResolver
     {
         static IEnumerable<MethodInfo> GetOperatorsOfType(Type type)
         {
+            if (type == typeof(Operators))
+                ;
+
             if (type is TypeBuilder tb)
             {
                 TypeContext tc = Context.Types.First(t => t.Builder == tb);
@@ -1645,7 +1650,7 @@ internal static class SymbolResolver
         }
 
         IEnumerable<Type> allTypes = Context.Types.Select(t => t.Builder).Cast<Type>()
-            .Concat(Context.ReferencedAssemblies
+            .Concat(Context.ReferencedAssemblies.Append(typeof(stdout).Assembly)
                 .SelectMany(a =>
                 {
                     Type[] types = [];
