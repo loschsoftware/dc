@@ -176,12 +176,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.attribute() != null)
         {
-            foreach ((Type attribType, CustomAttributeBuilder data, _, _) in AttributeHelpers.GetAttributeList(context.attribute(), eval))
+            foreach ((Type attribType, CustomAttributeBuilder data, _, _, AttributeHelpers.AttributeTarget target) in AttributeHelpers.GetAttributeList(context.attribute(), eval))
             {
                 if (attribType != null)
                 {
-                    attributes.Add(attribType);
-                    tb.SetCustomAttribute(data);
+                    if (target == AttributeHelpers.AttributeTarget.Assembly)
+                        Context.Assembly.SetCustomAttribute(data);
+                    else if (target == AttributeHelpers.AttributeTarget.Module)
+                        Context.Module.SetCustomAttribute(data);
+                    else
+                    {
+                        attributes.Add(attribType);
+                        tb.SetCustomAttribute(data);
+                    }
                 }
             }
         }
@@ -1062,7 +1069,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (context.attribute() != null)
             {
-                foreach ((int i, (Type attribType, CustomAttributeBuilder data, ConstructorInfo ctor, object[] attribData)) in AttributeHelpers.GetAttributeList(context.attribute(), eval).Index())
+                foreach ((int i, (Type attribType, CustomAttributeBuilder data, ConstructorInfo ctor, object[] attribData, _)) in AttributeHelpers.GetAttributeList(context.attribute(), eval).Index())
                 {
                     if (attribType == typeof(EntryPointAttribute))
                     {
@@ -1133,7 +1140,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.attribute() != null)
         {
-            foreach ((Type attribType, CustomAttributeBuilder data, _, _) in AttributeHelpers.GetAttributeList(context.attribute(), eval))
+            foreach ((Type attribType, CustomAttributeBuilder data, _, _, _) in AttributeHelpers.GetAttributeList(context.attribute(), eval))
             {
                 if (attribType != null)
                 {

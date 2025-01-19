@@ -15,6 +15,13 @@ namespace Dassie.Helpers;
 
 internal static class AttributeHelpers
 {
+    public enum AttributeTarget
+    {
+        Assembly,
+        Module,
+        Type
+    }
+
     public static FieldAttributes GetFieldAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, bool isReadOnly)
     {
         FieldAttributes baseAttributes;
@@ -301,17 +308,24 @@ internal static class AttributeHelpers
         }
     }
 
-    public static List<(Type AttributeType, CustomAttributeBuilder Data, ConstructorInfo Ctor, object[] Args)> GetAttributeList(IEnumerable<DassieParser.AttributeContext> attributes, ExpressionEvaluator eval)
+    public static List<(Type AttributeType, CustomAttributeBuilder Data, ConstructorInfo Ctor, object[] Args, AttributeTarget Target)> GetAttributeList(IEnumerable<DassieParser.AttributeContext> attributes, ExpressionEvaluator eval)
     {
-        List<(Type AttributeType, CustomAttributeBuilder Data, ConstructorInfo Ctor, object[] Args)> attribs = [];
+        List<(Type AttributeType, CustomAttributeBuilder Data, ConstructorInfo Ctor, object[] Args, AttributeTarget Target)> attribs = [];
 
         foreach (DassieParser.AttributeContext attribute in attributes)
         {
             Type attribType = SymbolResolver.ResolveAttributeTypeName(attribute.type_name());
             (CustomAttributeBuilder cab, ConstructorInfo ctor, object[] data) = GetAttributeData(attribute, attribType, eval);
+            AttributeTarget target = AttributeTarget.Type;
+
+            if (attribute.attribute_target() != null && attribute.attribute_target().Assembly_Target() != null)
+                target = AttributeTarget.Assembly;
+
+            if (attribute.attribute_target() != null && attribute.attribute_target().Module_Target() != null)
+                target = AttributeTarget.Module;
 
             if (attribType != null)
-                attribs.Add((attribType, cab, ctor, data));
+                attribs.Add((attribType, cab, ctor, data, target));
         }
 
         return attribs;
