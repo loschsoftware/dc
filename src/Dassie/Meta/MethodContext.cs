@@ -136,7 +136,7 @@ internal class MethodContext
 
     public int ParameterIndex { get; set; } = 0;
 
-    public List<LocalInfo> Locals { get; private set; } = [];
+    public List<LocalInfo> Locals { get; set; } = [];
 
     public List<ParamInfo> Parameters { get; private set; } = [];
 

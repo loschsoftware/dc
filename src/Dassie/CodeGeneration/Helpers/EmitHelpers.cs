@@ -590,6 +590,7 @@ internal static class EmitHelpers
 
     private static bool _inNullMode = false;
     private static ILGenerator _il = null;
+    private static List<LocalInfo> _locals = [];
     private static int _localIndex;
     public static void RedirectEmitterToNullStream()
     {
@@ -605,6 +606,7 @@ internal static class EmitHelpers
         MethodBuilder bogus = tb.DefineMethod("x", MethodAttributes.Public);
 
         _il = CurrentMethod.IL;
+        _locals = new(CurrentMethod.Locals);
         CurrentMethod.IL = bogus.GetILGenerator();
     }
 
@@ -612,6 +614,7 @@ internal static class EmitHelpers
     {
         _inNullMode = false;
         CurrentMethod.IL = _il;
+        CurrentMethod.Locals = _locals;
         CurrentMethod.LocalIndex = _localIndex;
     }
 
