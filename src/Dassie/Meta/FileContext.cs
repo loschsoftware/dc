@@ -33,6 +33,7 @@ internal class FileContext
     public List<string> ImportedTypes { get; } = new()
     {
         // Implicitly imported types ("built-in functions")
+        "Dassie.Core.Assert",
         "Dassie.Core.stdout",
         "Dassie.Core.stdin",
         "Dassie.Core.Value",

@@ -3531,6 +3531,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                             break;
                         }
 
+                        if (possibleMethod.GetParameters().Length != argumentTypes.Length)
+                            continue;
+
                         if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
                             CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
 
