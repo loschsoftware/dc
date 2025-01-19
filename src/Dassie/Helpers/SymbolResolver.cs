@@ -348,6 +348,9 @@ internal static class SymbolResolver
     {
         memberIndex++;
 
+        if (type == null)
+            return null;
+
         Type[] typeArgs = Type.EmptyTypes;
 
         if (type.IsByRef)
