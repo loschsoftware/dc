@@ -66,6 +66,8 @@ public static class TooltipGenerator
     {
         ObservableCollection<Word> words =
         [
+            .. Type(property.DeclaringType.GetTypeInfo(), false, true, true).Words,
+            BuildWord("."),
             BuildWord(property.Name, Color.Property),
             BuildWord(": "),
             .. Type(property.PropertyType.GetTypeInfo(), false, true, true).Words,
@@ -85,7 +87,11 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Field(FieldInfo field)
     {
-        ObservableCollection<Word> words = [];
+        ObservableCollection<Word> words =
+        [
+            .. Type(field.DeclaringType.GetTypeInfo(), false, true, true).Words,
+            BuildWord(".")
+        ];
 
         if (field.IsStatic)
             words.Add(BuildWord("static ", Color.Word));
@@ -112,6 +118,8 @@ public static class TooltipGenerator
     {
         ObservableCollection<Word> words =
         [
+            .. Type(field.DeclaringType.GetTypeInfo(), false, true, true).Words,
+            BuildWord("."),
             BuildWord(field.Name, Color.EnumField),
             BuildWord(": "),
             BuildWord(field.FieldType.Name, ColorForType(field.FieldType.GetTypeInfo()))
@@ -296,7 +304,11 @@ public static class TooltipGenerator
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Function(MethodInfo method, bool intrinsic = false)
     {
-        ObservableCollection<Word> words = [];
+        ObservableCollection<Word> words =
+        [
+            .. Type(method.DeclaringType.GetTypeInfo(), false, true, true).Words,
+            BuildWord(".")
+        ];
 
         if (intrinsic)
             words.Add(BuildWord("[intrinsic] "));
@@ -396,6 +408,20 @@ public static class TooltipGenerator
         {
             ObservableCollection<Word> words = [];
 
+            if (type.IsArray)
+            {
+                words = [
+                    .. Type(type.GetElementType().GetTypeInfo(), showBaseType, omitNamespace, noModifiers, doc, ignoreBuiltinAliases).Words,
+                    BuildWord("@[]")
+                ];
+
+                return new()
+                {
+                    Words = words,
+                    IconResourceName = ResourceNameForType(type)
+                };
+            }
+
             if (!ignoreBuiltinAliases && builtinTypeAliases.ContainsKey(type.AsType()))
             {
                 words.Add(new()
@@ -414,7 +440,10 @@ public static class TooltipGenerator
             if (!noModifiers)
             {
                 if (type.IsEnum)
-                    words.Add(BuildWord("enum ", Color.Word));
+                {
+                    words.Add(BuildWord($"<Enumeration>{Environment.NewLine}", Color.ReferenceType));
+                    words.Add(BuildWord("type ", Color.Word));
+                }
                 else if (type.IsInterface)
                     words.Add(BuildWord("template ", Color.Word));
                 else if (type.IsSealed && type.IsAbstract)
