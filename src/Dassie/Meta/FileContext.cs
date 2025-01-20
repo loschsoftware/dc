@@ -37,6 +37,7 @@ internal class FileContext
         "Dassie.Core.stdout",
         "Dassie.Core.stdin",
         "Dassie.Core.Value",
+        "Dassie.Core.Process",
         "Dassie.Core.Numerics.NumericSequence",
         "Dassie.CompilerServices.CodeGeneration"
     };
