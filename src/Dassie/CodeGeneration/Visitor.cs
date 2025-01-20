@@ -536,7 +536,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // Alias type
             if (context.type_block().type_name() != null)
             {
-                if (context.attribute() != null)
+                if (context.attribute().Length > 0)
                 {
                     EmitErrorMessage(
                         context.attribute()[0].Start.Line,
