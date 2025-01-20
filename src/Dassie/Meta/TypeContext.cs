@@ -57,4 +57,8 @@ internal class TypeContext
     public bool ContainsCustomOperators { get; set; }
 
     public List<(ConstructorInfo Constructor, object[] Data)> Attributes { get; set; } = [];
+
+    public bool IsAlias { get; set; }
+
+    public Type AliasedType { get; set; }
 }

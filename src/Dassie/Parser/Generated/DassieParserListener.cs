@@ -87,18 +87,6 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitBasic_import([NotNull] DassieParser.Basic_importContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>alias</c>
-	/// labeled alternative in <see cref="DassieParser.import_directive"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterAlias([NotNull] DassieParser.AliasContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>alias</c>
-	/// labeled alternative in <see cref="DassieParser.import_directive"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitAlias([NotNull] DassieParser.AliasContext context);
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.export_directive"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

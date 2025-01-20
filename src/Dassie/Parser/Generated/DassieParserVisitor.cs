@@ -67,13 +67,6 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBasic_import([NotNull] DassieParser.Basic_importContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>alias</c>
-	/// labeled alternative in <see cref="DassieParser.import_directive"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitAlias([NotNull] DassieParser.AliasContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.export_directive"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

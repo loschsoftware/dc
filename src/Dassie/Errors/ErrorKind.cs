@@ -735,5 +735,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an expression used as an attribute argument is not a compile-time constant.
     /// </summary>
-    DS0178_InvalidAttributeArgument
+    DS0178_InvalidAttributeArgument,
+    /// <summary>
+    /// Emitted when an alias type has an attribute list.
+    /// </summary>
+    DS0179_AttributesOnAliasType,
+    /// <summary>
+    /// Emitted when an alias type has modifiers that are not permitted.
+    /// </summary>
+    DS0180_AliasTypeInvalidModifiers
 }

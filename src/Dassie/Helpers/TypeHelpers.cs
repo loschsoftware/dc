@@ -390,6 +390,9 @@ internal static class TypeHelpers
         if (!genericType.IsGenericType)
             return true;
 
+        if (!genericType.IsGenericTypeDefinition)
+            return true;
+
         Type[] typeParams = genericType.GetGenericArguments();
         return CheckGenericCompatibility(genericType.FullName, true, typeParams, typeArgs, row, col, len, emitErrors);
     }
@@ -407,6 +410,9 @@ internal static class TypeHelpers
     public static bool CheckGenericMethodCompatibility(MethodBase method, Type[] typeArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
     {
         if (!method.IsGenericMethod)
+            return true;
+
+        if (!method.IsGenericMethodDefinition)
             return true;
 
         Type[] typeParams = method.DeclaringType.GetGenericTypeDefinition().GetGenericArguments();

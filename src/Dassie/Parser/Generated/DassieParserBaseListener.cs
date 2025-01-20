@@ -102,20 +102,6 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBasic_import([NotNull] DassieParser.Basic_importContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>alias</c>
-	/// labeled alternative in <see cref="DassieParser.import_directive"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterAlias([NotNull] DassieParser.AliasContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>alias</c>
-	/// labeled alternative in <see cref="DassieParser.import_directive"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitAlias([NotNull] DassieParser.AliasContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.export_directive"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

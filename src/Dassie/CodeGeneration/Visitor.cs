@@ -533,16 +533,50 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.type_block() != null)
         {
-            foreach (DassieParser.TypeContext nestedType in context.type_block().type())
+            // Alias type
+            if (context.type_block().type_name() != null)
             {
-                VisitType(nestedType, tb);
-                tc.Children.Add(TypeContext.Current);
+                if (context.attribute() != null)
+                {
+                    EmitErrorMessage(
+                        context.attribute()[0].Start.Line,
+                        context.attribute()[0].Start.Column,
+                        context.attribute()[0].GetText().Length,
+                        DS0179_AttributesOnAliasType,
+                        "An alias type cannot use attributes.");
+                }
+
+                if (context.type_special_modifier() != null && context.type_special_modifier().Open() != null)
+                {
+                    EmitErrorMessage(
+                        context.type_special_modifier().Open().Symbol.Line,
+                        context.type_special_modifier().Open().Symbol.Column,
+                        context.type_special_modifier().Open().GetText().Length,
+                        DS0180_AliasTypeInvalidModifiers,
+                        "The 'open' modifier is invalid on alias types.");
+                }
+
+                Type aliasedType = SymbolResolver.ResolveTypeName(context.type_block().type_name());
+
+                TypeContext.Current.IsAlias = true;
+                TypeContext.Current.AliasedType = aliasedType;
+
+                if (aliasedType != null)
+                    tb.SetCustomAttribute(new(typeof(AliasAttribute).GetConstructor([typeof(Type)]), [aliasedType]));
             }
+            else
+            {
+                foreach (DassieParser.TypeContext nestedType in context.type_block().type())
+                {
+                    VisitType(nestedType, tb);
+                    tc.Children.Add(TypeContext.Current);
+                }
 
-            TypeContext.Current = tc;
+                TypeContext.Current = tc;
 
-            foreach (DassieParser.Type_memberContext member in context.type_block()?.type_member())
-                Visit(member);
+                foreach (DassieParser.Type_memberContext member in context.type_block()?.type_member())
+                    Visit(member);
+            }
         }
 
         foreach (var ctor in TypeContext.Current.Constructors)
@@ -1547,22 +1581,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
 
             Context.GlobalImports.Add(ns);
-        }
-
-        return typeof(void);
-    }
-
-    public override Type VisitAlias([NotNull] DassieParser.AliasContext context)
-    {
-        for (int i = 0; i < context.Identifier().Length; i++)
-        {
-            if (context.Exclamation_Mark() == null)
-            {
-                CurrentFile.Aliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));
-                continue;
-            }
-
-            Context.GlobalAliases.Add((context.full_identifier()[i].GetText(), context.Identifier()[i].GetText()));
         }
 
         return typeof(void);

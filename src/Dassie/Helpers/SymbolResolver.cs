@@ -971,169 +971,175 @@ internal static class SymbolResolver
 
     public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false, Type[] typeArgs = null)
     {
-        if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
-        {
-            type = CurrentMethod.TypeParameters.First(t => t.Name == name).Builder;
-            return true;
-        }
-
-        if (TypeContext.Current != null && TypeContext.Current.TypeParameters.Any(t => t.Name == name))
-        {
-            type = TypeContext.Current.TypeParameters.First(t => t.Name == name).Builder;
-            return true;
-        }
-
-        type = Type.GetType(name);
-
-        if (type == null)
-        {
-            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name))
-            {
-                TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name);
-                type = ctx.FinishedType ?? ctx.Builder;
-
-                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
-                    type = type.MakeGenericType(typeArgs);
-
-                return true;
-            }
-
-            string nonGenericName = name;
-            if (name.Contains('`'))
-                nonGenericName = name.Split('`')[0];
-
-            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName))
-            {
-                TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName);
-                type = ctx.FinishedType ?? ctx.Builder;
-
-                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
-                    type = type.MakeGenericType(typeArgs);
-
-                if (type.IsGenericType)
-                    return true;
-
-                type = null;
-            }
-
-            List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
-            allAssemblies.AddRange(Context.ReferencedAssemblies);
-
-            List<Assembly> assemblies = allAssemblies.Where(_a => _a.GetType(name) != null).ToList();
-            if (assemblies.Any())
-            {
-                type = assemblies.First().GetType(name);
-
-                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
-                    type = type.MakeGenericType(typeArgs);
-
-                if (!noEmitFragments)
-                {
-                    CurrentFile.Fragments.Add(new()
-                    {
-                        Line = row,
-                        Column = col,
-                        Length = name.Length,
-                        Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
-                        ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
-                    });
-                }
-
-                return true;
-            }
-
-            foreach (string ns in CurrentFile.Imports.Concat(Context.GlobalImports))
-            {
-                string n = $"{ns}.{name}";
-
-                type = Type.GetType(n);
-
-                if (type != null)
-                {
-                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
-                        type = type.MakeGenericType(typeArgs);
-
-                    goto FoundType;
-                }
-
-                List<Assembly> _allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
-                _allAssemblies.AddRange(Context.ReferencedAssemblies);
-
-                List<Assembly> _assemblies = _allAssemblies.Where(a => a.GetType(n) != null).ToList();
-                if (_assemblies.Any())
-                {
-                    type = _assemblies.First().GetType(n);
-
-                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
-                        type = type.MakeGenericType(typeArgs);
-
-                    goto FoundType;
-                }
-
-                if (Context.Types.Any(t => t.FullName == n))
-                {
-                    TypeContext ctx = Context.Types.First(t => t.FullName == n);
-                    type = ctx.FinishedType ?? ctx.Builder;
-
-                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
-                        type = type.MakeGenericType(typeArgs);
-
-                    goto FoundType;
-                }
-
-                if (type != null)
-                {
-                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
-                        type = type.MakeGenericType(typeArgs);
-
-                    goto FoundType;
-                }
-            }
-
-            foreach (string originalName in CurrentFile.Aliases.Concat(Context.GlobalAliases).Where(a => a.Alias == name).Select(a => a.Name))
-            {
-                type = Type.GetType(originalName);
-
-                if (type != null)
-                {
-                    if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
-                        type = type.MakeGenericType(typeArgs);
-
-                    goto FoundType;
-                }
-            }
-        }
-
-    FoundType:
-
-        if (type == null)
-        {
-            //EmitErrorMessage(
-            //    row,
-            //    col,
-            //    len,
-            //    DS0009_TypeNotFound,
-            //    $"The name '{name}' could not be resolved.");
-
-            return false;
-        }
-        else
-        {
-            //if (!noEmitFragments)
-            //{
-            //    CurrentFile.Fragments.Add(new()
-            //    {
-            //        Line = row,
-            //        Column = col,
-            //        Length = name.Length,
-            //        Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
-            //        ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
-            //    });
-            //}
-
-            return true;
-        }
+        type = ResolveTypeName(name, row, col, len, noEmitFragments, typeArgs, noErrors: true, doNotFillGenericTypeDefinition: typeArgs == null);
+        return type != null;
     }
+
+    //public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false, Type[] typeArgs = null)
+    //{
+    //    if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
+    //    {
+    //        type = CurrentMethod.TypeParameters.First(t => t.Name == name).Builder;
+    //        return true;
+    //    }
+
+    //    if (TypeContext.Current != null && TypeContext.Current.TypeParameters.Any(t => t.Name == name))
+    //    {
+    //        type = TypeContext.Current.TypeParameters.First(t => t.Name == name).Builder;
+    //        return true;
+    //    }
+
+    //    type = Type.GetType(name);
+
+    //    if (type == null)
+    //    {
+    //        if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name))
+    //        {
+    //            TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == name);
+    //            type = ctx.FinishedType ?? ctx.Builder;
+
+    //            if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+    //                type = type.MakeGenericType(typeArgs);
+
+    //            return true;
+    //        }
+
+    //        string nonGenericName = name;
+    //        if (name.Contains('`'))
+    //            nonGenericName = name.Split('`')[0];
+
+    //        if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName))
+    //        {
+    //            TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.Builder.FullName == nonGenericName);
+    //            type = ctx.FinishedType ?? ctx.Builder;
+
+    //            if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+    //                type = type.MakeGenericType(typeArgs);
+
+    //            if (type.IsGenericType)
+    //                return true;
+
+    //            type = null;
+    //        }
+
+    //        List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+    //        allAssemblies.AddRange(Context.ReferencedAssemblies);
+
+    //        List<Assembly> assemblies = allAssemblies.Where(_a => _a.GetType(name) != null).ToList();
+    //        if (assemblies.Any())
+    //        {
+    //            type = assemblies.First().GetType(name);
+
+    //            if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+    //                type = type.MakeGenericType(typeArgs);
+
+    //            if (!noEmitFragments)
+    //            {
+    //                CurrentFile.Fragments.Add(new()
+    //                {
+    //                    Line = row,
+    //                    Column = col,
+    //                    Length = name.Length,
+    //                    Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+    //                    ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
+    //                });
+    //            }
+
+    //            return true;
+    //        }
+
+    //        foreach (string ns in CurrentFile.Imports.Concat(Context.GlobalImports))
+    //        {
+    //            string n = $"{ns}.{name}";
+
+    //            type = Type.GetType(n);
+
+    //            if (type != null)
+    //            {
+    //                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+    //                    type = type.MakeGenericType(typeArgs);
+
+    //                goto FoundType;
+    //            }
+
+    //            List<Assembly> _allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+    //            _allAssemblies.AddRange(Context.ReferencedAssemblies);
+
+    //            List<Assembly> _assemblies = _allAssemblies.Where(a => a.GetType(n) != null).ToList();
+    //            if (_assemblies.Any())
+    //            {
+    //                type = _assemblies.First().GetType(n);
+
+    //                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+    //                    type = type.MakeGenericType(typeArgs);
+
+    //                goto FoundType;
+    //            }
+
+    //            if (Context.Types.Any(t => t.FullName == n))
+    //            {
+    //                TypeContext ctx = Context.Types.First(t => t.FullName == n);
+    //                type = ctx.FinishedType ?? ctx.Builder;
+
+    //                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+    //                    type = type.MakeGenericType(typeArgs);
+
+    //                goto FoundType;
+    //            }
+
+    //            if (type != null)
+    //            {
+    //                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+    //                    type = type.MakeGenericType(typeArgs);
+
+    //                goto FoundType;
+    //            }
+    //        }
+
+    //        foreach (string originalName in CurrentFile.Aliases.Concat(Context.GlobalAliases).Where(a => a.Alias == name).Select(a => a.Name))
+    //        {
+    //            type = Type.GetType(originalName);
+
+    //            if (type != null)
+    //            {
+    //                if (type.IsGenericType && type.IsGenericTypeDefinition && typeArgs != null)
+    //                    type = type.MakeGenericType(typeArgs);
+
+    //                goto FoundType;
+    //            }
+    //        }
+    //    }
+
+    //FoundType:
+
+    //    if (type == null)
+    //    {
+    //        //EmitErrorMessage(
+    //        //    row,
+    //        //    col,
+    //        //    len,
+    //        //    DS0009_TypeNotFound,
+    //        //    $"The name '{name}' could not be resolved.");
+
+    //        return false;
+    //    }
+    //    else
+    //    {
+    //        //if (!noEmitFragments)
+    //        //{
+    //        //    CurrentFile.Fragments.Add(new()
+    //        //    {
+    //        //        Line = row,
+    //        //        Column = col,
+    //        //        Length = name.Length,
+    //        //        Color = TooltipGenerator.ColorForType(type.GetTypeInfo()),
+    //        //        ToolTip = TooltipGenerator.Type(type.GetTypeInfo(), true, true, false)
+    //        //    });
+    //        //}
+
+    //        return true;
+    //    }
+    //}
 
     private static bool TryGetGlobalMember(string name, out object members, int row, int col, int len)
     {
@@ -1222,6 +1228,34 @@ internal static class SymbolResolver
     }
 
     public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false)
+    {
+        Type t = ResolveTypeNameInternal(name, noEmitFragments, noEmitDS0149);
+
+        if (t == null)
+            return t;
+
+        if (t is TypeBuilder)
+        {
+            if (!Context.Types.Where(tc => tc.FullName == t.FullName).Any())
+                return t;
+
+            if (Context.Types.First(tc => tc.FullName == t.FullName).IsAlias)
+                return Context.Types.First(tc => tc.FullName == t.FullName).AliasedType;
+
+            return t;
+        }
+
+        try
+        {
+            if (t.GetCustomAttribute<AliasAttribute>() is AliasAttribute alias)
+                return alias.AliasedType;
+        }
+        catch (NotSupportedException) { }
+
+        return t;
+    }
+
+    private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false)
     {
         if (name.Func() != null)
         {
@@ -1342,9 +1376,37 @@ internal static class SymbolResolver
         return null;
     }
 
-    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false)
+    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
     {
-        if (TypeContext.Current.FullName == name)
+        Type t = ResolveTypeNameInternal(name, row, col, len, noEmitFragments, typeParams, arrayDimensions, noErrors, disableBacktickGenericResolve, doNotFillGenericTypeDefinition);
+
+        if (t == null)
+            return t;
+
+        if (t is TypeBuilder)
+        {
+            if (!Context.Types.Where(t => t.FullName == name).Any())
+                return t;
+
+            if (Context.Types.First(t => t.FullName == name).IsAlias)
+                return Context.Types.First(t => t.FullName == name).AliasedType;
+
+            return t;
+        }
+        
+        try
+        {
+            if (t.GetCustomAttribute<AliasAttribute>() is AliasAttribute alias)
+                return alias.AliasedType;
+        }
+        catch (NotSupportedException) { }
+
+        return t;
+    }
+
+    private static Type ResolveTypeNameInternal(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
+    {
+        if (TypeContext.Current != null && TypeContext.Current.FullName == name)
             return TypeContext.Current.Builder;
 
         if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
@@ -1456,10 +1518,13 @@ internal static class SymbolResolver
         }
         else
         {
-            TypeHelpers.CheckGenericTypeCompatibility(type, typeParams, row, col, len, true);
+            if (!doNotFillGenericTypeDefinition)
+            {
+                TypeHelpers.CheckGenericTypeCompatibility(type, typeParams, row, col, len, true);
 
-            if (typeParams != null)
-                type = type.MakeGenericType(typeParams);
+                if (typeParams != null && type.IsGenericTypeDefinition)
+                    type = type.MakeGenericType(typeParams);
+            }
 
             if (!noEmitFragments)
             {

@@ -25,7 +25,6 @@ full_program
 
 import_directive
     : Exclamation_Mark? Import full_identifier (Comma NewLine* full_identifier)* #basic_import
-    | Exclamation_Mark? Import Identifier Equals full_identifier (Comma NewLine* Identifier Equals full_identifier)* #alias
     ;
 
 export_directive
@@ -352,6 +351,7 @@ parameter_constraint
 
 type_block
     : Open_Brace (type_member | type | NewLine | access_modifier_member_group)* Close_Brace
+    | type_name
     ;
 
 try_branch
