@@ -1,14 +1,13 @@
 ﻿using Antlr4.Runtime.Tree;
+using Dassie.CodeGeneration;
 using Dassie.Core;
 using Dassie.Errors;
-using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -344,7 +343,7 @@ internal static class SymbolResolver
     }
 
     static int memberIndex = -1;
-    public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true, bool getDefaultOverload = false)
+    public static object ResolveMember(Type type, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true, bool getDefaultOverload = false, bool doNotRedirectTypeBuilder = false)
     {
         memberIndex++;
 
@@ -356,7 +355,7 @@ internal static class SymbolResolver
         if (type.IsByRef)
             type = type.GetElementType();
 
-        if (type is TypeBuilder tb)
+        if (type is TypeBuilder tb && !doNotRedirectTypeBuilder)
             return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors, getDefaultOverload);
 
         Type deconstructedGenericType = null;
@@ -372,7 +371,7 @@ internal static class SymbolResolver
         catch { }
 
         // 0. Constructors
-        if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
+        if (name == type.Name || name == type.FullName || (!doNotRedirectTypeBuilder && name == type.AssemblyQualifiedName))
         {
             argumentTypes ??= Type.EmptyTypes;
 
@@ -637,6 +636,9 @@ internal static class SymbolResolver
 
     private static object ResolveMember(TypeBuilder tb, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true, bool getDefaultOverload = false)
     {
+        if (tb.IsCreated())
+            return ResolveMember((Type)tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors, getDefaultOverload, true);
+
         TypeContext[] types = Context.Types.Where(c => c.Builder == tb).ToArray();
 
         Type[] typeArgs = Type.EmptyTypes;
@@ -1345,8 +1347,17 @@ internal static class SymbolResolver
             return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
         }
 
-        if (name.Open_Paren() != null)
-            return typeof(UnionValue);
+        // Inline union type
+        // e.g. int | string
+
+        if (name.Bar() != null)
+        {
+            List<Type> partTypes = [];
+            foreach (DassieParser.Type_nameContext unionMember in name.type_name())
+                partTypes.Add(ResolveTypeName(unionMember, noEmitFragments, noEmitDS0149));
+
+            return UnionTypeCodeGeneration.GenerateInlineUnionType(partTypes.ToArray());
+        }
 
         if (name.type_arg_list() != null)
         {

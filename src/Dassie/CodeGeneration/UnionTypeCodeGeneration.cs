@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace Dassie.CodeGeneration;
 
@@ -29,6 +30,120 @@ internal static class UnionTypeCodeGeneration
         }
 
         TypeContext.Current.FinishedType = TypeContext.Current.Builder.CreateType();
+    }
+
+    internal static readonly Dictionary<Type[], Type> _createdUnionTypes = [];
+
+    public static Type GenerateInlineUnionType(Type[] fields)
+    {
+        foreach (var existingUnion in _createdUnionTypes)
+        {
+            if (existingUnion.Key.SequenceEqual(fields))
+                return existingUnion.Value;
+        }
+
+        TypeBuilder tb = Context.Module.DefineType(SymbolNameGenerator.GetInlineUnionTypeName(_createdUnionTypes.Count), TypeAttributes.Public | TypeAttributes.Sealed);
+        tb.SetCustomAttribute(new(typeof(Union).GetConstructor([]), []));
+        tb.SetCustomAttribute(new(typeof(CompilerGeneratedAttribute).GetConstructor([]), []));
+
+        ConstructorBuilder defConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, []);
+        ILGenerator conIL = defConstructor.GetILGenerator();
+        conIL.Emit(OpCodes.Ldarg_0);
+        conIL.Emit(OpCodes.Call, typeof(object).GetConstructor([]));
+        conIL.Emit(OpCodes.Ret);
+
+        List<(Type Type, MethodInfo IsGetter, MethodInfo Getter)> tags = [];
+
+        foreach (Type field in fields)
+        {
+            string propName = field.FullName;
+            string isPropName = $"Is{field.FullName}";
+            FieldBuilder propBackingField = tb.DefineField(SymbolNameGenerator.GetPropertyBackingFieldName(propName), field, FieldAttributes.Private);
+            FieldBuilder isBackingField = tb.DefineField(SymbolNameGenerator.GetPropertyBackingFieldName(isPropName), typeof(bool), FieldAttributes.Private);
+            PropertyBuilder prop = tb.DefineProperty(propName, PropertyAttributes.None, field, []);
+            PropertyBuilder isProp = tb.DefineProperty(isPropName, PropertyAttributes.None, typeof(bool), []);
+
+            MethodBuilder getter = tb.DefineMethod($"get_{propName}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, field, []);
+            ILGenerator getterIL = getter.GetILGenerator();
+            getterIL.Emit(OpCodes.Ldarg_0);
+            getterIL.Emit(OpCodes.Ldfld, propBackingField);
+            getterIL.Emit(OpCodes.Ret);
+            prop.SetGetMethod(getter);
+
+            MethodBuilder setter = tb.DefineMethod($"set_{propName}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, typeof(void), [field]);
+            ILGenerator setterIL = setter.GetILGenerator();
+            setterIL.Emit(OpCodes.Ldarg_0);
+            setterIL.Emit(OpCodes.Ldarg_1);
+            setterIL.Emit(OpCodes.Stfld, propBackingField);
+            setterIL.Emit(OpCodes.Ret);
+            prop.SetSetMethod(setter);
+
+            MethodBuilder isPropGetter = tb.DefineMethod($"get_{isPropName}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, typeof(bool), []);
+            ILGenerator isPropGetterIL = isPropGetter.GetILGenerator();
+            isPropGetterIL.Emit(OpCodes.Ldarg_0);
+            isPropGetterIL.Emit(OpCodes.Ldfld, isBackingField);
+            isPropGetterIL.Emit(OpCodes.Ret);
+            isProp.SetGetMethod(isPropGetter);
+
+            MethodBuilder convertIntoTypeMethod = tb.DefineMethod("op_Implicit", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.SpecialName, tb, [field]);
+            ILGenerator convertIntoIL = convertIntoTypeMethod.GetILGenerator();
+            convertIntoIL.Emit(OpCodes.Newobj, defConstructor);
+            convertIntoIL.Emit(OpCodes.Dup);
+            convertIntoIL.Emit(OpCodes.Dup);
+            convertIntoIL.Emit(OpCodes.Ldc_I4_1);
+            convertIntoIL.Emit(OpCodes.Stfld, isBackingField);
+            convertIntoIL.Emit(OpCodes.Ldarg_0);
+            convertIntoIL.Emit(OpCodes.Call, setter);
+            convertIntoIL.Emit(OpCodes.Ret);
+
+            MethodBuilder convertFromTypeMethod = tb.DefineMethod("op_Implicit", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.SpecialName, field, [tb]);
+            ILGenerator convertFromIL = convertFromTypeMethod.GetILGenerator();
+            convertFromIL.Emit(OpCodes.Ldarg_0);
+            convertFromIL.Emit(OpCodes.Call, getter);
+            convertFromIL.Emit(OpCodes.Ret);
+
+            tags.Add((field, isPropGetter, getter));
+        }
+
+        MethodBuilder getValueMethod = tb.DefineMethod("GetValue", MethodAttributes.Public, CallingConventions.HasThis, typeof(object), []);
+        ILGenerator getValueIL = getValueMethod.GetILGenerator();
+        getValueIL.DeclareLocal(typeof(object));
+        Label endLabel = getValueIL.DefineLabel();
+
+        foreach ((Type type, MethodInfo isGetter, MethodInfo getter) in tags)
+        {
+            Label nextTypeLabel = getValueIL.DefineLabel();
+
+            getValueIL.Emit(OpCodes.Ldarg_0);
+            getValueIL.Emit(OpCodes.Call, isGetter);
+            getValueIL.Emit(OpCodes.Brfalse, nextTypeLabel);
+
+            getValueIL.Emit(OpCodes.Ldarg_0);
+            getValueIL.Emit(OpCodes.Call, getter);
+
+            if (type.IsValueType)
+                getValueIL.Emit(OpCodes.Box, type);
+
+            getValueIL.Emit(OpCodes.Stloc_0);
+            getValueIL.Emit(OpCodes.Br, endLabel);
+
+            getValueIL.MarkLabel(nextTypeLabel);
+        }
+
+        getValueIL.MarkLabel(endLabel);
+        getValueIL.Emit(OpCodes.Ldloc_0);
+        getValueIL.Emit(OpCodes.Ret);
+
+        MethodBuilder toStringMethod = tb.DefineMethod("ToString", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual, CallingConventions.HasThis, typeof(string), []);
+        ILGenerator toStringIL = toStringMethod.GetILGenerator();
+        toStringIL.Emit(OpCodes.Ldarg_0);
+        toStringIL.Emit(OpCodes.Call, getValueMethod);
+        toStringIL.Emit(OpCodes.Callvirt, typeof(object).GetMethod("ToString"));
+        toStringIL.Emit(OpCodes.Ret);
+
+        Type union = tb.CreateType();
+        _createdUnionTypes.Add(fields, union);
+        return union;
     }
 
     public static void GenerateUnionTagType(DassieParser.Type_memberContext context)

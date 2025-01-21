@@ -1,5 +1,7 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Core;
+using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Symbols;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -176,6 +178,12 @@ internal static class TypeHelpers
     /// <returns>Wheter or not a conversion from <paramref name="from"/> to <paramref name="to"/> exists.</returns>
     public static bool CanBeConverted(Type from, Type to)
     {
+        if (from.IsByRef)
+            from = from.GetElementType();
+
+        if (to.IsByRef)
+            to = to.GetElementType();
+
         if (from == to)
             return true;
 
@@ -705,4 +713,24 @@ internal static class TypeHelpers
     }
 
     public static bool IsValueTuple(Type t) => t.IsGenericType && t.FullName.StartsWith("System.ValueTuple`");
+
+    public static string TypeName(Type t)
+    {
+        bool isUnion = false;
+
+        if (t is not TypeBuilder)
+            isUnion = t.GetCustomAttribute<Union>() != null;
+        else
+            isUnion = t.Name.StartsWith(SymbolNameGenerator.GetInlineUnionTypeName(0)[..^1]);
+
+        if (isUnion)
+        {
+            IEnumerable<string> flagNames = t.GetMethods().Where(m => m.Name.StartsWith("set_"))
+                .Select(m => TypeName(m.GetParameters()[0].ParameterType));
+
+            return string.Join(" | ", flagNames);
+        }
+
+        return Format(t);
+    }
 }

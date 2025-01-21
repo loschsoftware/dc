@@ -8,11 +8,10 @@ namespace Dassie.Meta;
 
 internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
 {
-    public MetaFieldInfo(string name, FieldBuilder builder, UnionValue union)
+    public MetaFieldInfo(string name, FieldBuilder builder)
     {
         Name = name;
         Builder = builder;
-        Union = union;
     }
 
     public MetaFieldInfo() { }
@@ -20,8 +19,6 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
     public string Name { get; set; }
 
     public FieldInfo Builder { get; set; }
-
-    public UnionValue Union { get; set; }
 
     public object ConstantValue { get; set; } = null;
 
@@ -34,8 +31,7 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
     {
         return other is not null &&
                Name == other.Name &&
-               EqualityComparer<FieldInfo>.Default.Equals(Builder, other.Builder) &&
-               Union.Equals(other.Union);
+               EqualityComparer<FieldInfo>.Default.Equals(Builder, other.Builder);
     }
 
     public override int GetHashCode()
@@ -43,7 +39,6 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
         int hashCode = 1355297754;
         hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
         hashCode = hashCode * -1521134295 + EqualityComparer<FieldInfo>.Default.GetHashCode(Builder);
-        hashCode = hashCode * -1521134295 + Union.GetHashCode();
         return hashCode;
     }
 

@@ -1081,16 +1081,6 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitAttribute([NotNull] DassieParser.AttributeContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.attribute_target"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterAttribute_target([NotNull] DassieParser.Attribute_targetContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.attribute_target"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitAttribute_target([NotNull] DassieParser.Attribute_targetContext context);
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.generic_identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

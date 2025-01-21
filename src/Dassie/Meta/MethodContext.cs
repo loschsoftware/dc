@@ -1,6 +1,4 @@
-﻿using Dassie.Parser;
-using Dassie.Runtime;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -141,8 +139,6 @@ internal class MethodContext
     public List<ParamInfo> Parameters { get; private set; } = [];
 
     public List<SymbolInfo> AvailableSymbols { get; private set; } = [];
-
-    public UnionValue CurrentUnion { get; set; } = new(null, typeof(object));
 
     public int ThrowawayCounterVariableIndex { get; set; } = 0;
 

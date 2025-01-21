@@ -743,5 +743,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an alias type has modifiers that are not permitted.
     /// </summary>
-    DS0180_AliasTypeInvalidModifiers
+    DS0180_AliasTypeInvalidModifiers,
+    /// <summary>
+    /// Emitted when the target of an attribute is invalid.
+    /// </summary>
+    DS0181_InvalidAttributeTarget
 }

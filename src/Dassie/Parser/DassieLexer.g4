@@ -61,16 +61,6 @@ Default: 'default';
 
 Literal: 'literal';
 
-// Attribute targets
-Assembly_Target: 'assembly:';
-Module_Target: 'module:';
-Type_Target: 'type:';
-Field_Target: 'field:';
-Property_Target: 'property:';
-Method_Target: 'method:';
-Parameter_Target: 'parameter:';
-Return_Target: 'return:';
-
 Open_Paren: '(';
 Close_Paren: ')';
 Open_Paren_Bar: '(|';

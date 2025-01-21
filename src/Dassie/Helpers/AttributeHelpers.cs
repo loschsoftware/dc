@@ -1,4 +1,5 @@
-﻿using Dassie.CodeGeneration.Helpers;
+﻿using Antlr4.Runtime.Tree;
+using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Core;
 using Dassie.Errors;
@@ -318,10 +319,10 @@ internal static class AttributeHelpers
             (CustomAttributeBuilder cab, ConstructorInfo ctor, object[] data) = GetAttributeData(attribute, attribType, eval);
             AttributeTarget target = AttributeTarget.Type;
 
-            if (attribute.attribute_target() != null && attribute.attribute_target().Assembly_Target() != null)
-                target = AttributeTarget.Assembly;
+            if (attribute.Identifier() != null)
+                target = GetAttributeTarget(attribute.Identifier());
 
-            if (attribute.attribute_target() != null && attribute.attribute_target().Module_Target() != null)
+            if (attribute.Module() != null)
                 target = AttributeTarget.Module;
 
             if (attribType != null)
@@ -456,5 +457,25 @@ internal static class AttributeHelpers
                 DS0166_ModuleInitializerInvalid,
                 $"Module initializers cannot be contained in generic types.");
         }
+    }
+
+    private static AttributeTarget GetAttributeTarget(ITerminalNode node)
+    {
+        string id = node.GetText();
+
+        if (id == "assembly")
+            return AttributeTarget.Assembly;
+
+        if (id == "module")
+            return AttributeTarget.Module;
+
+        EmitErrorMessage(
+            node.Symbol.Line,
+            node.Symbol.Column,
+            id.Length,
+            DS0181_InvalidAttributeTarget,
+            $"'{id}' is not a valid attribute target.");
+
+        return AttributeTarget.Type;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Dassie.Aot;
+using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
 using Dassie.Configuration.Macros;
@@ -135,6 +136,7 @@ internal class CompileCommand : ICompilerCommand
         CompileSource(documents, config);
         VisitorStep1 = Context;
         LineNumberOffset = 0;
+        UnionTypeCodeGeneration._createdUnionTypes.Clear();
 
         if (config.Verbosity >= 1)
             EmitBuildLogMessage("Performing second pass.");

@@ -13,10 +13,8 @@ using Dassie.Runtime;
 using Dassie.Symbols;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
-using NuGet.Protocol.Plugins;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -221,7 +219,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                             context.inheritance_list().Start.Column,
                             context.inheritance_list().GetText().Length,
                             DS0157_InheritingFromSealedType,
-                            $"Cannot inherit from type '{type.FullName}' because it is sealed.",
+                            $"Cannot inherit from type '{TypeName(type)}' because it is sealed.",
                             tip: "If possible, mark the type as 'open' to allow inheritance.");
                     }
                     else if (context.type_kind().Val() != null)
@@ -647,7 +645,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         value.Start.Column,
                         value.GetText().Length,
                         DS0054_WrongFieldType,
-                        $"Expected expression of type '{field.FieldType.FullName}', but got type '{t.FullName}'.");
+                        $"Expected expression of type '{field.FieldType.FullName}', but got type '{TypeName(t)}'.");
                 }
             }
 
@@ -713,7 +711,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                 param.Context.Identifier().GetText());
 
-            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, new(), param.Context.Var() != null));
+            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, param.Context.Var() != null));
         }
 
         if (CurrentMethod.ConstructorBuilder.IsStatic)
@@ -737,7 +735,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Equals().Symbol.Column,
                 context.expression().Start.Column - context.Equals().Symbol.Column,
                 DS0093_ConstructorReturnsValue,
-                $"Expected expression of type 'null' but found type '{t.FullName}'. A constructor can never return a value.");
+                $"Expected expression of type 'null' but found type '{TypeName(t)}'. A constructor can never return a value.");
         }
 
         CurrentMethod.IL?.Emit(OpCodes.Ret);
@@ -968,7 +966,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                     param.Context.Identifier().GetText());
 
-                CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, new(), param.Context.Var() != null));
+                CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, param.Context.Var() != null));
             }
 
             if (CurrentMethod.Builder.IsStatic)
@@ -1238,7 +1236,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetText().Length,
                 DS0150_ByRefFieldInNonByRefLikeType,
-                $"Invalid {memberKind} type '{type}'. References are only valid as part of ByRef-like value types (val& type).");
+                $"Invalid {memberKind} type '{TypeName(type)}'. References are only valid as part of ByRef-like value types (val& type).");
         }
 
         // Auto-implemented property
@@ -1450,7 +1448,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         foreach (CustomAttributeBuilder cab in customAttribs)
             fb.SetCustomAttribute(cab);
 
-        MetaFieldInfo mfi = new(context.Identifier().GetText(), fb, default);
+        MetaFieldInfo mfi = new(context.Identifier().GetText(), fb);
 
         if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
         {
@@ -1646,7 +1644,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         AttributeHelpers.AddAttributeToCurrentMethod(entryPointCon, []);
 
-        mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(0, ParameterAttributes.None, "args"), 0, default, false));
+        mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(0, ParameterAttributes.None, "args"), 0, false));
         mc.FilesWhereDefined.Add(CurrentFile.Path);
         tc.Methods.Add(mc);
         Context.Types.Add(tc);
@@ -1787,7 +1785,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 //        context.op.Column,
                 //        context.op.Text.Length,
                 //        DS0036_ArithmeticError,
-                //        $"The type '{t.FullName}' does not implement an equality operation with operand type '{t2.FullName}'.",
+                //        $"The type '{TypeName(t)}' does not implement an equality operation with operand type '{TypeName(t2)}'.",
                 //        Path.GetFileName(CurrentFile.Path));
 
                 CurrentMethod.IL.Emit(OpCodes.Callvirt, equalsMethod);
@@ -1806,7 +1804,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 //        context.op.Column,
                 //        context.op.Text.Length,
                 //        DS0036_ArithmeticError,
-                //        $"The type '{t.FullName}' does not implement an inequality operation with operand type '{t2.FullName}'.",
+                //        $"The type '{TypeName(t)}' does not implement an inequality operation with operand type '{TypeName(t2)}'.",
                 //        Path.GetFileName(CurrentFile.Path));
 
                 CurrentMethod.IL.Emit(OpCodes.Callvirt, equalsMethod);
@@ -1869,7 +1867,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.op.Column,
                     context.op.Text.Length,
                     DS0036_ArithmeticError,
-                    $"The type '{t.FullName}' does not implement a comparison operation with operand type '{t2.FullName}'.",
+                    $"The type '{TypeName(t)}' does not implement a comparison operation with operand type '{TypeName(t2)}'.",
                     Path.GetFileName(CurrentFile.Path));
 
             return typeof(bool);
@@ -1898,7 +1896,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     //                    context.Minus().Symbol.Column,
     //                    context.Minus().GetText().Length,
     //                DS0036_ArithmeticError,
-    //                $"The type '{t.FullName}' does not implement the unary negation operation.",
+    //                $"The type '{TypeName(t)}' does not implement the unary negation operation.",
     //                Path.GetFileName(CurrentFile.Path));
 
     //        return t;
@@ -1924,7 +1922,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     //                context.Start.Line,
     //                context.Start.Column,
     //                DS0036_ArithmeticError,
-    //                $"The type '{t.FullName}' does not implement the unary plus operation.",
+    //                $"The type '{TypeName(t)}' does not implement the unary plus operation.",
     //                Path.GetFileName(CurrentFile.Path));
 
     //        return t;
@@ -1956,7 +1954,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Exclamation_Mark().Symbol.Column,
                 context.Exclamation_Mark().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a logical negation operation.",
+                $"The type '{TypeName(t)}' does not implement a logical negation operation.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2088,7 +2086,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Bar().Symbol.Column,
                 context.Bar().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a bitwise or operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a bitwise or operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2136,7 +2134,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Ampersand().Symbol.Column,
                 context.Ampersand().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a bitwise and operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a bitwise and operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2197,7 +2195,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Caret().Symbol.Column,
                 context.Caret().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement an exclusive or operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement an exclusive or operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2226,7 +2224,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Tilde().Symbol.Column,
                 context.Tilde().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a complement operation.",
+                $"The type '{TypeName(t)}' does not implement a complement operation.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2259,7 +2257,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Asterisk().Symbol.Column,
                 context.Asterisk().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a multiplication operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a multiplication operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2297,7 +2295,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Slash().Symbol.Column,
                 context.Slash().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a division operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a division operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2379,7 +2377,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Plus().Symbol.Column,
                 context.Plus().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement an addition operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement an addition operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2419,7 +2417,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Minus().Symbol.Column,
                 context.Minus().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a subtraction operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a subtraction operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2454,7 +2452,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Percent().Symbol.Column,
                 context.Percent().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a remainder operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a remainder operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2502,7 +2500,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Double_Percent().Symbol.Column,
                 context.Double_Percent().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a remainder operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a remainder operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2538,7 +2536,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Double_Asterisk().Symbol.Column,
                 context.Double_Asterisk().GetText().Length,
                 DS0036_ArithmeticError,
-                $"The type '{t.FullName}' does not implement a exponentiation operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a exponentiation operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2574,7 +2572,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.expression()[1].Start.Column,
                         context.expression()[1].GetText().Length,
                         DS0154_ListAppendIncompatibleElement,
-                        $"An expression of type '{t2}' cannot be appended to a list of type '{t}'.");
+                        $"An expression of type '{TypeName(t2)}' cannot be appended to a list of type '{TypeName(t)}'.");
                 }
             }
 
@@ -2592,7 +2590,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Double_Less_Than().Symbol.Column,
                 context.Double_Less_Than().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a left shift operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a left shift operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2635,7 +2633,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.expression()[1].Start.Column,
                         context.expression()[1].GetText().Length,
                         DS0154_ListAppendIncompatibleElement,
-                        $"An expression of type '{t}' cannot be prepended to a list of type '{t2}'.");
+                        $"An expression of type '{TypeName(t)}' cannot be prepended to a list of type '{TypeName(t2)}'.");
                 }
             }
 
@@ -2659,7 +2657,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Double_Greater_Than().Symbol.Column,
                 context.Double_Greater_Than().GetText().Length,
                 DS0002_MethodNotFound,
-                $"The type '{t.FullName}' does not implement a right shift operation with operand type '{t2.FullName}'.",
+                $"The type '{TypeName(t)}' does not implement a right shift operation with operand type '{TypeName(t2)}'.",
                 Path.GetFileName(CurrentFile.Path));
 
             return t;
@@ -2993,8 +2991,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Index = i,
                 IsConstant = !param.IsMutable,
                 Name = param.Name,
-                Scope = 0,
-                Union = default
+                Scope = 0
             });
         }
 
@@ -3009,8 +3006,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Index = i,
                 IsConstant = !param.IsMutable,
                 Name = param.Name,
-                Scope = 0,
-                Union = default
+                Scope = 0
             });
         }
 
@@ -3062,8 +3058,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Index = i + 1,
                 IsMutable = parameters[i].IsMutable,
                 Name = parameters[i].Name,
-                Type = parameters[i].Type,
-                Union = default
+                Type = parameters[i].Type
             });
         }
 
@@ -3076,8 +3071,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Index = sym.Index(),
                 IsConstant = !sym.IsMutable(),
                 Name = sym.Name(),
-                Scope = 0,
-                Union = default
+                Scope = 0
             });
         }
 
@@ -4297,8 +4291,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (allEqual && t3 == null)
             return t;
 
-        if (!allEqual || t != t3 || t != t2[0])
-            return typeof(UnionValue);
+        // TODO: Support branches with different types -> return new style union
+
+        //if (!allEqual || t != t3 || t != t2[0])
+        //    return typeof(UnionValue);
 
         return t;
     }
@@ -5018,31 +5014,31 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (checkTypes && type != sym.Type() && !((sym.Type().IsByRef /*|| sym.Type().IsByRefLike*/) && sym.Type().GetElementType() == type))
             {
-                if (sym.Type() == typeof(UnionValue))
-                {
-                    if (sym.Union().AllowedTypes.Contains(type))
-                    {
-                        sym.LoadAddress();
+                //if (sym.Type() == typeof(UnionValue))
+                //{
+                //    if (sym.Union().AllowedTypes.Contains(type))
+                //    {
+                //        sym.LoadAddress();
 
-                        EmitLdloc(CurrentMethod.LocalIndex);
-                        CurrentMethod.IL.Emit(OpCodes.Box, type);
+                //        EmitLdloc(CurrentMethod.LocalIndex);
+                //        CurrentMethod.IL.Emit(OpCodes.Box, type);
 
-                        MethodInfo m = typeof(UnionValue).GetMethod("set_Value", new Type[] { typeof(object) });
-                        CurrentMethod.IL.Emit(OpCodes.Call, m);
+                //        MethodInfo m = typeof(UnionValue).GetMethod("set_Value", new Type[] { typeof(object) });
+                //        CurrentMethod.IL.Emit(OpCodes.Call, m);
 
-                        CurrentMethod.SkipPop = true;
-                        return sym.Union().GetType();
-                    }
+                //        CurrentMethod.SkipPop = true;
+                //        return sym.Union().GetType();
+                //    }
 
-                    EmitErrorMessage(
-                        context.assignment_operator().Start.Line,
-                        context.assignment_operator().Start.Column,
-                        context.assignment_operator().GetText().Length,
-                        DS0019_GenericValueTypeInvalid,
-                        $"Values of type '{type}' are not supported by union type '{sym.Union().ToTypeString()}'.");
+                //    EmitErrorMessage(
+                //        context.assignment_operator().Start.Line,
+                //        context.assignment_operator().Start.Column,
+                //        context.assignment_operator().GetText().Length,
+                //        DS0019_GenericValueTypeInvalid,
+                //        $"Values of type '{TypeName(type)}' are not supported by union type '{sym.Union().ToTypeString()}'.");
 
-                    return sym.Union().GetType();
-                }
+                //    return sym.Union().GetType();
+                //}
 
                 if (!EmitConversionOperator(type, sym.Type()))
                 {
@@ -5051,7 +5047,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.assignment_operator().Start.Column,
                         context.assignment_operator().GetText().Length,
                         DS0006_VariableTypeChanged,
-                        $"Expected expression of type '{sym.Type().FullName}', but got type '{type.FullName}'.");
+                        $"Expected expression of type '{TypeName(sym.Type())}', but got type '{TypeName(type)}'.");
                 }
 
                 return type;
@@ -5122,7 +5118,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.expression().Start.Column,
                         context.expression().GetText().Length,
                         DS0057_IncompatibleType,
-                        $"An expression of type '{t.FullName}' cannot be assigned to a variable of type '{t2.FullName}'.");
+                        $"An expression of type '{TypeName(t)}' cannot be assigned to a variable of type '{TypeName(t2)}'.");
                 }
             }
 
@@ -5138,7 +5134,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetText().Length,
                 DS0148_ImmutableValueOfByRefType,
-                $"The type '{t}' is invalid for '{context.Identifier().GetText()}' since it is an immutable value. Pointers and references are only supported by mutable variables.");
+                $"The type '{TypeName(t)}' is invalid for '{context.Identifier().GetText()}' since it is an immutable value. Pointers and references are only supported by mutable variables.");
         }
 
         CurrentFile.Fragments.Add(new()
@@ -5155,7 +5151,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         MarkSequencePoint(context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
 
         CurrentMethod.LocalIndex++;
-        CurrentMethod.Locals.Add(new(context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex, CurrentMethod.CurrentUnion));
+        CurrentMethod.Locals.Add(new(context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex));
 
         SymbolInfo localSymbol = new()
         {
@@ -5179,34 +5175,34 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         //    }
         //}
 
-        if (t == typeof(UnionValue))
-        {
-            CurrentMethod.IL.Emit(OpCodes.Box, t1);
+        //if (t == typeof(UnionValue))
+        //{
+        //    CurrentMethod.IL.Emit(OpCodes.Box, t1);
 
-            ConstructorInfo constructor = t.GetConstructor(new Type[] { typeof(object), typeof(Type[]) });
+        //    ConstructorInfo constructor = t.GetConstructor(new Type[] { typeof(object), typeof(Type[]) });
 
-            UnionValue union = CurrentMethod.CurrentUnion;
+        //    UnionValue union = CurrentMethod.CurrentUnion;
 
-            EmitLdcI4(union.AllowedTypes.Length);
-            CurrentMethod.IL.Emit(OpCodes.Newarr, typeof(Type));
-            CurrentMethod.IL.Emit(OpCodes.Dup);
+        //    EmitLdcI4(union.AllowedTypes.Length);
+        //    CurrentMethod.IL.Emit(OpCodes.Newarr, typeof(Type));
+        //    CurrentMethod.IL.Emit(OpCodes.Dup);
 
-            for (int i = 0; i < union.AllowedTypes.Length; i++)
-            {
-                EmitLdcI4(i);
-                CurrentMethod.IL.Emit(OpCodes.Ldtoken, union.AllowedTypes[i]);
+        //    for (int i = 0; i < union.AllowedTypes.Length; i++)
+        //    {
+        //        EmitLdcI4(i);
+        //        CurrentMethod.IL.Emit(OpCodes.Ldtoken, union.AllowedTypes[i]);
 
-                MethodInfo getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
-                CurrentMethod.IL.Emit(OpCodes.Call, getTypeFromHandle);
-                CurrentMethod.IL.Emit(OpCodes.Stelem_Ref);
+        //        MethodInfo getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
+        //        CurrentMethod.IL.Emit(OpCodes.Call, getTypeFromHandle);
+        //        CurrentMethod.IL.Emit(OpCodes.Stelem_Ref);
 
-                CurrentMethod.IL.Emit(OpCodes.Dup);
-            }
+        //        CurrentMethod.IL.Emit(OpCodes.Dup);
+        //    }
 
-            CurrentMethod.IL.Emit(OpCodes.Pop);
+        //    CurrentMethod.IL.Emit(OpCodes.Pop);
 
-            CurrentMethod.IL.Emit(OpCodes.Newobj, constructor);
-        }
+        //    CurrentMethod.IL.Emit(OpCodes.Newobj, constructor);
+        //}
 
         if (!skipLocalSet)
             localSymbol.Set(setIndirectIfByRef: !t.IsByRef);
@@ -5357,7 +5353,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         expr.Start.Column,
                         expr.GetText().Length,
                         DS0153_ListLiteralDifferentTypes,
-                        $"An item of type '{type}' cannot be added to a list of type '{listType}'.");
+                        $"An item of type '{TypeName(type)}' cannot be added to a list of type '{listType}'.");
                 }
             }
 
@@ -5593,7 +5589,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // A local that saves the returning array
             LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(tReturn.MakeArrayType());
 
-            CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++, new(null, typeof(int))));
+            CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
 
             EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
@@ -5604,7 +5600,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Label start = CurrentMethod.IL.DefineLabel();
 
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(typeof(int));
-            CurrentMethod.Locals.Add(new(GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++, new(null, typeof(int))));
+            CurrentMethod.Locals.Add(new(GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex++), lb, false, CurrentMethod.LocalIndex++));
 
             SetLocalSymInfo(
                 lb,
@@ -5672,7 +5668,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // A local that saves the returning list
             LocalBuilder returnBuilder = CurrentMethod.IL.DeclareLocal(listType);
 
-            CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++, new(null, typeof(List<string>))));
+            CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex++));
 
             EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
 
@@ -6179,7 +6175,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
                 param.Context.Identifier().GetText());
 
-            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, new(), param.Context.Var() != null));
+            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, param.Context.Var() != null));
         }
 
         Type _tReturn = typeof(object);
@@ -6467,7 +6463,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.expression()[0].Start.Column,
                 context.expression()[0].GetText().Length,
                 DS0176_LockOnValueType,
-                $"The '$lock' statement is only valid on reference types. The provided expression is of type '{t}', which is a value type.");
+                $"The '$lock' statement is only valid on reference types. The provided expression is of type '{TypeName(t)}', which is a value type.");
         }
 
         int lockObjIndex = ++CurrentMethod.LocalIndex;

@@ -45,14 +45,6 @@ internal class SymbolInfo
         _ => -1
     };
 
-    public UnionValue Union() => SymbolType switch
-    {
-        SymType.Local => Local.Union,
-        SymType.Parameter => Parameter.Union,
-        SymType.Field => Field.Union,
-        _ => default
-    };
-
     public Tooltip GetToolTip() => SymbolType switch
     {
         SymType.Local => TooltipGenerator.Local(Local.Name, !Local.IsConstant, Local.Builder),

@@ -168,7 +168,7 @@ identifier_atom
 
 type_name
     : identifier_atom
-    | Open_Paren type_name (Bar type_name)+ Close_Paren
+    | type_name (Bar type_name)+
     | generic_identifier
     | type_name type_arg_list
     | type_name (Ampersand | Double_Ampersand)
@@ -213,18 +213,7 @@ arglist
     ;
 
 attribute
-    : Less_Than attribute_target? type_name arglist? Greater_Than NewLine*
-    ;
-
-attribute_target
-    : Assembly_Target
-    | Module_Target
-    | Type_Target
-    | Field_Target
-    | Property_Target
-    | Method_Target
-    | Parameter_Target
-    | Return_Target
+    : Less_Than ((Identifier | Module) Colon)? type_name arglist? Greater_Than NewLine*
     ;
 
 generic_identifier

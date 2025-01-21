@@ -19,9 +19,9 @@ internal static class ErrorMessageHelpers
         if (types.Length != 0)
         {
             foreach (Type paramType in types[..^1])
-                sb.Append($"{TypeHelpers.Format(paramType)}, ");
+                sb.Append($"{TypeHelpers.TypeName(paramType)}, ");
 
-            sb.Append(TypeHelpers.Format(types.Last()));
+            sb.Append(TypeHelpers.TypeName(types.Last()));
         }
 
         sb.Append(']');
@@ -38,7 +38,7 @@ internal static class ErrorMessageHelpers
         StringBuilder errorMsgBuilder = new();
 
         if (!overloads.Any())
-            errorMsgBuilder.Append($"Member '{name}' not found in type '{TypeHelpers.Format(type)}'.");
+            errorMsgBuilder.Append($"Member '{name}' not found in type '{TypeHelpers.TypeName(type)}'.");
 
         else
         {

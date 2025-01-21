@@ -1,14 +1,12 @@
-﻿using Dassie.Runtime;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Dassie.Meta;
 
 internal class LocalInfo : IEquatable<LocalInfo>
 {
-    public LocalInfo(string name, LocalBuilder builder, bool isConstant, int index, UnionValue union, int scope = -1)
+    public LocalInfo(string name, LocalBuilder builder, bool isConstant, int index, int scope = -1)
     {
         if (scope == -1)
             scope = CurrentMethod.CurrentScope;
@@ -17,7 +15,6 @@ internal class LocalInfo : IEquatable<LocalInfo>
         Builder = builder;
         IsConstant = isConstant;
         Index = index;
-        Union = union;
         Scope = scope;
     }
 
@@ -30,8 +27,6 @@ internal class LocalInfo : IEquatable<LocalInfo>
     public bool IsConstant { get; set; }
 
     public int Index { get; set; }
-
-    public UnionValue Union { get; set; }
 
     public int Scope { get; set; }
 
@@ -46,8 +41,7 @@ internal class LocalInfo : IEquatable<LocalInfo>
                Name == other.Name &&
                EqualityComparer<LocalBuilder>.Default.Equals(Builder, other.Builder) &&
                IsConstant == other.IsConstant &&
-               Index == other.Index &&
-               Union.Equals(other.Union);
+               Index == other.Index;
     }
 
     public override int GetHashCode()
@@ -57,7 +51,6 @@ internal class LocalInfo : IEquatable<LocalInfo>
         hashCode = hashCode * -1521134295 + EqualityComparer<LocalBuilder>.Default.GetHashCode(Builder);
         hashCode = hashCode * -1521134295 + IsConstant.GetHashCode();
         hashCode = hashCode * -1521134295 + Index.GetHashCode();
-        hashCode = hashCode * -1521134295 + Union.GetHashCode();
         return hashCode;
     }
 

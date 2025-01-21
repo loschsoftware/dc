@@ -445,6 +445,12 @@ internal static class EmitHelpers
             return true;
         }
 
+        if (from == typeof(object) && to.IsValueType)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Unbox_Any, to);
+            return true;
+        }
+
         if (from.IsAssignableTo(to) || from.IsAssignableFrom(to))
         {
             CurrentMethod.IL.Emit(OpCodes.Castclass, to);
@@ -454,12 +460,6 @@ internal static class EmitHelpers
         if (from == typeof(object) && to.IsClass)
         {
             CurrentMethod.IL.Emit(OpCodes.Castclass, to);
-            return true;
-        }
-
-        if (from == typeof(object))
-        {
-            CurrentMethod.IL.Emit(OpCodes.Unbox_Any, to);
             return true;
         }
 
@@ -536,8 +536,7 @@ internal static class EmitHelpers
                         Builder = containerTypeInstance,
                         Name = $"{closureType.FullName}$_field$",
                         IsConstant = true,
-                        Scope = 0,
-                        Union = default
+                        Scope = 0
                     });
 
                     CurrentMethod.IL.Emit(OpCodes.Newobj, closureType.GetConstructor([]));
