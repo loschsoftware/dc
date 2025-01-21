@@ -122,19 +122,19 @@ public struct @bool { }
 /// Defines 'null' as an alias for <see cref="System.Void"/>.
 /// </summary>
 [Alias(typeof(void))]
-public struct @null { }
+public sealed class @null { }
 
 /// <summary>
 /// Defines 'object' as an alias for <see cref="System.Object"/>.
 /// </summary>
 [Alias(typeof(object))]
-public struct @object { }
+public sealed class @object { }
 
 /// <summary>
 /// Defines 'string' as an alias for <see cref="System.String"/>.
 /// </summary>
 [Alias(typeof(string))]
-public struct @string { }
+public sealed class @string { }
 
 /// <summary>
 /// Defines 'char' as an alias for <see cref="System.Char"/>.
