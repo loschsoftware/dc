@@ -728,7 +728,7 @@ internal static class TypeHelpers
             IEnumerable<string> flagNames = t.GetMethods().Where(m => m.Name.StartsWith("set_"))
                 .Select(m => TypeName(m.GetParameters()[0].ParameterType));
 
-            return string.Join(" | ", flagNames);
+            return $"({string.Join(" | ", flagNames)})";
         }
 
         return Format(t);

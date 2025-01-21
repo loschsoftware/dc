@@ -168,7 +168,7 @@ identifier_atom
 
 type_name
     : identifier_atom
-    | type_name (Bar type_name)+
+    | Open_Paren type_name (Bar type_name)+ Close_Paren
     | generic_identifier
     | type_name type_arg_list
     | type_name (Ampersand | Double_Ampersand)

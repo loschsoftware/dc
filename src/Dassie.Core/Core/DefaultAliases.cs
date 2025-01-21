@@ -135,3 +135,9 @@ public struct @object { }
 /// </summary>
 [Alias(typeof(string))]
 public struct @string { }
+
+/// <summary>
+/// Defines 'char' as an alias for <see cref="System.Char"/>.
+/// </summary>
+[Alias(typeof(char))]
+public struct @char { }
