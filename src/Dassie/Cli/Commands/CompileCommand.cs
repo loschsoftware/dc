@@ -22,6 +22,7 @@ using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using System.Text;
 
 namespace Dassie.Cli.Commands;
 
@@ -452,6 +453,34 @@ internal class CompileCommand : ICompilerCommand
         }
     }
 
+    private static int Distance(string str1, string str2)
+    {
+        if (string.IsNullOrEmpty(str1)) return str2?.Length ?? 0;
+        if (string.IsNullOrEmpty(str2)) return str1?.Length ?? 0;
+
+        int len1 = str1.Length;
+        int len2 = str2.Length;
+
+        int[,] dp = new int[len1 + 1, len2 + 1];
+
+        for (int i = 0; i <= len1; i++) dp[i, 0] = i;
+        for (int j = 0; j <= len2; j++) dp[0, j] = j;
+
+        for (int i = 1; i <= len1; i++)
+        {
+            for (int j = 1; j <= len2; j++)
+            {
+                int cost = (str1[i - 1] == str2[j - 1]) ? 0 : 1;
+
+                dp[i, j] = Math.Min(
+                    Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1),
+                    dp[i - 1, j - 1] + cost);
+            }
+        }
+
+        return dp[len1, len2];
+    }
+
     private static string[] PatternToFileList(string pattern)
     {
         static bool IsFileMatchingPattern(string filePath, string filePattern)
@@ -490,10 +519,23 @@ internal class CompileCommand : ICompilerCommand
         {
             if (pattern.All(c => char.IsLetter(c) || c == '-'))
             {
+                IEnumerable<string> cmds = CommandRegistry.Commands.Select(c => c.Command.ToLowerInvariant()).Where(c => c.Length > 0).OrderBy(c => Distance(pattern.ToLowerInvariant(), c));
+                int dist = Distance(pattern.ToLowerInvariant(), cmds.First().ToLowerInvariant());
+
+                StringBuilder errorMsg = new();
+                errorMsg.Append($"Unrecognized command '{pattern}'. ");
+
+                if (dist < 2)
+                    errorMsg.Append($"Did you mean '{cmds.First()}'?");
+                else if (dist < 5)
+                    errorMsg.Append($"Closest match is '{cmds.First()}'.");
+                else
+                    errorMsg.Append("Use 'dc help' for a list of available commands.");
+
                 EmitErrorMessage(
                     0, 0, 0,
                     DS0100_InvalidCommand,
-                    $"Unrecognized command '{pattern}'. Use 'dc help' for a list of available commands.",
+                    errorMsg.ToString(),
                     "dc");
 
                 Environment.Exit(-1);
