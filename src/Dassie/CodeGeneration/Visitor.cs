@@ -6014,7 +6014,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.Start.Column,
                 context.GetText().Length,
                 DS0136_InvalidConversion,
-                $"Unable to convert from type '{tSource.FullName}' to type '{tTarget.FullName}'.");
+                $"Unable to convert from type '{TypeName(tSource)}' to type '{TypeName(tTarget)}'.");
         }
 
         return tTarget;
