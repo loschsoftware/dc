@@ -70,6 +70,18 @@ internal static class UnionTypeCodeGeneration
 
             MethodBuilder getter = tb.DefineMethod($"get_{propName}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, field, []);
             ILGenerator getterIL = getter.GetILGenerator();
+            Label successLabel = getterIL.DefineLabel();
+            getterIL.Emit(OpCodes.Ldarg_0);
+            getterIL.Emit(OpCodes.Ldfld, typeField);
+            getterIL.Emit(OpCodes.Ldc_I4, i);
+            getterIL.Emit(OpCodes.Ceq);
+            getterIL.Emit(OpCodes.Brtrue, successLabel);
+
+            getterIL.Emit(OpCodes.Ldstr, $"Current value is not of type '{field}'.");
+            getterIL.Emit(OpCodes.Newobj, typeof(InvalidOperationException).GetConstructor([typeof(string)]));
+            getterIL.Emit(OpCodes.Throw);
+
+            getterIL.MarkLabel(successLabel);
             getterIL.Emit(OpCodes.Ldarg_0);
             getterIL.Emit(OpCodes.Ldfld, propBackingField);
             getterIL.Emit(OpCodes.Ret);
