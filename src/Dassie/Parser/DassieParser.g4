@@ -168,12 +168,17 @@ identifier_atom
 
 type_name
     : identifier_atom
-    | Open_Paren type_name (Bar type_name)+ Close_Paren
+    | Open_Paren union_or_tuple_type_member (Bar union_or_tuple_type_member)+ Close_Paren
+    | Open_Paren union_or_tuple_type_member (Comma union_or_tuple_type_member)+ Close_Paren
     | generic_identifier
     | type_name type_arg_list
     | type_name (Ampersand | Double_Ampersand)
     | type_name array_type_specifier
     | Func Asterisk type_arg_list // Function pointer type
+    ;
+
+union_or_tuple_type_member
+    : (Identifier Colon)? type_name
     ;
 
 array_type_specifier

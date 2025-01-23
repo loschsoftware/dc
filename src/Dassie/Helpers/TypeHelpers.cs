@@ -733,4 +733,89 @@ internal static class TypeHelpers
 
         return Format(t);
     }
+
+    public static List<(Type Type, string Name)> GetTupleItems(DassieParser.Type_nameContext name, bool noEmitFragments, bool noEmitDS0149)
+        => GetTupleOrUnionItems(name, "Tuple", noEmitFragments, noEmitDS0149);
+
+    public static List<(Type Type, string Name)> GetUnionItems(DassieParser.Type_nameContext name, bool noEmitFragments, bool noEmitDS0149)
+    => GetTupleOrUnionItems(name, "Union", noEmitFragments, noEmitDS0149);
+
+    private static List<(Type Type, string Name)> GetTupleOrUnionItems(DassieParser.Type_nameContext name, string kind, bool noEmitFragments, bool noEmitDS0149)
+    {
+        List<(Type Type, string Name)> partTypes = [];
+        foreach (DassieParser.Union_or_tuple_type_memberContext unionMember in name.union_or_tuple_type_member())
+        {
+            Type type = SymbolResolver.ResolveTypeName(unionMember.type_name(), noEmitFragments, noEmitDS0149);
+            string unionMemberName = null;
+
+            if (partTypes.Any(p => p.Name != null && p.Name == unionMemberName))
+            {
+                EmitErrorMessage(
+                    unionMember.Identifier().Symbol.Line,
+                    unionMember.Identifier().Symbol.Column,
+                    unionMemberName.Length,
+                    DS0182_UnionTypeDuplicateTagName,
+                    $"{kind} type contains duplicate tag name '{unionMemberName}'.");
+            }
+
+            if (partTypes.Any(p => p.Type == type))
+            {
+                EmitErrorMessage(
+                    unionMember.type_name().Start.Line,
+                    unionMember.type_name().Start.Column,
+                    unionMember.type_name().GetText().Length,
+                    DS0183_UnionTypeDuplicateTagType,
+                    $"{kind} type contains multiple tags of type '{unionMemberName}'.");
+            }
+
+            if (unionMember.Identifier() != null)
+                unionMemberName = unionMember.Identifier().GetText();
+
+            partTypes.Add((type, unionMemberName));
+        }
+
+        int namedTags = partTypes.Count(p => p.Name != null);
+
+        if (!(namedTags == 0 || partTypes.Count == namedTags))
+        {
+            EmitErrorMessage(
+                name.Start.Line,
+                name.Start.Column,
+                name.GetText().Length,
+                DS0184_UnionTypeMixedTags,
+                $"{kind} type cannot contain mixed named and unnamed tags. All tags need to be either named or unnamed.");
+        }
+
+        return partTypes;
+    }
+
+    public static Type GetValueTupleType(Type[] elementTypes)
+    {
+        if (elementTypes.Length <= 8)
+            return CreateValueTupleType(elementTypes);
+
+        Type[] mainTypes = elementTypes.Take(7).ToArray();
+        Type[] remainingTypes = elementTypes.Skip(7).ToArray();
+
+        Type restType = GetValueTupleType(remainingTypes);
+
+        Type[] allTypes = mainTypes.Concat([restType]).ToArray();
+        return CreateValueTupleType(allTypes);
+    }
+
+    private static Type CreateValueTupleType(Type[] elementTypes)
+    {
+        return elementTypes.Length switch
+        {
+            1 => typeof(ValueTuple<>).MakeGenericType(elementTypes),
+            2 => typeof(ValueTuple<,>).MakeGenericType(elementTypes),
+            3 => typeof(ValueTuple<,,>).MakeGenericType(elementTypes),
+            4 => typeof(ValueTuple<,,,>).MakeGenericType(elementTypes),
+            5 => typeof(ValueTuple<,,,,>).MakeGenericType(elementTypes),
+            6 => typeof(ValueTuple<,,,,,>).MakeGenericType(elementTypes),
+            7 => typeof(ValueTuple<,,,,,,>).MakeGenericType(elementTypes),
+            8 => typeof(ValueTuple<,,,,,,,>).MakeGenericType(elementTypes),
+            _ => throw new ArgumentException("Invalid number of element types."),
+        };
+    }
 }

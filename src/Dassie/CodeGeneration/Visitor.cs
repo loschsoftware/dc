@@ -1066,7 +1066,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.expression().Start.Column,
                         context.expression().GetText().Length,
                         DS0053_WrongReturnType,
-                        $"Expected expression of type '{tReturn.FullName}', but got type '{_tReturn.FullName}'.");
+                        $"Expected expression of type '{tReturn.FullName}', but got type '{TypeName(_tReturn)}'.");
                 }
             }
 
@@ -1132,7 +1132,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                                 context.Equals().Symbol.Column,
                                 1,
                                 DS0050_ExpectedIntegerReturnValue,
-                                $"Expected expression of type 'int32', 'uint32' or 'null' for return value of application entry point, but got type '{tReturn.FullName}'.",
+                                $"Expected expression of type 'int32', 'uint32' or 'null' for return value of application entry point, but got type '{TypeName(tReturn)}'.",
                                 tip: "You may use the function 'ignore' to discard a value and return 'null'.");
 
                         }
@@ -1695,7 +1695,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.expression().Last().Start.Column,
                     context.expression().Last().GetText().Length,
                     DS0050_ExpectedIntegerReturnValue,
-                    $"Expected expression of type 'int32', 'uint32' or 'null', but got type '{ret.FullName}'.",
+                    $"Expected expression of type 'int32', 'uint32' or 'null', but got type '{TypeName(ret)}'.",
                     tip: "You may use the function 'ignore' to discard a value and return 'null'.");
 
                 return ret;
@@ -6235,7 +6235,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     context.expression().Start.Column,
                     context.expression().GetText().Length,
                     DS0053_WrongReturnType,
-                    $"Expected expression of type '{tReturn.FullName}', but got type '{_tReturn.FullName}'.");
+                    $"Expected expression of type '{tReturn.FullName}', but got type '{TypeName(_tReturn)}'.");
             }
         }
 

@@ -1150,6 +1150,18 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType_name([NotNull] DassieParser.Type_nameContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.union_or_tuple_type_member"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterUnion_or_tuple_type_member([NotNull] DassieParser.Union_or_tuple_type_memberContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.union_or_tuple_type_member"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitUnion_or_tuple_type_member([NotNull] DassieParser.Union_or_tuple_type_memberContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.array_type_specifier"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

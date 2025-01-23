@@ -591,6 +591,12 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType_name([NotNull] DassieParser.Type_nameContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.union_or_tuple_type_member"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitUnion_or_tuple_type_member([NotNull] DassieParser.Union_or_tuple_type_memberContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.array_type_specifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

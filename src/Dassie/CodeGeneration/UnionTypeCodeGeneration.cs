@@ -32,15 +32,17 @@ internal static class UnionTypeCodeGeneration
         TypeContext.Current.FinishedType = TypeContext.Current.Builder.CreateType();
     }
 
-    internal static readonly Dictionary<Type[], Type> _createdUnionTypes = [];
+    internal static readonly Dictionary<List<(Type Type, string Name)>, Type> _createdUnionTypes = [];
 
-    public static Type GenerateInlineUnionType(Type[] fields)
+    public static Type GenerateInlineUnionType(List<(Type Type, string Name)> fields)
     {
         foreach (var existingUnion in _createdUnionTypes)
         {
             if (existingUnion.Key.SequenceEqual(fields))
                 return existingUnion.Value;
         }
+
+        List<PropertyBuilder> properties = [];
 
         TypeBuilder tb = Context.Module.DefineType(SymbolNameGenerator.GetInlineUnionTypeName(_createdUnionTypes.Count), TypeAttributes.Public | TypeAttributes.Sealed);
         tb.SetParent(typeof(ValueType));
@@ -59,7 +61,7 @@ internal static class UnionTypeCodeGeneration
 
         List<(Type Type, int index, MethodInfo Getter)> tags = [];
 
-        foreach ((int i, Type field) in fields.Index())
+        foreach ((int i, (Type field, string name)) in fields.Index())
         {
             string propName = field.FullName;
             FieldBuilder propBackingField = tb.DefineField(SymbolNameGenerator.GetPropertyBackingFieldName(propName), field, FieldAttributes.Private);
@@ -159,6 +161,15 @@ internal static class UnionTypeCodeGeneration
         tagsEnum.CreateType();
         Type union = tb.CreateType();
         _createdUnionTypes.Add(fields, union);
+
+        TypeContext current = TypeContext.Current;
+        TypeContext _ = new()
+        {
+            Builder = tb,
+            Properties = properties
+        };
+        TypeContext.Current = current;
+        CurrentMethod = CurrentMethod;
         return union;
     }
 

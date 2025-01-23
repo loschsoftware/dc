@@ -355,7 +355,7 @@ internal static class SymbolResolver
         if (type.IsByRef)
             type = type.GetElementType();
 
-        if (type is TypeBuilder tb && !doNotRedirectTypeBuilder)
+        if (type is TypeBuilder tb /*&& !doNotRedirectTypeBuilder*/)
             return ResolveMember(tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors, getDefaultOverload);
 
         Type deconstructedGenericType = null;
@@ -636,8 +636,8 @@ internal static class SymbolResolver
 
     private static object ResolveMember(TypeBuilder tb, string name, int row, int col, int len, bool noEmitFragments = false, Type[] argumentTypes = null, BindingFlags flags = BindingFlags.Public, bool throwErrors = true, bool getDefaultOverload = false)
     {
-        if (tb.IsCreated())
-            return ResolveMember((Type)tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors, getDefaultOverload, true);
+        //if (tb.IsCreated())
+        //    return ResolveMember((Type)tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors, getDefaultOverload, true);
 
         TypeContext[] types = Context.Types.Where(c => c.Builder == tb).ToArray();
 
@@ -1284,7 +1284,7 @@ internal static class SymbolResolver
 
         if (name.Double_Ampersand() != null)
         {
-            Type t = ResolveTypeName(name.type_name().First(), noEmitFragments, noEmitDS0149: true);
+            Type t = ResolveTypeName(name.type_name(), noEmitFragments, noEmitDS0149: true);
 
             if (!noEmitDS0149)
             {
@@ -1304,7 +1304,7 @@ internal static class SymbolResolver
 
         if (name.Ampersand() != null)
         {
-            Type t = ResolveTypeName(name.type_name().First(), noEmitFragments, noEmitDS0149: true);
+            Type t = ResolveTypeName(name.type_name(), noEmitFragments, noEmitDS0149: true);
 
             if (t.IsByRef)
             {
@@ -1347,16 +1347,23 @@ internal static class SymbolResolver
             return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
         }
 
-        // Inline union type
-        // e.g. int | string
-
-        if (name.Bar() != null)
+        // Tuple type
+        // e.g. (int, string)
+        if (name.Comma() != null && name.Comma().Length > 0)
         {
-            List<Type> partTypes = [];
-            foreach (DassieParser.Type_nameContext unionMember in name.type_name())
-                partTypes.Add(ResolveTypeName(unionMember, noEmitFragments, noEmitDS0149));
+            var partTypes = TypeHelpers.GetTupleItems(name, noEmitFragments, noEmitDS0149);
+            if (partTypes.All(p => string.IsNullOrEmpty(p.Name)))
+                return TypeHelpers.GetValueTupleType(partTypes.Select(t => t.Type).ToArray());
 
-            return UnionTypeCodeGeneration.GenerateInlineUnionType(partTypes.ToArray());
+            return null;
+        }
+
+        // Inline union type
+        // e.g. (int | string)
+        if (name.Bar() != null && name.Bar().Length > 0)
+        {
+            var partTypes = TypeHelpers.GetUnionItems(name, noEmitFragments, noEmitDS0149);
+            return UnionTypeCodeGeneration.GenerateInlineUnionType(partTypes);
         }
 
         if (name.type_arg_list() != null)
@@ -1377,9 +1384,9 @@ internal static class SymbolResolver
             }
         }
 
-        if (name.type_name() != null && name.type_name().Length > 0)
+        if (name.type_name() != null && name.type_name() != null)
         {
-            Type child = ResolveTypeName(name.type_name().First(), noEmitFragments);
+            Type child = ResolveTypeName(name.type_name(), noEmitFragments);
             return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
         }
 

@@ -747,5 +747,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the target of an attribute is invalid.
     /// </summary>
-    DS0181_InvalidAttributeTarget
+    DS0181_InvalidAttributeTarget,
+    /// <summary>
+    /// Emitted when an inline union type has multiple cases with the same name.
+    /// </summary>
+    DS0182_UnionTypeDuplicateTagName,
+    /// <summary>
+    /// Emitted when an inline union type has multiple cases with the same type.
+    /// </summary>
+    DS0183_UnionTypeDuplicateTagType,
+    /// <summary>
+    /// Emitted when an inline union type has some named and some unnamed tags.
+    /// </summary>
+    DS0184_UnionTypeMixedTags
 }
