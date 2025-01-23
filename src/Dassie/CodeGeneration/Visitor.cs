@@ -5219,7 +5219,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitTuple_expression([NotNull] DassieParser.Tuple_expressionContext context)
     {
-        List<Type> types = new();
+        static string TypeName(Type t)
+        {
+            try
+            {
+                return t.AssemblyQualifiedName;
+            }
+            catch (Exception)
+            {
+                return $"{t.FullName}, {Context.Assembly.FullName}";
+            }
+        }
+
+        List<Type> types = [];
 
         for (int i = 0; i < context.expression().Length; i++)
             types.Add(Visit(context.expression()[i]));
@@ -5228,7 +5240,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         // This stupid algorithm took AGES to create...
 
         List<Type> _types = types.ToList();
-        List<string> _intermediateTuples = new();
+        List<string> _intermediateTuples = [];
 
         string typeId = $"System.ValueTuple`{Math.Min(_types.Count, 8)}[";
 
@@ -5238,7 +5250,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             {
                 for (int i = 0; i < _types.Count - 1; i++)
                 {
-                    string _middlePart = $"[{_types[i].AssemblyQualifiedName}],";
+                    string _middlePart = $"[{TypeName(_types[i])}],";
 
                     if (_intermediateTuples.Any())
                         _intermediateTuples[^1] += _middlePart;
@@ -5246,7 +5258,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     typeId += _middlePart;
                 }
 
-                string _endPart = $"[{_types.Last().AssemblyQualifiedName}]]";
+                string _endPart = $"[{TypeName(_types.Last())}]]";
 
                 if (_intermediateTuples.Any())
                     _intermediateTuples[^1] += _endPart;
@@ -5257,7 +5269,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             Type[] proper = _types.ToArray()[(k * 8)..7];
             for (int j = 0; j < proper.Length; j++)
-                typeId += $"[{proper[j].AssemblyQualifiedName}],";
+                typeId += $"[{TypeName(proper[j])}],";
 
             string imTupleStart = $"[System.ValueTuple`{Math.Min(_types.Count - 7, 8)}[";
 
@@ -5281,6 +5293,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         Type _tupleType = Type.GetType(typeId);
+        _tupleType ??= GetValueTupleType(_types.ToArray());
 
         ConstructorInfo _c = _tupleType.GetConstructor(_tupleType.GenericTypeArguments);
         CurrentMethod.IL.Emit(OpCodes.Newobj, _c);
