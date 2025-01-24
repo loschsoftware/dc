@@ -4650,7 +4650,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.Start.Column,
                         context.GetText().Length,
                         DS0094_InitOnlyFieldAssignedOutsideOfConstructor,
-                        $"The field '{f.Name}' is readonly and cannot be modified outside of a constructor.");
+                        $"The field '{f.Name}' is read-only and cannot be modified outside of a constructor.");
                 }
 
                 if (f.IsStatic)
@@ -4835,7 +4835,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                             context.Start.Column,
                             context.GetText().Length,
                             DS0094_InitOnlyFieldAssignedOutsideOfConstructor,
-                            $"The field '{mf.Name}' is readonly and cannot be modified outside of a constructor.");
+                            $"The field '{mf.Name}' is read-only and cannot be modified outside of a constructor.");
                     }
 
                     EmitLdloc(tempIndex);
@@ -4865,7 +4865,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                             context.Start.Column,
                             context.GetText().Length,
                             DS0094_InitOnlyFieldAssignedOutsideOfConstructor,
-                            $"The field '{f.Name}' is readonly and cannot be modified outside of a constructor.");
+                            $"The field '{f.Name}' is read-only and cannot be modified outside of a constructor.");
                     }
 
                     EmitLdloc(tempIndex);
