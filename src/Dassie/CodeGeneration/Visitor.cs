@@ -304,7 +304,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         foreach (Type _interface in interfaces)
+        {
             tb.AddInterfaceImplementation(_interface);
+
+            foreach (MethodInfo defaultMember in _interface.GetMethods().Where(m => !m.IsAbstract))
+            {
+                tc.Methods.Add(new()
+                {
+                    Builder = (MethodBuilder)defaultMember
+                });
+            }
+        }
 
         if (parent != null)
         {
