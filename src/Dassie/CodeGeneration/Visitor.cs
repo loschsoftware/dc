@@ -5288,14 +5288,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         List<Type> imTuples = _intermediateTuples.Select(Type.GetType).ToList();
         foreach (Type t in imTuples)
         {
-            ConstructorInfo imConstructor = t.GetConstructor(t.GenericTypeArguments);
+            ConstructorInfo imConstructor = TypeBuilder.GetConstructor(t, t.GetGenericTypeDefinition().GetConstructors()[0]);
             CurrentMethod.IL.Emit(OpCodes.Newobj, imConstructor);
         }
 
         Type _tupleType = Type.GetType(typeId);
         _tupleType ??= GetValueTupleType(_types.ToArray());
 
-        ConstructorInfo _c = _tupleType.GetConstructor(_tupleType.GenericTypeArguments);
+        ConstructorInfo _c = TypeBuilder.GetConstructor(_tupleType, _tupleType.GetGenericTypeDefinition().GetConstructors()[0]);
         CurrentMethod.IL.Emit(OpCodes.Newobj, _c);
         return _tupleType;
     }

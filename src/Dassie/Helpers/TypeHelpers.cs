@@ -380,7 +380,7 @@ internal static class TypeHelpers
             return type;
 
         string typeName = GetOpenGenericTypeString(type.AssemblyQualifiedName);
-        return SymbolResolver.ResolveTypeName(typeName);
+        return SymbolResolver.ResolveTypeName(typeName, doNotFillGenericTypeDefinition: true);
     }
 
     /// <summary>
