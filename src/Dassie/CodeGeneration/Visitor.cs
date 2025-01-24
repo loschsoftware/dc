@@ -821,8 +821,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.Identifier().GetText() == TypeContext.Current.Builder.Name)
         {
             // Defer constructors for field initializers
-            TypeContext.Current.Constructors.Add(context);
-
+            //TypeContext.Current.Constructors.Add(context);
+            HandleConstructor(context);
             return typeof(void);
         }
 
@@ -1109,14 +1109,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // Remove default implementation of static interface method
 
             if (TypeContext.Current.Methods.Count(m =>
-                m.Builder.IsStatic
+                m.Builder != null
+                && m.Builder.IsStatic
                 && m.Builder.Name == mb.Name
                 && m.Builder.ReturnType == mb.ReturnType
                 && m.Builder.GetParameters().SequenceEqual(mb.GetParameters()))
                 > 1)
             {
                 MethodContext[] overloads = TypeContext.Current.Methods.Where(m =>
-                    m.Builder.IsStatic
+                    m.Builder != null
+                    && m.Builder.IsStatic
                     && m.Builder.Name == mb.Name
                     && m.Builder.ReturnType == mb.ReturnType
                     && m.Builder.GetParameters().SequenceEqual(mb.GetParameters())).ToArray()[..^1];
