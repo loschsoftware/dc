@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Dassie.Meta;
 
@@ -15,4 +17,5 @@ internal class MockMethodInfo
     public bool IsAbstract { get; set; }
     public bool IsGenericMethod { get; set; }
     public List<Type> GenericTypeArguments { get; set; }
+    public MethodInfo Builder { get; set; }
 }

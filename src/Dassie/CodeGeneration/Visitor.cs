@@ -366,7 +366,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                             IsAbstract = m.IsAbstract,
                             DeclaringType = t,
                             IsGenericMethod = m.IsGenericMethod,
-                            GenericTypeArguments = m.GetGenericArguments().ToList()
+                            GenericTypeArguments = m.GetGenericArguments().ToList(),
+                            Builder = m
                         });
                     }
 
@@ -381,7 +382,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                             Parameters = [],
                             DeclaringType = t,
                             IsGenericMethod = m.IsGenericMethod,
-                            GenericTypeArguments = m.GetGenericArguments().ToList()
+                            GenericTypeArguments = m.GetGenericArguments().ToList(),
+                            Builder = TypeBuilder.GetMethod(t, m)
                         };
 
                         if (!m.ReturnType.IsGenericTypeParameter)
@@ -6161,7 +6163,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         (string methodName, string operatorName) = GetMethodNameForCustomOperator(context.Custom_Operator());
 
-        MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.SpecialName, CallingConventions.Standard);
+        MethodAttributes attrib = MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.SpecialName;
+        attrib |= MethodAttributes.HideBySig;
+
+        MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(methodName, attrib, CallingConventions.Standard);
         CurrentMethod = new()
         {
             Builder = mb,
@@ -6269,6 +6274,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Type = param.Type,
                 Constraint = constraint
             });
+        }
+
+        if (TypeContext.Current.RequiredInterfaceImplementations.Any(m => m.Name == CurrentMethod.Builder.Name && m.ReturnType == tReturn && m.Parameters.SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type))))
+        {
+            MockMethodInfo ovrMethod = TypeContext.Current.RequiredInterfaceImplementations.First(m => m.Name == CurrentMethod.Builder.Name && m.ReturnType == tReturn && m.Parameters.SequenceEqual(CurrentMethod.Parameters.Select(p => p.Type)));
+            TypeContext.Current.RequiredInterfaceImplementations.Remove(ovrMethod);
+            TypeContext.Current.Builder.DefineMethodOverride(mb, ovrMethod.Builder);
         }
 
         CurrentFile.Fragments.Add(new()
