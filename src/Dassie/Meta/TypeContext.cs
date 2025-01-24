@@ -30,7 +30,7 @@ internal class TypeContext
 
     public Type FinishedType { get; set; } = null;
 
-    public List<MethodContext> Methods { get; } = [];
+    public List<MethodContext> Methods { get; set; } = [];
 
     public List<MetaFieldInfo> Fields { get; } = [];
 

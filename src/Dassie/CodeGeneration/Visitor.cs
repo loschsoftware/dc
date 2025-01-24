@@ -350,12 +350,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (!tc.Builder.IsInterface)
         {
-            // Get all abstract declarations from entire interface hierarchy
-
-            // This absolutely ridiculous piece of shit is necessary because
-            // Microsoft could not be bothered to implement
-            // TypeBuilder.GetMethods() on constructed generic types...
-
             tc.RequiredInterfaceImplementations = interfaces
                 .SelectMany(t =>
                 {
@@ -890,21 +884,29 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 return typeof(object);
             }
 
+            MethodInfo ovr = null;
+
             if (VisitorStep1 != null)
             {
                 List<MockMethodInfo> interfaceMethods = TypeContext.Current.RequiredInterfaceImplementations;
                 foreach (MockMethodInfo method in interfaceMethods)
                 {
-                    if (method.IsAbstract && method.Name == context.Identifier().GetText() && method.ReturnType == (VisitorStep1CurrentMethod == null ? typeof(DassieParser) : VisitorStep1CurrentMethod.Builder.ReturnType) && method.Parameters.SequenceEqual(VisitorStep1CurrentMethod == null ? [] : VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
+                    if (method.Name == context.Identifier().GetText() && method.ReturnType == (VisitorStep1CurrentMethod == null ? typeof(DassieParser) : VisitorStep1CurrentMethod.Builder.ReturnType) && method.Parameters.SequenceEqual(VisitorStep1CurrentMethod == null ? [] : VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
                     {
-                        attrib |= MethodAttributes.HideBySig;
-                        attrib |= MethodAttributes.NewSlot;
-                        attrib |= MethodAttributes.Virtual;
+                        if (method.IsAbstract)
+                        {
+                            attrib |= MethodAttributes.HideBySig;
+                            attrib |= MethodAttributes.NewSlot;
+                            attrib |= MethodAttributes.Virtual;
+                        }
+                        else if (method.Builder.IsStatic)
+                            ovr = method.Builder;
                     }
                 }
             }
 
-            // TODO: Static interface members
+            if (attrib.HasFlag(MethodAttributes.Static))
+                attrib &= ~MethodAttributes.Virtual;
 
             MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
                 context.Identifier().GetText(),
@@ -912,6 +914,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 callingConventions);
 
             mb.SetImplementationFlags(implementationFlags);
+
+            if (ovr != null)
+                TypeContext.Current.Builder.DefineMethodOverride(mb, ovr);
 
             CurrentMethod = new()
             {
@@ -1099,6 +1104,24 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     Type = param.Type,
                     Constraint = constraint
                 });
+            }
+
+            // Remove default implementation of static interface method
+
+            if (TypeContext.Current.Methods.Count(m =>
+                m.Builder.IsStatic
+                && m.Builder.Name == mb.Name
+                && m.Builder.ReturnType == mb.ReturnType
+                && m.Builder.GetParameters().SequenceEqual(mb.GetParameters()))
+                > 1)
+            {
+                MethodContext[] overloads = TypeContext.Current.Methods.Where(m =>
+                    m.Builder.IsStatic
+                    && m.Builder.Name == mb.Name
+                    && m.Builder.ReturnType == mb.ReturnType
+                    && m.Builder.GetParameters().SequenceEqual(mb.GetParameters())).ToArray()[..^1];
+
+                TypeContext.Current.Methods = TypeContext.Current.Methods.Except(overloads).ToList();
             }
 
             CurrentFile.Fragments.Add(new()
