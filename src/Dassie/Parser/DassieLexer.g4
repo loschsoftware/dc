@@ -155,6 +155,9 @@ Remove_Handler: '@remove';
 Get: '@get';
 Set: '@set';
 
+Operator_Open_Paren: '﹙';
+Operator_Close_Paren: '﹚';
+
 Identifier
 	: IdentifierOrKeyword
 	| Backtick (~[`\r\n\u0085\u2028\u2029])+? Backtick
@@ -192,7 +195,7 @@ fragment CustomOperatorCharacter
 Custom_Operator
 	: Open_Paren CustomOperatorCharacter Close_Paren
 	| CustomOperatorCharacter CustomOperatorCharacter+
-    | Slash (~[/\r\n\u0085\u2028\u2029])+ Slash
+    | Operator_Open_Paren (~[/\r\n\u0085\u2028\u2029])+ Operator_Close_Paren
 	;
 
 fragment Integer_Suffix: [sS][bB] | [bB] | [sS] | [uU][sS] | [uU] | [lL] | [uU][lL] | [nN] | [uU][nN];
