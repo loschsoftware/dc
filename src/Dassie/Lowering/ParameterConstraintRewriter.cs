@@ -65,10 +65,6 @@ internal class ParameterConstraintRewriter : ITreeToStringRewriter
         if (member.Var() != null)
             var = member.Var().Symbol.Text;
 
-        string ovr = "";
-        if (member.Override() != null)
-            ovr = member.Override().Symbol.Text;
-
         string typeName = "";
         if (member.type_name() != null)
             typeName = $"{member.Colon().Symbol.Text} {listener.GetTextForRule(member.type_name())}";
@@ -81,7 +77,7 @@ internal class ParameterConstraintRewriter : ITreeToStringRewriter
                 attribsText.Append(listener.GetTextForRule(attrib));
         }
 
-        sb.Append($"{attribsText.ToString()} {val}{var} {listener.GetTextForRule(member.member_access_modifier())} {listener.GetTextForRule(member.member_oop_modifier())} {specialModsText} {ovr} {member.Identifier().Symbol.Text} {listener.GetTextForRule(member.type_parameter_list())} {paramListBuilder.ToString()} {typeName}");
+        sb.Append($"{attribsText.ToString()} {val}{var} {listener.GetTextForRule(member.member_access_modifier())} {listener.GetTextForRule(member.member_oop_modifier())} {specialModsText} {member.Identifier().Symbol.Text} {listener.GetTextForRule(member.type_parameter_list())} {paramListBuilder.ToString()} {typeName}");
         sb.Append("= {");
 
         foreach (var param in member.parameter_list().parameter())

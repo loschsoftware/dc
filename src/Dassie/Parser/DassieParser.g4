@@ -226,9 +226,9 @@ generic_identifier
     ;
 
 field_access_modifier
-    : Global Partial?
-    | Local Partial?
-    | Internal Partial?
+    : Global
+    | Local
+    | Internal
     ;
 
 field_declaration
@@ -311,9 +311,9 @@ member_special_modifier
 
 type_member
     // Method or field with initializer
-    : attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals NewLine* expression)?
+    : attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals NewLine* expression)?
     // Field without initializer
-    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Override? (Var | Val)? Identifier type_parameter_list? Colon type_name
+    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Var | Val)? Identifier type_parameter_list? Colon type_name
     // Custom operator
     | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Custom_Operator | Open_Paren Custom_Operator Close_Paren) parameter_list (Colon type_name)? Equals NewLine* expression
     // Property or event

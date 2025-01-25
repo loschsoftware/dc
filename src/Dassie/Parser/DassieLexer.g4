@@ -26,7 +26,6 @@ Local: 'local';
 Internal: 'internal';
 Static: 'static';
 Protected: 'protected';
-Partial: 'partial';
 Open: 'open';
 Closed: 'closed';
 Abstract: 'abstract';
@@ -40,7 +39,6 @@ Ref: 'ref';
 Var: 'var';
 Val: 'val';
 Base: 'base';
-Override: 'override';
 
 Try: '$try';
 Raise: '$throw';
