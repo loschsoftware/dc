@@ -5647,9 +5647,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type tReturn = null;
 
         CurrentMethod.LoopArrayTypeProbeIndex++;
-
-        if (VisitorStep1CurrentMethod != null)
-            tReturn = VisitorStep1CurrentMethod.LoopArrayTypeProbes[CurrentMethod.LoopArrayTypeProbeIndex];
+        VisitorStep1CurrentMethod?.LoopArrayTypeProbes.TryGetValue(CurrentMethod.LoopArrayTypeProbeIndex, out tReturn);
 
         if (tReturn == null || tReturn == typeof(void))
             tReturn = typeof(object);
