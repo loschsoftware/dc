@@ -759,5 +759,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an inline union type has some named and some unnamed tags.
     /// </summary>
-    DS0184_UnionTypeMixedTags
+    DS0184_UnionTypeMixedTags,
+    /// <summary>
+    /// Emitted when a type alias implements one or more interfaces.
+    /// </summary>
+    DS0185_AliasTypeImplementsInterface,
+    /// <summary>
+    /// Emitted when a type alias explicitly specifies a base type.
+    /// </summary>
+    DS0186_AliasTypeExtendsType,
+    /// <summary>
+    /// Emitted when a type alias has a generic type parameter list. This restriction might get lifted in the future.
+    /// </summary>
+    DS0187_GenericAliasType
 }

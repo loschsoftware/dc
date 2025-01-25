@@ -560,6 +560,38 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         "The 'open' modifier is invalid on alias types.");
                 }
 
+                if (interfaces.Count > 0)
+                {
+                    EmitErrorMessage(
+                        context.inheritance_list().Start.Line,
+                        context.inheritance_list().Start.Column,
+                        context.inheritance_list().GetText().Length,
+                        DS0185_AliasTypeImplementsInterface,
+                        "Type aliases cannot implement templates.");
+
+                    TypeContext.Current.RequiredInterfaceImplementations = [];
+                }
+
+                if (explicitBaseType)
+                {
+                    EmitErrorMessage(
+                        context.inheritance_list().Start.Line,
+                        context.inheritance_list().Start.Column,
+                        context.inheritance_list().GetText().Length,
+                        DS0186_AliasTypeExtendsType,
+                        "Type aliases cannot explicitly set their base type.");
+                }
+
+                if (context.type_parameter_list() != null)
+                {
+                    EmitErrorMessage(
+                        context.type_parameter_list().Start.Line,
+                        context.type_parameter_list().Start.Column,
+                        context.type_parameter_list().GetText().Length,
+                        DS0187_GenericAliasType,
+                        "Type aliases cannot define generic type parameters.");
+                }
+
                 Type aliasedType = SymbolResolver.ResolveTypeName(context.type_block().type_name());
 
                 TypeContext.Current.IsAlias = true;
