@@ -775,5 +775,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a string processor is used that cannot be resolved.
     /// </summary>
-    DS0188_InvalidStringProcessor
+    DS0188_InvalidStringProcessor,
+    /// <summary>
+    /// Emitted when a processed string contains interpolations.
+    /// </summary>
+    DS0189_ProcessedStringContainsInterpolations
 }

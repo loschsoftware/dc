@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using Dassie.Parser;
 using System.IO;
 using System.Text;
 
@@ -31,6 +32,20 @@ internal class InterpolatedStringRewriter : ITreeToStringRewriter
 
         if (!ContainsInterpolation(literal))
             return literal;
+
+        DassieParser.String_atomContext atom = (DassieParser.String_atomContext)tree;
+
+        if (atom.identifier_atom() != null)
+        {
+            EmitErrorMessage(
+                atom.identifier_atom().Start.Line,
+                atom.identifier_atom().Start.Column,
+                atom.identifier_atom().GetText().Length,
+                DS0189_ProcessedStringContainsInterpolations,
+                $"A processed string literal cannot contain interpolations. The string value needs to be known at compile-time.");
+
+            return literal;
+        }
 
         StringBuilder result = new();
         StringReader sr = new(literal[1..^1]);
