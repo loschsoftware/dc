@@ -61,7 +61,7 @@ internal class BuildCommand : ICompilerCommand
         else if (config.BuildProfiles.Any(p => p.Name.ToLowerInvariant() == "default"))
             return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"), config);
 
-        string[] filesToCompile = Directory.EnumerateFiles(".\\", "*.ds", SearchOption.AllDirectories).ToArray();
+        string[] filesToCompile = Directory.EnumerateFiles("./", "*.ds", SearchOption.AllDirectories).ToArray();
         filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();
 
         if (filesToCompile.Length < 1)

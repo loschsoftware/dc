@@ -119,7 +119,7 @@ internal class AnalyzeCommand : ICompilerCommand
             return -1;
         }
 
-        string[] files = Directory.EnumerateFiles(".\\", "*.ds", SearchOption.AllDirectories).ToArray();
+        string[] files = Directory.EnumerateFiles("./", "*.ds", SearchOption.AllDirectories).ToArray();
         files = files.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();
 
         return AnalyzeFiles(files, ProjectFileDeserializer.DassieConfig, analyzerName);

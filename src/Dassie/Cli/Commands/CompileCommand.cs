@@ -96,7 +96,7 @@ internal class CompileCommand : ICompilerCommand
 
             foreach (ProjectReference projRef in config.References.Where(r => r is ProjectReference).Cast<ProjectReference>())
             {
-                if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath(".\\"), relativePathResolverBaseDir))
+                if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath("./"), relativePathResolverBaseDir))
                     return -1;
             }
 
@@ -507,7 +507,7 @@ internal class CompileCommand : ICompilerCommand
 
         string directory = Path.GetDirectoryName(pattern);
         if (string.IsNullOrEmpty(directory))
-            directory = ".\\";
+            directory = "./";
 
         string filePattern = Path.GetFileName(pattern);
         string[] matchingFiles = Directory.GetFiles(directory, filePattern);

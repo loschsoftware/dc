@@ -86,7 +86,7 @@ internal static class ReferenceHandler
         }
         else
         {
-            foreach (string fsEntry in Directory.GetFileSystemEntries(".\\"))
+            foreach (string fsEntry in Directory.GetFileSystemEntries("./"))
             {
                 try
                 {
