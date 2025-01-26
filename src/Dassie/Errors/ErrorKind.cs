@@ -771,5 +771,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a type alias has a generic type parameter list. This restriction might get lifted in the future.
     /// </summary>
-    DS0187_GenericAliasType
+    DS0187_GenericAliasType,
+    /// <summary>
+    /// Emitted when a string processor is used that cannot be resolved.
+    /// </summary>
+    DS0188_InvalidStringProcessor
 }

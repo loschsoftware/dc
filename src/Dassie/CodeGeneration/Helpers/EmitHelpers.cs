@@ -1,5 +1,7 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Helpers;
+using Dassie.Meta;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -159,70 +161,109 @@ internal static class EmitHelpers
             CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
     }
 
-    public static void EmitConst(object value)
+    private static bool IsConstant(Type type)
+    {
+        return IsNumericType(type)
+            || type == typeof(bool)
+            || type == typeof(string)
+            || type.IsEnum
+            || type.IsArray && IsConstant(type.GetElementType());
+    }
+
+    public static bool EmitConst(object value)
     {
         if (value == null)
-            return;
+            return false;
 
         if (value is sbyte or byte or short or ushort or int or char)
         {
-            EmitLdcI4((int)value);
-            return;
+            EmitLdcI4(Convert.ToInt32(value));
+            return true;
         }
 
         if (value is uint i)
         {
             EmitLdcI4(i);
-            return;
+            return true;
         }
 
         if (value is long l)
         {
             CurrentMethod.IL.Emit(OpCodes.Ldc_I8, l);
-            return;
+            return true;
         }
 
         if (value is ulong u)
         {
             CurrentMethod.IL.Emit(OpCodes.Ldc_I8, u); // Nobody's gonna know
-            return;
+            return true;
         }
 
         if (value is float f)
         {
             CurrentMethod.IL.Emit(OpCodes.Ldc_R4, f);
-            return;
+            return true;
         }
 
         if (value is double d)
         {
             CurrentMethod.IL.Emit(OpCodes.Ldc_R8, d);
-            return;
+            return true;
         }
 
         if (value is decimal dec)
         {
-            CurrentMethod.IL.Emit(OpCodes.Ldc_R8, (double)dec); // Who uses decimal anyway
-            return;
+            DecimalLiteralCodeGeneration.EmitDecimal(dec);
+            return true;
         }
 
         if (value is bool b)
         {
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, b ? (byte)1 : (byte)0);
-            return;
+            return true;
         }
 
         if (value is string s)
         {
             CurrentMethod.IL.Emit(OpCodes.Ldstr, s);
-            return;
+            return true;
         }
 
         if (value.GetType().IsEnum)
         {
             EmitLdcI4((int)value);
-            return;
+            return true;
         }
+
+        if (value.GetType().IsArray && IsConstant(value.GetType()))
+        {
+            Array array = (Array)value;
+
+            CurrentMethod.IL.DeclareLocal(value.GetType());
+            CurrentMethod.LocalIndex++;
+
+            EmitLdcI4(array.Length);
+            CurrentMethod.IL.Emit(OpCodes.Newarr, value.GetType().GetElementType());
+            EmitStloc(CurrentMethod.LocalIndex);
+
+            IEnumerator enumerator = array.GetEnumerator();
+            int index = 0;
+
+            while (enumerator.MoveNext())
+            {
+                EmitLdloc(CurrentMethod.LocalIndex);
+                EmitLdcI4(index);
+                EmitConst(enumerator.Current);
+                CurrentMethod.IL.Emit(TypeHelpers.GetStelemOpCode(value.GetType().GetElementType()));
+
+                index++;
+            }
+
+            EmitLdloc(CurrentMethod.LocalIndex);
+            return true;
+        }
+
+        return false;
     }
 
     // Very rudimentary and almost useless - fix ASAP

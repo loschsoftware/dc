@@ -146,8 +146,7 @@ boolean_atom
     ;
 
 string_atom
-    : String_Literal
-    | Verbatim_String_Literal
+    : (String_Literal | Verbatim_String_Literal) (Colon identifier_atom)?
     ;
 
 character_atom

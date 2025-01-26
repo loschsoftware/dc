@@ -98,6 +98,38 @@ internal static class TypeHelpers
     }
 
     /// <summary>
+    /// Gets the IL instruction to set an array element.
+    /// </summary>
+    /// <param name="t">The element type of the array.</param>
+    /// <returns>The <c>stelem.X</c> opcode corresponding to the specified type.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static OpCode GetStelemOpCode(this Type t)
+    {
+        if (t == typeof(byte) || t == typeof(sbyte))
+            return OpCodes.Stelem_I1;
+
+        if (t == typeof(short) || t == typeof(ushort))
+            return OpCodes.Stelem_I2;
+
+        if (t == typeof(int) || t == typeof(uint))
+            return OpCodes.Stelem_I4;
+
+        if (t == typeof(long) || t == typeof(ulong))
+            return OpCodes.Stelem_I8;
+
+        if (t == typeof(float))
+            return OpCodes.Stelem_R4;
+
+        if (t == typeof(double))
+            return OpCodes.Stelem_R8;
+
+        if (t == typeof(nint) || t == typeof(nuint))
+            return OpCodes.Stelem_I;
+
+        return OpCodes.Stelem_Ref;
+    }
+
+    /// <summary>
     /// Emits an <c>ldind</c> instruction if the specified type is a ByRef type.
     /// </summary>
     /// <param name="t">The type to load indirectly.</param>

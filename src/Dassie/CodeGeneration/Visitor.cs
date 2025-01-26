@@ -4532,9 +4532,40 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         string rawText = eval.VisitString_atom(context).Value;
 
-        CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
+        if (context.identifier_atom() == null)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
+            return typeof(string);
+        }
 
-        return typeof(string);
+        Type processorType = SymbolResolver.ResolveTypeName(
+            context.identifier_atom().GetText(),
+            context.identifier_atom().Start.Line,
+            context.identifier_atom().Start.Column,
+            context.identifier_atom().GetText().Length);
+
+        if (processorType == null)
+        {
+            EmitErrorMessage(
+                context.identifier_atom().Start.Line,
+                context.identifier_atom().Start.Column,
+                context.identifier_atom().GetText().Length,
+                DS0188_InvalidStringProcessor,
+                $"The string processor '{context.identifier_atom().GetText()}' could not be resolved.");
+
+            CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
+            return typeof(string);
+        }
+
+        object result = processorType.InvokeMember("Process", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [rawText]);
+
+        if (EmitConst(result))
+            return result.GetType();
+
+        MethodInfo processMethod = processorType.GetMethod("Process");
+        CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
+        CurrentMethod.IL.Emit(OpCodes.Call, processMethod);
+        return processMethod.ReturnType;
     }
 
     public override Type VisitCharacter_atom([NotNull] DassieParser.Character_atomContext context)

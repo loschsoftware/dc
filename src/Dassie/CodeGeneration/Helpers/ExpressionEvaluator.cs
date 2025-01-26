@@ -247,10 +247,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
     public override Expression VisitString_atom([NotNull] DassieParser.String_atomContext context)
     {
-        string text = context.GetText()[1..^1];
+        string text = null;
+
+        if (context.String_Literal() != null)
+            text = context.String_Literal().GetText()[1..^1];
 
         if (context.Verbatim_String_Literal() != null)
         {
+            text = context.Verbatim_String_Literal().GetText()[1..^1];
             string verbatimText = text[1..];
 
             Regex doubleQuote = new(@"""""");
@@ -280,7 +284,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
             });
         }
 
-        return new(typeof(string), GetRawString(context.GetText()[1..^1]));
+        return new(typeof(string), GetRawString(text));
     }
 
     private static char GetChar(StringReader reader, int count)
