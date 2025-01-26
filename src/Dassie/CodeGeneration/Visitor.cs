@@ -4542,7 +4542,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             context.identifier_atom().GetText(),
             context.identifier_atom().Start.Line,
             context.identifier_atom().Start.Column,
-            context.identifier_atom().GetText().Length);
+            context.identifier_atom().GetText().Length,
+            noErrors: true);
 
         if (processorType == null)
         {
@@ -4557,12 +4558,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(string);
         }
 
-        object result = processorType.InvokeMember("Process", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [rawText]);
+        MethodInfo processMethod = processorType.GetMethod("Process");
+
+        if (processMethod.GetCustomAttribute<PureAttribute>() == null)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
+            CurrentMethod.IL.Emit(OpCodes.Call, processMethod);
+            return processMethod.ReturnType;
+        }
+
+        object result = processMethod.Invoke(null, [rawText]);
 
         if (EmitConst(result))
             return result.GetType();
 
-        MethodInfo processMethod = processorType.GetMethod("Process");
         CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
         CurrentMethod.IL.Emit(OpCodes.Call, processMethod);
         return processMethod.ReturnType;

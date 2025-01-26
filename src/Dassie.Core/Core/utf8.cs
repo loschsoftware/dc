@@ -10,6 +10,7 @@ namespace Dassie.Core;
 public class utf8 : IStringProcessor<byte[]>
 {
     /// <inheritdoc/>
+    [Pure]
     public static byte[] Process(string input)
         => Encoding.UTF8.GetBytes(input);
 }
