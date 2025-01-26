@@ -1675,16 +1675,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (Context.Files.Count > 0)
         {
             if ((context.expression().Length == 0 && Context.FilePaths.Count < 2) || (context.expression().Length == 0 && Context.FilePaths.Last() == CurrentFile.Path && Context.ShouldThrowDS0027))
-            {
-                EmitErrorMessage(0, 0, context.GetText().Length, DS0027_EmptyProgram, "The program does not contain any executable code.");
-                return typeof(void);
-            }
+                EmitWarningMessage(0, 0, context.GetText().Length, DS0027_EmptyProgram, "The program does not contain any executable code.");
 
             Context.ShouldThrowDS0027 = context.expression().Length == 0;
         }
-
-        if (context.children == null)
-            return typeof(void);
 
         TypeBuilder tb = Context.Module.DefineType($"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}Program");
 
@@ -1720,12 +1714,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         InjectClosureParameterInitializers();
 
-        foreach (IParseTree child in context.children.Take(context.children.Count - 1))
-        {
-            Type _t = Visit(child);
+        Type ret = typeof(void);
 
-            if (_t != typeof(void) && !CurrentMethod.SkipPop)
+        if (context.children != null && context.children.Count > 0)
+        {
+            foreach (IParseTree child in context.children.Take(context.children.Count - 1))
             {
+                Type _t = Visit(child);
+
+                if (_t != typeof(void) && !CurrentMethod.SkipPop)
+                {
 #if ENABLE_DS0125
                 ParserRuleContext rule = (ParserRuleContext)tree;
                 string text = CurrentFile.CharStream.GetText(new(rule.Start.StartIndex, rule.Stop.StopIndex)).Trim();
@@ -1741,15 +1739,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 }
 #endif // ENABLE_DS0125
 
-                CurrentMethod.IL.Emit(OpCodes.Pop);
+                    CurrentMethod.IL.Emit(OpCodes.Pop);
+                }
+
+                if (CurrentMethod.SkipPop)
+                    CurrentMethod.SkipPop = false;
             }
 
-            if (CurrentMethod.SkipPop)
-                CurrentMethod.SkipPop = false;
+            // Last expression is like return statement
+            ret = Visit(context.children.Last());
         }
-
-        // Last expression is like return statement
-        Type ret = Visit(context.children.Last());
 
         if (ret != typeof(void) && ret != typeof(int) && ret != typeof(int) && ret != null)
         {

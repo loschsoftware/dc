@@ -5,6 +5,7 @@ using Dassie.Configuration;
 using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Parser;
+using Dassie.Symbols;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,10 +92,22 @@ public static class Compiler
 
         if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !messages.Any(m => m.ErrorCode == DS0027_EmptyProgram))
         {
-            EmitErrorMessage(
+            // Create implicit entrypoint
+
+            TypeBuilder entry = Context.Module.DefineType(SymbolNameGenerator.GetImplicitEntryPointContainerTypeName(), TypeAttributes.Public | TypeAttributes.Class);
+            MethodBuilder entryMb = entry.DefineMethod(SymbolNameGenerator.GetImplicitEntryPointName(), MethodAttributes.Public | MethodAttributes.Static);
+            entryMb.SetSignature(typeof(void), [], [], [], [], []);
+            ILGenerator entryIL = entryMb.GetILGenerator();
+            entryIL.Emit(OpCodes.Ret);
+            entry.CreateType();
+
+            Context.EntryPointIsSet = true;
+            Context.EntryPoint = entryMb;
+
+            EmitWarningMessage(
                 0, 0, 0,
                 DS0030_NoEntryPoint,
-                "Program contains no entry point. Use the '<EntryPoint>' attribute to specify an application entry point.",
+                "Program contains no entry point. Use the '<EntryPoint>' attribute to set the application entry point.",
                 "dc");
         }
 

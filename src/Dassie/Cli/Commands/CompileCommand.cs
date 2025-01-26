@@ -245,7 +245,7 @@ internal class CompileCommand : ICompilerCommand
         foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
             AddResource(res, Directory.GetCurrentDirectory(), relativePathResolverBaseDir);
 
-        if (Context.Files.All(f => f.Errors.Count == 0) && VisitorStep1.Files.All(f => f.Errors.Count == 0))
+        if (!messages.Any(m => m.Severity == Severity.Error))
         {
             NativeResource[] resources = null;
 

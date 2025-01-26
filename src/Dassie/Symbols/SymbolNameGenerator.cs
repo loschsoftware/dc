@@ -39,4 +39,7 @@ internal static class SymbolNameGenerator
     public static string GetPropertyBackingFieldName(string propertyName) => $"{GeneratedPrefix}_{char.ToLower(propertyName[0])}{propertyName[1..]}_BackingField";
 
     public static string GetInlineUnionTypeName(int index) => $"{GeneratedPrefix}$Union'{index}";
+    
+    public static string GetImplicitEntryPointContainerTypeName() => $"{GeneratedPrefix}$Application";
+    public static string GetImplicitEntryPointName() => $"{GeneratedPrefix}$EntryPoint";
 }
