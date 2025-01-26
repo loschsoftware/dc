@@ -7,6 +7,10 @@ using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 
+#pragma warning disable IDE1006
+#pragma warning disable IDE0079
+#pragma warning disable IL3000
+
 namespace Dassie.Core;
 
 /// <summary>

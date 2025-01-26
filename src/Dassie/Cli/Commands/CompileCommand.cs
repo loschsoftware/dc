@@ -24,6 +24,9 @@ using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Text;
 
+#pragma warning disable IDE0079
+#pragma warning disable IL3000
+
 namespace Dassie.Cli.Commands;
 
 internal class CompileCommand : ICompilerCommand

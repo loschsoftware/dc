@@ -33,8 +33,13 @@ internal class WatchCommand : ICompilerCommand
         LogOut.WriteLine(" to stop watching changes.");
 
         watchProcess = new Process();
+#if STANDALONE
+        watchProcess.StartInfo.FileName = $"{Environment.GetCommandLineArgs()[0]}";
+        watchProcess.StartInfo.Arguments = "watch-indefinetly";
+#else
         watchProcess.StartInfo.FileName = "dotnet";
         watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} watch-indefinetly";
+#endif
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;
         watchProcess.Start();
@@ -47,8 +52,13 @@ internal class WatchCommand : ICompilerCommand
     public static int WatchIndefinetly()
     {
         watchProcess = new Process();
+#if STANDALONE
+        watchProcess.StartInfo.FileName = $"{Environment.GetCommandLineArgs()[0]}";
+        watchProcess.StartInfo.Arguments = "build";
+#else
         watchProcess.StartInfo.FileName = "dotnet";
-        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} build";
+        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} watch-indefinetly";
+#endif
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;
         watchProcess.Start();
@@ -62,7 +72,11 @@ internal class WatchCommand : ICompilerCommand
                 IncludeSubdirectories = true
             };
 
+#if STANDALONE
+            string cmd = $"{Environment.GetCommandLineArgs()[0]} build";
+#else
             string cmd = $"{Assembly.GetCallingAssembly().Location} build";
+#endif
 
             watcher.Changed += Compile;
             watcher.Created += Compile;
@@ -71,8 +85,13 @@ internal class WatchCommand : ICompilerCommand
             void Compile(object sender, FileSystemEventArgs e)
             {
                 var buildProcess = new Process();
+#if STANDALONE
+                buildProcess.StartInfo.FileName = cmd.Split(' ')[0];
+                buildProcess.StartInfo.Arguments = cmd.Split(' ')[1];
+#else
                 buildProcess.StartInfo.FileName = "dotnet";
                 buildProcess.StartInfo.Arguments = cmd;
+#endif
                 buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 buildProcess.Start();
                 buildProcess.WaitForExit();

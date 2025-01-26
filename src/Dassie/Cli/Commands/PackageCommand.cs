@@ -8,6 +8,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+#pragma warning disable IDE0079
+#pragma warning disable IL3000
+
 namespace Dassie.Cli.Commands;
 
 internal class PackageCommand : ICompilerCommand

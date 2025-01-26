@@ -28,14 +28,22 @@ internal class MacroParser
 
     public void AddDefaultMacros()
     {
+#if STANDALONE
+        string compilerDir = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]) + Path.DirectorySeparatorChar;
+        string compilerPath = Environment.GetCommandLineArgs()[0];
+#else
+        string compilerDir = Path.GetDirectoryName(typeof(MacroParser).Assembly.Location) + Path.DirectorySeparatorChar;
+        string compilerPath = typeof(MacroParser).Assembly.Location;
+#endif
+
         Dictionary<string, string> macros = new()
         {
             { "time", DateTime.Now.ToShortTimeString() },
             { "timeexact", DateTime.Now.ToString("HH:mm:ss.ffff") },
             { "date", DateTime.Now.ToShortDateString() },
             { "year", DateTime.Now.Year.ToString() },
-            { "compilerdirectory", Path.GetDirectoryName(typeof(MacroParser).Assembly.Location) + Path.DirectorySeparatorChar },
-            { "compilerpath", typeof(MacroParser).Assembly.Location }
+            { "compilerdirectory", compilerDir },
+            { "compilerpath", compilerPath }
         };
 
         foreach (var macro in macros)
