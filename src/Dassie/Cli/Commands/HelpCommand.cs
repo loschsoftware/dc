@@ -113,10 +113,12 @@ internal class HelpCommand : ICompilerCommand
         {
             StringBuilder outputBuilder = new();
 
-            string header = $"{"A "}{"Name",-40}{"Type",-20}{"Default"}";
+            string header = $"{"A "}{"Name",-30}{"Type",-20}{"Default",-10}{"Description"}";
             outputBuilder.AppendLine();
             outputBuilder.AppendLine(header);
-            outputBuilder.AppendLine(new string('-', header.Length));
+            outputBuilder.AppendLine(new string('-', Console.WindowWidth));
+
+            int descriptionWidth = Console.WindowWidth - 62 - 5;
 
             PropertyInfo[] properties = typeof(DassieConfig).GetProperties();
             List<(string PropertyName, string Text)> propertyLines = [];
@@ -144,11 +146,14 @@ internal class HelpCommand : ICompilerCommand
                 if (CommandLineOptionParser.Aliases.ContainsValue(name))
                     alias = CommandLineOptionParser.Aliases.First(a => a.Value == name).Key.ToLowerInvariant();
 
-                propertyLines.Add((name, $"{alias,-1} {property.Name,-40}{GetPropertyTypeName(property.PropertyType),-20}{defaultVal}"));
+                string descriptionText = CommandLineOptionParser.GetDescription(property.Name);
+                string descriptionFormatted = FormatLines(descriptionText, false, 62);
+
+                propertyLines.Add((name, $"{alias,-1} {property.Name,-30}{GetPropertyTypeName(property.PropertyType),-20}{defaultVal,-10}{descriptionFormatted}"));
             }
 
             foreach (string prop in propertyLines.OrderBy(p => p.PropertyName).Select(p => p.Text))
-                outputBuilder.AppendLine(prop);
+                outputBuilder.Append(prop);
 
             Console.WriteLine(outputBuilder.ToString());
             return 0;

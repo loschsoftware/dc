@@ -326,4 +326,17 @@ internal static class CommandLineOptionParser
             }
         }
     }
+
+    public static string GetDescription(string elementName)
+    {
+        PropertyInfo prop = typeof(DassieConfig).GetProperty(elementName);
+        if (prop == null)
+            return "";
+
+        DescriptionAttribute description = prop.GetCustomAttribute<DescriptionAttribute>();
+        if (description == null)
+            return "";
+
+        return description.Description;
+    }
 }
