@@ -1675,7 +1675,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (Context.Files.Count > 0)
         {
             if ((context.expression().Length == 0 && Context.FilePaths.Count < 2) || (context.expression().Length == 0 && Context.FilePaths.Last() == CurrentFile.Path && Context.ShouldThrowDS0027))
-                EmitWarningMessage(0, 0, context.GetText().Length, DS0027_EmptyProgram, "The program does not contain any executable code.");
+                EmitWarningMessage(0, 0, context.GetText().Length, DS0027_EmptyProgram, "Program contains no executable code.");
 
             Context.ShouldThrowDS0027 = context.expression().Length == 0;
         }
