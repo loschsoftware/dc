@@ -35,20 +35,11 @@ internal class InterpolatedStringRewriter : ITreeToStringRewriter
 
         DassieParser.String_atomContext atom = (DassieParser.String_atomContext)tree;
 
-        if (atom.identifier_atom() != null)
-        {
-            EmitErrorMessage(
-                atom.identifier_atom().Start.Line,
-                atom.identifier_atom().Start.Column,
-                atom.identifier_atom().GetText().Length,
-                DS0189_ProcessedStringContainsInterpolations,
-                $"A processed string literal cannot contain interpolations. The string value needs to be known at compile-time.");
-
-            return literal;
-        }
-
         StringBuilder result = new();
-        StringReader sr = new(literal[1..^1]);
+        StringReader sr = new(atom.String_Literal().GetText()[1..^1]);
+
+        if (atom.identifier_atom() != null)
+            result.Append($"{atom.identifier_atom().GetText()}.Process ");
 
         result.Append("\"\"");
 
