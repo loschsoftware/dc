@@ -712,4 +712,33 @@ internal static class EmitHelpers
         if (!equality)
             CurrentMethod.IL.Emit(OpCodes.Not);
     }
+
+    public static void EmitDefault(Type type)
+    {
+        if (type.IsClass)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldnull);
+            return;
+        }
+
+        CurrentMethod.LocalIndex++;
+        CurrentMethod.IL.DeclareLocal(type);
+
+        if (type.IsPrimitive)
+        {
+            if (type == typeof(float))
+                CurrentMethod.IL.Emit(OpCodes.Ldc_R4, (float)0);
+            else if (type == typeof(double))
+                CurrentMethod.IL.Emit(OpCodes.Ldc_R8, (float)0);
+            else
+                EmitLdcI4(0);
+
+            EmitStloc(CurrentMethod.LocalIndex);
+            return;
+        }
+
+        EmitLdloca(CurrentMethod.LocalIndex);
+        CurrentMethod.IL.Emit(OpCodes.Initobj, type);
+        EmitLdloc(CurrentMethod.LocalIndex);
+    }
 }

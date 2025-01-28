@@ -4346,6 +4346,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             else
                 t3 = Visit(context.else_branch().expression());
         }
+        else
+            EmitDefault(t);
 
         CurrentMethod.IL.MarkLabel(restBranch);
 
@@ -4385,6 +4387,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression());
 
         CurrentMethod.IL.MarkLabel(fb);
+        EmitDefault(t);
         CurrentMethod.IL.Emit(OpCodes.Br, rest);
 
         CurrentMethod.IL.MarkLabel(rest);
@@ -4451,6 +4454,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             else
                 t3 = Visit(context.else_branch().expression());
         }
+        else
+            EmitDefault(t);
 
         CurrentMethod.IL.MarkLabel(restBranch);
 
@@ -4495,6 +4500,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Type t = Visit(context.expression());
 
         CurrentMethod.IL.MarkLabel(fb);
+        EmitDefault(t);
         CurrentMethod.IL.Emit(OpCodes.Br, rest);
 
         CurrentMethod.IL.MarkLabel(rest);
