@@ -236,6 +236,13 @@ internal static class EmitHelpers
             return true;
         }
 
+        if (value.GetType().IsArray && ((Array)value).Length == 0)
+        {
+            EmitLdcI4(0);
+            CurrentMethod.IL.Emit(OpCodes.Newarr, value.GetType().GetElementType());
+            return true;
+        }
+
         if (value.GetType().IsArray && IsConstant(value.GetType()))
         {
             Array array = (Array)value;
