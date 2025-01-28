@@ -1,12 +1,15 @@
 ﻿using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Helpers;
 using Dassie.Parser;
 using Dassie.Text;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -574,4 +577,32 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
     //    Expression a = Visit(context.integer_atom());
     //    return new(typeof(Index), new Index(a.Value, context.Caret() != null));
     //}
+
+    public override Expression VisitArray_expression([NotNull] DassieParser.Array_expressionContext context)
+    {
+        if (context.expression() == null || context.expression().Length == 0)
+            return new(typeof(object[]), Array.Empty<object>());
+
+        Type elementType = null;
+        List<object> items = [];
+
+        foreach (IParseTree tree in context.expression())
+        {
+            Expression expr = Visit(tree);
+            if (expr == null)
+                return null;
+
+            if (elementType == null)
+                elementType = expr.Type;
+
+            if (elementType != null && expr.Type != elementType)
+                return null;
+
+            items.Add(expr.Value);
+        }
+
+        MethodInfo cast = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(elementType);
+        MethodInfo toArray = typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
+        return new(elementType.MakeArrayType(), toArray.Invoke(null, [cast.Invoke(null, [items])]));
+    }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using static Dassie.Configuration.ProjectFileDeserializer;
 using static Dassie.Helpers.TypeHelpers;
 
@@ -244,6 +245,17 @@ internal static class EmitHelpers
 
             EmitLdcI4(array.Length);
             CurrentMethod.IL.Emit(OpCodes.Newarr, value.GetType().GetElementType());
+
+            if (IsNumericType(value.GetType().GetElementType()))
+            {
+                byte[] data = InitializedArrayCodeGeneration.Serialize((Array)value);
+                CurrentMethod.IL.Emit(OpCodes.Dup);
+                FieldBuilder dataField = InitializedArrayCodeGeneration.DefineInitializedArray(data);
+                CurrentMethod.IL.Emit(OpCodes.Ldtoken, dataField);
+                CurrentMethod.IL.Emit(OpCodes.Call, typeof(RuntimeHelpers).GetMethod("InitializeArray"));
+                return true;
+            }
+
             EmitStloc(CurrentMethod.LocalIndex);
 
             IEnumerator enumerator = array.GetEnumerator();

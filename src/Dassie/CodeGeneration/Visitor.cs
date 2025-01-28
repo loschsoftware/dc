@@ -22,6 +22,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using static Dassie.Helpers.TypeHelpers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using Color = Dassie.Text.Color;
 
 namespace Dassie.CodeGeneration;
@@ -5410,6 +5411,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitArray_expression([NotNull] DassieParser.Array_expressionContext context)
     {
+        Expression cnst = eval.Visit(context);
+        if (cnst != null)
+        {
+            EmitConst(cnst.Value);
+            return cnst.Type;
+        }
+
         Type arrayType = Visit(context.expression()[0]);
         CurrentMethod.IL.Emit(OpCodes.Pop);
 

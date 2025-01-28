@@ -9,7 +9,7 @@ namespace Dassie.Symbols;
 internal static class SymbolNameGenerator
 {
     //private const string GeneratedPrefix = "<g>";
-    private const string GeneratedPrefix = "";
+    public const string GeneratedPrefix = "";
 
     public static string GetDelegateTypeName(Type returnType, Type[] paramTypes)
     {
@@ -42,4 +42,8 @@ internal static class SymbolNameGenerator
     
     public static string GetImplicitEntryPointContainerTypeName() => $"{GeneratedPrefix}$Application";
     public static string GetImplicitEntryPointName() => $"{GeneratedPrefix}$EntryPoint";
+    
+    public static string GetInlineArrayContainerTypeName(int index) => $"{GeneratedPrefix}$InlineArrayContainer'{index}";
+    public static string GetInlineArrayTypeName(int index) => $"{GeneratedPrefix}$InlineArray'{index}";
+    public static string GetInitializedDataFieldName(int index) => $"{GeneratedPrefix}$Data'{index}";
 }
