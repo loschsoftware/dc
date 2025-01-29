@@ -4573,7 +4573,24 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return processMethod.ReturnType;
         }
 
-        object result = processMethod.Invoke(null, [rawText]);
+        object result;
+
+        try
+        {
+            result = processMethod.Invoke(null, [rawText]);
+        }
+        catch (TargetInvocationException)
+        {
+            EmitErrorMessage(
+                context.identifier_atom().Start.Line,
+                context.identifier_atom().Start.Column,
+                context.identifier_atom().GetText().Length,
+                DS0190_StringProcessorThrewException,
+                $"Expression value could not be determined because string processor '{context.identifier_atom().GetText()}' threw an exception at compile-time.");
+
+            CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
+            return typeof(string);
+        }
 
         if (EmitConst(result))
             return result.GetType();

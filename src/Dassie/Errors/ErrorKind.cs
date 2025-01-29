@@ -779,5 +779,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a processed string contains interpolations.
     /// </summary>
-    DS0189_ProcessedStringContainsInterpolations
+    DS0189_ProcessedStringContainsInterpolations,
+    /// <summary>
+    /// Emitted when a string processor throws an exception at compile-time.
+    /// </summary>
+    DS0190_StringProcessorThrewException
 }
