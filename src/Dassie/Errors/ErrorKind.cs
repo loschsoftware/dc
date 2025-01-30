@@ -783,5 +783,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a string processor throws an exception at compile-time.
     /// </summary>
-    DS0190_StringProcessorThrewException
+    DS0190_StringProcessorThrewException,
+    /// <summary>
+    /// Emitted when a program contains multiple explicit or implicit entry points.
+    /// </summary>
+    DS0191_AmbiguousEntryPoint
 }

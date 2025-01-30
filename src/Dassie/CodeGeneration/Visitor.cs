@@ -1175,7 +1175,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 {
                     if (attribType == typeof(EntryPointAttribute))
                     {
-                        if (Context.EntryPointIsSet)
+                        if (Context.EntryPointIsSet && !messages.Any(m => m.ErrorCode == ErrorKind.DS0191_AmbiguousEntryPoint))
                         {
                             EmitErrorMessage(
                                 context.attribute()[i].Start.Line,
@@ -1688,6 +1688,21 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitWarningMessage(0, 0, context.GetText().Length, DS0027_EmptyProgram, "Program contains no executable code.");
 
             Context.ShouldThrowDS0027 = context.expression().Length == 0;
+        }
+
+        if (context.expression().Length > 0)
+        {
+            if (Context.EntryPointIsSet)
+            {
+                EmitErrorMessage(
+                    context.expression()[0].Start.Line,
+                    context.expression()[0].Start.Column,
+                    context.expression()[0].GetText().Length,
+                    DS0191_AmbiguousEntryPoint,
+                    "The program contains multiple implicit or explicit entry points.");
+            }
+
+            Context.EntryPointIsSet = true;
         }
 
         TypeBuilder tb = Context.Module.DefineType($"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}Program");
