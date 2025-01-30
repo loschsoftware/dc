@@ -11,12 +11,7 @@ compilation_unit
     ;
 
 file_body
-    : top_level_statements
-    | full_program
-    ;
-
-top_level_statements
-    : (expression | local_function | NewLine)*
+    : (expression | local_function | NewLine | full_program)*
     ;
 
 full_program

@@ -64,18 +64,6 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitFile_body([NotNull] DassieParser.File_bodyContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.top_level_statements"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTop_level_statements([NotNull] DassieParser.Top_level_statementsContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.top_level_statements"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTop_level_statements([NotNull] DassieParser.Top_level_statementsContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.full_program"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

@@ -68,18 +68,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return typeof(void);
     }
 
-    public override Type VisitFile_body([NotNull] DassieParser.File_bodyContext context)
-    {
-        if (context.top_level_statements() != null)
-        {
-            Visit(context.top_level_statements());
-            return typeof(void);
-        }
+    //public override Type VisitFile_body([NotNull] DassieParser.File_bodyContext context)
+    //{
+    //    if (context.top_level_statements() != null)
+    //    {
+    //        Visit(context.top_level_statements());
+    //        return typeof(void);
+    //    }
 
-        Visit(context.full_program());
+    //    Visit(context.full_program());
 
-        return typeof(void);
-    }
+    //    return typeof(void);
+    //}
 
     public override Type VisitFull_program([NotNull] DassieParser.Full_programContext context)
     {
@@ -1671,8 +1671,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return typeof(void);
     }
 
-    public override Type VisitTop_level_statements([NotNull] DassieParser.Top_level_statementsContext context)
+    public override Type VisitFile_body([NotNull] DassieParser.File_bodyContext context)
     {
+        if (context.full_program() != null && context.full_program().Length > 0)
+        {
+            foreach (IParseTree prog in context.full_program())
+                Visit(prog);
+        }
+
+        if (context.expression() == null || context.expression().Length == 0)
+            return typeof(void);
+
         if (Context.Files.Count > 0)
         {
             if ((context.expression().Length == 0 && Context.FilePaths.Count < 2) || (context.expression().Length == 0 && Context.FilePaths.Last() == CurrentFile.Path && Context.ShouldThrowDS0027))
@@ -1721,6 +1730,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             foreach (IParseTree child in context.children.Take(context.children.Count - 1))
             {
+                if (child is DassieParser.Full_programContext)
+                    continue;
+
                 Type _t = Visit(child);
 
                 if (_t != typeof(void) && !CurrentMethod.SkipPop)

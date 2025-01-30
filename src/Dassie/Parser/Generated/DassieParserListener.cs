@@ -55,16 +55,6 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitFile_body([NotNull] DassieParser.File_bodyContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.top_level_statements"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterTop_level_statements([NotNull] DassieParser.Top_level_statementsContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.top_level_statements"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitTop_level_statements([NotNull] DassieParser.Top_level_statementsContext context);
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.full_program"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

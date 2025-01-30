@@ -48,12 +48,6 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitFile_body([NotNull] DassieParser.File_bodyContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.top_level_statements"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitTop_level_statements([NotNull] DassieParser.Top_level_statementsContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.full_program"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
