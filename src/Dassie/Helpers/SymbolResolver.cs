@@ -1229,9 +1229,9 @@ internal static class SymbolResolver
         return t;
     }
 
-    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false)
+    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false)
     {
-        Type t = ResolveTypeNameInternal(name, noEmitFragments, noEmitDS0149);
+        Type t = ResolveTypeNameInternal(name, noEmitFragments, noEmitDS0149, noErrors);
 
         if (t == null)
             return t;
@@ -1257,7 +1257,7 @@ internal static class SymbolResolver
         return t;
     }
 
-    private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false)
+    private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false)
     {
         if (name.Func() != null)
         {
@@ -1286,7 +1286,7 @@ internal static class SymbolResolver
         {
             Type t = ResolveTypeName(name.type_name(), noEmitFragments, noEmitDS0149: true);
 
-            if (!noEmitDS0149)
+            if (!noEmitDS0149 && !noErrors)
             {
                 EmitErrorMessage(
                     name.Start.Line,
@@ -1306,7 +1306,7 @@ internal static class SymbolResolver
         {
             Type t = ResolveTypeName(name.type_name(), noEmitFragments, noEmitDS0149: true);
 
-            if (t.IsByRef)
+            if (t.IsByRef && !noErrors)
             {
                 EmitErrorMessage(
                     name.Start.Line,
@@ -1329,7 +1329,7 @@ internal static class SymbolResolver
             arrayDims += (name.array_type_specifier().Double_Comma() ?? Array.Empty<ITerminalNode>()).Length * 2;
         }
 
-        if (arrayDims > 32)
+        if (arrayDims > 32 && !noErrors)
         {
             EmitErrorMessage(
                 name.Start.Line,
@@ -1342,9 +1342,9 @@ internal static class SymbolResolver
         if (name.identifier_atom() != null)
         {
             if (name.identifier_atom().Identifier() != null)
-                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors);
 
-            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors);
         }
 
         // Tuple type
@@ -1373,9 +1373,9 @@ internal static class SymbolResolver
             DassieParser.Type_nameContext childName = (DassieParser.Type_nameContext)name.children[0];
             if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
             {
-                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims);
+                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims, noErrors: noErrors);
 
-                TypeHelpers.CheckGenericTypeCompatibility(result, typeParams, childName.Start.Line, childName.Start.Column, childName.GetText().Length, true);
+                TypeHelpers.CheckGenericTypeCompatibility(result, typeParams, childName.Start.Line, childName.Start.Column, childName.GetText().Length, !noErrors);
 
                 if (typeParams != null && result.IsGenericTypeDefinition)
                     result = result.MakeGenericType(typeParams);
@@ -1386,8 +1386,8 @@ internal static class SymbolResolver
 
         if (name.type_name() != null && name.type_name() != null)
         {
-            Type child = ResolveTypeName(name.type_name(), noEmitFragments);
-            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims);
+            Type child = ResolveTypeName(name.type_name(), noEmitFragments, noErrors: noErrors);
+            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors);
         }
 
         // TODO: Implement other kinds of types

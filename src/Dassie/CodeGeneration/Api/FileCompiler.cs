@@ -3,6 +3,7 @@ using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Configuration;
+using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -28,7 +29,10 @@ public static class FileCompiler
     /// <returns>An array of compilation errors that occured during the compilation. If no errors occured, this is an empty array.</returns>
     public static ErrorInfo[] CompileSingleFile(string path, DassieConfig config)
     {
-        return DocumentCompiler.CompileDocument(new(File.ReadAllText(path), path), config);
+        InputDocument doc = new(File.ReadAllText(path), path);
+        DassieParser parser = DocumentCompiler.CreateParser(doc, config, out string intermediatePath);
+
+        return DocumentCompiler.CompileDocument(doc, config, parser.compilation_unit(), intermediatePath).ToArray();
     }
 
     /// <summary>
@@ -75,9 +79,7 @@ public static class FileCompiler
 
             IParseTree compilationUnit = parser.compilation_unit();
 
-            ExpressionEvaluator eval = new();
-
-            Visitor v = new(eval);
+            Visitor v = new();
             v.VisitCompilation_unit((DassieParser.Compilation_unitContext)compilationUnit);
 
             ffrag.Fragments.AddRange(CurrentFile.Fragments);

@@ -1,7 +1,9 @@
 ﻿using Dassie.Meta;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Dassie.Helpers;
 
@@ -14,22 +16,35 @@ internal static class InheritanceHelpers
         Type currentType = baseType;
         while (currentType != null)
         {
-            foreach (FieldInfo field in currentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            if (currentType == typeof(TypeBuilder) || currentType.FullName.StartsWith("System.Reflection.Emit.TypeBuilderInstantiation"))
             {
-                object constant = null;
-
+                TypeContext tc = Context.Types.First(t => t.FullName == currentType.FullName);
+                foreach (MetaFieldInfo mfi in tc.Fields)
+                    fields.Add(mfi);
+            }
+            else
+            {
                 try
                 {
-                    constant = field.GetRawConstantValue();
-                }
-                catch (Exception) { }
+                    foreach (FieldInfo field in currentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                    {
+                        object constant = null;
 
-                fields.Add(new MetaFieldInfo
-                {
-                    Builder = field,
-                    ConstantValue = constant,
-                    Name = field.Name
-                });
+                        try
+                        {
+                            constant = field.GetRawConstantValue();
+                        }
+                        catch (Exception) { }
+
+                        fields.Add(new MetaFieldInfo
+                        {
+                            Builder = field,
+                            ConstantValue = constant,
+                            Name = field.Name
+                        });
+                    }
+                }
+                catch { }
             }
 
             currentType = currentType.BaseType;

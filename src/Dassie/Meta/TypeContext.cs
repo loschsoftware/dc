@@ -24,6 +24,8 @@ internal class TypeContext
 
     public string FullName { get; set; }
 
+    public DassieParser.TypeContext ParserRule { get; set; }
+
     public List<string> FilesWhereDefined { get; } = [];
 
     public TypeBuilder Builder { get; set; }
@@ -61,4 +63,8 @@ internal class TypeContext
     public bool IsAlias { get; set; }
 
     public Type AliasedType { get; set; }
+
+    public List<DassieParser.Type_nameContext> UnresolvedAssociatedTypeNames { get; set; } = [];
+
+    public DassieParser.Parameter_listContext PrimaryConstructorParameterList { get; set; }
 }

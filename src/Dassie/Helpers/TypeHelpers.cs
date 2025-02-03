@@ -712,14 +712,14 @@ internal static class TypeHelpers
         };
     }
 
-    public static List<Type> GetInheritedTypes(DassieParser.Inheritance_listContext context)
+    public static List<Type> GetInheritedTypes(DassieParser.Inheritance_listContext context, bool noErrors = false)
     {
         List<Type> types = [];
         int classCount = 0;
 
         foreach (DassieParser.Type_nameContext typeName in context.type_name())
         {
-            Type t = SymbolResolver.ResolveTypeName(typeName);
+            Type t = SymbolResolver.ResolveTypeName(typeName, noErrors: noErrors);
 
             if (t != null)
             {
@@ -850,4 +850,7 @@ internal static class TypeHelpers
             _ => throw new ArgumentException("Invalid number of element types."),
         };
     }
+
+    public static string GetTypeName(DassieParser.TypeContext context)
+        => $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetText()}";
 }

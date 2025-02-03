@@ -1,49 +1,25 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using Dassie.CodeAnalysis.Default;
-using Dassie.CodeGeneration.Helpers;
 using Dassie.Configuration;
 using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Lowering;
-using Dassie.Meta;
 using Dassie.Parser;
-using Dassie.Validation;
-using System.Linq;
-using System.Reflection;
+using System.Collections.Generic;
 
 namespace Dassie.CodeGeneration.Api;
 
 internal static class DocumentCompiler
 {
-    public static ErrorInfo[] CompileDocument(InputDocument document, DassieConfig config)
+    public static DassieParser CreateParser(InputDocument document, DassieConfig config, out string intermediatePath)
     {
-        if (config.Verbosity >= 1)
-            EmitBuildLogMessage($"Compiling source file '{document.Name}'.");
-
-        SetupBogusAssembly();
-
-        Context.Files.Add(new(document.Name));
-        CurrentFile = Context.GetFile(document.Name);
-
-        if (!config.ImplicitImports)
-        {
-            CurrentFile.Imports.Clear();
-            CurrentFile.ImportedTypes.Clear();
-        }
-
-        if (!config.ImplicitTypeAliases)
-            CurrentFile.Aliases.Clear();
-
-        CurrentFile.SymbolDocumentWriter = Context.Module.DefineDocument(document.Name);
-
         if (config.Verbosity >= 1)
             EmitBuildLogMessage("    Lowering...");
 
         string lowered = SourceFileRewriter.Rewrite(document.Text);
 
         Directory.CreateDirectory(TemporaryBuildDirectoryName);
-        string intermediatePath = Path.Combine(TemporaryBuildDirectoryName, Path.GetFileNameWithoutExtension(document.Name) + ".i.ds");
+        intermediatePath = Path.Combine(TemporaryBuildDirectoryName, Path.GetFileNameWithoutExtension(document.Name) + ".i.ds");
         File.WriteAllText(intermediatePath, lowered);
 
         if (config.Verbosity >= 1)
@@ -59,21 +35,30 @@ internal static class DocumentCompiler
         parser.RemoveErrorListeners();
         parser.AddErrorListener(new ParserErrorListener());
 
-        Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
-        var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom(Path.GetFullPath(Path.Combine(GlobalConfig.RelativePathResolverDirectory, (r as AssemblyReference).AssemblyPath))));
+        return parser;
+    }
 
-        if (refsToAdd != null)
-            Context.ReferencedAssemblies.AddRange(refsToAdd);
+    public static List<ErrorInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath)
+    {
+        if (config.Verbosity >= 1)
+            EmitBuildLogMessage($"Compiling source file '{document.Name}'.");
 
-        IParseTree compilationUnit = parser.compilation_unit();
+        SetupBogusAssembly();
+        CurrentFile = Context.GetFile(document.Name);
 
-        SymbolListener listener = new();
-        ParseTreeWalker.Default.Walk(listener, compilationUnit);
+        if (!config.ImplicitImports)
+        {
+            CurrentFile.Imports.Clear();
+            CurrentFile.ImportedTypes.Clear();
+        }
 
-        ExpressionEvaluator eval = new();
+        if (!config.ImplicitTypeAliases)
+            CurrentFile.Aliases.Clear();
 
-        Visitor v = new(eval);
-        v.VisitCompilation_unit((DassieParser.Compilation_unitContext)compilationUnit);
+        CurrentFile.SymbolDocumentWriter = Context.Module.DefineDocument(document.Name);
+
+        Visitor v = new();
+        v.Visit(compilationUnit);
 
         if (!config.KeepIntermediateFiles)
         {
@@ -83,6 +68,16 @@ internal static class DocumentCompiler
             Directory.Delete(TemporaryBuildDirectoryName, true);
         }
 
-        return CurrentFile.Errors.ToArray();
+        return CurrentFile.Errors;
+    }
+
+    public static List<ErrorInfo> DeclareSymbols(InputDocument document, DassieConfig config, IParseTree compilationUnit)
+    {
+        SetupBogusAssembly();
+        CurrentFile = Context.GetFile(document.Name);
+
+        SymbolVisitor visitor = new();
+        visitor.Visit(compilationUnit);
+        return CurrentFile.Errors;
     }
 }

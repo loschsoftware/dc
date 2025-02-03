@@ -41,7 +41,15 @@ internal class ProgramContext
 
     public bool EntryPointIsSet { get; set; } = false;
 
-    public FileContext GetFile(string path) => Files.Where(f => f.Path == path).First();
+    public FileContext GetFile(string path)
+    {
+        if (Files.Any(f => f.Path == path))
+            return Files.First(f => f.Path == path);
+
+        FileContext fc = new(path);
+        Files.Add(fc);
+        return fc;
+    }
 
     public TypeContext GetType(string name) => Types.Where(t => t.FullName == name).First();
 

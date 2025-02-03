@@ -787,5 +787,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a program contains multiple explicit or implicit entry points.
     /// </summary>
-    DS0191_AmbiguousEntryPoint
+    DS0191_AmbiguousEntryPoint,
+    /// <summary>
+    /// Emitted when an inheritance chain contains a circular reference.
+    /// </summary>
+    DS0192_CircularReference
 }

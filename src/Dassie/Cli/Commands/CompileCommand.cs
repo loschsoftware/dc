@@ -146,7 +146,7 @@ internal class CompileCommand : ICompilerCommand
             EmitBuildLogMessage("Performing second pass.");
 
         // Step 2
-        IEnumerable<ErrorInfo[]> errors = CompileSource(documents, config);
+        IEnumerable<ErrorInfo[]> errors = CompileSource(documents, config).Select(l => l.ToArray());
 
         string resFile = "";
 

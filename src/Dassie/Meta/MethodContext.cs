@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dassie.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -234,4 +235,10 @@ internal class MethodContext
     public Dictionary<int, Type> LoopExpressionTypes { get; set; } = [];
 
     public List<(ConstructorInfo Constructor, object[] Data)> Attributes { get; set; } = [];
+
+    public bool ReturnTypeIsUnresolved { get; set; }
+
+    public DassieParser.Type_nameContext ReturnTypeName { get; set; }
+
+    public List<DassieParser.Type_nameContext> ParameterTypeNames { get; set; } = [];
 }

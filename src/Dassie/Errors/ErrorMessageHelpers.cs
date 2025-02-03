@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using static Dassie.Helpers.TypeHelpers;
 
 namespace Dassie.Errors;
 
@@ -159,5 +160,43 @@ internal static class ErrorMessageHelpers
         sb.Append(')');
         sb.Append($": {FormatType(method.ReturnType)}");
         return sb.ToString();
+    }
+
+    public static void EnsureBaseTypeCompatibility(Type type, bool childTypeIsValueType, int row, int col, int len)
+    {
+        if (type.IsClass)
+        {
+            if (type.IsSealed)
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0157_InheritingFromSealedType,
+                    $"Cannot inherit from type '{TypeName(type)}' because it is sealed.",
+                    tip: "If possible, mark the type as 'open' to allow inheritance.");
+            }
+            else if (childTypeIsValueType)
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0146_ValueTypeInheritsFromClass,
+                    $"Value types cannot inherit from reference types. Value types are only allowed to implement templates.");
+            }
+            else if (type == typeof(ValueType))
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0145_ValueTypeInherited,
+                    $"Inheriting from 'System.ValueType' is not permitted. To declare a value type, use 'val type'.");
+            }
+
+
+        }
+        else if (type.IsValueType)
+        {
+            EmitErrorMessage(
+                row, col, len,
+                DS0147_ValueTypeAsBaseType,
+                $"Inheriting from value types is not permitted. Only reference types can be inherited.");
+        }
     }
 }

@@ -17,6 +17,11 @@ namespace Dassie.CodeGeneration.Helpers;
 
 internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 {
+    private static ExpressionEvaluator _instance;
+    public static ExpressionEvaluator Instance => _instance ??= new();
+    
+    private ExpressionEvaluator() { }
+
     private bool _requireNonZeroValue = false;
 
     public bool RequireNonZeroValue

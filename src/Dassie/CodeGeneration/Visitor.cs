@@ -22,17 +22,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using static Dassie.Helpers.TypeHelpers;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Color = Dassie.Text.Color;
 
 namespace Dassie.CodeGeneration;
 
 internal class Visitor : DassieParserBaseVisitor<Type>
 {
-    private readonly ExpressionEvaluator eval;
-
-    public Visitor(ExpressionEvaluator evaluator) => eval = evaluator;
-
     public override Type VisitCompilation_unit([NotNull] DassieParser.Compilation_unitContext context)
     {
         if (context.import_directive().Length > 1)
@@ -63,6 +58,24 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 il.Emit(OpCodes.Call, part);
 
             il.Emit(OpCodes.Ret);
+        }
+
+        TypeFinalizer.CreateTypes(Context.Types);
+
+        foreach (TypeContext type in Context.Types.Where(c => c.Builder.IsCreated()))
+        {
+            if (type.FullName == null)
+                continue;
+
+            CurrentFile.Fragments.Add(new()
+            {
+                Color = TooltipGenerator.ColorForType(type.Builder.CreateTypeInfo()),
+                Line = type.ParserRule.Identifier().Symbol.Line,
+                Column = type.ParserRule.Identifier().Symbol.Column,
+                Length = type.ParserRule.Identifier().GetText().Length,
+                ToolTip = TooltipGenerator.Type(type.Builder.CreateTypeInfo(), true, true),
+                IsNavigationTarget = true
+            });
         }
 
         return typeof(void);
@@ -97,378 +110,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     private void VisitType(DassieParser.TypeContext context, TypeBuilder enclosingType)
     {
-        if (context.Identifier().GetText().Length + (CurrentFile.ExportedNamespace ?? "").Length > 1024)
-        {
-            EmitErrorMessage(
-                context.Identifier().Symbol.Line,
-                context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
-                DS0073_TypeNameTooLong,
-                "A type name cannot be longer than 1024 characters.");
+        TypeContext tc = Context.Types.First(t => t.FullName == GetTypeName(context));
+        TypeContext.Current = tc;
+        TypeContext.Current.ParserRule = context;
 
-            return;
-        }
-
-        TypeBuilder tb;
-
-        if (enclosingType == null)
-        {
-            if (context.nested_type_access_modifier() != null && context.nested_type_access_modifier().Local() != null)
-            {
-                EmitErrorMessage(
-                    context.nested_type_access_modifier().Local().Symbol.Line,
-                    context.nested_type_access_modifier().Local().Symbol.Column,
-                    context.nested_type_access_modifier().Local().GetText().Length,
-                    DS0126_TopLevelTypeLocal,
-                    "The 'local' access modifier is only valid for nested types.");
-            }
-
-            tb = Context.Module.DefineType(
-                $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetText()}",
-                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false));
-        }
-        else
-        {
-            tb = enclosingType.DefineNestedType(
-                context.Identifier().GetText(),
-                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true));
-        }
-
-        if (Context.Types.Any(t => t.FullName == tb.FullName))
-        {
-            TypeContext duplicate = Context.Types.First(t => t.FullName == tb.FullName);
-            if (duplicate.TypeParameters != null && context.type_parameter_list() != null && duplicate.TypeParameters.Count != context.type_parameter_list().type_parameter().Length)
-            {
-                EmitErrorMessage(
-                    context.Identifier().Symbol.Line,
-                    context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
-                    DS0120_DuplicateGenericTypeName,
-                    $"Currently, the Dassie compiler does not allow creating types of the same name with different type parameters. This functionality might be added in the future. If you desperately need it, consider opening an issue on GitHub.");
-            }
-            else
-            {
-                string errMsg = "";
-                if (string.IsNullOrEmpty(CurrentFile.ExportedNamespace))
-                    errMsg = $"The global namespace";
-                else
-                    errMsg = $"The namespace '{CurrentFile.ExportedNamespace}'";
-
-                errMsg += $" already contains a definition for the type '{tb.Name}'.";
-
-                EmitErrorMessage(
-                    context.Identifier().Symbol.Line,
-                    context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
-                    DS0119_DuplicateTypeName,
-                    errMsg);
-            }
-        }
-
-        TypeContext tc = new()
-        {
-            Builder = tb,
-            FullName = tb.FullName,
-        };
-
-        List<Type> attributes = [];
-
-        if (context.attribute() != null)
-        {
-            foreach ((Type attribType, CustomAttributeBuilder data, _, _, AttributeHelpers.AttributeTarget target) in AttributeHelpers.GetAttributeList(context.attribute(), eval))
-            {
-                if (attribType != null)
-                {
-                    if (target == AttributeHelpers.AttributeTarget.Assembly)
-                        Context.Assembly.SetCustomAttribute(data);
-                    else if (target == AttributeHelpers.AttributeTarget.Module)
-                        Context.Module.SetCustomAttribute(data);
-                    else
-                    {
-                        attributes.Add(attribType);
-                        tb.SetCustomAttribute(data);
-                    }
-                }
-            }
-        }
-
-        if (attributes.Contains(typeof(Union)))
-        {
-            UnionTypeCodeGeneration.GenerateUnionType(context);
-            return;
-        }
-
-        bool explicitBaseType = false;
-        Type parent = typeof(object);
-        List<Type> interfaces = [];
-
-        if (context.type_kind().Val() != null)
-            parent = typeof(ValueType);
-
-        if (context.inheritance_list() != null)
-        {
-            List<Type> inherited = GetInheritedTypes(context.inheritance_list());
-
-            foreach (Type type in inherited)
-            {
-                if (type.IsClass)
-                {
-                    if (type.IsSealed)
-                    {
-                        EmitErrorMessage(
-                            context.inheritance_list().Start.Line,
-                            context.inheritance_list().Start.Column,
-                            context.inheritance_list().GetText().Length,
-                            DS0157_InheritingFromSealedType,
-                            $"Cannot inherit from type '{TypeName(type)}' because it is sealed.",
-                            tip: "If possible, mark the type as 'open' to allow inheritance.");
-                    }
-                    else if (context.type_kind().Val() != null)
-                    {
-                        EmitErrorMessage(
-                            context.inheritance_list().Start.Line,
-                            context.inheritance_list().Start.Column,
-                            context.inheritance_list().GetText().Length,
-                            DS0146_ValueTypeInheritsFromClass,
-                            $"Value types cannot inherit from reference types. Value types are only allowed to implement templates.");
-                    }
-                    else if (type == typeof(ValueType))
-                    {
-                        EmitErrorMessage(
-                            context.inheritance_list().Start.Line,
-                            context.inheritance_list().Start.Column,
-                            context.inheritance_list().GetText().Length,
-                            DS0145_ValueTypeInherited,
-                            $"Inheriting from 'System.ValueType' is not permitted. To declare a value type, use 'val type'.");
-                    }
-
-                    parent = type;
-                    explicitBaseType = true;
-                }
-                else if (type.IsValueType)
-                {
-                    EmitErrorMessage(
-                        context.inheritance_list().Start.Line,
-                        context.inheritance_list().Start.Column,
-                        context.inheritance_list().GetText().Length,
-                        DS0147_ValueTypeAsBaseType,
-                        $"Inheriting from value types is not permitted. Only reference types can be inherited.");
-                }
-                else
-                    interfaces.Add(type);
-            }
-        }
-
-        if (context.type_kind().Template() != null)
-            parent = null;
-
-        Type enumerationMarkerType = null;
-
-        foreach (Type attribType in attributes)
-        {
-            if (attribType != null && attribType.FullName.StartsWith("Dassie.Core.Enumeration"))
-            {
-                enumerationMarkerType = attribType;
-
-                if (context.type_kind().Ref() != null)
-                {
-                    EmitErrorMessage(
-                        context.type_kind().Ref().Symbol.Line,
-                        context.type_kind().Ref().Symbol.Column,
-                        3,
-                        DS0142_EnumTypeExplicitlyRef,
-                        "The modifier 'ref' is invalid for enumeration types. Enumerations are always value types.");
-                }
-
-                if (explicitBaseType && parent != null && parent != typeof(Enum))
-                {
-                    EmitErrorMessage(
-                        context.inheritance_list().Start.Line,
-                        context.inheritance_list().Start.Column,
-                        context.inheritance_list().GetText().Length,
-                        DS0143_EnumTypeBaseType,
-                        "The only allowed base type for enumerations is 'System.Enum'.");
-                }
-
-                if (interfaces.Count > 0)
-                {
-                    EmitErrorMessage(
-                        context.inheritance_list().Start.Line,
-                        context.inheritance_list().Start.Column,
-                        context.inheritance_list().GetText().Length,
-                        DS0144_EnumTypeImplementsTemplate,
-                        "Enumeration types cannot implement templates.");
-                }
-
-                parent = typeof(Enum);
-            }
-        }
-
-        foreach (Type _interface in interfaces)
-        {
-            tb.AddInterfaceImplementation(_interface);
-
-            foreach (MethodInfo defaultMember in _interface.GetMethods().Where(m => !m.IsAbstract))
-            {
-                tc.Methods.Add(new()
-                {
-                    Builder = (MethodBuilder)defaultMember
-                });
-            }
-        }
-
-        if (parent != null)
-        {
-            TypeContext.Current.Fields.AddRange(InheritanceHelpers.GetInheritedFields(parent));
-            tb.SetParent(parent);
-        }
-
-        tc.IsEnumeration = enumerationMarkerType != null;
-
-        if (enumerationMarkerType != null)
-        {
-            AttributeHelpers.AddAttributeToCurrentType(enumerationMarkerType.GetConstructor([]), []);
-            Type instanceFieldType = null;
-
-            if (enumerationMarkerType.GenericTypeArguments.Length > 0)
-                instanceFieldType = enumerationMarkerType.GenericTypeArguments[0];
-            else
-                instanceFieldType = typeof(int);
-
-            if (!IsIntegerType(instanceFieldType))
-            {
-                EmitErrorMessage(
-                    context.Identifier().Symbol.Line,
-                    context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
-                    DS0140_InvalidEnumerationType,
-                    $"Invalid enumeration type '{instanceFieldType}'. The only allowed types are int8, uint8, int16, uint16, int, uint, int32, uint32, int64, uint64, native, unative.");
-            }
-
-            tb.DefineField("value__", instanceFieldType,
-                FieldAttributes.Public | FieldAttributes.RTSpecialName | FieldAttributes.SpecialName);
-        }
-
-        if (!tc.Builder.IsInterface)
-        {
-            tc.RequiredInterfaceImplementations = interfaces
-                .SelectMany(t =>
-                {
-                    if (!t.IsConstructedGenericType)
-                        return t.GetInterfaces().Append(t);
-
-                    return t.GetGenericTypeDefinition().GetInterfaces().Append(t);
-                })
-                .SelectMany(t =>
-                {
-                    if (!t.IsConstructedGenericType)
-                    {
-                        return t.GetMethods().Select(m => new MockMethodInfo()
-                        {
-                            Name = m.Name,
-                            ReturnType = m.ReturnType,
-                            Parameters = m.GetParameters().Select(p => p.ParameterType).ToList(),
-                            IsAbstract = m.IsAbstract,
-                            DeclaringType = t,
-                            IsGenericMethod = m.IsGenericMethod,
-                            GenericTypeArguments = m.GetGenericArguments().ToList(),
-                            Builder = m
-                        });
-                    }
-
-                    Type[] typeArgs = t.GenericTypeArguments;
-
-                    return t.GetGenericTypeDefinition().GetMethods().Select(m =>
-                    {
-                        MockMethodInfo method = new()
-                        {
-                            Name = m.Name,
-                            IsAbstract = m.IsAbstract,
-                            Parameters = [],
-                            DeclaringType = t,
-                            IsGenericMethod = m.IsGenericMethod,
-                            GenericTypeArguments = m.GetGenericArguments().ToList(),
-                            Builder = TypeBuilder.GetMethod(t, m)
-                        };
-
-                        if (!m.ReturnType.IsGenericTypeParameter)
-                            method.ReturnType = m.ReturnType;
-                        else
-                            method.ReturnType = typeArgs[m.ReturnType.GenericParameterPosition];
-
-                        foreach (Type param in m.GetParameters().Select(p => p.ParameterType))
-                        {
-                            if (!param.IsGenericTypeParameter)
-                                method.Parameters.Add(param);
-                            else
-                                method.Parameters.Add(typeArgs[param.GenericParameterPosition]);
-                        }
-
-                        return method;
-                    });
-                })
-                .Where(m => m.IsAbstract)
-                .Distinct()
-                .ToList();
-        }
-
-        // byref-like type ('ref struct' in C#)
-        if (context.type_kind().Ampersand() != null)
-        {
-            tc.IsByRefLike = true;
-            AttributeHelpers.AddAttributeToCurrentType(typeof(IsByRefLikeAttribute).GetConstructor([]), []);
-        }
-
-        // immutable value type ('readonly struct' in C#)
-        if (context.type_kind().Exclamation_Mark() != null)
-        {
-            tc.IsImmutable = true;
-            AttributeHelpers.AddAttributeToCurrentType(typeof(IsReadOnlyAttribute).GetConstructor([]), []);
-        }
-
-        tc.ImplementedInterfaces.AddRange(interfaces);
-        tc.FilesWhereDefined.Add(CurrentFile.Path);
-
-        if (context.type_parameter_list() != null)
-        {
-            List<TypeParameterContext> typeParamContexts = [];
-
-            foreach (DassieParser.Type_parameterContext typeParam in context.type_parameter_list().type_parameter())
-            {
-                if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetText()))
-                {
-                    EmitErrorMessage(
-                        typeParam.Start.Line,
-                        typeParam.Start.Column,
-                        typeParam.GetText().Length,
-                        DS0112_DuplicateTypeParameter,
-                        $"Duplicate type parameter '{typeParam.GetText()}'.");
-
-                    continue;
-                }
-
-                typeParamContexts.Add(BuildTypeParameter(typeParam));
-            }
-
-            GenericTypeParameterBuilder[] typeParams = tb.DefineGenericParameters(typeParamContexts.Select(t => t.Name).ToArray());
-            foreach (GenericTypeParameterBuilder typeParam in typeParams)
-            {
-                TypeParameterContext ctx = typeParamContexts.First(c => c.Name == typeParam.Name);
-                typeParam.SetGenericParameterAttributes(ctx.Attributes);
-                typeParam.SetBaseTypeConstraint(ctx.BaseTypeConstraint);
-                typeParam.SetInterfaceConstraints(ctx.InterfaceConstraints.ToArray());
-
-                ctx.Builder = typeParam;
-            }
-
-            tc.TypeParameters = typeParamContexts;
-        }
-
-        if (context.parameter_list() != null)
+        if (tc.PrimaryConstructorParameterList != null)
         {
             List<FieldInfo> fields = [];
 
-            foreach (DassieParser.ParameterContext param in context.parameter_list().parameter())
+            foreach (DassieParser.ParameterContext param in tc.PrimaryConstructorParameterList.parameter())
             {
                 string paramName = param.Identifier().GetText();
                 string fieldName = SymbolNameGenerator.GetPropertyBackingFieldName(paramName);
@@ -538,82 +188,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.type_block() != null)
         {
-            // Alias type
-            if (context.type_block().type_name() != null)
-            {
-                if (context.attribute().Length > 0)
-                {
-                    EmitErrorMessage(
-                        context.attribute()[0].Start.Line,
-                        context.attribute()[0].Start.Column,
-                        context.attribute()[0].GetText().Length,
-                        DS0179_AttributesOnAliasType,
-                        "An alias type cannot use attributes.");
-                }
+            foreach (DassieParser.TypeContext nestedType in context.type_block().type())
+                VisitType(nestedType, tc.Builder);
 
-                if (context.type_special_modifier() != null && context.type_special_modifier().Open() != null)
-                {
-                    EmitErrorMessage(
-                        context.type_special_modifier().Open().Symbol.Line,
-                        context.type_special_modifier().Open().Symbol.Column,
-                        context.type_special_modifier().Open().GetText().Length,
-                        DS0180_AliasTypeInvalidModifiers,
-                        "The 'open' modifier is invalid on alias types.");
-                }
-
-                if (interfaces.Count > 0)
-                {
-                    EmitErrorMessage(
-                        context.inheritance_list().Start.Line,
-                        context.inheritance_list().Start.Column,
-                        context.inheritance_list().GetText().Length,
-                        DS0185_AliasTypeImplementsInterface,
-                        "Type aliases cannot implement templates.");
-
-                    TypeContext.Current.RequiredInterfaceImplementations = [];
-                }
-
-                if (explicitBaseType)
-                {
-                    EmitErrorMessage(
-                        context.inheritance_list().Start.Line,
-                        context.inheritance_list().Start.Column,
-                        context.inheritance_list().GetText().Length,
-                        DS0186_AliasTypeExtendsType,
-                        "Type aliases cannot explicitly set their base type.");
-                }
-
-                if (context.type_parameter_list() != null)
-                {
-                    EmitErrorMessage(
-                        context.type_parameter_list().Start.Line,
-                        context.type_parameter_list().Start.Column,
-                        context.type_parameter_list().GetText().Length,
-                        DS0187_GenericAliasType,
-                        "Type aliases cannot define generic type parameters.");
-                }
-
-                Type aliasedType = SymbolResolver.ResolveTypeName(context.type_block().type_name());
-
-                TypeContext.Current.IsAlias = true;
-                TypeContext.Current.AliasedType = aliasedType;
-
-                if (aliasedType != null)
-                    tb.SetCustomAttribute(new(typeof(AliasAttribute).GetConstructor([typeof(Type)]), [aliasedType]));
-            }
-            else
-            {
-                foreach (DassieParser.TypeContext nestedType in context.type_block().type())
-                {
-                    VisitType(nestedType, tb);
-                    tc.Children.Add(TypeContext.Current);
-                }
-
-                TypeContext.Current = tc;
-
-                foreach (DassieParser.Type_memberContext member in context.type_block()?.type_member())
-                    Visit(member);
-            }
+            foreach (DassieParser.Type_memberContext member in context.type_block()?.type_member())
+                Visit(member);
         }
 
         foreach (var ctor in TypeContext.Current.Constructors)
@@ -636,18 +215,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Ret);
         }
 
-        Type t = tb.CreateType();
-        TypeContext.Current.FinishedType = t;
-
-        CurrentFile.Fragments.Add(new()
-        {
-            Color = TooltipGenerator.ColorForType(tb.CreateTypeInfo()),
-            Line = context.Identifier().Symbol.Line,
-            Column = context.Identifier().Symbol.Column,
-            Length = context.Identifier().GetText().Length,
-            ToolTip = TooltipGenerator.Type(tb.CreateTypeInfo(), true, true),
-            IsNavigationTarget = true
-        });
+        //Type t = tc.Builder.CreateType();
+        //TypeContext.Current.FinishedType = t;
 
         if (TypeContext.Current.RequiredInterfaceImplementations.Count > 0)
         {
@@ -1171,7 +740,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (context.attribute() != null)
             {
-                foreach ((int i, (Type attribType, CustomAttributeBuilder data, ConstructorInfo ctor, object[] attribData, _)) in AttributeHelpers.GetAttributeList(context.attribute(), eval).Index())
+                foreach ((int i, (Type attribType, CustomAttributeBuilder data, ConstructorInfo ctor, object[] attribData, _)) in AttributeHelpers.GetAttributeList(context.attribute(), ExpressionEvaluator.Instance).Index())
                 {
                     if (attribType == typeof(EntryPointAttribute))
                     {
@@ -1242,7 +811,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.attribute() != null)
         {
-            foreach ((Type attribType, CustomAttributeBuilder data, _, _, _) in AttributeHelpers.GetAttributeList(context.attribute(), eval))
+            foreach ((Type attribType, CustomAttributeBuilder data, _, _, _) in AttributeHelpers.GetAttributeList(context.attribute(), ExpressionEvaluator.Instance))
             {
                 if (attribType != null)
                 {
@@ -1522,7 +1091,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
         {
-            Expression result = eval.Visit(context.expression());
+            Expression result = ExpressionEvaluator.Instance.Visit(context.expression());
 
             if (result == null)
             {
@@ -2367,7 +1936,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         Type t = Visit(context.expression()[0]);
 
-        eval.RequireNonZeroValue = true;
+        ExpressionEvaluator.Instance.RequireNonZeroValue = true;
         Type t2 = Visit(context.expression()[1]);
 
         if (IsNumericType(t))
@@ -2527,7 +2096,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         Type t = Visit(context.expression()[0]);
 
-        eval.RequireNonZeroValue = true;
+        ExpressionEvaluator.Instance.RequireNonZeroValue = true;
         Type t2 = Visit(context.expression()[1]);
 
         if (IsNumericType(t))
@@ -2563,7 +2132,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         Type t = Visit(context.expression()[0]);
 
-        eval.RequireNonZeroValue = true;
+        ExpressionEvaluator.Instance.RequireNonZeroValue = true;
         Type t2 = Visit(context.expression()[1]);
 
         if (IsNumericType(t))
@@ -4537,7 +4106,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitReal_atom([NotNull] DassieParser.Real_atomContext context)
     {
-        Expression expr = eval.VisitReal_atom(context);
+        Expression expr = ExpressionEvaluator.Instance.VisitReal_atom(context);
 
         if (expr.Type == typeof(float))
             CurrentMethod.IL.Emit(OpCodes.Ldc_R4, expr.Value);
@@ -4551,7 +4120,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitInteger_atom([NotNull] DassieParser.Integer_atomContext context)
     {
-        Expression expr = eval.VisitInteger_atom(context);
+        Expression expr = ExpressionEvaluator.Instance.VisitInteger_atom(context);
 
         if (expr.Type == typeof(ulong) || expr.Type == typeof(long))
             CurrentMethod.IL.Emit(OpCodes.Ldc_I8, expr.Value);
@@ -4563,7 +4132,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitString_atom([NotNull] DassieParser.String_atomContext context)
     {
-        string rawText = eval.VisitString_atom(context).Value;
+        string rawText = ExpressionEvaluator.Instance.VisitString_atom(context).Value;
 
         if (context.identifier_atom() == null)
         {
@@ -4629,7 +4198,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitCharacter_atom([NotNull] DassieParser.Character_atomContext context)
     {
-        char rawChar = eval.VisitCharacter_atom(context).Value;
+        char rawChar = ExpressionEvaluator.Instance.VisitCharacter_atom(context).Value;
 
         CurrentMethod.IL.Emit(OpCodes.Ldc_I4, rawChar);
 
@@ -4638,7 +4207,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitBoolean_atom([NotNull] DassieParser.Boolean_atomContext context)
     {
-        Expression val = eval.VisitBoolean_atom(context);
+        Expression val = ExpressionEvaluator.Instance.VisitBoolean_atom(context);
 
         CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)(val.Value ? 1 : 0));
 
@@ -5373,7 +4942,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitType_name([NotNull] DassieParser.Type_nameContext context)
     {
-        return eval.VisitType_name(context).Value;
+        return ExpressionEvaluator.Instance.VisitType_name(context).Value;
     }
 
     public override Type VisitTuple_expression([NotNull] DassieParser.Tuple_expressionContext context)
@@ -5461,7 +5030,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitArray_expression([NotNull] DassieParser.Array_expressionContext context)
     {
-        Expression cnst = eval.Visit(context);
+        Expression cnst = ExpressionEvaluator.Instance.Visit(context);
         if (cnst != null)
         {
             EmitConst(cnst.Value);

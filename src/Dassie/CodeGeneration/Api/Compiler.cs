@@ -1,9 +1,11 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis.Structure;
+using Dassie.CodeGeneration.Binding;
 using Dassie.Configuration;
 using Dassie.Data;
 using Dassie.Errors;
+using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Symbols;
 using System;
@@ -50,7 +52,7 @@ public static class Compiler
         return CompileSource(Directory.EnumerateFiles(rootDirectory, "*.ds", includeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToArray(), config);
     }
 
-    internal static IEnumerable<ErrorInfo[]> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
+    internal static List<List<ErrorInfo>> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
     {
         if (!documents.Any() && messages.Count == 0)
         {
@@ -85,10 +87,24 @@ public static class Compiler
         Context.Assembly = ab;
         Context.Module = mb;
 
-        List<ErrorInfo[]> errors = new();
+        List<List<ErrorInfo>> errors = [];
+
+        List<(InputDocument document, IParseTree compilationUnit, string intermediatePath)> docs = [];
 
         foreach (InputDocument doc in documents)
-            errors.Add(DocumentCompiler.CompileDocument(doc, cfg));
+        {
+            DassieParser parser = DocumentCompiler.CreateParser(doc, cfg, out string intermediatePath);
+            IParseTree compilationUnit = parser.compilation_unit();
+
+            docs.Add((doc, compilationUnit, intermediatePath));
+            DocumentCompiler.DeclareSymbols(doc, cfg, compilationUnit);
+        }
+
+        foreach (TypeContext context in Context.Types)
+            SymbolAssociationResolver.ResolveType(context);
+
+        foreach ((InputDocument doc, IParseTree compilationUnit, string intermediatePath) in docs)
+            errors.Add(DocumentCompiler.CompileDocument(doc, cfg, compilationUnit, intermediatePath));
 
         if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !messages.Any(m => m.ErrorCode == DS0027_EmptyProgram))
         {
@@ -123,7 +139,8 @@ public static class Compiler
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
     public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
     {
-        return CompileSource(sourceFiles.Select(s => new InputDocument(File.ReadAllText(s), s)), config, configFileName);
+        return CompileSource(sourceFiles.Select(s => new InputDocument(File.ReadAllText(s), s)), config, configFileName)
+            .Select(l => l.ToArray());
     }
 
     /// <summary>
