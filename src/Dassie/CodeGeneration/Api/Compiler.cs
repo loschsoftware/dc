@@ -101,10 +101,17 @@ public static class Compiler
         }
 
         foreach (TypeContext context in Context.Types)
+        {
             SymbolAssociationResolver.ResolveType(context);
+
+            foreach (MethodContext method in context.Methods)
+                SymbolAssociationResolver.ResolveMethodSignature(method);
+        }
 
         foreach ((InputDocument doc, IParseTree compilationUnit, string intermediatePath) in docs)
             errors.Add(DocumentCompiler.CompileDocument(doc, cfg, compilationUnit, intermediatePath));
+
+        TypeFinalizer.CreateTypes(Context.Types);
 
         if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !messages.Any(m => m.ErrorCode == DS0027_EmptyProgram))
         {

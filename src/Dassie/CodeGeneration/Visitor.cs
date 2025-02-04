@@ -60,8 +60,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             il.Emit(OpCodes.Ret);
         }
 
-        TypeFinalizer.CreateTypes(Context.Types);
-
         foreach (TypeContext type in Context.Types.Where(c => c.Builder.IsCreated()))
         {
             if (type.FullName == null)
@@ -186,6 +184,69 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod = current;
         }
 
+        if (!tc.Builder.IsInterface)
+        {
+            tc.RequiredInterfaceImplementations = tc.ImplementedInterfaces
+                .SelectMany(t =>
+                {
+                    if (!t.IsConstructedGenericType)
+                        return t.GetInterfaces().Append(t);
+
+                    return t.GetGenericTypeDefinition().GetInterfaces().Append(t);
+                })
+                .SelectMany(t =>
+                {
+                    if (!t.IsConstructedGenericType)
+                    {
+                        return t.GetMethods().Select(m => new MockMethodInfo()
+                        {
+                            Name = m.Name,
+                            ReturnType = m.ReturnType,
+                            Parameters = m.GetParameters().Select(p => p.ParameterType).ToList(),
+                            IsAbstract = m.IsAbstract,
+                            DeclaringType = t,
+                            IsGenericMethod = m.IsGenericMethod,
+                            GenericTypeArguments = m.GetGenericArguments().ToList(),
+                            Builder = m
+                        });
+                    }
+
+                    Type[] typeArgs = t.GenericTypeArguments;
+
+                    return t.GetGenericTypeDefinition().GetMethods().Select(m =>
+                    {
+                        MockMethodInfo method = new()
+                        {
+                            Name = m.Name,
+                            IsAbstract = m.IsAbstract,
+                            Parameters = [],
+                            DeclaringType = t,
+                            IsGenericMethod = m.IsGenericMethod,
+                            GenericTypeArguments = m.GetGenericArguments().ToList(),
+                            Builder = TypeBuilder.GetMethod(t, m)
+                        };
+
+                        if (!m.ReturnType.IsGenericTypeParameter)
+                            method.ReturnType = m.ReturnType;
+                        else
+                            method.ReturnType = typeArgs[m.ReturnType.GenericParameterPosition];
+
+                        foreach (Type param in m.GetParameters().Select(p => p.ParameterType))
+                        {
+                            if (!param.IsGenericTypeParameter)
+                                method.Parameters.Add(param);
+                            else
+                                method.Parameters.Add(typeArgs[param.GenericParameterPosition]);
+                        }
+
+                        return method;
+                    });
+                })
+                .Where(m => m.IsAbstract)
+                .Distinct()
+                .ToList();
+        }
+
         if (context.type_block() != null)
         {
             foreach (DassieParser.TypeContext nestedType in context.type_block().type())
@@ -274,59 +335,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     private void HandleConstructor(DassieParser.Type_memberContext context)
     {
-        if (TypeContext.Current.IsEnumeration)
-        {
-            EmitErrorMessage(
-                context.Identifier().Symbol.Line,
-                context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
-                DS0141_MethodInEnumeration,
-                "Enumeration types cannot contain constructors.");
-        }
-
-        CallingConventions callingConventions = CallingConventions.HasThis;
-
-        if (context.member_special_modifier().Any(m => m.Static() != null))
-            callingConventions = CallingConventions.Standard;
-
-        var paramTypes = ResolveParameterList(context.parameter_list());
-
-        (MethodAttributes attribs, MethodImplAttributes implementationFlags) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.attribute());
-        if (attribs.HasFlag(MethodAttributes.Virtual))
-            attribs &= ~MethodAttributes.Virtual;
-
-        ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(attribs, callingConventions, paramTypes.Select(p => p.Type).ToArray());
-        cb.SetImplementationFlags(implementationFlags);
-
-        ILGenerator il = null;
-
-        if (!implementationFlags.HasFlag(MethodImplAttributes.Runtime))
-            il = cb.GetILGenerator();
-
-        CurrentMethod = new()
-        {
-            ConstructorBuilder = cb,
-            IL = il
-        };
-
-        CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
-        TypeContext.Current.ConstructorContexts.Add(CurrentMethod);
-
-        foreach (var param in paramTypes)
-        {
-            ParameterBuilder pb = cb.DefineParameter(
-                CurrentMethod.ParameterIndex++,
-                AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
-                param.Context.Identifier().GetText());
-
-            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, param.Context.Var() != null));
-        }
-
-        if (CurrentMethod.ConstructorBuilder.IsStatic)
-        {
-            foreach (var param in CurrentMethod.Parameters)
-                param.Index--;
-        }
+        CurrentMethod = TypeContext.Current.GetMethod(context);
 
         if (CurrentMethod.IL != null)
             HandleFieldInitializersAndDefaultConstructor();
@@ -348,19 +357,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         CurrentMethod.IL?.Emit(OpCodes.Ret);
 
-        List<(Type, string)> _params = new();
-        foreach (var param in paramTypes)
-            _params.Add((param.Type, param.Context.Identifier().GetText()));
-
-        CurrentFile.Fragments.Add(new()
-        {
-            Color = TooltipGenerator.ColorForType(TypeContext.Current.Builder),
-            Line = context.Identifier().Symbol.Line,
-            Column = context.Identifier().Symbol.Column,
-            Length = context.Identifier().GetText().Length,
-            ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params),
-            NavigationTargetKind = Fragment.NavigationKind.Constructor
-        });
+        //CurrentFile.Fragments.Add(new()
+        //{
+        //    Color = TooltipGenerator.ColorForType(TypeContext.Current.Builder),
+        //    Line = context.Identifier().Symbol.Line,
+        //    Column = context.Identifier().Symbol.Column,
+        //    Length = context.Identifier().GetText().Length,
+        //    ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params),
+        //    NavigationTargetKind = Fragment.NavigationKind.Constructor
+        //});
     }
 
     //public override Type VisitAnonymous_function_expression([NotNull] DassieParser.Anonymous_function_expressionContext context)
@@ -428,220 +433,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        //CliHelpers.CreateFakeMethod();
-        //Type _tReturn = Visit(context.expression());
-
-        if (context.Var() != null && context.parameter_list() != null)
-        {
-            EmitErrorMessage(
-                context.Var().Symbol.Line,
-                context.Var().Symbol.Column,
-                context.Var().GetText().Length,
-                DS0083_InvalidVarModifier,
-                "The modifier 'var' cannot be used on methods.");
-        }
-
-        if (context.parameter_list() != null && context.member_special_modifier() != null && context.member_special_modifier().Any(s => s.Literal() != null))
-        {
-            ParserRuleContext rule = context.member_special_modifier().First(s => s.Literal != null);
-
-            EmitErrorMessage(
-                rule.Start.Line,
-                rule.Start.Column,
-                rule.GetText().Length,
-                DS0137_LiteralModifierOnMethod,
-                "The modifier 'literal' cannot be used on methods.");
-        }
-
         Type _tReturn = typeof(object);
 
         if (context.parameter_list() != null || _tReturn == typeof(void))
         {
-            if (TypeContext.Current.IsEnumeration)
-            {
-                EmitErrorMessage(
-                    context.Identifier().Symbol.Line,
-                    context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
-                    DS0141_MethodInEnumeration,
-                    "Enumeration types cannot contain methods.");
-            }
+            MethodContext mc = TypeContext.Current.GetMethod(context);
+            MethodBuilder mb = mc.Builder;
+            CurrentMethod = mc;
 
-            CallingConventions callingConventions = CallingConventions.HasThis;
-
-            if (context.member_special_modifier().Any(m => m.Static() != null) || (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract))
-                callingConventions = CallingConventions.Standard;
-
-            (MethodAttributes attrib, MethodImplAttributes implementationFlags) = AttributeHelpers.GetMethodAttributes(
-                    context.member_access_modifier(),
-                    context.member_oop_modifier(),
-                    context.member_special_modifier(),
-                    context.attribute());
-
-            if (attrib.HasFlag(MethodAttributes.PinvokeImpl))
-            {
-                // TODO: Implement P/Invoke methods
-                //MethodBuilder pInvokeMethod = TypeContext.Current.Builder.DefinePInvokeMethod();
-
-                return typeof(object);
-            }
-
-            MethodInfo ovr = null;
-
-            if (VisitorStep1 != null)
-            {
-                List<MockMethodInfo> interfaceMethods = TypeContext.Current.RequiredInterfaceImplementations;
-                foreach (MockMethodInfo method in interfaceMethods)
-                {
-                    if (method.Name == context.Identifier().GetText() && method.ReturnType == (VisitorStep1CurrentMethod == null ? typeof(DassieParser) : VisitorStep1CurrentMethod.Builder.ReturnType) && method.Parameters.SequenceEqual(VisitorStep1CurrentMethod == null ? [] : VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
-                    {
-                        if (method.IsAbstract)
-                        {
-                            attrib |= MethodAttributes.HideBySig;
-                            attrib |= MethodAttributes.NewSlot;
-                            attrib |= MethodAttributes.Virtual;
-                        }
-                        else if (method.Builder.IsStatic)
-                            ovr = method.Builder;
-                    }
-                }
-            }
-
-            if (attrib.HasFlag(MethodAttributes.Static))
-                attrib &= ~MethodAttributes.Virtual;
-
-            MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(
-                context.Identifier().GetText(),
-                attrib,
-                callingConventions);
-
-            mb.SetImplementationFlags(implementationFlags);
-
-            if (ovr != null)
-                TypeContext.Current.Builder.DefineMethodOverride(mb, ovr);
-
-            CurrentMethod = new()
-            {
-                Builder = mb
-            };
-
-            if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime))
-                CurrentMethod.IL = mb.GetILGenerator();
-
-            if (context.type_parameter_list() != null)
-            {
-                List<TypeParameterContext> typeParamContexts = [];
-
-                foreach (DassieParser.Type_parameterContext typeParam in context.type_parameter_list().type_parameter())
-                {
-                    if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetText()))
-                    {
-                        EmitErrorMessage(
-                            typeParam.Start.Line,
-                            typeParam.Start.Column,
-                            typeParam.GetText().Length,
-                            DS0112_DuplicateTypeParameter,
-                            $"Duplicate type parameter '{typeParam.GetText()}'.");
-
-                        continue;
-                    }
-
-                    if (TypeContext.Current.TypeParameters.Any(t => t.Name == typeParam.Identifier().GetText()))
-                    {
-                        EmitErrorMessage(
-                            typeParam.Start.Line,
-                            typeParam.Start.Column,
-                            typeParam.GetText().Length,
-                            DS0114_TypeParameterIsDefinedInContainingScope,
-                            $"The type parameter '{typeParam.Identifier().GetText()}' is already declared by the containing type '{TypeHelpers.Format(TypeContext.Current.Builder)}'.");
-                    }
-
-                    typeParamContexts.Add(BuildTypeParameter(typeParam));
-                }
-
-                GenericTypeParameterBuilder[] typeParams = mb.DefineGenericParameters(typeParamContexts.Select(t => t.Name).ToArray());
-                foreach (GenericTypeParameterBuilder typeParam in typeParams)
-                {
-                    TypeParameterContext tpc = typeParamContexts.First(c => c.Name == typeParam.Name);
-                    typeParam.SetGenericParameterAttributes(tpc.Attributes);
-                    typeParam.SetBaseTypeConstraint(tpc.BaseTypeConstraint);
-                    typeParam.SetInterfaceConstraints(tpc.InterfaceConstraints.ToArray());
-
-                    tpc.Builder = typeParam;
-                }
-
-                CurrentMethod.TypeParameters = typeParamContexts;
-            }
-
-            CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
-
-            var paramTypes = ResolveParameterList(context.parameter_list());
-            mb.SetParameters(paramTypes.Select(p => p.Type).ToArray());
-
-            foreach (var param in paramTypes)
-            {
-                ParameterBuilder pb = mb.DefineParameter(
-                    CurrentMethod.ParameterIndex++ + 1, // Add 1 so parameter indices start at 1 -> 0 is always the current instance of the containing type
-                    AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
-                    param.Context.Identifier().GetText());
-
-                CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, param.Context.Var() != null));
-            }
-
-            if (CurrentMethod.Builder.IsStatic)
-            {
-                foreach (var param in CurrentMethod.Parameters)
-                    param.Index--;
-            }
-
-            if (context.expression() == null)
-            {
-                if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime))
-                {
-                    EmitErrorMessage(
-                        context.Start.Line,
-                        context.Start.Column,
-                        context.GetText().Length,
-                        DS0115_NonAbstractMethodHasNoBody,
-                        $"The non-abstract member '{mb.Name}' needs to define a body.");
-
-                    CurrentMethod.IL.Emit(OpCodes.Ret);
-                }
-
-                //return typeof(void);
-            }
-
-            if (attrib.HasFlag(MethodAttributes.Abstract) && context.expression() != null)
-            {
-                EmitErrorMessage(
-                    context.Start.Line,
-                    context.Start.Column,
-                    context.GetText().Length,
-                    DS0116_AbstractMethodHasBody,
-                    $"The abstract member '{mb.Name}' cannot define a body.");
-
-                return typeof(void);
-            }
-
-            object ctx = context.expression();
-            if (ctx is DassieParser.Newlined_expressionContext)
-            {
-                while (ctx is DassieParser.Newlined_expressionContext expr)
-                    ctx = expr.expression();
-            }
-
-            bool allowTailCall = ctx is DassieParser.Member_access_expressionContext or DassieParser.Full_identifier_member_access_expressionContext;
-            CurrentMethod.EmitTailCall = allowTailCall;
-            CurrentMethod.AllowTailCallEmission = allowTailCall || ctx is DassieParser.Block_expressionContext;
+            _tReturn = mb.ReturnType;
 
             InjectClosureParameterInitializers();
 
-            Type tReturn = _tReturn;
-            if (context.type_name() != null)
-            {
-                tReturn = SymbolResolver.ResolveTypeName(context.type_name());
-                mb.SetReturnType(tReturn);
-            }
+            Type tReturn = null;
 
             if (context.expression() != null)
             {
@@ -649,11 +453,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 tReturn = _tReturn;
             }
 
-            if (context.type_name() == null)
+            if (tReturn != null && mc.UnresolvedReturnType)
                 mb.SetReturnType(_tReturn);
 
             if (context.expression() == null)
-                _tReturn = tReturn;
+                tReturn = _tReturn;
 
             if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
             {
@@ -1077,39 +881,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        FieldBuilder fb = TypeContext.Current.Builder.DefineField(
-            context.Identifier().GetText(),
-            type,
-            modreq.ToArray(),
-            modopt.ToArray(),
-            fieldAttribs);
+        MetaFieldInfo mfi = TypeContext.Current.GetField(context);
+        FieldBuilder fb = (FieldBuilder)mfi.Builder;
 
-        foreach (CustomAttributeBuilder cab in customAttribs)
-            fb.SetCustomAttribute(cab);
-
-        MetaFieldInfo mfi = new(context.Identifier().GetText(), fb);
-
-        if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
-        {
-            Expression result = ExpressionEvaluator.Instance.Visit(context.expression());
-
-            if (result == null)
-            {
-                EmitErrorMessage(
-                    context.expression().Start.Line,
-                    context.expression().Start.Column,
-                    context.expression().GetText().Length,
-                    DS0138_CompileTimeConstantRequired,
-                    "Compile-time constant expected.");
-
-                return typeof(void);
-            }
-
-            mfi.ConstantValue = result.Value;
-            fb.SetConstant(result.Value);
-        }
-
-        else if (context.expression() != null)
+        if (context.expression() != null)
             TypeContext.Current.FieldInitializers.Add((fb, context.expression()));
 
         TypeContext.Current.Fields.Add(mfi);
@@ -1127,7 +902,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return typeof(void);
     }
 
-    private (Type Type, DassieParser.ParameterContext Context)[] ResolveParameterList(DassieParser.Parameter_listContext paramList)
+    public static (Type Type, DassieParser.ParameterContext Context)[] ResolveParameterList(DassieParser.Parameter_listContext paramList, bool noErrors = false)
     {
         if (paramList == null)
             return Array.Empty<(Type, DassieParser.ParameterContext)>();
@@ -1135,18 +910,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         List<(Type, DassieParser.ParameterContext)> types = new();
 
         foreach (var param in paramList.parameter())
-            types.Add((ResolveParameter(param), param));
+            types.Add((ResolveParameter(param, noErrors), param));
 
         return types.ToArray();
     }
 
-    private Type ResolveParameter(DassieParser.ParameterContext param)
+    public static Type ResolveParameter(DassieParser.ParameterContext param, bool noErrors = false)
     {
         Type t = typeof(object);
 
         if (param.type_name() != null)
         {
-            t = SymbolResolver.ResolveTypeName(param.type_name());
+            t = SymbolResolver.ResolveTypeName(param.type_name(), noErrors: noErrors);
 
             if (t != null)
             {
@@ -1161,7 +936,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
         }
 
-        if (t.IsGenericTypeParameter && t.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant))
+        if (!noErrors && t.IsGenericTypeParameter && t.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant))
         {
             EmitErrorMessage(
                 param.type_name().Start.Line,
@@ -1301,7 +1076,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         AttributeHelpers.AddAttributeToCurrentMethod(entryPointCon, []);
 
-        mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(0, ParameterAttributes.None, "args"), 0, false));
+        mc.Parameters.Add(new("args", typeof(string[]), mb.DefineParameter(1, ParameterAttributes.None, "args"), 0, false));
         mc.FilesWhereDefined.Add(CurrentFile.Path);
         tc.Methods.Add(mc);
         Context.Types.Add(tc);
@@ -2716,7 +2491,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         invokeFunction.SetParameters(parameters.Select(p => p.Type).ToArray());
         for (int i = 0; i < parameters.Count; i++)
         {
-            ParameterBuilder pb = invokeFunction.DefineParameter(i, ParameterAttributes.None, parameters[i].Name);
+            ParameterBuilder pb = invokeFunction.DefineParameter(i + 1, ParameterAttributes.None, parameters[i].Name);
             CurrentMethod.Parameters.Add(new()
             {
                 Builder = pb,
@@ -5797,7 +5572,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         [">="] = "GreaterThanOrEqual"
     };
 
-    private static (string MethodName, string OperatorName) GetMethodNameForCustomOperator(ITerminalNode customOperator, bool isUnary = false)
+    internal static (string MethodName, string OperatorName) GetMethodNameForCustomOperator(ITerminalNode customOperator, bool isUnary = false)
     {
         string fullName = customOperator.GetText();
         string operatorName = fullName;
@@ -5844,88 +5619,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     private void DefineCustomOperator(DassieParser.Type_memberContext context)
     {
-        //if (!(TypeContext.Current.Builder.IsAbstract && TypeContext.Current.Builder.IsSealed))
-        //{
-        //    EmitErrorMessage(
-        //        context.Custom_Operator().Symbol.Line,
-        //        context.Custom_Operator().Symbol.Column,
-        //        context.Custom_Operator().GetText().Length,
-        //        DS0160_CustomOperatorDefinedOutsideModule,
-        //        "Custom operators can only be defined inside of modules.");
-
-        //    return;
-        //}
-
-        if (context.member_access_modifier() != null && context.member_access_modifier().Global() == null)
-        {
-            EmitErrorMessage(
-                context.member_access_modifier().Start.Line,
-                context.member_access_modifier().Start.Column,
-                context.member_access_modifier().GetText().Length,
-                DS0161_CustomOperatorNotGlobal,
-                "The only valid access modifier for a custom operator is 'global'.");
-
-            return;
-        }
-
-        if (context.parameter_list().parameter().Length > 2)
-        {
-            EmitErrorMessage(
-                context.parameter_list().Start.Line,
-                context.parameter_list().Start.Column,
-                context.parameter_list().GetText().Length,
-                DS0162_CustomOperatorTooManyParameters,
-                "A custom operator cannot have more than two operands.");
-
-            return;
-        }
-
-        if (context.expression() == null)
-        {
-            EmitErrorMessage(
-                context.Custom_Operator().Symbol.Line,
-                context.Custom_Operator().Symbol.Column,
-                context.Custom_Operator().GetText().Length,
-                DS0163_CustomOperatorNoMethodBody,
-                "Custom operators are required to have method bodies.");
-
-            return;
-        }
-
-        (string methodName, string operatorName) = GetMethodNameForCustomOperator(context.Custom_Operator());
-
-        MethodAttributes attrib = MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.SpecialName;
-        attrib |= MethodAttributes.HideBySig;
-
-        MethodBuilder mb = TypeContext.Current.Builder.DefineMethod(methodName, attrib, CallingConventions.Standard);
-        CurrentMethod = new()
-        {
-            Builder = mb,
-            IL = mb.GetILGenerator(),
-            IsCustomOperator = true
-        };
-        CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
-
-        if (!TypeContext.Current.ContainsCustomOperators)
-        {
-            TypeContext.Current.Builder.SetCustomAttribute(new(typeof(ContainsCustomOperatorsAttribute).GetConstructor([]), []));
-            TypeContext.Current.ContainsCustomOperators = true;
-        }
-
-        mb.SetCustomAttribute(new(typeof(OperatorAttribute).GetConstructor([]), []));
+        MethodContext mc = TypeContext.Current.GetMethod(context);
+        MethodBuilder mb = mc.Builder;
+        CurrentMethod = mc;
 
         var paramTypes = ResolveParameterList(context.parameter_list());
         mb.SetParameters(paramTypes.Select(p => p.Type).ToArray());
-
-        foreach (var param in paramTypes)
-        {
-            ParameterBuilder pb = mb.DefineParameter(
-                CurrentMethod.ParameterIndex++,
-                AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
-                param.Context.Identifier().GetText());
-
-            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, param.Context.Var() != null));
-        }
 
         Type _tReturn = typeof(object);
 
@@ -5991,7 +5690,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (context.expression() != null)
             CurrentMethod.IL.Emit(OpCodes.Ret);
 
-        CurrentFile.FunctionParameterConstraints.TryGetValue(operatorName, out Dictionary<string, string> constraintsForCurrentFunction);
+        CurrentFile.FunctionParameterConstraints.TryGetValue(mb.Name, out Dictionary<string, string> constraintsForCurrentFunction);
         constraintsForCurrentFunction ??= [];
 
         List<Parameter> _params = [];
@@ -6020,7 +5719,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Line = context.Custom_Operator().Symbol.Line,
             Column = context.Custom_Operator().Symbol.Column,
             Length = context.Custom_Operator().GetText().Length,
-            ToolTip = TooltipGenerator.Function(operatorName, tReturn, _params.ToArray()),
+            ToolTip = TooltipGenerator.Function(mb.Name, tReturn, _params.ToArray()),
             IsNavigationTarget = true
         });
 

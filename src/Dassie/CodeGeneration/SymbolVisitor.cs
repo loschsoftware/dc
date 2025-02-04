@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Dassie.Helpers;
+using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
@@ -116,20 +117,14 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
 
     public override Type VisitType([NotNull] DassieParser.TypeContext context)
     {
-        TypeDeclarationGeneration.GenerateType(context, null);
+        TypeContext tc = TypeDeclarationGeneration.GenerateType(context, null);
 
         if (context.type_block() != null && context.type_block().type_member() != null)
         {
             foreach (DassieParser.Type_memberContext member in context.type_block().type_member())
-                VisitType_member(member);
+                MemberDeclarationGeneration.GenerateMember(member, tc);
         }
 
-        return typeof(void);
-    }
-
-    // TODO
-    public override object VisitType_member([NotNull] DassieParser.Type_memberContext context)
-    {
         return typeof(void);
     }
 }

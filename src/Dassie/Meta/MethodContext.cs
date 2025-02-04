@@ -85,6 +85,8 @@ internal class MethodContext
 
     public static MethodContext CurrentMethod { get; set; }
 
+    public DassieParser.Type_memberContext ParserRule { get; set; }
+
     public string UniqueMethodName
     {
         get
@@ -235,8 +237,8 @@ internal class MethodContext
     public Dictionary<int, Type> LoopExpressionTypes { get; set; } = [];
 
     public List<(ConstructorInfo Constructor, object[] Data)> Attributes { get; set; } = [];
-
-    public bool ReturnTypeIsUnresolved { get; set; }
+    
+    public bool UnresolvedReturnType { get; set; }
 
     public DassieParser.Type_nameContext ReturnTypeName { get; set; }
 

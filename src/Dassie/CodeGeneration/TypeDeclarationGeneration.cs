@@ -3,7 +3,6 @@ using Dassie.Core;
 using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
-using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
 using System.Linq;

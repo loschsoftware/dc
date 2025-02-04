@@ -1,4 +1,5 @@
-﻿using Dassie.Runtime;
+﻿using Dassie.Parser;
+using Dassie.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -21,6 +22,8 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
     public FieldInfo Builder { get; set; }
 
     public object ConstantValue { get; set; } = null;
+
+    public DassieParser.Type_memberContext ParserRule { get; set; }
 
     public override bool Equals(object obj)
     {
