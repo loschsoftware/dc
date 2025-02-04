@@ -3,6 +3,7 @@ using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 
@@ -32,73 +33,24 @@ internal static class SymbolAssociationResolver
                 }
             }
         }
-
-        if (!context.Builder.IsInterface)
-        {
-            context.RequiredInterfaceImplementations = context.ImplementedInterfaces
-                .SelectMany(t =>
-                {
-                    if (!t.IsConstructedGenericType)
-                        return t.GetInterfaces().Append(t);
-
-                    return t.GetGenericTypeDefinition().GetInterfaces().Append(t);
-                })
-                .SelectMany(t =>
-                {
-                    if (!t.IsConstructedGenericType)
-                    {
-                        return t.GetMethods().Select(m => new MockMethodInfo()
-                        {
-                            Name = m.Name,
-                            ReturnType = m.ReturnType,
-                            Parameters = m.GetParameters().Select(p => p.ParameterType).ToList(),
-                            IsAbstract = m.IsAbstract,
-                            DeclaringType = t,
-                            IsGenericMethod = m.IsGenericMethod,
-                            GenericTypeArguments = m.GetGenericArguments().ToList(),
-                            Builder = m
-                        });
-                    }
-
-                    Type[] typeArgs = t.GenericTypeArguments;
-
-                    return t.GetGenericTypeDefinition().GetMethods().Select(m =>
-                    {
-                        MockMethodInfo method = new()
-                        {
-                            Name = m.Name,
-                            IsAbstract = m.IsAbstract,
-                            Parameters = [],
-                            DeclaringType = t,
-                            IsGenericMethod = m.IsGenericMethod,
-                            GenericTypeArguments = m.GetGenericArguments().ToList(),
-                            Builder = TypeBuilder.GetMethod(t, m)
-                        };
-
-                        if (!m.ReturnType.IsGenericTypeParameter)
-                            method.ReturnType = m.ReturnType;
-                        else
-                            method.ReturnType = typeArgs[m.ReturnType.GenericParameterPosition];
-
-                        foreach (Type param in m.GetParameters().Select(p => p.ParameterType))
-                        {
-                            if (!param.IsGenericTypeParameter)
-                                method.Parameters.Add(param);
-                            else
-                                method.Parameters.Add(typeArgs[param.GenericParameterPosition]);
-                        }
-
-                        return method;
-                    });
-                })
-                .Where(m => m.IsAbstract)
-                .Distinct()
-                .ToList();
-        }
     }
 
     public static void ResolveMethodSignature(MethodContext context)
     {
+        if (context.UnresolvedReturnType && context.ReturnTypeName != null)
+        {
+            Type ret = SymbolResolver.ResolveTypeName(context.ReturnTypeName);
+            context.Builder.SetReturnType(ret);
+        }
 
+        if (context.ParameterTypeNames != null && context.ParameterTypeNames.Count > 0)
+        {
+            List<Type> parameters = [];
+
+            foreach (DassieParser.Type_nameContext name in context.ParameterTypeNames)
+                parameters.Add(SymbolResolver.ResolveTypeName(name));
+
+            context.Builder.SetParameters(parameters.ToArray());
+        }
     }
 }

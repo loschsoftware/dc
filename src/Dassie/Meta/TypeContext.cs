@@ -1,6 +1,7 @@
 ﻿using Dassie.Parser;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -15,6 +16,12 @@ internal class TypeContext
         if (!Context.Types.Contains(this))
             Context.Types.Add(this);
     }
+
+    public MethodContext GetMethod(DassieParser.Type_memberContext member)
+        => Methods.First(m => m.ParserRule == member);
+
+    public MetaFieldInfo GetField(DassieParser.Type_memberContext member)
+        => Fields.First(m => m.ParserRule == member);
 
     public static TypeContext Current { get; set; }
 
