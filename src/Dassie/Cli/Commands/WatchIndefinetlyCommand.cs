@@ -15,5 +15,5 @@ internal class WatchIndefinetlyCommand : ICompilerCommand
 
     public bool Hidden() => true;
 
-    public int Invoke(string[] args) => WatchCommand.WatchIndefinetly();
+    public int Invoke(string[] args) => WatchCommand.WatchIndefinetly(args);
 }

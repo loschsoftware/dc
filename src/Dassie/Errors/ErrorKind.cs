@@ -791,5 +791,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an inheritance chain contains a circular reference.
     /// </summary>
-    DS0192_CircularReference
+    DS0192_CircularReference,
+    /// <summary>
+    /// Emitted when a CLI command is invoked with an option or flag that requires a value but no value is set.
+    /// </summary>
+    DS0193_ExpectedCliOptionValue,
+    /// <summary>
+    /// Emitted when the 'dc watch' command is invoked with an invalid combination of arguments.
+    /// </summary>
+    DS0194_DCWatchInvalidCombination
 }
