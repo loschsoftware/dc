@@ -42,6 +42,9 @@ internal static class SymbolNameGenerator
     
     public static string GetImplicitEntryPointContainerTypeName() => $"{GeneratedPrefix}$Application";
     public static string GetImplicitEntryPointName() => $"{GeneratedPrefix}$EntryPoint";
+
+    public static string GetLocalTopLevelFunctionsContainerTypeName(int index) => $"{GeneratedPrefix}$LocalFunctions'{index}";
+    public static string GetGlobalTopLevelFunctionsContainerTypeName() => $"{GeneratedPrefix}$GlobalFunctions";
     
     public static string GetInlineArrayContainerTypeName(int index) => $"{GeneratedPrefix}$InlineArrayContainer'{index}";
     public static string GetInlineArrayTypeName(int index) => $"{GeneratedPrefix}$InlineArray'{index}";

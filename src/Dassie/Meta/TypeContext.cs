@@ -17,6 +17,14 @@ internal class TypeContext
             Context.Types.Add(this);
     }
 
+    public static TypeContext GetForType(TypeBuilder tb)
+    {
+        if (!Context.Types.Any(t => t.Builder == tb))
+            return null;
+
+        return Context.Types.First(t => t.Builder == tb);
+    }
+
     public MethodContext GetMethod(DassieParser.Type_memberContext member)
         => Methods.First(m => m.ParserRule == member);
 

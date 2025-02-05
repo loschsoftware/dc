@@ -214,7 +214,7 @@ internal static class MemberDeclarationGeneration
             _params.Add((param.Type, param.Context.Identifier().GetText()));
     }
 
-    public static void GenerateMember(DassieParser.Type_memberContext context, TypeContext declaringType)
+    public static void GenerateMember(DassieParser.Type_memberContext context, TypeContext declaringType, bool ignoreDS0058 = false, bool alwaysGlobal = false)
     {
         if (context.Custom_Operator() != null)
         {
@@ -275,7 +275,14 @@ internal static class MemberDeclarationGeneration
                     context.member_access_modifier(),
                     context.member_oop_modifier(),
                     context.member_special_modifier(),
-                    context.attribute());
+                    context.attribute(),
+                    ignoreDS0058);
+
+            if (alwaysGlobal && attrib.HasFlag(MethodAttributes.Private))
+            {
+                attrib &= ~MethodAttributes.Private;
+                attrib |= MethodAttributes.Public;
+            }
 
             if (attrib.HasFlag(MethodAttributes.PinvokeImpl))
             {

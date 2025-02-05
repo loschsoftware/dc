@@ -1172,6 +1172,26 @@ internal static class SymbolResolver
             }
         }
 
+        if (CurrentFile != null && CurrentFile.LocalTopLevelFunctionContainerType != null)
+        {
+            TypeContext localCtx = TypeContext.GetForType(CurrentFile.LocalTopLevelFunctionContainerType);
+            if (localCtx.Methods.Any(m => m.Builder.Name == name))
+            {
+                members = localCtx.Methods.Where(m => m.Builder.Name == name).Select(m => m.Builder).ToList();
+                return true;
+            }
+        }
+
+        if (Context != null && Context.GlobalTopLevelFunctionContainerType != null)
+        {
+            TypeContext globalCtx = TypeContext.GetForType(Context.GlobalTopLevelFunctionContainerType);
+            if (globalCtx.Methods.Any(m => m.Builder.Name == name))
+            {
+                members = globalCtx.Methods.Where(m => m.Builder.Name == name).Select(m => m.Builder).ToList();
+                return true;
+            }
+        }
+
         members = null;
         return false;
     }

@@ -1,5 +1,7 @@
 ﻿using Dassie.Configuration;
 using Dassie.Errors;
+using Dassie.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -64,4 +66,7 @@ internal class ProgramContext
     public List<(ConstructorInfo Constructor, object[] Data)> Attributes { get; set; } = [];
 
     public List<MethodInfo> ModuleInitializerParts { get; set; } = [];
+
+    public TypeBuilder GlobalTopLevelFunctionContainerType { get; set; }
+    public List<(FileContext DeclaringFile, DassieParser.Type_memberContext Function)> GlobalTopLevelFunctions { get; set; } = [];
 }

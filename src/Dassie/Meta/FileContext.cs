@@ -1,10 +1,12 @@
 ﻿using Antlr4.Runtime;
 using Dassie.Errors;
+using Dassie.Parser;
 using Dassie.Text;
 using Dassie.Text.Regions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
+using System.Reflection.Emit;
 
 namespace Dassie.Meta;
 
@@ -15,6 +17,8 @@ internal class FileContext
         Path = path;
         AvailableTypes = new(path);
     }
+
+    public int Index => Context.Files.IndexOf(this);
 
     public static FileContext CurrentFile { get; set; }
 
@@ -61,4 +65,7 @@ internal class FileContext
     public ISymbolDocumentWriter SymbolDocumentWriter { get; set; }
 
     public ICharStream CharStream { get; set; }
+
+    public TypeBuilder LocalTopLevelFunctionContainerType { get; set; }
+    public List<DassieParser.Type_memberContext> LocalTopLevelFunctions { get; set; } = [];
 }

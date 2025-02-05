@@ -89,7 +89,7 @@ internal static class AttributeHelpers
         return baseAttributes;
     }
 
-    public static (MethodAttributes, MethodImplAttributes) GetMethodAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, DassieParser.AttributeContext[] attribs)
+    public static (MethodAttributes, MethodImplAttributes) GetMethodAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, DassieParser.AttributeContext[] attribs, bool ignoreDS0058 = false)
     {
         MethodAttributes baseAttributes;
         MethodImplAttributes implementationFlags = MethodImplAttributes.Managed;
@@ -111,7 +111,7 @@ internal static class AttributeHelpers
                 baseAttributes |= MethodAttributes.Static;
                 isStatic = true;
 
-                if (oopModifier != null && oopModifier.Closed() != null)
+                if (oopModifier != null && oopModifier.Closed() != null && !ignoreDS0058)
                 {
                     EmitMessage(
                         oopModifier.Closed().Symbol.Line,
@@ -132,7 +132,7 @@ internal static class AttributeHelpers
                 implementationFlags |= MethodImplAttributes.AggressiveInlining;
         }
 
-        if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(MethodAttributes.Static))
+        if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(MethodAttributes.Static) && !ignoreDS0058)
         {
             EmitMessage(
                 specialModifiers.First(s => s.GetText() == "static").Start.Line,

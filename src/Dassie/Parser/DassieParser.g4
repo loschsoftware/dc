@@ -11,7 +11,7 @@ compilation_unit
     ;
 
 file_body
-    : (expression | local_function | NewLine | full_program)*
+    : (expression | local_function | type_member | NewLine | full_program)*
     ;
 
 full_program

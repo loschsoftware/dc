@@ -65,7 +65,8 @@ internal static class DocumentCompiler
             if (File.Exists(intermediatePath))
                 File.Delete(intermediatePath);
 
-            Directory.Delete(TemporaryBuildDirectoryName, true);
+            if (Directory.Exists(TemporaryBuildDirectoryName))
+                Directory.Delete(TemporaryBuildDirectoryName, true);
         }
 
         return CurrentFile.Errors;

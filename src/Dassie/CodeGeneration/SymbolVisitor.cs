@@ -3,6 +3,7 @@ using Antlr4.Runtime.Tree;
 using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Symbols;
 using Dassie.Text;
 using Dassie.Text.Tooltips;
 using System;
@@ -103,6 +104,64 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
             Length = context.full_identifier().GetText().Length,
             ToolTip = TooltipGenerator.Namespace(context.full_identifier().GetText())
         });
+
+        return typeof(void);
+    }
+
+    public override object VisitFile_body([NotNull] DassieParser.File_bodyContext context)
+    {
+        foreach (IParseTree prog in context.full_program() ?? [])
+            Visit(prog);
+
+        foreach (DassieParser.Type_memberContext member in context.type_member() ?? [])
+        {
+            if (member.member_special_modifier() == null || !member.member_special_modifier().Any(a => a.Static() != null))
+                continue;
+
+            bool isLocal = true;
+            if (member.member_access_modifier() != null && member.member_access_modifier().Global() != null)
+                isLocal = false;
+
+            TypeBuilder parent;
+            TypeAttributes attribs = TypeAttributes.NotPublic | TypeAttributes.Sealed | TypeAttributes.Abstract;
+
+            if (isLocal)
+            {
+                if (CurrentFile.LocalTopLevelFunctionContainerType == null)
+                {
+                    CurrentFile.LocalTopLevelFunctionContainerType = Context.Module.DefineType(SymbolNameGenerator.GetLocalTopLevelFunctionsContainerTypeName(CurrentFile.Index), attribs);
+
+                    TypeContext tc = new()
+                    {
+                        Builder = CurrentFile.LocalTopLevelFunctionContainerType,
+                        FullName = CurrentFile.LocalTopLevelFunctionContainerType.FullName
+                    };
+                }
+
+                CurrentFile.LocalTopLevelFunctions.Add(member);
+                parent = CurrentFile.LocalTopLevelFunctionContainerType;
+            }
+            else
+            {
+                if (Context.GlobalTopLevelFunctionContainerType == null)
+                {
+                    Context.GlobalTopLevelFunctionContainerType = Context.Module.DefineType(SymbolNameGenerator.GetGlobalTopLevelFunctionsContainerTypeName(), attribs);
+
+                    TypeContext tc = new()
+                    {
+                        Builder = Context.GlobalTopLevelFunctionContainerType,
+                        FullName = Context.GlobalTopLevelFunctionContainerType.FullName
+                    };
+                }
+
+                Context.GlobalTopLevelFunctions.Add((CurrentFile, member));
+                parent = Context.GlobalTopLevelFunctionContainerType;
+            }
+
+            MemberDeclarationGeneration.GenerateMember(member, TypeContext.GetForType(parent),
+                ignoreDS0058: true,
+                alwaysGlobal: true);
+        }
 
         return typeof(void);
     }

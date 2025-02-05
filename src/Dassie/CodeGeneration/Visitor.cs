@@ -11,7 +11,6 @@ using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
 using Dassie.Symbols;
-using Dassie.Text;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
@@ -1023,6 +1022,31 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Visit(prog);
         }
 
+        List<IParseTree> ignoredTrees = [];
+
+        if (context.type_member() != null && context.type_member().Length != 0)
+        {
+            if (CurrentFile.LocalTopLevelFunctionContainerType != null)
+            {
+                TypeContext.Current = TypeContext.GetForType(CurrentFile.LocalTopLevelFunctionContainerType);
+                foreach (DassieParser.Type_memberContext localFunc in CurrentFile.LocalTopLevelFunctions)
+                {
+                    ignoredTrees.Add(localFunc);
+                    Visit(localFunc);
+                }
+            }
+
+            if (Context.GlobalTopLevelFunctionContainerType != null)
+            {
+                TypeContext.Current = TypeContext.GetForType(Context.GlobalTopLevelFunctionContainerType);
+                foreach (DassieParser.Type_memberContext globalFunc in Context.GlobalTopLevelFunctions.Where(f => f.DeclaringFile == CurrentFile).Select(f => f.Function))
+                {
+                    ignoredTrees.Add(globalFunc);
+                    Visit(globalFunc);
+                }
+            }
+        }
+
         if (context.expression() == null || context.expression().Length == 0)
             return typeof(void);
 
@@ -1090,6 +1114,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             foreach (IParseTree child in context.children.Take(context.children.Count - 1))
             {
                 if (child is DassieParser.Full_programContext)
+                    continue;
+
+                if (ignoredTrees.Contains(child))
                     continue;
 
                 Type _t = Visit(child);
@@ -2952,8 +2979,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
 
             // Global method
-            else if (o is List<MethodInfo> methods)
+            else if (o is List<MethodInfo> or List<MethodBuilder>)
             {
+                List<MethodInfo> methods;
+                if (o is List<MethodInfo> methodInfos)
+                    methods = methodInfos;
+                else
+                    methods = ((List<MethodBuilder>)o).Cast<MethodInfo>().ToList();
+
                 if (getFunctionPointerTarget && functionPointerParams == null && functionPointerRet == null && methods.Count > 0)
                 {
                     MethodInfo fptr = methods.First();
