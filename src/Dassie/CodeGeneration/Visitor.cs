@@ -75,6 +75,57 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             });
         }
 
+        if (!string.IsNullOrEmpty(Context.Configuration.EntryPoint))
+        {
+            if (Context.EntryPoint != null)
+            {
+                EmitWarningMessage(
+                    0, 0, 0,
+                    DS0195_EntryPointManuallySetWhenUsingDSConfigEntryPointProperty,
+                    $"The manually specified entry point '{Context.Configuration.EntryPoint}' was overwritten by an '<EntryPoint>' attribute or top-level code.",
+                    ProjectConfigurationFileName);
+
+                return typeof(void);
+            }
+
+            bool IsValidEntryPoint(out MethodContext entryPoint)
+            {
+                entryPoint = null;
+
+                if (!Context.Configuration.EntryPoint.Contains('.'))
+                    return false;
+
+                string[] parts = Context.Configuration.EntryPoint.Split('.');
+                string typeId = string.Join('.', parts[..^1]);
+                string methodName = parts[^1];
+
+                TypeContext typeContext = Context.Types.FirstOrDefault(t => t.Builder.FullName == typeId);
+                if (typeContext == null)
+                    return false;
+
+                entryPoint = typeContext.Methods.FirstOrDefault(m => m.UniqueMethodName == methodName);
+                if (entryPoint == null)
+                    return false;
+
+                return true;
+            }
+
+            if (IsValidEntryPoint(out MethodContext entryPoint))
+            {
+                entryPoint.Builder.SetCustomAttribute(new(typeof(EntryPointAttribute).GetConstructor([]), []));
+                Context.EntryPointIsSet = true;
+                Context.EntryPoint = entryPoint.Builder;
+            }
+            else
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0196_InvalidMethodIdentifier,
+                    $"The manually specified entry point '{Context.Configuration.EntryPoint}' is not a valid method or function identifier.",
+                    ProjectConfigurationFileName);
+            }
+        }
+
         return typeof(void);
     }
 

@@ -1,4 +1,5 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Core;
+using Dassie.Meta;
 using System;
 using System.Reflection.Emit;
 
@@ -799,5 +800,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the 'dc watch' command is invoked with an invalid combination of arguments.
     /// </summary>
-    DS0194_DCWatchInvalidCombination
+    DS0194_DCWatchInvalidCombination,
+    /// <summary>
+    /// Emitted when the 'EntryPoint' property is set in <c>dsconfig.xml</c> while the application also manually marks a method using the <see cref="EntryPointAttribute"/> attribute.
+    /// </summary>
+    DS0195_EntryPointManuallySetWhenUsingDSConfigEntryPointProperty,
+    /// <summary>
+    /// Emitted when a string representation of a method is not a valid method identifier.
+    /// </summary>
+    DS0196_InvalidMethodIdentifier
 }

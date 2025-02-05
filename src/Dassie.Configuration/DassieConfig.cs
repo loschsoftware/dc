@@ -223,6 +223,11 @@ public sealed class DassieConfig
     [DefaultValue(null)]
     [XmlElement("CodeAnalysis")]
     public CodeAnalysisConfiguration CodeAnalysisConfiguration { get; set; }
+
+    [Description("Sets the function or method that functions as the application entry point.")]
+    [DefaultValue("")]
+    [XmlElement]
+    public string EntryPoint { get; set; }
 }
 
 [Serializable]
