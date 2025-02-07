@@ -1721,7 +1721,7 @@ internal static class SymbolResolver
 
         if (Context.Attributes.Any(a => a.Constructor == typeof(ExtensionAttribute).GetConstructor([])))
         {
-            extensionMethodsTypesFromCurrentAssembly = Context.Types.Where(t => t.Attributes.Any(a => a.Constructor == typeof(ExtensionAttribute).GetConstructor([])))
+            extensionMethodsTypesFromCurrentAssembly = Context.Types.Where(t => !t.IsLocalType).Concat(CurrentFile.LocalTypes).Where(t => t.Attributes.Any(a => a.Constructor == typeof(ExtensionAttribute).GetConstructor([])))
                 .SelectMany(t => t.Methods)
                 .Where(m => m.Attributes.Any(a => a.Constructor == typeof(ExtensionAttribute).GetConstructor([])))
                 .Select(m => m.Builder)
@@ -1765,7 +1765,8 @@ internal static class SymbolResolver
             return type.GetMethods(BindingFlags.Public | BindingFlags.Static).Where(m => m.GetCustomAttribute<OperatorAttribute>() != null);
         }
 
-        IEnumerable<Type> allTypes = Context.Types.Select(t => t.Builder).Cast<Type>()
+        IEnumerable<Type> allTypes = Context.Types.Where(t => !t.IsLocalType).Select(t => t.Builder).Cast<Type>()
+            .Concat(CurrentFile.LocalTypes.Select(t => t.Builder))
             .Concat(Context.ReferencedAssemblies.Append(typeof(stdout).Assembly)
                 .SelectMany(a =>
                 {
