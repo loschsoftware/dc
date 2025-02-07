@@ -1475,9 +1475,9 @@ internal static class SymbolResolver
                 return locCtx.FinishedType ?? locCtx.Builder;
             }
 
-            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name && !t.IsLocalType))
+            if (Context.Types.Any(t => t.FullName == name && !t.IsLocalType))
             {
-                TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name);
+                TypeContext ctx = Context.Types.First(t => t.FullName == name && !t.IsLocalType);
                 return ctx.FinishedType ?? ctx.Builder;
             }
 
