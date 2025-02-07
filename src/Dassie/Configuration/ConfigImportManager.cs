@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Xml.Serialization;
+﻿using Dassie.Extensions;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 
 namespace Dassie.Configuration;
@@ -30,41 +30,42 @@ internal static class ConfigImportManager
         fileName ??= ProjectConfigurationFileName;
         string importPath = Path.GetFullPath(config.Import);
 
-        if (!File.Exists(importPath))
-        {
-            EmitErrorMessage(
-                0, 0, 0,
-                DS0197_ImportedConfigFileNotFound,
-                $"The imported configuration file '{importPath}' could not be found.",
-                fileName);
+        DassieConfig importedConfig = null;
 
-            return;
+        if (ExtensionLoader.ConfigurationProviders.Any(p => p.Name == config.Import))
+            importedConfig = ExtensionLoader.ConfigurationProviders.First(p => p.Name == config.Import).Configuration;
+        else
+        {
+            if (!File.Exists(importPath))
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0197_ImportedConfigFileNotFound,
+                    $"The imported configuration file '{importPath}' could not be found.",
+                    fileName);
+
+                return;
+            }
+
+            visitedFiles ??= new(StringComparer.OrdinalIgnoreCase);
+
+            if (!visitedFiles.Add(importPath))
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0198_ImportedConfigFileCircularDependency,
+                    $"Importing the configuration file '{importPath}' would lead to a circular dependency.",
+                    fileName);
+
+                return;
+            }
+
+            importedConfig = ProjectFileDeserializer.Deserialize(importPath, false);
         }
 
-        visitedFiles ??= new(StringComparer.OrdinalIgnoreCase);
-
-        if (!visitedFiles.Add(importPath))
-        {
-            EmitErrorMessage(
-                0, 0, 0,
-                DS0198_ImportedConfigFileCircularDependency,
-                $"Importing the configuration file '{importPath}' would lead to a circular dependency.",
-                fileName);
-
-            return;
-        }
-
-        DassieConfig importedConfig = Deserialize(importPath);
         Directory.SetCurrentDirectory(Path.GetDirectoryName(importPath));
         Merge(importedConfig, visitedFiles, importPath);
         ApplySettings(config, importedConfig);
-    }
-
-    private static DassieConfig Deserialize(string filePath)
-    {
-        XmlSerializer serializer = new(typeof(DassieConfig));
-        using StreamReader reader = new(filePath);
-        return (DassieConfig)serializer.Deserialize(reader);
     }
 
     private static void ApplySettings(DassieConfig target, DassieConfig source)

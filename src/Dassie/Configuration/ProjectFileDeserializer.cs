@@ -16,12 +16,15 @@ internal static class ProjectFileDeserializer
     public static void Set(DassieConfig cfg) => _config = cfg;
 
     private static DassieConfig Deserialize()
+        => Deserialize(ProjectConfigurationFileName);
+
+    public static DassieConfig Deserialize(string path, bool handleImports = true)
     {
-        if (!File.Exists(ProjectConfigurationFileName))
+        if (!File.Exists(path))
             return null;
 
         XmlSerializer xmls = new(typeof(DassieConfig));
-        using StreamReader sr = new(ProjectConfigurationFileName);
+        using StreamReader sr = new(path);
         DassieConfig config = null;
 
         try
@@ -42,15 +45,16 @@ internal static class ProjectFileDeserializer
                 row, col, 0,
                 DS0090_MalformedConfigurationFile,
                 $"Invalid project file.{string.Join(':', ex.InnerException.Message.Split(':')[1..])}",
-                ProjectConfigurationFileName);
+                path);
         }
 
-        ConfigImportManager.Merge(config);
+        if (handleImports)
+            ConfigImportManager.Merge(config);
 
-        foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
+        foreach (ErrorInfo error in ConfigValidation.Validate(path))
             EmitGeneric(error);
 
-        BuildLogDeviceContextBuilder.RegisterBuildLogDevices(config, ProjectConfigurationFileName);
+        BuildLogDeviceContextBuilder.RegisterBuildLogDevices(config, path);
         return config;
     }
 }
