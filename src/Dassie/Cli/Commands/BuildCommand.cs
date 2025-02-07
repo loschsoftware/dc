@@ -43,11 +43,12 @@ internal class BuildCommand : ICompilerCommand
         if (args.Length > 0 && args.TakeWhile(a => !a.StartsWith('-')).Any())
         {
             string profileName = args.First(a => !a.StartsWith('-'));
+            string[] additionalArgs = args.Skip(args.ToList().IndexOf(profileName) + 1).ToArray();
 
             if (config.BuildProfiles.Any(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase)))
             {
                 BuildProfile profile = config.BuildProfiles.First(p => p.Name.Equals(profileName, StringComparison.OrdinalIgnoreCase));
-                return ExecuteBuildProfile(profile, config);
+                return ExecuteBuildProfile(profile, config, additionalArgs);
             }
 
             EmitErrorMessage(
@@ -59,7 +60,7 @@ internal class BuildCommand : ICompilerCommand
             return -1;
         }
         else if (config.BuildProfiles.Any(p => p.Name.ToLowerInvariant() == "default"))
-            return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"), config);
+            return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"), config, args);
 
         string[] filesToCompile = Directory.EnumerateFiles("./", "*.ds", SearchOption.AllDirectories).ToArray();
         filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();
@@ -78,7 +79,7 @@ internal class BuildCommand : ICompilerCommand
         return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray());
     }
 
-    private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config)
+    private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config, string[] args)
     {
         if (profile.Settings != null)
         {
@@ -146,7 +147,7 @@ internal class BuildCommand : ICompilerCommand
         }
 
         if (!string.IsNullOrEmpty(profile.Arguments))
-            CompileCommand.Instance.Invoke(profile.Arguments.Split(' '), config);
+            CompileCommand.Instance.Invoke(profile.Arguments.Split(' ').Concat(args).ToArray(), config);
 
         if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
         {
