@@ -808,5 +808,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a string representation of a method is not a valid method identifier.
     /// </summary>
-    DS0196_InvalidMethodIdentifier
+    DS0196_InvalidMethodIdentifier,
+    /// <summary>
+    /// Emitted when an imported project configuration file does not exist.
+    /// </summary>
+    DS0197_ImportedConfigFileNotFound,
+    /// <summary>
+    /// Emitted when a project configuration import results in a circular dependency.
+    /// </summary>
+    DS0198_ImportedConfigFileCircularDependency
 }

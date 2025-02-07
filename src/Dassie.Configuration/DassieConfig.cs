@@ -13,6 +13,10 @@ public sealed class DassieConfig
     [XmlAttribute("FormatVersion")]
     public string FormatVersion { get; set; }
 
+    [Description("Loads the specified configuration file and applies its settings.")]
+    [XmlAttribute]
+    public string Import { get; set; }
+
     [Description("Sets custom macro definitions.")]
     [DefaultValue(null)]
     [XmlArray("MacroDefinitions")]

@@ -45,6 +45,8 @@ internal static class ProjectFileDeserializer
                 ProjectConfigurationFileName);
         }
 
+        ConfigImportManager.Merge(config);
+
         foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
             EmitGeneric(error);
 
