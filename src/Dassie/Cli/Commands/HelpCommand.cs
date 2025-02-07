@@ -144,7 +144,7 @@ internal class HelpCommand : ICompilerCommand
 
                 string alias = "";
                 if (CommandLineOptionParser.Aliases.ContainsValue(name))
-                    alias = CommandLineOptionParser.Aliases.First(a => a.Value == name).Key.ToLowerInvariant();
+                    alias = CommandLineOptionParser.Aliases.First(a => a.Value == name).Key;
 
                 string descriptionText = CommandLineOptionParser.GetDescription(property.Name);
                 string descriptionFormatted = FormatLines(descriptionText, false, 62);
