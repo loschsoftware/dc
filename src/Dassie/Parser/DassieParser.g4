@@ -234,13 +234,13 @@ placeholder
     ;
 
 type_access_modifier
-    : Global
+    : Local
+    | Global
     | Internal
     ;
 
 nested_type_access_modifier
     : type_access_modifier
-    | Local
     | Protected Internal?
     ;
 

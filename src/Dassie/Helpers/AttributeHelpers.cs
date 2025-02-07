@@ -220,17 +220,20 @@ internal static class AttributeHelpers
 
         if (typeAccess != null)
         {
+            baseAttributes &= ~TypeAttributes.Public;
+
             if (typeAccess.Global() != null)
                 baseAttributes |= TypeAttributes.Public;
-            else
+            else if (!isNested)
                 baseAttributes |= TypeAttributes.NotPublic;
+            else if (typeAccess.Local() != null)
+                baseAttributes |= TypeAttributes.NestedPrivate;
+            else if (typeAccess.Internal() != null)
+                baseAttributes |= TypeAttributes.NestedFamORAssem;
         }
         else if (nestedTypeAccess != null)
         {
-            if (nestedTypeAccess.Local() != null)
-                baseAttributes |= TypeAttributes.NestedPrivate;
-
-            else if (nestedTypeAccess.Protected() != null && nestedTypeAccess.Internal() != null)
+            if (nestedTypeAccess.Protected() != null && nestedTypeAccess.Internal() != null)
                 baseAttributes |= TypeAttributes.NestedFamORAssem;
 
             else if (nestedTypeAccess.Protected() != null)

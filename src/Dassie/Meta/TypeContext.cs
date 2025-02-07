@@ -82,4 +82,6 @@ internal class TypeContext
     public List<DassieParser.Type_nameContext> UnresolvedAssociatedTypeNames { get; set; } = [];
 
     public DassieParser.Parameter_listContext PrimaryConstructorParameterList { get; set; }
+
+    public bool IsLocalType { get; set; }
 }

@@ -36,16 +36,6 @@ internal static class TypeDeclarationGeneration
 
         if (enclosingType == null)
         {
-            if (context.nested_type_access_modifier() != null && context.nested_type_access_modifier().Local() != null)
-            {
-                EmitErrorMessage(
-                    context.nested_type_access_modifier().Local().Symbol.Line,
-                    context.nested_type_access_modifier().Local().Symbol.Column,
-                    context.nested_type_access_modifier().Local().GetText().Length,
-                    DS0126_TopLevelTypeLocal,
-                    "The 'local' access modifier is only valid for nested types.");
-            }
-
             tb = Context.Module.DefineType(
                 GetTypeName(context),
                 AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false));
@@ -88,11 +78,17 @@ internal static class TypeDeclarationGeneration
             }
         }
 
+        bool isLocalType = context.type_access_modifier() != null && context.type_access_modifier().Local() != null;
+
         TypeContext tc = new()
         {
             Builder = tb,
             FullName = tb.FullName,
+            IsLocalType = isLocalType
         };
+
+        if (isLocalType)
+            CurrentFile.LocalTypes.Add(tc);
 
         List<Type> attributes = [];
 

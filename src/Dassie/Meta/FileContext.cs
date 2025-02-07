@@ -68,4 +68,6 @@ internal class FileContext
 
     public TypeBuilder LocalTopLevelFunctionContainerType { get; set; }
     public List<DassieParser.Type_memberContext> LocalTopLevelFunctions { get; set; } = [];
+
+    public List<TypeContext> LocalTypes { get; set; } = [];
 }

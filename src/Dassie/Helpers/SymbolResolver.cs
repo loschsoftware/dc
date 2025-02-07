@@ -1469,7 +1469,13 @@ internal static class SymbolResolver
 
         if (type == null)
         {
-            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name))
+            if (CurrentFile.LocalTypes.Any(t => t.FullName == name))
+            {
+                TypeContext locCtx = CurrentFile.LocalTypes.First(t => t.FullName == name);
+                return locCtx.FinishedType ?? locCtx.Builder;
+            }
+
+            if (Context.Types.Any(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name && !t.IsLocalType))
             {
                 TypeContext ctx = Context.Types.First(t => t.FilesWhereDefined.Contains(CurrentFile.Path) && t.FullName == name);
                 return ctx.FinishedType ?? ctx.Builder;
@@ -1520,7 +1526,14 @@ internal static class SymbolResolver
                     goto FoundType;
                 }
 
-                if (Context.Types.Any(t => t.FullName == n))
+                if (CurrentFile.LocalTypes.Any(t => t.FullName == n))
+                {
+                    TypeContext ctx = CurrentFile.LocalTypes.First(t => t.FullName == n);
+                    type = ctx.FinishedType ?? ctx.Builder;
+                    goto FoundType;
+                }
+
+                if (Context.Types.Any(t => t.FullName == n && !t.IsLocalType))
                 {
                     TypeContext ctx = Context.Types.First(t => t.FullName == n);
                     type = ctx.FinishedType ?? ctx.Builder;
