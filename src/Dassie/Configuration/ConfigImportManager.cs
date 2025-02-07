@@ -13,9 +13,9 @@ namespace Dassie.Configuration;
 internal static class ConfigImportManager
 {
     /// <summary>
-    /// Merges 
+    /// Handles the '<c>Import</c>' attribute if it is set for the specified project configuration.
     /// </summary>
-    /// <param name="config"></param>
+    /// <param name="config">The configuration to merge.</param>
     public static void Merge(DassieConfig config)
     {
         string workingDir = Directory.GetCurrentDirectory();
