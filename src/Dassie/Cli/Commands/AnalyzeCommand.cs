@@ -16,6 +16,9 @@ namespace Dassie.Cli.Commands;
 
 internal class AnalyzeCommand : ICompilerCommand
 {
+    private static AnalyzeCommand _instance;
+    public static AnalyzeCommand Instance => _instance ??= new();
+
     public string Command => "analyze";
 
     public string UsageString => "analyze [Options]";

@@ -14,18 +14,19 @@ internal static class CommandLineOptionParser
 {
     public static readonly Dictionary<string, string> Aliases = new()
     {
-        ["O"] = "BuildDirectory",
-        ["T"] = "ApplicationType",
-        ["A"] = "AssemblyFileName",
-        ["R"] = "Runtime",
-        ["M"] = "ILOptimizations",
-        ["L"] = "MeasureElapsedTime",
-        ["I"] = "GenerateILFiles",
-        ["H"] = "GenerateNativeAppHost",
-        ["C"] = "CacheSourceFiles"
+        ["o"] = "BuildDirectory",
+        ["t"] = "ApplicationType",
+        ["a"] = "AssemblyFileName",
+        ["r"] = "Runtime",
+        ["m"] = "ILOptimizations",
+        ["l"] = "MeasureElapsedTime",
+        ["i"] = "GenerateILFiles",
+        ["h"] = "GenerateNativeAppHost",
+        ["c"] = "CacheSourceFiles",
+        ["A"] = "RunAnalyzers"
     };
 
-    private static readonly List<string> BooleanAliases = ["M", "L", "I", "H", "C"];
+    private static readonly List<string> BooleanAliases = ["m", "l", "i", "h", "c", "A"];
 
     public static void ParseOptions(ref string[] args, DassieConfig config)
     {
@@ -34,7 +35,7 @@ internal static class CommandLineOptionParser
             if (!args[i].StartsWith('-'))
                 continue;
 
-            string arg = args[i][1..].ToUpperInvariant();
+            string arg = args[i][1..];
 
             if (Aliases.TryGetValue(arg, out string option))
             {
@@ -53,7 +54,7 @@ internal static class CommandLineOptionParser
                 {
                     EmitErrorMessage(0, 0, 0,
                         DS0089_InvalidDSConfigProperty,
-                        $"Expected argument for option '{arg.ToLowerInvariant()}'.",
+                        $"Expected argument for option '{arg}' (alias for '{option}').",
                         "dc");
 
                     continue;

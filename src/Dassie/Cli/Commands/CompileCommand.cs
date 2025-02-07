@@ -45,6 +45,7 @@ internal class CompileCommand : ICompilerCommand
 
     private static int Compile(string[] args, DassieConfig overrideSettings = null)
     {
+        string workingDir = Directory.GetCurrentDirectory();
         long stopwatchTimeStamp = Stopwatch.GetTimestamp();
 
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
@@ -135,6 +136,15 @@ internal class CompileCommand : ICompilerCommand
 
         List<InputDocument> documents = files.Select(f => new InputDocument(File.ReadAllText(f), f)).ToList();
         documents.AddRange(DocumentCommandLineManager.ExtractDocuments(documentArgs));
+
+        // Run analyzers (if enabled)
+        if (config.RunAnalyzers)
+        {
+            string compileDir = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory(workingDir);
+            AnalyzeCommand.Instance.Invoke(args);
+            Directory.SetCurrentDirectory(compileDir);
+        }
 
         // Step 1
         CompileSource(documents, config);

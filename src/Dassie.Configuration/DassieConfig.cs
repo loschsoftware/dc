@@ -228,6 +228,11 @@ public sealed class DassieConfig
     [DefaultValue("")]
     [XmlElement]
     public string EntryPoint { get; set; }
+
+    [Description("If enabled, runs code analyzers before compilation.")]
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool RunAnalyzers { get; set; }
 }
 
 [Serializable]
