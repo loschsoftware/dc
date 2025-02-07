@@ -19,6 +19,7 @@ The following documentation is about format version 1.0, which is the most recen
 |[Resources](./Projects.md#resources)|
 |[Version information](./Projects.md#version-information)|
 |[Macros](./Projects.md#macros)|
+|[Importing project files](./Projects.md#importing-project-files)|
 
 ## General settings
 These settings are at the top level of the XML tree and configure the behavior of the compiler as well as resources associated with the project.
@@ -227,3 +228,19 @@ Custom macros are contained in the ``<MacroDefinitions>`` tag. Here is an exampl
   <Company>$(Author)</Company>
 </VersionInfo>
 ````
+
+## Importing project files
+The ``Import`` attribute can be used on the ``<DassieConfig>`` object to specify a configuration file to inherit settings from. When the compiler encounters this attribute, it loads the specified configuration file and applies all settings to the current configuration file. If the current file already contains a setting that is set by the imported configuration file, the inherited value is overwritten.
+````xml
+<!--measurements.xml-->
+<DassieConfig>
+  <MeasureElapsedTime>true</MeasureElapsedTime>
+</DassieConfig>
+
+<!--dsconfig.xml-->
+<DassieConfig Import="measurements.xml">
+  <ApplicationType>Library</ApplicationType>
+  <!--...-->
+</DassieConfig>
+````
+Besides configuration files, the ``Import`` attribute also supports **configuration providers** from compiler extensions.
