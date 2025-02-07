@@ -2,10 +2,12 @@
 using Dassie.CodeAnalysis.Rules;
 using Dassie.Configuration;
 using Dassie.Errors;
+using Dassie.Helpers;
 using Dassie.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Dassie.CodeAnalysis.Default;
 
@@ -21,7 +23,13 @@ internal class AnalyzingListener : DassieParserBaseListener
         Configuration = config;
     }
 
+    private string _exportedNamespace = null;
     private bool _isInModule = false;
+
+    public override void EnterExport_directive([NotNull] DassieParser.Export_directiveContext context)
+    {
+        _exportedNamespace = context.full_identifier().GetText();
+    }
 
     public override void EnterLocal_declaration_or_assignment([NotNull] DassieParser.Local_declaration_or_assignmentContext context)
     {
@@ -78,6 +86,26 @@ internal class AnalyzingListener : DassieParserBaseListener
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetText().Length,
                 $"'{context.Identifier().GetText()}': Naming convention violation: Type names should use PascalCase capitalization.",
+                config: Configuration));
+        }
+
+        TypeAttributes attribs = AttributeHelpers.GetTypeAttributes(
+            context.type_kind(),
+            context.type_access_modifier(),
+            context.nested_type_access_modifier(),
+            context.type_special_modifier(),
+            false);
+
+        if (string.IsNullOrEmpty(_exportedNamespace) && attribs.HasFlag(TypeAttributes.Public))
+        {
+            Messages.Add(ErrorHelper.GetError(
+                AnalysisErrorKind.DS5003_TypeOutsideNamespace,
+                context.Identifier().Symbol.Line,
+                context.Identifier().Symbol.Column,
+                context.Identifier().GetText().Length,
+                $"'{context.Identifier().GetText()}': Globally accessible types should be defined inside of a namespace.",
+                severity: Severity.Warning,
+                tip: "Use the 'export' directive to set the namespace for all types in the current file.",
                 config: Configuration));
         }
     }

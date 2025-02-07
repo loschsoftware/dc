@@ -16,5 +16,9 @@ public enum AnalysisErrorKind
     /// <summary>
     /// Emitted when the application entry point is not called 'Main'.
     /// </summary>
-    DS5002_EntryPointWrongName
+    DS5002_EntryPointWrongName,
+    /// <summary>
+    /// Emitted when a globally accessible type is not contained within a namespace.
+    /// </summary>
+    DS5003_TypeOutsideNamespace
 }
