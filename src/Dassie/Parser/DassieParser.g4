@@ -101,7 +101,7 @@ expression
     | full_identifier type_arg_list? arglist? #full_identifier_member_access_expression
     | expression (Dot Identifier)+ type_arg_list? arglist? #member_access_expression
     | expression assignment_operator expression #assignment
-    | Open_Paren expression (Comma expression)+ Close_Paren #tuple_expression
+    | Open_Paren expression (Comma expression)* Comma? Close_Paren #tuple_expression
     // | Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals expression)? #local_function_expression
     ;
 
