@@ -1,4 +1,5 @@
-﻿using Antlr4.Runtime.Misc;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Dassie.Helpers;
 using Dassie.Meta;
@@ -31,8 +32,21 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
         foreach (IParseTree tree in context.import_directive())
             Visit(tree);
 
-        if (context.export_directive() != null)
-            Visit(context.export_directive());
+        if (context.export_directive() != null && context.export_directive().Length > 0)
+            Visit(context.export_directive()[0]);
+
+        if (context.export_directive().Length > 1)
+        {
+            foreach (ParserRuleContext pt in context.export_directive().Skip(1))
+            {
+                EmitErrorMessage(
+                    pt.Start.Line,
+                    pt.Start.Column,
+                    pt.GetText().Length,
+                    DS0199_MultipleExports,
+                    "A source file can export at most one namespace.");
+            }
+        }
 
         Visit(context.file_body());
 

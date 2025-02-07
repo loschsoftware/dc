@@ -7,7 +7,7 @@ options { tokenVocab = DassieLexer; }
 }
 
 compilation_unit
-    : (import_directive | NewLine)* (export_directive NewLine*)? file_body EOF
+    : (import_directive | export_directive | NewLine)* file_body EOF
     ;
 
 file_body

@@ -816,5 +816,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a project configuration import results in a circular dependency.
     /// </summary>
-    DS0198_ImportedConfigFileCircularDependency
+    DS0198_ImportedConfigFileCircularDependency,
+    /// <summary>
+    /// Emitted when a file exports multiple namespaces.
+    /// </summary>
+    DS0199_MultipleExports
 }
