@@ -98,11 +98,11 @@ expression
     | code_block #block_expression
     // | Plus expression #unary_plus_expression
     // | Minus expression #unary_negation_expression
-    | full_identifier type_arg_list? arglist? #full_identifier_member_access_expression
-    | expression (Dot Identifier)+ type_arg_list? arglist? #member_access_expression
+    | full_identifier generic_arg_list? arglist? #full_identifier_member_access_expression
+    | expression (Dot Identifier)+ generic_arg_list? arglist? #member_access_expression
     | expression assignment_operator expression #assignment
     | Open_Paren expression (Comma expression)* Comma? Close_Paren #tuple_expression
-    // | Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals expression)? #local_function_expression
+    // | Identifier generic_parameter_list? parameter_list? (Colon type_name)? (Equals expression)? #local_function_expression
     ;
 
 atom
@@ -165,10 +165,10 @@ type_name
     | Open_Paren union_or_tuple_type_member (Bar union_or_tuple_type_member)+ Close_Paren
     | Open_Paren union_or_tuple_type_member (Comma union_or_tuple_type_member)+ Close_Paren
     | generic_identifier
-    | type_name type_arg_list
+    | type_name generic_arg_list
     | type_name (Ampersand | Double_Ampersand)
     | type_name array_type_specifier
-    | Func Asterisk type_arg_list // Function pointer type
+    | Func Asterisk generic_arg_list // Function pointer type
     ;
 
 union_or_tuple_type_member
@@ -216,7 +216,7 @@ attribute
     ;
 
 generic_identifier
-    : identifier_atom Open_Bracket type_parameter_list Close_Bracket
+    : identifier_atom Open_Bracket generic_parameter_list Close_Bracket
     ;
 
 field_access_modifier
@@ -249,24 +249,25 @@ type_special_modifier
     ;
 
 type
-    : attribute* (type_access_modifier | nested_type_access_modifier)? type_special_modifier? type_kind Identifier type_parameter_list? parameter_list? inheritance_list? (Equals type_block)?
+    : attribute* (type_access_modifier | nested_type_access_modifier)? type_special_modifier? type_kind Identifier generic_parameter_list? parameter_list? inheritance_list? (Equals type_block)?
     ;
 
-type_parameter_list
-    : Open_Bracket type_parameter (Comma type_parameter)* Close_Bracket
+generic_parameter_list
+    : Open_Bracket generic_parameter (Comma generic_parameter)* Close_Bracket
     ;
 
-type_parameter
-    : type_parameter_attribute* type_parameter_variance? Identifier (Colon type_name (Comma type_name)*)?
+generic_parameter
+    : generic_parameter_attribute* generic_parameter_variance? Identifier (Colon type_name (Comma type_name)*)?
+    | (Single_Quote | Double_Quote) Identifier (Colon type_name)? parameter_constraint?
     ;
 
-type_parameter_attribute
+generic_parameter_attribute
     : Ref
     | Val
     | Default
     ;
 
-type_parameter_variance
+generic_parameter_variance
     : Plus                  // covariant
     | Minus                 // contravariant
     | Equals                // invariant
@@ -305,13 +306,13 @@ member_special_modifier
 
 type_member
     // Method or field with initializer
-    : attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? (Equals NewLine* expression)?
+    : attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Var | Val)? Identifier generic_parameter_list? parameter_list? (Colon type_name)? (Equals NewLine* expression)?
     // Field without initializer
-    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Var | Val)? Identifier type_parameter_list? Colon type_name
+    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Var | Val)? Identifier generic_parameter_list? Colon type_name
     // Custom operator
     | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Custom_Operator | Open_Paren Custom_Operator Close_Paren) parameter_list (Colon type_name)? Equals NewLine* expression
     // Property or event
-    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Identifier type_parameter_list? (Colon type_name)? Equals NewLine* property_or_event_block
+    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Identifier generic_parameter_list? (Colon type_name)? Equals NewLine* property_or_event_block
     ;
 
 access_modifier_member_group
@@ -358,8 +359,13 @@ fault_branch
     : Fault Equals expression
     ;
 
-type_arg_list
-    : Open_Bracket type_name (Comma type_name)* Close_Bracket
+generic_arg_list
+    : Open_Bracket generic_argument (Comma generic_argument)* Close_Bracket
+    ;
+
+generic_argument
+    : type_name
+    | expression
     ;
 
 assignment_operator
@@ -412,7 +418,7 @@ match_case_expression
     ;
 
 local_function
-    : (Var | Val)? Identifier type_parameter_list? parameter_list? (Colon type_name)? Equals NewLine* expression
+    : (Var | Val)? Identifier generic_parameter_list? parameter_list? (Colon type_name)? Equals NewLine* expression
     ;
 
 add_handler

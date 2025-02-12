@@ -1,4 +1,5 @@
-﻿using Dassie.Core;
+﻿using Dassie.CodeGeneration.Helpers;
+using Dassie.Core;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Symbols;
@@ -419,13 +420,13 @@ internal static class TypeHelpers
     /// Checks if the specified generic type can be initialized with the specified type arguments.
     /// </summary>
     /// <param name="genericType">The uninitialized generic type.</param>
-    /// <param name="typeArgs">The type arguments to initialize the specified generic type with.</param>
+    /// <param name="genericArgs">The generic arguments to initialize the specified generic type with.</param>
     /// <param name="row"/>
     /// <param name="col"/>
     /// <param name="len"/>
     /// <param name="emitErrors"/>
     /// <returns>Wheter or not the specified generic type can be initialized with the specified type arguments.</returns>
-    public static bool CheckGenericTypeCompatibility(Type genericType, Type[] typeArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
+    public static bool CheckGenericTypeCompatibility(Type genericType, Generics.GenericArgumentContext[] genericArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
     {
         if (!genericType.IsGenericType)
             return true;
@@ -434,20 +435,20 @@ internal static class TypeHelpers
             return true;
 
         Type[] typeParams = genericType.GetGenericArguments();
-        return CheckGenericCompatibility(genericType.FullName, true, typeParams, typeArgs, row, col, len, emitErrors);
+        return CheckGenericCompatibility(genericType.FullName, true, typeParams, genericArgs, row, col, len, emitErrors);
     }
 
     /// <summary>
     /// Checks if the specified generic method can be initialized with the specified type arguments.
     /// </summary>
     /// <param name="method">The uninitialized generic method.</param>
-    /// <param name="typeArgs">The type arguments to initialize the specified generic type with.</param>
+    /// <param name="genericArgs">The generic arguments to initialize the specified generic type with.</param>
     /// <param name="row"/>
     /// <param name="col"/>
     /// <param name="len"/>
     /// <param name="emitErrors"/>
     /// <returns>Wheter or not the specified generic type can be initialized with the specified type arguments.</returns>
-    public static bool CheckGenericMethodCompatibility(MethodBase method, Type[] typeArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
+    public static bool CheckGenericMethodCompatibility(MethodBase method, Generics.GenericArgumentContext[] genericArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
     {
         if (!method.IsGenericMethod)
             return true;
@@ -456,10 +457,10 @@ internal static class TypeHelpers
             return true;
 
         Type[] typeParams = method.DeclaringType.GetGenericTypeDefinition().GetGenericArguments();
-        return CheckGenericCompatibility(method.Name, false, typeParams, typeArgs, row, col, len, emitErrors);
+        return CheckGenericCompatibility(method.Name, false, typeParams, genericArgs, row, col, len, emitErrors);
     }
 
-    private static bool CheckGenericCompatibility(string name, bool isType, Type[] parameters, Type[] arguments, int row, int col, int len, bool emitErrors)
+    private static bool CheckGenericCompatibility(string name, bool isType, Type[] parameters, Generics.GenericArgumentContext[] arguments, int row, int col, int len, bool emitErrors)
     {
         if (arguments == null || parameters.Length != arguments.Length)
         {
@@ -478,7 +479,7 @@ internal static class TypeHelpers
 
         for (int i = 0; i < parameters.Length; i++)
         {
-            if (arguments[i] == TypeContext.Current.Builder)
+            if (arguments[i].Type == TypeContext.Current.Builder)
                 continue;
 
             if (!MeetsGenericConstraints(parameters[i], arguments[i], row, col, len, emitErrors))
@@ -498,17 +499,17 @@ internal static class TypeHelpers
     /// <param name="len"/>
     /// <param name="throwErrors"/>
     /// <returns></returns>
-    private static bool MeetsGenericConstraints(Type param, Type arg, int row, int col, int len, bool throwErrors)
+    private static bool MeetsGenericConstraints(Type param, Generics.GenericArgumentContext arg, int row, int col, int len, bool throwErrors)
     {
         if (!param.IsGenericParameter)
             return true;
 
-        string errMsgStart = $"Generic argument '{Format(arg)}' is incompatible with generic parameter '{Format(param)}': ";
+        string errMsgStart = $"Generic argument '{Format(arg.Type)}' is incompatible with generic parameter '{Format(param)}': ";
         GenericParameterAttributes attributes = param.GenericParameterAttributes;
 
         if (attributes.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint))
         {
-            if (!arg.IsClass)
+            if (!arg.Type.IsClass)
             {
                 if (throwErrors)
                 {
@@ -524,7 +525,7 @@ internal static class TypeHelpers
 
         if (attributes.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint))
         {
-            if (!arg.IsValueType)
+            if (!arg.Type.IsValueType)
             {
                 if (throwErrors)
                 {
@@ -540,7 +541,7 @@ internal static class TypeHelpers
 
         if (attributes.HasFlag(GenericParameterAttributes.DefaultConstructorConstraint))
         {
-            if (arg.GetConstructor([]) == null && !arg.IsValueType)
+            if (arg.Type.GetConstructor([]) == null && !arg.Type.IsValueType)
             {
                 if (throwErrors)
                 {
@@ -560,12 +561,12 @@ internal static class TypeHelpers
         {
             try
             {
-                if (!constraint.IsAssignableFrom(arg) && !CanBeConverted(arg, constraint))
+                if (!constraint.IsAssignableFrom(arg.Type) && !CanBeConverted(arg.Type, constraint))
                 {
                     EmitErrorMessage(
                         row, col, len,
                         DS0107_GenericTypeConstraintViolation,
-                        $"{errMsgStart}'{Format(arg)}' violates constraint '{Format(constraint)}'.");
+                        $"{errMsgStart}'{Format(arg.Type)}' violates constraint '{Format(constraint)}'.");
 
                     result = false;
                 }
@@ -576,35 +577,35 @@ internal static class TypeHelpers
         return result;
     }
 
-    public static TypeParameterContext BuildTypeParameter(DassieParser.Type_parameterContext context)
+    public static GenericParameterContext BuildTypeParameter(DassieParser.Generic_parameterContext context)
     {
         string name = context.Identifier().GetText();
         GenericParameterAttributes attribs = GenericParameterAttributes.None;
         List<Type> interfaceConstraints = [];
         Type baseTypeConstraint = null;
 
-        if (context.type_parameter_variance() != null)
+        if (context.generic_parameter_variance() != null)
         {
-            if (context.type_parameter_variance().Plus() != null)
+            if (context.generic_parameter_variance().Plus() != null)
                 attribs |= GenericParameterAttributes.Covariant;
 
-            if (context.type_parameter_variance().Minus() != null)
+            if (context.generic_parameter_variance().Minus() != null)
                 attribs |= GenericParameterAttributes.Contravariant;
 
-            if (context.type_parameter_variance().Equals() == null && !TypeContext.Current.Builder.IsInterface)
+            if (context.generic_parameter_variance().Equals() == null && !TypeContext.Current.Builder.IsInterface)
             {
                 EmitErrorMessage(
-                    context.type_parameter_variance().Start.Line,
-                    context.type_parameter_variance().Start.Column,
-                    context.type_parameter_variance().GetText().Length,
+                    context.generic_parameter_variance().Start.Line,
+                    context.generic_parameter_variance().Start.Column,
+                    context.generic_parameter_variance().GetText().Length,
                     DS0117_VarianceModifierOnConcreteType,
-                    $"The variance modifier '{context.type_parameter_variance().GetText()}' is invalid on type '{Format(TypeContext.Current.Builder)}'. Only type parameters of template types can have variance modifiers.");
+                    $"The variance modifier '{context.generic_parameter_variance().GetText()}' is invalid on type '{Format(TypeContext.Current.Builder)}'. Only type parameters of template types can have variance modifiers.");
             }
         }
 
-        if (context.type_parameter_attribute() != null)
+        if (context.generic_parameter_attribute() != null)
         {
-            foreach (var attrib in context.type_parameter_attribute())
+            foreach (var attrib in context.generic_parameter_attribute())
             {
                 bool duplicate = false;
 
@@ -657,17 +658,25 @@ internal static class TypeHelpers
             }
         }
 
-        bool removeNone = context.type_parameter_variance() != null
-            || context.type_parameter_attribute() != null;
+        bool removeNone = context.generic_parameter_variance() != null
+            || context.generic_parameter_attribute() != null;
 
         if (removeNone)
             attribs &= ~GenericParameterAttributes.None;
+
+        Type valueType = null;
 
         if (context.type_name() != null)
         {
             foreach (var type in context.type_name())
             {
                 Type constraint = SymbolResolver.ResolveTypeName(type);
+
+                if (context.Single_Quote() != null || context.Double_Quote() != null)
+                {
+                    valueType = constraint;
+                    continue;
+                }
 
                 if (constraint.IsClass)
                 {
@@ -708,7 +717,11 @@ internal static class TypeHelpers
             Name = name,
             Attributes = attribs,
             InterfaceConstraints = interfaceConstraints,
-            BaseTypeConstraint = baseTypeConstraint
+            BaseTypeConstraint = baseTypeConstraint,
+            IsCompileTimeConstant = context.Single_Quote() != null,
+            IsRuntimeValue = context.Double_Quote() != null,
+            ValueType = valueType,
+            ValueConstraint = context.parameter_constraint()
         };
     }
 

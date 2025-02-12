@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration;
+using Dassie.CodeGeneration.Helpers;
 using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Meta;
@@ -32,7 +33,7 @@ internal static class SymbolResolver
         public Type Type { get; init; }
     }
 
-    public static string GetTypeArgumentListSuffix(Type[] typeArgs, bool includeBacktick)
+    public static string GetTypeArgumentListSuffix(Generics.GenericArgumentContext[] typeArgs, bool includeBacktick)
     {
         static string Name(Type t)
         {
@@ -52,15 +53,15 @@ internal static class SymbolResolver
 
         sb.Append('[');
 
-        foreach (Type t in typeArgs[0..^1])
+        foreach (Type t in typeArgs[0..^1].Select(t => t.Type))
             sb.Append($"[{Name(t)}],");
 
-        sb.Append($"[{Name(typeArgs.Last())}]");
+        sb.Append($"[{Name(typeArgs.Last().Type)}]");
         sb.Append(']');
         return sb.ToString();
     }
 
-    public static object GetSmallestTypeFromLeft(DassieParser.Full_identifierContext fullId, Type[] typeArgs, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
+    public static object GetSmallestTypeFromLeft(DassieParser.Full_identifierContext fullId, Generics.GenericArgumentContext[] genericArgs, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
     {
         string[] parts = fullId.Identifier().Select(f => f.GetText()).ToArray();
         firstUnusedPart = 0;
@@ -70,25 +71,25 @@ internal static class SymbolResolver
         for (int i = 0; i < parts.Length; i++)
         {
             string regularType = string.Join(".", parts[0..(i + 1)]);
-            typeString = string.Join(".", regularType + GetTypeArgumentListSuffix(typeArgs, true));
-            string typeStringNoBacktick = string.Join(".", regularType + GetTypeArgumentListSuffix(typeArgs, false));
+            typeString = string.Join(".", regularType + GetTypeArgumentListSuffix(genericArgs, true));
+            string typeStringNoBacktick = string.Join(".", regularType + GetTypeArgumentListSuffix(genericArgs, false));
 
             firstUnusedPart++;
 
-            if (typeArgs != null && typeArgs.Length > 0)
+            if (genericArgs != null && genericArgs.Length > 0)
             {
-                string uninitializedGenericTypeName = $"{regularType}`{typeArgs.Length}";
+                string uninitializedGenericTypeName = $"{regularType}`{genericArgs.Length}";
                 if (ResolveIdentifier(uninitializedGenericTypeName, row, col, len, true) is Type uninitializedGenericType)
-                    TypeHelpers.CheckGenericTypeCompatibility(uninitializedGenericType, typeArgs, row, col, len, true);
+                    TypeHelpers.CheckGenericTypeCompatibility(uninitializedGenericType, genericArgs, row, col, len, true);
 
                 else
                 {
                     if (ResolveIdentifier(regularType, row, col, len, true) is Type genericTypeWithoutBacktick)
-                        TypeHelpers.CheckGenericTypeCompatibility(genericTypeWithoutBacktick, typeArgs, row, col, len, true);
+                        TypeHelpers.CheckGenericTypeCompatibility(genericTypeWithoutBacktick, genericArgs, row, col, len, true);
                 }
             }
 
-            if (ResolveIdentifier(typeString, row, col, len, true, typeArgs: typeArgs) is Type t)
+            if (ResolveIdentifier(typeString, row, col, len, true, genericArgs: genericArgs) is Type t)
             {
                 if (!noEmitFragments)
                 {
@@ -106,7 +107,7 @@ internal static class SymbolResolver
                 return t;
             }
 
-            if (ResolveIdentifier(typeStringNoBacktick, row, col, len, true, typeArgs: typeArgs) is Type _t)
+            if (ResolveIdentifier(typeStringNoBacktick, row, col, len, true, genericArgs: genericArgs) is Type _t)
             {
                 if (!noEmitFragments)
                 {
@@ -123,6 +124,24 @@ internal static class SymbolResolver
 
                 return _t;
             }
+
+            if (ResolveIdentifier(regularType, row, col, len, true, genericArgs: genericArgs, disableBacktickGenericResolve: true) is Type __t)
+            {
+                if (!noEmitFragments)
+                {
+                    CurrentFile.Fragments.Add(new()
+                    {
+                        Line = row,
+                        Column = col,
+                        Length = len,
+                        Color = TooltipGenerator.ColorForType(__t.GetTypeInfo()),
+                        IsNavigationTarget = false,
+                        ToolTip = TooltipGenerator.Type(__t.GetTypeInfo(), false, true)
+                    });
+                }
+
+                return __t;
+            }
         }
 
         firstUnusedPart = Math.Min(1, fullId.Identifier().Length - 1);
@@ -134,10 +153,10 @@ internal static class SymbolResolver
             col,
             len,
             noEmitFragments,
-            typeArgs: typeArgs);
+            genericArgs: genericArgs);
     }
 
-    public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false, bool throwErrors = true, Type[] typeArgs = null)
+    public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false, bool throwErrors = true, Generics.GenericArgumentContext[] genericArgs = null, bool disableBacktickGenericResolve = false)
     {
         // 1. Parameters
         if (CurrentMethod.Parameters.Any(p => p.Name == text))
@@ -237,14 +256,14 @@ internal static class SymbolResolver
             return globals;
 
         // 5. Other classes, including aliases
-        if (TryGetType(text, out Type t, row, col, len, noEmitFragments, typeArgs))
+        if (TryGetType(text, out Type t, row, col, len, noEmitFragments, genericArgs, disableBacktickGenericResolve))
             return t;
 
         // 6. Members of other classes
         return null;
     }
 
-    private static MethodInfo GetOverload(Type type, IEnumerable<MethodInfo> methods, Type[] typeArgs, Type[] argumentTypes, int row, int col, int len, bool getDefaultOverload, bool noEmitFragments, bool throwErrors)
+    private static MethodInfo GetOverload(Type type, IEnumerable<MethodInfo> methods, Generics.GenericArgumentContext[] genericArgs, Type[] argumentTypes, int row, int col, int len, bool getDefaultOverload, bool noEmitFragments, bool throwErrors)
     {
         if (getDefaultOverload && methods.Any())
             return methods.First();
@@ -254,7 +273,8 @@ internal static class SymbolResolver
         if (!CurrentMethod.ParameterBoxIndices.ContainsKey(memberIndex))
             CurrentMethod.ParameterBoxIndices.Add(memberIndex, new());
 
-        typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
+        Type[] genericArgTypes = genericArgs.Select(t => t.Type).ToArray();
+        genericArgs = CurrentMethod.GenericArgumentsForNextMethodCall;
 
         if (methods.Any())
         {
@@ -269,8 +289,8 @@ internal static class SymbolResolver
 
                 if (possibleMethod.IsGenericMethod)
                 {
-                    TypeHelpers.CheckGenericMethodCompatibility(possibleMethod, typeArgs, row, col, len, throwErrors);
-                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs);
+                    TypeHelpers.CheckGenericMethodCompatibility(possibleMethod, genericArgs, row, col, len, throwErrors);
+                    possibleMethod = possibleMethod.MakeGenericMethod(genericArgTypes);
                 }
 
                 if (possibleMethod.GetParameters().Length == 0 && argumentTypes.Length == 0)
@@ -350,7 +370,7 @@ internal static class SymbolResolver
         if (type == null)
             return null;
 
-        Type[] typeArgs = Type.EmptyTypes;
+        Generics.GenericArgumentContext[] typeArgs = [];
 
         if (type.IsByRef)
             type = type.GetElementType();
@@ -623,7 +643,7 @@ internal static class SymbolResolver
         {
             IEnumerable<MethodBase> overloads = type.GetMethods()
                 .Where(m => m.Name == name)
-                .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs) : m);
+                .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs.GetTypes()) : m);
 
             if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
                 overloads = type.GetConstructors();
@@ -641,7 +661,7 @@ internal static class SymbolResolver
 
         TypeContext[] types = Context.Types.Where(c => c.Builder == tb).ToArray();
 
-        Type[] typeArgs = Type.EmptyTypes;
+        Generics.GenericArgumentContext[] typeArgs = [];
 
         if (types.Length == 0 && throwErrors)
         {
@@ -878,10 +898,10 @@ internal static class SymbolResolver
                     break;
                 }
 
-                typeArgs = CurrentMethod.TypeArgumentsForNextMethodCall;
+                typeArgs = CurrentMethod.GenericArgumentsForNextMethodCall;
 
                 if (possibleMethod.IsGenericMethod)
-                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs);
+                    possibleMethod = possibleMethod.MakeGenericMethod(typeArgs.GetTypes());
 
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
@@ -960,7 +980,7 @@ internal static class SymbolResolver
         {
             IEnumerable<MethodBase> overloads = tc.Methods.Select(m => m.Builder)
                 .Where(m => m != null && (m.Name == name || m.IsConstructor))
-                .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs) : m);
+                .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs.GetTypes()) : m);
 
             if (name == tb.Name || name == tb.FullName)
                 overloads = tc.ConstructorContexts.Select(c => c.ConstructorBuilder);
@@ -971,9 +991,9 @@ internal static class SymbolResolver
         return false;
     }
 
-    public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false, Type[] typeArgs = null)
+    public static bool TryGetType(string name, out Type type, int row, int col, int len, bool noEmitFragments = false, Generics.GenericArgumentContext[] genericArgs = null, bool disableBacktickGenericResolve = false)
     {
-        type = ResolveTypeName(name, row, col, len, noEmitFragments, typeArgs, noErrors: true, doNotFillGenericTypeDefinition: typeArgs == null);
+        type = ResolveTypeName(name, row, col, len, noEmitFragments, genericArgs, noErrors: true, doNotFillGenericTypeDefinition: genericArgs == null, disableBacktickGenericResolve: disableBacktickGenericResolve);
         return type != null;
     }
 
@@ -1211,27 +1231,19 @@ internal static class SymbolResolver
 
     public static Type ResolveAttributeTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false)
     {
-        List<Type> typeArgs = [];
-
-        if (name.type_arg_list() != null)
-        {
-            foreach (DassieParser.Type_nameContext typeArg in name.type_arg_list().type_name())
-                typeArgs.Add(ResolveTypeName(typeArg));
-        }
-
         return ResolveAttributeTypeName(
             name.GetText(),
-            typeArgs.Count == 0 ? null : typeArgs.ToArray(),
+            Generics.ResolveGenericArgList(name.generic_arg_list()),
             name.Start.Line,
             name.Start.Column,
             name.GetText().Length,
             noEmitFragments);
     }
 
-    public static Type ResolveAttributeTypeName(string name, Type[] typeParams, int row, int col, int len, bool noEmitFragments = false)
+    public static Type ResolveAttributeTypeName(string name, Generics.GenericArgumentContext[] genericParams, int row, int col, int len, bool noEmitFragments = false)
     {
         Type t;
-        if ((t = ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, noErrors: true, typeParams: typeParams)) == null)
+        if ((t = ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, noErrors: true, genericParams: genericParams)) == null)
             t = ResolveTypeName($"{name}Attribute", row, col, len, noEmitFragments: noEmitFragments, noErrors: true);
 
         if (t != null && !t.IsAssignableTo(typeof(Attribute)))
@@ -1245,13 +1257,13 @@ internal static class SymbolResolver
         if (t != null)
             return t;
 
-        ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, typeParams: typeParams); // To display error
+        ResolveTypeName(name, row, col, len, noEmitFragments: noEmitFragments, genericParams: genericParams); // To display error
         return t;
     }
 
-    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false)
+    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
     {
-        Type t = ResolveTypeNameInternal(name, noEmitFragments, noEmitDS0149, noErrors);
+        Type t = ResolveTypeNameInternal(name, noEmitFragments, noEmitDS0149, noErrors, disableBacktickGenericResolve);
 
         if (t == null)
             return t;
@@ -1277,14 +1289,14 @@ internal static class SymbolResolver
         return t;
     }
 
-    private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false)
+    private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
     {
         if (name.Func() != null)
         {
             // Function pointer type
             // e.g. func*[int, int, int] -> X (a: int, b: int): int
 
-            Type[] typeArgs = name.type_arg_list().type_name().Select(t => ResolveTypeName(t, noEmitFragments)).ToArray();
+            Type[] typeArgs = name.generic_arg_list().generic_argument().Select(t => ResolveTypeName(t.type_name(), noEmitFragments)).ToArray();
 
             Type[] parameterTypes = typeArgs[..^1];
             Type returnType = typeArgs[^1];
@@ -1362,9 +1374,9 @@ internal static class SymbolResolver
         if (name.identifier_atom() != null)
         {
             if (name.identifier_atom().Identifier() != null)
-                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors);
+                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, disableBacktickGenericResolve: disableBacktickGenericResolve, arrayDimensions: arrayDims, noErrors: noErrors);
 
-            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors);
+            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
         }
 
         // Tuple type
@@ -1386,19 +1398,19 @@ internal static class SymbolResolver
             return UnionTypeCodeGeneration.GenerateInlineUnionType(partTypes);
         }
 
-        if (name.type_arg_list() != null)
+        if (name.generic_arg_list() != null)
         {
-            Type[] typeParams = name.type_arg_list().type_name().Select(t => ResolveTypeName(t, noEmitFragments)).ToArray();
+            Generics.GenericArgumentContext[] typeParams = Generics.ResolveGenericArgList(name.generic_arg_list());
 
             DassieParser.Type_nameContext childName = (DassieParser.Type_nameContext)name.children[0];
             if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
             {
-                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims, noErrors: noErrors);
+                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
 
                 TypeHelpers.CheckGenericTypeCompatibility(result, typeParams, childName.Start.Line, childName.Start.Column, childName.GetText().Length, !noErrors);
 
                 if (typeParams != null && result.IsGenericTypeDefinition)
-                    result = result.MakeGenericType(typeParams);
+                    result = result.MakeGenericType(typeParams.GetTypes());
 
                 return result;
             }
@@ -1407,16 +1419,16 @@ internal static class SymbolResolver
         if (name.type_name() != null && name.type_name() != null)
         {
             Type child = ResolveTypeName(name.type_name(), noEmitFragments, noErrors: noErrors);
-            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors);
+            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
         }
 
         // TODO: Implement other kinds of types
         return null;
     }
 
-    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
+    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Generics.GenericArgumentContext[] genericParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
     {
-        Type t = ResolveTypeNameInternal(name, row, col, len, noEmitFragments, typeParams, arrayDimensions, noErrors, disableBacktickGenericResolve, doNotFillGenericTypeDefinition);
+        Type t = ResolveTypeNameInternal(name, row, col, len, noEmitFragments, genericParams, arrayDimensions, noErrors, disableBacktickGenericResolve, doNotFillGenericTypeDefinition);
 
         if (t == null)
             return t;
@@ -1442,7 +1454,7 @@ internal static class SymbolResolver
         return t;
     }
 
-    private static Type ResolveTypeNameInternal(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Type[] typeParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
+    private static Type ResolveTypeNameInternal(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Generics.GenericArgumentContext[] genericParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
     {
         if (TypeContext.Current != null && TypeContext.Current.FullName == name)
             return TypeContext.Current.Builder;
@@ -1450,17 +1462,17 @@ internal static class SymbolResolver
         if (CurrentMethod != null && CurrentMethod.TypeParameters.Any(t => t.Name == name))
             return CurrentMethod.TypeParameters.First(t => t.Name == name).Builder;
 
-        if (TypeContext.Current != null && TypeContext.Current.TypeParameters.Any(t => t.Name == name))
-            return TypeContext.Current.TypeParameters.First(t => t.Name == name).Builder;
+        if (TypeContext.Current != null && TypeContext.Current.GenericParameters.Any(t => t.Name == name))
+            return TypeContext.Current.GenericParameters.First(t => t.Name == name).Builder;
 
-        if (typeParams != null && typeParams.Length > 0 && !disableBacktickGenericResolve)
+        if (genericParams != null && genericParams.Length > 0 && !disableBacktickGenericResolve)
         {
             // Convention used by Microsoft compilers to allow "overloaded" generics
             // e.g. A[T], A[T1, T2], A[T1, T2, T3]
             // otherwise only one set of generic parameters would be possible
 
-            string backtickName = $"{name}`{typeParams.Length}";
-            Type t = ResolveTypeName(backtickName, row, col, len, noEmitFragments, typeParams, arrayDimensions, noErrors: true, disableBacktickGenericResolve: true);
+            string backtickName = $"{name}`{genericParams.Length}";
+            Type t = ResolveTypeName(backtickName, row, col, len, noEmitFragments, genericParams, arrayDimensions, noErrors: true, disableBacktickGenericResolve: true);
             if (t != null)
                 return t;
         }
@@ -1472,13 +1484,15 @@ internal static class SymbolResolver
             if (CurrentFile.LocalTypes.Any(t => t.FullName == name))
             {
                 TypeContext locCtx = CurrentFile.LocalTypes.First(t => t.FullName == name);
-                return locCtx.FinishedType ?? locCtx.Builder;
+                type = locCtx.FinishedType ?? locCtx.Builder;
+                goto FoundType;
             }
 
             if (Context.Types.Any(t => t.FullName == name && !t.IsLocalType))
             {
                 TypeContext ctx = Context.Types.First(t => t.FullName == name && !t.IsLocalType);
-                return ctx.FinishedType ?? ctx.Builder;
+                type = ctx.FinishedType ?? ctx.Builder;
+                goto FoundType;
             }
 
             List<Assembly> allAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
@@ -1504,7 +1518,7 @@ internal static class SymbolResolver
                 if (arrayDimensions > 0)
                     type = type.MakeArrayType(arrayDimensions);
 
-                return type;
+                goto FoundType;
             }
 
             foreach (string ns in CurrentFile.Imports.Concat(Context.GlobalImports))
@@ -1571,10 +1585,10 @@ internal static class SymbolResolver
         {
             if (!doNotFillGenericTypeDefinition)
             {
-                TypeHelpers.CheckGenericTypeCompatibility(type, typeParams, row, col, len, true);
+                TypeHelpers.CheckGenericTypeCompatibility(type, genericParams, row, col, len, true);
 
-                if (typeParams != null && type.IsGenericTypeDefinition)
-                    type = type.MakeGenericType(typeParams);
+                if (genericParams != null && type.IsGenericTypeDefinition)
+                    type = type.MakeGenericType(genericParams.GetTypes());
             }
 
             if (!noEmitFragments)
@@ -1797,5 +1811,39 @@ internal static class SymbolResolver
             return availableOperators.Where(o => o.Name == methodName).ToArray();
 
         return null;
+    }
+
+    public static List<MetaFieldInfo> GetFields(Type type, BindingFlags flags)
+    {
+        if (type is TypeBuilder tb)
+        {
+            TypeContext tc = TypeContext.GetForType(tb);
+            return tc.Fields;
+        }
+
+        if (type.GetType().Name == "TypeBuilderInstantiation")
+        {
+            Type deconstructed = TypeHelpers.DeconstructGenericType(type);
+            List<MetaFieldInfo> fields = [];
+
+            foreach (MetaFieldInfo field in GetFields(deconstructed, flags))
+            {
+                fields.Add(new()
+                {
+                    Builder = TypeBuilder.GetField(type, field.Builder),
+                    Name = field.Name,
+                    Attributes = field.Attributes
+                });
+            }
+
+            return fields;
+        }
+
+        return type.GetFields(flags).Select(t => new MetaFieldInfo()
+        {
+            Builder = t,
+            Name = t.Name,
+            Attributes = t.GetCustomAttributes().Cast<Attribute>().ToList()
+        }).ToList();
     }
 }

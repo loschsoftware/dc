@@ -1,4 +1,5 @@
-﻿using Dassie.Parser;
+﻿using Dassie.CodeGeneration.Helpers;
+using Dassie.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -153,17 +154,17 @@ internal class MethodContext
 
     public List<Type> ArgumentTypesForNextMethodCall { get; set; } = [];
 
-    private Type[] _typeArgs = [];
-    public Type[] TypeArgumentsForNextMethodCall
+    private Generics.GenericArgumentContext[] _genericArgs = [];
+    public Generics.GenericArgumentContext[] GenericArgumentsForNextMethodCall
     {
         get
         {
-            Type[] result = _typeArgs;
-            TypeArgumentsForNextMethodCall = [];
+            Generics.GenericArgumentContext[] result = _genericArgs;
+            GenericArgumentsForNextMethodCall = [];
             return result;
         }
 
-        set => _typeArgs = value;
+        set => _genericArgs = value;
     }
 
     private bool _shouldLoadAddressIfValueType = false;
@@ -200,7 +201,7 @@ internal class MethodContext
 
     public int CurrentScope { get; set; }
 
-    public List<TypeParameterContext> TypeParameters { get; set; } = [];
+    public List<GenericParameterContext> TypeParameters { get; set; } = [];
 
     public List<SymbolInfo> CapturedSymbols { get; set; } = [];
 

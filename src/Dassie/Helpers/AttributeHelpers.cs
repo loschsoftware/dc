@@ -444,14 +444,14 @@ internal static class AttributeHelpers
         if (CurrentMethod.TypeParameters.Count > 0)
         {
             EmitErrorMessage(
-                context.type_parameter_list().Start.Line,
-                context.type_parameter_list().Start.Column,
-                context.type_parameter_list().GetText().Length,
+                context.generic_parameter_list().Start.Line,
+                context.generic_parameter_list().Start.Column,
+                context.generic_parameter_list().GetText().Length,
                 DS0166_ModuleInitializerInvalid,
                 $"Module initializers cannot be generic.");
         }
 
-        if (TypeContext.Current.TypeParameters.Count > 0)
+        if (TypeContext.Current.GenericParameters.Count > 0)
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,

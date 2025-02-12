@@ -1366,53 +1366,53 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType([NotNull] DassieParser.TypeContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_list"/>.
+	/// Enter a parse tree produced by <see cref="DassieParser.generic_parameter_list"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterType_parameter_list([NotNull] DassieParser.Type_parameter_listContext context) { }
+	public virtual void EnterGeneric_parameter_list([NotNull] DassieParser.Generic_parameter_listContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_list"/>.
+	/// Exit a parse tree produced by <see cref="DassieParser.generic_parameter_list"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitType_parameter_list([NotNull] DassieParser.Type_parameter_listContext context) { }
+	public virtual void ExitGeneric_parameter_list([NotNull] DassieParser.Generic_parameter_listContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter"/>.
+	/// Enter a parse tree produced by <see cref="DassieParser.generic_parameter"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterType_parameter([NotNull] DassieParser.Type_parameterContext context) { }
+	public virtual void EnterGeneric_parameter([NotNull] DassieParser.Generic_parameterContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter"/>.
+	/// Exit a parse tree produced by <see cref="DassieParser.generic_parameter"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitType_parameter([NotNull] DassieParser.Type_parameterContext context) { }
+	public virtual void ExitGeneric_parameter([NotNull] DassieParser.Generic_parameterContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
+	/// Enter a parse tree produced by <see cref="DassieParser.generic_parameter_attribute"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context) { }
+	public virtual void EnterGeneric_parameter_attribute([NotNull] DassieParser.Generic_parameter_attributeContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
+	/// Exit a parse tree produced by <see cref="DassieParser.generic_parameter_attribute"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context) { }
+	public virtual void ExitGeneric_parameter_attribute([NotNull] DassieParser.Generic_parameter_attributeContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// Enter a parse tree produced by <see cref="DassieParser.generic_parameter_variance"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context) { }
+	public virtual void EnterGeneric_parameter_variance([NotNull] DassieParser.Generic_parameter_varianceContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// Exit a parse tree produced by <see cref="DassieParser.generic_parameter_variance"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context) { }
+	public virtual void ExitGeneric_parameter_variance([NotNull] DassieParser.Generic_parameter_varianceContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.inheritance_list"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -1606,17 +1606,29 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitFault_branch([NotNull] DassieParser.Fault_branchContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="DassieParser.type_arg_list"/>.
+	/// Enter a parse tree produced by <see cref="DassieParser.generic_arg_list"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterType_arg_list([NotNull] DassieParser.Type_arg_listContext context) { }
+	public virtual void EnterGeneric_arg_list([NotNull] DassieParser.Generic_arg_listContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="DassieParser.type_arg_list"/>.
+	/// Exit a parse tree produced by <see cref="DassieParser.generic_arg_list"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitType_arg_list([NotNull] DassieParser.Type_arg_listContext context) { }
+	public virtual void ExitGeneric_arg_list([NotNull] DassieParser.Generic_arg_listContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.generic_argument"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterGeneric_argument([NotNull] DassieParser.Generic_argumentContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.generic_argument"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitGeneric_argument([NotNull] DassieParser.Generic_argumentContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="DassieParser.assignment_operator"/>.
 	/// <para>The default implementation does nothing.</para>

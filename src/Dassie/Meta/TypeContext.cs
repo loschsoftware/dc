@@ -57,7 +57,9 @@ internal class TypeContext
 
     public List<TypeContext> Children { get; } = [];
 
-    public List<TypeParameterContext> TypeParameters { get; set; } = [];
+    public List<GenericParameterContext> GenericParameters { get; set; } = [];
+
+    public bool IsDependentType => GenericParameters.Any(p => p.IsRuntimeValue || p.IsCompileTimeConstant);
 
     public List<Type> ImplementedInterfaces { get; } = [];
 

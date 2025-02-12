@@ -3,6 +3,7 @@ using Dassie.Core;
 using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +51,7 @@ internal static class TypeDeclarationGeneration
         if (Context.Types.Any(t => t.FullName == tb.FullName))
         {
             TypeContext duplicate = Context.Types.First(t => t.FullName == tb.FullName);
-            if (duplicate.TypeParameters != null && context.type_parameter_list() != null && duplicate.TypeParameters.Count != context.type_parameter_list().type_parameter().Length)
+            if (duplicate.GenericParameters != null && context.generic_parameter_list() != null && duplicate.GenericParameters.Count != context.generic_parameter_list().generic_parameter().Length)
             {
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
@@ -265,11 +266,11 @@ internal static class TypeDeclarationGeneration
         tc.ImplementedInterfaces.AddRange(interfaces);
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
-        if (context.type_parameter_list() != null)
+        if (context.generic_parameter_list() != null)
         {
-            List<TypeParameterContext> typeParamContexts = [];
+            List<GenericParameterContext> typeParamContexts = [];
 
-            foreach (DassieParser.Type_parameterContext typeParam in context.type_parameter_list().type_parameter())
+            foreach (DassieParser.Generic_parameterContext typeParam in context.generic_parameter_list().generic_parameter())
             {
                 if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetText()))
                 {
@@ -278,7 +279,7 @@ internal static class TypeDeclarationGeneration
                         typeParam.Start.Column,
                         typeParam.GetText().Length,
                         DS0112_DuplicateTypeParameter,
-                        $"Duplicate type parameter '{typeParam.GetText()}'.");
+                        $"Duplicate generic parameter '{typeParam.GetText()}'.");
 
                     continue;
                 }
@@ -289,15 +290,58 @@ internal static class TypeDeclarationGeneration
             GenericTypeParameterBuilder[] typeParams = tb.DefineGenericParameters(typeParamContexts.Select(t => t.Name).ToArray());
             foreach (GenericTypeParameterBuilder typeParam in typeParams)
             {
-                TypeParameterContext ctx = typeParamContexts.First(c => c.Name == typeParam.Name);
+                GenericParameterContext ctx = typeParamContexts.First(c => c.Name == typeParam.Name);
                 typeParam.SetGenericParameterAttributes(ctx.Attributes);
                 typeParam.SetBaseTypeConstraint(ctx.BaseTypeConstraint);
                 typeParam.SetInterfaceConstraints(ctx.InterfaceConstraints.ToArray());
 
+                if (ctx.ValueType != null)
+                    typeParam.SetBaseTypeConstraint(ctx.ValueType);
+
+                if (ctx.IsRuntimeValue)
+                    typeParam.SetCustomAttribute(new(typeof(RuntimeDependencyAttribute).GetConstructor([]), []));
+                else if (ctx.IsCompileTimeConstant)
+                    typeParam.SetCustomAttribute(new(typeof(CompileTimeDependencyAttribute).GetConstructor([]), []));
+
+                if (ctx.IsRuntimeValue || ctx.IsCompileTimeConstant)
+                {
+                    PropertyBuilder dependencyProperty = tb.DefineProperty(ctx.Name, PropertyAttributes.None, ctx.ValueType, []);
+                    FieldBuilder backingField = tb.DefineField(SymbolNameGenerator.GetPropertyBackingFieldName(ctx.Name), ctx.ValueType, FieldAttributes.Assembly);
+                    backingField.SetCustomAttribute(new(typeof(DependentValueAttribute).GetConstructor([typeof(string)]), [ctx.Name]));
+
+                    MethodBuilder getMethod = tb.DefineMethod($"get_{ctx.Name}",
+                        MethodAttributes.Public | MethodAttributes.SpecialName,
+                        CallingConventions.Standard,
+                        ctx.ValueType,
+                        []);
+
+                    ILGenerator getterIL = getMethod.GetILGenerator();
+                    getterIL.Emit(OpCodes.Ldarg_0);
+                    getterIL.Emit(OpCodes.Ldfld, backingField);
+                    getterIL.Emit(OpCodes.Ret);
+
+                    MethodContext curr = CurrentMethod;
+                    MethodContext getterCtx = new()
+                    {
+                        Builder = getMethod
+                    };
+                    CurrentMethod = curr;
+
+                    dependencyProperty.SetGetMethod(getMethod);
+                    tc.Properties.Add(dependencyProperty);
+                    tc.Methods.Add(getterCtx);
+                    tc.Fields.Add(new()
+                    {
+                        Builder = backingField,
+                        Name = backingField.Name,
+                        Attributes = [new DependentValueAttribute(ctx.Name)]
+                    });
+                }
+
                 ctx.Builder = typeParam;
             }
 
-            tc.TypeParameters = typeParamContexts;
+            tc.GenericParameters = typeParamContexts;
         }
 
         if (context.parameter_list() != null)
@@ -350,12 +394,12 @@ internal static class TypeDeclarationGeneration
                         "Type aliases cannot explicitly set their base type.");
                 }
 
-                if (context.type_parameter_list() != null)
+                if (context.generic_parameter_list() != null)
                 {
                     EmitErrorMessage(
-                        context.type_parameter_list().Start.Line,
-                        context.type_parameter_list().Start.Column,
-                        context.type_parameter_list().GetText().Length,
+                        context.generic_parameter_list().Start.Line,
+                        context.generic_parameter_list().Start.Column,
+                        context.generic_parameter_list().GetText().Length,
                         DS0187_GenericAliasType,
                         "Type aliases cannot define generic type parameters.");
                 }

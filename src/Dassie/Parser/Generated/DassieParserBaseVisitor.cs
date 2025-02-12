@@ -1102,7 +1102,7 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// <return>The visitor result.</return>
 	public virtual Result VisitType([NotNull] DassieParser.TypeContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_list"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_parameter_list"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -1110,9 +1110,9 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitType_parameter_list([NotNull] DassieParser.Type_parameter_listContext context) { return VisitChildren(context); }
+	public virtual Result VisitGeneric_parameter_list([NotNull] DassieParser.Generic_parameter_listContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_parameter"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -1120,9 +1120,9 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitType_parameter([NotNull] DassieParser.Type_parameterContext context) { return VisitChildren(context); }
+	public virtual Result VisitGeneric_parameter([NotNull] DassieParser.Generic_parameterContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_parameter_attribute"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -1130,9 +1130,9 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context) { return VisitChildren(context); }
+	public virtual Result VisitGeneric_parameter_attribute([NotNull] DassieParser.Generic_parameter_attributeContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_parameter_variance"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -1140,7 +1140,7 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context) { return VisitChildren(context); }
+	public virtual Result VisitGeneric_parameter_variance([NotNull] DassieParser.Generic_parameter_varianceContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.inheritance_list"/>.
 	/// <para>
@@ -1302,7 +1302,7 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// <return>The visitor result.</return>
 	public virtual Result VisitFault_branch([NotNull] DassieParser.Fault_branchContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_arg_list"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_arg_list"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -1310,7 +1310,17 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitType_arg_list([NotNull] DassieParser.Type_arg_listContext context) { return VisitChildren(context); }
+	public virtual Result VisitGeneric_arg_list([NotNull] DassieParser.Generic_arg_listContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_argument"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitGeneric_argument([NotNull] DassieParser.Generic_argumentContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.assignment_operator"/>.
 	/// <para>

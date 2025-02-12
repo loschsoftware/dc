@@ -336,11 +336,11 @@ internal static class MemberDeclarationGeneration
             if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime))
                 CurrentMethod.IL = mb.GetILGenerator();
 
-            if (context.type_parameter_list() != null)
+            if (context.generic_parameter_list() != null)
             {
-                List<TypeParameterContext> typeParamContexts = [];
+                List<GenericParameterContext> typeParamContexts = [];
 
-                foreach (DassieParser.Type_parameterContext typeParam in context.type_parameter_list().type_parameter())
+                foreach (DassieParser.Generic_parameterContext typeParam in context.generic_parameter_list().generic_parameter())
                 {
                     if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetText()))
                     {
@@ -354,7 +354,7 @@ internal static class MemberDeclarationGeneration
                         continue;
                     }
 
-                    if (TypeContext.Current.TypeParameters.Any(t => t.Name == typeParam.Identifier().GetText()))
+                    if (TypeContext.Current.GenericParameters.Any(t => t.Name == typeParam.Identifier().GetText()))
                     {
                         EmitErrorMessage(
                             typeParam.Start.Line,
@@ -370,7 +370,7 @@ internal static class MemberDeclarationGeneration
                 GenericTypeParameterBuilder[] typeParams = mb.DefineGenericParameters(typeParamContexts.Select(t => t.Name).ToArray());
                 foreach (GenericTypeParameterBuilder typeParam in typeParams)
                 {
-                    TypeParameterContext tpc = typeParamContexts.First(c => c.Name == typeParam.Name);
+                    GenericParameterContext tpc = typeParamContexts.First(c => c.Name == typeParam.Name);
                     typeParam.SetGenericParameterAttributes(tpc.Attributes);
                     typeParam.SetBaseTypeConstraint(tpc.BaseTypeConstraint);
                     typeParam.SetInterfaceConstraints(tpc.InterfaceConstraints.ToArray());

@@ -699,29 +699,29 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType([NotNull] DassieParser.TypeContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_list"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_parameter_list"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitType_parameter_list([NotNull] DassieParser.Type_parameter_listContext context);
+	Result VisitGeneric_parameter_list([NotNull] DassieParser.Generic_parameter_listContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_parameter"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitType_parameter([NotNull] DassieParser.Type_parameterContext context);
+	Result VisitGeneric_parameter([NotNull] DassieParser.Generic_parameterContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_attribute"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_parameter_attribute"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitType_parameter_attribute([NotNull] DassieParser.Type_parameter_attributeContext context);
+	Result VisitGeneric_parameter_attribute([NotNull] DassieParser.Generic_parameter_attributeContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_parameter_variance"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_parameter_variance"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitType_parameter_variance([NotNull] DassieParser.Type_parameter_varianceContext context);
+	Result VisitGeneric_parameter_variance([NotNull] DassieParser.Generic_parameter_varianceContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.inheritance_list"/>.
 	/// </summary>
@@ -819,11 +819,17 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitFault_branch([NotNull] DassieParser.Fault_branchContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="DassieParser.type_arg_list"/>.
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_arg_list"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitType_arg_list([NotNull] DassieParser.Type_arg_listContext context);
+	Result VisitGeneric_arg_list([NotNull] DassieParser.Generic_arg_listContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.generic_argument"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitGeneric_argument([NotNull] DassieParser.Generic_argumentContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="DassieParser.assignment_operator"/>.
 	/// </summary>

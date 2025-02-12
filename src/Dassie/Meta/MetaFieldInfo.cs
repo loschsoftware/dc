@@ -25,6 +25,8 @@ internal class MetaFieldInfo : IEquatable<MetaFieldInfo>
 
     public DassieParser.Type_memberContext ParserRule { get; set; }
 
+    public List<Attribute> Attributes { get; set; } = [];
+
     public override bool Equals(object obj)
     {
         return Equals(obj as MetaFieldInfo);

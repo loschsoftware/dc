@@ -339,8 +339,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentMethod.IL.Emit(OpCodes.Ret);
         }
 
-        //Type t = tc.Builder.CreateType();
-        //TypeContext.Current.FinishedType = t;
+        // TODO: Find a better way
+        Type t = tc.Builder.CreateType();
+        TypeContext.Current.FinishedType = t;
 
         if (TypeContext.Current.RequiredInterfaceImplementations.Count > 0)
         {
@@ -522,7 +523,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (context.expression() == null)
                 tReturn = _tReturn;
 
-            if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
+            if (TypeContext.Current.GenericParameters.Select(t => t.Builder).Contains(tReturn))
             {
                 if (tReturn.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant))
                 {
@@ -2739,15 +2740,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         memberIndex++;
 
-        Type[] typeArgs = null;
-        if (context.type_arg_list() != null)
-        {
-            typeArgs = new Type[context.type_arg_list().type_name().Length];
-            for (int i = 0; i < context.type_arg_list().type_name().Length; i++)
-                typeArgs[i] = SymbolResolver.ResolveTypeName(context.type_arg_list().type_name()[i]);
-        }
+        Generics.GenericArgumentContext[] genericArgList = Generics.ResolveGenericArgList(context.generic_arg_list());
+        Type[] typeArgs = genericArgList
+            .Select(t => t.Type)
+            .ToArray();
 
-        CurrentMethod.TypeArgumentsForNextMethodCall = typeArgs;
+        CurrentMethod.GenericArgumentsForNextMethodCall = genericArgList;
 
         if (context.full_identifier().Identifier().Length > 1)
             CurrentMethod.ShouldLoadAddressIfValueType = true;
@@ -2767,7 +2765,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         object o = SymbolResolver.GetSmallestTypeFromLeft(
             context.full_identifier(),
-            typeArgs,
+            genericArgList,
             context.full_identifier().Start.Line,
             context.full_identifier().Start.Column,
             context.full_identifier().GetText().Length,
@@ -2947,10 +2945,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             else if (o is PropertyInfo prop)
             {
+                MethodInfo getter = prop.GetGetMethod();
+
+                if (getter.DeclaringType.IsGenericTypeDefinition && getter.DeclaringType.FullName == TypeContext.Current.FullName)
+                    getter = TypeBuilder.GetMethod(getter.DeclaringType.MakeGenericType(TypeContext.Current.GenericParameters.Select(t => t.Builder).ToArray()), getter);
+
                 if (!prop.GetGetMethod().IsStatic)
                     EmitLdarg(0);
 
-                EmitCall(prop.DeclaringType, prop.GetGetMethod());
+                EmitCall(prop.DeclaringType, getter);
                 t = prop.PropertyType;
 
                 if (firstIndex < (context.full_identifier().Identifier().Length - 1) && t.IsValueType)
@@ -3304,9 +3307,23 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 try
                 {
                     CurrentMethod.IL.Emit(OpCodes.Newobj, c);
-
                 }
                 catch { }
+
+                if (genericArgList.Any(g => g.Value != null))
+                {
+                    Generics.GenericArgumentContext[] vals = genericArgList.Where(g => g.Value != null).ToArray();
+                    MetaFieldInfo[] fields = SymbolResolver.GetFields(c.DeclaringType, BindingFlags.NonPublic | BindingFlags.Instance)
+                        .Where(f => f.Attributes.Any(f => f is DependentValueAttribute))
+                        .ToArray();
+
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        CurrentMethod.IL.Emit(OpCodes.Dup);
+                        EmitConst(vals[i].Value);
+                        CurrentMethod.IL.Emit(OpCodes.Stfld, fields[i].Builder);
+                    }
+                }
 
                 t = c.DeclaringType;
 
@@ -5776,7 +5793,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 "A custom operator must return a value. 'null' is an invalid return type.");
         }
 
-        if (TypeContext.Current.TypeParameters.Select(t => t.Builder).Contains(tReturn))
+        if (TypeContext.Current.GenericParameters.Select(t => t.Builder).Contains(tReturn))
         {
             if (tReturn.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant))
             {
