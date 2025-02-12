@@ -23,6 +23,7 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 #pragma warning disable IDE0079
 #pragma warning disable IL3000
@@ -281,7 +282,21 @@ internal class CompileCommand : ICompilerCommand
             BlobBuilder peBlob = new();
             peBuilder.Serialize(peBlob);
 
-            FileStream fs = new(Path.GetFileName(assembly), FileMode.Create, FileAccess.Write);
+            FileStream fs = null;
+
+            try
+            {
+                fs = new(Path.GetFileName(assembly), FileMode.Create, FileAccess.Write);
+            }
+            catch (IOException ex)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0029_FileAccessDenied,
+                    $"Output assembly could not be saved: {ex.Message}",
+                    "dc");
+            }
+
             peBlob.WriteContentTo(fs);
             fs.Dispose();
 

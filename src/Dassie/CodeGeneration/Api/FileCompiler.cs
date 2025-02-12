@@ -29,7 +29,22 @@ public static class FileCompiler
     /// <returns>An array of compilation errors that occured during the compilation. If no errors occured, this is an empty array.</returns>
     public static ErrorInfo[] CompileSingleFile(string path, DassieConfig config)
     {
-        InputDocument doc = new(File.ReadAllText(path), path);
+        string text = "";
+
+        try
+        {
+            text = File.ReadAllText(path);
+        }
+        catch (IOException ex)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0029_FileAccessDenied,
+                $"Could not read from '{path}': {ex.Message}",
+                path);
+        }
+
+        InputDocument doc = new(text, path);
         DassieParser parser = DocumentCompiler.CreateParser(doc, config, out string intermediatePath);
 
         return DocumentCompiler.CompileDocument(doc, config, parser.compilation_unit(), intermediatePath).ToArray();
