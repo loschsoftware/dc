@@ -687,6 +687,7 @@ internal static class EmitHelpers
 
         Label comparisonFailed = CurrentMethod.IL.DefineLabel();
         Label comparisonSucceeded = CurrentMethod.IL.DefineLabel();
+        Label end = CurrentMethod.IL.DefineLabel();
 
         EmitStloc(tuple2LocalIndex);
         EmitStloc(tuple1LocalIndex);
@@ -711,10 +712,12 @@ internal static class EmitHelpers
 
         CurrentMethod.IL.MarkLabel(comparisonFailed);
         EmitLdcI4(0);
-        CurrentMethod.IL.Emit(OpCodes.Br, equality ? comparisonSucceeded : comparisonFailed);
+        CurrentMethod.IL.Emit(OpCodes.Br, end);
 
         CurrentMethod.IL.MarkLabel(comparisonSucceeded);
         EmitLdcI4(1);
+
+        CurrentMethod.IL.MarkLabel(end);
 
         if (!equality)
             CurrentMethod.IL.Emit(OpCodes.Not);
