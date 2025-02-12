@@ -1274,7 +1274,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (IsValueTuple(t) && IsValueTuple(t2))
         {
-            EmitTupleEquality(t, context.op.Text == "==");
+            if (t.GetGenericArguments().Length != t2.GetGenericArguments().Length)
+            {
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+                EmitLdcI4(0);
+                return typeof(bool);
+            }
+
+            EmitTupleEquality(t, t2, context.op.Text == "==");
             return typeof(bool);
         }
 
@@ -5023,6 +5031,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     {
         CurrentMethod.IL.Emit(OpCodes.Ldnull);
         return typeof(object);
+    }
+
+    public override Type VisitWildcard_atom([NotNull] DassieParser.Wildcard_atomContext context)
+    {
+        CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Wildcard).GetConstructor([]));
+        return typeof(Wildcard);
     }
 
     public override Type VisitIndex_expression([NotNull] DassieParser.Index_expressionContext context)

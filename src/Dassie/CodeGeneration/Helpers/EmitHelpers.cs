@@ -1,5 +1,6 @@
 ﻿using Dassie.Helpers;
 using Dassie.Meta;
+using Dassie.Runtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -677,12 +678,12 @@ internal static class EmitHelpers
         CurrentMethod.LocalIndex = _localIndex;
     }
 
-    public static void EmitTupleEquality(Type tupleType, bool equality)
+    public static void EmitTupleEquality(Type tuple1Type, Type tuple2Type, bool equality)
     {
-        LocalBuilder tuple1 = CurrentMethod.IL.DeclareLocal(tupleType);
+        LocalBuilder tuple1 = CurrentMethod.IL.DeclareLocal(tuple1Type);
         int tuple1LocalIndex = ++CurrentMethod.LocalIndex;
 
-        LocalBuilder tuple2 = CurrentMethod.IL.DeclareLocal(tupleType);
+        LocalBuilder tuple2 = CurrentMethod.IL.DeclareLocal(tuple1Type);
         int tuple2LocalIndex = ++CurrentMethod.LocalIndex;
 
         Label comparisonFailed = CurrentMethod.IL.DefineLabel();
@@ -692,15 +693,21 @@ internal static class EmitHelpers
         EmitStloc(tuple2LocalIndex);
         EmitStloc(tuple1LocalIndex);
 
-        foreach (FieldInfo field in tupleType.GetFields())
+        FieldInfo[] t1Fields = tuple1Type.GetFields();
+        FieldInfo[] t2Fields = tuple2Type.GetFields();
+
+        for (int i = 0; i < t1Fields.Length; i++)
         {
+            if (t1Fields[i].FieldType == typeof(Wildcard) || t2Fields[i].FieldType == typeof(Wildcard))
+                continue;
+
             EmitLdloc(tuple1LocalIndex);
-            CurrentMethod.IL.Emit(OpCodes.Ldfld, field);
+            CurrentMethod.IL.Emit(OpCodes.Ldfld, t1Fields[i]);
 
             EmitLdloc(tuple2LocalIndex);
-            CurrentMethod.IL.Emit(OpCodes.Ldfld, field);
+            CurrentMethod.IL.Emit(OpCodes.Ldfld, t2Fields[i]);
 
-            if (field.FieldType.IsValueType)
+            if (t1Fields[i].FieldType.IsValueType && t2Fields[i].FieldType.IsValueType)
                 CurrentMethod.IL.Emit(OpCodes.Ceq);
             else
                 CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetMethod("Equals", [typeof(object), typeof(object)]));
