@@ -404,3 +404,5 @@ launchSettings.json
 
 build/
 /.editorconfig
+/src/Dassie/Parser/Generated/DassieLexer.interp
+/src/Dassie/Parser/Generated/DassieParser.interp
