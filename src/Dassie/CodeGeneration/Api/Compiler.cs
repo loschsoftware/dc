@@ -8,6 +8,7 @@ using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Symbols;
+using Dassie.Validation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -88,6 +89,12 @@ public static class Compiler
         Context.Module = mb;
 
         List<List<ErrorInfo>> errors = [];
+
+        Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
+        var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom(Path.GetFullPath(Path.Combine(GlobalConfig.RelativePathResolverDirectory, (r as AssemblyReference).AssemblyPath))));
+
+        if (refsToAdd != null)
+            Context.ReferencedAssemblies.AddRange(refsToAdd);
 
         List<(InputDocument document, IParseTree compilationUnit, string intermediatePath)> docs = [];
 
