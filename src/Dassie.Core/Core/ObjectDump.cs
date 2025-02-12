@@ -41,7 +41,7 @@ public static class ObjectDump
 
         sb.AppendLine($"{{{GetTypeName(obj.GetType())}}}");
 
-        if (obj is IEnumerable or string || obj.GetType().IsPrimitive || obj.GetType() == typeof(decimal) || obj.GetType().IsArray || obj.GetType().FullName.StartsWith("System.ValueTuple"))
+        if (obj is IEnumerable or string || obj.GetType().IsPrimitive || obj.GetType() == typeof(decimal) || obj.GetType().IsArray || obj.GetType().FullName.StartsWith("System.ValueTuple") || obj.GetType().IsEnum)
             return Format(obj, depth);
 
         foreach (MemberInfo member in obj.GetType().GetMembers())
@@ -162,6 +162,9 @@ public static class ObjectDump
             sb.Append($"){(omitNL ? "" : Environment.NewLine)}");
             return sb.ToString();
         }
+
+        if (obj.GetType().IsEnum)
+            return $"{obj.GetType()}.{obj}{(omitNL ? "" : Environment.NewLine)}";
 
         return Dump(obj, prevDepth + 1, true);
     }
