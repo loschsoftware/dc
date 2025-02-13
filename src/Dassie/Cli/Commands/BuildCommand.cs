@@ -3,6 +3,7 @@ using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -62,7 +63,21 @@ internal class BuildCommand : ICompilerCommand
         else if (config.BuildProfiles.Any(p => p.Name.ToLowerInvariant() == "default"))
             return ExecuteBuildProfile(config.BuildProfiles.First(p => p.Name.ToLowerInvariant() == "default"), config, args);
 
-        string[] filesToCompile = Directory.EnumerateFiles("./", "*.ds", SearchOption.AllDirectories).ToArray();
+        string[] filesToCompile = [];
+
+        try
+        {
+            filesToCompile = Directory.EnumerateFiles("./", "*.ds", SearchOption.AllDirectories).ToArray();
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0029_FileAccessDenied,
+                $"Files to compile could not be determined: {ex.Message}",
+                "dc");
+        }
+
         filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();
 
         if (filesToCompile.Length < 1)
