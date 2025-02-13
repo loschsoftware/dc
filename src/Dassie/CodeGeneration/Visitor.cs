@@ -1806,6 +1806,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return t;
         }
 
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>) && IsIntegerType(t2))
+        {
+            if (t2 != typeof(int))
+                EmitConversionOperator(t2, typeof(int));
+
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("Repeat").MakeGenericMethod(t));
+            CurrentMethod.IL.Emit(OpCodes.Ldnull);
+            CurrentMethod.IL.Emit(OpCodes.Ldftn, typeof(Value).GetMethods().Where(m => m.Name == "id").ToArray()[1].MakeGenericMethod(t));
+            CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType(t.GetGenericArguments()[0], t).GetConstructor([typeof(object), typeof(nint)]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethods().Where(m => m.Name == "SelectMany").ToArray()[1].MakeGenericMethod(t, t.GetGenericArguments()[0]));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(t.GetGenericArguments()[0]));
+            return t;
+        }
+
         MethodInfo op = t.GetMethod("op_Multiply", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
         if (op == null)

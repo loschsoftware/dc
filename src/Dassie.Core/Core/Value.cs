@@ -15,6 +15,13 @@ public static class Value
     public static object id(object obj) => obj;
 
     /// <summary>
+    /// Computes the identity of the specified value, which is the value itself.
+    /// </summary>
+    /// <param name="item">The value, whose identity should be returned.</param>
+    /// <returns>Returns the identity of the specified value.</returns>
+    public static T id<T>(T item) => item;
+
+    /// <summary>
     /// Discards the specified value.
     /// </summary>
     /// <param name="obj">The value to discard.</param>
