@@ -5,6 +5,29 @@ namespace Dassie.Core;
 #pragma warning disable IDE1006
 
 /// <summary>
+/// Defines 'Vector[T]' as an alias for a single-dimensional array of type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Alias(typeof(Vector<>))]
+public class Vector<T> { }
+
+/// <summary>
+/// Defines 'Array[T, 'D: int]' as an alias for a multi-dimensional array of type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <typeparam name="D"></typeparam>
+[Alias(typeof(Array<,>))]
+public class Array<T, D> { }
+
+/// <summary>
+/// Defines 'Buffer[T, 'L: int]' as an alias for a single-dimensional, fixed-length array of type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <typeparam name="L"></typeparam>
+[Alias(typeof(Buffer<,>))]
+public class Buffer<T, L> { }
+
+/// <summary>
 /// Defines 'int8' as an alias for <see cref="System.SByte"/>.
 /// </summary>
 [Alias(typeof(sbyte))]

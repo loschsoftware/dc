@@ -167,16 +167,11 @@ type_name
     | generic_identifier
     | type_name generic_arg_list
     | type_name (Ampersand | Double_Ampersand)
-    | type_name array_type_specifier
     | Func Asterisk generic_arg_list // Function pointer type
     ;
 
 union_or_tuple_type_member
     : (Identifier Colon)? type_name
-    ;
-
-array_type_specifier
-    : At_Open_Bracket (Comma | Double_Comma)* Close_Bracket
     ;
 
 if_branch

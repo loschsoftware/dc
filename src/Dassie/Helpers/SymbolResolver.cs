@@ -1263,7 +1263,7 @@ internal static class SymbolResolver
 
     public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
     {
-        Type t = ResolveTypeNameInternal(name, noEmitFragments, noEmitDS0149, noErrors, disableBacktickGenericResolve);
+        Type t = ResolveTypeNameInternal(name, out Generics.GenericArgumentContext[] genericArgs, noEmitFragments, noEmitDS0149, noErrors, disableBacktickGenericResolve);
 
         if (t == null)
             return t;
@@ -1282,15 +1282,50 @@ internal static class SymbolResolver
         try
         {
             if (t.GetCustomAttribute<AliasAttribute>() is AliasAttribute alias)
-                return alias.AliasedType;
+            {
+                Type aliasType = alias.AliasedType;
+
+                // Special cases for Vector[T], Array[T, D] and Buffer[T, L]
+                // TODO: Support Buffer[T, L] properly
+                if (aliasType == typeof(Vector<>) || aliasType == typeof(Buffer<,>))
+                {
+                    Type elemType = t.GetGenericArguments()[0];
+                    return elemType.MakeArrayType();
+                }
+
+                if (aliasType == typeof(Array<,>))
+                {
+                    int rank = 1;
+                    Type elemType = t.GetGenericArguments()[0];
+
+                    if (genericArgs != null && genericArgs.Length > 1 && genericArgs[1].Value != null)
+                        rank = (int)genericArgs[1].Value;
+
+                    if (rank > 32)
+                    {
+                        EmitErrorMessage(
+                            name.Start.Line,
+                            name.Start.Column,
+                            name.GetText().Length,
+                            DS0079_ArrayTooManyDimensions,
+                            $"An array cannot have more than 32 dimensions.");
+                    }
+
+                    return elemType.MakeArrayType(rank);
+                }
+
+                return aliasType;
+            }
         }
         catch (NotSupportedException) { }
 
         return t;
     }
 
-    private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
+    private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, out Generics.GenericArgumentContext[] genericArgs, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
     {
+        genericArgs = null;
+
         if (name.Func() != null)
         {
             // Function pointer type
@@ -1353,30 +1388,12 @@ internal static class SymbolResolver
             return t.MakeByRefType();
         }
 
-        int arrayDims = 0;
-
-        if (name.array_type_specifier() != null)
-        {
-            arrayDims = (name.array_type_specifier().Comma() ?? Array.Empty<ITerminalNode>()).Length + 1;
-            arrayDims += (name.array_type_specifier().Double_Comma() ?? Array.Empty<ITerminalNode>()).Length * 2;
-        }
-
-        if (arrayDims > 32 && !noErrors)
-        {
-            EmitErrorMessage(
-                name.Start.Line,
-                name.Start.Column,
-                name.GetText().Length,
-                DS0079_ArrayTooManyDimensions,
-                $"An array cannot have more than 32 dimensions.");
-        }
-
         if (name.identifier_atom() != null)
         {
             if (name.identifier_atom().Identifier() != null)
-                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, disableBacktickGenericResolve: disableBacktickGenericResolve, arrayDimensions: arrayDims, noErrors: noErrors);
+                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, disableBacktickGenericResolve: disableBacktickGenericResolve, noErrors: noErrors);
 
-            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
+            return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
         }
 
         // Tuple type
@@ -1401,11 +1418,12 @@ internal static class SymbolResolver
         if (name.generic_arg_list() != null)
         {
             Generics.GenericArgumentContext[] typeParams = Generics.ResolveGenericArgList(name.generic_arg_list());
+            genericArgs = typeParams;
 
             DassieParser.Type_nameContext childName = (DassieParser.Type_nameContext)name.children[0];
             if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
             {
-                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, arrayDimensions: arrayDims, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
+                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
 
                 TypeHelpers.CheckGenericTypeCompatibility(result, typeParams, childName.Start.Line, childName.Start.Column, childName.GetText().Length, !noErrors);
 
@@ -1419,7 +1437,7 @@ internal static class SymbolResolver
         if (name.type_name() != null && name.type_name() != null)
         {
             Type child = ResolveTypeName(name.type_name(), noEmitFragments, noErrors: noErrors);
-            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, arrayDimensions: arrayDims, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
+            return ResolveTypeName(child.AssemblyQualifiedName, name.Start.Line, name.Start.Column, name.GetText().Length, noEmitFragments, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
         }
 
         // TODO: Implement other kinds of types
@@ -1443,7 +1461,7 @@ internal static class SymbolResolver
 
             return t;
         }
-        
+
         try
         {
             if (t.GetCustomAttribute<AliasAttribute>() is AliasAttribute alias)
