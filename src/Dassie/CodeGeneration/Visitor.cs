@@ -632,16 +632,22 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                                 "The application entry point must be static.");
                         }
 
-                        if (tReturn != typeof(void) && tReturn != typeof(int) && tReturn != typeof(uint))
+                        if ((tReturn != typeof(void) && tReturn != typeof(int) && tReturn != typeof(uint)) || CurrentMethod.Parameters.Count > 1 || (CurrentMethod.Parameters.Count == 1 && CurrentMethod.Parameters[0].Type != typeof(string[])))
                         {
                             EmitErrorMessage(
-                                context.Equals().Symbol.Line,
-                                context.Equals().Symbol.Column,
-                                1,
-                                DS0050_ExpectedIntegerReturnValue,
-                                $"Expected expression of type 'int32', 'uint32' or 'null' for return value of application entry point, but got type '{TypeName(tReturn)}'.",
-                                tip: "You may use the function 'ignore' to discard a value and return 'null'.");
-
+                                context.Identifier().Symbol.Line,
+                                context.Identifier().Symbol.Column,
+                                context.Identifier().GetText().Length,
+                                DS0201_EntryPointInvalidSignature,
+                                """
+                                The application entry point has an invalid signature. The only allowed signatures are:
+                                    * () -> null
+                                    * () -> int
+                                    * () -> uint
+                                    * Vector[string] -> null
+                                    * Vector[string] -> int
+                                    * Vector[string] -> uint
+                                """);
                         }
 
                         Context.EntryPointIsSet = true;

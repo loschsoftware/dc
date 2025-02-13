@@ -824,5 +824,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a list literal constructed from an integer range does not use compile-time constant indices.
     /// </summary>
-    DS0200_ListFromRangeNotCompileTimeConstant
+    DS0200_ListFromRangeNotCompileTimeConstant,
+    /// <summary>
+    /// Emitted when the designated application entry point has an invalid signature.
+    /// </summary>
+    DS0201_EntryPointInvalidSignature
 }
