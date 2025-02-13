@@ -820,5 +820,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a file exports multiple namespaces.
     /// </summary>
-    DS0199_MultipleExports
+    DS0199_MultipleExports,
+    /// <summary>
+    /// Emitted when a list literal constructed from an integer range does not use compile-time constant indices.
+    /// </summary>
+    DS0200_ListFromRangeNotCompileTimeConstant
 }

@@ -4946,6 +4946,30 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitArray_expression([NotNull] DassieParser.Array_expressionContext context)
     {
+        if (context.expression().Length == 1 && context.expression()[0] is DassieParser.Delimited_range_expressionContext range)
+        {
+            Expression start = ExpressionEvaluator.Instance.Visit(range.expression()[0]);
+            Expression end = ExpressionEvaluator.Instance.Visit(range.expression()[1]);
+
+            if (start == null || end == null || start.Type != typeof(int) || end.Type != typeof(int))
+            {
+                EmitErrorMessage(
+                    range.Start.Line,
+                    range.Start.Column,
+                    range.GetText().Length,
+                    DS0200_ListFromRangeNotCompileTimeConstant,
+                    "Array constructed from range expression must use range of compile-time constant integral values.");
+
+                return typeof(int[]);
+            }
+
+            EmitLdcI4(start.Value); // Start
+            EmitLdcI4(end.Value - start.Value + 1); // Count
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("Range"));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(typeof(int)));
+            return typeof(int[]);
+        }
+
         Expression cnst = ExpressionEvaluator.Instance.Visit(context);
         if (cnst != null)
         {
@@ -4984,6 +5008,30 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         {
             CurrentMethod.IL.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor([]));
             return typeof(List<object>);
+        }
+
+        if (context.expression().Length == 1 && context.expression()[0] is DassieParser.Delimited_range_expressionContext range)
+        {
+            Expression start = ExpressionEvaluator.Instance.Visit(range.expression()[0]);
+            Expression end = ExpressionEvaluator.Instance.Visit(range.expression()[1]);
+
+            if (start == null || end == null || start.Type != typeof(int) || end.Type != typeof(int))
+            {
+                EmitErrorMessage(
+                    range.Start.Line,
+                    range.Start.Column,
+                    range.GetText().Length,
+                    DS0200_ListFromRangeNotCompileTimeConstant,
+                    "List constructed from range expression must use range of compile-time constant integral values.");
+
+                return typeof(List<int>);
+            }
+
+            EmitLdcI4(start.Value); // Start
+            EmitLdcI4(end.Value - start.Value + 1); // Count
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("Range"));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("ToList").MakeGenericMethod(typeof(int)));
+            return typeof(List<int>);
         }
 
         Type itemType = Visit(context.expression()[0]);
