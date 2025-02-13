@@ -1793,6 +1793,19 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return t;
         }
 
+        // String repetition operator
+        // "ABC" * 3 = "ABCABCABC"
+
+        if (t == typeof(string) && IsIntegerType(t2))
+        {
+            if (t2 != typeof(int))
+                EmitConversionOperator(t2, typeof(int));
+
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(Enumerable).GetMethod("Repeat").MakeGenericMethod(typeof(string)));
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(string).GetMethod("Concat", BindingFlags.Public | BindingFlags.Static, [typeof(IEnumerable<string>)]));
+            return t;
+        }
+
         MethodInfo op = t.GetMethod("op_Multiply", BindingFlags.Public | BindingFlags.Static, null, new Type[] { t, t2 }, null);
 
         if (op == null)
