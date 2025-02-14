@@ -1317,6 +1317,17 @@ internal static class SymbolResolver
                 if (aliasType == typeof(Ref<>))
                 {
                     Type type = t.GetGenericArguments()[0];
+
+                    if (type.IsByRef && !noEmitDS0149 && !noErrors)
+                    {
+                        EmitErrorMessage(
+                            name.Start.Line,
+                            name.Start.Column,
+                            name.GetText().Length,
+                            DS0149_NestedByRefType,
+                            $"Invalid type '{name.GetText()}': Nested references are not permitted.");
+                    }
+
                     return type.MakeByRefType();
                 }
 

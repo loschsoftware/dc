@@ -348,15 +348,46 @@ internal static class TypeHelpers
             ? type.GenericTypeArguments.FirstOrDefault()
             : null))!;
 
+    private static readonly Dictionary<string, string> IntrinsicAliases = new()
+    {
+        ["System.IntPtr"] = "native",
+        ["System.UIntPtr"] = "unative",
+        ["System.SByte"] = "int8",
+        ["System.Byte"] = "uint8",
+        ["System.Int16"] = "int16",
+        ["System.UInt16"] = "uint16",
+        ["System.Int32"] = "int",
+        ["System.UInt32"] = "uint",
+        ["System.Int64"] = "int64",
+        ["System.UInt64"] = "uint64",
+        ["System.Int128"] = "int128",
+        ["System.UInt128"] = "uint128",
+        ["System.Half"] = "float16",
+        ["System.Single"] = "float32",
+        ["System.Double"] = "float64",
+        ["System.Decimal"] = "decimal",
+        ["System.Boolean"] = "bool",
+        ["System.String"] = "string",
+        ["System.Char"] = "char",
+        ["System.Void"] = "null",
+        ["System.Object"] = "object"
+    };
+
     private static string GetTypeNameOrAlias(Type type)
     {
         string name = type.FullName ?? type.Name;
 
+        if (type.IsArray || type.IsByRef || type.IsPointer)
+        {
+            Type elem = type.GetElementType();
+            name = elem.FullName ?? elem.Name;
+        }
+
         if (type.IsGenericType)
             name = name.Split('`')[0];
 
-        if (CurrentFile.Aliases.Any(a => a.Name == name))
-            return CurrentFile.Aliases.First(a => a.Name == name).Alias;
+        if (IntrinsicAliases.TryGetValue(name, out string alias))
+            return alias;
 
         return name.Split('.').Last();
     }
@@ -385,6 +416,17 @@ internal static class TypeHelpers
             name.Append(Format(type.GetGenericArguments().Last()));
             name.Append(']');
         }
+
+        if (type.IsByRef)
+            name = new($"Ref[{name}]");
+
+        if (type.IsPointer)
+            name = new($"Ptr[{name}]");
+
+        if (type.IsSZArray)
+            name = new($"Vector[{name}]");
+        else if (type.IsArray)
+            name = new($"Array[{name}, {type.GetArrayRank()}]");
 
         return name.ToString();
     }
@@ -506,6 +548,32 @@ internal static class TypeHelpers
     {
         if (!param.IsGenericParameter)
             return true;
+
+        if (arg.Type == typeof(void))
+        {
+            if (throwErrors)
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0203_InvalidGenericArgument,
+                    $"Invalid generic argument '{TypeName(arg.Type)}': 'null' cannot be used as a type argument.");
+            }
+
+            return true;
+        }
+
+        if (arg.Type.IsByRef)
+        {
+            if (throwErrors)
+            {
+                EmitErrorMessage(
+                    row, col, len,
+                    DS0203_InvalidGenericArgument,
+                    $"Invalid generic argument '{TypeName(arg.Type)}': References cannot be used as type arguments.");
+            }
+
+            return true;
+        }
 
         string errMsgStart = $"Generic argument '{Format(arg.Type)}' is incompatible with generic parameter '{Format(param)}': ";
         GenericParameterAttributes attributes = param.GenericParameterAttributes;

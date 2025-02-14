@@ -832,5 +832,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the condition of a conditional expression is a compile-time constant.
     /// </summary>
-    DS0202_ConditionConstant
+    DS0202_ConditionConstant,
+    /// <summary>
+    /// Emitted when an invalid type is used as a generic argument.
+    /// </summary>
+    DS0203_InvalidGenericArgument
 }
