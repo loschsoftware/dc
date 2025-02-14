@@ -428,6 +428,9 @@ internal static class TypeHelpers
     /// <returns>Wheter or not the specified generic type can be initialized with the specified type arguments.</returns>
     public static bool CheckGenericTypeCompatibility(Type genericType, Generics.GenericArgumentContext[] genericArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
     {
+        if (genericType == null)
+            return true;
+
         if (!genericType.IsGenericType)
             return true;
 

@@ -1427,7 +1427,7 @@ internal static class SymbolResolver
 
                 TypeHelpers.CheckGenericTypeCompatibility(result, typeParams, childName.Start.Line, childName.Start.Column, childName.GetText().Length, !noErrors);
 
-                if (typeParams != null && result.IsGenericTypeDefinition)
+                if (typeParams != null && result != null && result.IsGenericTypeDefinition)
                     result = result.MakeGenericType(typeParams.GetTypes());
 
                 return result;
