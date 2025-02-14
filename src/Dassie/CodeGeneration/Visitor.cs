@@ -259,7 +259,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 })
                 .SelectMany(t =>
                 {
-                    if (!t.IsConstructedGenericType)
+                    if (!t.IsConstructedGenericType || !t.GetGenericTypeDefinition().GetGenericArguments().Any(t => t is TypeBuilder))
                     {
                         return t.GetMethods().Select(m => new MockMethodInfo()
                         {
