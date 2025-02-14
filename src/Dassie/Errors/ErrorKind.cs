@@ -828,5 +828,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the designated application entry point has an invalid signature.
     /// </summary>
-    DS0201_EntryPointInvalidSignature
+    DS0201_EntryPointInvalidSignature,
+    /// <summary>
+    /// Emitted when the condition of a conditional expression is a compile-time constant.
+    /// </summary>
+    DS0202_ConditionConstant
 }

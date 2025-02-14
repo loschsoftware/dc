@@ -199,6 +199,10 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
     public override Expression VisitLogical_and_expression([NotNull] DassieParser.Logical_and_expressionContext context)
     {
         Expression a = Visit(context.expression()[0]);
+
+        if (a is not null && a.Value is bool lhs && !lhs)
+            return new(typeof(bool), false);
+
         Expression b = Visit(context.expression()[1]);
 
         if (a == null || b == null)
@@ -253,6 +257,10 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
     public override Expression VisitLogical_or_expression([NotNull] DassieParser.Logical_or_expressionContext context)
     {
         Expression a = Visit(context.expression()[0]);
+
+        if (a is not null && a.Value is bool lhs && lhs)
+            return new(typeof(bool), true);
+
         Expression b = Visit(context.expression()[1]);
 
         if (a == null || b == null)

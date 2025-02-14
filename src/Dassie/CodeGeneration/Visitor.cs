@@ -3956,6 +3956,20 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     //    return Helpers.ResolveTypeName(context.GetText(), context.Identifier().Last().Symbol.Line, context.Identifier().Last().Symbol.Column, context.Identifier().Last().GetText().Length);
     //}
 
+    private static void WarnIfConstantBoolean(DassieParser.ExpressionContext rule)
+    {
+        Expression expr = ExpressionEvaluator.Instance.Visit(rule);
+        if (expr is not null && expr.Value is bool cond)
+        {
+            EmitWarningMessage(
+                rule.Start.Line,
+                rule.Start.Column,
+                rule.GetText().Length,
+                DS0202_ConditionConstant,
+                $"Condition is always '{cond.ToString().ToLowerInvariant()}'.");
+        }
+    }
+
     public override Type VisitPrefix_if_expression([NotNull] DassieParser.Prefix_if_expressionContext context)
     {
         Type t;
@@ -3967,8 +3981,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         // Comparative expression
         Type ct = Visit(context.if_branch().expression()[0]);
-
-        TypeHelpers.EnsureBoolean(ct,
+        WarnIfConstantBoolean(context.if_branch().expression()[0]);
+        EnsureBoolean(ct,
             context.Start.Line,
             context.Start.Column,
             context.Start.Text.Length);
@@ -3991,7 +4005,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Label stillFalseBranch = CurrentMethod.IL.DefineLabel();
 
                 Type _ct = Visit(tree.expression()[0]);
-                TypeHelpers.EnsureBoolean(_ct,
+                WarnIfConstantBoolean(tree.expression()[0]);
+                EnsureBoolean(_ct,
                     context.Start.Line,
                     context.Start.Column,
                     context.Start.Text.Length);
@@ -4046,7 +4061,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         // Comparative expression
         Type ct = Visit(context.postfix_if_branch().expression());
-        TypeHelpers.EnsureBoolean(ct,
+        WarnIfConstantBoolean(context.postfix_if_branch().expression());
+        EnsureBoolean(ct,
             context.Start.Line,
             context.Start.Column,
             context.Start.Text.Length);
@@ -4076,7 +4092,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         // Comparative expression
         Type ct = Visit(context.unless_branch().expression()[0]);
-        TypeHelpers.EnsureBoolean(ct,
+        WarnIfConstantBoolean(context.unless_branch().expression()[0]);
+        EnsureBoolean(ct,
             context.Start.Line,
             context.Start.Column,
             context.Start.Text.Length);
@@ -4099,7 +4116,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Label stillFalseBranch = CurrentMethod.IL.DefineLabel();
 
                 Type _ct = Visit(tree.expression()[0]);
-                TypeHelpers.EnsureBoolean(_ct,
+                WarnIfConstantBoolean(tree.expression()[0]);
+                EnsureBoolean(_ct,
                     context.Start.Line,
                     context.Start.Column,
                     context.Start.Text.Length);
@@ -4159,7 +4177,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         // Comparative expression
         Type ct = Visit(context.postfix_unless_branch().expression());
-        TypeHelpers.EnsureBoolean(ct,
+        WarnIfConstantBoolean(context.postfix_unless_branch().expression());
+        EnsureBoolean(ct,
             context.Start.Line,
             context.Start.Column,
             context.Start.Text.Length);
@@ -5445,6 +5464,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitWhile_loop([NotNull] DassieParser.While_loopContext context)
     {
         Type t = null;
+        WarnIfConstantBoolean(context.expression().First());
 
         if (VisitorStep1CurrentMethod == null)
         {
