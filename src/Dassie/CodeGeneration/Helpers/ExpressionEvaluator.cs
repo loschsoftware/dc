@@ -4,6 +4,7 @@ using Dassie.CodeGeneration.Structure;
 using Dassie.Helpers;
 using Dassie.Parser;
 using Dassie.Text;
+using Microsoft.CSharp.RuntimeBinder;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -56,7 +57,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value + b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value + Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitSubtraction_expression([NotNull] DassieParser.Subtraction_expressionContext context)
@@ -67,7 +75,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value - b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value - Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitMultiply_expression([NotNull] DassieParser.Multiply_expressionContext context)
@@ -78,7 +93,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value * b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value * Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitDivide_expression([NotNull] DassieParser.Divide_expressionContext context)
@@ -89,7 +111,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value / b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value / Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitRemainder_expression([NotNull] DassieParser.Remainder_expressionContext context)
@@ -100,7 +129,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value % b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value % Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitModulus_expression([NotNull] DassieParser.Modulus_expressionContext context)
@@ -111,7 +147,17 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, (a.Value % b.Value + b.Value) % b.Value);
+        try
+        {
+            dynamic aVal = a.Value;
+            dynamic bVal = Convert.ChangeType(b.Value, a.Type);
+
+            return new(a.Type, Convert.ChangeType((aVal % bVal + bVal) % bVal, a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitLeft_shift_expression([NotNull] DassieParser.Left_shift_expressionContext context)
@@ -122,7 +168,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value << b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value << Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitRight_shift_expression([NotNull] DassieParser.Right_shift_expressionContext context)
@@ -133,7 +186,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value >> b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value >> Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitLogical_and_expression([NotNull] DassieParser.Logical_and_expressionContext context)
@@ -144,7 +204,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value & b.Value);
+        try
+        {
+            return new(typeof(bool), Convert.ChangeType((bool)a.Value && (bool)b.Value, typeof(bool)));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitAnd_expression([NotNull] DassieParser.And_expressionContext context)
@@ -155,7 +222,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value & b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value & Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitOr_expression([NotNull] DassieParser.Or_expressionContext context)
@@ -166,7 +240,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value | b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value | Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitLogical_or_expression([NotNull] DassieParser.Logical_or_expressionContext context)
@@ -177,7 +258,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value | b.Value);
+        try
+        {
+            return new(typeof(bool), Convert.ChangeType((bool)a.Value || (bool)b.Value, typeof(bool)));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitXor_expression([NotNull] DassieParser.Xor_expressionContext context)
@@ -188,7 +276,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(a.Type, a.Value ^ b.Value);
+        try
+        {
+            return new(a.Type, Convert.ChangeType(a.Value ^ Convert.ChangeType(b.Value, b.Type), a.Type));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitPower_expression([NotNull] DassieParser.Power_expressionContext context)
@@ -199,7 +294,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(typeof(double), Math.Pow(a.Value, b.Value));
+        try
+        {
+            return new(typeof(double), Math.Pow(a.Value, b.Value));
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitEquality_expression([NotNull] DassieParser.Equality_expressionContext context)
@@ -210,10 +312,17 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        if (context.op.Text == "==")
-            return a.Value == b.Value;
+        try
+        {
+            if (context.op.Text == "==")
+                return a.Value == b.Value;
 
-        return new(typeof(bool), a.Value != b.Value);
+            return new(typeof(bool), a.Value != b.Value);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitComparison_expression([NotNull] DassieParser.Comparison_expressionContext context)
@@ -224,13 +333,20 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null || b == null)
             return null;
 
-        return new(typeof(bool), context.op.Text switch
+        try
         {
-            "<" => a.Value < b.Value,
-            ">" => a.Value > b.Value,
-            "<=" => a.Value <= b.Value,
-            _ => a.Value >= b.Value
-        });
+            return new(typeof(bool), context.op.Text switch
+            {
+                "<" => a.Value < b.Value,
+                ">" => a.Value > b.Value,
+                "<=" => a.Value <= b.Value,
+                _ => a.Value >= b.Value
+            });
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitBitwise_complement_expression([NotNull] DassieParser.Bitwise_complement_expressionContext context)
@@ -240,7 +356,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null)
             return null;
 
-        return new(a.Type, ~a.Value);
+        try
+        {
+            return new(a.Type, ~a.Value);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitLogical_negation_expression([NotNull] DassieParser.Logical_negation_expressionContext context)
@@ -250,7 +373,14 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         if (a == null)
             return null;
 
-        return new(a.Type, -a.Value);
+        try
+        {
+            return new(a.Type, !a.Value);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public override Expression VisitString_atom([NotNull] DassieParser.String_atomContext context)

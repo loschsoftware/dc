@@ -1269,6 +1269,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitEquality_expression([NotNull] DassieParser.Equality_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         EnsureBoolean(t, throwError: false);
 
@@ -1365,6 +1373,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitComparison_expression([NotNull] DassieParser.Comparison_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
@@ -1480,6 +1496,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitLogical_negation_expression([NotNull] DassieParser.Logical_negation_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression());
 
         if (IsBoolean(t))
@@ -1511,6 +1535,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitLogical_and_expression([NotNull] DassieParser.Logical_and_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         List<Type> types = [];
 
         Label falseLabel = CurrentMethod.IL.DefineLabel();
@@ -1552,6 +1584,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitLogical_or_expression([NotNull] DassieParser.Logical_or_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         List<Type> types = [];
 
         Label trueLabel = CurrentMethod.IL.DefineLabel();
@@ -1593,6 +1633,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitOr_expression([NotNull] DassieParser.Or_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         EnsureBoolean(t, throwError: false);
 
@@ -1643,6 +1691,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitAnd_expression([NotNull] DassieParser.And_expressionContext context)
     {
+        Expression expr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (expr != null)
+        {
+            EmitConst(expr.Value);
+            return expr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         EnsureBoolean(t, throwError: false);
 
@@ -1691,6 +1747,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitXor_expression([NotNull] DassieParser.Xor_expressionContext context)
     {
+        Expression expr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (expr != null)
+        {
+            EmitConst(expr.Value);
+            return expr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         EnsureBoolean(t, throwError: false);
 
@@ -1752,6 +1816,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitBitwise_complement_expression([NotNull] DassieParser.Bitwise_complement_expressionContext context)
     {
+        Expression expr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (expr != null)
+        {
+            EmitConst(expr.Value);
+            return expr.Type;
+        }
+
         Type t = Visit(context.expression());
 
         if (IsNumericType(t) || t.IsEnum)
@@ -1781,6 +1853,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitMultiply_expression([NotNull] DassieParser.Multiply_expressionContext context)
     {
+        Expression expr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (expr != null)
+        {
+            EmitConst(expr.Value);
+            return expr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
@@ -1841,6 +1921,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitDivide_expression([NotNull] DassieParser.Divide_expressionContext context)
     {
+        Expression expr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (expr != null)
+        {
+            EmitConst(expr.Value);
+            return expr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
 
         ExpressionEvaluator.Instance.RequireNonZeroValue = true;
@@ -1879,6 +1967,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitAddition_expression([NotNull] DassieParser.Addition_expressionContext context)
     {
+        Expression expr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (expr != null)
+        {
+            EmitConst(expr.Value);
+            return expr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
@@ -1961,6 +2057,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitSubtraction_expression([NotNull] DassieParser.Subtraction_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
@@ -2001,6 +2105,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitRemainder_expression([NotNull] DassieParser.Remainder_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
 
         ExpressionEvaluator.Instance.RequireNonZeroValue = true;
@@ -2037,6 +2149,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     // a %% b = (a % b + b) % b
     public override Type VisitModulus_expression([NotNull] DassieParser.Modulus_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
 
         ExpressionEvaluator.Instance.RequireNonZeroValue = true;
@@ -2084,6 +2204,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitPower_expression([NotNull] DassieParser.Power_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
 
         if (t != typeof(double))
@@ -2120,6 +2248,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitLeft_shift_expression([NotNull] DassieParser.Left_shift_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
@@ -2174,6 +2310,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitRight_shift_expression([NotNull] DassieParser.Right_shift_expressionContext context)
     {
+        Expression constExpr = ExpressionEvaluator.Instance.Visit(context);
+
+        if (constExpr != null)
+        {
+            EmitConst(constExpr.Value);
+            return constExpr.Type;
+        }
+
         Type t = Visit(context.expression()[0]);
         Type t2 = Visit(context.expression()[1]);
 
