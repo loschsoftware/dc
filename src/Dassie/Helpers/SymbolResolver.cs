@@ -1314,6 +1314,18 @@ internal static class SymbolResolver
                     return elemType.MakeArrayType(rank);
                 }
 
+                if (aliasType == typeof(Ref<>))
+                {
+                    Type type = t.GetGenericArguments()[0];
+                    return type.MakeByRefType();
+                }
+
+                if (aliasType == typeof(Ptr<>))
+                {
+                    Type type = t.GetGenericArguments()[0];
+                    return type.MakePointerType();
+                }
+
                 return aliasType;
             }
         }

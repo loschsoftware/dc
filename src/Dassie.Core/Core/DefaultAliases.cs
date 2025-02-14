@@ -5,14 +5,14 @@ namespace Dassie.Core;
 #pragma warning disable IDE1006
 
 /// <summary>
-/// Defines 'Vector[T]' as an alias for a single-dimensional array of type <typeparamref name="T"/>.
+/// Defines '<c>Vector[T]</c>' as an alias for a single-dimensional array of type <typeparamref name="T"/>.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Alias(typeof(Vector<>))]
 public class Vector<T> { }
 
 /// <summary>
-/// Defines 'Array[T, 'D: int]' as an alias for a multi-dimensional array of type <typeparamref name="T"/>.
+/// Defines '<c>Array[T, 'D: int]</c>' as an alias for a multi-dimensional array of type <typeparamref name="T"/>.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <typeparam name="D"></typeparam>
@@ -20,12 +20,26 @@ public class Vector<T> { }
 public class Array<T, D> { }
 
 /// <summary>
-/// Defines 'Buffer[T, 'L: int]' as an alias for a single-dimensional, fixed-length array of type <typeparamref name="T"/>.
+/// Defines '<c>Buffer[T, 'L: int]</c>' as an alias for a single-dimensional, fixed-length array of type <typeparamref name="T"/>.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <typeparam name="L"></typeparam>
 [Alias(typeof(Buffer<,>))]
 public class Buffer<T, L> { }
+
+/// <summary>
+/// Defines '<c>Ptr[T]</c>' as an alias for <c><typeparamref name="T"/>&amp;</c>.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Alias(typeof(Ref<>))]
+public class Ref<T> { }
+
+/// <summary>
+/// Defines '<c>Ptr[T]</c>' as an alias for <c><typeparamref name="T"/>*</c>.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Alias(typeof(Ptr<>))]
+public class Ptr<T> { }
 
 /// <summary>
 /// Defines 'int8' as an alias for <see cref="System.SByte"/>.
