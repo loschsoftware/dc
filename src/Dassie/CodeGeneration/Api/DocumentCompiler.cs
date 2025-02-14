@@ -13,6 +13,9 @@ internal static class DocumentCompiler
 {
     public static DassieParser CreateParser(InputDocument document, DassieConfig config, out string intermediatePath)
     {
+        if (string.IsNullOrEmpty(CurrentFile.Path))
+            CurrentFile.Path = document.Name;
+
         if (config.Verbosity >= 1)
             EmitBuildLogMessage("    Lowering...");
 

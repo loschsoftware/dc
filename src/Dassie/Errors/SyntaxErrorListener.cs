@@ -12,6 +12,7 @@ internal class ParserErrorListener : BaseErrorListener
         EmitErrorMessage(new()
         {
             CodePosition = (line, charPositionInLine),
+            Length = offendingSymbol.Text.Length,
             ErrorCode = DS0001_SyntaxError,
             ErrorMessage = msg,
             File = CurrentFile.Path,

@@ -24,7 +24,7 @@ internal class FileContext
 
     public TypeRegistry AvailableTypes { get; }
 
-    public string Path { get; }
+    public string Path { get; set; }
 
     public List<Fragment> Fragments { get; } = new();
 
