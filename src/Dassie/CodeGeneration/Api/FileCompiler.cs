@@ -3,6 +3,7 @@ using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Configuration;
+using Dassie.Core;
 using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Meta;
@@ -91,6 +92,9 @@ public static class FileCompiler
 
             if (refsToAdd != null)
                 Context.ReferencedAssemblies.AddRange(refsToAdd);
+
+            if (!config.NoStdLib)
+                Context.ReferencedAssemblies.Add(typeof(stdout).Assembly);
 
             IParseTree compilationUnit = parser.compilation_unit();
 

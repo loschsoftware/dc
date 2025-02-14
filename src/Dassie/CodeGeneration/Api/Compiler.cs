@@ -3,6 +3,7 @@ using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis.Structure;
 using Dassie.CodeGeneration.Binding;
 using Dassie.Configuration;
+using Dassie.Core;
 using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Meta;
@@ -95,6 +96,9 @@ public static class Compiler
 
         if (refsToAdd != null)
             Context.ReferencedAssemblies.AddRange(refsToAdd);
+
+        if (!config.NoStdLib)
+            Context.ReferencedAssemblies.Add(typeof(stdout).Assembly);
 
         List<(InputDocument document, IParseTree compilationUnit, string intermediatePath)> docs = [];
 

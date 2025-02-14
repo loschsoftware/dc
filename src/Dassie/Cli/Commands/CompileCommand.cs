@@ -321,15 +321,18 @@ internal class CompileCommand : ICompilerCommand
             }
         }
 
-        string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
-
-        if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory))
+        if (!config.NoStdLib)
         {
-            try
+            string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
+
+            if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory))
             {
-                File.Copy(coreLib, Path.Combine(Directory.GetCurrentDirectory(), "Dassie.Core.dll"), true);
+                try
+                {
+                    File.Copy(coreLib, Path.Combine(Directory.GetCurrentDirectory(), "Dassie.Core.dll"), true);
+                }
+                catch (IOException) { }
             }
-            catch (IOException) { }
         }
 
         foreach (string dependency in Context.ReferencedAssemblies.Select(a => a.Location))

@@ -1758,7 +1758,7 @@ internal static class SymbolResolver
                 .Where(m => m.Name == name);
         }
 
-        IEnumerable<MethodInfo> extensionMethodsFromReferencedAssemblies = Context.ReferencedAssemblies.Append(typeof(stdout).Assembly)
+        IEnumerable<MethodInfo> extensionMethodsFromReferencedAssemblies = Context.ReferencedAssemblies
             .Where(a => a.GetCustomAttribute<ExtensionAttribute>() != null)
             .SelectMany(a =>
             {
@@ -1797,7 +1797,7 @@ internal static class SymbolResolver
 
         IEnumerable<Type> allTypes = Context.Types.Where(t => !t.IsLocalType).Select(t => t.Builder).Cast<Type>()
             .Concat(CurrentFile.LocalTypes.Select(t => t.Builder))
-            .Concat(Context.ReferencedAssemblies.Append(typeof(stdout).Assembly)
+            .Concat(Context.ReferencedAssemblies
                 .SelectMany(a =>
                 {
                     Type[] types = [];

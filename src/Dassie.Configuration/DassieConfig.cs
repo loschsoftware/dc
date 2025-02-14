@@ -237,6 +237,11 @@ public sealed class DassieConfig
     [DefaultValue(false)]
     [XmlElement]
     public bool RunAnalyzers { get; set; }
+
+    [Description("If enabled, the Dassie standard library (Dassie.Core.dll) is not implicitly referenced.")]
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool NoStdLib { get; set; }
 }
 
 [Serializable]

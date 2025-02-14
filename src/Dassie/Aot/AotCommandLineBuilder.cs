@@ -106,7 +106,8 @@ internal class AotCommandLineBuilder
         _arglistBuilder.AppendLine(referencesString);
 
         // Dassie Core library
-        _arglistBuilder.AppendLine($"-r:\"{Path.GetFullPath("Dassie.Core.dll")}\"");
+        if (!_config.Config.NoStdLib)
+            _arglistBuilder.AppendLine($"-r:\"{Path.GetFullPath("Dassie.Core.dll")}\"");
 
         Version version = typeof(object).Assembly.GetName().Version;
         string target = version.ToString(2);

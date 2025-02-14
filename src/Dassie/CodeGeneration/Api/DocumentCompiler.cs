@@ -49,13 +49,13 @@ internal static class DocumentCompiler
         SetupBogusAssembly();
         CurrentFile = Context.GetFile(document.Name);
 
-        if (!config.ImplicitImports)
+        if (!config.ImplicitImports || config.NoStdLib)
         {
             CurrentFile.Imports.Clear();
             CurrentFile.ImportedTypes.Clear();
         }
 
-        if (!config.ImplicitTypeAliases)
+        if (!config.ImplicitTypeAliases || config.NoStdLib)
             CurrentFile.Aliases.Clear();
 
         CurrentFile.SymbolDocumentWriter = Context.Module.DefineDocument(document.Name);
