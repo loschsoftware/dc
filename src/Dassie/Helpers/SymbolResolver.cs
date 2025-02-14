@@ -1,5 +1,4 @@
-﻿using Antlr4.Runtime.Tree;
-using Dassie.CodeGeneration;
+﻿using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Helpers;
 using Dassie.Core;
 using Dassie.Errors;
@@ -1261,10 +1260,8 @@ internal static class SymbolResolver
         return t;
     }
 
-    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
+    private static Type GetAliasedType(Type t, string name, int row, int col, int len, Generics.GenericArgumentContext[] genericArgs, bool noEmitDS0149, bool noErrors)
     {
-        Type t = ResolveTypeNameInternal(name, out Generics.GenericArgumentContext[] genericArgs, noEmitFragments, noEmitDS0149, noErrors, disableBacktickGenericResolve);
-
         if (t == null)
             return t;
 
@@ -1304,9 +1301,9 @@ internal static class SymbolResolver
                     if (rank > 32)
                     {
                         EmitErrorMessage(
-                            name.Start.Line,
-                            name.Start.Column,
-                            name.GetText().Length,
+                            row,
+                            col,
+                            len,
                             DS0079_ArrayTooManyDimensions,
                             $"An array cannot have more than 32 dimensions.");
                     }
@@ -1321,11 +1318,11 @@ internal static class SymbolResolver
                     if (type.IsByRef && !noEmitDS0149 && !noErrors)
                     {
                         EmitErrorMessage(
-                            name.Start.Line,
-                            name.Start.Column,
-                            name.GetText().Length,
+                            row,
+                            col,
+                            len,
                             DS0149_NestedByRefType,
-                            $"Invalid type '{name.GetText()}': Nested references are not permitted.");
+                            $"Invalid type '{name}': Nested references are not permitted.");
                     }
 
                     return type.MakeByRefType();
@@ -1340,9 +1337,46 @@ internal static class SymbolResolver
                 return aliasType;
             }
         }
-        catch (NotSupportedException) { }
+        catch (NotSupportedException)
+        {
+            Dictionary<string, Func<Type, Type>> genericAliases = new()
+            {
+                ["Dassie.Core.Ref"] = t => t.GetGenericArguments()[0].MakeByRefType(),
+                ["Dassie.Core.Ptr"] = t => t.GetGenericArguments()[0].MakePointerType(),
+                ["Dassie.Core.Vector"] = t => t.GetGenericArguments()[0].MakeArrayType(),
+                ["Dassie.Core.Array"] = t =>
+                {
+                    int rank = 1;
+                    if (genericArgs != null && genericArgs.Length > 1 && genericArgs[1].Value != null)
+                        rank = (int)genericArgs[1].Value;
+
+                    return t.GetGenericArguments()[0].MakeArrayType(rank);
+                }
+            };
+
+            if (t.IsGenericType)
+            {
+                string typeName = t.FullName.Split('`')[0];
+                if (genericAliases.TryGetValue(typeName, out var func))
+                    return func(t);
+            }
+        }
 
         return t;
+    }
+
+    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
+    {
+        Type t = ResolveTypeNameInternal(name, out Generics.GenericArgumentContext[] genericArgs, noEmitFragments, noEmitDS0149, noErrors, disableBacktickGenericResolve);
+        return GetAliasedType(
+            t,
+            name.GetText(),
+            name.Start.Line,
+            name.Start.Column,
+            name.GetText().Length,
+            genericArgs,
+            noEmitDS0149,
+            noErrors);
     }
 
     private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, out Generics.GenericArgumentContext[] genericArgs, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
@@ -1431,29 +1465,9 @@ internal static class SymbolResolver
     public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Generics.GenericArgumentContext[] genericParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
     {
         Type t = ResolveTypeNameInternal(name, row, col, len, noEmitFragments, genericParams, arrayDimensions, noErrors, disableBacktickGenericResolve, doNotFillGenericTypeDefinition);
-
-        if (t == null)
-            return t;
-
-        if (t is TypeBuilder)
-        {
-            if (!Context.Types.Where(t => t.FullName == name).Any())
-                return t;
-
-            if (Context.Types.First(t => t.FullName == name).IsAlias)
-                return Context.Types.First(t => t.FullName == name).AliasedType;
-
-            return t;
-        }
-
-        try
-        {
-            if (t.GetCustomAttribute<AliasAttribute>() is AliasAttribute alias)
-                return alias.AliasedType;
-        }
-        catch (NotSupportedException) { }
-
-        return t;
+        return GetAliasedType(
+            t, name, row, col, len,
+            genericParams, noErrors, noErrors);
     }
 
     private static Type ResolveTypeNameInternal(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Generics.GenericArgumentContext[] genericParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)

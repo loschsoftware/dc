@@ -990,6 +990,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public static Type ResolveParameter(DassieParser.ParameterContext param, bool noErrors = false)
     {
+        string name = param.Identifier().GetText();
         Type t = typeof(object);
 
         if (param.type_name() != null)
