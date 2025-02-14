@@ -517,6 +517,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 _tReturn = Visit(context.expression());
             }
 
+            if (context.type_name() == null)
+                tReturn = _tReturn;
+
             if (tReturn != null && mc.UnresolvedReturnType)
                 mb.SetReturnType(_tReturn);
 
@@ -6031,9 +6034,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (context.expression() != null)
         {
-            _tReturn = Visit(context.expression());
             tReturn = _tReturn;
+            _tReturn = Visit(context.expression());
         }
+
+        if (context.type_name() == null)
+            tReturn = _tReturn;
 
         if (context.type_name() == null)
             mb.SetReturnType(_tReturn);

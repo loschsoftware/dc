@@ -1372,45 +1372,6 @@ internal static class SymbolResolver
             return FunctionPointerHelpers.MakeGenericManagedCallFunctionPointerType((returnType, parameterTypes));
         }
 
-        if (name.Double_Ampersand() != null)
-        {
-            Type t = ResolveTypeName(name.type_name(), noEmitFragments, noEmitDS0149: true);
-
-            if (!noEmitDS0149 && !noErrors)
-            {
-                EmitErrorMessage(
-                    name.Start.Line,
-                    name.Start.Column,
-                    name.GetText().Length,
-                    DS0149_NestedByRefType,
-                    $"Invalid type '{name.GetText()}': Nested references are not permitted.");
-            }
-
-            if (t.IsByRef)
-                return t;
-
-            return t.MakeByRefType();
-        }
-
-        if (name.Ampersand() != null)
-        {
-            Type t = ResolveTypeName(name.type_name(), noEmitFragments, noEmitDS0149: true);
-
-            if (t.IsByRef && !noErrors)
-            {
-                EmitErrorMessage(
-                    name.Start.Line,
-                    name.Start.Column,
-                    name.GetText().Length,
-                    DS0149_NestedByRefType,
-                    $"Invalid type '{name.GetText()}': Nested references are not permitted.");
-
-                return t;
-            }
-
-            return t.MakeByRefType();
-        }
-
         if (name.identifier_atom() != null)
         {
             if (name.identifier_atom().Identifier() != null)

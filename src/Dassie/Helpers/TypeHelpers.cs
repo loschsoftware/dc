@@ -423,10 +423,13 @@ internal static class TypeHelpers
         if (type.IsPointer)
             name = new($"Ptr[{name}]");
 
-        if (type.IsSZArray)
-            name = new($"Vector[{name}]");
-        else if (type.IsArray)
-            name = new($"Array[{name}, {type.GetArrayRank()}]");
+        if (type.IsArray)
+        {
+            if (type.GetArrayRank() == 1)
+                name = new($"Vector[{name}]");
+            else
+                name = new($"Array[{name}, {type.GetArrayRank()}]");
+        }
 
         return name.ToString();
     }
