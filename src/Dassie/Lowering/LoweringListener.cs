@@ -30,6 +30,9 @@ internal class LoweringListener : DassieParserBaseListener
         if (rule == null)
             return "";
 
+        if (rule.Stop.StopIndex - rule.Start.StartIndex < 1)
+            return "";
+
         return CharStream.GetText(new(rule.Start.StartIndex, rule.Stop.StopIndex));
     }
 
