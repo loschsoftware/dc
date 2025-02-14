@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics.X86;
 using static Dassie.Configuration.ProjectFileDeserializer;
 using static Dassie.Helpers.TypeHelpers;
 
@@ -560,6 +561,15 @@ internal static class EmitHelpers
             EmitCall(from, explicitConversions.First());
             return true;
         }
+
+        if (from.IsByRef && to.IsPointer && from.GetElementType() == to.GetElementType())
+        {
+            CurrentMethod.IL.Emit(OpCodes.Conv_U);
+            return true;
+        }
+
+        if (from.IsPointer && to.IsByRef && from.GetElementType() == to.GetElementType())
+            return true;
 
         return false;
     }
