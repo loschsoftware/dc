@@ -513,8 +513,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             if (context.expression() != null)
             {
-                _tReturn = Visit(context.expression());
                 tReturn = _tReturn;
+                _tReturn = Visit(context.expression());
             }
 
             if (tReturn != null && mc.UnresolvedReturnType)
@@ -532,7 +532,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.type_name().Start.Column,
                         context.type_name().GetText().Length,
                         DS0118_InvalidVariance,
-                        $"Invalid variance: The type parameter '{tReturn.Name}' must be covariantly valid on '{mb.Name}'. '{tReturn.Name}' is contravariant.");
+                        $"Invalid variance: The type parameter '{TypeName(tReturn)}' must be covariantly valid on '{mb.Name}'. '{TypeName(tReturn)}' is contravariant.");
                 }
             }
 
@@ -553,7 +553,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         context.expression().Start.Column,
                         context.expression().GetText().Length,
                         DS0053_WrongReturnType,
-                        $"Expected expression of type '{tReturn.FullName}', but got type '{TypeName(_tReturn)}'.");
+                        $"Expected expression of type '{TypeName(tReturn)}', but got type '{TypeName(_tReturn)}'.");
                 }
             }
 
