@@ -246,8 +246,8 @@ internal class CompileCommand : ICompilerCommand
             Process.Start(psi).WaitForExit();
 
             resFile = Path.ChangeExtension(rcPath, ".res");
-
-            if (!args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("rc")).Any())
+            
+            if (!Context.Configuration.PersistentResourceScript)
                 File.Delete(rcPath);
         }
 

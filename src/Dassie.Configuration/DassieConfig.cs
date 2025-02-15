@@ -133,6 +133,11 @@ public sealed class DassieConfig
     [XmlElement("PersistentResourceFile")]
     public bool PersistentResourceFile { get; set; }
 
+    [Description("If set, does not delete the generated '.rc' file after the build is completed.")]
+    [DefaultValue(false)]
+    [XmlElement]
+    public bool PersistentResourceScript { get; set; }
+
     [Description("If set, does not delete intermediate source files.")]
     [DefaultValue(false)]
     [XmlElement("KeepIntermediateFiles")]

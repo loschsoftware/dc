@@ -15,15 +15,13 @@ internal class ResourceScriptWriter : IDisposable
         };
     }
 
-    public void AddIcon(string iconPath, int id)
+    public void AddIcon(string iconPath, string id)
     {
-        sw.WriteLine($"{id} ICON {iconPath}");
+        iconPath = iconPath.Trim('"');
+        sw.WriteLine($"{id} ICON \"{iconPath.Replace("\\", "\\\\")}\"");
     }
 
-    public void AddMainIcon(string iconPath)
-    {
-        sw.WriteLine($"MAINICON ICON LOADONCALL MOVEABLE DISCARDABLE IMPURE {iconPath}");
-    }
+    public void AddMainIcon(string iconPath) => AddIcon(iconPath, "MAINICON");
 
     public void AddFileVersion(string version)
     {
