@@ -642,14 +642,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                                 context.Identifier().Symbol.Column,
                                 context.Identifier().GetText().Length,
                                 DS0201_EntryPointInvalidSignature,
-                                """
-                                The application entry point has an invalid signature. The only allowed signatures are:
-                                    * () -> null
-                                    * () -> int
-                                    * () -> uint
-                                    * Vector[string] -> null
-                                    * Vector[string] -> int
-                                    * Vector[string] -> uint
+                                $"""
+                                The application entry point has an invalid signature ({ErrorMessageHelpers.GenerateParamList(CurrentMethod.Parameters.Select(p => p.Type).ToArray())} -> {TypeName(tReturn)}). The only allowed signatures are:
+                                    * [] -> null
+                                    * [] -> int
+                                    * [] -> uint
+                                    * [Vector[string]] -> null
+                                    * [Vector[string]] -> int
+                                    * [Vector[string]] -> uint
                                 """);
                         }
 

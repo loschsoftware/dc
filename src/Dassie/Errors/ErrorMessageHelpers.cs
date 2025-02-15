@@ -12,7 +12,7 @@ namespace Dassie.Errors;
 
 internal static class ErrorMessageHelpers
 {
-    private static string GenerateParamList(Type[] types)
+    public static string GenerateParamList(Type[] types)
     {
         StringBuilder sb = new();
         sb.Append('[');
