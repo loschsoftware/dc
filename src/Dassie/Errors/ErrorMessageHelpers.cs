@@ -142,15 +142,15 @@ internal static class ErrorMessageHelpers
     {
         StringBuilder sb = new();
 
-        sb.Append($"{method.DeclaringType.FullName}.{method.Name} ");
+        sb.Append($"{TypeName(method.DeclaringType)}.{method.Name} ");
 
         if (method.IsGenericMethod)
         {
             sb.Append("[");
             foreach (Type typeArg in method.GenericTypeArguments[..^1])
-                sb.Append($"{typeArg}, ");
+                sb.Append($"{TypeName(typeArg)}, ");
 
-            sb.Append(method.GenericTypeArguments.Last().ToString());
+            sb.Append(TypeName(method.GenericTypeArguments.Last()));
             sb.Append("] ");
         }
 
@@ -159,13 +159,13 @@ internal static class ErrorMessageHelpers
         if (method.Parameters.Count > 0)
         {
             foreach (Type type in method.Parameters[..^1])
-                sb.Append($"{FormatType(type)}, ");
+                sb.Append($"{TypeName(type)}, ");
 
-            sb.Append(FormatType(method.Parameters.Last()));
+            sb.Append(TypeName(method.Parameters.Last()));
         }
 
         sb.Append(')');
-        sb.Append($": {FormatType(method.ReturnType)}");
+        sb.Append($": {TypeName(method.ReturnType)}");
         return sb.ToString();
     }
 
