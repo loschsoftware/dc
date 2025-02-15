@@ -838,7 +838,16 @@ internal static class TypeHelpers
         bool isUnion = false;
 
         if (t is not TypeBuilder)
-            isUnion = t.GetCustomAttribute<Union>() != null;
+        {
+            try
+            {
+                isUnion = t.GetCustomAttribute<Union>() != null;
+            }
+            catch (Exception)
+            {
+                isUnion = false;
+            }
+        }
         else
             isUnion = t.Name.StartsWith(SymbolNameGenerator.GetInlineUnionTypeName(0)[..^1]);
 

@@ -301,6 +301,7 @@ internal static class SymbolResolver
                 for (int i = 0; i < possibleMethod.GetParameters().Length; i++)
                 {
                     if (possibleMethod.GetParameters()[i].ParameterType.IsAssignableFrom(argumentTypes[i])
+                        || possibleMethod.GetParameters()[i].ParameterType.IsGenericParameter && argumentTypes[i].IsGenericParameter
                         || possibleMethod.GetParameters()[i].ParameterType == typeof(Wildcard))
                     {
                         if (possibleMethod.GetParameters()[i].ParameterType == typeof(object))
@@ -369,6 +370,22 @@ internal static class SymbolResolver
         if (type == null)
             return null;
 
+        //if (type.IsGenericType && !type.IsGenericTypeDefinition)
+        //{
+        //    object openMember = ResolveMember(
+        //        type.GetGenericTypeDefinition(),
+        //        name,
+        //        row, col, len,
+        //        noEmitFragments,
+        //        argumentTypes,
+        //        flags,
+        //        throwErrors,
+        //        getDefaultOverload,
+        //        doNotRedirectTypeBuilder);
+
+        //    return openMember;
+        //}
+
         Generics.GenericArgumentContext[] typeArgs = [];
 
         if (type.IsByRef)
@@ -380,6 +397,9 @@ internal static class SymbolResolver
         Type deconstructedGenericType = null;
         if (type.GetType().Name == "TypeBuilderInstantiation" && type.IsGenericType)
             deconstructedGenericType = TypeHelpers.DeconstructGenericType(type);
+
+        if (type.IsGenericTypeDefinition)
+            deconstructedGenericType = type.GetGenericTypeDefinition();
 
         // -1. Nested types
         try
@@ -634,13 +654,13 @@ internal static class SymbolResolver
 
         Error:
 
-        object parentMember = ResolveMember(type.BaseType, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors, getDefaultOverload);
+        object parentMember = ResolveMember(type.BaseType, name, row, col, len, noEmitFragments, argumentTypes, flags, false, getDefaultOverload);
         if (parentMember != null)
             return parentMember;
 
         if (throwErrors)
         {
-            IEnumerable<MethodBase> overloads = type.GetMethods()
+            IEnumerable<MethodBase> overloads = (deconstructedGenericType ?? type).GetMethods()
                 .Where(m => m.Name == name)
                 .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(typeArgs.GetTypes()) : m);
 

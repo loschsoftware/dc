@@ -6,7 +6,6 @@ namespace Dassie.Unmanaged;
 
 internal class ResourceScriptWriter : IDisposable
 {
-    readonly FileStream fs;
     readonly StreamWriter sw;
 
     public ResourceScriptWriter(string path)
