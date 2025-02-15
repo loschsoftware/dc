@@ -3229,8 +3229,22 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (t.IsGenericTypeParameter)
                     t = m.DeclaringType.GetGenericArguments()[t.GenericParameterPosition];
 
-                if (typeParams.Contains(t))
-                    t = typeArgs[typeParams.IndexOf(t)];
+                if (typeParams.Count != typeArgs.Length)
+                {
+                    ThrowErrorForInvalidTypeArgumentCount(
+                        context.full_identifier().Identifier()[0].Symbol.Line,
+                        context.full_identifier().Identifier()[0].Symbol.Column,
+                        context.full_identifier().Identifier()[0].GetText().Length,
+                        false,
+                        context.full_identifier().Identifier()[0].GetText(),
+                        typeParams.Count,
+                        typeArgs.Length);
+                }
+                else
+                {
+                    if (typeParams.Contains(t))
+                        t = typeArgs[typeParams.IndexOf(t)];
+                }
             }
 
             // Global method

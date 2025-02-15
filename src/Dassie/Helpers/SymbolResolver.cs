@@ -893,7 +893,10 @@ internal static class SymbolResolver
             .Where(m => m != null && m.Name == name);
 
         if (getDefaultOverload && methods.Any())
+        {
+            TypeHelpers.CheckGenericMethodCompatibility(methods.First(), typeArgs, row, col, len, throwErrors);
             return methods.First();
+        }
 
         methods = methods.Where(m => m != null && m.GetParameters().Length == argumentTypes.Length);
 
@@ -986,6 +989,7 @@ internal static class SymbolResolver
                 });
             }
 
+            TypeHelpers.CheckGenericMethodCompatibility(final, typeArgs, row, col, len, throwErrors);
             return final;
         }
 

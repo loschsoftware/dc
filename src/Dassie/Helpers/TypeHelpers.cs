@@ -508,18 +508,20 @@ internal static class TypeHelpers
         return CheckGenericCompatibility(method.Name, false, typeParams, genericArgs, row, col, len, emitErrors);
     }
 
+    public static void ThrowErrorForInvalidTypeArgumentCount(int row, int col, int len, bool isType, string name, int paramCount, int argCount)
+    {
+        EmitErrorMessage(
+            row, col, len,
+            DS0107_GenericTypeConstraintViolation,
+            $"The generic {(isType ? "type" : "function")} '{name}' requires {paramCount} type argument{(paramCount > 1 ? "s" : "")}, but {(argCount == 0 ? "none" : argCount.ToString())} {(argCount == 1 ? "was" : "were")} specified.");
+    }
+
     private static bool CheckGenericCompatibility(string name, bool isType, Type[] parameters, Generics.GenericArgumentContext[] arguments, int row, int col, int len, bool emitErrors)
     {
         if (arguments == null || parameters.Length != arguments.Length)
         {
             arguments ??= [];
-            int count = arguments.Length;
-
-            EmitErrorMessage(
-                row, col, len,
-                DS0107_GenericTypeConstraintViolation,
-                $"The generic {(isType ? "type" : "function")} '{name}' requires {parameters.Length} type argument{(parameters.Length > 1 ? "s" : "")}, but {(count == 0 ? "none" : count.ToString())} {(count == 1 ? "was" : "were")} specified.");
-
+            ThrowErrorForInvalidTypeArgumentCount(row, col, len, isType, name, parameters.Length, arguments.Length);
             return false;
         }
 
