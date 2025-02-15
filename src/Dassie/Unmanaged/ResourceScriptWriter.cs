@@ -1,15 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 namespace Dassie.Unmanaged;
 
 internal class ResourceScriptWriter : IDisposable
 {
+    readonly FileStream fs;
     readonly StreamWriter sw;
 
     public ResourceScriptWriter(string path)
     {
-        sw = new(path)
+        sw = new(new FileStream(path, FileMode.Create), Encoding.Unicode)
         {
             AutoFlush = true
         };
@@ -113,14 +115,14 @@ FILESUBTYPE 0x0");
     BEGIN
         BLOCK ""040904b0""
         BEGIN
-            VALUE ""CompanyName"", ""{company}"" ""\0""
-            VALUE ""FileDescription"", ""{description}""
-            VALUE ""FileVersion"", ""{fileVersion}"" ""\0""
-            VALUE ""InternalName"", ""{internalName}""
-            VALUE ""LegalCopyright"", ""{legalCopyright}"" ""\0""
-            VALUE ""LegalTrademarks"", ""{legalTrademarks}"" ""\0""
-            VALUE ""ProductName"", ""{productName}""
-            VALUE ""ProductVersion"", ""{productVersion}"" ""\0""
+            VALUE ""CompanyName"", L""{company}\0""
+            VALUE ""FileDescription"", L""{description}""
+            VALUE ""FileVersion"", L""{fileVersion}\0""
+            VALUE ""InternalName"", L""{internalName}""
+            VALUE ""LegalCopyright"", L""{legalCopyright}\0""
+            VALUE ""LegalTrademarks"", L""{legalTrademarks}\0""
+            VALUE ""ProductName"", L""{productName}""
+            VALUE ""ProductVersion"", L""{productVersion}\0""
         END
     END
     BLOCK ""VarFileInfo""
