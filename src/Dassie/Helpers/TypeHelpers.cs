@@ -504,7 +504,7 @@ internal static class TypeHelpers
         if (!method.IsGenericMethodDefinition)
             return true;
 
-        Type[] typeParams = method.DeclaringType.GetGenericTypeDefinition().GetGenericArguments();
+        Type[] typeParams = method.GetGenericArguments();
         return CheckGenericCompatibility(method.Name, false, typeParams, genericArgs, row, col, len, emitErrors);
     }
 
