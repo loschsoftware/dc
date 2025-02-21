@@ -378,7 +378,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         value.Start.Column,
                         value.GetText().Length,
                         DS0054_WrongFieldType,
-                        $"Expected expression of type '{field.FieldType.FullName}', but got type '{TypeName(t)}'.");
+                        $"Expected expression of type '{TypeName(field.FieldType)}', but got type '{TypeName(t)}'.");
                 }
             }
 

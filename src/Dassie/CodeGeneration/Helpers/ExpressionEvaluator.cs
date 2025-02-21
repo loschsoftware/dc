@@ -2,9 +2,9 @@
 using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Helpers;
+using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Text;
-using Microsoft.CSharp.RuntimeBinder;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,7 +20,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 {
     private static ExpressionEvaluator _instance;
     public static ExpressionEvaluator Instance => _instance ??= new();
-    
+
     private ExpressionEvaluator() { }
 
     private bool _requireNonZeroValue = false;
@@ -748,4 +748,55 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         MethodInfo toArray = typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
         return new(elementType.MakeArrayType(), toArray.Invoke(null, [cast.Invoke(null, [items])]));
     }
+
+    public override Expression VisitIdentifier_atom([NotNull] DassieParser.Identifier_atomContext context)
+    {
+        if (context.full_identifier() != null)
+            return Visit(context.full_identifier());
+
+        object o = SymbolResolver.ResolveIdentifier(
+            context.Identifier().GetText(),
+            context.Identifier().Symbol.Line,
+            context.Identifier().Symbol.Column,
+            context.Identifier().GetText().Length);
+
+        if (o is MetaFieldInfo mfi)
+            return new(mfi.ConstantValue.GetType(), mfi.ConstantValue);
+
+        return null;
+    }
+
+    public override Expression VisitFull_identifier([NotNull] DassieParser.Full_identifierContext context)
+    {
+        object o = SymbolResolver.ResolveIdentifier(
+            context.GetText(),
+            context.Start.Line,
+            context.Start.Column,
+            context.GetText().Length);
+
+        if (o is MetaFieldInfo mfi)
+            return new(mfi.ConstantValue.GetType(), mfi.ConstantValue);
+
+        return null;
+    }
+
+    public override Expression VisitFull_identifier_member_access_expression([NotNull] DassieParser.Full_identifier_member_access_expressionContext context)
+    {
+        if (context.arglist() != null)
+            return null;
+
+        if (context.generic_arg_list() != null)
+            return null;
+
+        return Visit(context.full_identifier());
+    }
+
+    public override Expression VisitMember_access_expression([NotNull] DassieParser.Member_access_expressionContext context)
+        => null;
+
+    public override Expression VisitIndex_expression([NotNull] DassieParser.Index_expressionContext context)
+        => null;
+
+    public override Expression VisitArray_element_assignment([NotNull] DassieParser.Array_element_assignmentContext context)
+        => null;
 }
