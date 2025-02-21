@@ -490,10 +490,14 @@ internal static class MemberDeclarationGeneration
 
         CreateFakeMethod();
 
+        bool explicitFieldType = false;
         Type type = typeof(object);
 
         if (context.type_name() != null)
+        {
+            explicitFieldType = true;
             type = SymbolResolver.ResolveTypeName(context.type_name());
+        }
 
         bool isAutoEvent = false;
         bool isAutoProperty = false;
@@ -769,6 +773,43 @@ internal static class MemberDeclarationGeneration
             return;
         }
 
+        if (TypeContext.Current.IsEnumeration)
+        {
+            type = TypeContext.Current.EnumerationBaseType;
+            explicitFieldType = true;
+        }
+
+        Expression compileTimeConst = null;
+
+        if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+        {
+            compileTimeConst = ExpressionEvaluator.Instance.Visit(context.expression());
+
+            if (compileTimeConst == null)
+            {
+                EmitErrorMessage(
+                    context.expression().Start.Line,
+                    context.expression().Start.Column,
+                    context.expression().GetText().Length,
+                    DS0138_CompileTimeConstantRequired,
+                    "Compile-time constant expected.");
+
+                return;
+            }
+
+            if (explicitFieldType && type != compileTimeConst.Type && type != typeof(object) && compileTimeConst.Type != typeof(object))
+            {
+                EmitErrorMessage(
+                    context.expression().Start.Line,
+                    context.expression().Start.Column,
+                    context.expression().GetText().Length,
+                    DS0054_WrongFieldType,
+                    $"Expected expression of type '{TypeName(type)}', but got type '{TypeName(compileTimeConst.Type)}'.");
+            }
+            else
+                type = compileTimeConst.Type;
+        }
+
         FieldBuilder fb = TypeContext.Current.Builder.DefineField(
             context.Identifier().GetText(),
             type,
@@ -782,24 +823,10 @@ internal static class MemberDeclarationGeneration
         MetaFieldInfo mfi = new(context.Identifier().GetText(), fb);
         mfi.ParserRule = context;
 
-        if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+        if (compileTimeConst != null)
         {
-            Expression result = ExpressionEvaluator.Instance.Visit(context.expression());
-
-            if (result == null)
-            {
-                EmitErrorMessage(
-                    context.expression().Start.Line,
-                    context.expression().Start.Column,
-                    context.expression().GetText().Length,
-                    DS0138_CompileTimeConstantRequired,
-                    "Compile-time constant expected.");
-
-                return;
-            }
-
-            mfi.ConstantValue = result.Value;
-            fb.SetConstant(result.Value);
+            mfi.ConstantValue = compileTimeConst.Value;
+            fb.SetConstant(compileTimeConst.Value);
         }
 
         else if (context.expression() != null)

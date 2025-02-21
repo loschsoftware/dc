@@ -223,8 +223,6 @@ internal static class TypeDeclarationGeneration
             tb.SetParent(parent);
         }
 
-        tc.IsEnumeration = enumerationMarkerType != null;
-
         if (enumerationMarkerType != null)
         {
             Type instanceFieldType = null;
@@ -246,6 +244,9 @@ internal static class TypeDeclarationGeneration
 
             tb.DefineField("value__", instanceFieldType,
                 FieldAttributes.Public | FieldAttributes.RTSpecialName | FieldAttributes.SpecialName);
+
+            tc.IsEnumeration = true;
+            tc.EnumerationBaseType = instanceFieldType;
         }
 
         // byref-like type ('ref struct' in C#)

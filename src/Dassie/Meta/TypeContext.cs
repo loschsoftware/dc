@@ -64,6 +64,7 @@ internal class TypeContext
     public List<Type> ImplementedInterfaces { get; } = [];
 
     public bool IsEnumeration { get; set; }
+    public Type EnumerationBaseType { get; set; }
 
     public bool IsByRefLike { get; set; }
 
