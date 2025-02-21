@@ -1254,12 +1254,21 @@ internal static class SymbolResolver
 
     public static Type ResolveAttributeTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false)
     {
+        string typeName = name.GetText();
+
+        if (name.identifier_atom() != null)
+            typeName = name.identifier_atom().GetText();
+        else if (name.type_name() != null)
+            typeName = name.type_name().GetText();
+
+        // TODO: Allow attributes of form A[B[C]] or even A[B|C], A[(B,C)]
+
         return ResolveAttributeTypeName(
-            name.GetText(),
+            typeName,
             Generics.ResolveGenericArgList(name.generic_arg_list()),
             name.Start.Line,
             name.Start.Column,
-            name.GetText().Length,
+            typeName.Length,
             noEmitFragments);
     }
 

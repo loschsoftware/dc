@@ -227,7 +227,6 @@ internal static class TypeDeclarationGeneration
 
         if (enumerationMarkerType != null)
         {
-            AttributeHelpers.AddAttributeToCurrentType(enumerationMarkerType.GetConstructor([]), []);
             Type instanceFieldType = null;
 
             if (enumerationMarkerType.GenericTypeArguments.Length > 0)

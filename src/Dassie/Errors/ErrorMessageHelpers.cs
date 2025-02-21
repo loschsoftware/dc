@@ -195,8 +195,6 @@ internal static class ErrorMessageHelpers
                     DS0145_ValueTypeInherited,
                     $"Inheriting from 'System.ValueType' is not permitted. To declare a value type, use 'val type'.");
             }
-
-
         }
         else if (type.IsValueType)
         {
