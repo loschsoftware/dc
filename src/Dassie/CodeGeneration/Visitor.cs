@@ -957,21 +957,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         MetaFieldInfo mfi = TypeContext.Current.GetField(context);
         FieldBuilder fb = (FieldBuilder)mfi.Builder;
 
-        if (context.expression() != null)
-            TypeContext.Current.FieldInitializers.Add((fb, context.expression()));
-
-        TypeContext.Current.Fields.Add(mfi);
-
-        CurrentFile.Fragments.Add(new()
-        {
-            Color = Color.Field,
-            Column = context.Identifier().Symbol.Column,
-            Line = context.Identifier().Symbol.Line,
-            Length = context.Identifier().GetText().Length,
-            ToolTip = TooltipGenerator.Field(fb),
-            IsNavigationTarget = true
-        });
-
         return typeof(void);
     }
 

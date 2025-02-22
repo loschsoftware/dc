@@ -829,7 +829,7 @@ internal static class MemberDeclarationGeneration
             fb.SetConstant(compileTimeConst.Value);
         }
 
-        else if (context.expression() != null)
+        else if (context.expression() != null && !context.member_special_modifier().Any(s => s.Literal() != null))
             TypeContext.Current.FieldInitializers.Add((fb, context.expression()));
 
         TypeContext.Current.Fields.Add(mfi);
