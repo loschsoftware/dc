@@ -322,7 +322,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         foreach (var ctor in TypeContext.Current.Constructors)
             HandleConstructor(ctor);
 
-        if (TypeContext.Current.Constructors.Count == 0 && TypeContext.Current.FieldInitializers.Count > 0)
+        if (TypeContext.Current.Constructors.Count == 0 && TypeContext.Current.FieldInitializers.Count > 0 && !TypeContext.Current.IsEnumeration)
         {
             ConstructorBuilder cb = TypeContext.Current.Builder.DefineConstructor(
                 MethodAttributes.Public,
