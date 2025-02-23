@@ -21,12 +21,12 @@ internal static class TypeDeclarationGeneration
 {
     public static TypeContext GenerateType(DassieParser.TypeContext context, TypeBuilder enclosingType)
     {
-        if (context.Identifier().GetText().Length + (CurrentFile.ExportedNamespace ?? "").Length > 1024)
+        if (context.Identifier().GetIdentifier().Length + (CurrentFile.ExportedNamespace ?? "").Length > 1024)
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0073_TypeNameTooLong,
                 "A type name cannot be longer than 1024 characters.");
 
@@ -44,7 +44,7 @@ internal static class TypeDeclarationGeneration
         else
         {
             tb = enclosingType.DefineNestedType(
-                context.Identifier().GetText(),
+                context.Identifier().GetIdentifier(),
                 AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true));
         }
 
@@ -56,7 +56,7 @@ internal static class TypeDeclarationGeneration
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
+                    context.Identifier().GetIdentifier().Length,
                     DS0120_DuplicateGenericTypeName,
                     $"Currently, the Dassie compiler does not allow creating types of the same name with different type parameters. This functionality might be added in the future. If you desperately need it, consider opening an issue on GitHub.");
             }
@@ -73,7 +73,7 @@ internal static class TypeDeclarationGeneration
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
+                    context.Identifier().GetIdentifier().Length,
                     DS0119_DuplicateTypeName,
                     errMsg);
             }
@@ -237,7 +237,7 @@ internal static class TypeDeclarationGeneration
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
+                    context.Identifier().GetIdentifier().Length,
                     DS0140_InvalidEnumerationType,
                     $"Invalid enumeration type '{instanceFieldType}'. The only allowed types are int8, uint8, int16, uint16, int, uint, int32, uint32, int64, uint64, native, unative.");
             }
@@ -272,7 +272,7 @@ internal static class TypeDeclarationGeneration
 
             foreach (DassieParser.Generic_parameterContext typeParam in context.generic_parameter_list().generic_parameter())
             {
-                if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetText()))
+                if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetIdentifier()))
                 {
                     EmitErrorMessage(
                         typeParam.Start.Line,
@@ -457,7 +457,7 @@ internal static class TypeDeclarationGeneration
         //        EmitErrorMessage(
         //            context.Identifier().Symbol.Line,
         //            context.Identifier().Symbol.Column,
-        //            context.Identifier().GetText().Length,
+        //            context.Identifier().Identifier().Length,
         //            DS0156_RequiredInterfaceMembersNotImplemented,
         //            $"The type '{tc.FullName}' does not provide an implementation for the abstract template member '{method.FormatMethod()}'.");
         //    }

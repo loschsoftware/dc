@@ -82,7 +82,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Color = TooltipGenerator.ColorForType(type.Builder.CreateTypeInfo()),
                 Line = type.ParserRule.Identifier().Symbol.Line,
                 Column = type.ParserRule.Identifier().Symbol.Column,
-                Length = type.ParserRule.Identifier().GetText().Length,
+                Length = type.ParserRule.Identifier().GetIdentifier().Length,
                 ToolTip = TooltipGenerator.Type(type.Builder.CreateTypeInfo(), true, true),
                 IsNavigationTarget = true
             });
@@ -181,7 +181,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             foreach (DassieParser.ParameterContext param in tc.PrimaryConstructorParameterList.parameter())
             {
-                string paramName = param.Identifier().GetText();
+                string paramName = param.Identifier().GetIdentifier();
                 string fieldName = SymbolNameGenerator.GetPropertyBackingFieldName(paramName);
                 Type paramType = SymbolResolver.ResolveTypeName(param.type_name());
 
@@ -350,7 +350,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
+                    context.Identifier().GetIdentifier().Length,
                     DS0156_RequiredInterfaceMembersNotImplemented,
                     $"The type '{tc.FullName}' does not provide an implementation for the abstract template member '{method.FormatMethod()}'.");
             }
@@ -426,7 +426,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         //    Color = TooltipGenerator.ColorForType(TypeContext.Current.Builder),
         //    Line = context.Identifier().Symbol.Line,
         //    Column = context.Identifier().Symbol.Column,
-        //    Length = context.Identifier().GetText().Length,
+        //    Length = context.Identifier().Identifier().Length,
         //    ToolTip = TooltipGenerator.Constructor(TypeContext.Current.Builder, _params),
         //    NavigationTargetKind = Fragment.NavigationKind.Constructor
         //});
@@ -481,7 +481,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitType_member([NotNull] DassieParser.Type_memberContext context)
     {
         if (Context.Configuration.Verbosity >= 1)
-            EmitBuildLogMessage($"    Generating code for '{TypeContext.Current.Builder.FullName}::{context.Identifier().GetText()}'...");
+            EmitBuildLogMessage($"    Generating code for '{TypeContext.Current.Builder.FullName}::{context.Identifier().GetIdentifier()}'...");
 
         if (context.Custom_Operator() != null)
         {
@@ -489,7 +489,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        if (context.Identifier().GetText() == TypeContext.Current.Builder.Name)
+        if (context.Identifier().GetIdentifier() == TypeContext.Current.Builder.Name)
         {
             // Defer constructors for field initializers
             //TypeContext.Current.Constructors.Add(context);
@@ -563,7 +563,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (context.expression() != null)
                 CurrentMethod.IL.Emit(OpCodes.Ret);
 
-            CurrentFile.FunctionParameterConstraints.TryGetValue(context.Identifier().GetText(), out Dictionary<string, string> constraintsForCurrentFunction);
+            CurrentFile.FunctionParameterConstraints.TryGetValue(context.Identifier().GetIdentifier(), out Dictionary<string, string> constraintsForCurrentFunction);
             constraintsForCurrentFunction ??= [];
 
             List<Parameter> _params = [];
@@ -604,8 +604,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Color = Color.Function,
                 Line = context.Identifier().Symbol.Line,
                 Column = context.Identifier().Symbol.Column,
-                Length = context.Identifier().GetText().Length,
-                ToolTip = TooltipGenerator.Function(context.Identifier().GetText(), tReturn, _params.ToArray()),
+                Length = context.Identifier().GetIdentifier().Length,
+                ToolTip = TooltipGenerator.Function(context.Identifier().GetIdentifier(), tReturn, _params.ToArray()),
                 IsNavigationTarget = true
             });
 
@@ -630,7 +630,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                             EmitErrorMessage(
                                 context.Identifier().Symbol.Line,
                                 context.Identifier().Symbol.Column,
-                                context.Identifier().GetText().Length,
+                                context.Identifier().GetIdentifier().Length,
                                 DS0035_EntryPointNotStatic,
                                 "The application entry point must be static.");
                         }
@@ -640,7 +640,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                             EmitErrorMessage(
                                 context.Identifier().Symbol.Line,
                                 context.Identifier().Symbol.Column,
-                                context.Identifier().GetText().Length,
+                                context.Identifier().GetIdentifier().Length,
                                 DS0201_EntryPointInvalidSignature,
                                 $"""
                                 The application entry point has an invalid signature ({ErrorMessageHelpers.GenerateParamList(CurrentMethod.Parameters.Select(p => p.Type).ToArray())} -> {TypeName(tReturn)}). The only allowed signatures are:
@@ -714,7 +714,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0172_EventAndProperty,
                 $"The attributes '<Auto>' and '<Event>' cannot be combined.");
         }
@@ -740,7 +740,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0158_InstanceFieldInTemplate,
                 $"Template types cannot contain instance {memberKindPlural}.");
         }
@@ -750,7 +750,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0150_ByRefFieldInNonByRefLikeType,
                 $"Invalid {memberKind} type '{TypeName(type)}'. References are only valid as part of ByRef-like value types (val& type).");
         }
@@ -770,7 +770,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     "The modifier 'literal' is not valid on properties.");
             }
 
-            string propName = context.Identifier().GetText();
+            string propName = context.Identifier().GetIdentifier();
             FieldBuilder backingField = TypeContext.Current.Builder.DefineField(
                 SymbolNameGenerator.GetPropertyBackingFieldName(propName),
                 type,
@@ -812,7 +812,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 Color = Color.Property,
                 Column = context.Identifier().Symbol.Column,
                 Line = context.Identifier().Symbol.Line,
-                Length = context.Identifier().GetText().Length,
+                Length = context.Identifier().GetIdentifier().Length,
                 ToolTip = TooltipGenerator.Property(pb),
                 IsNavigationTarget = true
             });
@@ -846,7 +846,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 return typeof(void);
             }
 
-            string eventName = context.Identifier().GetText();
+            string eventName = context.Identifier().GetIdentifier();
 
             FieldBuilder eventField = TypeContext.Current.Builder.DefineField(
                 eventName,
@@ -942,7 +942,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
+                    context.Identifier().GetIdentifier().Length,
                     DS0175_EventMissingHandlers,
                     $"Event '{eventName}' is missing a{(context.property_or_event_block().add_handler().Length == 0 ? "n" : "")} '{(context.property_or_event_block().add_handler().Length == 0 ? "add" : "remove")}' handler.");
             }
@@ -975,7 +975,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public static Type ResolveParameter(DassieParser.ParameterContext param, bool noErrors = false)
     {
-        string name = param.Identifier().GetText();
+        string name = param.Identifier().GetIdentifier();
         Type t = typeof(object);
 
         if (param.type_name() != null)
@@ -1010,7 +1010,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Color = Color.LocalValue,
             Line = param.Identifier().Symbol.Line,
             Column = param.Identifier().Symbol.Column,
-            Length = param.Identifier().GetText().Length,
+            Length = param.Identifier().GetIdentifier().Length,
         });
 
         return t;
@@ -2674,7 +2674,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (param.type_name() != null)
                 paramType = SymbolResolver.ResolveTypeName(param.type_name());
 
-            parameters.Add((paramType, param.Identifier().GetText(), param.Var() != null));
+            parameters.Add((paramType, param.Identifier().GetIdentifier(), param.Var() != null));
         }
 
         var locals = CurrentMethod.Locals;
@@ -3869,7 +3869,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     public override Type VisitIdentifier_atom([NotNull] DassieParser.Identifier_atomContext context)
     {
         string text = context.Identifier() != null
-            ? context.Identifier().GetText()
+            ? context.Identifier().GetIdentifier()
             : context.full_identifier().GetText();
 
         object obj = SymbolResolver.ResolveIdentifier(
@@ -4746,7 +4746,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         FieldInfo closureInstanceField = null;
         string closureContainerLocalName = "";
-        SymbolInfo sym = SymbolResolver.GetSymbol(context.Identifier().GetText());
+        SymbolInfo sym = SymbolResolver.GetSymbol(context.Identifier().GetIdentifier());
 
         if (sym is not null)
         {
@@ -4889,17 +4889,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             CurrentFile.Fragments.Add(sym.GetFragment(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 false));
 
             return sym.Type();
         }
 
-        if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == context.Identifier().GetText()))
-            (closureInstanceField, closureContainerLocalName) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == context.Identifier().GetText()).Value;
+        if (VisitorStep1CurrentMethod != null && VisitorStep1CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == context.Identifier().GetIdentifier()))
+            (closureInstanceField, closureContainerLocalName) = VisitorStep1CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == context.Identifier().GetIdentifier()).Value;
 
-        if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == context.Identifier().GetText()))
-            (closureInstanceField, closureContainerLocalName) = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == context.Identifier().GetText()).Value;
+        if (CurrentMethod.AdditionalStorageLocations.Any(s => s.Key.Name() == context.Identifier().GetIdentifier()))
+            (closureInstanceField, closureContainerLocalName) = CurrentMethod.AdditionalStorageLocations.First(s => s.Key.Name() == context.Identifier().GetIdentifier()).Value;
 
         if (CurrentMethod.Locals.Any(l => l.Name == closureContainerLocalName))
             EmitLdloc(CurrentMethod.Locals.First(l => l.Name == closureContainerLocalName).Index);
@@ -4955,26 +4955,26 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0148_ImmutableValueOfByRefType,
-                $"The type '{TypeName(t)}' is invalid for '{context.Identifier().GetText()}' since it is an immutable value. Pointers and references are only supported by mutable variables.");
+                $"The type '{TypeName(t)}' is invalid for '{context.Identifier().GetIdentifier()}' since it is an immutable value. Pointers and references are only supported by mutable variables.");
         }
 
         CurrentFile.Fragments.Add(new()
         {
             Line = context.Identifier().Symbol.Line,
             Column = context.Identifier().Symbol.Column,
-            Length = context.Identifier().GetText().Length,
+            Length = context.Identifier().GetIdentifier().Length,
             Color = context.Var() == null ? Color.LocalValue : Color.LocalVariable,
-            ToolTip = TooltipGenerator.Local(context.Identifier().GetText(), context.Var() != null, lb),
+            ToolTip = TooltipGenerator.Local(context.Identifier().GetIdentifier(), context.Var() != null, lb),
             IsNavigationTarget = true
         });
 
-        SetLocalSymInfo(lb, context.Identifier().GetText());
-        MarkSequencePoint(context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetText().Length);
+        SetLocalSymInfo(lb, context.Identifier().GetIdentifier());
+        MarkSequencePoint(context.Identifier().Symbol.Line, context.Identifier().Symbol.Column, context.Identifier().GetIdentifier().Length);
 
         CurrentMethod.LocalIndex++;
-        CurrentMethod.Locals.Add(new(context.Identifier().GetText(), lb, context.Var() == null, CurrentMethod.LocalIndex));
+        CurrentMethod.Locals.Add(new(context.Identifier().GetIdentifier(), lb, context.Var() == null, CurrentMethod.LocalIndex));
 
         SymbolInfo localSymbol = new()
         {
@@ -5773,9 +5773,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         else
         {
             LocalBuilder lb = CurrentMethod.IL.DeclareLocal(t);
-            lb.SetLocalSymInfo(context.Identifier().GetText());
+            lb.SetLocalSymInfo(context.Identifier().GetIdentifier());
 
-            LocalInfo loc = new(context.Identifier().GetText(), lb, true, ++CurrentMethod.LocalIndex, default);
+            LocalInfo loc = new(context.Identifier().GetIdentifier(), lb, true, ++CurrentMethod.LocalIndex, default);
             invalidationList.Add(loc);
             CurrentMethod.Locals.Add(loc);
 

@@ -1,4 +1,5 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Helpers;
+using Dassie.Meta;
 using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
@@ -45,7 +46,7 @@ internal static class TypeFinalizer
             EmitErrorMessage(
                 context.ParserRule.Identifier().Symbol.Line,
                 context.ParserRule.Identifier().Symbol.Column,
-                context.ParserRule.Identifier().GetText().Length,
+                context.ParserRule.Identifier().GetIdentifier().Length,
                 DS0192_CircularReference,
                 $"Circular base type dependency involving '{context.FullName}' and '{context.Builder.BaseType.FullName}'.");
 

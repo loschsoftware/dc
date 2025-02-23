@@ -103,9 +103,9 @@ internal static class MemberDeclarationGeneration
             ParameterBuilder pb = mb.DefineParameter(
                 CurrentMethod.ParameterIndex++,
                 AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
-                param.Context.Identifier().GetText());
+                param.Context.Identifier().GetIdentifier());
 
-            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, param.Context.Var() != null));
+            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetIdentifier(), param.Type, pb, pb.Position, param.Context.Var() != null));
         }
 
         Type _tReturn = typeof(object);
@@ -159,7 +159,7 @@ internal static class MemberDeclarationGeneration
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0141_MethodInEnumeration,
                 "Enumeration types cannot contain constructors.");
         }
@@ -198,9 +198,9 @@ internal static class MemberDeclarationGeneration
             ParameterBuilder pb = cb.DefineParameter(
                 CurrentMethod.ParameterIndex++,
                 AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
-                param.Context.Identifier().GetText());
+                param.Context.Identifier().GetIdentifier());
 
-            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, CurrentMethod.ParameterIndex, param.Context.Var() != null));
+            CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetIdentifier(), param.Type, pb, CurrentMethod.ParameterIndex, param.Context.Var() != null));
         }
 
         if (CurrentMethod.ConstructorBuilder.IsStatic)
@@ -211,7 +211,7 @@ internal static class MemberDeclarationGeneration
 
         List<(Type, string)> _params = new();
         foreach (var param in paramTypes)
-            _params.Add((param.Type, param.Context.Identifier().GetText()));
+            _params.Add((param.Type, param.Context.Identifier().GetIdentifier()));
     }
 
     public static void GenerateMember(DassieParser.Type_memberContext context, TypeContext declaringType, bool ignoreDS0058 = false, bool alwaysGlobal = false)
@@ -222,7 +222,7 @@ internal static class MemberDeclarationGeneration
             return;
         }
 
-        if (context.Identifier().GetText() == TypeContext.Current.Builder.Name)
+        if (context.Identifier().GetIdentifier() == TypeContext.Current.Builder.Name)
         {
             // Defer constructors for field initializers
             //TypeContext.Current.Constructors.Add(context);
@@ -261,7 +261,7 @@ internal static class MemberDeclarationGeneration
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
+                    context.Identifier().GetIdentifier().Length,
                     DS0141_MethodInEnumeration,
                     "Enumeration types cannot contain methods.");
             }
@@ -299,7 +299,7 @@ internal static class MemberDeclarationGeneration
                 List<MockMethodInfo> interfaceMethods = TypeContext.Current.RequiredInterfaceImplementations;
                 foreach (MockMethodInfo method in interfaceMethods)
                 {
-                    if (method.Name == context.Identifier().GetText() && method.ReturnType == (VisitorStep1CurrentMethod == null ? typeof(DassieParser) : VisitorStep1CurrentMethod.Builder.ReturnType) && method.Parameters.SequenceEqual(VisitorStep1CurrentMethod == null ? [] : VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
+                    if (method.Name == context.Identifier().GetIdentifier() && method.ReturnType == (VisitorStep1CurrentMethod == null ? typeof(DassieParser) : VisitorStep1CurrentMethod.Builder.ReturnType) && method.Parameters.SequenceEqual(VisitorStep1CurrentMethod == null ? [] : VisitorStep1CurrentMethod.Builder.GetParameters().Select(p => p.ParameterType)))
                     {
                         if (method.IsAbstract)
                         {
@@ -317,7 +317,7 @@ internal static class MemberDeclarationGeneration
                 attrib &= ~MethodAttributes.Virtual;
 
             MethodBuilder mb = declaringType.Builder.DefineMethod(
-                context.Identifier().GetText(),
+                context.Identifier().GetIdentifier(),
                 attrib,
                 callingConventions);
 
@@ -342,7 +342,7 @@ internal static class MemberDeclarationGeneration
 
                 foreach (DassieParser.Generic_parameterContext typeParam in context.generic_parameter_list().generic_parameter())
                 {
-                    if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetText()))
+                    if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetIdentifier()))
                     {
                         EmitErrorMessage(
                             typeParam.Start.Line,
@@ -354,14 +354,14 @@ internal static class MemberDeclarationGeneration
                         continue;
                     }
 
-                    if (TypeContext.Current.GenericParameters.Any(t => t.Name == typeParam.Identifier().GetText()))
+                    if (TypeContext.Current.GenericParameters.Any(t => t.Name == typeParam.Identifier().GetIdentifier()))
                     {
                         EmitErrorMessage(
                             typeParam.Start.Line,
                             typeParam.Start.Column,
                             typeParam.GetText().Length,
                             DS0114_TypeParameterIsDefinedInContainingScope,
-                            $"The type parameter '{typeParam.Identifier().GetText()}' is already declared by the containing type '{Format(TypeContext.Current.Builder)}'.");
+                            $"The type parameter '{typeParam.Identifier().GetIdentifier()}' is already declared by the containing type '{Format(TypeContext.Current.Builder)}'.");
                     }
 
                     typeParamContexts.Add(BuildTypeParameter(typeParam));
@@ -396,9 +396,9 @@ internal static class MemberDeclarationGeneration
                     ParameterBuilder pb = mb.DefineParameter(
                         CurrentMethod.ParameterIndex++ + 1, // Add 1 so parameter indices start at 1 -> 0 is always the current instance of the containing type
                         AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
-                        param.Context.Identifier().GetText());
+                        param.Context.Identifier().GetIdentifier());
 
-                    CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetText(), param.Type, pb, pb.Position, param.Context.Var() != null));
+                    CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetIdentifier(), param.Type, pb, pb.Position, param.Context.Var() != null));
 
                     if (CurrentMethod.Builder.IsStatic)
                     {
@@ -533,7 +533,7 @@ internal static class MemberDeclarationGeneration
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0172_EventAndProperty,
                 $"The attributes '<Auto>' and '<Event>' cannot be combined.");
         }
@@ -559,7 +559,7 @@ internal static class MemberDeclarationGeneration
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0158_InstanceFieldInTemplate,
                 $"Template types cannot contain instance {memberKindPlural}.");
         }
@@ -569,7 +569,7 @@ internal static class MemberDeclarationGeneration
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0150_ByRefFieldInNonByRefLikeType,
                 $"Invalid {memberKind} type '{TypeName(type)}'. References are only valid as part of ByRef-like value types (val& type).");
         }
@@ -589,7 +589,7 @@ internal static class MemberDeclarationGeneration
                     "The modifier 'literal' is not valid on properties.");
             }
 
-            string propName = context.Identifier().GetText();
+            string propName = context.Identifier().GetIdentifier();
             FieldBuilder backingField = declaringType.Builder.DefineField(
                 SymbolNameGenerator.GetPropertyBackingFieldName(propName),
                 type,
@@ -631,7 +631,7 @@ internal static class MemberDeclarationGeneration
                 Color = Color.Property,
                 Column = context.Identifier().Symbol.Column,
                 Line = context.Identifier().Symbol.Line,
-                Length = context.Identifier().GetText().Length,
+                Length = context.Identifier().GetIdentifier().Length,
                 ToolTip = TooltipGenerator.Property(pb),
                 IsNavigationTarget = true
             });
@@ -665,7 +665,7 @@ internal static class MemberDeclarationGeneration
                 return;
             }
 
-            string eventName = context.Identifier().GetText();
+            string eventName = context.Identifier().GetIdentifier();
 
             FieldBuilder eventField = declaringType.Builder.DefineField(
                 eventName,
@@ -761,7 +761,7 @@ internal static class MemberDeclarationGeneration
                 EmitErrorMessage(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
-                    context.Identifier().GetText().Length,
+                    context.Identifier().GetIdentifier().Length,
                     DS0175_EventMissingHandlers,
                     $"Event '{eventName}' is missing a{(context.property_or_event_block().add_handler().Length == 0 ? "n" : "")} '{(context.property_or_event_block().add_handler().Length == 0 ? "add" : "remove")}' handler.");
             }
@@ -811,7 +811,7 @@ internal static class MemberDeclarationGeneration
         }
 
         FieldBuilder fb = TypeContext.Current.Builder.DefineField(
-            context.Identifier().GetText(),
+            context.Identifier().GetIdentifier(),
             type,
             modreq.ToArray(),
             modopt.ToArray(),
@@ -820,7 +820,7 @@ internal static class MemberDeclarationGeneration
         foreach (CustomAttributeBuilder cab in customAttribs)
             fb.SetCustomAttribute(cab);
 
-        MetaFieldInfo mfi = new(context.Identifier().GetText(), fb);
+        MetaFieldInfo mfi = new(context.Identifier().GetIdentifier(), fb);
         mfi.ParserRule = context;
 
         if (compileTimeConst != null)
@@ -839,7 +839,7 @@ internal static class MemberDeclarationGeneration
             Color = Color.Field,
             Column = context.Identifier().Symbol.Column,
             Line = context.Identifier().Symbol.Line,
-            Length = context.Identifier().GetText().Length,
+            Length = context.Identifier().GetIdentifier().Length,
             ToolTip = TooltipGenerator.Field(fb),
             IsNavigationTarget = true
         });

@@ -1,4 +1,5 @@
-﻿using Dassie.CodeGeneration;
+﻿using Antlr4.Runtime.Tree;
+using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Helpers;
 using Dassie.Core;
 using Dassie.Errors;
@@ -32,6 +33,18 @@ internal static class SymbolResolver
         public Type Type { get; init; }
     }
 
+    public static string GetIdentifier(this ITerminalNode identifier)
+    {
+        string rawText = identifier.GetText();
+
+        if (!rawText.StartsWith('`'))
+            return rawText;
+
+        return rawText[1..^1]
+            .Replace("^`", "`")
+            .Replace("^^", "^");
+    }
+
     public static string GetTypeArgumentListSuffix(Generics.GenericArgumentContext[] typeArgs, bool includeBacktick)
     {
         static string Name(Type t)
@@ -62,7 +75,7 @@ internal static class SymbolResolver
 
     public static object GetSmallestTypeFromLeft(DassieParser.Full_identifierContext fullId, Generics.GenericArgumentContext[] genericArgs, int row, int col, int len, out int firstUnusedPart, bool noEmitFragments = false)
     {
-        string[] parts = fullId.Identifier().Select(f => f.GetText()).ToArray();
+        string[] parts = fullId.Identifier().Select(f => f.GetIdentifier()).ToArray();
         firstUnusedPart = 0;
 
         string typeString = "";
@@ -1456,7 +1469,7 @@ internal static class SymbolResolver
         if (name.identifier_atom() != null)
         {
             if (name.identifier_atom().Identifier() != null)
-                return ResolveTypeName(name.identifier_atom().Identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetText().Length, noEmitFragments, disableBacktickGenericResolve: disableBacktickGenericResolve, noErrors: noErrors);
+                return ResolveTypeName(name.identifier_atom().Identifier().GetIdentifier(), name.Start.Line, name.Start.Column, name.identifier_atom().Identifier().GetIdentifier().Length, noEmitFragments, disableBacktickGenericResolve: disableBacktickGenericResolve, noErrors: noErrors);
 
             return ResolveTypeName(name.identifier_atom().full_identifier().GetText(), name.Start.Line, name.Start.Column, name.identifier_atom().full_identifier().GetText().Length, noEmitFragments, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
         }
@@ -1488,7 +1501,7 @@ internal static class SymbolResolver
             DassieParser.Type_nameContext childName = (DassieParser.Type_nameContext)name.children[0];
             if (childName.identifier_atom() != null && childName.identifier_atom().Identifier() != null)
             {
-                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetText(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetText().Length, noEmitFragments, typeParams, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
+                Type result = ResolveTypeName(childName.identifier_atom().Identifier().GetIdentifier(), childName.Start.Line, childName.Start.Column, childName.identifier_atom().Identifier().GetIdentifier().Length, noEmitFragments, typeParams, noErrors: noErrors, disableBacktickGenericResolve: disableBacktickGenericResolve);
 
                 TypeHelpers.CheckGenericTypeCompatibility(result, typeParams, childName.Start.Line, childName.Start.Column, childName.GetText().Length, !noErrors);
 

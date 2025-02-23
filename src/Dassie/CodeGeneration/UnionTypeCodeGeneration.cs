@@ -176,7 +176,7 @@ internal static class UnionTypeCodeGeneration
     public static void GenerateUnionTagType(DassieParser.Type_memberContext context)
     {
         TypeContext tc = TypeContext.Current;
-        string typeName = context.Identifier().GetText();
+        string typeName = context.Identifier().GetIdentifier();
 
         TypeBuilder tagType = TypeContext.Current.Builder.DefineNestedType(typeName, TypeAttributes.NestedPublic | TypeAttributes.SpecialName);
         tagType.SetParent(TypeContext.Current.Builder);
@@ -210,7 +210,7 @@ internal static class UnionTypeCodeGeneration
 
             foreach (DassieParser.ParameterContext param in context.parameter_list().parameter())
             {
-                string paramName = param.Identifier().GetText();
+                string paramName = param.Identifier().GetIdentifier();
                 string fieldName = SymbolNameGenerator.GetPropertyBackingFieldName(paramName);
                 Type paramType = SymbolResolver.ResolveTypeName(param.type_name());
 

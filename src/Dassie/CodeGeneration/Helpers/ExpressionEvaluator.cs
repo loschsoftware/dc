@@ -755,10 +755,10 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
             return Visit(context.full_identifier());
 
         object o = SymbolResolver.ResolveIdentifier(
-            context.Identifier().GetText(),
+            context.Identifier().GetIdentifier(),
             context.Identifier().Symbol.Line,
             context.Identifier().Symbol.Column,
-            context.Identifier().GetText().Length);
+            context.Identifier().GetIdentifier().Length);
 
         if (o is MetaFieldInfo mfi)
             return new(mfi.ConstantValue.GetType(), mfi.ConstantValue);

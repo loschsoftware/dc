@@ -16,7 +16,7 @@ internal class AccessModifierGroupRewriter : ITreeToStringRewriter
         string oopModifier = rule.member_oop_modifier()?.GetText() ?? "";
         string[] specialModifiers = rule.member_special_modifier()?.Select(s => s.GetText()).ToArray() ?? [];
 
-        string[] identifiers = rule.type_member().Select(t => t.Identifier().GetText()).ToArray();
+        string[] identifiers = rule.type_member().Select(t => t.Identifier().GetIdentifier()).ToArray();
         string[] members = rule.type_member().Select(listener.GetTextForRule).ToArray();
 
         List<string> finalMembers = new();

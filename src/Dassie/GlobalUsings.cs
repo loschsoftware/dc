@@ -1,4 +1,5 @@
-﻿global using static Dassie.CodeGeneration.Api.Compiler;
+﻿global using Dassie.Helpers;
+global using static Dassie.CodeGeneration.Api.Compiler;
 global using static Dassie.CodeGeneration.Helpers.EmitHelpers;
 global using static Dassie.Constants;
 global using static Dassie.Errors.ErrorKind;

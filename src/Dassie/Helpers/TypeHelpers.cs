@@ -13,6 +13,8 @@ using System.Text;
 
 namespace Dassie.Helpers;
 
+#pragma warning disable IDE0305
+
 /// <summary>
 /// Provides helper methods regarding data types.
 /// </summary>
@@ -276,7 +278,7 @@ internal static class TypeHelpers
     public static bool IsNumericType(Type type)
     {
         Type[] numerics =
-        {
+        [
             typeof(byte),
             typeof(sbyte),
             typeof(short),
@@ -290,7 +292,7 @@ internal static class TypeHelpers
             typeof(nint),
             typeof(nuint),
             typeof(char)
-        };
+        ];
 
         return numerics.Contains(type.RemoveByRef());
     }
@@ -298,7 +300,7 @@ internal static class TypeHelpers
     public static bool IsIntegerType(Type type)
     {
         Type[] numerics =
-        {
+        [
             typeof(byte),
             typeof(sbyte),
             typeof(short),
@@ -310,7 +312,7 @@ internal static class TypeHelpers
             typeof(nint),
             typeof(nuint),
             typeof(char)
-        };
+        ];
 
         return numerics.Contains(type.RemoveByRef());
     }
@@ -318,13 +320,13 @@ internal static class TypeHelpers
     public static bool IsUnsignedIntegerType(Type type)
     {
         Type[] numerics =
-        {
+        [
             typeof(byte),
             typeof(ushort),
             typeof(uint),
             typeof(ulong),
             typeof(nuint)
-        };
+        ];
 
         return numerics.Contains(type.RemoveByRef());
     }
@@ -332,10 +334,10 @@ internal static class TypeHelpers
     public static bool IsFloatingPointType(Type type)
     {
         Type[] floats =
-        {
+        [
             typeof(float),
             typeof(double)
-        };
+        ];
 
         return floats.Contains(type.RemoveByRef());
     }
@@ -660,7 +662,7 @@ internal static class TypeHelpers
 
     public static GenericParameterContext BuildTypeParameter(DassieParser.Generic_parameterContext context)
     {
-        string name = context.Identifier().GetText();
+        string name = context.Identifier().GetIdentifier();
         GenericParameterAttributes attribs = GenericParameterAttributes.None;
         List<Type> interfaceConstraints = [];
         Type baseTypeConstraint = null;
@@ -904,7 +906,7 @@ internal static class TypeHelpers
             }
 
             if (unionMember.Identifier() != null)
-                unionMemberName = unionMember.Identifier().GetText();
+                unionMemberName = unionMember.Identifier().GetIdentifier();
 
             partTypes.Add((type, unionMemberName));
         }
@@ -955,5 +957,5 @@ internal static class TypeHelpers
     }
 
     public static string GetTypeName(DassieParser.TypeContext context)
-        => $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetText()}";
+        => $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetIdentifier()}";
 }

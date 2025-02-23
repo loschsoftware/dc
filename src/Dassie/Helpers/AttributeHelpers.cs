@@ -416,7 +416,7 @@ internal static class AttributeHelpers
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0166_ModuleInitializerInvalid,
                 $"Module initializers must be defined inside of a module or explicitly marked as 'static'.");
         }
@@ -436,7 +436,7 @@ internal static class AttributeHelpers
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0166_ModuleInitializerInvalid,
                 $"Module initializers cannot return a value.");
         }
@@ -456,7 +456,7 @@ internal static class AttributeHelpers
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
-                context.Identifier().GetText().Length,
+                context.Identifier().GetIdentifier().Length,
                 DS0166_ModuleInitializerInvalid,
                 $"Module initializers cannot be contained in generic types.");
         }

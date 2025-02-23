@@ -33,7 +33,7 @@ internal class ParameterConstraintRewriter : ITreeToStringRewriter
         if (!member.parameter_list().parameter().Any(p => p.parameter_constraint() != null))
             return listener.GetTextForRule(member);
 
-        CurrentFile.FunctionParameterConstraints.Add(member.Identifier().GetText(), []);
+        CurrentFile.FunctionParameterConstraints.Add(member.Identifier().GetIdentifier(), []);
 
         string specialModsText = "";
         foreach (var mod in member.member_special_modifier())
@@ -89,7 +89,7 @@ internal class ParameterConstraintRewriter : ITreeToStringRewriter
             sb.Append($"\t$throw Dassie.Runtime.ConstraintViolationException \"{param.Identifier().Symbol.Text}\", \"{listener.GetTextForRule(param.parameter_constraint().expression())}\"");
             sb.Append("} : = {}");
 
-            CurrentFile.FunctionParameterConstraints[member.Identifier().GetText()].Add(param.Identifier().GetText(), listener.GetTextForRule(param.parameter_constraint().expression()));
+            CurrentFile.FunctionParameterConstraints[member.Identifier().GetIdentifier()].Add(param.Identifier().GetIdentifier(), listener.GetTextForRule(param.parameter_constraint().expression()));
         }
 
         sb.Append(listener.GetTextForRule(member.expression()));

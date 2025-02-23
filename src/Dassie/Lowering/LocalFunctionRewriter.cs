@@ -21,7 +21,7 @@ internal class LocalFunctionRewriter : ITreeToStringRewriter
             paramListSb.Append($"{listener.GetTextForRule(localFunc.parameter_list().parameter().Last())}");
         }
 
-        sb.AppendLine($"{localFunc.Identifier().GetText()} = (func ({paramListSb.ToString()}) => {{{listener.GetTextForRule(localFunc.expression())}}})");
+        sb.AppendLine($"{localFunc.Identifier().GetIdentifier()} = (func ({paramListSb.ToString()}) => {{{listener.GetTextForRule(localFunc.expression())}}})");
 
         return sb.ToString();
     }

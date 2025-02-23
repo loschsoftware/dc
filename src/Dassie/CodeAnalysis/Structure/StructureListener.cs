@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Misc;
+using Dassie.Helpers;
 using Dassie.Parser;
 using System.Linq;
 
@@ -68,7 +69,7 @@ internal class StructureListener(ProjectStructure prevStructure, string filePath
                 .. Structure.Types ?? [],
                 new()
                 {
-                    Name = context.Identifier().GetText(),
+                    Name = context.Identifier().GetIdentifier(),
                     Files = [filePath],
                     TypeKind = kind
                 }
@@ -81,7 +82,7 @@ internal class StructureListener(ProjectStructure prevStructure, string filePath
                 .. _namespace.Types ?? [],
                 new()
                 {
-                    Name = context.Identifier().GetText(),
+                    Name = context.Identifier().GetIdentifier(),
                     Files = [filePath],
                     TypeKind = kind
                 }

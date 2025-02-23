@@ -24,9 +24,9 @@ internal class CompoundAssignmentRewriter : ITreeToStringRewriter
             var local = (DassieParser.Local_declaration_or_assignmentContext)tree;
 
             op = local.assignment_operator();
-            left = $"{(local.Var() == null ? "" : "var ")}{local.Identifier().GetText()}{(local.type_name() == null ? " " : $": {local.type_name().GetText()}")}";
+            left = $"{(local.Var() == null ? "" : "var ")}{local.Identifier().GetIdentifier()}{(local.type_name() == null ? " " : $": {local.type_name().GetText()}")}";
             expr = local.expression().GetText();
-            right = $"{local.Identifier().GetText()} ";
+            right = $"{local.Identifier().GetIdentifier()} ";
         }
 
         if (op.GetText() == "=")
