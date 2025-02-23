@@ -28,7 +28,7 @@ public class Array<T, D> { }
 public class Buffer<T, L> { }
 
 /// <summary>
-/// Defines '<c>Ptr[T]</c>' as an alias for <c><typeparamref name="T"/>&amp;</c>.
+/// Defines '<c>Ref[T]</c>' as an alias for <c><typeparamref name="T"/>&amp;</c>.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Alias(typeof(Ref<>))]
@@ -40,6 +40,112 @@ public class Ref<T> { }
 /// <typeparam name="T"></typeparam>
 [Alias(typeof(Ptr<>))]
 public class Ptr<T> { }
+
+/// <summary>
+/// Defines '<c>Ptr</c>' as an alias for <c><see langword="void"/>*</c>.
+/// </summary>
+[Alias(typeof(Ptr))]
+public class Ptr { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T]</c>' as an alias for a function pointer type.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Alias(typeof(FuncPtr<>))]
+public class FuncPtr<T> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, T2]</c>' as an alias for a function pointer type.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <typeparam name="T2"></typeparam>
+[Alias(typeof(FuncPtr<,>))]
+public class FuncPtr<T, T2> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, T2, T3]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,>))]
+public class FuncPtr<T, T2, T3> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T4]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,>))]
+public class FuncPtr<T, T2, T3, T4> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T5]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T6]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T7]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T8]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T9]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8, T9> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T10]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8, T9, T10> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T11]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T12]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T13]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T14]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T15]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> { }
+
+/// <summary>
+/// Defines '<c>FuncPtr[T, ..., T16]</c>' as an alias for a function pointer type.
+/// </summary>
+[Alias(typeof(FuncPtr<,,,,,,,,,,,,,,,>))]
+public class FuncPtr<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> { }
+
 
 /// <summary>
 /// Defines 'int8' as an alias for <see cref="System.SByte"/>.

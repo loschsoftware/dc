@@ -166,7 +166,6 @@ type_name
     | Open_Paren union_or_tuple_type_member (Comma union_or_tuple_type_member)+ Close_Paren
     | generic_identifier
     | type_name generic_arg_list
-    | Func Asterisk generic_arg_list // Function pointer type
     ;
 
 union_or_tuple_type_member

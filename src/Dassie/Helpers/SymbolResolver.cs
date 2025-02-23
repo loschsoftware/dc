@@ -1367,6 +1367,20 @@ internal static class SymbolResolver
                     return type.MakePointerType();
                 }
 
+                if (aliasType == typeof(Ptr))
+                    return typeof(void*);
+
+                if (aliasType.FullName.StartsWith("Dassie.Core.FuncPtr"))
+                {
+                    Type[] paramTypes = genericArgs[..^1].Select(t => t.Type).ToArray();
+                    Type tRet = genericArgs[^1].Type;
+
+                    if (tRet == typeof(void))
+                        return FunctionPointerHelpers.MakeGenericManagedCallVoidFunctionPointerType(paramTypes);
+
+                    return FunctionPointerHelpers.MakeGenericManagedCallFunctionPointerType((tRet, paramTypes));
+                }
+
                 return aliasType;
             }
         }
@@ -1416,28 +1430,28 @@ internal static class SymbolResolver
     {
         genericArgs = null;
 
-        if (name.Func() != null)
-        {
-            // Function pointer type
-            // e.g. func*[int, int, int] -> X (a: int, b: int): int
+        //if (name.Func() != null)
+        //{
+        //    // Function pointer type
+        //    // e.g. func*[int, int, int] -> X (a: int, b: int): int
 
-            Type[] typeArgs = name.generic_arg_list().generic_argument().Select(t => ResolveTypeName(t.type_name(), noEmitFragments)).ToArray();
+        //    Type[] typeArgs = name.generic_arg_list().generic_argument().Select(t => ResolveTypeName(t.type_name(), noEmitFragments)).ToArray();
 
-            Type[] parameterTypes = typeArgs[..^1];
-            Type returnType = typeArgs[^1];
+        //    Type[] parameterTypes = typeArgs[..^1];
+        //    Type returnType = typeArgs[^1];
 
-            //EmitErrorMessage(
-            //    name.Start.Line,
-            //    name.Start.Column,
-            //    name.GetText().Length,
-            //    DS0159_FrameworkLimitation,
-            //    $"Function pointer types are currently unsupported.");
+        //    //EmitErrorMessage(
+        //    //    name.Start.Line,
+        //    //    name.Start.Column,
+        //    //    name.GetText().Length,
+        //    //    DS0159_FrameworkLimitation,
+        //    //    $"Function pointer types are currently unsupported.");
 
-            if (returnType == typeof(void))
-                return FunctionPointerHelpers.MakeGenericManagedCallVoidFunctionPointerType(parameterTypes);
+        //    if (returnType == typeof(void))
+        //        return FunctionPointerHelpers.MakeGenericManagedCallVoidFunctionPointerType(parameterTypes);
 
-            return FunctionPointerHelpers.MakeGenericManagedCallFunctionPointerType((returnType, parameterTypes));
-        }
+        //    return FunctionPointerHelpers.MakeGenericManagedCallFunctionPointerType((returnType, parameterTypes));
+        //}
 
         if (name.identifier_atom() != null)
         {
