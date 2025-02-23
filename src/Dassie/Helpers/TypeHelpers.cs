@@ -421,7 +421,12 @@ internal static class TypeHelpers
             name = new($"Ref[{name}]");
 
         if (type.IsPointer)
-            name = new($"Ptr[{name}]");
+        {
+            StringBuilder inner = name;
+            name = new("Ptr");
+            if (type.GetElementType() != typeof(void))
+                name.Append($"[{inner}]");
+        }
 
         if (type.IsArray)
         {
