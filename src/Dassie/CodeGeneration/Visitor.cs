@@ -5615,6 +5615,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             if (_tReturn == typeof(void))
                 CurrentMethod.IL.Emit(OpCodes.Ldnull);
 
+            if (tReturn == typeof(object) && _tReturn != typeof(object))
+                EmitConversionOperator(_tReturn, tReturn);
+
             CurrentMethod.IL.EmitCall(OpCodes.Callvirt, listType.GetMethod("Add", [tReturn]), null);
 
             CurrentMethod.IL.MarkLabel(loop);
