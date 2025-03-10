@@ -13,6 +13,13 @@ namespace Dassie.Helpers;
 /// </summary>
 internal static class ReferenceHandler
 {
+    private static void ResolveProjectReference(ProjectReference reference, string referenceResolverBaseDir)
+    {
+        reference.ProjectFile = Path.GetFullPath(Path.Combine(referenceResolverBaseDir ?? Directory.GetCurrentDirectory(), reference.ProjectFile));
+        if (Directory.Exists(reference.ProjectFile))
+            reference.ProjectFile = Path.Combine(reference.ProjectFile, ProjectConfigurationFileName);
+    }
+
     /// <summary>
     /// Converts a project reference into an assembly reference by compiling the referenced project and referencing the generated executable.
     /// </summary>
@@ -23,9 +30,7 @@ internal static class ReferenceHandler
     /// <returns>Wheter or not the compilation of the project reference was successful.</returns>
     public static bool HandleProjectReference(ProjectReference reference, DassieConfig currentConfig, string destDir, string referenceResolverBaseDir = null)
     {
-        reference.ProjectFile = Path.GetFullPath(Path.Combine(referenceResolverBaseDir ?? Directory.GetCurrentDirectory(), reference.ProjectFile));
-        if (Directory.Exists(reference.ProjectFile))
-            reference.ProjectFile = Path.Combine(reference.ProjectFile, ProjectConfigurationFileName);
+        ResolveProjectReference(reference, referenceResolverBaseDir);
 
         if (!File.Exists(reference.ProjectFile))
         {
@@ -42,8 +47,29 @@ internal static class ReferenceHandler
 
         string dir = Directory.GetCurrentDirectory();
         DassieConfig prevConfig = ProjectFileDeserializer.DassieConfig;
+        string prevPath = ProjectFileDeserializer.Path;
+
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
         ProjectFileDeserializer.Reload();
+
+        if (ProjectFileDeserializer.DassieConfig.References != null && ProjectFileDeserializer.DassieConfig.References.Any(r => r is ProjectReference))
+        {
+            foreach (ProjectReference projRef in ProjectFileDeserializer.DassieConfig.References.Where(r => r is ProjectReference).Cast<ProjectReference>())
+            {
+                ResolveProjectReference(projRef, Directory.GetCurrentDirectory());
+
+                if (projRef.ProjectFile == prevPath)
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0204_CircularProjectDependency,
+                        $"Circular project dependency between '{Path.GetDirectoryName(projRef.ProjectFile).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(prevPath).Split(Path.DirectorySeparatorChar)[^1]}'.",
+                        ProjectConfigurationFileName);
+
+                    return false;
+                }
+            }
+        }
 
         int errCode = BuildCommand.Instance.Invoke([]);
 

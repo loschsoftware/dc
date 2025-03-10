@@ -836,5 +836,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an invalid type is used as a generic argument.
     /// </summary>
-    DS0203_InvalidGenericArgument
+    DS0203_InvalidGenericArgument,
+    /// <summary>
+    /// Emitted when a project structure contains a circular dependency.
+    /// </summary>
+    DS0204_CircularProjectDependency
 }

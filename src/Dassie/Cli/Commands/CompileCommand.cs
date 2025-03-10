@@ -382,7 +382,7 @@ internal class CompileCommand : ICompilerCommand
         TextWriterBuildLogDevice.WarnOut?.Dispose();
         TextWriterBuildLogDevice.ErrorOut?.Dispose();
 
-        return errors.Select(e => e.Length).Sum() == 0 ? 0 : -1;
+        return errors.SelectMany(e => e).Count(e => e.Severity == Severity.Error);
     }
 
     public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources, string asmName, bool makePdb, bool is32Bit)

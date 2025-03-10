@@ -12,6 +12,8 @@ internal static class ProjectFileDeserializer
     private static DassieConfig _config;
     public static DassieConfig DassieConfig => _config ??= Deserialize();
 
+    public static string Path { get; private set; }
+
     public static void Reload() => _config = Deserialize();
     public static void Set(DassieConfig cfg) => _config = cfg;
 
@@ -22,6 +24,8 @@ internal static class ProjectFileDeserializer
     {
         if (!File.Exists(path))
             return null;
+
+        Path = System.IO.Path.GetFullPath(path);
 
         XmlSerializer xmls = new(typeof(DassieConfig));
         using StreamReader sr = new(path);
