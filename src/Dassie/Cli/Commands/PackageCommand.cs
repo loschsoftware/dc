@@ -82,7 +82,10 @@ internal class PackageCommand : ICompilerCommand
         Console.WriteLine("Installed extensions:");
         Console.WriteLine();
 
-        Console.WriteLine($"{"Name",-50}Version");
+        string header = $"{"\e[1mName\e[22m",-59}\e[1mVersion\e[22m";
+        Console.WriteLine(header);
+        Console.WriteLine(new string('-', header.Length - 18));
+
         foreach (IPackage package in packages.Where(p => p.Metadata.Name != "Default"))
         {
             string packageDisplay = package.Metadata.Name;
