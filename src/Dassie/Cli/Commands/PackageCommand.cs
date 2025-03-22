@@ -198,7 +198,13 @@ internal class PackageCommand : ICompilerCommand
 
     private static int Install(string name)
     {
-        throw new NotImplementedException("Installing and updating packages from the internet is not yet implemented.");
+        EmitErrorMessage(
+            0, 0, 0,
+            DS0063_UnsupportedFeature,
+            "Installing and updating packages from the internet is not yet supported.",
+            "dc");
+
+        return 0;
     }
 
     private static int Import(string path, bool overwrite = false, bool globalTool = false)
