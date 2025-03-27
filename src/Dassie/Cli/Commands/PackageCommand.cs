@@ -232,7 +232,6 @@ internal class PackageCommand : ICompilerCommand
                 File.Copy(path, tempFileName);
                 return 0;
             }
-
             else
             {
                 Console.WriteLine("The specified extension is already installed. Use the -o flag to overwrite existing extensions.");

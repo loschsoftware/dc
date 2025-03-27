@@ -33,7 +33,7 @@ internal class VersionCommand : ICompilerCommand
         int padding = 35;
 
         output.AppendLine();
-        output.AppendLine("Dassie Compiler Command Line");
+        output.AppendLine(ProductName);
         output.AppendLine($"(C) 2023-{buildDate.Year} Losch");
 
         output.AppendLine();
