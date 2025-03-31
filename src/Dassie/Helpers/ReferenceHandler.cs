@@ -2,6 +2,7 @@
 using Dassie.Configuration;
 using Dassie.Packages;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FileSystem = Microsoft.VisualBasic.FileIO.FileSystem;
@@ -54,7 +55,8 @@ internal static class ReferenceHandler
 
         if (ProjectFileDeserializer.DassieConfig.References != null && ProjectFileDeserializer.DassieConfig.References.Any(r => r is ProjectReference))
         {
-            foreach (ProjectReference projRef in ProjectFileDeserializer.DassieConfig.References.Where(r => r is ProjectReference).Cast<ProjectReference>())
+            IEnumerable<ProjectReference> refs = ProjectFileDeserializer.DassieConfig.References.Where(r => r is ProjectReference).Cast<ProjectReference>();
+            foreach (ProjectReference projRef in refs)
             {
                 ResolveProjectReference(projRef, Directory.GetCurrentDirectory());
 
@@ -63,7 +65,7 @@ internal static class ReferenceHandler
                     EmitErrorMessage(
                         0, 0, 0,
                         DS0204_CircularProjectDependency,
-                        $"Circular project dependency between '{Path.GetDirectoryName(projRef.ProjectFile).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(prevPath).Split(Path.DirectorySeparatorChar)[^1]}'.",
+                        $"Circular project dependency between '{Path.GetDirectoryName(prevPath).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}'.",
                         ProjectConfigurationFileName);
 
                     return false;
