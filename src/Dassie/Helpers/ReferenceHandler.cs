@@ -21,6 +21,8 @@ internal static class ReferenceHandler
             reference.ProjectFile = Path.Combine(reference.ProjectFile, ProjectConfigurationFileName);
     }
 
+    private static readonly List<string> _referencedProjectPaths = [];
+
     /// <summary>
     /// Converts a project reference into an assembly reference by compiling the referenced project and referencing the generated executable.
     /// </summary>
@@ -53,6 +55,8 @@ internal static class ReferenceHandler
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
         ProjectFileDeserializer.Reload();
 
+        _referencedProjectPaths.Add(ProjectFileDeserializer.Path);
+
         if (ProjectFileDeserializer.DassieConfig.References != null && ProjectFileDeserializer.DassieConfig.References.Any(r => r is ProjectReference))
         {
             IEnumerable<ProjectReference> refs = ProjectFileDeserializer.DassieConfig.References.Where(r => r is ProjectReference).Cast<ProjectReference>();
@@ -60,16 +64,29 @@ internal static class ReferenceHandler
             {
                 ResolveProjectReference(projRef, Directory.GetCurrentDirectory());
 
-                if (projRef.ProjectFile == prevPath)
+                if (_referencedProjectPaths.Contains(projRef.ProjectFile))
                 {
-                    EmitErrorMessage(
-                        0, 0, 0,
-                        DS0204_CircularProjectDependency,
-                        $"Circular project dependency between '{Path.GetDirectoryName(prevPath).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}'.",
-                        ProjectConfigurationFileName);
+                    if (prevPath == projRef.ProjectFile)
+                    {
+                        EmitErrorMessage(
+                            0, 0, 0,
+                            DS0204_CircularProjectDependency,
+                            $"Project '{Path.GetDirectoryName(prevPath).Split(Path.DirectorySeparatorChar)[^1]}' references itself.",
+                            ProjectConfigurationFileName);
+                    }
+                    else
+                    {
+                        EmitErrorMessage(
+                            0, 0, 0,
+                            DS0204_CircularProjectDependency,
+                            $"Circular project dependency between '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(prevPath).Split(Path.DirectorySeparatorChar)[^1]}'.",
+                            ProjectConfigurationFileName);
+                    }
 
                     return false;
                 }
+
+                _referencedProjectPaths.Add(projRef.ProjectFile);
             }
         }
 
