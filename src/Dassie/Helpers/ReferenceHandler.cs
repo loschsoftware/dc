@@ -50,7 +50,6 @@ internal static class ReferenceHandler
 
         string dir = Directory.GetCurrentDirectory();
         DassieConfig prevConfig = ProjectFileDeserializer.DassieConfig;
-        string prevPath = ProjectFileDeserializer.Path;
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
         ProjectFileDeserializer.Reload();
@@ -66,12 +65,12 @@ internal static class ReferenceHandler
 
                 if (_referencedProjectPaths.Contains(projRef.ProjectFile))
                 {
-                    if (prevPath == projRef.ProjectFile)
+                    if (ProjectFileDeserializer.Path == projRef.ProjectFile)
                     {
                         EmitErrorMessage(
                             0, 0, 0,
                             DS0204_CircularProjectDependency,
-                            $"Project '{Path.GetDirectoryName(prevPath).Split(Path.DirectorySeparatorChar)[^1]}' references itself.",
+                            $"Project '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}' references itself.",
                             ProjectConfigurationFileName);
                     }
                     else
@@ -79,14 +78,15 @@ internal static class ReferenceHandler
                         EmitErrorMessage(
                             0, 0, 0,
                             DS0204_CircularProjectDependency,
-                            $"Circular project dependency between '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(prevPath).Split(Path.DirectorySeparatorChar)[^1]}'.",
+                            $"Circular project dependency between '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(projRef.ProjectFile).Split(Path.DirectorySeparatorChar)[^1]}'.",
                             ProjectConfigurationFileName);
                     }
 
                     return false;
                 }
 
-                _referencedProjectPaths.Add(projRef.ProjectFile);
+                if (!_referencedProjectPaths.Contains(projRef.ProjectFile))
+                    _referencedProjectPaths.Add(projRef.ProjectFile);
             }
         }
 
