@@ -94,6 +94,11 @@ internal class AnalyzeCommand : ICompilerCommand
             ITokenStream tokenStream = new CommonTokenStream(lexer);
             DassieParser parser = new(tokenStream);
 
+            lexer.RemoveErrorListeners();
+            lexer.AddErrorListener(new LexerErrorListener());
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(new ParserErrorListener());
+
             CurrentFile = new(file);
 
             DassieParser.Compilation_unitContext compilationUnit = parser.compilation_unit();
