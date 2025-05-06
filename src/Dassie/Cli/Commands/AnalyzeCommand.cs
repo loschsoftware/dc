@@ -62,7 +62,6 @@ internal class AnalyzeCommand : ICompilerCommand
         
         if (string.IsNullOrEmpty(analyzerName))
             analyzer = new NamingConventionAnalyzer(config);
-
         else
         {
             if (ExtensionLoader.TryGetAnalyzer(analyzerName, out IAnalyzer<IParseTree> a))
