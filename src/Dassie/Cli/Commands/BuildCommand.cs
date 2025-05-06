@@ -92,7 +92,7 @@ internal class BuildCommand : ICompilerCommand
             return -1;
         }
 
-        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray(), null, dirName);
+        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray(), null, config.AssemblyName != null ? null : dirName);
     }
 
     private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config, string[] args)
