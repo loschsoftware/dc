@@ -73,7 +73,7 @@ internal class RunCommand : ICompilerCommand
                 EmitErrorMessage(
                     0, 0, 0,
                     DS0124_DCRunInvalidProjectType,
-                    "The current project is not executable. Projects with an application type of 'Library' cannot be executed.",
+                    "The current project cannot be executed. Projects with an application type of 'Library' are not executable.",
                     "dc");
 
                 return -1;
