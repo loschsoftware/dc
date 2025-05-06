@@ -42,9 +42,9 @@ internal class CompileCommand : ICompilerCommand
     public bool Hidden() => true;
 
     public int Invoke(string[] args) => Compile(args);
-    public int Invoke(string[] args, DassieConfig overrideSettings) => Compile(args, overrideSettings);
+    public int Invoke(string[] args, DassieConfig overrideSettings, string assemblyName = null) => Compile(args, overrideSettings, assemblyName);
 
-    private static int Compile(string[] args, DassieConfig overrideSettings = null)
+    private static int Compile(string[] args, DassieConfig overrideSettings = null, string assemblyName = null)
     {
         string workingDir = Directory.GetCurrentDirectory();
         long stopwatchTimeStamp = Stopwatch.GetTimestamp();
@@ -54,6 +54,9 @@ internal class CompileCommand : ICompilerCommand
         string asmName = "";
         if (args.Where(File.Exists).Any())
             asmName = Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
+
+        if (assemblyName != null)
+            asmName = assemblyName;
 
         config ??= new();
         config.AssemblyName ??= asmName;

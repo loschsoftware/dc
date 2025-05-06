@@ -79,6 +79,7 @@ internal class BuildCommand : ICompilerCommand
         }
 
         filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();
+        string dirName = Path.GetDirectoryName(Path.GetFullPath(filesToCompile[0])).Split(Path.DirectorySeparatorChar)[^1];
 
         if (filesToCompile.Length < 1)
         {
@@ -91,7 +92,7 @@ internal class BuildCommand : ICompilerCommand
             return -1;
         }
 
-        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray());
+        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray(), null, dirName);
     }
 
     private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config, string[] args)
