@@ -1,6 +1,8 @@
-﻿using Dassie.Configuration;
+﻿using Dassie.Cli.Commands;
+using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,17 +17,45 @@ internal static class TemplateBuilder
 {
     public static int CreateStructure(string[] args)
     {
+        IEnumerable<IProjectTemplate> availableTemplates = ExtensionLoader.ProjectTemplates;
+
+        void PrintAvailableTemplates()
+        {
+            int templateNameWidth = availableTemplates.Select(t => t.Name).Append("Template Name").Select(n => n.Length).Max();
+            WriteLine($"The following project templates are available:{Environment.NewLine}");
+
+            string tableHeader = $"{"Template Name".PadRight(templateNameWidth)}\t\tPackage";
+            int headerWidth = tableHeader.Length + ExtensionLoader.InstalledExtensions.Where(t => t.ProjectTemplates()?.Length > 0).Select(p => p.Metadata.Name).Append("Preinstalled").Select(p => p.Length).Max();
+
+            WriteLine(tableHeader);
+            WriteLine(new('-', headerWidth));
+
+            foreach (IProjectTemplate template in availableTemplates.OrderBy(t => t.Name))
+            {
+                string packageName;
+
+                if (ExtensionLoader.InstalledExtensions.Any(p => p.ProjectTemplates() != null && p.ProjectTemplates().Any(t => t.GetType() == template.GetType())))
+                    packageName = ExtensionLoader.InstalledExtensions.First(p => p.ProjectTemplates() != null && p.ProjectTemplates().Any(t => t.GetType() == template.GetType())).Metadata.Name;
+                else
+                    packageName = "Preinstalled";
+
+                WriteLine($"{template.Name.PadRight(templateNameWidth)}\t\t{packageName}");
+            }
+        }
+
         if (args.Length < 2)
         {
-            WriteLine("Specify a project template and name.");
+            EmitErrorMessage(0, 0, 0, DS0205_DCNewInvalidArguments, "Project template and name expected.", "dc");
+            WriteLine("");
+            PrintAvailableTemplates();
             return -1;
         }
 
-        IEnumerable<IProjectTemplate> availableTemplates = ExtensionLoader.ProjectTemplates;
-
         if (!availableTemplates.Any(t => string.Compare(t.Name, args[0], !t.IsCaseSensitive()) == 0))
         {
-            WriteLine($"The project template '{args[0]}' is not installed. Installed templates are: {string.Join(", ", availableTemplates.Select(t => $"'{t.Name}'"))}.");
+            EmitErrorMessage(0, 0, 0, DS0205_DCNewInvalidArguments, $"The project template '{args[0]}' is not installed.", "dc");
+            WriteLine("");
+            PrintAvailableTemplates();
             return -1;
         }
 

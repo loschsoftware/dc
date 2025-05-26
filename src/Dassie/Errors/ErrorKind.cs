@@ -840,5 +840,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a project structure contains a circular dependency.
     /// </summary>
-    DS0204_CircularProjectDependency
+    DS0204_CircularProjectDependency,
+    /// <summary>
+    /// Emitted when the 'dc new' command is invoked with invalid arguments.
+    /// </summary>
+    DS0205_DCNewInvalidArguments
 }
