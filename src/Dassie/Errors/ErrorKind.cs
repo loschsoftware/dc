@@ -844,5 +844,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the 'dc new' command is invoked with invalid arguments.
     /// </summary>
-    DS0205_DCNewInvalidArguments
+    DS0205_DCNewInvalidArguments,
+    /// <summary>
+    /// Emitted when the 'dc new' command specifies a project directory that is not empty.
+    /// </summary>
+    DS0206_DCNewNonEmptyDirectory
 }

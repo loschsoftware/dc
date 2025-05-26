@@ -62,8 +62,19 @@ internal static class TemplateBuilder
         IProjectTemplate selectedTemplate = availableTemplates.First(t => string.Compare(t.Name, args[0], !t.IsCaseSensitive()) == 0);
 
         string rootDir = Path.Combine(Directory.GetCurrentDirectory(), args[1]);
-        Directory.CreateDirectory(rootDir);
 
+        if (Directory.Exists(rootDir) && Directory.GetFileSystemEntries(rootDir).Length > 0)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0206_DCNewNonEmptyDirectory,
+                $"The project directory '{rootDir}' already exists and is not empty.",
+                "dc");
+
+            return -1;
+        }
+
+        Directory.CreateDirectory(rootDir);
         DassieConfig config = null;
 
         if (selectedTemplate.Entries.Any(t => t is ProjectFile))
