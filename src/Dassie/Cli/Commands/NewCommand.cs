@@ -10,7 +10,7 @@ internal class NewCommand : ICompilerCommand
 
     public string Command => "new";
 
-    public string UsageString => "new <Type> <Name>";
+    public string UsageString => "new <Type> <Name> [-f|--force]";
 
     public string Description => "Creates the file structure of a Dassie project.";
 

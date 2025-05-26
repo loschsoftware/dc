@@ -15,6 +15,17 @@ namespace Dassie.Templates;
 /// </summary>
 internal static class TemplateBuilder
 {
+    private static void RecursiveDelete(DirectoryInfo baseDir)
+    {
+        if (!baseDir.Exists)
+            return;
+
+        foreach (var dir in baseDir.EnumerateDirectories())
+            RecursiveDelete(dir);
+
+        baseDir.Delete(true);
+    }
+
     public static int CreateStructure(string[] args)
     {
         IEnumerable<IProjectTemplate> availableTemplates = ExtensionLoader.ProjectTemplates;
@@ -65,13 +76,18 @@ internal static class TemplateBuilder
 
         if (Directory.Exists(rootDir) && Directory.GetFileSystemEntries(rootDir).Length > 0)
         {
-            EmitErrorMessage(
-                0, 0, 0,
-                DS0206_DCNewNonEmptyDirectory,
-                $"The project directory '{rootDir}' already exists and is not empty.",
-                "dc");
+            if (args.Any(a => a == "-f" || a == "--force"))
+                RecursiveDelete(new(rootDir));
+            else
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0206_DCNewNonEmptyDirectory,
+                    $"The project directory '{rootDir}' already exists and is not empty. Use the '-f' flag to delete the existing directory.",
+                    "dc");
 
-            return -1;
+                return -1;
+            }
         }
 
         Directory.CreateDirectory(rootDir);
