@@ -264,20 +264,36 @@ internal class CompileCommand : ICompilerCommand
 
         if (!messages.Any(m => m.Severity == Severity.Error))
         {
-            NativeResource[] resources = null;
+            ResourceList rl = new();
 
             if (!string.IsNullOrEmpty(resFile))
             {
-                resources = [new()
-                {
-                    Data = File.ReadAllBytes(resFile),
-                    Kind = ResourceKind.Version
-                }];
+                rl.Types = [
+                    new() {
+                        Id = 0x10,
+                        Resources = [
+                            new() {
+                                LanguageVariants = [
+                                    new() {
+                                        Data = ResourceExtractor.ExtractVersionInfoResource(File.ReadAllBytes(resFile)),
+                                        Language = 1
+                                    }
+                                    ]
+                            }
+                            ]
+                    }
+                    ];
+
+                //resources = [new()
+                //{
+                //    Data = File.ReadAllBytes(resFile),
+                //    Kind = ResourceKind.Version
+                //}];
             }
 
             ManagedPEBuilder peBuilder = CreatePEBuilder(
                 Context.EntryPoint,
-                resources,
+                rl,
                 assembly,
                 config.Configuration == ApplicationConfiguration.Debug || config.CreatePdb,
                 config.Platform == Platform.x86);
@@ -388,7 +404,7 @@ internal class CompileCommand : ICompilerCommand
         return errors.SelectMany(e => e).Count(e => e.Severity == Severity.Error);
     }
 
-    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, NativeResource[] resources, string asmName, bool makePdb, bool is32Bit)
+    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, ResourceList resources, string asmName, bool makePdb, bool is32Bit)
     {
         MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData, out MetadataBuilder pdbBuilder);
         PEHeaderBuilder headerBuilder = new(
