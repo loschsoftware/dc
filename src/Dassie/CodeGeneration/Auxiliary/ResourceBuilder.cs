@@ -57,7 +57,7 @@ internal class ResourceBuilder : ResourceSectionBuilder
                 foreach ((int i, ResourceEntry res) in rlg.LanguageVariants.Index())
                 {
                     bw.Write(res.Language);
-                    bw.Write(0x80000000 + realOffset + rtg.Resources.Length * 8 + i * 16);
+                    bw.Write((uint)(0x80000000 + realOffset + rtg.Resources.Length * 8 + i * 16));
                     realOffset += 8;
                 }
 
