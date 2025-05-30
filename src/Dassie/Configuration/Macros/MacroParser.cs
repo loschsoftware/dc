@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -78,6 +79,19 @@ internal class MacroParser
                 }
 
                 Normalize(prop.GetValue(obj));
+                continue;
+            }
+
+            if (prop.PropertyType.Name == "List`1")
+            {
+                object list = prop.GetValue(obj);
+
+                if (list == null)
+                    continue;
+
+                foreach (object item in (IList)list)
+                    Normalize(item);
+
                 continue;
             }
 

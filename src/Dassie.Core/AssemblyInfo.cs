@@ -9,4 +9,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyProduct("Dassie")]
 [assembly: AssemblyDescription("Dassie Standard Library")]
 [assembly: AssemblyTitle("Dassie Standard Library")]
-[assembly: AssemblyCopyright("© 2024 Losch")]
+[assembly: AssemblyCopyright("© 2025 Losch")]
