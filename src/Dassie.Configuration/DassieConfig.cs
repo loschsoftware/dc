@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration.ProjectGroups;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Dassie.Configuration;
@@ -69,9 +70,14 @@ public sealed class DassieConfig
     [DefaultValue("")]
     public string RuntimeIdentifier { get; set; }
 
-    [Description("Defines version information of the application.")]
+    [Description("Sets version information fields for the application.")]
     [XmlElement("VersionInfo")]
-    public VersionInfo VersionInfo { get; set; }
+    public List<VersionInfo> VersionInfo { get; set; }
+
+    [Description("Sets the application icon file.")]
+    [DefaultValue("")]
+    [XmlElement]
+    public string IconFile { get; set; }
 
     [Description("Sets the directory where the compiled assemblies will be placed.")]
     [XmlElement("BuildDirectory")]

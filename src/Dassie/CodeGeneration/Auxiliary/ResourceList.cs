@@ -19,19 +19,24 @@ internal class ResourceTypeGroup
     /// <summary>
     /// The resource type identifier.
     /// </summary>
-    public uint Id;
+    public uint Id { get; set; }
 
     /// <summary>
     /// An array of resource directories containing language variants for resources.
     /// </summary>
-    public ResourceLanguageGroup[] Resources { get; set; }
+    public ResourceId[] Resources { get; set; }
 }
 
 /// <summary>
-/// Represents a resource directory containing language variants for a resource.
+/// Represents a resource identifier with multiple language variants.
 /// </summary>
-internal class ResourceLanguageGroup
+internal class ResourceId
 {
+    /// <summary>
+    /// The ID of the resource.
+    /// </summary>
+    public uint Id { get; set; }
+
     /// <summary>
     /// An array of resource entries with specific languages.
     /// </summary>

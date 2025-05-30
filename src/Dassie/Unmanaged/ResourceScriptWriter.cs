@@ -1,16 +1,20 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Dassie.Unmanaged;
 
 internal class ResourceScriptWriter : IDisposable
 {
-    readonly StreamWriter sw;
+    readonly StreamWriter _sw;
+    readonly int[] _lcids;
+    int _currentId;
 
-    public ResourceScriptWriter(string path)
+    public ResourceScriptWriter(string path, int[] lcids)
     {
-        sw = new(new FileStream(path, FileMode.Create), Encoding.Unicode)
+        _lcids = lcids;
+        _sw = new(new FileStream(path, FileMode.Create), Encoding.Unicode)
         {
             AutoFlush = true
         };
@@ -18,11 +22,18 @@ internal class ResourceScriptWriter : IDisposable
 
     public void AddIcon(string iconPath, string id)
     {
+        _sw.WriteLine("LANGUAGE 0, 0");
         iconPath = iconPath.Trim('"');
-        sw.WriteLine($"{id} ICON \"{iconPath.Replace("\\", "\\\\")}\"");
+        _sw.WriteLine($"{id} ICON \"{iconPath.Trim('"').Replace("\\", "\\\\")}\"");
     }
 
     public void AddMainIcon(string iconPath) => AddIcon(iconPath, "MAINICON");
+
+    public void AddManifest(string manifestFilePath)
+    {
+        _sw.WriteLine("LANGUAGE 0, 0");
+        _sw.WriteLine($"{++_currentId} RT_MANIFEST \"{manifestFilePath.Trim('"').Replace("\\", "\\\\")}\"");
+    }
 
     public void AddFileVersion(string version)
     {
@@ -58,31 +69,39 @@ internal class ResourceScriptWriter : IDisposable
             parts.Length > 3 ? int.Parse(parts[3]) : 0);
     }
 
-    public void BeginVersionInfo()
+    public void SetLanguage(int lcid)
     {
-        sw.WriteLine("VS_VERSION_INFO VERSIONINFO");
+        _sw.WriteLine($"LANGUAGE {lcid}, {(lcid == 0 ? 0 : 1)}");
+    }
 
-        sw.WriteLine(@"FILEFLAGSMASK 0x3fL
+    public void BeginVersionInfo(int fileType)
+    {
+        _sw.WriteLine($"{++_currentId} VERSIONINFO");
+
+        _sw.WriteLine($@"FILEFLAGSMASK 0x3fL
 FILEFLAGS 0x0
+FILEOS 0x4
+FILETYPE {fileType}
 FILESUBTYPE 0x0");
     }
 
     public void AddFileVersion(int major, int minor, int patch = 0, int build = 0)
     {
-        sw.WriteLine($"FILEVERSION {major},{minor},{patch},{build}");
+        _sw.WriteLine($"FILEVERSION {major},{minor},{patch},{build}");
     }
 
     public void AddProductVersion(int major, int minor, int patch = 0, int build = 0)
     {
-        sw.WriteLine($"PRODUCTVERSION {major},{minor},{patch},{build}");
+        _sw.WriteLine($"PRODUCTVERSION {major},{minor},{patch},{build}");
     }
 
     public void Begin()
     {
-        sw.WriteLine("BEGIN");
+        _sw.WriteLine("BEGIN");
     }
 
     public void AddStringFileInfo(
+        int lcid,
         string company,
         string description,
         string fileVersion,
@@ -110,9 +129,9 @@ FILESUBTYPE 0x0");
         productName = productName.Replace("\"", "\"\"");
         productVersion = productVersion.Replace("\"", "\"\"");
 
-        sw.WriteLine($@"BLOCK ""StringFileInfo""
+        _sw.WriteLine($@"BLOCK ""StringFileInfo""
     BEGIN
-        BLOCK ""040904b0""
+        BLOCK ""{string.Format("{0:X}", lcid).PadLeft(4, '0')}04b0""
         BEGIN
             VALUE ""CompanyName"", L""{company}\0""
             VALUE ""FileDescription"", L""{description}""
@@ -126,17 +145,17 @@ FILESUBTYPE 0x0");
     END
     BLOCK ""VarFileInfo""
     BEGIN
-        VALUE ""Translation"", 0x409, 1200
+        VALUE ""Translation"", {string.Join(" ", _lcids.Select(l => $"{l}, 1200,"))[..^1]}
     END");
     }
 
     public void End()
     {
-        sw.WriteLine("END");
+        _sw.WriteLine("END");
     }
 
     public void Dispose()
     {
-        sw.Dispose();
+        _sw.Dispose();
     }
 }

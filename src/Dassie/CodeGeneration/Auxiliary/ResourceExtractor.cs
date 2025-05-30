@@ -98,7 +98,6 @@ internal static class ResourceExtractor
         try
         {
             // Skip the empty first entry
-            int offset = 0x20;
             br.ReadBytes(0x20);
 
             while (br.PeekChar() != -1)
@@ -124,8 +123,7 @@ internal static class ResourceExtractor
                 else
                     name = ReadString(br, nameFirstChar);
 
-                if (br.BaseStream.Position % 4 != 0)
-                    br.ReadUInt16();
+                br.BaseStream.Seek((4 - (br.BaseStream.Position % 4)) % 4, SeekOrigin.Current);
 
                 uint dataVersion = br.ReadUInt32();
                 ushort memoryFlags = br.ReadUInt16();
@@ -151,14 +149,7 @@ internal static class ResourceExtractor
                     Data = data
                 });
 
-                offset += (int)(dataSize + headerSize);
-
-                if (offset % 8 != 0)
-                {
-                    int alignment = 8 - (offset % 8);
-                    br.ReadBytes(alignment);
-                    offset += alignment;
-                }
+                br.BaseStream.Seek((4 - (br.BaseStream.Position % 4)) % 4, SeekOrigin.Current);
             }
         }
         catch (Exception)
@@ -184,7 +175,7 @@ internal static class ResourceExtractor
 
         foreach (var typeGroup in resources.GroupBy(r => r.ResourceType))
         {
-            List<ResourceLanguageGroup> langGroups = [];
+            List<ResourceId> langGroups = [];
 
             foreach (var langGroup in typeGroup.GroupBy(t => t.LanguageId))
             {

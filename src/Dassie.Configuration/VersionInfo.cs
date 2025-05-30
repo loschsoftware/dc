@@ -1,11 +1,18 @@
-﻿namespace Dassie.Configuration;
+﻿using System.ComponentModel;
+
+namespace Dassie.Configuration;
 
 [Serializable]
 [XmlRoot]
 public class VersionInfo
 {
-    [XmlElement("IconFile")]
-    public string ApplicationIcon { get; set; }
+    [XmlAttribute]
+    [DefaultValue("en-US")]
+    public string Language { get; set; }
+
+    [XmlAttribute]
+    [DefaultValue(1033)]
+    public int Lcid { get; set; }
 
     [XmlElement("Product")]
     public string Product { get; set; }

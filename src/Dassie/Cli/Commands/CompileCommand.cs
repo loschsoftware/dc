@@ -7,7 +7,6 @@ using Dassie.Data;
 using Dassie.Errors;
 using Dassie.Errors.Devices;
 using Dassie.Extensions;
-using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Unmanaged;
 using Microsoft.NET.HostModel.AppHost;
@@ -15,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -23,7 +23,6 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 #pragma warning disable IDE0079
 #pragma warning disable IL3000
@@ -178,10 +177,10 @@ internal class CompileCommand : ICompilerCommand
                     ProjectConfigurationFileName);
             }
         }
-        
-        if (Context.Configuration.VersionInfo != null)
+
+        if ((Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0) || !string.IsNullOrEmpty(Context.Configuration.IconFile) || !string.IsNullOrEmpty(Context.Configuration.AssemblyManifest))
         {
-            if (!string.IsNullOrEmpty(resFile))
+            if (!string.IsNullOrEmpty(resFile) && (Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0))
             {
                 EmitErrorMessage(
                     0, 0, 0,
@@ -191,12 +190,6 @@ internal class CompileCommand : ICompilerCommand
             }
             else
             {
-                EmitMessage(
-                    0, 0, 0,
-                    DS0070_AvoidVersionInfoTag,
-                    $"Using the 'VersionInfo' tag in dsconfig.xml worsens compilation performance. Consider precompiling your version info and including it as an unmanaged resource.",
-                    ProjectConfigurationFileName);
-
                 string rc = WinSdkHelper.GetToolPath("rc.exe");
 
                 if (string.IsNullOrEmpty(rc))
@@ -210,42 +203,115 @@ internal class CompileCommand : ICompilerCommand
                     return -1;
                 }
 
-                Guid guid = Guid.NewGuid();
+                int[] lcids = [0];
+
+                if (Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0)
+                {
+                    lcids = Context.Configuration.VersionInfo.Select(v =>
+                    {
+                        if (!string.IsNullOrEmpty(v.Language))
+                        {
+                            try
+                            {
+                                return new CultureInfo(v.Language).LCID;
+                            }
+                            catch (CultureNotFoundException)
+                            {
+                                if (v.Language.Equals("default", StringComparison.InvariantCultureIgnoreCase))
+                                    return 0;
+
+                                EmitErrorMessage(
+                                    0, 0, 0,
+                                    DS0089_InvalidDSConfigProperty,
+                                    $"Invalid language code '{v.Language}'.",
+                                    ProjectConfigurationFileName);
+                            }
+
+                            return 1033;
+                        }
+
+                        return v.Lcid;
+
+                    }).ToArray();
+                }
 
                 string rcPath = Path.ChangeExtension(config.AssemblyName, "rc");
-                ResourceScriptWriter rsw = new(rcPath);
+                ResourceScriptWriter rsw = new(rcPath, lcids);
 
-                rsw.BeginVersionInfo();
-                rsw.AddFileVersion(Context.Configuration.VersionInfo.FileVersion);
-                rsw.AddProductVersion(Context.Configuration.VersionInfo.Version);
+                if (lcids.Distinct().Count() != lcids.Length)
+                {
+                    List<int> seen = [];
+                    foreach (int lcid in lcids)
+                    {
+                        if (seen.Contains(lcid))
+                        {
+                            EmitErrorMessage(
+                                0, 0, 0,
+                                DS0089_InvalidDSConfigProperty,
+                                $"Configuration file contains multiple version info resources for language '{new CultureInfo(lcid).Name}'.",
+                                ProjectConfigurationFileName);
+                        }
 
-                rsw.Begin();
-                rsw.AddStringFileInfo(
-                    Context.Configuration.VersionInfo.Company,
-                    Context.Configuration.VersionInfo.Description,
-                    Context.Configuration.VersionInfo.FileVersion,
-                    Context.Configuration.VersionInfo.InternalName,
-                    Context.Configuration.VersionInfo.Copyright,
-                    Context.Configuration.VersionInfo.Trademark,
-                    Context.Configuration.VersionInfo.Product,
-                    Context.Configuration.VersionInfo.Version
-                    );
+                        seen.Add(lcid);
+                    }
+                }
 
-                rsw.End();
+                if (Context.Configuration.VersionInfo != null)
+                {
+                    foreach ((int i, VersionInfo lang) in Context.Configuration.VersionInfo.Index())
+                    {
+                        rsw.SetLanguage(lcids[i]);
+                        rsw.BeginVersionInfo(Context.Configuration.ApplicationType == ApplicationType.Library ? 2 : 1);
+                        rsw.AddFileVersion(lang.FileVersion);
+                        rsw.AddProductVersion(lang.Version);
 
-                if (!string.IsNullOrEmpty(Context.Configuration.VersionInfo.ApplicationIcon) && !File.Exists(Context.Configuration.VersionInfo.ApplicationIcon))
+                        rsw.Begin();
+                        rsw.AddStringFileInfo(
+                            lcids[i],
+                            lang.Company,
+                            lang.Description,
+                            lang.FileVersion,
+                            lang.InternalName,
+                            lang.Copyright,
+                            lang.Trademark,
+                            lang.Product,
+                            lang.Version
+                            );
+
+                        rsw.End();
+                    }
+                }
+
+                string icoFile = Path.GetFullPath(Path.Combine(relativePathResolverBaseDir, Context.Configuration.IconFile ?? ""));
+                string manifest = Path.GetFullPath(Path.Combine(relativePathResolverBaseDir, Context.Configuration.AssemblyManifest ?? ""));
+                
+                if (!string.IsNullOrEmpty(Context.Configuration.IconFile) && !File.Exists(icoFile))
                 {
                     EmitErrorMessage(
                        0, 0, 0,
-                       DS0069_WinSdkToolNotFound,
-                       $"The specified icon file '{Context.Configuration.VersionInfo.ApplicationIcon}' could not be found.",
+                       DS0067_ResourceFileNotFound,
+                       $"The specified icon file '{Context.Configuration.IconFile}' could not be found.",
                        ProjectConfigurationFileName);
 
                     return -1;
                 }
 
-                if (File.Exists(Context.Configuration.VersionInfo.ApplicationIcon ?? ""))
-                    rsw.AddMainIcon(Context.Configuration.VersionInfo.ApplicationIcon);
+                if (!string.IsNullOrEmpty(Context.Configuration.AssemblyManifest) && !File.Exists(manifest))
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0067_ResourceFileNotFound,
+                        $"The specified manifest file '{Context.Configuration.AssemblyManifest}' could not be found.",
+                        ProjectConfigurationFileName);
+
+                    return -1;
+                }
+
+                if (File.Exists(icoFile))
+                    rsw.AddMainIcon(icoFile);
+
+                if (File.Exists(manifest))
+                    rsw.AddManifest(manifest);
 
                 rsw.Dispose();
 
@@ -266,22 +332,17 @@ internal class CompileCommand : ICompilerCommand
             }
         }
 
-        if (!string.IsNullOrEmpty(config.AssemblyManifest) && File.Exists(config.AssemblyManifest))
-        {
-            // TODO: Include .manifest file
-        }
-
         foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
             AddResource(res, Directory.GetCurrentDirectory(), relativePathResolverBaseDir);
 
         if (!messages.Any(m => m.Severity == Severity.Error))
         {
             byte[] resourceBytes = File.ReadAllBytes(resFile);
-            ResourceList rl = ResourceExtractor.GetResourceList(ResourceExtractor.GetResources(resourceBytes, Path.GetFileName(resFile)));
+            ResourceExtractor.Resource[] resources = ResourceExtractor.GetResources(resourceBytes, Path.GetFileName(resFile));
 
             ManagedPEBuilder peBuilder = CreatePEBuilder(
                 Context.EntryPoint,
-                rl,
+                resources,
                 assembly,
                 config.Configuration == ApplicationConfiguration.Debug || config.CreatePdb,
                 config.Platform == Platform.x86);
@@ -307,21 +368,19 @@ internal class CompileCommand : ICompilerCommand
             peBlob.WriteContentTo(fs);
             fs.Dispose();
 
-            // TODO: Uncomment this ASAP
+            if (config.ApplicationType != ApplicationType.Library && config.GenerateNativeAppHost)
+            {
+                string executableExtension = OperatingSystem.IsWindows() ? "exe" : "";
+                string frameworkBaseDir = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk")).Last();
+                string asmPath = Path.GetFileName(assembly);
 
-            //if (config.ApplicationType != ApplicationType.Library && config.GenerateNativeAppHost)
-            //{
-            //    string executableExtension = OperatingSystem.IsWindows() ? "exe" : "";
-            //    string frameworkBaseDir = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk")).Last();
-            //    string asmPath = Path.GetFileName(assembly);
-
-            //    HostWriter.CreateAppHost(
-            //        Directory.GetFiles(Path.Combine(frameworkBaseDir, "AppHostTemplate")).First(),
-            //        Path.ChangeExtension(asmPath, executableExtension),
-            //        asmPath,
-            //        config.ApplicationType == ApplicationType.WinExe,
-            //        asmPath);
-            //}
+                HostWriter.CreateAppHost(
+                    Directory.GetFiles(Path.Combine(frameworkBaseDir, "AppHostTemplate")).First(),
+                    Path.ChangeExtension(asmPath, executableExtension),
+                    asmPath,
+                    config.ApplicationType == ApplicationType.WinExe,
+                    asmPath);
+            }
 
             if (Context.Configuration.Runtime == Configuration.Runtime.Aot)
             {
@@ -394,7 +453,7 @@ internal class CompileCommand : ICompilerCommand
         return errors.SelectMany(e => e).Count(e => e.Severity == Severity.Error);
     }
 
-    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, ResourceList resources, string asmName, bool makePdb, bool is32Bit)
+    public static ManagedPEBuilder CreatePEBuilder(MethodInfo entryPoint, ResourceExtractor.Resource[] resources, string asmName, bool makePdb, bool is32Bit)
     {
         MetadataBuilder mb = Context.Assembly.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder mappedFieldData, out MetadataBuilder pdbBuilder);
         PEHeaderBuilder headerBuilder = new(
@@ -413,7 +472,7 @@ internal class CompileCommand : ICompilerCommand
 
         ResourceSectionBuilder rsb = null;
         if (resources != null)
-            rsb = new ResourceBuilder(resources);
+            rsb = new ResourceSerializer(resources);
 
         DebugDirectoryBuilder dbgBuilder = null;
 
