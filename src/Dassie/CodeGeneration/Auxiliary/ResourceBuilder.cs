@@ -5,8 +5,15 @@ using System.Reflection.PortableExecutable;
 
 namespace Dassie.CodeGeneration.Auxiliary;
 
+/// <summary>
+/// Serializes the .rsrc section of a .NET assembly.
+/// </summary>
 internal class ResourceBuilder : ResourceSectionBuilder
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ResourceBuilder"/> class with the specified resources.
+    /// </summary>
+    /// <param name="resources">A <see cref="ResourceList"/> containing the resources to include.</param>
     public ResourceBuilder(ResourceList resources)
     {
         _resources = resources;
@@ -18,9 +25,6 @@ internal class ResourceBuilder : ResourceSectionBuilder
     {
         using MemoryStream ms = new();
         BinaryWriter bw = new(ms);
-
-        // TODO: Make this whole thing work with more than just version infos
-        //_resources[0].Data = ResourceExtractor.ExtractVersionInfoResource(_resources[0].Data);
 
         bw.Write((uint)0);                            // Characteristics -> irrelevant
         bw.Write((uint)0);                            // Time Stamp -> irrelevant
@@ -78,7 +82,7 @@ internal class ResourceBuilder : ResourceSectionBuilder
 
                 foreach (ResourceEntry res in rlg.LanguageVariants)
                 {
-                    bw.Write((uint)location.RelativeVirtualAddress + realOffset + 8);  // Offset to data
+                    bw.Write((uint)location.RelativeVirtualAddress + realOffset + 16);  // Offset to data
                     bw.Write((uint)res.Data.Length);                                   // Data size
                     bw.Write((uint)0);                                                 // Code page
                     bw.Write((uint)0);                                                 // Reserved

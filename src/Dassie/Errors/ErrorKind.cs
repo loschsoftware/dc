@@ -848,5 +848,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the 'dc new' command specifies a project directory that is not empty.
     /// </summary>
-    DS0206_DCNewNonEmptyDirectory
+    DS0206_DCNewNonEmptyDirectory,
+    /// <summary>
+    /// Emitted when a resource file passed to the compiler is invalid.
+    /// </summary>
+    DS0207_InvalidResourceFile
 }

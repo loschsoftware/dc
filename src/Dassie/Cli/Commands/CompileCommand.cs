@@ -178,80 +178,92 @@ internal class CompileCommand : ICompilerCommand
                     ProjectConfigurationFileName);
             }
         }
-        else if (Context.Configuration.VersionInfo != null)
+        
+        if (Context.Configuration.VersionInfo != null)
         {
-            EmitMessage(
-                0, 0, 0,
-                DS0070_AvoidVersionInfoTag,
-                $"Using the 'VersionInfo' tag in dsconfig.xml worsens compilation performance. Consider precompiling your version info and including it as an unmanaged resource.",
-                ProjectConfigurationFileName);
-
-            string rc = WinSdkHelper.GetToolPath("rc.exe");
-
-            if (string.IsNullOrEmpty(rc))
-            {
-                EmitWarningMessage(
-                    0, 0, 0,
-                    DS0069_WinSdkToolNotFound,
-                    $"The Windows SDK tool 'rc.exe' could not be located. Setting version information failed. Consider precompiling your version info and including it as an unmanaged resource.",
-                    ProjectConfigurationFileName);
-
-                return -1;
-            }
-
-            Guid guid = Guid.NewGuid();
-
-            string rcPath = Path.ChangeExtension(config.AssemblyName, "rc");
-            ResourceScriptWriter rsw = new(rcPath);
-
-            rsw.BeginVersionInfo();
-            rsw.AddFileVersion(Context.Configuration.VersionInfo.FileVersion);
-            rsw.AddProductVersion(Context.Configuration.VersionInfo.Version);
-
-            rsw.Begin();
-            rsw.AddStringFileInfo(
-                Context.Configuration.VersionInfo.Company,
-                Context.Configuration.VersionInfo.Description,
-                Context.Configuration.VersionInfo.FileVersion,
-                Context.Configuration.VersionInfo.InternalName,
-                Context.Configuration.VersionInfo.Copyright,
-                Context.Configuration.VersionInfo.Trademark,
-                Context.Configuration.VersionInfo.Product,
-                Context.Configuration.VersionInfo.Version
-                );
-
-            rsw.End();
-
-            if (!string.IsNullOrEmpty(Context.Configuration.VersionInfo.ApplicationIcon) && !File.Exists(Context.Configuration.VersionInfo.ApplicationIcon))
+            if (!string.IsNullOrEmpty(resFile))
             {
                 EmitErrorMessage(
-                   0, 0, 0,
-                   DS0069_WinSdkToolNotFound,
-                   $"The specified icon file '{Context.Configuration.VersionInfo.ApplicationIcon}' could not be found.",
-                   ProjectConfigurationFileName);
-
-                return -1;
+                    0, 0, 0,
+                    DS0090_MalformedConfigurationFile,
+                    $"The 'VersionInfo' tag cannot be used if an unmanaged resource file is specified.",
+                    ProjectConfigurationFileName);
             }
-
-            if (File.Exists(Context.Configuration.VersionInfo.ApplicationIcon ?? ""))
-                rsw.AddMainIcon(Context.Configuration.VersionInfo.ApplicationIcon);
-
-            rsw.Dispose();
-
-            ProcessStartInfo psi = new()
+            else
             {
-                FileName = rc,
-                Arguments = rcPath,
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
+                EmitMessage(
+                    0, 0, 0,
+                    DS0070_AvoidVersionInfoTag,
+                    $"Using the 'VersionInfo' tag in dsconfig.xml worsens compilation performance. Consider precompiling your version info and including it as an unmanaged resource.",
+                    ProjectConfigurationFileName);
 
-            Process.Start(psi).WaitForExit();
+                string rc = WinSdkHelper.GetToolPath("rc.exe");
 
-            resFile = Path.ChangeExtension(rcPath, ".res");
-            
-            if (!Context.Configuration.PersistentResourceScript)
-                File.Delete(rcPath);
+                if (string.IsNullOrEmpty(rc))
+                {
+                    EmitWarningMessage(
+                        0, 0, 0,
+                        DS0069_WinSdkToolNotFound,
+                        $"The Windows SDK tool 'rc.exe' could not be located. Setting version information failed. Consider precompiling your version info and including it as an unmanaged resource.",
+                        ProjectConfigurationFileName);
+
+                    return -1;
+                }
+
+                Guid guid = Guid.NewGuid();
+
+                string rcPath = Path.ChangeExtension(config.AssemblyName, "rc");
+                ResourceScriptWriter rsw = new(rcPath);
+
+                rsw.BeginVersionInfo();
+                rsw.AddFileVersion(Context.Configuration.VersionInfo.FileVersion);
+                rsw.AddProductVersion(Context.Configuration.VersionInfo.Version);
+
+                rsw.Begin();
+                rsw.AddStringFileInfo(
+                    Context.Configuration.VersionInfo.Company,
+                    Context.Configuration.VersionInfo.Description,
+                    Context.Configuration.VersionInfo.FileVersion,
+                    Context.Configuration.VersionInfo.InternalName,
+                    Context.Configuration.VersionInfo.Copyright,
+                    Context.Configuration.VersionInfo.Trademark,
+                    Context.Configuration.VersionInfo.Product,
+                    Context.Configuration.VersionInfo.Version
+                    );
+
+                rsw.End();
+
+                if (!string.IsNullOrEmpty(Context.Configuration.VersionInfo.ApplicationIcon) && !File.Exists(Context.Configuration.VersionInfo.ApplicationIcon))
+                {
+                    EmitErrorMessage(
+                       0, 0, 0,
+                       DS0069_WinSdkToolNotFound,
+                       $"The specified icon file '{Context.Configuration.VersionInfo.ApplicationIcon}' could not be found.",
+                       ProjectConfigurationFileName);
+
+                    return -1;
+                }
+
+                if (File.Exists(Context.Configuration.VersionInfo.ApplicationIcon ?? ""))
+                    rsw.AddMainIcon(Context.Configuration.VersionInfo.ApplicationIcon);
+
+                rsw.Dispose();
+
+                ProcessStartInfo psi = new()
+                {
+                    FileName = rc,
+                    Arguments = rcPath,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+
+                Process.Start(psi).WaitForExit();
+
+                resFile = Path.ChangeExtension(rcPath, ".res");
+
+                if (!Context.Configuration.PersistentResourceScript)
+                    File.Delete(rcPath);
+            }
         }
 
         if (!string.IsNullOrEmpty(config.AssemblyManifest) && File.Exists(config.AssemblyManifest))
@@ -264,32 +276,8 @@ internal class CompileCommand : ICompilerCommand
 
         if (!messages.Any(m => m.Severity == Severity.Error))
         {
-            ResourceList rl = new();
-
-            if (!string.IsNullOrEmpty(resFile))
-            {
-                rl.Types = [
-                    new() {
-                        Id = 0x10,
-                        Resources = [
-                            new() {
-                                LanguageVariants = [
-                                    new() {
-                                        Data = ResourceExtractor.ExtractVersionInfoResource(File.ReadAllBytes(resFile)),
-                                        Language = 1
-                                    }
-                                    ]
-                            }
-                            ]
-                    }
-                    ];
-
-                //resources = [new()
-                //{
-                //    Data = File.ReadAllBytes(resFile),
-                //    Kind = ResourceKind.Version
-                //}];
-            }
+            byte[] resourceBytes = File.ReadAllBytes(resFile);
+            ResourceList rl = ResourceExtractor.GetResourceList(ResourceExtractor.GetResources(resourceBytes, Path.GetFileName(resFile)));
 
             ManagedPEBuilder peBuilder = CreatePEBuilder(
                 Context.EntryPoint,
@@ -319,19 +307,21 @@ internal class CompileCommand : ICompilerCommand
             peBlob.WriteContentTo(fs);
             fs.Dispose();
 
-            if (config.ApplicationType != ApplicationType.Library && config.GenerateNativeAppHost)
-            {
-                string executableExtension = OperatingSystem.IsWindows() ? "exe" : "";
-                string frameworkBaseDir = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk")).Last();
-                string asmPath = Path.GetFileName(assembly);
+            // TODO: Uncomment this ASAP
 
-                HostWriter.CreateAppHost(
-                    Directory.GetFiles(Path.Combine(frameworkBaseDir, "AppHostTemplate")).First(),
-                    Path.ChangeExtension(asmPath, executableExtension),
-                    asmPath,
-                    config.ApplicationType == ApplicationType.WinExe,
-                    asmPath);
-            }
+            //if (config.ApplicationType != ApplicationType.Library && config.GenerateNativeAppHost)
+            //{
+            //    string executableExtension = OperatingSystem.IsWindows() ? "exe" : "";
+            //    string frameworkBaseDir = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk")).Last();
+            //    string asmPath = Path.GetFileName(assembly);
+
+            //    HostWriter.CreateAppHost(
+            //        Directory.GetFiles(Path.Combine(frameworkBaseDir, "AppHostTemplate")).First(),
+            //        Path.ChangeExtension(asmPath, executableExtension),
+            //        asmPath,
+            //        config.ApplicationType == ApplicationType.WinExe,
+            //        asmPath);
+            //}
 
             if (Context.Configuration.Runtime == Configuration.Runtime.Aot)
             {
