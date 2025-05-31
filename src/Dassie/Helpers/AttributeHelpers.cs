@@ -310,6 +310,12 @@ internal static class AttributeHelpers
             CheckModuleInitializerCompatibility(context);
             Context.ModuleInitializerParts.Add(CurrentMethod.Builder);
         }
+
+        else if (attribType == typeof(InitLocalsAttribute))
+        {
+            CurrentMethod.Builder.InitLocals = (bool)args[0];
+            AddAttributeToCurrentMethod(con, args);
+        }
     }
 
     public static List<(Type AttributeType, CustomAttributeBuilder Data, ConstructorInfo Ctor, object[] Args, AttributeTarget Target)> GetAttributeList(IEnumerable<DassieParser.AttributeContext> attributes, ExpressionEvaluator eval)
