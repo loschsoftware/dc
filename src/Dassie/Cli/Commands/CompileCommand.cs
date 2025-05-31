@@ -256,16 +256,17 @@ internal class CompileCommand : ICompilerCommand
                     }
                 }
 
-                if (Context.Configuration.VersionInfo != null)
+                if (Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0)
                 {
+                    rsw.SetLanguage(0);
+                    rsw.BeginVersionInfo(Context.Configuration.ApplicationType == ApplicationType.Library ? 2 : 1);
+                    rsw.AddFileVersion(Context.Configuration.VersionInfo[0].FileVersion);
+                    rsw.AddProductVersion(Context.Configuration.VersionInfo[0].Version);
+
+                    rsw.Begin();
+
                     foreach ((int i, VersionInfo lang) in Context.Configuration.VersionInfo.Index())
                     {
-                        rsw.SetLanguage(lcids[i]);
-                        rsw.BeginVersionInfo(Context.Configuration.ApplicationType == ApplicationType.Library ? 2 : 1);
-                        rsw.AddFileVersion(lang.FileVersion);
-                        rsw.AddProductVersion(lang.Version);
-
-                        rsw.Begin();
                         rsw.AddStringFileInfo(
                             lcids[i],
                             lang.Company,
@@ -277,9 +278,10 @@ internal class CompileCommand : ICompilerCommand
                             lang.Product,
                             lang.Version
                             );
-
-                        rsw.End();
                     }
+
+                    rsw.AddVarFileInfo();
+                    rsw.End();
                 }
 
                 string icoFile = Path.GetFullPath(Path.Combine(relativePathResolverBaseDir, Context.Configuration.IconFile ?? ""));

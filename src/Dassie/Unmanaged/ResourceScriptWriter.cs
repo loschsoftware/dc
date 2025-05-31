@@ -142,8 +142,12 @@ FILESUBTYPE 0x0");
             VALUE ""ProductName"", L""{productName}""
             VALUE ""ProductVersion"", L""{productVersion}\0""
         END
-    END
-    BLOCK ""VarFileInfo""
+    END");
+    }
+
+    public void AddVarFileInfo()
+    {
+        _sw.WriteLine($@"BLOCK ""VarFileInfo""
     BEGIN
         VALUE ""Translation"", {string.Join(" ", _lcids.Select(l => $"{l}, 1200,"))[..^1]}
     END");
