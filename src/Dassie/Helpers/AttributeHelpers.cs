@@ -313,6 +313,16 @@ internal static class AttributeHelpers
 
         else if (attribType == typeof(InitLocalsAttribute))
         {
+            if (!(bool)args[0])
+            {
+                EmitWarningMessage(
+                    context.Start.Line,
+                    context.Start.Column,
+                    context.GetText().Length,
+                    DS0208_UnverifiableCode,
+                    $"Disabling the zero-initialization of local variables using the <InitLocals> attribute causes the generated assembly to be unverifiable.");
+            }
+
             CurrentMethod.Builder.InitLocals = (bool)args[0];
             AddAttributeToCurrentMethod(con, args);
         }

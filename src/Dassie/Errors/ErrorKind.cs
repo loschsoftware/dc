@@ -852,5 +852,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a resource file passed to the compiler is invalid.
     /// </summary>
-    DS0207_InvalidResourceFile
+    DS0207_InvalidResourceFile,
+    /// <summary>
+    /// Emitted when the compiler produces code that is unverifiable.
+    /// </summary>
+    DS0208_UnverifiableCode
 }
