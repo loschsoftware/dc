@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Dassie.Cli.Commands;
 
@@ -24,6 +22,19 @@ internal class WatchCommand : ICompilerCommand
 
     public List<string> Aliases() => ["auto"];
 
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.",
+        Usage = ["dc watch [(--command|-c) <Command>] [(--profile|-p) <Profile>] [Directory]"],
+        Remarks = "Use the 'dc quit' command to stop all file watchers.",
+        Options =
+        [
+            ("-c|--command <Command>", "Specifies the compiler command that is executed when files are changed. The default value is 'build'."),
+            ("-p|--profile <Profile>", "Specifies the build profile that is used when files are changed. If this option is set, the '--command' option cannot be used."),
+            ("<Directory>", "Specifies the directory that is watched for changed source files. Cannot be combined with the '--command' and '--profile' options.")
+        ]
+    };
+
     public int Invoke(string[] args)
     {
         bool error = false;
@@ -33,27 +44,6 @@ internal class WatchCommand : ICompilerCommand
 
         if (args != null && args.Length > 0)
         {
-            if (args.Any(a => a == "-h" || a == "--help" || a == "-?"))
-            {
-                StringBuilder sb = new();
-
-                sb.AppendLine();
-                sb.AppendLine($"dc watch: {Description}");
-                sb.AppendLine();
-                sb.AppendLine("Usage: dc watch [(--command|-c) <Command>] [(--profile|-p) <Profile>] [Directory] [--help]");
-
-                sb.AppendLine();
-                sb.AppendLine("Available options:");
-                sb.Append($"{"    --command, -c <Command>",-35}{HelpCommand.FormatLines("Specifies the compiler command that is executed when files are changed. Default is 'build'.", indentWidth: 35)}");
-                sb.Append($"{"    --profile, -p <Profile>",-35}{HelpCommand.FormatLines("Specifies the build profile that is used when files are changed. If this option is set, the '--command' option cannot be used.", indentWidth: 35)}");
-                sb.Append($"{"    <Directory>",-35}{HelpCommand.FormatLines("Specifies the directory that is watched for changed source files. Cannot be combined with the '--command' and '--profile' options.", indentWidth: 35)}");
-                sb.Append($"{"    --help",-35}{HelpCommand.FormatLines("Shows this page.", indentWidth: 35)}");
-
-                HelpCommand.DisplayLogo();
-                Console.Write(sb.ToString());
-                return 0;
-            }
-
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].StartsWith('-'))

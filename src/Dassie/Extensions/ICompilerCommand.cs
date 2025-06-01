@@ -28,6 +28,12 @@ public interface ICompilerCommand
     public string Description { get; }
 
     /// <summary>
+    /// Represents the information displayed on the command's help page.
+    /// </summary>
+    /// <returns>Returns <see langword="null"/> by default.</returns>
+    public virtual CommandHelpDetails HelpDetails() => null;
+
+    /// <summary>
     /// An extended help text displayed when using the 'dc help &lt;Command&gt;' command.
     /// </summary>
     public virtual string Help() => "";

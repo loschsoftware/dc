@@ -24,6 +24,8 @@ internal static class CommandRegistry
         Commands = ExtensionLoader.GetAllCommands(packages);
     }
 
+    private static readonly string[] _helpOptions = ["-h", "--help", "/help", "/?"];
+
     /// <summary>
     /// Attempts to invoke a command with specific arguments.
     /// </summary>
@@ -36,6 +38,13 @@ internal static class CommandRegistry
         if (Commands.Any(c => c.Command == name || c.Aliases().Any(a => a == name)))
         {
             ICompilerCommand selectedCommand = Commands.First(c => c.Command == name || c.Aliases().Any(a => a == name));
+
+            if (args.Any(a => _helpOptions.Contains(a)))
+            {
+                errorCode = HelpCommand.DisplayHelpForCommand(selectedCommand);
+                return true;
+            }
+
             errorCode = selectedCommand.Invoke(args);
             return true;
         }

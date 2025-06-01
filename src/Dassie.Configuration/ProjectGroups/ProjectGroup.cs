@@ -11,6 +11,9 @@ public class ProjectGroup
     [XmlArrayItem(typeof(ProjectGroupComponent))]
     public Component[] Components { get; set; }
 
+    [XmlElement("Executable")]
+    public string ExecutableComponent { get; set; }
+
     [XmlArray]
     [XmlArrayItem(typeof(Directory))]
     public DeploymentTarget[] Targets { get; set; }

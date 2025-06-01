@@ -23,13 +23,26 @@ internal class AnalyzeCommand : ICompilerCommand
 
     public string UsageString => "analyze [Options]";
 
-    public string Description => "Runs code analyzers on the current project. Use 'dc analyze --help' for more information.";
+    public string Description => "Runs code analyzers on the current project or on a list of source files.";
+
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = Description,
+        Usage =
+        [
+            "dc analyze [(--analyzer|-a)=<Name>]",
+            "dc analyze <Files> [(--analyzer|-a)=<Name>]",
+        ],
+        Remarks = "Code analyzers other than the default one are installed as part of compiler extensions (packages). Managing compiler extensions is facilitated through the 'dc package' command.",
+        Options =
+        [
+            ("(--analyzer | -a)=<Name>", "The name of the code analyzer to run. If none is specified, the default analyzer is used."),
+            ("Files", "A list of source files to analyze. If this option is not used, all source files in the current project will be analyzed.")
+        ]
+    };
 
     public int Invoke(string[] args)
     {
-        if (args.Length > 0 && ((string[])["-h", "--help", "/help", "/?"]).Contains(args[0]))
-            return ShowUsage();
-
         IEnumerable<string> files = args.Where(File.Exists);
         string analyzerName = null;
 
@@ -42,24 +55,10 @@ internal class AnalyzeCommand : ICompilerCommand
         return AnalyzeProject(analyzerName);
     }
 
-    private static int ShowUsage()
-    {
-        StringBuilder sb = new();
-
-        sb.AppendLine();
-        sb.AppendLine("Usage:");
-        sb.Append($"{"    dc analyze [(--analyzer|-a)=<Name>]",-50}{HelpCommand.FormatLines("Runs the specified or the default analyzer on the current project or project group.", indentWidth: 50)}");
-        sb.Append($"{"    dc analyze <Files> [(--analyzer|-a)=<Name>]",-50}{HelpCommand.FormatLines("Runs the specified or the default analyzer on a set of source files.", indentWidth: 50)}");
-
-        HelpCommand.DisplayLogo();
-        Console.Write(sb.ToString());
-        return 0;
-    }
-
     private static int AnalyzeFiles(IEnumerable<string> files, DassieConfig config = null, string analyzerName = null)
     {
         ParseTreeAnalyzer<IParseTree> analyzer = null;
-        
+
         if (string.IsNullOrEmpty(analyzerName))
             analyzer = new NamingConventionAnalyzer(config);
         else

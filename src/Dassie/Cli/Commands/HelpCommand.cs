@@ -23,10 +23,20 @@ internal class HelpCommand : ICompilerCommand
 
     public string Description => "Shows this page. Use the -o flag to display all available options.";
 
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = "Shows a list of available subcommands.",
+        Usage = ["dc help [(-o|--options)]"],
+        Options =
+        [
+            ("-o|--options", "Shows a list of all available project file properties.")
+        ]
+    };
+
     public int Invoke(string[] args)
     {
         if (args.Any(a => !a.StartsWith('-')))
-            return DisplayHelpForCommand(args.First(a => !a.StartsWith('-')));
+            return 0; // DisplayHelpForCommand(...)
 
         return DisplayHelpMessage(args);
     }
@@ -223,9 +233,54 @@ internal class HelpCommand : ICompilerCommand
         return 0;
     }
 
-    private static int DisplayHelpForCommand(string name)
+    public static int DisplayHelpForCommand(ICompilerCommand command)
     {
-        LogOut.WriteLine("Command-specific help is not yet available. Refer to the online documentation for help.");
+        if (command.HelpDetails() == null)
+        {
+            DisplayLogo();
+            LogOut.WriteLine();
+            LogOut.WriteLine($"The command '{command.Command}' does not define help details.");
+            return 0;
+        }
+
+        CommandHelpDetails hd = command.HelpDetails();
+        StringBuilder sb = new();
+
+        sb.AppendLine();
+        sb.AppendLine($"dc {command.Command}: {(string.IsNullOrEmpty(hd.Description) ? command.Description : hd.Description)}");
+        sb.AppendLine();
+
+        sb.Append("Usage:");
+        if (hd.Usage == null || hd.Usage.Count == 0)
+            sb.AppendLine($" {command.UsageString}");
+        else if (hd.Usage.Count == 1)
+            sb.AppendLine($" {hd.Usage[0]}");
+        else
+        {
+            sb.AppendLine();
+            foreach (string usage in hd.Usage)
+                sb.Append(FormatLines(usage, true, 4));
+        }
+
+        sb.AppendLine();
+
+        if (hd.Options != null && hd.Options.Count > 0)
+        {
+            sb.AppendLine("Options:");
+            foreach ((string opt, string desc) in hd.Options)
+                sb.Append($"{$"    {opt}",-35}{FormatLines(desc, indentWidth: 35)}");
+            sb.AppendLine();
+        }
+
+        if (!string.IsNullOrEmpty(hd.Remarks))
+        {
+            sb.AppendLine("Remarks:");
+            sb.AppendLine(FormatLines(hd.Remarks, true, 4));
+        }
+
+        DisplayLogo();
+        LogOut.Write($"{sb}\b");
+
         return 0;
     }
 }

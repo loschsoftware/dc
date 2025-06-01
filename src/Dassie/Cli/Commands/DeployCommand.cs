@@ -19,6 +19,14 @@ internal class DeployCommand : ICompilerCommand
 
     public string Description => "Builds and deploys a project group.";
 
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = Description,
+        Usage = ["dc deploy"],
+        Remarks = $"This is the primary command for interacting with project groups. The 'deploy' command first builds all component projects and then executes all targets defined in the project group file. A project group is defined using the <ProjectGroup> tag inside of a compiler configuration file ({ProjectConfigurationFileName}).",
+        Options = []
+    };
+
     public int Invoke(string[] args) => Deploy(args, Directory.GetCurrentDirectory(), false);
 
     private static int Deploy(string[] args, string baseDir, bool noDeleteTempDirectory)

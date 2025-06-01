@@ -17,6 +17,13 @@ internal class ConfigCommand : ICompilerCommand
 
     public string Description => "Creates a new dsconfig.xml file with default values.";
 
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = Description,
+        Usage = ["dc config"],
+        Remarks = "This command provides an alternative way of initializing a project to the 'dc new' command. It is primarily useful when creating a project out of an existing file structure of source files.",
+    };
+
     public int Invoke(string[] args)
     {
         if (File.Exists(ProjectConfigurationFileName))

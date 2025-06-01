@@ -1,5 +1,6 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Macros;
+using Dassie.Configuration.ProjectGroups;
 using Dassie.Errors;
 using Dassie.Extensions;
 using Dassie.Validation;
@@ -22,6 +23,17 @@ internal class RunCommand : ICompilerCommand
     public string UsageString => "run [Arguments]";
 
     public string Description => "Automatically compiles using the default profile and then runs the output executable with the specified arguments.";
+
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = Description,
+        Usage = ["dc run [Arguments]"],
+        Remarks = "This command requires the presence of a project or project group. If it is executed on a project group, the project that is executed is determined by the <Executable> property in the project group definition.",
+        Options =
+        [
+            ("Arguments", "Command-line arguments passed to the program that is executed.")
+        ]
+    };
 
     public int Invoke(string[] args)
     {
@@ -67,6 +79,59 @@ internal class RunCommand : ICompilerCommand
             MacroParser parser = new();
             parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
             parser.Normalize(config);
+
+            if (config.ProjectGroup != null)
+            {
+                if (string.IsNullOrEmpty(config.ProjectGroup.ExecutableComponent))
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0105_DCRunInsufficientInfo,
+                        "Project group does not define an executable project.",
+                        "dc");
+
+                    return -1;
+                }
+
+                Func<Component, bool> predicate = c =>
+                {
+                    string path;
+
+                    if (c is Project p)
+                        path = p.Path;
+                    else
+                        path = ((ProjectGroupComponent)c).Path;
+
+                    return Path.GetFullPath(path) == Path.GetFullPath(config.ProjectGroup.ExecutableComponent);
+                };
+
+                if (!config.ProjectGroup.Components.Any(predicate))
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0209_ProjectGroupExecutableInvalid,
+                        $"The executable component '{config.ProjectGroup.ExecutableComponent}' could not be found.",
+                        "dc");
+
+                    return -1;
+                }
+
+                Component com = config.ProjectGroup.Components.First(predicate);
+
+                if (com is ProjectGroupComponent)
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0209_ProjectGroupExecutableInvalid,
+                        "Currently, project group executables can only be projects.",
+                        "dc");
+
+                    return -1;
+                }
+
+                Directory.SetCurrentDirectory(((Project)com).Path);
+                return Invoke([]);
+            }
 
             if (config.ApplicationType == ApplicationType.Library)
             {

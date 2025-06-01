@@ -339,8 +339,13 @@ internal class CompileCommand : ICompilerCommand
 
         if (!messages.Any(m => m.Severity == Severity.Error))
         {
-            byte[] resourceBytes = File.ReadAllBytes(resFile);
-            ResourceExtractor.Resource[] resources = ResourceExtractor.GetResources(resourceBytes, Path.GetFileName(resFile));
+            ResourceExtractor.Resource[] resources = [];
+
+            if (File.Exists(resFile))
+            {
+                byte[] resourceBytes = File.ReadAllBytes(resFile);
+                resources = ResourceExtractor.GetResources(resourceBytes, Path.GetFileName(resFile));
+            }
 
             ManagedPEBuilder peBuilder = CreatePEBuilder(
                 Context.EntryPoint,

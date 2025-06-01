@@ -24,6 +24,18 @@ internal class PackageCommand : ICompilerCommand
 
     public string Description => "Used to install and manage compiler extensions. Use 'dc package help' to display available commands.";
 
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = "Used to install and manage compiler extensions.",
+        Usage = ["dc package [Command] [Options]"],
+        Remarks = "This command is made up of several subcommands. Use the 'help' subcommand for a list of available commands.",
+        Options =
+        [
+            ("Command", "The subcommand to execute."),
+            ("Options", "Additional options passed to the subcommand.")
+        ]
+    };
+
     public int Invoke(string[] args)
     {
         args ??= [];

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Dassie.Cli.Commands;
 
@@ -18,7 +19,19 @@ internal class BuildCommand : ICompilerCommand
 
     public string UsageString => "build [BuildProfile]";
 
-    public string Description => "Executes the specified build profile, or compiles all .ds source files in the current directory if none is specified.";
+    public string Description => "Executes the specified build profile, or compiles all source files in the current folder structure if none is specified.";
+
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = Description,
+        Usage = ["dc build [BuildProfile]"],
+        Remarks = "This is the primary command for building Dassie projects. By default, this command will compile all Dassie source files in the current directory as well as all subdirectories. If no project file is present in the root directory, the default configuration is used.",
+        Options =
+        [
+            ("[BuildProfile]", "Specifies the build profile to execute. If not set, the default profile is executed."),
+            ("[Options]", "Additional options to pass to the compiler. For a list of available options, use 'dc help -o'.")
+        ]
+    };
 
     public int Invoke(string[] args)
     {

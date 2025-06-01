@@ -856,5 +856,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the compiler produces code that is unverifiable.
     /// </summary>
-    DS0208_UnverifiableCode
+    DS0208_UnverifiableCode,
+    /// <summary>
+    /// Emitted when the executable project defined in a project group file could not be found.
+    /// </summary>
+    DS0209_ProjectGroupExecutableInvalid
 }

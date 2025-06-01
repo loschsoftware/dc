@@ -16,6 +16,12 @@ internal class QuitCommand : ICompilerCommand
 
     public string Description => "Stops all file watchers.";
 
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = Description,
+        Usage = ["dc quit"]
+    };
+
     public int Invoke(string[] args)
     {
         Process[] processes = Process.GetProcesses();

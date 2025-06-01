@@ -264,5 +264,17 @@ internal class ScratchpadCommand : ICompilerCommand
 
     public List<string> Aliases() => ["sp"];
 
+    public CommandHelpDetails HelpDetails() => new()
+    {
+        Description = "Allows compiling and running Dassie source code from the console.",
+        Usage = ["dc scratchpad [Command] [Options]"],
+        Remarks = "This command is made up of several subcommands. Use the 'help' subcommand for a list of available commands.",
+        Options =
+        [
+            ("Command", "The subcommand to execute."),
+            ("Options", "Additional options passed to the subcommand.")
+        ]
+    };
+
     public int Invoke(string[] args) => Scratchpad.HandleScratchpadCommands(args);
 }
