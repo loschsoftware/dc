@@ -38,6 +38,7 @@ internal class FileBuildLogDevice : IBuildLogDevice, IDisposable
         TextWriterBuildLogDevice.ErrorOut.AddWriter(sw);
     }
 
+    // No logic here, since it is handled by TextWriterBuildLogDevice
     public void Log(ErrorInfo error) { }
     public void WriteString(string input) { }
 
