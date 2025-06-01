@@ -120,8 +120,8 @@ internal class CompileCommand : ICompilerCommand
 
                 if (cachedFiles.SequenceEqual(currentFiles) && File.Exists(assembly))
                 {
-                    if (args.Any(a => a == "-elapsed") || config.MeasureElapsedTime)
-                        Console.WriteLine($"\r\nElapsed time: {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms");
+                    if (Context.Configuration.MeasureElapsedTime)
+                        WriteLine($"\r\nElapsed time: {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms");
 
                     return 0;
                 }
@@ -155,8 +155,7 @@ internal class CompileCommand : ICompilerCommand
         LineNumberOffset = 0;
         UnionTypeCodeGeneration._createdUnionTypes.Clear();
 
-        if (config.Verbosity >= 1)
-            EmitBuildLogMessage("Performing second pass.");
+        EmitBuildLogMessage("Performing second pass.", 2);
 
         // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(documents, config).Select(l => l.ToArray());
@@ -286,7 +285,7 @@ internal class CompileCommand : ICompilerCommand
 
                 string icoFile = Path.GetFullPath(Path.Combine(relativePathResolverBaseDir, Context.Configuration.IconFile ?? ""));
                 string manifest = Path.GetFullPath(Path.Combine(relativePathResolverBaseDir, Context.Configuration.AssemblyManifest ?? ""));
-                
+
                 if (!string.IsNullOrEmpty(Context.Configuration.IconFile) && !File.Exists(icoFile))
                 {
                     EmitErrorMessage(

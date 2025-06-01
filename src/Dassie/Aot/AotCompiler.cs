@@ -38,8 +38,7 @@ internal class AotCompiler
     /// <returns></returns>
     public bool Compile()
     {
-        if (Context.Configuration.Verbosity >= 1)
-            EmitBuildLogMessage($"Executing AOT compiler.");
+        EmitBuildLogMessage($"Executing AOT compiler.", 2);
 
         // Seems kind of wasteful to download the whole runtime just to use one file of it as an argument for ilc ...
         // ... But then again, storage is abundant anyway in 2024.
@@ -77,20 +76,14 @@ internal class AotCompiler
     private void InvokeCompiler()
     {
         string args = _cmdLineBuilder.GenerateIlcArgumentList();
-
-        if (Context.Configuration.Verbosity >= 2)
-            EmitBuildLogMessage($"Invoking IL compiler with following arguments: {args}");
-
+        EmitBuildLogMessage($"Invoking IL compiler with following arguments: {args}", 3);
         Process.Start(Path.Combine(_config.ILCompilerPackageRootDirectory, "tools", "ilc.exe"), args).WaitForExit();
     }
 
     private void InvokeLinker()
     {
         string args = _cmdLineBuilder.GenerateLinkerArgumentList(out string linkerPath);
-
-        if (Context.Configuration.Verbosity >= 2)
-            EmitBuildLogMessage($"Invoking linker with following arguments: {args}");
-
+        EmitBuildLogMessage($"Invoking linker with following arguments: {args}", 3);
         Process.Start(linkerPath, args).WaitForExit();
     }
 }

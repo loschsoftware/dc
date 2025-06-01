@@ -16,8 +16,7 @@ internal static class DocumentCompiler
         if (string.IsNullOrEmpty(CurrentFile.Path))
             CurrentFile.Path = document.Name;
 
-        if (config.Verbosity >= 1)
-            EmitBuildLogMessage("    Lowering...");
+        EmitBuildLogMessage("    Lowering...", 2);
 
         string lowered = SourceFileRewriter.Rewrite(document.Text);
 
@@ -25,8 +24,7 @@ internal static class DocumentCompiler
         intermediatePath = Path.Combine(TemporaryBuildDirectoryName, Path.GetFileNameWithoutExtension(document.Name) + ".i.ds");
         File.WriteAllText(intermediatePath, lowered);
 
-        if (config.Verbosity >= 1)
-            EmitBuildLogMessage("    Parsing...");
+        EmitBuildLogMessage("    Parsing...", 2);
 
         CurrentFile.CharStream = CharStreams.fromString(lowered);
         DassieLexer lexer = new(CurrentFile.CharStream);
@@ -43,8 +41,7 @@ internal static class DocumentCompiler
 
     public static List<ErrorInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath)
     {
-        if (config.Verbosity >= 1)
-            EmitBuildLogMessage($"Compiling source file '{document.Name}'.");
+        EmitBuildLogMessage($"Compiling source file '{document.Name}'.", 2);
 
         SetupBogusAssembly();
         CurrentFile = Context.GetFile(document.Name);

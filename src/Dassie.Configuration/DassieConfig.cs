@@ -154,10 +154,10 @@ public sealed class DassieConfig
     [XmlElement]
     public bool EnableMessageTimestamps { get; set; } = false;
 
-    [Description("Sets the verbosity of compiler messages. Valid values are 0, 1 and 2.")]
-    [DefaultValue(0)]
+    [Description("Sets the verbosity of compiler messages. Valid values are 0-3 (both inclusive).")]
+    [DefaultValue(1)]
     [XmlElement]
-    public int Verbosity { get; set; } = 0;
+    public int Verbosity { get; set; } = 1;
 
     [Description("A list of log devices to write build messages to.")]
     [DefaultValue(null)]

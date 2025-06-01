@@ -51,6 +51,9 @@ public static class ErrorWriter
         if (Disabled)
             return;
 
+        if (Context.Configuration.Verbosity < 1)
+            return;
+
         error.CodePosition = (error.CodePosition.Item1 + LineNumberOffset, error.CodePosition.Item2);
 
         Context ??= new();
@@ -142,8 +145,12 @@ public static class ErrorWriter
     /// Emits a build log message that is not caused by an error in the code.
     /// </summary>
     /// <param name="message">The message to emit.</param>
-    public static void EmitBuildLogMessage(string message)
+    /// <param name="minimumVerbosity">The minimum verbosity at which the message is printed.</param>
+    public static void EmitBuildLogMessage(string message, int minimumVerbosity = 0)
     {
+        if (Context.Configuration.Verbosity < minimumVerbosity)
+            return;
+
         EmitGeneric(new ErrorInfo()
         {
             CodePosition = (0, 0),
@@ -266,6 +273,12 @@ public static class ErrorWriter
     /// <param name="str">The string to write.</param>
     public static void WriteOutString(string str)
     {
+        if (Disabled)
+            return;
+
+        if (Context.Configuration.Verbosity < 1)
+            return;
+
         foreach (IBuildLogDevice device in BuildLogDevices)
             device.WriteString(str);
     }

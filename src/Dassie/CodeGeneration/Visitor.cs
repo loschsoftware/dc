@@ -480,8 +480,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitType_member([NotNull] DassieParser.Type_memberContext context)
     {
-        if (Context.Configuration.Verbosity >= 1)
-            EmitBuildLogMessage($"    Generating code for '{TypeContext.Current.Builder.FullName}::{context.Identifier().GetIdentifier()}'...");
+        EmitBuildLogMessage($"    Generating code for '{TypeContext.Current.Builder.FullName}::{context.Identifier().GetIdentifier()}'...", 2);
 
         if (context.Custom_Operator() != null)
         {
@@ -1140,8 +1139,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Builder = tb
         };
 
-        if (Context.Configuration.Verbosity >= 1)
-            EmitBuildLogMessage($"    Generating code for '{tb.FullName}::Main'...");
+        EmitBuildLogMessage($"    Generating code for '{tb.FullName}::Main'...", 2);
 
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 
