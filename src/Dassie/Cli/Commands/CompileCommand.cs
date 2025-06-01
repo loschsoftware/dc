@@ -625,7 +625,7 @@ internal class CompileCommand : ICompilerCommand
         {
             if (pattern.All(c => char.IsLetter(c) || c == '-'))
             {
-                IEnumerable<string> cmds = CommandRegistry.Commands.Select(c => c.Command.ToLowerInvariant()).Where(c => c.Length > 0).OrderBy(c => Distance(pattern.ToLowerInvariant(), c));
+                IEnumerable<string> cmds = CommandRegistry.Commands.Where(c => !c.Hidden()).Select(c => c.Command.ToLowerInvariant()).Where(c => c.Length > 0).OrderBy(c => Distance(pattern.ToLowerInvariant(), c));
                 int dist = Distance(pattern.ToLowerInvariant(), cmds.First().ToLowerInvariant());
 
                 StringBuilder errorMsg = new();
@@ -648,9 +648,7 @@ internal class CompileCommand : ICompilerCommand
             }
 
             EmitErrorMessage(
-                0,
-                0,
-                0,
+                0, 0, 0,
                 DS0048_SourceFileNotFound,
                 $"The source file '{filePattern}' could not be found.",
                 Path.GetFileName(filePattern));
