@@ -36,7 +36,10 @@ internal class HelpCommand : ICompilerCommand
     public int Invoke(string[] args)
     {
         if (args.Any(a => !a.StartsWith('-')))
-            return 0; // DisplayHelpForCommand(...)
+        {
+            if (CommandRegistry.TryInvoke(args.First(a => !a.StartsWith('-')), ["--help"], out int exit))
+                return exit;
+        }
 
         return DisplayHelpMessage(args);
     }
