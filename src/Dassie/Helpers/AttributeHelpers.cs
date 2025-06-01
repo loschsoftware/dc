@@ -320,7 +320,7 @@ internal static class AttributeHelpers
                     context.Start.Column,
                     context.GetText().Length,
                     DS0208_UnverifiableCode,
-                    $"Disabling the zero-initialization of local variables using the <InitLocals> attribute causes the generated assembly to be unverifiable.");
+                    $"Disabling the zero-initialization of local variables using the <InitLocals> attribute causes the generated code to be unverifiable.");
             }
 
             CurrentMethod.Builder.InitLocals = (bool)args[0];
