@@ -43,6 +43,6 @@ internal class FileBuildLogDevice : IBuildLogDevice, IDisposable
 
     public void Dispose()
     {
-        sw.Dispose();
+        sw?.Dispose();
     }
 }

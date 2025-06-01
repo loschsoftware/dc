@@ -122,7 +122,8 @@ internal class MacroParser
                 val = val.Replace(match.Value, _macros[match.Value[2..^1].ToLowerInvariant()], StringComparison.InvariantCultureIgnoreCase);
             }
 
-            prop.SetValue(obj, val);
+            if (prop.SetMethod != null)
+                prop.SetValue(obj, val);
         }
     }
 
