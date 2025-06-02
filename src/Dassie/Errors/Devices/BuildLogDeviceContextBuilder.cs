@@ -7,8 +7,16 @@ using System.Xml;
 
 namespace Dassie.Errors.Devices;
 
+/// <summary>
+/// Provides methods for instantiating and registering build log devices.
+/// </summary>
 internal static class BuildLogDeviceContextBuilder
 {
+    /// <summary>
+    /// Instantiates and registers all build log devices enabled in the specified configuration file.
+    /// </summary>
+    /// <param name="config">A <see cref="DassieConfig"/> object representing a deserialized configuration file.</param>
+    /// <param name="configPath">The file path to the configuration file, used for error messages.</param>
     public static void RegisterBuildLogDevices(DassieConfig config, string configPath)
     {
         IEnumerable<IBuildLogDevice> availableDevices = ExtensionLoader.BuildLogDevices;

@@ -17,6 +17,7 @@ internal class FileBuildLogDevice : IBuildLogDevice, IDisposable
 
     private StreamWriter sw;
 
+    /// <inheritdoc/>
     public void Initialize(List<XmlAttribute> attributes, List<XmlNode> elements)
     {
         if (!attributes.Any(a => a.Name == "Path"))
@@ -39,9 +40,13 @@ internal class FileBuildLogDevice : IBuildLogDevice, IDisposable
     }
 
     // No logic here, since it is handled by TextWriterBuildLogDevice
+
+    /// <inheritdoc/>
     public void Log(ErrorInfo error) { }
+    /// <inheritdoc/>
     public void WriteString(string input) { }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         sw?.Dispose();

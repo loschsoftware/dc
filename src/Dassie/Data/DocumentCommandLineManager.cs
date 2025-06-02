@@ -3,8 +3,16 @@ using System.Linq;
 
 namespace Dassie.Data;
 
+/// <summary>
+/// Extracts input documents out of command-line arguments passed to the compiler.
+/// </summary>
 internal static class DocumentCommandLineManager
 {
+    /// <summary>
+    /// Extracts input documents from command-line arguments starting with '--Document'.
+    /// </summary>
+    /// <param name="args">An array of command-line arguments.</param>
+    /// <returns>An enumerable of <see cref="InputDocument"/> instances representing the documents extracted from the command-line arguments that were passed.</returns>
     public static IEnumerable<InputDocument> ExtractDocuments(string[] args)
     {
         List<InputDocument> docs = [];

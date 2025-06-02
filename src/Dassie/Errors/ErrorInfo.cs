@@ -28,9 +28,9 @@ public class ErrorInfo
     public string File { get; set; }
 
     /// <summary>
-    /// The starting position of the error in the file. The first tuple item represents the row, the second the column of the error.
+    /// The starting position of the error in the file.
     /// </summary>
-    public (int, int) CodePosition { get; set; }
+    public (int Line, int Column) CodePosition { get; set; }
 
     /// <summary>
     /// Allows hiding the code position for errors with no specific location.
