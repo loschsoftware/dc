@@ -84,8 +84,19 @@ internal class CompileCommand : ICompilerCommand
 
         if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
         {
-            Directory.CreateDirectory(config.BuildOutputDirectory);
-            Directory.SetCurrentDirectory(config.BuildOutputDirectory);
+            try
+            {
+                Directory.CreateDirectory(config.BuildOutputDirectory);
+                Directory.SetCurrentDirectory(config.BuildOutputDirectory);
+            }
+            catch (Exception ex)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0029_FileAccessDenied,
+                    $"Could not create build output directory: {ex.Message}",
+                    "dc");
+            }
         }
 
         string assembly = Path.Combine(config.BuildOutputDirectory ?? "", $"{config.AssemblyName}.dll");
@@ -137,7 +148,26 @@ internal class CompileCommand : ICompilerCommand
                 File.Copy(ProjectConfigurationFileName, Path.Combine(".cache", ProjectConfigurationFileName), true);
         }
 
-        List<InputDocument> documents = files.Select(f => new InputDocument(File.ReadAllText(f), f)).ToList();
+        List<InputDocument> documents = files.Select(f =>
+        {
+            string text = "";
+
+            try
+            {
+                text = File.ReadAllText(f);
+            }
+            catch (Exception ex)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0029_FileAccessDenied,
+                    ex.Message,
+                    "dc");
+            }
+
+            return new InputDocument(text, f);
+        }).ToList();
+
         documents.AddRange(DocumentCommandLineManager.ExtractDocuments(documentArgs));
 
         // Run analyzers (if enabled)
