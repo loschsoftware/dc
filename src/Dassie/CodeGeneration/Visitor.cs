@@ -782,7 +782,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             TypeContext.Current.Properties.Add(pb);
 
-            (MethodAttributes attribs, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
+            (MethodAttributes attribs, _, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
             attribs |= MethodAttributes.SpecialName;
 
             if (!attribs.HasFlag(MethodAttributes.HideBySig))

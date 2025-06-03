@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using static Dassie.Helpers.SymbolResolver;
 
 namespace Dassie.CodeGeneration.Helpers;
 
@@ -776,6 +777,32 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
         if (o is MetaFieldInfo mfi)
             return new(mfi.ConstantValue.GetType(), mfi.ConstantValue);
+
+        object o2 = SymbolResolver.GetSmallestTypeFromLeft(
+            context,
+            [],
+            context.Start.Line,
+            context.Start.Column,
+            context.GetText().Length,
+            out int firstIndex);
+
+        // Indices are hard-coded just to get useful attributes like MethodImplAttribute working; a proper implementation will come later
+
+        if (o2 is Type t)
+        {
+            object member = ResolveMember(
+                t,
+                context.GetText().Split('.')[firstIndex],
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                false,
+                [],
+                BindingFlags.Public | BindingFlags.Static);
+
+            if (member is EnumValueInfo evi)
+                return new(evi.EnumType, evi.Value);
+        }
 
         return null;
     }

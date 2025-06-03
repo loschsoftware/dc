@@ -171,7 +171,7 @@ internal static class MemberDeclarationGeneration
 
         var paramTypes = Visitor.ResolveParameterList(context.parameter_list());
 
-        (MethodAttributes attribs, MethodImplAttributes implementationFlags) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.attribute());
+        (MethodAttributes attribs, MethodImplAttributes implementationFlags, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), context.attribute());
         if (attribs.HasFlag(MethodAttributes.Virtual))
             attribs &= ~MethodAttributes.Virtual;
 
@@ -271,7 +271,7 @@ internal static class MemberDeclarationGeneration
             if (context.member_special_modifier().Any(m => m.Static() != null) || (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract))
                 callingConventions = CallingConventions.Standard;
 
-            (MethodAttributes attrib, MethodImplAttributes implementationFlags) = AttributeHelpers.GetMethodAttributes(
+            (MethodAttributes attrib, MethodImplAttributes implementationFlags, bool isExtern) = AttributeHelpers.GetMethodAttributes(
                     context.member_access_modifier(),
                     context.member_oop_modifier(),
                     context.member_special_modifier(),
@@ -413,7 +413,9 @@ internal static class MemberDeclarationGeneration
 
             if (context.expression() == null)
             {
-                if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime))
+                if (!attrib.HasFlag(MethodAttributes.Abstract)
+                    && !implementationFlags.HasFlag(MethodImplAttributes.Runtime)
+                    && !isExtern)
                 {
                     EmitErrorMessage(
                         context.Start.Line,
@@ -602,7 +604,7 @@ internal static class MemberDeclarationGeneration
 
             TypeContext.Current.Properties.Add(pb);
 
-            (MethodAttributes attribs, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
+            (MethodAttributes attribs, _, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
             attribs |= MethodAttributes.SpecialName;
 
             if (!attribs.HasFlag(MethodAttributes.HideBySig))

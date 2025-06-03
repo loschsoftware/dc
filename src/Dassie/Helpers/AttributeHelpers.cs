@@ -89,8 +89,9 @@ internal static class AttributeHelpers
         return baseAttributes;
     }
 
-    public static (MethodAttributes, MethodImplAttributes) GetMethodAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, DassieParser.AttributeContext[] attribs, bool ignoreDS0058 = false)
+    public static (MethodAttributes, MethodImplAttributes, bool) GetMethodAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, DassieParser.AttributeContext[] attribs, bool ignoreDS0058 = false)
     {
+        bool isExtern = false;
         MethodAttributes baseAttributes;
         MethodImplAttributes implementationFlags = MethodImplAttributes.Managed;
 
@@ -123,7 +124,7 @@ internal static class AttributeHelpers
             }
 
             if (modifier.Extern() != null)
-                baseAttributes |= MethodAttributes.PinvokeImpl;
+                isExtern = true;
 
             if (modifier.Abstract() != null)
                 baseAttributes |= MethodAttributes.Abstract;
@@ -182,7 +183,7 @@ internal static class AttributeHelpers
             Disabled = false;
         }
 
-        return (baseAttributes, implementationFlags);
+        return (baseAttributes, implementationFlags, isExtern);
     }
 
     public static ParameterAttributes GetParameterAttributes(DassieParser.Parameter_modifierContext modifier, bool hasDefault)
