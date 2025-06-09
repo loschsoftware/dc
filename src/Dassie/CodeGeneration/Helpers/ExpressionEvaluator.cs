@@ -769,7 +769,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
     public override Expression VisitFull_identifier([NotNull] DassieParser.Full_identifierContext context)
     {
-        object o = SymbolResolver.ResolveIdentifier(
+        object o = ResolveIdentifier(
             context.GetText(),
             context.Start.Line,
             context.Start.Column,
@@ -777,8 +777,8 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
         if (o is MetaFieldInfo mfi)
             return new(mfi.ConstantValue.GetType(), mfi.ConstantValue);
-
-        object o2 = SymbolResolver.GetSmallestTypeFromLeft(
+        
+        object o2 = GetSmallestTypeFromLeft(
             context,
             [],
             context.Start.Line,
