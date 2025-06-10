@@ -558,7 +558,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         $"Expected expression of type '{TypeName(tReturn)}', but got type '{TypeName(_tReturn)}'.");
                 }
             }
-
+            
             if (context.expression() != null)
                 CurrentMethod.IL.Emit(OpCodes.Ret);
 
@@ -5611,7 +5611,10 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             }
 
             if (_tReturn == typeof(void))
+            {
                 CurrentMethod.IL.Emit(OpCodes.Ldnull);
+                _tReturn = typeof(object);
+            }
 
             if (tReturn == typeof(object) && _tReturn != typeof(object))
                 EmitConversionOperator(_tReturn, tReturn);

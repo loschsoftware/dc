@@ -35,6 +35,9 @@ internal static class SymbolResolver
 
     public static string GetIdentifier(this ITerminalNode identifier)
     {
+        if (identifier == null)
+            return "";
+
         string rawText = identifier.GetText();
 
         if (!rawText.StartsWith('`'))
