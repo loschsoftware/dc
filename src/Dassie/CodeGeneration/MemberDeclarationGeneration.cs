@@ -333,7 +333,7 @@ internal static class MemberDeclarationGeneration
                 ParserRule = context
             };
 
-            if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime))
+            if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime) && !isExtern)
                 CurrentMethod.IL = mb.GetILGenerator();
 
             if (context.generic_parameter_list() != null)
