@@ -40,6 +40,20 @@ internal class AotCompiler
     {
         EmitBuildLogMessage($"Executing AOT compiler.", 2);
 
+        string os = _config.Config.RuntimeIdentifier.Split('-')[0];
+        if (os == "win") os = "windows";
+
+        if (!string.IsNullOrEmpty(os) && !OperatingSystem.IsOSPlatform(os))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0210_CrossSystemAotCompilation,
+                $"Cross-system ahead-of-time compilation is not supported.",
+                "dc");
+
+            return false;
+        }
+
         // Seems kind of wasteful to download the whole runtime just to use one file of it as an argument for ilc ...
         // ... But then again, storage is abundant anyway in 2024.
         DownloadRuntime();

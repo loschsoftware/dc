@@ -37,7 +37,8 @@ internal static class PackageDownloader
             packageId,
             cache,
             NullLogger.Instance,
-            CancellationToken.None).Result;
+            CancellationToken.None).Result
+            .Where(v => !v.IsPrerelease);
 
         if (!versions.Any())
         {

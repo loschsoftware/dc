@@ -860,5 +860,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the executable project defined in a project group file could not be found.
     /// </summary>
-    DS0209_ProjectGroupExecutableInvalid
+    DS0209_ProjectGroupExecutableInvalid,
+    /// <summary>
+    /// Emitted when AOT compilation is attempted for a system other than the current one.
+    /// </summary>
+    DS0210_CrossSystemAotCompilation
 }
