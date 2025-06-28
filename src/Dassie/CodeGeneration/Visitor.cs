@@ -340,8 +340,42 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         // TODO: Find a better way
-        Type t = tc.Builder.CreateType();
-        TypeContext.Current.FinishedType = t;
+
+        Type currentType = tc.Builder.BaseType;
+        bool hasCycle = false;
+
+        while (currentType != null)
+        {
+            if (currentType == tc.Builder)
+            {
+                hasCycle = true;
+                break;
+            }
+
+            currentType = currentType.BaseType;
+        }
+
+        if (hasCycle)
+        {
+            if (!Context.DS0192Emissions.Any(types =>
+                (types.Type1 == tc.Builder && types.Type2 == tc.Builder.BaseType) ||
+                (types.Type1 == tc.Builder.BaseType && types.Type2 == tc.Builder)))
+            {
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetIdentifier().Length,
+                    DS0192_CircularReference,
+                    $"Circular base type dependency involving '{tc.Builder.FullName}' and '{tc.Builder.BaseType.FullName}'.");
+            }
+
+            Context.DS0192Emissions.Add((tc.Builder, tc.Builder.BaseType));
+        }
+        else
+        {
+            Type t = tc.Builder.CreateType();
+            TypeContext.Current.FinishedType = t;
+        }
 
         if (TypeContext.Current.RequiredInterfaceImplementations.Count > 0)
         {
@@ -558,7 +592,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         $"Expected expression of type '{TypeName(tReturn)}', but got type '{TypeName(_tReturn)}'.");
                 }
             }
-            
+
             if (context.expression() != null)
                 CurrentMethod.IL.Emit(OpCodes.Ret);
 

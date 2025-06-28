@@ -69,4 +69,6 @@ internal class ProgramContext
 
     public TypeBuilder GlobalTopLevelFunctionContainerType { get; set; }
     public List<(FileContext DeclaringFile, DassieParser.Type_memberContext Function)> GlobalTopLevelFunctions { get; set; } = [];
+
+    public List<(Type Type1, Type Type2)> DS0192Emissions { get; set; } = [];
 }

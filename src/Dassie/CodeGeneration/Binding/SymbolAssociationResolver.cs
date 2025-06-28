@@ -1,11 +1,8 @@
 ﻿using Dassie.Errors;
-using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
 
 namespace Dassie.CodeGeneration.Binding;
 
