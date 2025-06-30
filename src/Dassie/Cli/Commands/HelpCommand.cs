@@ -1,4 +1,6 @@
 ﻿using Dassie.Configuration;
+using Dassie.Errors;
+using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
@@ -26,10 +28,11 @@ internal class HelpCommand : ICompilerCommand
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = "Shows a list of available subcommands.",
-        Usage = ["dc help [(-o|--options)]"],
+        Usage = ["dc help [(-o|--options) | (-s|--simple)]"],
         Options =
         [
-            ("-o|--options", "Shows a list of all available project file properties.")
+            ("-o|--options", "Shows a list of all available project file properties."),
+            ("-s|--simple", "Shows a simplified selection of commands suitable for minimalist developers.")
         ]
     };
 
@@ -120,6 +123,25 @@ internal class HelpCommand : ICompilerCommand
 
     private static int DisplayHelpMessage(string[] args)
     {
+        // "Tsoding mode", to appeal to "minimalist developers"
+        if (args.Any(a => a == "-s" || a == "--simple"))
+        {
+            Version v = Assembly.GetExecutingAssembly().GetName().Version;
+            Version version = new(v.Major, v.Minor, v.Build - 8517);
+            DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
+
+            StringBuilder sb = new();
+            sb.AppendLine();
+            sb.AppendLine($"Dassie Compiler - Build {version.Build} ({buildDate.ToShortDateString()})");
+            sb.AppendLine("Simplified Mode");
+            sb.AppendLine();
+            sb.AppendLine("Usage: dc <Files>");
+            sb.AppendLine("       Compiles the specified source files.");
+            LogOut.Write(sb.ToString());
+
+            return 0;
+        }
+
         DisplayLogo();
 
         if (args.Any(a => a == "-o" || a == "--options"))
@@ -168,7 +190,7 @@ internal class HelpCommand : ICompilerCommand
             foreach (string prop in propertyLines.OrderBy(p => p.PropertyName).Select(p => p.Text))
                 outputBuilder.Append(prop);
 
-            Console.WriteLine(outputBuilder.ToString());
+            LogOut.WriteLine(outputBuilder.ToString());
             return 0;
         }
 
@@ -177,7 +199,7 @@ internal class HelpCommand : ICompilerCommand
 
     private static int DisplayHelpMessage()
     {
-        if (Console.BufferWidth - 50 - 5 < 30)
+        if (LogOut == Console.Out && Console.BufferWidth - 50 - 5 < 30)
         {
             ConsoleColor prev = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
