@@ -21,18 +21,19 @@ internal class HelpCommand : ICompilerCommand
 
     public List<string> Aliases() => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
 
-    public string UsageString => "help, ? [(-o|--options)]";
+    public string UsageString => "help, ? [Options]";
 
-    public string Description => "Shows this page. Use the -o flag to display all available options.";
+    public string Description => "Lists all available commands.";
 
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = "Shows a list of available subcommands.",
-        Usage = ["dc help [(-o|--options) | (-s|--simple)]"],
+        Usage = ["dc help [(-o|--options) | (-s|--simple) | --no-external]"],
         Options =
         [
             ("-o|--options", "Shows a list of all available project file properties."),
-            ("-s|--simple", "Shows a simplified selection of commands suitable for minimalist developers.")
+            ("-s|--simple", "Shows a simplified selection of commands suitable for minimalist developers."),
+            ("--no-external", "Does not display commands defined by external packages.")
         ]
     };
 
@@ -232,7 +233,7 @@ internal class HelpCommand : ICompilerCommand
             sb.Append(FormatLines(command.Description));
         }
 
-        if (externalCommands.Any())
+        if (externalCommands.Any() && !Environment.GetCommandLineArgs().Any(c => c == "--no-external"))
         {
             sb.AppendLine();
             sb.AppendLine("External commands:");
