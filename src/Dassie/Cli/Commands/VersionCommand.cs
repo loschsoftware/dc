@@ -37,23 +37,7 @@ internal class VersionCommand : ICompilerCommand
         output.AppendLine($"(C) 2023-{buildDate.Year} Losch");
 
         output.AppendLine();
-        output.Append($"Build ID: {v.ToString(2)}.{version.Build}");
-
-#if STANDALONE
-output.Append('a');
-#else
-        output.Append('j');
-#endif
-
-        string osShortName = RuntimeInformation.OSDescription.Replace(' ', '_');
-        if (OperatingSystem.IsWindows())
-            osShortName = "win";
-        else if (OperatingSystem.IsLinux())
-            osShortName = "linux";
-        else if (OperatingSystem.IsMacOS())
-            osShortName = "macOS";
-
-        output.AppendLine($"_{osShortName}-{RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant()}");
+        output.AppendLine($"Build ID: {IdCommand.GetBuildID(version)}");
 
         output.AppendLine();
         output.AppendLine("Environment:");
@@ -80,5 +64,49 @@ output.AppendLine("AOT, statically linked");
 
         WriteOutString(output.ToString());
         return 0;
+    }
+}
+
+internal class IdCommand : ICompilerCommand
+{
+    private static IdCommand _instance;
+    public static IdCommand Instance => _instance ??= new();
+
+    public string Command => "--build-id";
+
+    public bool Hidden() => true;
+
+    public string UsageString => "";
+    public string Description => "";
+
+    public int Invoke(string[] args)
+    {
+        Version v = Assembly.GetExecutingAssembly().GetName().Version;
+        Version version = new(v.Major, v.Minor, v.Build - 8517);
+        WriteOutString($"{GetBuildID(version)}{Environment.NewLine}");
+        return 0;
+    }
+
+    public static string GetBuildID(Version version)
+    {
+        StringBuilder output = new();
+        output.Append($"{version.ToString(2)}.{version.Build}");
+
+#if STANDALONE
+output.Append('a');
+#else
+        output.Append('j');
+#endif
+
+        string osShortName = RuntimeInformation.OSDescription.Replace(' ', '_');
+        if (OperatingSystem.IsWindows())
+            osShortName = "win";
+        else if (OperatingSystem.IsLinux())
+            osShortName = "linux";
+        else if (OperatingSystem.IsMacOS())
+            osShortName = "macOS";
+
+        output.Append($"_{osShortName}-{RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant()}");
+        return output.ToString();
     }
 }
