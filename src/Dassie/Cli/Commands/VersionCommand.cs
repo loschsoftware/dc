@@ -37,10 +37,36 @@ internal class VersionCommand : ICompilerCommand
         output.AppendLine($"(C) 2023-{buildDate.Year} Losch");
 
         output.AppendLine();
+        output.Append($"Build ID: {v.ToString(2)}.{version.Build}");
+
+#if STANDALONE
+output.Append('a');
+#else
+        output.Append('j');
+#endif
+
+        string osShortName = RuntimeInformation.OSDescription.Replace(' ', '_');
+        if (OperatingSystem.IsWindows())
+            osShortName = "win";
+        else if (OperatingSystem.IsLinux())
+            osShortName = "linux";
+        else if (OperatingSystem.IsMacOS())
+            osShortName = "macOS";
+
+        output.AppendLine($"_{osShortName}-{RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant()}");
+
+        output.AppendLine();
         output.AppendLine("Environment:");
-        output.AppendLine($"{"    - Compiler version:".PadRight(padding)}{v}");
+        output.AppendLine($"{"    - Compiler version:".PadRight(padding)}{v.ToString(2)}");
         output.AppendLine($"{"    - Build number:".PadRight(padding)}{version.Build}");
         output.AppendLine($"{"    - Compilation date:".PadRight(padding)}{buildDate.ToShortDateString()}");
+        output.Append("    - Compiler architecture:".PadRight(padding));
+
+#if STANDALONE
+output.AppendLine("AOT, statically linked");
+#else
+        output.AppendLine("JIT, dynamically linked");
+#endif
         output.AppendLine($"{"    - .NET version:".PadRight(padding)}{typeof(object).Assembly.GetName().Version}");
         output.AppendLine($"{"    - Operating system:".PadRight(padding)}{RuntimeInformation.OSDescription}");
         output.AppendLine($"{"    - OS architecture:".PadRight(padding)}{RuntimeInformation.OSArchitecture}");
