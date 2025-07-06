@@ -96,6 +96,18 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
 
             outBuilder.Append(prefix);
 
+            string severityPrefix = "";
+            if (Context.Configuration.EnableMessageIndicators)
+            {
+                severityPrefix = error.Severity switch
+                {
+                    Severity.Information => "ℹ️ ",
+                    Severity.Warning => "⚠️ ",
+                    Severity.Error => "❌ ",
+                    _ => ""
+                };
+            }
+
             if (Context.Configuration.EnableMessageTimestamps)
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -139,12 +151,12 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 }
 
                 SetColor();
-                outBuilder.Append(error.Severity switch
+                outBuilder.Append($"{severityPrefix}{error.Severity switch
                 {
                     Severity.Error => "error",
                     Severity.Warning => "warning",
                     _ => "message"
-                });
+                }}");
                 outBuilder.Append(' ');
                 outBuilder.Append(errCode);
                 outBuilder.Append(": ");
