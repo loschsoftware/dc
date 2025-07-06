@@ -26,6 +26,20 @@ internal class ConfigCommand : ICompilerCommand
 
     public int Invoke(string[] args)
     {
+        if (args.Length > 0)
+        {
+            foreach (string arg in args)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0211_UnexpectedArgument,
+                    $"Unexpected argument '{arg}'.",
+                    "dc");
+            }
+
+            return -1;
+        }
+
         if (File.Exists(ProjectConfigurationFileName))
         {
             LogOut.Write("The file dsconfig.xml already exists. Overwrite [Y/N]? ");

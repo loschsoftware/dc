@@ -229,26 +229,7 @@ internal class ScratchpadCommand : ICompilerCommand
         /// <returns>Always returns 0.</returns>
         private static int ShowUsage()
         {
-            StringBuilder sb = new();
-            sb.AppendLine();
-            sb.AppendLine("Usage: dc scratchpad [Command] [Options]");
-            sb.AppendLine("If no command is specified, the command 'new' is used implicitly.");
-
-            sb.AppendLine();
-            sb.AppendLine("Available commands:");
-            sb.Append($"{"    new [Options]",-35}{HelpCommand.FormatLines("Creates a new scratch.", indentWidth: 35)}");
-            sb.Append($"{"        --name=<Name>",-35}{HelpCommand.FormatLines("Specifies the name of the scratch.", indentWidth: 35)}");
-            sb.Append($"{"        --config=<Path>",-35}{HelpCommand.FormatLines("The compiler configuration (dsconfig.xml) file to use.", indentWidth: 35)}");
-            sb.AppendLine();
-
-            sb.Append($"{"    load <Name>",-35}{HelpCommand.FormatLines("Loads the specified scratch.", indentWidth: 35)}");
-            sb.Append($"{"    list",-35}{HelpCommand.FormatLines("Lists all saved scratches.", indentWidth: 35)}");
-            sb.Append($"{"    delete <Name>",-35}{HelpCommand.FormatLines("Deletes the specified scratch.", indentWidth: 35)}");
-            sb.Append($"{"    clear",-35}{HelpCommand.FormatLines("Deletes all saved scratches.", indentWidth: 35)}");
-            sb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
-
-            HelpCommand.DisplayLogo();
-            Console.WriteLine(sb.ToString());
+            HelpCommand.Instance.Invoke(["scratchpad"]);
             return 0;
         }
     }
@@ -264,17 +245,36 @@ internal class ScratchpadCommand : ICompilerCommand
 
     public List<string> Aliases() => ["sp"];
 
-    public CommandHelpDetails HelpDetails() => new()
+    public CommandHelpDetails HelpDetails()
     {
-        Description = "Allows compiling and running Dassie source code from the console.",
-        Usage = ["dc scratchpad [Command] [Options]"],
-        Remarks = "This command is made up of several subcommands. Use the 'help' subcommand for a list of available commands.",
-        Options =
-        [
-            ("Command", "The subcommand to execute."),
-            ("Options", "Additional options passed to the subcommand.")
-        ]
-    };
+        StringBuilder commandsSb = new();
+        commandsSb.Append($"{"    new [Options]",-35}{HelpCommand.FormatLines("Creates a new scratch.", indentWidth: 35)}");
+        commandsSb.Append($"{"        --name=<Name>",-35}{HelpCommand.FormatLines("Specifies the name of the scratch.", indentWidth: 35)}");
+        commandsSb.Append($"{"        --config=<Path>",-35}{HelpCommand.FormatLines("The compiler configuration (dsconfig.xml) file to use.", indentWidth: 35)}");
+        commandsSb.AppendLine();
+
+        commandsSb.Append($"{"    load <Name>",-35}{HelpCommand.FormatLines("Loads the specified scratch.", indentWidth: 35)}");
+        commandsSb.Append($"{"    list",-35}{HelpCommand.FormatLines("Lists all saved scratches.", indentWidth: 35)}");
+        commandsSb.Append($"{"    delete <Name>",-35}{HelpCommand.FormatLines("Deletes the specified scratch.", indentWidth: 35)}");
+        commandsSb.Append($"{"    clear",-35}{HelpCommand.FormatLines("Deletes all saved scratches.", indentWidth: 35)}");
+        commandsSb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
+
+        return new()
+        {
+            Description = "Allows compiling and running Dassie source code from the console.",
+            Usage = ["dc scratchpad [Command] [Options]"],
+            Remarks = "If no command is specified, the command 'new' is used implicitly.",
+            Options =
+            [
+                ("Command", "The subcommand to execute."),
+                ("Options", "Additional options passed to the subcommand.")
+            ],
+            CustomSections =
+            [
+                ("Available commands", commandsSb.ToString())
+            ]
+        };
+    } 
 
     public int Invoke(string[] args) => Scratchpad.HandleScratchpadCommands(args);
 }

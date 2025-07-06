@@ -24,6 +24,20 @@ internal class QuitCommand : ICompilerCommand
 
     public int Invoke(string[] args)
     {
+        if (args.Length > 0)
+        {
+            foreach (string arg in args)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0211_UnexpectedArgument,
+                    $"Unexpected argument '{arg}'.",
+                    "dc");
+            }
+
+            return -1;
+        }
+
         Process[] processes = Process.GetProcesses();
 
         string pidFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "pid.txt");

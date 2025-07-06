@@ -31,6 +31,20 @@ internal class DeployCommand : ICompilerCommand
 
     private static int Deploy(string[] args, string baseDir, bool noDeleteTempDirectory)
     {
+        if (args.Length > 0)
+        {
+            foreach (string arg in args)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0211_UnexpectedArgument,
+                    $"Unexpected argument '{arg}'.",
+                    "dc");
+            }
+
+            return -1;
+        }
+
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
         config ??= new();
 

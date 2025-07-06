@@ -864,5 +864,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when AOT compilation is attempted for a system other than the current one.
     /// </summary>
-    DS0210_CrossSystemAotCompilation
+    DS0210_CrossSystemAotCompilation,
+    /// <summary>
+    /// Emitted when unexpected or invalid arguments are passed to a command.
+    /// </summary>
+    DS0211_UnexpectedArgument
 }
