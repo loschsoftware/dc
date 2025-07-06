@@ -4,8 +4,16 @@ using System.Collections.Generic;
 
 namespace Dassie.Validation;
 
-internal class ReferenceValidation
+/// <summary>
+/// Checks assembly and file references for validity.
+/// </summary>
+internal class ReferenceValidator
 {
+    /// <summary>
+    /// Validates the specified array of references.
+    /// </summary>
+    /// <param name="references">An array containing the references to validate.</param>
+    /// <returns>The valid references.</returns>
     public static Reference[] ValidateReferences(Reference[] references)
     {
         if (references == null)

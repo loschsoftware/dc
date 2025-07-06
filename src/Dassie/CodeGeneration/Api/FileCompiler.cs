@@ -87,7 +87,7 @@ public static class FileCompiler
             parser.RemoveErrorListeners();
             parser.AddErrorListener(new ParserErrorListener());
 
-            Reference[] refs = ReferenceValidation.ValidateReferences(config.References);
+            Reference[] refs = ReferenceValidator.ValidateReferences(config.References);
             var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom(Path.GetFullPath(Path.Combine(GlobalConfig.RelativePathResolverDirectory, (r as AssemblyReference).AssemblyPath))));
 
             if (refsToAdd != null)
