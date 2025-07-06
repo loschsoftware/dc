@@ -1,9 +1,11 @@
 ﻿using Dassie.Cli.Commands;
 using Dassie.Configuration;
 using Dassie.Core;
+using Dassie.Errors;
 using Dassie.Extensions;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace Dassie.Cli;
@@ -31,7 +33,7 @@ internal class Program
         }
         catch (Exception ex)
         {
-            if (messages.Count == 0)
+            if (messages.Count(m => m.Severity == Severity.Error) == 0)
             {
                 EmitErrorMessage(0, 0, 0, DS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "dc");
                 Console.WriteLine();
