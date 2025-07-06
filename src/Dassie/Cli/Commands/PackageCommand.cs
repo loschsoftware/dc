@@ -24,17 +24,33 @@ internal class PackageCommand : ICompilerCommand
 
     public string Description => "Used to install and manage compiler extensions. Use 'dc package help' to display available commands.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public CommandHelpDetails HelpDetails()
     {
-        Description = "Used to install and manage compiler extensions.",
-        Usage = ["dc package [Command] [Options]"],
-        Remarks = "This command is made up of several subcommands. Use the 'help' subcommand for a list of available commands.",
-        Options =
-        [
-            ("Command", "The subcommand to execute."),
-            ("Options", "Additional options passed to the subcommand.")
-        ]
-    };
+        StringBuilder commandsSb = new();
+        commandsSb.Append($"{"    list",-35}{HelpCommand.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
+        commandsSb.Append($"{"    info <Name>",-35}{HelpCommand.FormatLines("Displays advanced information about the specified extension.", indentWidth: 35)}");
+        commandsSb.Append($"{"    install <Name> [-g]",-35}{HelpCommand.FormatLines("Installs the specified extension from the package repository. Use the -g flag to install the package as a globally accessible tool.", indentWidth: 35)}");
+        commandsSb.Append($"{"    import <Path> [-o] [-g]",-35}{HelpCommand.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
+        commandsSb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
+        commandsSb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
+        commandsSb.Append($"{"    source [Command] [Options]",-35}{HelpCommand.FormatLines("Manages extension sources. Use 'dc package source help' for a list of commands.", indentWidth: 35)}");
+        commandsSb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
+
+        return new()
+        {
+            Description = "Used to install and manage compiler extensions.",
+            Usage = ["dc package [Command] [Options]"],
+            Options =
+            [
+                ("Command", "The subcommand to execute."),
+                ("Options", "Additional options passed to the subcommand.")
+            ],
+            CustomSections =
+            [
+                ("Available commands", commandsSb.ToString())
+            ]
+        };
+    }
 
     public int Invoke(string[] args)
     {
@@ -315,26 +331,5 @@ internal class PackageCommand : ICompilerCommand
         throw new NotImplementedException("Installing and updating packages from the internet is not yet implemented.");
     }
 
-    private static int ShowUsage()
-    {
-        StringBuilder sb = new();
-
-        sb.AppendLine();
-        sb.AppendLine("Usage: dc package [Command] [Options]");
-
-        sb.AppendLine();
-        sb.AppendLine("Available commands:");
-        sb.Append($"{"    list",-35}{HelpCommand.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
-        sb.Append($"{"    info <Name>",-35}{HelpCommand.FormatLines("Displays advanced information about the specified extension.", indentWidth: 35)}");
-        sb.Append($"{"    install <Name> [-g]",-35}{HelpCommand.FormatLines("Installs the specified extension from the package repository. Use the -g flag to install the package as a globally accessible tool.", indentWidth: 35)}");
-        sb.Append($"{"    import <Path> [-o] [-g]",-35}{HelpCommand.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
-        sb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
-        sb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
-        sb.Append($"{"    source [Command] [Options]",-35}{HelpCommand.FormatLines("Manages extension sources. Use 'dc package source help' for a list of commands.", indentWidth: 35)}");
-        sb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
-
-        HelpCommand.DisplayLogo();
-        Console.Write(sb.ToString());
-        return 0;
-    }
+    private static int ShowUsage() => HelpCommand.Instance.Invoke(["package"]);
 }

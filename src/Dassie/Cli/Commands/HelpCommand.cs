@@ -1,6 +1,4 @@
 ﻿using Dassie.Configuration;
-using Dassie.Errors;
-using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
@@ -296,6 +294,15 @@ internal class HelpCommand : ICompilerCommand
             foreach ((string opt, string desc) in hd.Options)
                 sb.Append($"{$"    {opt}",-35}{FormatLines(desc, indentWidth: 35)}");
             sb.AppendLine();
+        }
+
+        if (hd.CustomSections != null && hd.CustomSections.Count > 0)
+        {
+            foreach ((string header, string content) in hd.CustomSections)
+            {
+                sb.AppendLine($"{header}:");
+                sb.AppendLine(content);
+            }
         }
 
         if (!string.IsNullOrEmpty(hd.Remarks))

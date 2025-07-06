@@ -26,4 +26,9 @@ public class CommandHelpDetails
     /// Further, more detailed information regarding the command.
     /// </summary>
     public string Remarks { get; set; }
+
+    /// <summary>
+    /// A list of custom help sections.
+    /// </summary>
+    public List<(string Heading, string Text)> CustomSections { get; set; }
 }
