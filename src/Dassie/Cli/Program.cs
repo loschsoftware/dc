@@ -2,6 +2,7 @@
 using Dassie.Configuration;
 using Dassie.Core;
 using Dassie.Errors;
+using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using System;
 using System.Diagnostics;
@@ -33,11 +34,8 @@ internal class Program
         }
         catch (Exception ex)
         {
-            if (messages.Count(m => m.Severity == Severity.Error) == 0)
-            {
+            if (!messages.Any(m => m.Severity == Severity.Error))
                 EmitErrorMessage(0, 0, 0, DS0000_UnexpectedError, $"Unhandled exception of type '{ex.GetType()}'.", "dc");
-                Console.WriteLine();
-            }
 
             if (Debugger.IsAttached)
                 throw;
@@ -45,7 +43,7 @@ internal class Program
             try
             {
                 if (ProjectFileDeserializer.DassieConfig.PrintExceptionInfo)
-                    Console.WriteLine(ex);
+                    TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
             }
             catch { }
         }
