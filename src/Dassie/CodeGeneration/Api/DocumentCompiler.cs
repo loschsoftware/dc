@@ -41,7 +41,7 @@ internal static class DocumentCompiler
 
     public static List<ErrorInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath)
     {
-        EmitBuildLogMessage($"Compiling source file '{document.Name}'.", 2);
+        EmitBuildLogMessage($"Compiling document '{document.Name}'.", 2);
 
         SetupBogusAssembly();
         CurrentFile = Context.GetFile(document.Name);

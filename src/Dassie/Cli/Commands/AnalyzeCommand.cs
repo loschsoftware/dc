@@ -52,7 +52,7 @@ internal class AnalyzeCommand : ICompilerCommand
         if (files.Any())
             return AnalyzeFiles(files, analyzerName: analyzerName);
 
-        Func<string, bool> predicate = a => !a.StartsWith("-a=") && !a.StartsWith("--analyzer=") && !File.Exists(a);
+        Func<string, bool> predicate = static a => !a.StartsWith("-a=") && !a.StartsWith("--analyzer=") && !File.Exists(a);
         if (args.Any(predicate))
         {
             foreach (string arg in args.Where(predicate))
