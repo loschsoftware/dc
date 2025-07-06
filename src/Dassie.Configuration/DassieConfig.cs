@@ -257,7 +257,7 @@ public sealed class DassieConfig
     [Description("If enabled, compiler messages will display an icon to distinguish them by severity.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool EnableMessageIndicators { get; set; }
+    public bool EnableSeverityIndicators { get; set; }
 }
 
 [Serializable]

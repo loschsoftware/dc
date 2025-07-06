@@ -97,7 +97,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
             outBuilder.Append(prefix);
 
             string severityPrefix = "";
-            if (Context.Configuration.EnableMessageIndicators)
+            if (Context.Configuration.EnableSeverityIndicators)
             {
                 severityPrefix = error.Severity switch
                 {
