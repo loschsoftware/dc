@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 #pragma warning disable CS8981
 #pragma warning disable IDE1006
@@ -144,4 +145,24 @@ public static class stdout
     /// </summary>
     /// <param name="obj">The object to dump.</param>
     public static void dump(object obj) => print(obj.Dump());
+
+    /// <summary>
+    /// Prints the specified value along with type information to the standard output.
+    /// </summary>
+    /// <param name="obj">The value to print.</param>
+    public static void printv(object obj)
+    {
+        print(obj);
+        print($" : {obj.GetType()}");
+    }
+
+    /// <summary>
+    /// Prints the specified value along with type information, followed by a newline character, to the standard output.
+    /// </summary>
+    /// <param name="obj">The value to print.</param>
+    public static void printvn(object obj)
+    {
+        printv(obj);
+        println();
+    }
 }
