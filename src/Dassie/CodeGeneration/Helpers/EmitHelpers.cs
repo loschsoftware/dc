@@ -139,6 +139,17 @@ internal static class EmitHelpers
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4, value);
     }
 
+    public static void EmitLdcI8(long value)
+    {
+        if (value >= int.MinValue && value <= int.MaxValue)
+        {
+            EmitLdcI4((int)value);
+            EmitConversionOperator(typeof(int), typeof(long));
+        }
+        else
+            CurrentMethod.IL.Emit(OpCodes.Ldc_I8, value);
+    }
+
     public static void EmitStloc(int index)
     {
         if (index <= 3)

@@ -4250,9 +4250,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         Expression expr = ExpressionEvaluator.Instance.VisitInteger_atom(context);
 
         if (expr.Type == typeof(ulong) || expr.Type == typeof(long))
-            CurrentMethod.IL.Emit(OpCodes.Ldc_I8, expr.Value);
+            EmitLdcI8(expr.Value);
         else
+        {
             EmitLdcI4(expr.Value);
+
+            if (expr.Type != typeof(int) && expr.Type != typeof(uint))
+                EmitConversionOperator(typeof(int), expr.Type);
+        }
 
         return expr.Type;
     }
