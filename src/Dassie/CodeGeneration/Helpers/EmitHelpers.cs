@@ -1,5 +1,4 @@
-﻿using Dassie.Helpers;
-using Dassie.Meta;
+﻿using Dassie.Meta;
 using Dassie.Runtime;
 using System;
 using System.Collections;
@@ -8,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics.X86;
 using static Dassie.Configuration.ProjectFileDeserializer;
 using static Dassie.Helpers.TypeHelpers;
 
@@ -96,7 +94,23 @@ internal static class EmitHelpers
 
     public static void EmitLdcI4(int value)
     {
-        if (value >= -128 && value <= 127)
+        if (value >= -1 && value <= 8)
+        {
+            CurrentMethod.IL.Emit(value switch
+            {
+                -1 => OpCodes.Ldc_I4_M1,
+                0 => OpCodes.Ldc_I4_0,
+                1 => OpCodes.Ldc_I4_1,
+                2 => OpCodes.Ldc_I4_2,
+                3 => OpCodes.Ldc_I4_3,
+                4 => OpCodes.Ldc_I4_4,
+                5 => OpCodes.Ldc_I4_5,
+                6 => OpCodes.Ldc_I4_6,
+                7 => OpCodes.Ldc_I4_7,
+                _ => OpCodes.Ldc_I4_8
+            });
+        }
+        else if (value >= -128 && value <= 127)
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)value);
         else
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4, value);
@@ -104,7 +118,22 @@ internal static class EmitHelpers
 
     public static void EmitLdcI4(uint value)
     {
-        if (value <= 127)
+        if (value <= 8)
+        {
+            CurrentMethod.IL.Emit(value switch
+            {
+                0 => OpCodes.Ldc_I4_0,
+                1 => OpCodes.Ldc_I4_1,
+                2 => OpCodes.Ldc_I4_2,
+                3 => OpCodes.Ldc_I4_3,
+                4 => OpCodes.Ldc_I4_4,
+                5 => OpCodes.Ldc_I4_5,
+                6 => OpCodes.Ldc_I4_6,
+                7 => OpCodes.Ldc_I4_7,
+                _ => OpCodes.Ldc_I4_8
+            });
+        }
+        else if (value <= 127)
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)value);
         else
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4, value);
@@ -112,7 +141,17 @@ internal static class EmitHelpers
 
     public static void EmitStloc(int index)
     {
-        if (index <= 255)
+        if (index <= 3)
+        {
+            CurrentMethod.IL.Emit(index switch
+            {
+                0 => OpCodes.Stloc_0,
+                1 => OpCodes.Stloc_1,
+                2 => OpCodes.Stloc_2,
+                _ => OpCodes.Stloc_3
+            });
+        }
+        else if (index <= 255)
             CurrentMethod.IL.Emit(OpCodes.Stloc_S, (byte)index);
         else
             CurrentMethod.IL.Emit(OpCodes.Stloc, index);
@@ -128,7 +167,17 @@ internal static class EmitHelpers
 
     public static void EmitLdloc(int index)
     {
-        if (index <= 255)
+        if (index <= 3)
+        {
+            CurrentMethod.IL.Emit(index switch
+            {
+                0 => OpCodes.Ldloc_0,
+                1 => OpCodes.Ldloc_1,
+                2 => OpCodes.Ldloc_2,
+                _ => OpCodes.Ldloc_3
+            });
+        }
+        else if (index <= 255)
             CurrentMethod.IL.Emit(OpCodes.Ldloc_S, (byte)index);
         else
             CurrentMethod.IL.Emit(OpCodes.Ldloc, index);
@@ -136,7 +185,17 @@ internal static class EmitHelpers
 
     public static void EmitLdarg(int index)
     {
-        if (index <= 255)
+        if (index <= 3)
+        {
+            CurrentMethod.IL.Emit(index switch
+            {
+                0 => OpCodes.Ldarg_0,
+                1 => OpCodes.Ldarg_1,
+                2 => OpCodes.Ldarg_2,
+                _ => OpCodes.Ldarg_3
+            });
+        }
+        else if (index <= 255)
             CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)index);
         else
             CurrentMethod.IL.Emit(OpCodes.Ldarg, index);
