@@ -868,5 +868,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when unexpected or invalid arguments are passed to a command.
     /// </summary>
-    DS0211_UnexpectedArgument
+    DS0211_UnexpectedArgument,
+    /// <summary>
+    /// Emitted when a program that contains varargs function declarations is compiled ahead-of-time.
+    /// </summary>
+    DS0212_AotVarArgsFunction
 }
