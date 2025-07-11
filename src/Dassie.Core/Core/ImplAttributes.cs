@@ -21,3 +21,9 @@ public class HideBySigAttribute : Attribute { }
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 public class NewSlotAttribute : Attribute { }
+
+/// <summary>
+/// Sets the 'vararg' method attribute.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+public class VarArgsAttribute : Attribute { }

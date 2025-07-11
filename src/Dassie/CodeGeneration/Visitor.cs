@@ -816,13 +816,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             TypeContext.Current.Properties.Add(pb);
 
-            (MethodAttributes attribs, _, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
+            (MethodAttributes attribs, _, _, CallingConventions callingConventions) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
             attribs |= MethodAttributes.SpecialName;
 
             if (!attribs.HasFlag(MethodAttributes.HideBySig))
                 attribs |= MethodAttributes.HideBySig;
 
-            MethodBuilder getter = TypeContext.Current.Builder.DefineMethod($"get_{propName}", attribs, type, []);
+            MethodBuilder getter = TypeContext.Current.Builder.DefineMethod($"get_{propName}", attribs, callingConventions, type, []);
             ILGenerator ilGet = getter.GetILGenerator();
             ilGet.Emit(OpCodes.Ldarg_0);
             ilGet.Emit(OpCodes.Ldfld, backingField);

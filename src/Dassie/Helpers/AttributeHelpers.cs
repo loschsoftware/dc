@@ -89,11 +89,12 @@ internal static class AttributeHelpers
         return baseAttributes;
     }
 
-    public static (MethodAttributes, MethodImplAttributes, bool) GetMethodAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, DassieParser.AttributeContext[] attribs, bool ignoreDS0058 = false)
+    public static (MethodAttributes, MethodImplAttributes, bool, CallingConventions) GetMethodAttributes(DassieParser.Member_access_modifierContext accessModifier, DassieParser.Member_oop_modifierContext oopModifier, DassieParser.Member_special_modifierContext[] specialModifiers, DassieParser.AttributeContext[] attribs, bool ignoreDS0058 = false)
     {
         bool isExtern = false;
         MethodAttributes baseAttributes;
         MethodImplAttributes implementationFlags = MethodImplAttributes.Managed;
+        CallingConventions callingConventions = CallingConventions.Standard;
 
         if (accessModifier == null || accessModifier.Global() != null)
             baseAttributes = MethodAttributes.Public;
@@ -178,12 +179,21 @@ internal static class AttributeHelpers
 
                 if (attribType == typeof(NewSlotAttribute) && !baseAttributes.HasFlag(MethodAttributes.NewSlot))
                     baseAttributes |= MethodAttributes.NewSlot;
+
+                if (attribType == typeof(VarArgsAttribute))
+                    callingConventions |= CallingConventions.VarArgs;
             }
 
             Disabled = false;
         }
 
-        return (baseAttributes, implementationFlags, isExtern);
+        if (!baseAttributes.HasFlag(MethodAttributes.Static))
+        {
+            callingConventions &= CallingConventions.Standard;
+            callingConventions |= CallingConventions.HasThis;
+        }
+
+        return (baseAttributes, implementationFlags, isExtern, callingConventions);
     }
 
     public static ParameterAttributes GetParameterAttributes(DassieParser.Parameter_modifierContext modifier, bool hasDefault)
