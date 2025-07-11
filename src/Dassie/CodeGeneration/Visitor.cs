@@ -3226,8 +3226,13 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (!getFunctionPointerTarget)
                 {
+                    Type[] optionalParamTypes = null;
+
+                    if (meth.CallingConvention.HasFlag(CallingConventions.VarArgs))
+                        optionalParamTypes = argTypes[meth.GetParameters().Length..];
+
                     EmitTailcall();
-                    EmitCall(meth.DeclaringType, meth);
+                    EmitCall(meth.DeclaringType, meth, optionalParamTypes);
                 }
 
                 if (meth.ReturnType.IsValueType && CurrentMethod.ShouldLoadAddressIfValueType && !notLoadAddress && !getFunctionPointerTarget)
@@ -3583,8 +3588,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 if (!getFunctionPointerTarget || identifier != nextNodes.Last())
                 {
+                    Type[] optionalParamTypes = null;
+                    if (m.CallingConvention.HasFlag(CallingConventions.VarArgs))
+                        optionalParamTypes = CurrentMethod.ArgumentTypesForNextMethodCall[m.GetParameters().Length..].ToArray();
+
                     //EmitTailcall();
-                    EmitCall(t, m);
+                    EmitCall(t, m, optionalParamTypes);
                 }
 
                 if (identifier == nextNodes.Last())
@@ -3735,8 +3744,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                     EmitLdloca(CurrentMethod.LocalIndex);
                 }
 
+                Type[] optionalParamTypes = null;
+                if (m.CallingConvention.HasFlag(CallingConventions.VarArgs))
+                    optionalParamTypes = CurrentMethod.ArgumentTypesForNextMethodCall[m.GetParameters().Length..].ToArray();
+
                 EmitTailcall();
-                EmitCall(t, m);
+                EmitCall(t, m, optionalParamTypes);
                 t = m.ReturnType;
 
                 if (t.IsGenericTypeParameter)

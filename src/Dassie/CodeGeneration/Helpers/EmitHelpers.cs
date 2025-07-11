@@ -433,14 +433,14 @@ internal static class EmitHelpers
             CurrentMethod.IL.Emit(OpCodes.Stfld, f);
     }
 
-    public static void EmitCall(Type type, MethodInfo m)
+    public static void EmitCall(Type type, MethodInfo m, Type[] optionalParamTypes = null)
     {
         try
         {
             if (m.IsStatic || type.IsValueType)
-                CurrentMethod.IL.EmitCall(OpCodes.Call, m, null);
+                CurrentMethod.IL.EmitCall(OpCodes.Call, m, optionalParamTypes);
             else
-                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, null);
+                CurrentMethod.IL.EmitCall(OpCodes.Callvirt, m, optionalParamTypes);
 
             if (m.ReturnType == typeof(void))
                 CurrentMethod.SkipPop = true;

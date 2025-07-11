@@ -69,11 +69,15 @@ internal static class ErrorMessageHelpers
 
         bool error = false;
 
-        if (overload.GetParameters().Length != providedArgs.Length)
+        if (overload.GetParameters().Length > providedArgs.Length)
             error = true;
-
+        else if (providedArgs.Length > overload.GetParameters().Length && !overload.CallingConvention.HasFlag(CallingConventions.VarArgs))
+            error = true;
         else
         {
+            if (overload.CallingConvention.HasFlag(CallingConventions.VarArgs))
+                return;
+
             for (int i = 0; i < overload.GetParameters().Length; i++)
             {
                 try
