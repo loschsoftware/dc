@@ -182,17 +182,29 @@ internal static class AttributeHelpers
 
                 if (attribType == typeof(VarArgsAttribute))
                 {
+                    Disabled = disableErrorWriter;
+
+                    if (!string.IsNullOrEmpty(Context.Configuration.RuntimeIdentifier) && Context.Configuration.RuntimeIdentifier.Split('-')[0] != "win")
+                    {
+                        EmitWarningMessage(
+                            attrib.Start.Line,
+                            attrib.Start.Column,
+                            attrib.GetText().Length,
+                            DS0213_VarArgsNonWindows,
+                            "Varargs functions are currently only supported on Windows. Calling this function will always throw an exception.");
+                    }
+
                     if (Context.Configuration.Runtime == Configuration.Runtime.Aot)
                     {
-                        Disabled = disableErrorWriter;
                         EmitWarningMessage(
                             attrib.Start.Line,
                             attrib.Start.Column,
                             attrib.GetText().Length,
                             DS0212_AotVarArgsFunction,
                             "Varargs functions are unsupported when compiling ahead of time. Calling this function will always throw an exception.");
-                        Disabled = true;
                     }
+
+                    Disabled = true;
 
                     callingConventions |= CallingConventions.VarArgs;
                 }

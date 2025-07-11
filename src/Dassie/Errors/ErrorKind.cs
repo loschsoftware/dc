@@ -872,5 +872,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a program that contains varargs function declarations is compiled ahead-of-time.
     /// </summary>
-    DS0212_AotVarArgsFunction
+    DS0212_AotVarArgsFunction,
+    /// <summary>
+    /// Emitted when a program that contains a varargs function declaration is compiled for a platform other than Windows.
+    /// </summary>
+    DS0213_VarArgsNonWindows
 }
