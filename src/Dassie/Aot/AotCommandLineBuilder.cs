@@ -189,6 +189,9 @@ internal class AotCommandLineBuilder
 
     private void AddAdditionalConfig()
     {
+        if (_config.Config.ApplicationType == ApplicationType.Library)
+            _arglistBuilder.AppendLine("--nativelib");
+
         _arglistBuilder.AppendLine($@"--export-dynamic-symbol:DotNetRuntimeDebugHeader,DATA
 --initassembly:System.Private.CoreLib
 --initassembly:System.Private.StackTraceMetadata
@@ -301,5 +304,8 @@ internal class AotCommandLineBuilder
 /OPT:REF
 /OPT:ICF
 ");
+
+        if (_config.Config.ApplicationType == ApplicationType.Library)
+            _linkerArglistBuilder.AppendLine("/DLL");
     }
 }
