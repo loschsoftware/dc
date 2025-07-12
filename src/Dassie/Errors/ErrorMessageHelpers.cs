@@ -84,6 +84,10 @@ internal static class ErrorMessageHelpers
                 {
                     if (!overload.GetParameters()[i].ParameterType.IsAssignableFrom(providedArgs[i]))
                     {
+                        if (overload.GetParameters()[i].ParameterType.IsByRef && providedArgs[i].IsByRef &&
+                            overload.GetParameters()[i].ParameterType.GetElementType().IsAssignableFrom(providedArgs[i].GetElementType()))
+                            continue;
+
                         if (providedArgs[i] == typeof(Wildcard))
                             continue;
 
