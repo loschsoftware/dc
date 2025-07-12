@@ -4007,14 +4007,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
     private static void WarnIfConstantBoolean(DassieParser.ExpressionContext rule)
     {
         Expression expr = ExpressionEvaluator.Instance.Visit(rule);
-        if (expr is not null && expr.Value is bool cond)
+
+        if (expr is not null && expr.Value is bool cond && !expr.IsBooleanLiteral)
         {
             EmitWarningMessage(
                 rule.Start.Line,
                 rule.Start.Column,
                 rule.GetText().Length,
                 DS0202_ConditionConstant,
-                $"Condition is always '{cond.ToString().ToLowerInvariant()}'.");
+                $"Condition is always {cond.ToString().ToLowerInvariant()}.");
         }
     }
 

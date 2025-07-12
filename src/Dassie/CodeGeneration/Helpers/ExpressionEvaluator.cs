@@ -666,7 +666,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
     public override Expression VisitBoolean_atom([NotNull] DassieParser.Boolean_atomContext context)
     {
-        return new(typeof(bool), context.False() == null);
+        return new(typeof(bool), context.False() == null) { IsBooleanLiteral = true };
     }
 
     public override Expression VisitType_name([NotNull] DassieParser.Type_nameContext context)
@@ -777,7 +777,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
         if (o is MetaFieldInfo mfi)
             return new(mfi.ConstantValue.GetType(), mfi.ConstantValue);
-        
+
         object o2 = GetSmallestTypeFromLeft(
             context,
             [],

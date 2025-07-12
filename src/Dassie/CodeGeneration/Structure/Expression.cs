@@ -15,4 +15,6 @@ internal class Expression
     public Type Type { get; set; }
 
     public dynamic Value { get; set; }
+
+    public bool IsBooleanLiteral { get; set; }
 }
