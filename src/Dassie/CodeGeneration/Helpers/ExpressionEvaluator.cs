@@ -604,15 +604,15 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
             if (text.EndsWith("un", StringComparison.OrdinalIgnoreCase))
             {
-                literalType = typeof(uint);
-                return new(typeof(uint), uint.Parse(text[0..^2].Replace("'", ""), style));
+                literalType = typeof(nuint);
+                return new(typeof(nuint), nuint.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             if (text.EndsWith("n", StringComparison.OrdinalIgnoreCase))
             {
-                literalType = typeof(int);
+                literalType = typeof(nint);
                 text += "0";
-                return new(typeof(int), int.Parse(text[0..^2].Replace("'", ""), style));
+                return new(typeof(nint), nint.Parse(text[0..^2].Replace("'", ""), style));
             }
 
             text += "00";

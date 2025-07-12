@@ -4266,7 +4266,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             EmitLdcI8(expr.Value);
         else
         {
-            EmitLdcI4(expr.Value);
+            EmitLdcI4((int)expr.Value);
 
             if (expr.Type != typeof(int) && expr.Type != typeof(uint))
                 EmitConversionOperator(typeof(int), expr.Type);
