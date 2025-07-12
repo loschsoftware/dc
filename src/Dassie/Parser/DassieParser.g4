@@ -313,8 +313,8 @@ access_modifier_member_group
     ;
 
 parameter_list
-    : Open_Paren (parameter (Comma parameter)*)? Close_Paren
-    | parameter (Comma parameter)*
+    : Open_Paren NewLine* (parameter (Comma NewLine* parameter)*)? NewLine* Close_Paren
+    | parameter (Comma NewLine* parameter)* NewLine*
     ;
 
 parameter_modifier
