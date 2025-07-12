@@ -174,7 +174,7 @@ internal static class SymbolResolver
     public static object ResolveIdentifier(string text, int row, int col, int len, bool noEmitFragments = false, bool throwErrors = true, Generics.GenericArgumentContext[] genericArgs = null, bool disableBacktickGenericResolve = false)
     {
         // 1. Parameters
-        if (CurrentMethod.Parameters.Any(p => p.Name == text))
+        if (CurrentMethod != null && CurrentMethod.Parameters.Any(p => p.Name == text))
         {
             ParamInfo param = CurrentMethod.Parameters.First(p => p.Name == text);
 
@@ -189,7 +189,7 @@ internal static class SymbolResolver
             return param;
         }
 
-        if (CurrentMethod.IsLocalFunction && CurrentMethod.Parent.Parameters.Any(p => p.Name == text))
+        if (CurrentMethod != null && CurrentMethod.IsLocalFunction && CurrentMethod.Parent.Parameters.Any(p => p.Name == text))
         {
             ParamInfo param = CurrentMethod.Parameters.First(p => p.Name == text);
             CurrentMethod.CapturedSymbols.Add(new()
@@ -201,7 +201,7 @@ internal static class SymbolResolver
         }
 
         // 2. Locals
-        if (CurrentMethod.Locals.Any(p => p.Name == text))
+        if (CurrentMethod != null && CurrentMethod.Locals.Any(p => p.Name == text))
         {
             LocalInfo loc = CurrentMethod.Locals.First(p => p.Name == text);
 
@@ -226,7 +226,7 @@ internal static class SymbolResolver
             return loc;
         }
 
-        if (CurrentMethod.IsLocalFunction && CurrentMethod.Parent.Locals.Any(p => p.Name == text))
+        if (CurrentMethod != null && CurrentMethod.IsLocalFunction && CurrentMethod.Parent.Locals.Any(p => p.Name == text))
         {
             LocalInfo loc = CurrentMethod.Parent.Locals.First(p => p.Name == text);
 
@@ -241,13 +241,13 @@ internal static class SymbolResolver
         }
 
         // 3. Members of current class
-        if (TypeContext.Current.Methods.Select(m => m.Builder).Where(m => m != null).Any(m => m.Name == text))
+        if (TypeContext.Current != null && TypeContext.Current.Methods.Select(m => m.Builder).Where(m => m != null).Any(m => m.Name == text))
             return TypeContext.Current.Methods.Select(m => m.Builder).First(m => m != null && m.Name == text);
 
-        if (TypeContext.Current.Builder.BaseType?.GetMethods(BindingFlags.Public | BindingFlags.NonPublic).Any(m => m.Name == text) is true)
+        if (TypeContext.Current != null && TypeContext.Current.Builder.BaseType?.GetMethods(BindingFlags.Public | BindingFlags.NonPublic).Any(m => m.Name == text) is true)
             return TypeContext.Current.Builder.BaseType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic).First(m => m.Name == text);
 
-        if (TypeContext.Current.Fields.Select(f => f.Builder).Where(f => f != null).Any(f => f.Name == text))
+        if (TypeContext.Current != null && TypeContext.Current.Fields.Select(f => f.Builder).Where(f => f != null).Any(f => f.Name == text))
         {
             MetaFieldInfo field = TypeContext.Current.Fields.First(f => f.Name == text);
 
@@ -257,13 +257,13 @@ internal static class SymbolResolver
             return field;
         }
 
-        if (TypeContext.Current.Builder.BaseType?.GetFields(BindingFlags.Public | BindingFlags.NonPublic).Any(f => f.Name == text) is true)
+        if (TypeContext.Current != null && TypeContext.Current.Builder.BaseType?.GetFields(BindingFlags.Public | BindingFlags.NonPublic).Any(f => f.Name == text) is true)
             return TypeContext.Current.Builder.BaseType.GetFields(BindingFlags.Public | BindingFlags.NonPublic).First(f => f.Name == text);
 
-        if (TypeContext.Current.Properties.Any(p => p.Name == text))
+        if (TypeContext.Current != null && TypeContext.Current.Properties.Any(p => p.Name == text))
             return TypeContext.Current.Properties.First(p => p.Name == text);
 
-        if (TypeContext.Current.Builder.BaseType?.GetProperties(BindingFlags.Public | BindingFlags.NonPublic).Any(p => p.Name == text) is true)
+        if (TypeContext.Current != null && TypeContext.Current.Builder.BaseType?.GetProperties(BindingFlags.Public | BindingFlags.NonPublic).Any(p => p.Name == text) is true)
             return TypeContext.Current.Builder.BaseType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic).First(p => p.Name == text);
 
         // 4. Members of type-imported types ("global members")
