@@ -318,7 +318,7 @@ public enum ErrorKind
     /// </summary>
     DS0073_TypeNameTooLong,
     /// <summary>
-    /// Emitted when more than 65534 locals are defined in a function.
+    /// Emitted when more than 65535 locals are defined in a function.
     /// </summary>
     DS0074_TooManyLocals,
     /// <summary>

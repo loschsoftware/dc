@@ -122,18 +122,7 @@ internal class MethodContext
     public int LocalIndex
     {
         get => _localIndex;
-        set
-        {
-            if (value > 65534)
-            {
-                EmitErrorMessage(
-                    0, 0, 0,
-                    DS0074_TooManyLocals,
-                    "Only 65534 locals can be declared per function.");
-            }
-
-            _localIndex = value;
-        }
+        set => _localIndex = value;
     }
 
     public int ParameterIndex { get; set; } = 0;

@@ -8,7 +8,7 @@ internal class CompoundAssignmentRewriter : ITreeToStringRewriter
 {
     public string Rewrite(IParseTree tree, LoweringListener listener)
     {
-        IParseTree op;
+        DassieParser.Assignment_operatorContext op;
         string left, right, expr;
 
         if (tree is DassieParser.AssignmentContext a)
@@ -18,7 +18,6 @@ internal class CompoundAssignmentRewriter : ITreeToStringRewriter
             expr = a.expression()[1].GetText();
             right = $"{a.expression()[0].GetText()} ";
         }
-
         else
         {
             var local = (DassieParser.Local_declaration_or_assignmentContext)tree;
