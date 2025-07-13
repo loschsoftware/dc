@@ -5033,14 +5033,15 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             SymbolType = SymbolInfo.SymType.Local
         };
 
-        if (localSymbol.Index() > ushort.MaxValue)
+        string ds0074Message = $"'{CurrentMethod.Builder.Name}': Only {ushort.MaxValue} locals can be declared per function.";
+        if (localSymbol.Index() > ushort.MaxValue && !messages.Any(m => m.ErrorMessage == ds0074Message))
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetText().Length,
                 DS0074_TooManyLocals,
-                $"'{CurrentMethod.Builder.Name}': Only {ushort.MaxValue} locals can be declared per function.");
+                ds0074Message);
         }
 
         //if (CurrentMethod.NextAssignmentIsFunctionPointer && localSymbol.Type() == typeof(nint))
