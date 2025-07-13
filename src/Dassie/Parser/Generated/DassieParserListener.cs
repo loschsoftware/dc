@@ -1510,5 +1510,15 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitProperty_or_event_block([NotNull] DassieParser.Property_or_event_blockContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.external_block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterExternal_block([NotNull] DassieParser.External_blockContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.external_block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitExternal_block([NotNull] DassieParser.External_blockContext context);
 }
 } // namespace Dassie.Parser

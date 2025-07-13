@@ -96,7 +96,6 @@ internal static class SymbolResolver
                 string uninitializedGenericTypeName = $"{regularType}`{genericArgs.Length}";
                 if (ResolveIdentifier(uninitializedGenericTypeName, row, col, len, true) is Type uninitializedGenericType)
                     TypeHelpers.CheckGenericTypeCompatibility(uninitializedGenericType, genericArgs, row, col, len, true);
-
                 else
                 {
                     if (ResolveIdentifier(regularType, row, col, len, true) is Type genericTypeWithoutBacktick)

@@ -876,5 +876,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a program that contains a varargs function declaration is compiled for a platform other than Windows.
     /// </summary>
-    DS0213_VarArgsNonWindows
+    DS0213_VarArgsNonWindows,
+    /// <summary>
+    /// Emitted when an 'extern' block contains another.
+    /// </summary>
+    DS0214_NestedExternalBlock
 }

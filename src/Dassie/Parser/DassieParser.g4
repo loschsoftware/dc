@@ -303,9 +303,10 @@ type_member
     // Field without initializer
     | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Var | Val)? Identifier generic_parameter_list? Colon type_name
     // Custom operator
-    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Custom_Operator | Open_Paren Custom_Operator Close_Paren) parameter_list (Colon type_name)? Equals NewLine* expression
+    | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* (Custom_Operator | (Open_Paren Custom_Operator Close_Paren)) parameter_list (Colon type_name)? Equals NewLine* expression
     // Property or event
     | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Identifier generic_parameter_list? (Colon type_name)? Equals NewLine* property_or_event_block
+    | external_block
     ;
 
 access_modifier_member_group
@@ -432,4 +433,8 @@ property_setter
 
 property_or_event_block
     : Open_Brace NewLine* ((add_handler | remove_handler | NewLine)+ | (property_getter | property_setter | NewLine)+) NewLine* Close_Brace
+    ;
+
+external_block
+    : Extern String_Literal Equals Open_Brace (NewLine* type_member)* NewLine* Close_Brace
     ;

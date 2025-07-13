@@ -908,5 +908,11 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitProperty_or_event_block([NotNull] DassieParser.Property_or_event_blockContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.external_block"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitExternal_block([NotNull] DassieParser.External_blockContext context);
 }
 } // namespace Dassie.Parser

@@ -24,6 +24,7 @@ internal class LoweringListener : DassieParserBaseListener
     readonly ParameterConstraintRewriter constraintRewriter = new();
     readonly MatchExpressionRewriter matchExpressionRewriter = new();
     readonly LocalFunctionRewriter localFunctionRewriter = new();
+    readonly ExternalBlockRewriter externalBlockRewriter = new();
 
     public string GetTextForRule(ParserRuleContext rule)
     {
@@ -107,5 +108,10 @@ internal class LoweringListener : DassieParserBaseListener
     public override void EnterLocal_function([NotNull] DassieParser.Local_functionContext context)
     {
         Text = Replace(localFunctionRewriter.Rewrite(context, this), context);
+    }
+
+    public override void EnterExternal_block([NotNull] DassieParser.External_blockContext context)
+    {
+        Text = Replace(externalBlockRewriter.Rewrite(context, this), context);
     }
 }
