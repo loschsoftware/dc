@@ -880,5 +880,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an 'extern' block contains another.
     /// </summary>
-    DS0214_NestedExternalBlock
+    DS0214_NestedExternalBlock,
+    /// <summary>
+    /// Emitted when an external extension caused an unhandled exception.
+    /// </summary>
+    DS0215_ExtensionThrewException
 }

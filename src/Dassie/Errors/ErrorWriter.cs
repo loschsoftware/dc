@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dassie.Errors;
 
@@ -31,6 +30,8 @@ public static class ErrorWriter
     /// </summary>
     public static List<IBuildLogDevice> BuildLogDevices { get; set; } = [TextWriterBuildLogDevice.Instance];
 
+    private static readonly List<IBuildLogDevice> _disabledDevices = [];
+
     /// <summary>
     /// A prefix of all error messages, indicating which project the error is from.
     /// </summary>
@@ -45,6 +46,31 @@ public static class ErrorWriter
     /// A value added to the line number of every error message.
     /// </summary>
     public static int LineNumberOffset { get; set; } = 0;
+
+    private static void BuildLogDeviceSafeCall(IBuildLogDevice device, Action<IBuildLogDevice> func)
+    {
+        try
+        {
+            func(device);
+        }
+        catch (Exception ex)
+        {
+            _disabledDevices.Add(device);
+
+            EmitWarningMessage(
+                0, 0, 0,
+                DS0215_ExtensionThrewException,
+                $"An unhandled exception of type '{ex.GetType()}' was caused by the build log device '{device.Name}'. This build log device will be disabled for the rest of the compilation.",
+                "dc");
+
+            try
+            {
+                if (ProjectFileDeserializer.DassieConfig.PrintExceptionInfo)
+                    TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
+            }
+            catch { }
+        }
+    }
 
     internal static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
     {
@@ -108,10 +134,13 @@ public static class ErrorWriter
 
         foreach (IBuildLogDevice device in BuildLogDevices)
         {
+            if (_disabledDevices.Contains(device))
+                continue;
+
             if (!device.SeverityLevel.HasFlag(severity))
                 continue;
 
-            device.Log(error);
+            BuildLogDeviceSafeCall(device, d => d.Log(error));
         }
 
         messages.Add(error);
@@ -280,7 +309,12 @@ public static class ErrorWriter
             return;
 
         foreach (IBuildLogDevice device in BuildLogDevices)
-            device.WriteString(str);
+        {
+            if (_disabledDevices.Contains(device))
+                continue;
+
+            BuildLogDeviceSafeCall(device, d => d.WriteString(str));
+        }
     }
 
     /// <summary>
