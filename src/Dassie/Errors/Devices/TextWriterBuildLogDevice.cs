@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 
@@ -34,15 +35,27 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
     public string Name => "Default";
     public BuildLogSeverity SeverityLevel => BuildLogSeverity.All;
 
-    public void Initialize(List<XmlAttribute> attributes, List<XmlNode> elements) { }
+    private bool _disabled;
+
+    public void Initialize(List<XmlAttribute> attributes, List<XmlNode> elements)
+    {
+        if (attributes != null && attributes.Any(a => a.Name == "Disabled"))
+            _ = bool.TryParse(attributes.First(a => a.Name == "Disabled").InnerText, out _disabled);
+    }
 
     public void WriteString(string input)
     {
+        if (_disabled)
+            return;
+
         InfoOut.Write(input);
     }
 
     public void Log(ErrorInfo error)
     {
+        if (_disabled)
+            return;
+
         Log(error, false, true);
     }
 

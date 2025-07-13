@@ -27,11 +27,11 @@ internal static class BuildLogDeviceContextBuilder
 
         foreach (XmlElement element in config.BuildLogOptions.Elements)
         {
+            var loc = XmlLocationService.GetElementLocation(configPath, "BuildLogDevices");
             string deviceName = element.Name;
 
             if (!availableDevices.Any(d => d.Name == deviceName))
             {
-                var loc = XmlLocationService.GetElementLocation(configPath, "BuildLogDevices");
                 EmitWarningMessage(
                     loc.Row,
                     loc.Column,
