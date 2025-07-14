@@ -1213,7 +1213,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
                 Type _t = Visit(child);
 
-                if (_t != typeof(void) && !CurrentMethod.SkipPop)
+                if (_t != typeof(void) && _t != null && !CurrentMethod.SkipPop)
                 {
 #if ENABLE_DS0125
                 ParserRuleContext rule = (ParserRuleContext)tree;
