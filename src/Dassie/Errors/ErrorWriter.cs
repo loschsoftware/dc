@@ -198,7 +198,7 @@ public static class ErrorWriter
     /// Writes an error message to the designated error outputs.
     /// </summary>
     /// <remarks>If <paramref name="file"/> is null, will assume <see cref="FileContext.Path"/>.</remarks>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool addToErrorList = true, string tip = "", bool hideCodePosition = false)
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, bool addToErrorList = true, string tip = "", bool hideCodePosition = false)
     {
         hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -231,7 +231,7 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a warning message to the designated warning outputs.
     /// </summary>
-    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, bool treatAsError = false, string tip = "", bool hideCodePosition = false)
+    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, bool treatAsError = false, string tip = "", bool hideCodePosition = false)
     {
         hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -266,7 +266,7 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a message to the designated information outputs.
     /// </summary>
-    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_SyntaxError, string msg = "Syntax error.", string file = null, string tip = "", bool hideCodePosition = false)
+    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", bool hideCodePosition = false)
     {
         hideCodePosition = ln == 0 && col == 0 && length == 0;
 

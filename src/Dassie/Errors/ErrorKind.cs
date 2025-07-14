@@ -15,9 +15,9 @@ public enum ErrorKind
     /// </summary>
     CustomError = -1,
     /// <summary>
-    /// An unexpected and not further specified error.
+    /// An unknown and not further specified error or an unhandled exception.
     /// </summary>
-    DS0000_UnexpectedError,
+    DS0000_UnknownError,
     /// <summary>
     /// An error that occured during the parsing stage of the compilation process that was emitted by ANTLR.
     /// </summary>
