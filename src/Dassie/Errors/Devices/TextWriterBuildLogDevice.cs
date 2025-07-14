@@ -149,12 +149,20 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 outBuilder.AppendLine($"{error.ErrorMessage}");
             else
             {
-                SetColorRgb(120, 120, 120);
-                outBuilder.Append(Path.GetFileName(error.File));
-                outBuilder.Append(' ');
-                outBuilder.Append(codePos);
-                outBuilder.Append(": ");
-                ResetColor();
+                if (!error.HideCodePosition || !string.IsNullOrEmpty(Path.GetFileName(error.File)))
+                {
+                    SetColorRgb(120, 120, 120);
+
+                    if (!string.IsNullOrEmpty(Path.GetFileName(error.File)))
+                    {
+                        outBuilder.Append(Path.GetFileName(error.File));
+                        outBuilder.Append(' ');
+                    }
+
+                    outBuilder.Append(codePos);
+                    outBuilder.Append(": ");
+                    ResetColor();
+                }
 
                 if (error.Source != ErrorSource.Compiler)
                 {
