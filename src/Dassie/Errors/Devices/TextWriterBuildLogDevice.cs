@@ -143,7 +143,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
             }
 
             if (!error.HideCodePosition)
-                codePos = $"({error.CodePosition.Item1},{error.CodePosition.Item2})";
+                codePos = $"({error.CodePosition.Line},{error.CodePosition.Column})";
 
             if (error.Severity == Severity.BuildLogMessage)
                 outBuilder.AppendLine($"{error.ErrorMessage}");
@@ -178,8 +178,13 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                     Severity.Warning => "warning",
                     _ => "message"
                 }}");
-                outBuilder.Append(' ');
-                outBuilder.Append(errCode);
+
+                if (!string.IsNullOrEmpty(errCode))
+                {
+                    outBuilder.Append(' ');
+                    outBuilder.Append(errCode);
+                }
+
                 outBuilder.Append(": ");
                 ResetColor();
 
@@ -209,10 +214,10 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                     using StreamReader sr = new(CurrentFile.Path);
                     string line = "";
 
-                    for (int i = 0; i < error.CodePosition.Item1; i++, line = sr.ReadLine()) ;
+                    for (int i = 0; i < error.CodePosition.Line; i++, line = sr.ReadLine()) ;
 
                     outBuilder.AppendLine(line);
-                    outBuilder.Append(new string(' ', error.CodePosition.Item2));
+                    outBuilder.Append(new string(' ', error.CodePosition.Column));
 
                     ResetColor();
                     output.Write(outBuilder.ToString());
