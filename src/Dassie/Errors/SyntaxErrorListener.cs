@@ -9,7 +9,7 @@ internal class ParserErrorListener : BaseErrorListener
     {
         base.SyntaxError(output, recognizer, offendingSymbol, line, charPositionInLine, msg, e);
 
-        EmitErrorMessage(new()
+        EmitGeneric(new()
         {
             CodePosition = (line, charPositionInLine),
             Length = offendingSymbol.Text.Length,
@@ -17,7 +17,7 @@ internal class ParserErrorListener : BaseErrorListener
             ErrorMessage = msg,
             File = CurrentFile.Path,
             Severity = Severity.Error
-        }, true);
+        });
     }
 }
 
@@ -25,13 +25,13 @@ internal class LexerErrorListener : IAntlrErrorListener<int>
 {
     public void SyntaxError(TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
     {
-        EmitErrorMessage(new()
+        EmitGeneric(new()
         {
             CodePosition = (line, charPositionInLine),
             ErrorCode = DS0001_SyntaxError,
             ErrorMessage = msg,
             File = CurrentFile.Path,
             Severity = Severity.Error
-        }, true);
+        });
     }
 }

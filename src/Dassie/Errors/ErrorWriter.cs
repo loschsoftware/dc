@@ -72,21 +72,25 @@ public static class ErrorWriter
         }
     }
 
-    internal static void EmitGeneric(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true)
+    /// <summary>
+    /// Emits a generic build log message.
+    /// </summary>
+    /// <param name="error">The message to emit.</param>
+    public static void EmitGeneric(ErrorInfo error)
     {
         if (Disabled)
             return;
-
-        if (Context.Configuration.Verbosity < 1)
-            return;
-
-        error.CodePosition = (error.CodePosition.Item1 + LineNumberOffset, error.CodePosition.Item2);
 
         Context ??= new();
         Context.Configuration ??= ProjectFileDeserializer.DassieConfig;
         Context.Configuration ??= new();
         Context.ConfigurationPath ??= ProjectConfigurationFileName;
-        Context.Configuration.IgnoredMessages ??= Array.Empty<Ignore>();
+        Context.Configuration.IgnoredMessages ??= [];
+
+        if (Context.Configuration.Verbosity < 1)
+            return;
+
+        error.CodePosition = (error.CodePosition.Line + LineNumberOffset, error.CodePosition.Column);
 
         if (Context.Configuration.IgnoreMessages && (error.Severity == Severity.Information || error.Severity == Severity.BuildLogMessage))
             return;
@@ -147,30 +151,6 @@ public static class ErrorWriter
     }
 
     /// <summary>
-    /// Writes an error message to the designated error outputs.
-    /// </summary>
-    public static void EmitErrorMessage(ErrorInfo error, bool addToErrorList = true)
-    {
-        EmitGeneric(error, true, addToErrorList);
-    }
-
-    /// <summary>
-    /// Writes a warning message to the designated warning outputs.
-    /// </summary>
-    public static void EmitWarningMessage(ErrorInfo error, bool treatAsError = false)
-    {
-        EmitGeneric(error, treatAsError, false);
-    }
-
-    /// <summary>
-    /// Writes a message to the designated information outputs.
-    /// </summary>
-    public static void EmitMessage(ErrorInfo error)
-    {
-        EmitGeneric(error, false, false);
-    }
-
-    /// <summary>
     /// Emits a build log message that is not caused by an error in the code.
     /// </summary>
     /// <param name="message">The message to emit.</param>
@@ -191,26 +171,26 @@ public static class ErrorWriter
             Severity = Severity.BuildLogMessage,
             Tip = "",
             ToolTip = null
-        }, false);
+        });
     }
 
     /// <summary>
     /// Writes an error message to the designated error outputs.
     /// </summary>
     /// <remarks>If <paramref name="file"/> is null, will assume <see cref="FileContext.Path"/>.</remarks>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, bool addToErrorList = true, string tip = "", bool hideCodePosition = false)
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "")
     {
-        hideCodePosition = ln == 0 && col == 0 && length == 0;
+        bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             new()
             {
                 Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
             }
-        };
+        ];
 
-        EmitErrorMessage(new ErrorInfo()
+        EmitGeneric(new ErrorInfo()
         {
             CodePosition = (ln, col),
             Length = length,
@@ -225,23 +205,23 @@ public static class ErrorWriter
                 IconResourceName = "CodeErrorRule",
                 Words = words
             }
-        }, addToErrorList);
+        });
     }
 
     /// <summary>
     /// Writes a warning message to the designated warning outputs.
     /// </summary>
-    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, bool treatAsError = false, string tip = "", bool hideCodePosition = false)
+    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "")
     {
-        hideCodePosition = ln == 0 && col == 0 && length == 0;
+        bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             new()
             {
                 Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
             }
-        };
+        ];
 
         ErrorInfo err = new()
         {
@@ -260,25 +240,25 @@ public static class ErrorWriter
             }
         };
 
-        EmitWarningMessage(err, treatAsError);
+        EmitGeneric(err);
     }
 
     /// <summary>
     /// Writes a message to the designated information outputs.
     /// </summary>
-    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", bool hideCodePosition = false)
+    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "")
     {
-        hideCodePosition = ln == 0 && col == 0 && length == 0;
+        bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
-        ObservableCollection<Word> words = new()
-        {
+        ObservableCollection<Word> words =
+        [
             new()
             {
                 Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
             }
-        };
+        ];
 
-        EmitMessage(new ErrorInfo()
+        EmitGeneric(new ErrorInfo()
         {
             CodePosition = (ln, col),
             Length = length,
