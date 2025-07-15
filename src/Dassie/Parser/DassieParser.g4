@@ -436,5 +436,5 @@ property_or_event_block
     ;
 
 external_block
-    : Extern String_Literal Equals Open_Brace (NewLine* type_member)* NewLine* Close_Brace
+    : Extern String_Literal (Identifier Identifier)? Equals Open_Brace (NewLine* type_member)* NewLine* Close_Brace
     ;

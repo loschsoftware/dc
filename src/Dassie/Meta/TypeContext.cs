@@ -26,10 +26,10 @@ internal class TypeContext
     }
 
     public MethodContext GetMethod(DassieParser.Type_memberContext member)
-        => Methods.First(m => m.ParserRule == member);
+        => Methods.FirstOrDefault(m => m.ParserRule == member);
 
     public MetaFieldInfo GetField(DassieParser.Type_memberContext member)
-        => Fields.First(m => m.ParserRule == member);
+        => Fields.FirstOrDefault(m => m.ParserRule == member);
 
     public static TypeContext Current { get; set; }
 

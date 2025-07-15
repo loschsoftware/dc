@@ -1,4 +1,5 @@
-﻿using Antlr4.Runtime.Tree;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using Dassie.Parser;
 using System;
 using System.Linq;
@@ -15,6 +16,24 @@ internal class ExternalBlockRewriter : ITreeToStringRewriter
             return listener.GetTextForRule(rule);
 
         StringBuilder sb = new();
+
+        bool module = false;
+        if (rule.Identifier() != null && rule.Identifier().Length != 0)
+        {
+            module = true;
+
+            if (rule.Identifier()[0].GetText() != "as")
+            {
+                EmitErrorMessage(
+                    rule.Identifier()[0].Symbol.Line,
+                    rule.Identifier()[0].Symbol.Column,
+                    rule.Identifier()[0].GetText().Length,
+                    DS0001_SyntaxError,
+                    $"Unexpected token '{rule.Identifier()[1].GetText()}'. Expected 'as'.");
+            }
+
+            sb.AppendLine($"module {rule.Identifier()[1].GetText()} = {{");
+        }
 
         foreach (DassieParser.Type_memberContext member in rule.type_member())
         {
@@ -48,6 +67,9 @@ internal class ExternalBlockRewriter : ITreeToStringRewriter
             
             sb.AppendLine(listener.CharStream.GetText(new(startIndex, member.Stop.StopIndex)));
         }
+
+        if (module)
+            sb.Append('}');
 
         return sb.ToString();
     }
