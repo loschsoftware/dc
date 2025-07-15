@@ -523,7 +523,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
     {
         Expression result = VisitInteger_atom_Impl(context);
 
-        if (RequireNonZeroValue && result.Value == 0)
+        if (false && RequireNonZeroValue && result.Value == 0)
         {
             EmitErrorMessage(
                 context.Start.Line,
@@ -635,7 +635,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
     {
         Expression result = VisitReal_atom_Impl(context);
 
-        if (RequireNonZeroValue && result.Value == 0)
+        if (false && RequireNonZeroValue && result.Value == 0)
         {
             EmitErrorMessage(
                 context.Start.Line,
