@@ -5572,7 +5572,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex));
 
-            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index);
 
             SetLocalSymInfo(returnBuilder,
                 GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1));
@@ -5595,9 +5595,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             // Save the return value of the current iteration to the returning array
 
             // Array
-            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index);
             // Index
-            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
 
             Type _tReturn = Visit(context.expression().Last());
 
@@ -5619,18 +5619,18 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             else
                 CurrentMethod.IL.Emit(OpCodes.Stelem, tReturn);
 
-            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
             CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)1);
             CurrentMethod.IL.Emit(OpCodes.Add);
-            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
 
             CurrentMethod.IL.MarkLabel(loop);
 
-            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetThrowawayCounterVariableName(CurrentMethod.ThrowawayCounterVariableIndex - 1)).First().Index);
             Visit(context.expression().First());
             CurrentMethod.IL.Emit(OpCodes.Blt, start);
 
-            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index);
             CurrentMethod.SkipPop = false;
 
             return tReturn.MakeArrayType();
@@ -5653,7 +5653,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             CurrentMethod.Locals.Add(new(GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex++), returnBuilder, false, CurrentMethod.LocalIndex));
 
-            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitStloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index);
 
             SetLocalSymInfo(
                 returnBuilder,
@@ -5666,7 +5666,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
             CurrentMethod.IL.MarkLabel(start);
 
-            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index);
             Type _tReturn = Visit(context.expression().Last());
 
             if (VisitorStep1 == null)
@@ -5695,7 +5695,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Visit(context.expression().First());
             CurrentMethod.IL.Emit(OpCodes.Brtrue, start);
 
-            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index + 1);
+            EmitLdloc(CurrentMethod.Locals.Where(l => l.Name == GetLoopArrayReturnValueVariableName(CurrentMethod.LoopArrayReturnValueIndex - 1)).First().Index);
             CurrentMethod.SkipPop = false;
 
             return listType;
