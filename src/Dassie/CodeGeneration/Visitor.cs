@@ -5,7 +5,6 @@ using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Core;
 using Dassie.Errors;
-using Dassie.Helpers;
 using Dassie.Intrinsics;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -422,8 +421,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.IL.Emit(OpCodes.Stfld, field);
         }
 
-        CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
-        CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
+        if (!TypeContext.Current.Builder.IsValueType)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
+            CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
+        }
     }
 
     public override Type VisitBlock_expression([NotNull] DassieParser.Block_expressionContext context)
