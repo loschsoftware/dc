@@ -392,6 +392,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     private void HandleFieldInitializersAndDefaultConstructor()
     {
+        if (!TypeContext.Current.Builder.IsValueType)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldarg_0);
+            CurrentMethod.IL.Emit(OpCodes.Call, TypeContext.Current.Builder.BaseType.GetConstructor(Type.EmptyTypes));
+        }
+
         foreach (var (field, value) in TypeContext.Current.FieldInitializers)
         {
             if (!field.IsStatic)
@@ -419,12 +425,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 CurrentMethod.IL.Emit(OpCodes.Stsfld, field);
             else
                 CurrentMethod.IL.Emit(OpCodes.Stfld, field);
-        }
-
-        if (!TypeContext.Current.Builder.IsValueType)
-        {
-            CurrentMethod.IL.Emit(OpCodes.Ldarg_S, (byte)0);
-            CurrentMethod.IL.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
         }
     }
 
