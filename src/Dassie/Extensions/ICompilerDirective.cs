@@ -29,7 +29,7 @@ public record DirectiveContext
 }
 
 /// <summary>
-/// Represents a custom compiler directive enabled by the <c>&gt;#</c> syntax.
+/// Represents a custom compiler directive enabled by the <c>${...}</c> syntax.
 /// </summary>
 public interface ICompilerDirective
 {
