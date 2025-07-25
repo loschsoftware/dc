@@ -2,7 +2,7 @@
 A **compiler extension** is a .NET assembly containing a public type implementing the ``IPackage`` interface in the ``Dassie.Extensions`` namespace. All features of the API are supported through special interfaces in this namespace. To add a new feature to the extension API, follow the below steps. The code below uses the ``IBuildLogWriter`` interface as an example.
 <hr/>
 
-1. **Create a new public interface in the [``Dassie.Extensions``](../../main/src/Dassie/Extensions) namespace:**
+1. **Create a new public interface in the [``Dassie.Extensions``](../../src/Dassie/Extensions) namespace:**
 ````csharp
 using System.IO;
 
@@ -30,7 +30,7 @@ public interface IBuildLogWriter
 }
 ````
 
-2. **Add a new virtual method to [``IPackage``](../../main/src/Dassie/Extensions/IPackage.cs) in order not to break existing implementations:**
+2. **Add a new virtual method to [``IPackage``](../../src/Dassie/Extensions/IPackage.cs) in order not to break existing implementations:**
 ````csharp
 /// <summary>
 /// An array of build log writers.
@@ -38,12 +38,12 @@ public interface IBuildLogWriter
 public virtual IBuildLogWriter[] BuildLogWriters() => [];
 ````
 
-3. **Add a corresponding property to [``ExtensionLoader``](../../main/src/Dassie/Extensions/ExtensionLoader.cs):**
+3. **Add a corresponding property to [``ExtensionLoader``](../../src/Dassie/Extensions/ExtensionLoader.cs):**
 ````csharp
 public static IEnumerable<IBuildLogWriter> BuildLogWriters => InstalledExtensions.Select(a => a.BuildLogWriters()).SelectMany(a => a);
 ````
 
-4. **Add a new section to the [``dc package info``](../../main/src/Dassie/Cli/Commands/PackageCommand.cs#L129) command output:**
+4. **Add a new section to the [``dc package info``](../../src/Dassie/Cli/Commands/PackageCommand.cs#L129) command output:**
 ````csharp
 if (package.BuildLogWriters().Length != 0)
 {
