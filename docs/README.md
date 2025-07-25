@@ -6,7 +6,7 @@ Documentation geared towards contributors and maintainers can be found in the [C
 
 |**Table of contents**|
 |---|
-|[Compiler API](https://github.com/loschsoftware/dc/blob/main/docs/API.md)|
+|[Compiler API](./API.md)|
 |[Command line arguments](./CLI.md)|
 |[Error codes](./Errors.md)|
 |[Extending the compiler with custom commands](./Extensions.md)|
