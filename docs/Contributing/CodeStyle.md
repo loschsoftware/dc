@@ -1,5 +1,7 @@
 # Dassie Compiler Contribution Guidelines – Code Style
 
+Follow these code style guidelines whenever editing C# code of the compiler. Compliance with these guidelines is required for pull requests to be merged.
+
 ## Naming conventions
 - Use ``_camelCase`` prefixed with an underscore for private fields.
 - Use ``camelCase`` for method parameters and local variables.
@@ -183,5 +185,25 @@ public string Name
 {
   get => _name;
   set => SetProperty(ref _name, value);
+}
+````
+
+## Documentation comments
+Document **all** public types and their members with XML documentation comments.
+
+**❌ Wrong:**
+````csharp
+public interface ICompilerCommand
+{
+}
+````
+
+**✔️ Correct:**
+````csharp
+/// <summary>
+/// Defines a command used to add additional features to the Dassie compiler.
+/// </summary>
+public interface ICompilerCommand
+{
 }
 ````
