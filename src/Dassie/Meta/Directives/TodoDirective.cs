@@ -35,7 +35,7 @@ internal class TodoDirective : ICompilerDirective
             return null;
         }
 
-        string todoDesc = context.Arguments[0].Trim('"');
+        string todoDesc = context.Arguments[0].ToString().Trim('"');
         string todoMsg = $"TODO ({Path.GetFileName(CurrentFile.Path)}, line {context.Rule.Start.Line + LineNumberOffset}): {todoDesc}";
         CurrentMethod.IL.EmitWriteLine(todoMsg);
         return null;

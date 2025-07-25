@@ -35,7 +35,7 @@ internal class ILDirective : ICompilerDirective
             return null;
         }
 
-        string arg = context.Arguments[0].Trim('"');
+        string arg = context.Arguments[0].ToString();
         EmitInlineIL(arg, context.Rule.Start.Line, context.Rule.Start.Column + 1, context.Rule.GetText().Length);
 
         return null;

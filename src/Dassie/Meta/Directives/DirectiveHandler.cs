@@ -1,4 +1,5 @@
-﻿using Dassie.Errors;
+﻿using Dassie.CodeGeneration.Helpers;
+using Dassie.Errors;
 using Dassie.Extensions;
 using Dassie.Parser;
 using System;
@@ -53,7 +54,7 @@ internal static class DirectiveHandler
 
         DirectiveContext dc = new()
         {
-            Arguments = (context.expression() ?? []).Select(e => e.GetText()).ToArray(),
+            Arguments = (context.expression() ?? []).Select(e => ExpressionEvaluator.Instance.Visit(e).Value).ToArray(),
             DocumentName = CurrentFile.Path,
             LineNumber = context.Start.Line,
             Rule = context

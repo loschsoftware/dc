@@ -30,16 +30,16 @@ internal class ImportDirective : ICompilerDirective
 
         if (context.Arguments.Length == 3)
         {
-            _ = bool.TryParse(context.Arguments[2], out negate);
+            _ = bool.TryParse(context.Arguments[2].ToString(), out negate);
             context.Arguments = context.Arguments[..^1];
         }
 
         if (context.Arguments.Length == 1)
-            importee = context.Arguments[0].Trim('"');
+            importee = context.Arguments[0].ToString().Trim('"');
         else
         {
-            string target = context.Arguments[0].Trim('"');
-            importee = context.Arguments[1].Trim('"');
+            string target = context.Arguments[0].ToString().Trim('"');
+            importee = context.Arguments[1].ToString();
 
             if (target != "local" && target != "global")
             {

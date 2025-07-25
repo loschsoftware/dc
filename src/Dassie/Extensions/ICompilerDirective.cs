@@ -10,7 +10,7 @@ public record DirectiveContext
     /// <summary>
     /// The arguments passed to the directive.
     /// </summary>
-    public string[] Arguments { get; internal set; }
+    public object[] Arguments { get; internal set; }
 
     /// <summary>
     /// The name of the source document containing the compiler directive.

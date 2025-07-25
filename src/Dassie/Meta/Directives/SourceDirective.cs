@@ -23,7 +23,7 @@ internal class SourceDirective : ICompilerDirective
             return null;
         }
 
-        Context.CodeSource = context.Arguments[0];
+        Context.CodeSource = context.Arguments[0].ToString();
         return null;
     }
 }

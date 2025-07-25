@@ -3,6 +3,7 @@ using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Helpers;
 using Dassie.Meta;
+using Dassie.Meta.Directives;
 using Dassie.Parser;
 using Dassie.Text;
 using System;
@@ -826,4 +827,13 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
     public override Expression VisitArray_element_assignment([NotNull] DassieParser.Array_element_assignmentContext context)
         => null;
+
+    public override Expression VisitSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context)
+        => Visit(context.special_symbol());
+
+    public override Expression VisitSpecial_symbol([NotNull] DassieParser.Special_symbolContext context)
+    {
+        object ret = DirectiveHandler.HandleCompilerDirective(context);
+        return new(ret.GetType(), ret);
+    }
 }

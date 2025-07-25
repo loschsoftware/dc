@@ -14,7 +14,7 @@ internal class LineDirective : ICompilerDirective
         if (context.Arguments == null || context.Arguments.Length == 0)
             return context.Rule.Start.Line + LineNumberOffset;
 
-        if (context.Arguments.Length > 2 || !int.TryParse(context.Arguments[0], out int line))
+        if (context.Arguments.Length > 2 || !int.TryParse(context.Arguments[0].ToString(), out int line))
         {
             DirectiveHandler.Error(
                 context.Rule.Start.Line,
@@ -28,7 +28,7 @@ internal class LineDirective : ICompilerDirective
 
         bool add = false;
         if (context.Arguments.Length == 2)
-            _ = bool.TryParse(context.Arguments[1], out add);
+            _ = bool.TryParse(context.Arguments[1].ToString(), out add);
 
         if (add)
             LineNumberOffset += line;
