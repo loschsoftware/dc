@@ -523,6 +523,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitType_member([NotNull] DassieParser.Type_memberContext context)
     {
+        if (context.special_symbol() != null)
+        {
+            DirectiveHandler.HandleCompilerDirective(context.special_symbol());
+            return typeof(void);
+        }
+
         EmitBuildLogMessage($"    Generating code for '{TypeContext.Current.Builder.FullName}::{context.Identifier().GetIdentifier()}'...", 2);
 
         if (context.Custom_Operator() != null)
@@ -6435,7 +6441,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context)
     {
-        DirectiveHandler.HandleCompilerDirective(context.special_symbol());
-        return typeof(void);
+        object ret = DirectiveHandler.HandleCompilerDirective(context.special_symbol());
+
+        if (ret == null)
+            return typeof(void);
+
+        EmitConst(ret);
+        return ret.GetType();
     }
 }

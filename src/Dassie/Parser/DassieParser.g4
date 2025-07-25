@@ -308,6 +308,7 @@ type_member
     // Property or event
     | attribute* member_access_modifier? member_oop_modifier? member_special_modifier* Identifier generic_parameter_list? (Colon type_name)? Equals NewLine* property_or_event_block
     | external_block
+    | special_symbol
     ;
 
 access_modifier_member_group
@@ -441,5 +442,5 @@ external_block
     ;
 
 special_symbol
-    : Special_Symbol_Start Identifier expression* Close_Brace
+    : Special_Symbol_Start (Identifier | Import) expression* Close_Brace
     ;

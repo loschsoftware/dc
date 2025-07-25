@@ -24,6 +24,7 @@ internal class AccessModifierGroupRewriter : ITreeToStringRewriter
         for (int i = 0; i < members.Length; i++)
             finalMembers.Add(members[i].ReplaceFirst(identifiers[i], $"{accessModifier} {oopModifier} {string.Join(" ", specialModifiers)} {identifiers[i]}"));
 
+        finalMembers.Add("${line 1 true}");
         return string.Join(Environment.NewLine, finalMembers);
     }
 }

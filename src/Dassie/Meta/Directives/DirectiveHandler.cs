@@ -30,9 +30,14 @@ internal static class DirectiveHandler
         });
     }
 
-    public static void HandleCompilerDirective(DassieParser.Special_symbolContext context)
+    public static object HandleCompilerDirective(DassieParser.Special_symbolContext context)
     {
-        string identifier = SymbolResolver.GetIdentifier(context.Identifier());
+        string identifier;
+
+        if (context.Identifier() != null)
+            identifier = SymbolResolver.GetIdentifier(context.Identifier());
+        else
+            identifier = "import";
 
         if (!ExtensionLoader.CompilerDirectives.Any(c => c.Identifier == identifier))
         {
@@ -43,7 +48,7 @@ internal static class DirectiveHandler
                 DS0217_InvalidCompilerDirective,
                 $"The compiler directive '{identifier}' could not be found.");
 
-            return;
+            return null;
         }
 
         DirectiveContext dc = new()
@@ -55,8 +60,11 @@ internal static class DirectiveHandler
         };
 
         IEnumerable<ICompilerDirective> dirs = ExtensionLoader.CompilerDirectives.Where(c => c.Identifier == identifier);
+        object ret = null;
 
         foreach (ICompilerDirective dir in dirs)
-            dir.Invoke(dc);
+            ret = dir.Invoke(dc);
+
+        return ret;
     }
 }

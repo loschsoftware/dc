@@ -216,6 +216,9 @@ internal static class MemberDeclarationGeneration
 
     public static void GenerateMember(DassieParser.Type_memberContext context, TypeContext declaringType, bool ignoreDS0058 = false, bool alwaysGlobal = false)
     {
+        if (context.special_symbol() != null)
+            return;
+
         if (context.Custom_Operator() != null)
         {
             DefineCustomOperator(context);

@@ -9,7 +9,7 @@ internal class SourceDirective : ICompilerDirective
 
     public string Identifier { get; set; } = "source";
 
-    public void Invoke(DirectiveContext context)
+    public object Invoke(DirectiveContext context)
     {
         if (context.Arguments == null || context.Arguments.Length < 1 || context.Arguments.Length > 1)
         {
@@ -20,9 +20,10 @@ internal class SourceDirective : ICompilerDirective
                 DS0218_CompilerDirectiveInvalidArguments,
                 $"Invalid arguments passed to 'source' directive. Expected [string].");
 
-            return;
+            return null;
         }
 
         Context.CodeSource = context.Arguments[0];
+        return null;
     }
 }

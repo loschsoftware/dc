@@ -26,7 +26,12 @@ internal static class ExtensionLoader
 
     public static IEnumerable<IProjectTemplate> ProjectTemplates => InstalledExtensions.Select(p => p.ProjectTemplates()).SelectMany(a => a).Append(LibraryProject.Instance).Append(ConsoleProject.Instance);
 
-    public static IEnumerable<ICompilerDirective> CompilerDirectives => InstalledExtensions.Select(p => p.CompilerDirectives()).SelectMany(a => a).Append(LineDirective.Instance).Append(SourceDirective.Instance);
+    public static IEnumerable<ICompilerDirective> CompilerDirectives => InstalledExtensions.Select(p => p.CompilerDirectives()).SelectMany(a => a)
+        .Append(LineDirective.Instance)
+        .Append(SourceDirective.Instance)
+        .Append(TodoDirective.Instance)
+        .Append(ILDirective.Instance)
+        .Append(ImportDirective.Instance);
 
     private static List<IPackage> LoadInstalledExtensions()
     {

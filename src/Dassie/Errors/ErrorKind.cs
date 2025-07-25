@@ -896,5 +896,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a compiler directive is called with invalid arguments.
     /// </summary>
-    DS0218_CompilerDirectiveInvalidArguments
+    DS0218_CompilerDirectiveInvalidArguments,
+    /// <summary>
+    /// Emitted when a compiler directive is called in an invalid scope.
+    /// </summary>
+    DS0219_CompilerDirectiveInvalidScope,
+    /// <summary>
+    /// Emitted when the target of an import compiler directive is invalid.
+    /// </summary>
+    DS0220_ImportDirectiveInvalidTarget
 }

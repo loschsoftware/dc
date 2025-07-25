@@ -42,5 +42,5 @@ public interface ICompilerDirective
     /// The method that is called when the compiler directive is invoked.
     /// </summary>
     /// <param name="context">An object of type <see cref="DirectiveContext"/> representing the metadata associated with the directive invocation.</param>
-    public void Invoke(DirectiveContext context);
+    public object Invoke(DirectiveContext context);
 }
