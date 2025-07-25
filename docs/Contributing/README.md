@@ -5,3 +5,4 @@ This directory contains all information needed to get started with contributing 
 |**Table of contents**|
 |---|
 |[Code style guidelines](./CodeStyle.md)|
+|[Adding new features to the Compiler Extension API](./Extensions.md)|
