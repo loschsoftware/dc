@@ -219,6 +219,15 @@ internal class PackageCommand : ICompilerCommand
                 sb.AppendLine($"    {device.Name}");
         }
 
+        if (package.CompilerDirectives().Length != 0)
+        {
+            sb.AppendLine();
+            WriteHeading("Compiler directives");
+
+            foreach (ICompilerDirective directive in package.CompilerDirectives())
+                sb.AppendLine($"    {directive.Identifier}");
+        }
+
         HelpCommand.DisplayLogo();
         Console.WriteLine(sb.ToString());
         return 0;
@@ -277,10 +286,8 @@ internal class PackageCommand : ICompilerCommand
 
         if (File.Exists(toolPath))
             File.Copy(toolPath, Path.Combine(toolDir, Path.GetFileName(toolPath)));
-
         else if (Directory.Exists(toolPath))
             FileSystem.CopyDirectory(toolPath, toolDir, true);
-
         else
         {
             Console.WriteLine("The specified tool path could not be found.");

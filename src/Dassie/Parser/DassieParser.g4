@@ -7,15 +7,15 @@ options { tokenVocab = DassieLexer; }
 }
 
 compilation_unit
-    : (import_directive | export_directive | NewLine)* file_body EOF
+    : (import_directive | export_directive | special_symbol | NewLine)* file_body EOF
     ;
 
 file_body
-    : (expression | local_function | type_member | NewLine | full_program)*
+    : (expression | special_symbol | local_function | type_member | NewLine | full_program)*
     ;
 
 full_program
-    : (type | attribute | NewLine)+
+    : (type | special_symbol | attribute | NewLine)+
     ;
 
 import_directive
@@ -35,7 +35,8 @@ code_block
     ;
 
 expression
-    : expression Custom_Operator expression #custom_operator_binary_expression
+    : special_symbol #special_symbol_expression
+    | expression Custom_Operator expression #custom_operator_binary_expression
     // | Custom_Operator expression #custom_operator_unary_expression 
     | Tilde expression #bitwise_complement_expression
     | expression Open_Bracket expression Close_Bracket Equals expression #array_element_assignment
@@ -437,4 +438,8 @@ property_or_event_block
 
 external_block
     : Extern String_Literal (Identifier Identifier)? Equals Open_Brace (NewLine* type_member)* NewLine* Close_Brace
+    ;
+
+special_symbol
+    : Special_Symbol_Start Identifier expression* Close_Brace
     ;

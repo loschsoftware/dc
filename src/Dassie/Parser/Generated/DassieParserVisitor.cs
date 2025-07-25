@@ -450,6 +450,13 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitTuple_expression([NotNull] DassieParser.Tuple_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>special_symbol_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>nameof_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -914,5 +921,11 @@ public interface IDassieParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitExternal_block([NotNull] DassieParser.External_blockContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.special_symbol"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSpecial_symbol([NotNull] DassieParser.Special_symbolContext context);
 }
 } // namespace Dassie.Parser

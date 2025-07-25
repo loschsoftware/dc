@@ -884,5 +884,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an external extension caused an unhandled exception.
     /// </summary>
-    DS0215_ExtensionThrewException
+    DS0215_ExtensionThrewException,
+    /// <summary>
+    /// Emitted when a compiler directive is used as an expression.
+    /// </summary>
+    DS0216_CompilerDirectiveAsExpression,
+    /// <summary>
+    /// Emitted when a compiler directive is used that could not be found.
+    /// </summary>
+    DS0217_InvalidCompilerDirective,
+    /// <summary>
+    /// Emitted when a compiler directive is called with invalid arguments.
+    /// </summary>
+    DS0218_CompilerDirectiveInvalidArguments
 }

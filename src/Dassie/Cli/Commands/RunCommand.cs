@@ -192,7 +192,7 @@ internal class RunCommand : ICompilerCommand
         if (recompile)
         {
             int ret = BuildCommand.Instance.Invoke([]);
-            if (ret != 0 || messages.Where(m => m.Severity == Severity.Error).Any())
+            if (ret != 0 || Messages.Where(m => m.Severity == Severity.Error).Any())
                 return -1;
         }
 

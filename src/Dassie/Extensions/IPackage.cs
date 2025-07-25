@@ -44,4 +44,9 @@ public interface IPackage
     /// An array of build log devices.
     /// </summary>
     public virtual IBuildLogDevice[] BuildLogDevices() => [];
+
+    /// <summary>
+    /// An array of compiler directives.
+    /// </summary>
+    public virtual ICompilerDirective[] CompilerDirectives() => [];
 }

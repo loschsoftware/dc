@@ -743,6 +743,18 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitTuple_expression([NotNull] DassieParser.Tuple_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>special_symbol_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>special_symbol_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>nameof_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// </summary>
@@ -1520,5 +1532,15 @@ public interface IDassieParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitExternal_block([NotNull] DassieParser.External_blockContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.special_symbol"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSpecial_symbol([NotNull] DassieParser.Special_symbolContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.special_symbol"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSpecial_symbol([NotNull] DassieParser.Special_symbolContext context);
 }
 } // namespace Dassie.Parser

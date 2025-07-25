@@ -868,6 +868,20 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitTuple_expression([NotNull] DassieParser.Tuple_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>special_symbol_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>special_symbol_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>nameof_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -1797,6 +1811,18 @@ public partial class DassieParserBaseListener : IDassieParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitExternal_block([NotNull] DassieParser.External_blockContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DassieParser.special_symbol"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterSpecial_symbol([NotNull] DassieParser.Special_symbolContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DassieParser.special_symbol"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitSpecial_symbol([NotNull] DassieParser.Special_symbolContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

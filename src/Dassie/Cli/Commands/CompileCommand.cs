@@ -366,7 +366,7 @@ internal class CompileCommand : ICompilerCommand
         foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
             AddResource(res, Directory.GetCurrentDirectory(), relativePathResolverBaseDir);
 
-        if (!messages.Any(m => m.Severity == Severity.Error))
+        if (!Messages.Any(m => m.Severity == Severity.Error))
         {
             ResourceExtractor.Resource[] resources = [];
 

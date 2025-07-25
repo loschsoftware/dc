@@ -207,7 +207,7 @@ internal class ScratchpadCommand : ICompilerCommand
                     asm = Path.Combine(outDir, $"{cfg.AssemblyName}.dll");
             }
 
-            if (File.Exists(asm) && !messages.Any(e => e.Severity == Severity.Error))
+            if (File.Exists(asm) && !Messages.Any(e => e.Severity == Severity.Error))
             {
                 ProcessStartInfo psi = new()
                 {

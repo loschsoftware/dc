@@ -34,7 +34,7 @@ internal class Program
         }
         catch (Exception ex)
         {
-            if (!messages.Any(m => m.Severity == Severity.Error))
+            if (!Messages.Any(m => m.Severity == Severity.Error))
                 EmitErrorMessage(0, 0, 0, DS0000_UnknownError, $"Unhandled exception of type '{ex.GetType()}'.", "dc");
 
             if (Debugger.IsAttached)

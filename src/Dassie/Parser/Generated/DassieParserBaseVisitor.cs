@@ -693,6 +693,17 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// <return>The visitor result.</return>
 	public virtual Result VisitTuple_expression([NotNull] DassieParser.Tuple_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by the <c>special_symbol_expression</c>
+	/// labeled alternative in <see cref="DassieParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by the <c>nameof_expression</c>
 	/// labeled alternative in <see cref="DassieParser.expression"/>.
 	/// <para>
@@ -1461,5 +1472,15 @@ public partial class DassieParserBaseVisitor<Result> : AbstractParseTreeVisitor<
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitExternal_block([NotNull] DassieParser.External_blockContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DassieParser.special_symbol"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitSpecial_symbol([NotNull] DassieParser.Special_symbolContext context) { return VisitChildren(context); }
 }
 } // namespace Dassie.Parser

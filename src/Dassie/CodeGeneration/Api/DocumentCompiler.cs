@@ -39,12 +39,13 @@ internal static class DocumentCompiler
         return parser;
     }
 
-    public static List<ErrorInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath)
+    public static List<ErrorInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath, DassieParser parser)
     {
         EmitBuildLogMessage($"Compiling document '{document.Name}'.", 2);
 
         SetupBogusAssembly();
         CurrentFile = Context.GetFile(document.Name);
+        CurrentFile.Parser = parser;
 
         if (!config.ImplicitImports || config.NoStdLib)
         {

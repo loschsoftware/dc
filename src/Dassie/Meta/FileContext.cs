@@ -70,4 +70,6 @@ internal class FileContext
     public List<DassieParser.Type_memberContext> LocalTopLevelFunctions { get; set; } = [];
 
     public List<TypeContext> LocalTypes { get; set; } = [];
+
+    public DassieParser Parser { get; set; }
 }

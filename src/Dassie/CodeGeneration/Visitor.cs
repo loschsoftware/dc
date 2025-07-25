@@ -7,6 +7,7 @@ using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Intrinsics;
 using Dassie.Meta;
+using Dassie.Meta.Directives;
 using Dassie.Parser;
 using Dassie.Runtime;
 using Dassie.Symbols;
@@ -28,6 +29,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 {
     public override Type VisitCompilation_unit([NotNull] DassieParser.Compilation_unitContext context)
     {
+        foreach (DassieParser.Special_symbolContext dir in context.special_symbol())
+            DirectiveHandler.HandleCompilerDirective(dir);
+
         if (context.import_directive().Length > 1)
         {
             CurrentFile.FoldingRegions.Add(new()
@@ -156,6 +160,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitFull_program([NotNull] DassieParser.Full_programContext context)
     {
+        foreach (DassieParser.Special_symbolContext dir in context.special_symbol())
+            DirectiveHandler.HandleCompilerDirective(dir);
+
         foreach (IParseTree type in context.type() ?? [])
             Visit(type);
 
@@ -650,7 +657,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 {
                     if (attribType == typeof(EntryPointAttribute))
                     {
-                        if (Context.EntryPointIsSet && !messages.Any(m => m.ErrorCode == ErrorKind.DS0191_AmbiguousEntryPoint))
+                        if (Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == ErrorKind.DS0191_AmbiguousEntryPoint))
                         {
                             EmitErrorMessage(
                                 context.attribute()[i].Start.Line,
@@ -1111,6 +1118,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
     public override Type VisitFile_body([NotNull] DassieParser.File_bodyContext context)
     {
+        foreach (DassieParser.Special_symbolContext dir in context.special_symbol())
+            DirectiveHandler.HandleCompilerDirective(dir);
+
         if (context.full_program() != null && context.full_program().Length > 0)
         {
             foreach (IParseTree prog in context.full_program())
@@ -2937,9 +2947,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         }
 
         il.Emit(OpCodes.Call, method);
-
         il.Emit(OpCodes.Ret);
-
         return result;
     }
 
@@ -5036,7 +5044,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         };
 
         string ds0074Message = $"'{CurrentMethod.Builder.Name}': Only {ushort.MaxValue} locals can be declared per function.";
-        if (localSymbol.Index() > ushort.MaxValue && !messages.Any(m => m.ErrorMessage == ds0074Message))
+        if (localSymbol.Index() > ushort.MaxValue && !Messages.Any(m => m.ErrorMessage == ds0074Message))
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
@@ -6422,6 +6430,12 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         CurrentMethod.IL.MarkLabel(end);
         CurrentMethod.IL.EndExceptionBlock();
+        return typeof(void);
+    }
+
+    public override Type VisitSpecial_symbol_expression([NotNull] DassieParser.Special_symbol_expressionContext context)
+    {
+        DirectiveHandler.HandleCompilerDirective(context.special_symbol());
         return typeof(void);
     }
 }

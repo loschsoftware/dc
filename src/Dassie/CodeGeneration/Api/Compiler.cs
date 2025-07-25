@@ -56,7 +56,7 @@ public static class Compiler
 
     internal static List<List<ErrorInfo>> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
     {
-        if (!documents.Any() && messages.Count == 0)
+        if (!documents.Any() && Messages.Count == 0)
         {
             EmitErrorMessage(
                 0, 0, 0,
@@ -100,14 +100,14 @@ public static class Compiler
         if (!config.NoStdLib)
             Context.ReferencedAssemblies.Add(typeof(stdout).Assembly);
 
-        List<(InputDocument document, IParseTree compilationUnit, string intermediatePath)> docs = [];
+        List<(InputDocument document, IParseTree compilationUnit, string intermediatePath, DassieParser parser)> docs = [];
 
         foreach (InputDocument doc in documents)
         {
             DassieParser parser = DocumentCompiler.CreateParser(doc, cfg, out string intermediatePath);
             IParseTree compilationUnit = parser.compilation_unit();
 
-            docs.Add((doc, compilationUnit, intermediatePath));
+            docs.Add((doc, compilationUnit, intermediatePath, parser));
             DocumentCompiler.DeclareSymbols(doc, cfg, compilationUnit);
         }
 
@@ -119,12 +119,12 @@ public static class Compiler
                 SymbolAssociationResolver.ResolveMethodSignature(method);
         }
 
-        foreach ((InputDocument doc, IParseTree compilationUnit, string intermediatePath) in docs)
-            errors.Add(DocumentCompiler.CompileDocument(doc, cfg, compilationUnit, intermediatePath));
+        foreach ((InputDocument doc, IParseTree compilationUnit, string intermediatePath, DassieParser parser) in docs)
+            errors.Add(DocumentCompiler.CompileDocument(doc, cfg, compilationUnit, intermediatePath, parser));
 
         TypeFinalizer.CreateTypes(Context.Types);
 
-        if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !messages.Any(m => m.ErrorCode == DS0027_EmptyProgram))
+        if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == DS0027_EmptyProgram))
         {
             // Create implicit entrypoint
 

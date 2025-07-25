@@ -27,8 +27,8 @@ public static class DassieCompiler
             arglist.Add($"--Document:{doc.SymbolicName}:{doc.SourceText}");
 
         int result = CompileCommand.Instance.Invoke(arglist.ToArray(), context.Configuration);
-        bool success = result == 0 && !ErrorWriter.messages.Where(m => m.Severity == Severity.Error).Any();
-        return new(success, ErrorWriter.messages);
+        bool success = result == 0 && !ErrorWriter.Messages.Where(m => m.Severity == Severity.Error).Any();
+        return new(success, ErrorWriter.Messages);
     }
 
     private static CompilationResult CompileProjectWithArguments(string projectFilePath, string[] args)
@@ -39,8 +39,8 @@ public static class DassieCompiler
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(projectFilePath));
         int result = BuildCommand.Instance.Invoke(args);
-        bool success = result == 0 && !ErrorWriter.messages.Where(m => m.Severity == Severity.Error).Any();
-        return new(success, ErrorWriter.messages);
+        bool success = result == 0 && !ErrorWriter.Messages.Where(m => m.Severity == Severity.Error).Any();
+        return new(success, ErrorWriter.Messages);
     }
 
     /// <summary>

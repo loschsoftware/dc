@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using Dassie.Errors.Devices;
+using Dassie.Meta.Directives;
 using Dassie.Templates;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,8 @@ internal static class ExtensionLoader
     public static IEnumerable<IBuildLogDevice> BuildLogDevices => InstalledExtensions.Select(a => a.BuildLogDevices()).SelectMany(a => a).Append(TextWriterBuildLogDevice.Instance).Append(new FileBuildLogDevice());
 
     public static IEnumerable<IProjectTemplate> ProjectTemplates => InstalledExtensions.Select(p => p.ProjectTemplates()).SelectMany(a => a).Append(LibraryProject.Instance).Append(ConsoleProject.Instance);
+
+    public static IEnumerable<ICompilerDirective> CompilerDirectives => InstalledExtensions.Select(p => p.CompilerDirectives()).SelectMany(a => a).Append(LineDirective.Instance).Append(SourceDirective.Instance);
 
     private static List<IPackage> LoadInstalledExtensions()
     {

@@ -23,7 +23,10 @@ public static class ErrorWriter
         Context.Configuration ??= new();
     }
 
-    internal static readonly List<ErrorInfo> messages = [];
+    /// <summary>
+    /// A list of all build messages emitted so far.
+    /// </summary>
+    public static readonly List<ErrorInfo> Messages = [];
 
     /// <summary>
     /// A list of build devices to use.
@@ -126,7 +129,7 @@ public static class ErrorWriter
             return;
 
         // Filter out duplicate messages
-        if (messages.Where(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition).Any())
+        if (Messages.Where(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition).Any())
             return;
 
         BuildLogSeverity severity = error.Severity switch
@@ -147,7 +150,7 @@ public static class ErrorWriter
             BuildLogDeviceSafeCall(device, d => d.Log(error));
         }
 
-        messages.Add(error);
+        Messages.Add(error);
     }
 
     /// <summary>
