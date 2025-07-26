@@ -23,7 +23,8 @@ internal static class CommandLineOptionParser
         ["i"] = "GenerateILFiles",
         ["h"] = "GenerateNativeAppHost",
         ["c"] = "CacheSourceFiles",
-        ["A"] = "RunAnalyzers"
+        ["A"] = "RunAnalyzers",
+        ["v"] = "Verbosity"
     };
 
     private static readonly List<string> BooleanAliases = ["m", "l", "i", "h", "c", "A"];
