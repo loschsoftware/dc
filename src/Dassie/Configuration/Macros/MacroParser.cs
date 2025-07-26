@@ -98,7 +98,16 @@ internal class MacroParser
             if (prop.PropertyType != typeof(string))
                 continue;
 
-            string val = (string)prop.GetValue(obj);
+            string val;
+
+            try
+            {
+                val = (string)prop.GetValue(obj);
+            }
+            catch (ArgumentException)
+            {
+                continue;
+            }
 
             if (val == null)
                 continue;

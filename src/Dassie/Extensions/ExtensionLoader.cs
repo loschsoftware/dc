@@ -5,9 +5,11 @@ using Dassie.Meta.Directives;
 using Dassie.Templates;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml;
 
 namespace Dassie.Extensions;
 
@@ -69,8 +71,30 @@ internal static class ExtensionLoader
         return packages;
     }
 
-    public static List<IPackage> LoadInstalledExtensions(string assembly)
+    public static void LoadTransientExtensions(IEnumerable<(string, List<XmlAttribute>, List<XmlElement>)> paths)
     {
+        foreach ((string path, List<XmlAttribute> attribs, List<XmlElement> elems) in paths)
+        {
+            EmitBuildLogMessage($"Loaded transient extension '{path}'.", 2, true);
+            _installedExtensions.AddRange(LoadInstalledExtensions(path, true, attribs, elems));
+        }
+    }
+
+    public static List<IPackage> LoadInstalledExtensions(string assembly)
+        => LoadInstalledExtensions(assembly, false, null, null);
+
+    private static List<IPackage> LoadInstalledExtensions(string assembly, bool loadTransient, List<XmlAttribute> xmlAttributes, List<XmlElement> xmlElements)
+    {
+        if (!File.Exists(assembly))
+        {
+            EmitErrorMessage(0, 0, 0,
+                DS0221_ExtensionFileNotFound,
+                $"Extension package '{assembly}' could not be found.",
+                "dc");
+
+            return [];
+        }
+
         List<IPackage> packages = [];
         Assembly extensionAssembly = Assembly.LoadFile(assembly);
 
@@ -81,6 +105,78 @@ internal static class ExtensionLoader
             foreach (Type t in packageTypes)
             {
                 IPackage package = (IPackage)Activator.CreateInstance(t);
+                int ret = -1;
+
+                if (loadTransient && !package.Modes().HasFlag(ExtensionModes.Transient))
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0222_ExtensionUnsupportedMode,
+                        $"The extension '{package.Metadata.Name}' cannot be loaded in transient mode.",
+                        "dc");
+
+                    continue;
+                }
+
+                if (!loadTransient && !package.Modes().HasFlag(ExtensionModes.Global))
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0222_ExtensionUnsupportedMode,
+                        $"The extension '{package.Metadata.Name}' cannot be loaded in global mode.",
+                        "dc");
+
+                    continue;
+                }
+
+                try
+                {
+                    if (loadTransient)
+                        ret = (int)typeof(IPackage).GetMethod("InitializeTransient").Invoke(package, [xmlAttributes, xmlElements]);
+                    else
+                        ret = (int)typeof(IPackage).GetMethod("InitializeGlobal").Invoke(package, []);
+                }
+                catch (Exception ex)
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0223_ExtensionInitializerFailed,
+                        $"The extension initializer of '{package.Metadata.Name}' threw an exception.",
+                        "dc");
+
+                    if (Context.Configuration.PrintExceptionInfo)
+                        TextWriterBuildLogDevice.ErrorOut.WriteLine(ex.ToString());
+
+                    continue;
+                }
+
+                if (ret != 0)
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0223_ExtensionInitializerFailed,
+                        $"The extension initializer of '{package.Metadata.Name}' exited with a nonzero status code.",
+                        "dc");
+
+                    continue;
+                }
+
+                if (loadTransient && _installedExtensions.Any(p => p.Metadata.Id == package.Metadata.Id))
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0224_ExtensionDuplicateMode,
+                        $"Extension '{package.Metadata.Name}' was loaded twice in different modes. Global mode will be unloaded.",
+                        "dc");
+
+                    IPackage duplicate = _installedExtensions.First(p => p.Metadata.Id == package.Metadata.Id);
+                    Unload(duplicate);
+                    _installedExtensions.Remove(duplicate);
+                }
+
+                if (!loadTransient)
+                    EmitBuildLogMessage($"Loaded extension '{package.Metadata.Name}'.", 2, true);
+
                 packages.Add(package);
             }
         }
@@ -93,6 +189,35 @@ internal static class ExtensionLoader
         }
 
         return packages;
+    }
+
+    public static void Unload(IPackage package)
+    {
+        try
+        {
+            package?.Unload();
+        }
+        catch (Exception ex)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0223_ExtensionInitializerFailed,
+                $"Finalizer of extension '{package.Metadata.Name}' threw an exception.",
+                "dc");
+
+            if (Context.Configuration.PrintExceptionInfo)
+                TextWriterBuildLogDevice.ErrorOut.WriteLine(ex.ToString());
+        }
+
+        EmitBuildLogMessage($"Unloaded extension '{package.Metadata.Name}'.", 2);
+    }
+
+    public static void UnloadAll()
+    {
+        foreach (IPackage package in InstalledExtensions)
+            Unload(package);
+
+        _installedExtensions.Clear();
     }
 
     public static List<ICompilerCommand> GetAllCommands(List<IPackage> packages)

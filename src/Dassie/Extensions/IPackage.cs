@@ -1,6 +1,8 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using System;
+using System.Collections.Generic;
+using System.Xml;
 
 namespace Dassie.Extensions;
 
@@ -18,6 +20,30 @@ public interface IPackage
     /// An array of compiler commands added by this extension.
     /// </summary>
     public Type[] Commands { get; }
+
+    /// <summary>
+    /// The method called when the extension is initialized in global mode. This method is only called if the extension is configured to allow initialization in global mode.
+    /// </summary>
+    /// <returns>A status code representing the result of the initialization. If nonzero, the compiler will emit an error.</returns>
+    public virtual int InitializeGlobal() => 0;
+
+    /// <summary>
+    /// The method called when the extension is initialized in transient mode. This method is only called if the extension is configured to allow initialization in transient mode.
+    /// </summary>
+    /// <param name="attributes">The XML attributes the extension is initialized with.</param>
+    /// <param name="elements">The XML elements the extension is initialized with.</param>
+    /// <returns>A status code representing the result of the initialization. If nonzero, the compiler will emit an error.</returns>
+    public virtual int InitializeTransient(List<XmlAttribute> attributes, List<XmlElement> elements) => 0;
+
+    /// <summary>
+    /// Specifies the modes the extension can be loaded in.
+    /// </summary>
+    public virtual ExtensionModes Modes() => ExtensionModes.Global | ExtensionModes.Transient;
+
+    /// <summary>
+    /// The method that is called when the extension is unloaded.
+    /// </summary>
+    public virtual void Unload() { }
 
     /// <summary>
     /// An array of project templates added by this extension.

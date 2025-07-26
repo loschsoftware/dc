@@ -51,7 +51,7 @@ internal static class DirectiveHandler
 
             return null;
         }
-
+        
         DirectiveContext dc = new()
         {
             Arguments = (context.expression() ?? []).Select(e => ExpressionEvaluator.Instance.Visit(e).Value).ToArray(),

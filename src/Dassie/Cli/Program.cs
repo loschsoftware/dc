@@ -54,6 +54,8 @@ internal class Program
                 if (device is IDisposable d)
                     d.Dispose();
             }
+
+            ExtensionLoader.UnloadAll();
         }
 
         return -1;

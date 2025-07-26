@@ -1,9 +1,12 @@
 ﻿using Dassie.Errors;
 using Dassie.Errors.Devices;
+using Dassie.Extensions;
 using Dassie.Validation;
 using System;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
+using IOPath = System.IO.Path;
 
 namespace Dassie.Configuration;
 
@@ -51,6 +54,9 @@ internal static class ProjectFileDeserializer
                 $"Invalid project file.{string.Join(':', ex.InnerException.Message.Split(':')[1..])}",
                 path);
         }
+
+        if (config.Extensions != null && config.Extensions.Count > 0)
+            ExtensionLoader.LoadTransientExtensions(config.Extensions.Select(e => (IOPath.GetFullPath(e.Path), e.Attributes, e.Elements)));
 
         if (handleImports)
             ConfigImportManager.Merge(config);

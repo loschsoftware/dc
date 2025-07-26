@@ -258,6 +258,11 @@ public sealed class DassieConfig
     [DefaultValue(false)]
     [XmlElement]
     public bool EnableSeverityIndicators { get; set; }
+
+    [Description("Configures compiler extensions enabled only during the compilation.")]
+    [DefaultValue(null)]
+    [XmlArray]
+    public List<Extension> Extensions { get; set; }
 }
 
 [Serializable]

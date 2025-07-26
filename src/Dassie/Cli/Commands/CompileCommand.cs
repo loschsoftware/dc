@@ -68,6 +68,11 @@ internal class CompileCommand : ICompilerCommand
         if (overrideSettings != null)
             config = overrideSettings;
 
+        Context ??= new();
+        Context.Configuration = config;
+
+        EmitDeferredBuildLogMessages();
+
         MacroParser parser = new();
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);

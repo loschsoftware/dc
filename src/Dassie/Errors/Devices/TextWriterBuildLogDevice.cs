@@ -2,6 +2,7 @@
 using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -97,9 +98,12 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
             }
 
             Console.CursorLeft = 0;
-            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.ForegroundColor = ConsoleColor.Gray;
 
             string prefix = "\r\n";
+
+            if (error.Severity == Severity.BuildLogMessage)
+                prefix = "";
 
             if (!string.IsNullOrEmpty(MessagePrefix) && error.Severity != Severity.BuildLogMessage)
             {
@@ -121,10 +125,11 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 };
             }
 
-            if (Context.Configuration.EnableMessageTimestamps)
+            if (Context.Configuration.EnableMessageTimestamps || error.Severity == Severity.BuildLogMessage)
             {
-                Console.ForegroundColor = ConsoleColor.Gray;
-                outBuilder.Append($"[{DateTime.Now}] ");
+                SetColorRgb(120, 120, 120);
+                outBuilder.Append($"[{DateTime.Now.ToString("HH:mm:ss.fff")}] ");
+                SetColor();
             }
 
             string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];

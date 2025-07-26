@@ -904,5 +904,21 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the target of an import compiler directive is invalid.
     /// </summary>
-    DS0220_ImportDirectiveInvalidTarget
+    DS0220_ImportDirectiveInvalidTarget,
+    /// <summary>
+    /// Emitted when a specified extension file (.dll) does not exist.
+    /// </summary>
+    DS0221_ExtensionFileNotFound,
+    /// <summary>
+    /// Emitted when a compiler extension is attempted to be initialized in an unsupported mode.
+    /// </summary>
+    DS0222_ExtensionUnsupportedMode,
+    /// <summary>
+    /// Emitted when the initializer of an extension package returns a nonzero status code.
+    /// </summary>
+    DS0223_ExtensionInitializerFailed,
+    /// <summary>
+    /// Emitted when an extension is loaded multiple times in different modes.
+    /// </summary>
+    DS0224_ExtensionDuplicateMode
 }

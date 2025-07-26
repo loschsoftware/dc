@@ -67,6 +67,9 @@ public static class Compiler
 
         DassieConfig cfg = config ?? new();
 
+        if (Context != null && Context.Configuration != null)
+            cfg = Context.Configuration;
+
         Context = new()
         {
             Configuration = cfg,

@@ -26,4 +26,9 @@ public class PackageMetadata
     /// The author of the extension.
     /// </summary>
     public string Author { get; set; }
+
+    /// <summary>
+    /// The unique ID of the extension, calculated from author, name and version number.
+    /// </summary>
+    public string Id => $"{Author}.{Name}_v{Version}";
 }

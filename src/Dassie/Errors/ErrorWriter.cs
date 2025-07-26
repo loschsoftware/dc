@@ -27,6 +27,8 @@ public static class ErrorWriter
     /// A list of all build messages emitted so far.
     /// </summary>
     public static readonly List<ErrorInfo> Messages = [];
+    
+    private static readonly List<(ErrorInfo Error, int MinVerbosity)> _deferredMessages = [];
 
     /// <summary>
     /// A list of build devices to use.
@@ -129,7 +131,7 @@ public static class ErrorWriter
             return;
 
         // Filter out duplicate messages
-        if (Messages.Where(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition).Any())
+        if (Messages.Any(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition))
             return;
 
         BuildLogSeverity severity = error.Severity switch
@@ -158,12 +160,10 @@ public static class ErrorWriter
     /// </summary>
     /// <param name="message">The message to emit.</param>
     /// <param name="minimumVerbosity">The minimum verbosity at which the message is printed.</param>
-    public static void EmitBuildLogMessage(string message, int minimumVerbosity = 0)
+    /// <param name="defer">If <see langword="true"/>, defers the emission of the message until the next call to <see cref="EmitDeferredBuildLogMessages"/>.</param>
+    public static void EmitBuildLogMessage(string message, int minimumVerbosity = 1, bool defer = false)
     {
-        if (Context.Configuration.Verbosity < minimumVerbosity)
-            return;
-
-        EmitGeneric(new ErrorInfo()
+        ErrorInfo msg = new()
         {
             CodePosition = (0, 0),
             Length = 0,
@@ -174,7 +174,32 @@ public static class ErrorWriter
             Severity = Severity.BuildLogMessage,
             Tip = "",
             ToolTip = null
-        });
+        };
+
+        if (defer)
+        {
+            _deferredMessages.Add((msg, minimumVerbosity));
+            return;
+        }
+
+        if (Context.Configuration.Verbosity < minimumVerbosity)
+            return;
+
+        EmitGeneric(msg);
+    }
+
+    /// <summary>
+    /// Emits all build log messages marked as "deferred" by calls to <see cref="EmitBuildLogMessage(string, int, bool)"/>.
+    /// </summary>
+    public static void EmitDeferredBuildLogMessages()
+    {
+        foreach ((ErrorInfo error, int v) in _deferredMessages)
+        {
+            if (Context.Configuration.Verbosity >= v)
+                EmitGeneric(error);
+        }
+
+        _deferredMessages.Clear();
     }
 
     /// <summary>
