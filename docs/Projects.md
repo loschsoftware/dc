@@ -20,6 +20,7 @@ The following documentation is about format version 1.0, which is the most recen
 |[Version information](./Projects.md#version-information)|
 |[Macros](./Projects.md#macros)|
 |[Importing project files](./Projects.md#importing-project-files)|
+|[Transient extensions](./Projects.md#transient-extensions)|
 
 ## General settings
 These settings are at the top level of the XML tree and configure the behavior of the compiler as well as resources associated with the project.
@@ -43,6 +44,7 @@ These settings are at the top level of the XML tree and configure the behavior o
 |``EnableTips``|``true`` or ``false``|If ``true``, some errors and warnings will display additional information to help resolve the issue.||
 |``EntryPoint``|Any string|Sets the application entry point. The value of this property corresponds to the unique name of the method or function that is set as the entry point.||
 |``ErrorColor``|Any string|The color to use for error messages, in the format #RRGGBB.||
+|``Extensions``|See below|A list of transient extensions.||
 |``GenerateILFiles``|``true`` or ``false``|If ``true``, the compiler outputs human-readable .NET Intermediate Language (.il) files.||
 |``GenerateNativeAppHost``|``true`` or ``false``|If ``true``, generates native host executables along with .NET assemblies.||
 |``IconFile``|Any string|A file path to an icon file to use for the generated assembly.||
@@ -257,3 +259,17 @@ The ``Import`` attribute can be used on the ``<DassieConfig>`` object to specify
 </DassieConfig>
 ````
 Besides configuration files, the ``Import`` attribute also supports **configuration providers** from compiler extensions.
+
+## Transient extensions
+With **transient extensions**, projects can declare dependencies on Dassie compiler extensions. These extensions will then be active during the build process only. Additionally, the extension behavior can be customized with XML attributes and elements.
+
+Transient extensions are declared in the ``<Extensions>`` tag, like in the following example:
+````xml
+<Extensions>
+  <Extension Path="./tools/Extension1.dll"/>
+  <Extension Path="./tools/Extension2.dll" CustomConfig="10"/>
+</Extensions>
+````
+
+> [!IMPORTANT]
+> Not every extension can be loaded in transient mode. Extension developers can customize which "loading modes" are supported.
