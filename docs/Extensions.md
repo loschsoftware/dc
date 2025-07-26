@@ -10,14 +10,14 @@ The Dassie compiler provides a rich API for extending its functionality with cus
 |[Creating a custom extension](./Extensions.md#creating-a-custom-extension)|
 
 ## Format
-An **extension** is a .NET type implementing the [``Dassie.Extensions.IPackage``](../../src/Dassie/Extensions/IPackage.cs) interface. An **extension package** is a .NET assembly containing one or more extensions.
+An **extension** is a .NET type implementing the [``Dassie.Extensions.IPackage``](../src/Dassie/Extensions/IPackage.cs) interface. An **extension package** is a .NET assembly containing one or more extensions.
 
 ## Extension lifecycle
 Compiler extensions can be loaded in one of two modes:
 - **Global:** The extension is enabled globally and is initialized as soon as the compiler is launched. It is active for every build. Managing global extensions is done through the ``dc package`` command.
 - **Transient:** The extension is enabled only for a single build process. Managing transient extensions is done through the [``<Extensions>``](./Projects.md#transient-extensions) tag in a project file.
 
-``IPackage`` contains the virtual methods [``InitializeGlobal``](../../src/Dassie/Extensions/IPackage.cs#L28) and [``InitializeTransient``](../../src/Dassie/Extensions/IPackage.cs#L36) that can be overridden to implement custom behavior when the extension is loaded. Similarly, the [``Unload``](../../src/Dassie/Extensions/IPackage.cs#L46) method provides a way of performing an action when the extension is unloaded, regardless of loading mode.
+``IPackage`` contains the virtual methods [``InitializeGlobal``](../src/Dassie/Extensions/IPackage.cs#L28) and [``InitializeTransient``](../src/Dassie/Extensions/IPackage.cs#L36) that can be overridden to implement custom behavior when the extension is loaded. Similarly, the [``Unload``](../src/Dassie/Extensions/IPackage.cs#L46) method provides a way of performing an action when the extension is unloaded, regardless of loading mode.
 
 > [!CAUTION]
 > Do not rely on ``IDisposable`` for freeing resources of extensions, as the Dassie compiler does **not** invoke the ``Dispose`` method when they are unloaded. Always call ``Dispose`` in ``Unload`` to ensure the extension is disposed correctly.
@@ -26,14 +26,14 @@ Compiler extensions can be loaded in one of two modes:
 The command ``dc package`` is used to manage extensions in global mode. To install extensions from an extension package stored on disk, use the ``dc package import`` subcommand. To install them from the online extension registry, use the ``dc package install`` command. This command is not supported yet.
 
 ## Extension API features
-All features of the API are supported through interfaces in the [``Dassie.Extensions``](../../src/Dassie/Extensions) namespace. All features of an extension are centrally registered in ``IPackage`` through its various virtual methods. The following is a list of all available interfaces:
-- **[``ICompilerCommand``](../../src/Dassie/Extensions/ICompilerCommand.cs):** Defines a custom compiler command to integrate external tools with the compiler.
-- **[``IProjectTemplate``](../../src/Dassie/Extensions/IProjectTemplate.cs):** Defines a custom project template used in combination with the ``dc new`` command.
-- **[``IConfigurationProvider``](../../src/Dassie/Extensions/IConfigurationProvider.cs):** Defines a configuration provider that serves as a template for a project file. This is used in combination with the [``Import``](./Projects.md#importing-project-files) attribute of project files.
-- **[``IAnalyzer``](../../src/Dassie/Extensions/IAnalyzer.cs):** Defines a custom code analyzer used in combination with the ``dc analyze`` command.
-- **[``IBuildLogWriter``](../../src/Dassie/Extensions/IBuildLogWriter.cs):** Allows the redirection of build message to an arbitrary ``TextWriter`` object. Requires the usage of the default build log device.
-- **[``IBuildLogDevice``](../../src/Dassie/Extensions/IBuildLogDevice.cs):** Enables the implementation of custom logic for serializing build messages. Can be configured with XML attributes and elements in project files.
-- **[``ICompilerDirective``](../../src/Dassie/Extensions/ICompilerDirective.cs):** Defines a custom **compiler directive** that can be used in code.
+All features of the API are supported through interfaces in the [``Dassie.Extensions``](../src/Dassie/Extensions) namespace. All features of an extension are centrally registered in ``IPackage`` through its various virtual methods. The following is a list of all available interfaces:
+- **[``ICompilerCommand``](../src/Dassie/Extensions/ICompilerCommand.cs):** Defines a custom compiler command to integrate external tools with the compiler.
+- **[``IProjectTemplate``](../src/Dassie/Extensions/IProjectTemplate.cs):** Defines a custom project template used in combination with the ``dc new`` command.
+- **[``IConfigurationProvider``](../src/Dassie/Extensions/IConfigurationProvider.cs):** Defines a configuration provider that serves as a template for a project file. This is used in combination with the [``Import``](./Projects.md#importing-project-files) attribute of project files.
+- **[``IAnalyzer``](../src/Dassie/Extensions/IAnalyzer.cs):** Defines a custom code analyzer used in combination with the ``dc analyze`` command.
+- **[``IBuildLogWriter``](../src/Dassie/Extensions/IBuildLogWriter.cs):** Allows the redirection of build message to an arbitrary ``TextWriter`` object. Requires the usage of the default build log device.
+- **[``IBuildLogDevice``](../src/Dassie/Extensions/IBuildLogDevice.cs):** Enables the implementation of custom logic for serializing build messages. Can be configured with XML attributes and elements in project files.
+- **[``ICompilerDirective``](../src/Dassie/Extensions/ICompilerDirective.cs):** Defines a custom **compiler directive** that can be used in code.
 
 ## Creating a custom extension
 The following example implements a minimal compiler extension that adds a new command to the compiler.
