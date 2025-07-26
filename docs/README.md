@@ -9,6 +9,6 @@ Documentation geared towards contributors and maintainers can be found in the [C
 |[Compiler API](./API.md)|
 |[Command line arguments](./CLI.md)|
 |[Error codes](./Errors.md)|
-|[Extending the compiler with custom commands](./Extensions.md)|
+|[Compiler extensions](./Extensions.md)|
 |[Projects and compiler configuration](./Projects.md)|
 |[Tools for code editors](./Editors.md)|
