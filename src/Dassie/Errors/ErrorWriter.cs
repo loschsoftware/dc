@@ -161,7 +161,8 @@ public static class ErrorWriter
     /// <param name="message">The message to emit.</param>
     /// <param name="minimumVerbosity">The minimum verbosity at which the message is printed.</param>
     /// <param name="defer">If <see langword="true"/>, defers the emission of the message until the next call to <see cref="EmitDeferredBuildLogMessages"/>.</param>
-    public static void EmitBuildLogMessage(string message, int minimumVerbosity = 1, bool defer = false)
+    /// <returns><see langword="true"/> if the message was emitted or deferred. <see langword="false"/> if the message was not emitted due to an insufficient verbosity configuration.</returns>
+    public static bool EmitBuildLogMessage(string message, int minimumVerbosity = 1, bool defer = false)
     {
         ErrorInfo msg = new()
         {
@@ -179,13 +180,14 @@ public static class ErrorWriter
         if (defer)
         {
             _deferredMessages.Add((msg, minimumVerbosity));
-            return;
+            return true;
         }
 
         if (Context.Configuration.Verbosity < minimumVerbosity)
-            return;
+            return false;
 
         EmitGeneric(msg);
+        return true;
     }
 
     /// <summary>

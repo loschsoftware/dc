@@ -16,15 +16,15 @@ internal static class DocumentCompiler
         if (string.IsNullOrEmpty(CurrentFile.Path))
             CurrentFile.Path = document.Name;
 
-        EmitBuildLogMessage("    Lowering...", 2);
+        intermediatePath = Path.Combine(TemporaryBuildDirectoryName, Path.GetFileNameWithoutExtension(document.Name) + ".i.ds");
+        EmitBuildLogMessage($"Rewriting document '{document.Name}' -> '{intermediatePath}'.", 2);
 
         string lowered = SourceFileRewriter.Rewrite(document.Text);
 
         Directory.CreateDirectory(TemporaryBuildDirectoryName);
-        intermediatePath = Path.Combine(TemporaryBuildDirectoryName, Path.GetFileNameWithoutExtension(document.Name) + ".i.ds");
         File.WriteAllText(intermediatePath, lowered);
 
-        EmitBuildLogMessage("    Parsing...", 2);
+        EmitBuildLogMessage($"Parsing document '{intermediatePath}'.", 2);
 
         CurrentFile.CharStream = CharStreams.fromString(lowered);
         DassieLexer lexer = new(CurrentFile.CharStream);

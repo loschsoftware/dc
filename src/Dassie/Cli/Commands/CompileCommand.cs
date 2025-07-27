@@ -71,6 +71,7 @@ internal class CompileCommand : ICompilerCommand
         Context ??= new();
         Context.Configuration = config;
 
+        EmitBuildLogMessage($"Compilation started. Log verbosity is {config.Verbosity}.", 2);
         EmitDeferredBuildLogMessages();
 
         MacroParser parser = new();
@@ -175,6 +176,19 @@ internal class CompileCommand : ICompilerCommand
 
         documents.AddRange(DocumentCommandLineManager.ExtractDocuments(documentArgs));
 
+        if (Context.Configuration.Verbosity >= 2)
+        {
+            EmitBuildLogMessage("Determined documents to compile:", 2);
+
+            if (documents.Count == 0)
+                EmitBuildLogMessage("    None.", 2);
+            else
+            {
+                foreach (InputDocument doc in documents)
+                    EmitBuildLogMessage($"    - {doc.Name}", 2);
+            }
+        }
+
         // Run analyzers (if enabled)
         if (config.RunAnalyzers)
         {
@@ -190,7 +204,10 @@ internal class CompileCommand : ICompilerCommand
         LineNumberOffset = 0;
         UnionTypeCodeGeneration._createdUnionTypes.Clear();
 
-        EmitBuildLogMessage("Performing second pass.", 2);
+        if (Messages.Any(m => m.ErrorCode == DS0106_NoInputFiles))
+            return -1;
+
+        EmitBuildLogMessage("Starting second pass.", 2);
 
         // Step 2
         IEnumerable<ErrorInfo[]> errors = CompileSource(documents, config).Select(l => l.ToArray());

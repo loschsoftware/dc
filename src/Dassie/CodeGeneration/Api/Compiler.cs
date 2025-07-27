@@ -56,13 +56,16 @@ public static class Compiler
 
     internal static List<List<ErrorInfo>> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
     {
-        if (!documents.Any() && Messages.Count == 0)
+        if (!documents.Any() && Messages.Count(m => m.Severity == Severity.Error) == 0)
         {
             EmitErrorMessage(
                 0, 0, 0,
                 DS0106_NoInputFiles,
                 "No input files specified.",
                 "dc");
+
+            EmitBuildLogMessage("Ending compilation.", 2);
+            return [];
         }
 
         DassieConfig cfg = config ?? new();
@@ -77,10 +80,6 @@ public static class Compiler
         };
 
         Context.FilePaths.AddRange(documents.Select(d => d.Name));
-
-        if (VisitorStep1 == null)
-            EmitBuildLogMessage($"Compilation started at {DateTime.Now:HH:mm:ss} on {DateTime.Now.ToShortDateString()} at log verbosity level {config.Verbosity}.", 2);
-
         string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
         AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(documents.First().Name) : config.AssemblyName);

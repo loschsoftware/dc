@@ -529,7 +529,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        EmitBuildLogMessage($"    Generating code for '{TypeContext.Current.Builder.FullName}::{context.Identifier().GetIdentifier()}'...", 2);
+        if (VisitorStep1 != null)
+            EmitBuildLogMessage($"Emitting IL for '{TypeContext.Current.Builder.FullName}.{context.Identifier().GetIdentifier()}'.", 2);
 
         if (context.Custom_Operator() != null)
         {
@@ -1191,7 +1192,8 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             Builder = tb
         };
 
-        EmitBuildLogMessage($"    Generating code for '{tb.FullName}::Main'...", 2);
+        if (VisitorStep1 != null)
+            EmitBuildLogMessage($"Emitting IL for '{tb.FullName}.Main'.", 2);
 
         tc.FilesWhereDefined.Add(CurrentFile.Path);
 

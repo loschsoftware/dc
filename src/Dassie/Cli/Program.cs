@@ -34,18 +34,23 @@ internal class Program
         }
         catch (Exception ex)
         {
+            bool verbose = EmitBuildLogMessage($"Unhandled exception occured. {ex}", 2);
+
             if (!Messages.Any(m => m.Severity == Severity.Error))
                 EmitErrorMessage(0, 0, 0, DS0000_UnknownError, $"Unhandled exception of type '{ex.GetType()}'.", "dc");
 
+            if (!verbose)
+            {
+                try
+                {
+                    if (ProjectFileDeserializer.DassieConfig.PrintExceptionInfo)
+                        TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
+                }
+                catch { }
+            }
+
             if (Debugger.IsAttached)
                 throw;
-
-            try
-            {
-                if (ProjectFileDeserializer.DassieConfig.PrintExceptionInfo)
-                    TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
-            }
-            catch { }
         }
         finally
         {
