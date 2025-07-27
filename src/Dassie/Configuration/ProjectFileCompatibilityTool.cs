@@ -35,7 +35,7 @@ internal static class ProjectFileCompatibilityTool
             EmitWarningMessage(
                 0, 0, 0,
                 DS0092_ConfigurationFormatVersionTooOld,
-                $"Project configuration file uses an outdated format. For best compatibility, the project file should be updated to version {current.ToString(2)}. Use the 'update-config' command to perform this action automatically.",
+                $"Project configuration file uses an outdated format. For best compatibility, the project file should be updated to version {current.ToString(2)}. Use the 'dc config update' command to perform this action automatically.",
                 ProjectConfigurationFileName);
         }
     }
