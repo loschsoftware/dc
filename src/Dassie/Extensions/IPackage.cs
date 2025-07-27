@@ -12,7 +12,7 @@ namespace Dassie.Extensions;
 public interface IPackage
 {
     /// <summary>
-    /// The metadata for the extension.
+    /// The metadata of the extension.
     /// </summary>
     public PackageMetadata Metadata { get; }
 
