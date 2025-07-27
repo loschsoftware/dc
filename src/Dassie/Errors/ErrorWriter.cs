@@ -164,6 +164,9 @@ public static class ErrorWriter
     /// <returns><see langword="true"/> if the message was emitted or deferred. <see langword="false"/> if the message was not emitted due to an insufficient verbosity configuration.</returns>
     public static bool EmitBuildLogMessage(string message, int minimumVerbosity = 1, bool defer = false)
     {
+        if (!defer && Context.Configuration.Verbosity < minimumVerbosity)
+            return false;
+
         ErrorInfo msg = new()
         {
             CodePosition = (0, 0),
@@ -182,9 +185,6 @@ public static class ErrorWriter
             _deferredMessages.Add((msg, minimumVerbosity));
             return true;
         }
-
-        if (Context.Configuration.Verbosity < minimumVerbosity)
-            return false;
 
         EmitGeneric(msg);
         return true;
