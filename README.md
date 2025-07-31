@@ -4,7 +4,7 @@
 The official .NET compiler for the [Dassie](https://github.com/loschsoftware/dassie) programming language.
 
 ## Quick start
-To get started with Dassie development, either download a binary from the 'Releases' section of this repository or build the compiler from source. To build from source, clone the repository and run the build script ``build.cmd`` on Windows. Sadly, there is no build script for Linux yet, but I will gladly accept a pull request adding one.
+To get started with Dassie development, either download a binary from the 'Releases' section of this repository or build the compiler from source. To build from source, clone the repository and either run the appropriate build script or invoke MSBuild/Roslyn manually.
 
 After the compilation is completed, the directory ``build`` will contain the compiler executables. It is recommended to add this directory to the ``Path`` environment variable to allow access to the compiler from anywhere.
 
