@@ -233,4 +233,6 @@ internal class MethodContext
     public DassieParser.Type_nameContext ReturnTypeName { get; set; }
 
     public List<DassieParser.Type_nameContext> ParameterTypeNames { get; set; } = [];
+
+    public bool IsLiteral { get; set; }
 }

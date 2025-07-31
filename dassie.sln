@@ -62,8 +62,8 @@ Global
 		{5A1D6840-6E2A-4A46-9A9E-2A83B35A368E}.Debug|x64.Build.0 = Debug|x64
 		{5A1D6840-6E2A-4A46-9A9E-2A83B35A368E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A1D6840-6E2A-4A46-9A9E-2A83B35A368E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5A1D6840-6E2A-4A46-9A9E-2A83B35A368E}.Release|x64.ActiveCfg = Release|Any CPU
-		{5A1D6840-6E2A-4A46-9A9E-2A83B35A368E}.Release|x64.Build.0 = Release|Any CPU
+		{5A1D6840-6E2A-4A46-9A9E-2A83B35A368E}.Release|x64.ActiveCfg = Release|x64
+		{5A1D6840-6E2A-4A46-9A9E-2A83B35A368E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

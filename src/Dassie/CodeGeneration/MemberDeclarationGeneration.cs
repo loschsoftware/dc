@@ -1,9 +1,7 @@
-﻿using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
+﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Core;
-using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
@@ -243,17 +241,10 @@ internal static class MemberDeclarationGeneration
                 "The modifier 'var' cannot be used on methods.");
         }
 
-        if (context.parameter_list() != null && context.member_special_modifier() != null && context.member_special_modifier().Any(s => s.Literal() != null))
-        {
-            DassieParser.Member_special_modifierContext rule = context.member_special_modifier().First(s => s.Literal != null);
+        bool isLiteral = false;
 
-            EmitErrorMessage(
-                rule.Start.Line,
-                rule.Start.Column,
-                rule.GetText().Length,
-                DS0137_LiteralModifierOnMethod,
-                "The modifier 'literal' cannot be used on methods.");
-        }
+        if (context.parameter_list() != null && context.member_special_modifier() != null && context.member_special_modifier().Any(s => s.Literal() != null))
+            isLiteral = true;
 
         Type _tReturn = typeof(object);
 
@@ -335,7 +326,8 @@ internal static class MemberDeclarationGeneration
             {
                 Builder = mb,
                 UnresolvedReturnType = true,
-                ParserRule = context
+                ParserRule = context,
+                IsLiteral = isLiteral
             };
 
             if (!attrib.HasFlag(MethodAttributes.Abstract) && !implementationFlags.HasFlag(MethodImplAttributes.Runtime) && !isExtern)

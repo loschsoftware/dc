@@ -810,6 +810,8 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
     public override Expression VisitFull_identifier_member_access_expression([NotNull] DassieParser.Full_identifier_member_access_expressionContext context)
     {
+        // TODO: Support "literal" functions if args are constant
+
         if (context.arglist() != null)
             return null;
 

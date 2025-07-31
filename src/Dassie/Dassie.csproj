@@ -33,6 +33,6 @@
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-		<Exec Command="java -jar $(SolutionDir)tools\antlr-4.13.1-complete.jar -visitor -Dlanguage=CSharp -package Dassie.Parser -o $(ProjectDir)Parser\Generated $(ProjectDir)Parser\DassieLexer.g4 $(ProjectDir)Parser\DassieParser.g4" />
+		<Exec Command="java -jar $(SolutionDir)tools/antlr-4.13.1-complete.jar -visitor -Dlanguage=CSharp -package Dassie.Parser -o $(ProjectDir)Parser/Generated $(ProjectDir)Parser/DassieLexer.g4 $(ProjectDir)Parser/DassieParser.g4" />
 	</Target>
 </Project>

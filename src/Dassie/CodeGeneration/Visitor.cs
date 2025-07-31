@@ -4,6 +4,7 @@ using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Core;
+using Dassie.Core.Meta;
 using Dassie.Errors;
 using Dassie.Intrinsics;
 using Dassie.Meta;
@@ -546,14 +547,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
+        MethodContext mc = TypeContext.Current.GetMethod(context);
+        MethodBuilder mb = mc.Builder;
+        CurrentMethod = mc;
+
+        if (CurrentMethod.IsLiteral)
+            CurrentMethod.Builder.SetCustomAttribute(new(typeof(ConstantAttribute).GetConstructor([]), []));
+
         Type _tReturn = typeof(object);
 
         if (context.parameter_list() != null || _tReturn == typeof(void))
         {
-            MethodContext mc = TypeContext.Current.GetMethod(context);
-            MethodBuilder mb = mc.Builder;
-            CurrentMethod = mc;
-
             _tReturn = mb.ReturnType;
 
             InjectClosureParameterInitializers();
