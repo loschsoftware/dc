@@ -3,7 +3,6 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net9.0</TargetFramework>
 		<AssemblyName>dc</AssemblyName>
-		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<Platforms>AnyCPU;x64</Platforms>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>13</LangVersion>
