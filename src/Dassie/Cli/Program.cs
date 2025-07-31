@@ -39,6 +39,9 @@ internal class Program
             if (!Messages.Any(m => m.Severity == Severity.Error))
                 EmitErrorMessage(0, 0, 0, DS0000_UnknownError, $"Unhandled exception of type '{ex.GetType()}'.", "dc");
 
+#if PRINT_EXCEPTION_INFO
+            TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
+#else
             if (!verbose)
             {
                 try
@@ -48,6 +51,7 @@ internal class Program
                 }
                 catch { }
             }
+#endif
 
             if (Debugger.IsAttached)
                 throw;
