@@ -16,6 +16,8 @@ internal class Program
     [EntryPoint]
     internal static int Main(string[] args)
     {
+        int exit = -1;
+
         try
         {
             Console.OutputEncoding = Encoding.Unicode;
@@ -24,13 +26,15 @@ internal class Program
 
             args ??= [];
             if (args.Length == 0)
-                return HelpCommand.Instance.Invoke(args);
-
-            string command = args[0];
-            if (CommandRegistry.TryInvoke(command, args[1..], out int ret))
-                return ret;
-
-            return CompileCommand.Instance.Invoke(args);
+                exit = HelpCommand.Instance.Invoke(args);
+            else
+            {
+                string command = args[0];
+                if (CommandRegistry.TryInvoke(command, args[1..], out int ret))
+                    exit = ret;
+                else 
+                    exit = CompileCommand.Instance.Invoke(args);
+            }
         }
         catch (Exception ex)
         {
@@ -56,17 +60,14 @@ internal class Program
             if (Debugger.IsAttached)
                 throw;
         }
-        finally
-        {
-            foreach (IBuildLogDevice device in BuildLogDevices)
-            {
-                if (device is IDisposable d)
-                    d.Dispose();
-            }
 
-            ExtensionLoader.UnloadAll();
+        foreach (IBuildLogDevice device in BuildLogDevices)
+        {
+            if (device is IDisposable d)
+                d.Dispose();
         }
 
-        return -1;
+        ExtensionLoader.UnloadAll();
+        return exit;
     }
 }
