@@ -2,8 +2,11 @@
 using Dassie.Cli.Commands;
 using Dassie.CodeAnalysis;
 using Dassie.Errors.Devices;
+using NuGet.Packaging;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
@@ -12,18 +15,57 @@ namespace Dassie.Extensions;
 
 internal static class ExtensionLoader
 {
+    static ExtensionLoader()
+    {
+        InstalledExtensions = [];
+        InstalledExtensions.AddRange(LoadInstalledExtensions());
+        InstalledExtensions.CollectionChanged += Update;
+    }
+
     public static readonly string DefaultExtensionSource = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Extensions")).FullName;
     public static readonly string GlobalToolsPath = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")).FullName;
 
-    private static readonly List<IPackage> _installedExtensions = LoadInstalledExtensions();
-    public static List<IPackage> InstalledExtensions => _installedExtensions;
+    public static ObservableCollection<IPackage> InstalledExtensions
+    {
+        get => field;
+        set
+        {
+            if (field != null)
+                field.CollectionChanged -= Update;
 
-    public static IEnumerable<ICompilerCommand> Commands => InstalledExtensions.SelectMany(p => p.Commands());
-    public static IEnumerable<IConfigurationProvider> ConfigurationProviders => InstalledExtensions.SelectMany(p => p.ConfigurationProviders());
-    public static IEnumerable<IAnalyzer<IParseTree>> CodeAnalyzers => InstalledExtensions.SelectMany(a => a.CodeAnalyzers());
-    public static IEnumerable<IBuildLogDevice> BuildLogDevices => InstalledExtensions.SelectMany(a => a.BuildLogDevices());
-    public static IEnumerable<IProjectTemplate> ProjectTemplates => InstalledExtensions.SelectMany(p => p.ProjectTemplates());
-    public static IEnumerable<ICompilerDirective> CompilerDirectives => InstalledExtensions.SelectMany(p => p.CompilerDirectives());
+            field = value;
+            field.CollectionChanged += Update;
+            Update(null, null);
+        }
+    }
+
+    private static IEnumerable<ICompilerCommand> _commands = [];
+    public static IEnumerable<ICompilerCommand> Commands => _commands;
+
+    private static IEnumerable<IConfigurationProvider> _configurationProviders = [];
+    public static IEnumerable<IConfigurationProvider> ConfigurationProviders => _configurationProviders;
+
+    private static IEnumerable<IAnalyzer<IParseTree>> _codeAnalyzers = [];
+    public static IEnumerable<IAnalyzer<IParseTree>> CodeAnalyzers => _codeAnalyzers;
+
+    private static IEnumerable<IBuildLogDevice> _buildLogDevices = [];
+    public static IEnumerable<IBuildLogDevice> BuildLogDevices => _buildLogDevices;
+
+    private static IEnumerable<IProjectTemplate> _projectTemplates = [];
+    public static IEnumerable<IProjectTemplate> ProjectTemplates => _projectTemplates;
+
+    private static IEnumerable<ICompilerDirective> _compilerDirectives = [];
+    public static IEnumerable<ICompilerDirective> CompilerDirectives => _compilerDirectives;
+
+    private static void Update(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        _commands = InstalledExtensions.SelectMany(p => p.Commands());
+        _configurationProviders = InstalledExtensions.SelectMany(p => p.ConfigurationProviders());
+        _codeAnalyzers = InstalledExtensions.SelectMany(p => p.CodeAnalyzers());
+        _buildLogDevices = InstalledExtensions.SelectMany(p => p.BuildLogDevices());
+        _projectTemplates = InstalledExtensions.SelectMany(p => p.ProjectTemplates());
+        _compilerDirectives = InstalledExtensions.SelectMany(p => p.CompilerDirectives());
+    }
 
     private static List<IPackage> LoadInstalledExtensions()
     {
@@ -67,7 +109,7 @@ internal static class ExtensionLoader
         foreach ((string path, List<XmlAttribute> attribs, List<XmlElement> elems) in paths)
         {
             EmitBuildLogMessage($"Loaded transient extension '{path}'.", 2, true);
-            _installedExtensions.AddRange(LoadInstalledExtensions(path, true, attribs, elems));
+            InstalledExtensions.AddRange(LoadInstalledExtensions(path, true, attribs, elems));
         }
     }
 
@@ -152,7 +194,7 @@ internal static class ExtensionLoader
                     continue;
                 }
 
-                if (loadTransient && _installedExtensions.Any(p => p.Metadata.Id == package.Metadata.Id))
+                if (loadTransient && InstalledExtensions.Any(p => p.Metadata.Id == package.Metadata.Id))
                 {
                     EmitErrorMessage(
                         0, 0, 0,
@@ -160,9 +202,9 @@ internal static class ExtensionLoader
                         $"Extension '{package.Metadata.Name}' was loaded twice in different modes. Global mode will be unloaded.",
                         CompilerExecutableName);
 
-                    IPackage duplicate = _installedExtensions.First(p => p.Metadata.Id == package.Metadata.Id);
+                    IPackage duplicate = InstalledExtensions.First(p => p.Metadata.Id == package.Metadata.Id);
                     Unload(duplicate);
-                    _installedExtensions.Remove(duplicate);
+                    InstalledExtensions.Remove(duplicate);
                 }
 
                 if (!loadTransient)
@@ -208,7 +250,7 @@ internal static class ExtensionLoader
         foreach (IPackage package in InstalledExtensions)
             Unload(package);
 
-        _installedExtensions.Clear();
+        InstalledExtensions.Clear();
     }
 
     //public static List<ICompilerCommand> GetAllCommands(List<IPackage> packages)

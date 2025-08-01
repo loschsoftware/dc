@@ -16,6 +16,12 @@ public interface IPackage
     public PackageMetadata Metadata { get; }
 
     /// <summary>
+    /// If <see langword="true"/>, the extension is hidden and does not appear in extension lists.
+    /// </summary>
+    /// <returns>Wheter or not the package is hidden.</returns>
+    public virtual bool Hidden() => false;
+
+    /// <summary>
     /// The method called when the extension is initialized in global mode. This method is only called if the extension is configured to allow initialization in global mode.
     /// </summary>
     /// <returns>A status code representing the result of the initialization. If nonzero, the compiler will emit an error.</returns>

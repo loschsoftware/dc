@@ -5,7 +5,7 @@
 		<AssemblyName>dc</AssemblyName>
 		<Platforms>AnyCPU;x64</Platforms>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<LangVersion>13</LangVersion>
+		<LangVersion>Preview</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Deterministic>false</Deterministic>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>

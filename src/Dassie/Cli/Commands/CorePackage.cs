@@ -16,6 +16,8 @@ internal class CorePackage : IPackage
     private static CorePackage _instance;
     public static CorePackage Instance => _instance ??= new();
 
+    public bool Hidden() => true;
+
     public PackageMetadata Metadata => new()
     {
         Author = "Losch",
