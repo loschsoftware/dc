@@ -26,16 +26,16 @@ internal class FileContext
 
     public string Path { get; set; }
 
-    public List<Fragment> Fragments { get; } = new();
+    public List<Fragment> Fragments { get; } = [];
 
-    public List<string> Imports { get; } = new()
-    {
+    public List<string> Imports { get; } =
+    [
         // Implicit imports
         "Dassie.Core"
-    };
+    ];
 
-    public List<string> ImportedTypes { get; } = new()
-    {
+    public List<string> ImportedTypes { get; } =
+    [
         // Implicitly imported types ("built-in functions")
         "Dassie.Core.Assert",
         "Dassie.Core.stdout",
@@ -44,7 +44,7 @@ internal class FileContext
         "Dassie.Core.Process",
         "Dassie.Core.Numerics.NumericSequence",
         "Dassie.CompilerServices.CodeGeneration"
-    };
+    ];
 
     public List<(string Name, string Alias)> Aliases { get; } = [];
 
@@ -52,11 +52,11 @@ internal class FileContext
 
     public bool CompilationFailed { get; set; }
 
-    public List<ErrorInfo> Errors { get; } = new();
+    public List<ErrorInfo> Errors { get; } = [];
 
-    public List<FoldingRegion> FoldingRegions { get; } = new();
+    public List<FoldingRegion> FoldingRegions { get; } = [];
 
-    public List<GuideLine> GuideLines { get; } = new();
+    public List<GuideLine> GuideLines { get; } = [];
 
     public bool CheckType(Type type) => AvailableTypes.Contains(type);
 

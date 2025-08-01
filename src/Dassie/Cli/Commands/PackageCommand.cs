@@ -172,7 +172,7 @@ internal class PackageCommand : ICompilerCommand
         sb.AppendLine($"{"    Version:",-50}{package.Metadata.Version}");
         sb.AppendLine($"{"    File:",-50}{package.GetType().Assembly.Location}");
 
-        IEnumerable<ICompilerCommand> definedCommands = CommandRegistry.Commands.Where(c => c.GetType().Assembly == package.GetType().Assembly);
+        IEnumerable<ICompilerCommand> definedCommands = ExtensionLoader.Commands.Where(c => c.GetType().Assembly == package.GetType().Assembly);
 
         if (definedCommands.Any())
         {

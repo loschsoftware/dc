@@ -1,6 +1,5 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
-using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -15,11 +14,6 @@ public interface IPackage
     /// The metadata of the extension.
     /// </summary>
     public PackageMetadata Metadata { get; }
-
-    /// <summary>
-    /// An array of compiler commands added by this extension.
-    /// </summary>
-    public Type[] Commands { get; }
 
     /// <summary>
     /// The method called when the extension is initialized in global mode. This method is only called if the extension is configured to allow initialization in global mode.
@@ -44,6 +38,11 @@ public interface IPackage
     /// The method that is called when the extension is unloaded.
     /// </summary>
     public virtual void Unload() { }
+
+    /// <summary>
+    /// An array of compiler commands added by this extension.
+    /// </summary>
+    public virtual ICompilerCommand[] Commands() => [];
 
     /// <summary>
     /// An array of project templates added by this extension.

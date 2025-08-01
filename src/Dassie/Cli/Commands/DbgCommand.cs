@@ -5,6 +5,9 @@ namespace Dassie.Cli.Commands;
 
 internal class DbgCommand : ICompilerCommand
 {
+    private static DbgCommand _instance;
+    public static DbgCommand Instance => _instance ??= new();
+
     public string Command => "dbg";
 
     public string UsageString => "dbg [Command]";

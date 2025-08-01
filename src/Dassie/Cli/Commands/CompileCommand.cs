@@ -26,6 +26,7 @@ using System.Text;
 
 #pragma warning disable IDE0079
 #pragma warning disable IL3000
+#pragma warning disable CA1822
 
 namespace Dassie.Cli.Commands;
 
@@ -80,9 +81,9 @@ internal class CompileCommand : ICompilerCommand
 
         ProjectFileCompatibilityTool.VerifyFormatVersionCompatibility(config);
 
-        string[] files = args.Where(s => !s.StartsWith("-") && !s.StartsWith("/") && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
+        string[] files = args.Where(s => !s.StartsWith('-') && !s.StartsWith('/') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
 
-        if (args.Where(s => (s.StartsWith("-") || s.StartsWith("/") || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
+        if (args.Where(s => (s.StartsWith('-') || s.StartsWith('/') || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;
 
         string relativePathResolverBaseDir = Directory.GetCurrentDirectory();
@@ -385,7 +386,7 @@ internal class CompileCommand : ICompilerCommand
             }
         }
 
-        foreach (Resource res in Context.Configuration.Resources ?? Array.Empty<Resource>())
+        foreach (Resource res in Context.Configuration.Resources ?? [])
             AddResource(res, Directory.GetCurrentDirectory(), relativePathResolverBaseDir);
 
         if (!Messages.Any(m => m.Severity == Severity.Error))
@@ -564,7 +565,7 @@ internal class CompileCommand : ICompilerCommand
         using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write);
         portablePdbBlob.WriteContentTo(fileStream);
 
-        DebugDirectoryBuilder debugDirectoryBuilder = new DebugDirectoryBuilder();
+        DebugDirectoryBuilder debugDirectoryBuilder = new();
         debugDirectoryBuilder.AddCodeViewEntry(fileName, pdbContentId, portablePdbBuilder.FormatVersion);
         return debugDirectoryBuilder;
     }
@@ -643,7 +644,7 @@ internal class CompileCommand : ICompilerCommand
         static bool IsFileMatchingPattern(string filePath, string filePattern)
         {
             string fileName = Path.GetFileName(filePath);
-            string[] patternSegments = filePattern.Split(new[] { '*', '?' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] patternSegments = filePattern.Split([ '*', '?' ], StringSplitOptions.RemoveEmptyEntries);
 
             int index = 0;
             foreach (string segment in patternSegments)
@@ -666,7 +667,7 @@ internal class CompileCommand : ICompilerCommand
         string filePattern = Path.GetFileName(pattern);
         string[] matchingFiles = Directory.GetFiles(directory, filePattern);
 
-        if (filePattern.Contains("*") || filePattern.Contains("?"))
+        if (filePattern.Contains('*') || filePattern.Contains('?'))
         {
             matchingFiles = matchingFiles.Where(file =>
                 IsFileMatchingPattern(file, filePattern)).ToArray();
@@ -676,8 +677,11 @@ internal class CompileCommand : ICompilerCommand
         {
             if (pattern.All(c => char.IsLetter(c) || c == '-'))
             {
-                IEnumerable<string> cmds = CommandRegistry.Commands.Where(c => !c.Hidden()).Select(c => c.Command.ToLowerInvariant()).Where(c => c.Length > 0).OrderBy(c => Distance(pattern.ToLowerInvariant(), c));
-                int dist = Distance(pattern.ToLowerInvariant(), cmds.First().ToLowerInvariant());
+                IEnumerable<string> cmds = ExtensionLoader.Commands.Where(c => !c.Hidden()).Select(c => c.Command.ToLowerInvariant()).Where(c => c.Length > 0).OrderBy(c => Distance(pattern.ToLowerInvariant(), c));
+                int dist = int.MaxValue;
+
+                if (cmds.Any())
+                    dist = Distance(pattern.ToLowerInvariant(), cmds.First().ToLowerInvariant());
 
                 StringBuilder errorMsg = new();
                 errorMsg.Append($"Unrecognized command '{pattern}'. ");

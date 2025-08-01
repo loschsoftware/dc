@@ -10,8 +10,16 @@ using System.Text;
 
 namespace Dassie.Cli;
 
+/// <summary>
+/// Acts as a container for the application entry point.
+/// </summary>
 internal class Program
 {
+    /// <summary>
+    /// The compiler entry point.
+    /// </summary>
+    /// <param name="args">The command-line arguments passed to the compiler.</param>
+    /// <returns>The exit code of the process.</returns>
     [EntryPoint]
     internal static int Main(string[] args)
     {
@@ -21,7 +29,6 @@ internal class Program
         {
             Console.OutputEncoding = Encoding.Unicode;
             ToolPaths.GetOrCreateToolPathsFile();
-            CommandRegistry.InitializeDefaults();
 
             args ??= [];
             if (args.Length == 0)
@@ -29,7 +36,7 @@ internal class Program
             else
             {
                 string command = args[0];
-                if (CommandRegistry.TryInvoke(command, args[1..], out int ret))
+                if (CommandHandler.TryInvoke(command, args[1..], out int ret))
                     exit = ret;
                 else 
                     exit = CompileCommand.Instance.Invoke(args);

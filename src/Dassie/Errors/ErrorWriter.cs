@@ -2,7 +2,6 @@
 using Dassie.Configuration.Analysis;
 using Dassie.Errors.Devices;
 using Dassie.Extensions;
-using Dassie.Meta;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ using System.Linq;
 namespace Dassie.Errors;
 
 /// <summary>
-/// Provides methods for emitting Dassie error messages.
+/// Provides methods for emitting diagnostic messages.
 /// </summary>
 public static class ErrorWriter
 {
@@ -78,7 +77,7 @@ public static class ErrorWriter
     }
 
     /// <summary>
-    /// Emits a generic build log message.
+    /// Emits a build message.
     /// </summary>
     /// <param name="error">The message to emit.</param>
     public static void EmitGeneric(ErrorInfo error)
@@ -207,8 +206,15 @@ public static class ErrorWriter
     /// <summary>
     /// Writes an error message to the designated error outputs.
     /// </summary>
-    /// <remarks>If <paramref name="file"/> is null, will assume <see cref="FileContext.Path"/>.</remarks>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    /// <param name="ln">The line of the error.</param>
+    /// <param name="col">The column of the error.</param>
+    /// <param name="length">The length the error.</param>
+    /// <param name="errorType">The error code of the message.</param>
+    /// <param name="msg">The error message.</param>
+    /// <param name="file">The file name to use in the error message.</param>
+    /// <param name="tip">An optional tip displayed in the message.</param>
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -242,6 +248,14 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a warning message to the designated warning outputs.
     /// </summary>
+    /// <param name="ln">The line of the warning.</param>
+    /// <param name="col">The column of the warning.</param>
+    /// <param name="length">The length the warning.</param>
+    /// <param name="errorType">The error code of the message.</param>
+    /// <param name="msg">The warning message.</param>
+    /// <param name="file">The file name to use in the warning message.</param>
+    /// <param name="tip">An optional tip displayed in the message.</param>
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
     public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
@@ -278,7 +292,15 @@ public static class ErrorWriter
     /// <summary>
     /// Writes a message to the designated information outputs.
     /// </summary>
-    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    /// <param name="ln">The line of the message.</param>
+    /// <param name="col">The column of the message.</param>
+    /// <param name="length">The length the message.</param>
+    /// <param name="errorType">The error code of the message.</param>
+    /// <param name="msg">The message.</param>
+    /// <param name="file">The file name to use in the message.</param>
+    /// <param name="tip">An optional tip displayed in the message.</param>
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
+    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 

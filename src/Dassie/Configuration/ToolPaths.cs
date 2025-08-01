@@ -12,27 +12,6 @@ namespace Dassie.Configuration;
 [XmlRoot("CompilerTools")]
 public class ToolPaths
 {
-    internal static void GetOrCreateToolPathsFile()
-    {
-        XmlSerializer xmls = new(typeof(ToolPaths));
-
-        Directory.CreateDirectory(Path.GetDirectoryName(ToolPaths.ToolPathsFile));
-        if (File.Exists(ToolPaths.ToolPathsFile))
-        {
-            using StreamReader sr = new(ToolPaths.ToolPathsFile);
-            GlobalConfig.ExternalToolPaths = (ToolPaths)xmls.Deserialize(sr);
-            return;
-        }
-
-        GlobalConfig.ExternalToolPaths = new()
-        {
-            Tools = []
-        };
-
-        using StreamWriter sw = new(ToolPaths.ToolPathsFile);
-        xmls.Serialize(sw, GlobalConfig.ExternalToolPaths);
-    }
-
     /// <summary>
     /// The path to the tools.xml file.
     /// </summary>
@@ -43,6 +22,27 @@ public class ToolPaths
     /// </summary>
     [XmlElement]
     public Tool[] Tools { get; set; }
+
+    internal static void GetOrCreateToolPathsFile()
+    {
+        XmlSerializer xmls = new(typeof(ToolPaths));
+
+        Directory.CreateDirectory(Path.GetDirectoryName(ToolPathsFile));
+        if (File.Exists(ToolPathsFile))
+        {
+            using StreamReader sr = new(ToolPathsFile);
+            GlobalConfig.ExternalToolPaths = (ToolPaths)xmls.Deserialize(sr);
+            return;
+        }
+
+        GlobalConfig.ExternalToolPaths = new()
+        {
+            Tools = []
+        };
+
+        using StreamWriter sw = new(ToolPathsFile);
+        xmls.Serialize(sw, GlobalConfig.ExternalToolPaths);
+    }
 }
 
 /// <summary>

@@ -39,7 +39,7 @@ internal class HelpCommand : ICompilerCommand
     {
         if (args.Any(a => !a.StartsWith('-')))
         {
-            if (CommandRegistry.TryInvoke(args.First(a => !a.StartsWith('-')), ["--help"], out int exit))
+            if (CommandHandler.TryInvoke(args.First(a => !a.StartsWith('-')), ["--help"], out int exit))
                 return exit;
         }
 
@@ -220,10 +220,10 @@ internal class HelpCommand : ICompilerCommand
         sb.AppendLine();
         sb.AppendLine("Commands:");
 
-        IEnumerable<ICompilerCommand> internalCommands = CommandRegistry.Commands.OrderBy(c => c.Command).Where(c => !c.Hidden()
+        IEnumerable<ICompilerCommand> internalCommands = ExtensionLoader.Commands.OrderBy(c => c.Command).Where(c => !c.Hidden()
             && c.GetType().Assembly == Assembly.GetExecutingAssembly());
 
-        IEnumerable<ICompilerCommand> externalCommands = CommandRegistry.Commands.Where(c => !c.Hidden()).Except(internalCommands);
+        IEnumerable<ICompilerCommand> externalCommands = ExtensionLoader.Commands.Where(c => !c.Hidden()).Except(internalCommands);
 
         foreach (ICompilerCommand command in internalCommands)
         {

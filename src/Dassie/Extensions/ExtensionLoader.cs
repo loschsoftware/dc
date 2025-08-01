@@ -1,13 +1,11 @@
 ﻿using Antlr4.Runtime.Tree;
+using Dassie.Cli.Commands;
 using Dassie.CodeAnalysis;
 using Dassie.Errors.Devices;
-using Dassie.Meta.Directives;
-using Dassie.Templates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Xml;
 
 namespace Dassie.Extensions;
@@ -20,19 +18,12 @@ internal static class ExtensionLoader
     private static readonly List<IPackage> _installedExtensions = LoadInstalledExtensions();
     public static List<IPackage> InstalledExtensions => _installedExtensions;
 
-    public static IEnumerable<IConfigurationProvider> ConfigurationProviders => InstalledExtensions.Select(p => p.ConfigurationProviders()).SelectMany(p => p);
-    public static IEnumerable<IAnalyzer<IParseTree>> CodeAnalyzers => InstalledExtensions.Select(a => a.CodeAnalyzers()).SelectMany(a => a);
-
-    public static IEnumerable<IBuildLogDevice> BuildLogDevices => InstalledExtensions.Select(a => a.BuildLogDevices()).SelectMany(a => a).Append(TextWriterBuildLogDevice.Instance).Append(new FileBuildLogDevice());
-
-    public static IEnumerable<IProjectTemplate> ProjectTemplates => InstalledExtensions.Select(p => p.ProjectTemplates()).SelectMany(a => a).Append(LibraryProject.Instance).Append(ConsoleProject.Instance);
-
-    public static IEnumerable<ICompilerDirective> CompilerDirectives => InstalledExtensions.Select(p => p.CompilerDirectives()).SelectMany(a => a)
-        .Append(LineDirective.Instance)
-        .Append(SourceDirective.Instance)
-        .Append(TodoDirective.Instance)
-        .Append(ILDirective.Instance)
-        .Append(ImportDirective.Instance);
+    public static IEnumerable<ICompilerCommand> Commands => InstalledExtensions.SelectMany(p => p.Commands());
+    public static IEnumerable<IConfigurationProvider> ConfigurationProviders => InstalledExtensions.SelectMany(p => p.ConfigurationProviders());
+    public static IEnumerable<IAnalyzer<IParseTree>> CodeAnalyzers => InstalledExtensions.SelectMany(a => a.CodeAnalyzers());
+    public static IEnumerable<IBuildLogDevice> BuildLogDevices => InstalledExtensions.SelectMany(a => a.BuildLogDevices());
+    public static IEnumerable<IProjectTemplate> ProjectTemplates => InstalledExtensions.SelectMany(p => p.ProjectTemplates());
+    public static IEnumerable<ICompilerDirective> CompilerDirectives => InstalledExtensions.SelectMany(p => p.CompilerDirectives());
 
     private static List<IPackage> LoadInstalledExtensions()
     {
@@ -66,6 +57,7 @@ internal static class ExtensionLoader
         foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))
             packages.AddRange(LoadInstalledExtensions(file));
 
+        packages.Add(CorePackage.Instance);
         ActivateBuildLogWriters(packages);
         return packages;
     }
@@ -219,53 +211,35 @@ internal static class ExtensionLoader
         _installedExtensions.Clear();
     }
 
-    public static List<ICompilerCommand> GetAllCommands(List<IPackage> packages)
-    {
-        List<ICompilerCommand> commands = [];
+    //public static List<ICompilerCommand> GetAllCommands(List<IPackage> packages)
+    //{
+    //    List<ICompilerCommand> commands = [];
 
-        foreach (IPackage package in packages)
-        {
-            var cmds = GetCommands(package);
+    //    foreach (IPackage package in packages)
+    //    {
+    //        var cmds = GetCommands(package);
 
-            foreach (ICompilerCommand cmd in cmds)
-            {
-                if (commands.Any(c => c.Command == cmd.Command || c.Aliases().Intersect(cmd.Aliases()).Any()))
-                {
-                    StringBuilder errMsg = new();
-                    errMsg.Append($"Ambiguous command: The command '{cmd.Command}' is defined by multiple extensions. ");
-                    errMsg.AppendLine($"The command defined in '{package.Metadata.Name}, version {package.Metadata.Version}' will be used.");
+    //        foreach (ICompilerCommand cmd in cmds)
+    //        {
+    //            if (commands.Any(c => c.Command == cmd.Command || c.Aliases().Intersect(cmd.Aliases()).Any()))
+    //            {
+    //                StringBuilder errMsg = new();
+    //                errMsg.Append($"Ambiguous command: The command '{cmd.Command}' is defined by multiple extensions. ");
+    //                errMsg.AppendLine($"The command defined in '{package.Metadata.Name}, version {package.Metadata.Version}' will be used.");
 
-                    EmitWarningMessage(
-                        0, 0, 0,
-                        DS0099_DuplicateCompilerCommand,
-                        errMsg.ToString(),
-                        CompilerExecutableName);
-                }
+    //                EmitWarningMessage(
+    //                    0, 0, 0,
+    //                    DS0099_DuplicateCompilerCommand,
+    //                    errMsg.ToString(),
+    //                    CompilerExecutableName);
+    //            }
 
-                commands.Add(cmd);
-            }
-        }
+    //            commands.Add(cmd);
+    //        }
+    //    }
 
-        return commands;
-    }
-
-    public static List<ICompilerCommand> GetCommands(IPackage package)
-    {
-        List<ICompilerCommand> commands = [];
-
-        foreach (var command in package.Commands)
-        {
-            PropertyInfo instanceProp = command.GetProperty("Instance");
-            ICompilerCommand instance = null;
-
-            if (instanceProp != null)
-                instance = (ICompilerCommand)instanceProp.GetValue(null);
-
-            commands.Add(instance ?? (ICompilerCommand)Activator.CreateInstance(command));
-        }
-
-        return commands;
-    }
+    //    return commands;
+    //}
 
     public static bool TryGetAnalyzer(string name, out IAnalyzer<IParseTree> analyzer)
     {

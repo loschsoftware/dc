@@ -1,29 +1,13 @@
 ﻿using Dassie.Extensions;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Dassie.Cli.Commands;
 
 /// <summary>
-/// Acts as a container for all installed compiler commands.
+/// Looks up and invokes compiler commands.
 /// </summary>
-internal static class CommandRegistry
+internal static class CommandHandler
 {
-    /// <summary>
-    /// A list containing all available compiler commands, predefined as well as external.
-    /// </summary>
-    public static List<ICompilerCommand> Commands { get; private set; }
-
-    /// <summary>
-    /// Initializes the command list.
-    /// </summary>
-    public static void InitializeDefaults()
-    {
-        List<IPackage> packages = ExtensionLoader.InstalledExtensions;
-        packages.Add(DefaultCommandPackage.Instance);
-        Commands = ExtensionLoader.GetAllCommands(packages);
-    }
-
     private static readonly string[] _helpOptions = ["-h", "--help", "/help", "/?"];
 
     /// <summary>
@@ -35,9 +19,9 @@ internal static class CommandRegistry
     /// <returns><see langword="true"/>, if the command was executed. <see langword="false"/>, if the command could not be found.</returns>
     public static bool TryInvoke(string name, string[] args, out int errorCode)
     {
-        if (Commands.Any(c => c.Command == name || c.Aliases().Any(a => a == name)))
+        if (ExtensionLoader.Commands.Any(c => c.Command == name || c.Aliases().Any(a => a == name)))
         {
-            ICompilerCommand selectedCommand = Commands.First(c => c.Command == name || c.Aliases().Any(a => a == name));
+            ICompilerCommand selectedCommand = ExtensionLoader.Commands.First(c => c.Command == name || c.Aliases().Any(a => a == name));
 
             if (args.Any(a => _helpOptions.Contains(a)))
             {
