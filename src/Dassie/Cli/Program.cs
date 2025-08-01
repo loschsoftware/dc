@@ -61,12 +61,6 @@ internal class Program
                 throw;
         }
 
-        foreach (IBuildLogDevice device in BuildLogDevices)
-        {
-            if (device is IDisposable d)
-                d.Dispose();
-        }
-
         ExtensionLoader.UnloadAll();
         return exit;
     }
