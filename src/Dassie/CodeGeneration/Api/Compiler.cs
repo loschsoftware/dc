@@ -62,7 +62,7 @@ public static class Compiler
                 0, 0, 0,
                 DS0106_NoInputFiles,
                 "No input files specified.",
-                "dc");
+                CompilerExecutableName);
 
             EmitBuildLogMessage("Ending compilation.", 2);
             return [];
@@ -144,7 +144,7 @@ public static class Compiler
                 0, 0, 0,
                 DS0030_NoEntryPoint,
                 "Program contains no entry point. Use the '<EntryPoint>' attribute to set the application entry point or add executable code to generate an implicit entry point.",
-                "dc");
+                CompilerExecutableName);
         }
 
         return errors;

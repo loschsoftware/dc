@@ -54,7 +54,7 @@ internal class WatchCommand : ICompilerCommand
                             0, 0, 0,
                             DS0193_ExpectedCliOptionValue,
                             $"Expected value for option '{args[i]}'.",
-                            "dc");
+                            CompilerExecutableName);
 
                         return -1;
                     }
@@ -69,7 +69,7 @@ internal class WatchCommand : ICompilerCommand
                             0, 0, 0,
                             DS0194_DCWatchInvalidCombination,
                             $"'dc watch': Command to execute was already set to '{command}'",
-                            "dc");
+                            CompilerExecutableName);
                     }
 
                     command = args[i++ + 1];
@@ -85,7 +85,7 @@ internal class WatchCommand : ICompilerCommand
                             0, 0, 0,
                             DS0194_DCWatchInvalidCombination,
                             $"'dc watch': Build profile was already set to '{profile}'",
-                            "dc");
+                            CompilerExecutableName);
                     }
 
                     profile = args[i++ + 1];
@@ -99,7 +99,7 @@ internal class WatchCommand : ICompilerCommand
                         0, 0, 0,
                         DS0194_DCWatchInvalidCombination,
                         "'dc watch': Compilation target can only be manually specified if neither '--profile' nor '--command' are set.",
-                        "dc");
+                        CompilerExecutableName);
                 }
 
                 if (!Directory.Exists(args[i]))
@@ -109,7 +109,7 @@ internal class WatchCommand : ICompilerCommand
                         0, 0, 0,
                         DS0194_DCWatchInvalidCombination,
                         $"'dc watch': Directory '{args[i]}' does not exist.",
-                        "dc");
+                        CompilerExecutableName);
                 }
 
                 if (!string.IsNullOrEmpty(dir))
@@ -119,7 +119,7 @@ internal class WatchCommand : ICompilerCommand
                         0, 0, 0,
                         DS0194_DCWatchInvalidCombination,
                         $"'dc watch': Compilation target directory was already set to '{args[i]}'.",
-                        "dc");
+                        CompilerExecutableName);
                 }
 
                 dir = args[i];
@@ -133,7 +133,7 @@ internal class WatchCommand : ICompilerCommand
                 0, 0, 0,
                 DS0194_DCWatchInvalidCombination,
                 "'dc watch': The options '--command' and '--profile' cannot be combined.",
-                "dc");
+                CompilerExecutableName);
         }
 
         if (error)

@@ -87,7 +87,7 @@ internal class BuildCommand : ICompilerCommand
                 0, 0, 0,
                 DS0029_FileAccessDenied,
                 $"Files to compile could not be determined: {ex.Message}",
-                "dc");
+                CompilerExecutableName);
         }
 
         filesToCompile = filesToCompile.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();

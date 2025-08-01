@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Dassie.Configuration;
+using Dassie.Errors.Devices;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Dassie.Cli;
@@ -56,5 +58,22 @@ internal static partial class ConsoleHelper
 
         // Better safe than sorry
         return false;
+    }
+
+    public static void PrintException(Exception ex, bool verbose)
+    {
+#if PRINT_EXCEPTION_INFO
+            TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
+#else
+        if (!verbose)
+        {
+            try
+            {
+                if (ProjectFileDeserializer.DassieConfig.PrintExceptionInfo)
+                    TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
+            }
+            catch { }
+        }
+#endif
     }
 }

@@ -49,7 +49,7 @@ internal class AotCompiler
                 0, 0, 0,
                 DS0210_CrossSystemAotCompilation,
                 $"Cross-system ahead-of-time compilation is not supported.",
-                "dc");
+                CompilerExecutableName);
 
             return false;
         }

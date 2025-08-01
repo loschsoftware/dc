@@ -67,7 +67,7 @@ internal class RunCommand : ICompilerCommand
                     0, 0, 0,
                     DS0105_DCRunInsufficientInfo,
                     "Insufficient information for 'dc run': The files to execute could not be determined. Create a project file (dsconfig.xml) and set the required properties 'BuildDirectory' and 'AssemblyFileName' to enable this command.",
-                    "dc");
+                    CompilerExecutableName);
 
                 return -1;
             }
@@ -88,7 +88,7 @@ internal class RunCommand : ICompilerCommand
                         0, 0, 0,
                         DS0105_DCRunInsufficientInfo,
                         "Project group does not define an executable project.",
-                        "dc");
+                        CompilerExecutableName);
 
                     return -1;
                 }
@@ -111,7 +111,7 @@ internal class RunCommand : ICompilerCommand
                         0, 0, 0,
                         DS0209_ProjectGroupExecutableInvalid,
                         $"The executable component '{config.ProjectGroup.ExecutableComponent}' could not be found.",
-                        "dc");
+                        CompilerExecutableName);
 
                     return -1;
                 }
@@ -124,7 +124,7 @@ internal class RunCommand : ICompilerCommand
                         0, 0, 0,
                         DS0209_ProjectGroupExecutableInvalid,
                         "Currently, project group executables can only be projects.",
-                        "dc");
+                        CompilerExecutableName);
 
                     return -1;
                 }
@@ -139,7 +139,7 @@ internal class RunCommand : ICompilerCommand
                     0, 0, 0,
                     DS0124_DCRunInvalidProjectType,
                     "The current project cannot be executed. Projects with an application type of 'Library' are not executable.",
-                    "dc");
+                    CompilerExecutableName);
 
                 return -1;
             }

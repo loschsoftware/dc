@@ -51,7 +51,7 @@ internal static class PackageDownloader
                     0, 0, 0,
                     DS0103_NetworkError,
                     $"Could not download package '{packageId}'.",
-                    "dc");
+                    CompilerExecutableName);
 
                 return "";
             }
@@ -72,7 +72,7 @@ internal static class PackageDownloader
                     0, 0, 0,
                     DS0104_InvalidPackageReference,
                     $"Version '{version}' not found in package '{packageId}'. Using latest version instead, which is '{targetVersion.ToFullString()}'.",
-                    "dc");
+                    CompilerExecutableName);
             }
         }
 

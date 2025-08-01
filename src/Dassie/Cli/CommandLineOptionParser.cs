@@ -56,7 +56,7 @@ internal static class CommandLineOptionParser
                     EmitErrorMessage(0, 0, 0,
                         DS0089_InvalidDSConfigProperty,
                         $"Expected argument for option '{arg}' (alias for '{option}').",
-                        "dc");
+                        CompilerExecutableName);
 
                     continue;
                 }
@@ -79,7 +79,7 @@ internal static class CommandLineOptionParser
                     0, 0, 0,
                     DS0089_InvalidDSConfigProperty,
                     $"Invalid flag '{flag[1..]}'.",
-                    "dc");
+                    CompilerExecutableName);
             }
 
             return;
@@ -122,7 +122,7 @@ internal static class CommandLineOptionParser
                     0, 0, 0,
                     DS0089_InvalidDSConfigProperty,
                     $"Invalid option '{arg[2..]}'.",
-                    "dc");
+                    CompilerExecutableName);
             }
         }
     }
@@ -168,7 +168,7 @@ internal static class CommandLineOptionParser
                     0, 0, 0,
                     DS0089_InvalidDSConfigProperty,
                     $"Invalid property value for '{prop.Name}': '{value}' cannot be converted to '{prop.PropertyType.FullName}'.",
-                    "dc");
+                    CompilerExecutableName);
             }
 
             prop.SetValue(config, val);
@@ -179,7 +179,7 @@ internal static class CommandLineOptionParser
             0, 0, 0,
             DS0089_InvalidDSConfigProperty,
             $"Invalid option '{identifier}'.",
-            "dc");
+            CompilerExecutableName);
     }
 
     public static void ParseArrayOption(string arg, DassieConfig config)
@@ -199,7 +199,7 @@ internal static class CommandLineOptionParser
                     0, 0, 0,
                     DS0022_InvalidAssemblyReference,
                     $"Reference '{value}' could not be resolved.",
-                    "dc");
+                    CompilerExecutableName);
 
                 return;
             }
@@ -318,7 +318,7 @@ internal static class CommandLineOptionParser
                     0, 0, 0,
                     DS0089_InvalidDSConfigProperty,
                     $"Invalid property value for '{_prop.Name}': '{value}' cannot be converted to '{_prop.PropertyType.FullName}'.",
-                    "dc");
+                    CompilerExecutableName);
             }
 
             if ("versioninfo".StartsWith(obj))

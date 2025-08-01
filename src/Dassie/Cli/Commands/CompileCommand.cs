@@ -101,7 +101,7 @@ internal class CompileCommand : ICompilerCommand
                     0, 0, 0,
                     DS0029_FileAccessDenied,
                     $"Could not create build output directory: {ex.Message}",
-                    "dc");
+                    CompilerExecutableName);
             }
         }
 
@@ -168,7 +168,7 @@ internal class CompileCommand : ICompilerCommand
                     0, 0, 0,
                     DS0029_FileAccessDenied,
                     ex.Message,
-                    "dc");
+                    CompilerExecutableName);
             }
 
             return new InputDocument(text, f);
@@ -420,7 +420,7 @@ internal class CompileCommand : ICompilerCommand
                     0, 0, 0,
                     DS0029_FileAccessDenied,
                     $"Output assembly could not be saved: {ex.Message}",
-                    "dc");
+                    CompilerExecutableName);
             }
 
             peBlob.WriteContentTo(fs);
@@ -693,7 +693,7 @@ internal class CompileCommand : ICompilerCommand
                     0, 0, 0,
                     DS0100_InvalidCommand,
                     errorMsg.ToString(),
-                    "dc");
+                    CompilerExecutableName);
 
                 Environment.Exit(-1);
             }

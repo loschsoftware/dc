@@ -239,7 +239,7 @@ internal class PackageCommand : ICompilerCommand
             0, 0, 0,
             DS0063_UnsupportedFeature,
             "Installing and updating packages from the internet is not yet supported.",
-            "dc");
+            CompilerExecutableName);
 
         return 0;
     }

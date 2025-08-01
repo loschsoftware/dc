@@ -61,7 +61,7 @@ internal class AnalyzeCommand : ICompilerCommand
                     0, 0, 0,
                     DS0211_UnexpectedArgument,
                     $"Unexpected argument '{arg}'.",
-                    "dc");
+                    CompilerExecutableName);
             }
 
             return -1;
@@ -91,7 +91,7 @@ internal class AnalyzeCommand : ICompilerCommand
                     0, 0, 0,
                     DS0134_DCAnalyzeInvalidAnalyzer,
                     $"The analyzer '{analyzerName}' could not be found.",
-                    "dc");
+                    CompilerExecutableName);
 
                 return -1;
             }
@@ -135,7 +135,7 @@ internal class AnalyzeCommand : ICompilerCommand
                 0, 0, 0,
                 DS0133_DCAnalyzeNoProjectFile,
                 "The current directory contains no project file.",
-                file: "dc");
+                file: CompilerExecutableName);
 
             return -1;
         }

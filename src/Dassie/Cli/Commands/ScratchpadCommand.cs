@@ -72,7 +72,7 @@ internal class ScratchpadCommand : ICompilerCommand
                     0, 0, 0,
                     DS0098_ScratchNotFound,
                     $"The scratch '{name}' could not be found.",
-                    "dc");
+                    CompilerExecutableName);
 
                 return -1;
             }
@@ -95,7 +95,7 @@ internal class ScratchpadCommand : ICompilerCommand
                     0, 0, 0,
                     DS0098_ScratchNotFound,
                     $"The scratch '{name}' could not be found.",
-                    "dc");
+                    CompilerExecutableName);
 
                 return -1;
             }

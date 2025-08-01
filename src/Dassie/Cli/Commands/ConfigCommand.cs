@@ -34,7 +34,7 @@ internal class ConfigCommand : ICompilerCommand
                     0, 0, 0,
                     DS0211_UnexpectedArgument,
                     $"Unexpected argument '{arg}'.",
-                    "dc");
+                    CompilerExecutableName);
             }
 
             return -1;

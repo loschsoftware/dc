@@ -89,7 +89,7 @@ internal static class ExtensionLoader
             EmitErrorMessage(0, 0, 0,
                 DS0221_ExtensionFileNotFound,
                 $"Extension package '{assembly}' could not be found.",
-                "dc");
+                CompilerExecutableName);
 
             return [];
         }
@@ -112,7 +112,7 @@ internal static class ExtensionLoader
                         0, 0, 0,
                         DS0222_ExtensionUnsupportedMode,
                         $"The extension '{package.Metadata.Name}' cannot be loaded in transient mode.",
-                        "dc");
+                        CompilerExecutableName);
 
                     continue;
                 }
@@ -123,7 +123,7 @@ internal static class ExtensionLoader
                         0, 0, 0,
                         DS0222_ExtensionUnsupportedMode,
                         $"The extension '{package.Metadata.Name}' cannot be loaded in global mode.",
-                        "dc");
+                        CompilerExecutableName);
 
                     continue;
                 }
@@ -141,7 +141,7 @@ internal static class ExtensionLoader
                         0, 0, 0,
                         DS0223_ExtensionInitializerFailed,
                         $"The extension initializer of '{package.Metadata.Name}' threw an exception.",
-                        "dc");
+                        CompilerExecutableName);
 
                     if (Context.Configuration.PrintExceptionInfo)
                         TextWriterBuildLogDevice.ErrorOut.WriteLine(ex.ToString());
@@ -155,7 +155,7 @@ internal static class ExtensionLoader
                         0, 0, 0,
                         DS0223_ExtensionInitializerFailed,
                         $"The extension initializer of '{package.Metadata.Name}' exited with a nonzero status code.",
-                        "dc");
+                        CompilerExecutableName);
 
                     continue;
                 }
@@ -166,7 +166,7 @@ internal static class ExtensionLoader
                         0, 0, 0,
                         DS0224_ExtensionDuplicateMode,
                         $"Extension '{package.Metadata.Name}' was loaded twice in different modes. Global mode will be unloaded.",
-                        "dc");
+                        CompilerExecutableName);
 
                     IPackage duplicate = _installedExtensions.First(p => p.Metadata.Id == package.Metadata.Id);
                     Unload(duplicate);
@@ -184,7 +184,7 @@ internal static class ExtensionLoader
             EmitWarningMessage(0, 0, 0,
                 DS0123_InvalidExtensionPackage,
                 $"Extension package '{extensionAssembly.GetName().Name}' is malformed and will be ignored.",
-                "dc");
+                CompilerExecutableName);
         }
 
         return packages;
@@ -202,7 +202,7 @@ internal static class ExtensionLoader
                 0, 0, 0,
                 DS0223_ExtensionInitializerFailed,
                 $"Finalizer of extension '{package.Metadata.Name}' threw an exception.",
-                "dc");
+                CompilerExecutableName);
 
             if (Context.Configuration.PrintExceptionInfo)
                 TextWriterBuildLogDevice.ErrorOut.WriteLine(ex.ToString());
@@ -239,7 +239,7 @@ internal static class ExtensionLoader
                         0, 0, 0,
                         DS0099_DuplicateCompilerCommand,
                         errMsg.ToString(),
-                        "dc");
+                        CompilerExecutableName);
                 }
 
                 commands.Add(cmd);

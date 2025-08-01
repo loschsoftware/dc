@@ -66,7 +66,7 @@ public static class ErrorWriter
                 0, 0, 0,
                 DS0215_ExtensionThrewException,
                 $"An unhandled exception of type '{ex.GetType()}' was caused by the build log device '{device.Name}'. This build log device will be disabled for the rest of the compilation.",
-                "dc");
+                CompilerExecutableName);
             
             try
             {
