@@ -920,5 +920,25 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an extension is loaded multiple times in different modes.
     /// </summary>
-    DS0224_ExtensionDuplicateMode
+    DS0224_ExtensionDuplicateMode,
+    /// <summary>
+    /// Emitted when an exception occured while loading extensions from a remote source.
+    /// </summary>
+    DS0225_RemoteExtensionException,
+    /// <summary>
+    /// Emitted when the 'dc package install' command is used but the specified extension couldn't be found.
+    /// </summary>
+    DS0226_PackageInstallNotFound,
+    /// <summary>
+    /// Emitted when the 'dc package source' command is invoked with an invalid set of arguments.
+    /// </summary>
+    DS0227_PackageSourceInvalidArguments,
+    /// <summary>
+    /// Emitted when the 'dc package install' command is used but the specified extension is already installed.
+    /// </summary>
+    DS0228_PackageInstallAlreadyInstalled,
+    /// <summary>
+    /// Emitted when an operation was successful.
+    /// </summary>
+    DS0229_Success
 }

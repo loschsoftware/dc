@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using Dassie.Extensions;
+using Dassie.Extensions.Web;
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,6 @@ internal class PackageCommand : ICompilerCommand
         commandsSb.Append($"{"    import <Path> [-o] [-g]",-35}{HelpCommand.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
         commandsSb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
         commandsSb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
-        commandsSb.Append($"{"    source [Command] [Options]",-35}{HelpCommand.FormatLines("Manages extension sources. Use 'dc package source help' for a list of commands.", indentWidth: 35)}");
         commandsSb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
 
         return new()
@@ -58,6 +58,9 @@ internal class PackageCommand : ICompilerCommand
 
         if (args.Length == 0)
             args = ["help"];
+
+        if (args.Any(a => a.StartsWith("--source=")))
+            ExtensionDownloader.Source = args.First(a => a.StartsWith("--source="))[9..];
 
         string command = args[0];
 
@@ -88,9 +91,6 @@ internal class PackageCommand : ICompilerCommand
 
         if (command == "update" && args.Length > 1)
             return Update(args[1]);
-
-        if (command == "source")
-            return ExtensionSourceManager.HandleArgs(args);
 
         return ShowUsage();
     }
@@ -235,12 +235,35 @@ internal class PackageCommand : ICompilerCommand
 
     private static int Install(string name)
     {
-        EmitErrorMessage(
-            0, 0, 0,
-            DS0063_UnsupportedFeature,
-            "Installing and updating packages from the internet is not yet supported.",
-            CompilerExecutableName);
+        List<ExtensionMetadata> extensions = ExtensionDownloader.GetPackagesAsync(name).Result;
 
+        if (extensions == null || extensions.Count == 0)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0226_PackageInstallNotFound,
+                $"The extension '{name}' could not be found.",
+                CompilerExecutableName);
+
+            return -1;
+        }
+
+        (byte[] dataBytes, string fileName) = ExtensionDownloader.DownloadExtension(extensions[0]).Result;
+        string path = Path.Combine(ExtensionLoader.DefaultExtensionSource, fileName);
+
+        if (File.Exists(path))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0228_PackageInstallAlreadyInstalled,
+                $"The extension '{name}' is already installed. Use the 'dc package update' command to update it to the newest version.",
+                CompilerExecutableName);
+
+            return -1;
+        }
+
+        File.WriteAllBytes(path, dataBytes);
+        EmitMessage(0, 0, 0, DS0229_Success, $"Successfully installed extension '{name}', version {extensions[0].Metadata.Version}.", CompilerExecutableName);
         return 0;
     }
 
@@ -335,7 +358,13 @@ internal class PackageCommand : ICompilerCommand
 
     private static int Update(string name)
     {
-        throw new NotImplementedException("Installing and updating packages from the internet is not yet implemented.");
+        EmitErrorMessage(
+            0, 0, 0,
+            DS0063_UnsupportedFeature,
+            "This command is not yet implemented.",
+            CompilerExecutableName);
+
+        return -1;
     }
 
     private static int ShowUsage() => HelpCommand.Instance.Invoke(["package"]);

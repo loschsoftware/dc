@@ -36,7 +36,7 @@ internal class AnalyzingListener : DassieParserBaseListener
         if (context.Var() != null && char.IsUpper(context.Identifier().GetIdentifier()[0]))
         {
             Messages.Add(ErrorHelper.GetError(
-                AnalysisErrorKind.DS5001_NamingConvention,
+                AnalysisErrorKind.DS2001_NamingConvention,
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
@@ -53,7 +53,7 @@ internal class AnalyzingListener : DassieParserBaseListener
         if (!_isInModule && context.parameter_list() != null && (context.member_special_modifier() == null || !context.member_special_modifier().Any(m => m.Static() != null)) && char.IsLower(id[0]))
         {
             Messages.Add(ErrorHelper.GetError(
-                AnalysisErrorKind.DS5001_NamingConvention,
+                AnalysisErrorKind.DS2001_NamingConvention,
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
@@ -64,7 +64,7 @@ internal class AnalyzingListener : DassieParserBaseListener
         if (context.attribute().Any(a => a.type_name().GetText() == "EntryPoint") && id != "Main")
         {
             Messages.Add(ErrorHelper.GetError(
-                AnalysisErrorKind.DS5002_EntryPointWrongName,
+                AnalysisErrorKind.DS2002_EntryPointWrongName,
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
@@ -81,7 +81,7 @@ internal class AnalyzingListener : DassieParserBaseListener
         if (char.IsLower(context.Identifier().GetIdentifier()[0]))
         {
             Messages.Add(ErrorHelper.GetError(
-                AnalysisErrorKind.DS5001_NamingConvention,
+                AnalysisErrorKind.DS2001_NamingConvention,
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
@@ -99,7 +99,7 @@ internal class AnalyzingListener : DassieParserBaseListener
         if (string.IsNullOrEmpty(_exportedNamespace) && attribs.HasFlag(TypeAttributes.Public))
         {
             Messages.Add(ErrorHelper.GetError(
-                AnalysisErrorKind.DS5003_TypeOutsideNamespace,
+                AnalysisErrorKind.DS2003_TypeOutsideNamespace,
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
@@ -122,7 +122,7 @@ internal class AnalyzingListener : DassieParserBaseListener
             if (char.IsLower(context.Identifier().GetIdentifier()[0]))
             {
                 Messages.Add(ErrorHelper.GetError(
-                    AnalysisErrorKind.DS5001_NamingConvention,
+                    AnalysisErrorKind.DS2001_NamingConvention,
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
@@ -136,7 +136,7 @@ internal class AnalyzingListener : DassieParserBaseListener
         if (char.IsUpper(context.Identifier().GetIdentifier()[0]))
         {
             Messages.Add(ErrorHelper.GetError(
-                AnalysisErrorKind.DS5001_NamingConvention,
+                AnalysisErrorKind.DS2001_NamingConvention,
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
