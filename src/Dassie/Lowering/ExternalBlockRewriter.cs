@@ -1,5 +1,4 @@
-﻿using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
+﻿using Antlr4.Runtime.Tree;
 using Dassie.Parser;
 using System;
 using System.Linq;
@@ -63,7 +62,7 @@ internal class ExternalBlockRewriter : ITreeToStringRewriter
             else if (member.Var() != null) startIndex = member.Var().Symbol.StartIndex;
             else if (member.Open_Paren() != null) startIndex = member.Open_Paren().Symbol.StartIndex;
             else if (member.Custom_Operator() != null) startIndex = member.Custom_Operator().Symbol.StartIndex;
-            else startIndex = member.Identifier().Symbol.StartIndex;
+            else if (member.Identifier() != null) startIndex = member.Identifier().Symbol.StartIndex;
             
             sb.AppendLine(listener.CharStream.GetText(new(startIndex, member.Stop.StopIndex)));
         }
