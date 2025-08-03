@@ -381,8 +381,8 @@ internal static class TypeHelpers
 
         if (type.IsArray || type.IsByRef || type.IsPointer)
         {
-            Type elem = type.GetElementType();
-            name = elem.FullName ?? elem.Name;
+            type = type.GetElementType();
+            name = type.FullName ?? type.Name;
         }
 
         if (type.IsGenericType)
@@ -402,20 +402,24 @@ internal static class TypeHelpers
     public static string Format(Type type)
     {
         StringBuilder name = new(GetTypeNameOrAlias(type));
+        Type elem = type;
 
-        if (type.IsGenericType)
+        if (type.IsArray || type.IsByRef || type.IsPointer)
+            elem = type.GetElementType();
+
+        if (elem.IsGenericType)
         {
             name.Clear();
-            name.Append(GetTypeNameOrAlias(type));
+            name.Append(GetTypeNameOrAlias(elem));
             name.Append('[');
-
-            foreach (Type typeArg in type.GetGenericArguments()[..^1])
+            
+            foreach (Type typeArg in elem.GetGenericArguments()[..^1])
             {
-                name.Append(Format(typeArg));
+                name.Append(TypeName(typeArg));
                 name.Append(", ");
             }
 
-            name.Append(Format(type.GetGenericArguments().Last()));
+            name.Append(TypeName(type.GetGenericArguments().Last()));
             name.Append(']');
         }
 
