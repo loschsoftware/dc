@@ -547,17 +547,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(void);
         }
 
-        MethodContext mc = TypeContext.Current.GetMethod(context);
-        MethodBuilder mb = mc.Builder;
-        CurrentMethod = mc;
-
-        if (CurrentMethod.IsLiteral)
-            CurrentMethod.Builder.SetCustomAttribute(new(typeof(ConstantAttribute).GetConstructor([]), []));
-
         Type _tReturn = typeof(object);
 
         if (context.parameter_list() != null || _tReturn == typeof(void))
         {
+            MethodContext mc = TypeContext.Current.GetMethod(context);
+            MethodBuilder mb = mc.Builder;
+            CurrentMethod = mc;
+
+            if (CurrentMethod.IsLiteral)
+                CurrentMethod.Builder.SetCustomAttribute(new(typeof(ConstantAttribute).GetConstructor([]), []));
+
             _tReturn = mb.ReturnType;
 
             InjectClosureParameterInitializers();
