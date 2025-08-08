@@ -80,4 +80,9 @@ public interface IPackage
     /// An array of compiler directives.
     /// </summary>
     public virtual ICompilerDirective[] CompilerDirectives() => [];
+
+    /// <summary>
+    /// An array of document sources.
+    /// </summary>
+    public virtual IDocumentSource[] DocumentSources() => [];
 }

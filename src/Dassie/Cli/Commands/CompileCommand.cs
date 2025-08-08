@@ -176,6 +176,7 @@ internal class CompileCommand : ICompilerCommand
         }).ToList();
 
         documents.AddRange(DocumentCommandLineManager.ExtractDocuments(documentArgs));
+        documents.AddRange(DocumentSourceManager.GetDocuments(Context.Configuration));
 
         if (Context.Configuration.Verbosity >= 2)
         {

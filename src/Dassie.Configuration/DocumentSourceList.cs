@@ -3,10 +3,10 @@ using System.Xml;
 
 namespace Dassie.Configuration;
 
+[XmlRoot("DocumentSources")]
 [Serializable]
-[XmlRoot("Devices")]
-public class BuildLogOptions
+public class DocumentSourceList
 {
     [XmlAnyElement]
-    public List<XmlElement> Elements { get; set; }
+    public List<XmlElement> Sources { get; set; }
 }

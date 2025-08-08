@@ -944,5 +944,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a function declared as a <c>&lt;Predicate&gt;</c> does not return a value of type <see cref="bool"/>.
     /// </summary>
-    DS0230_PredicateFunctionNotBoolean
+    DS0230_PredicateFunctionNotBoolean,
+    /// <summary>
+    /// Emitted when a specified document source cannot be found.
+    /// </summary>
+    DS0231_DocumentSourceNotFound,
+    /// <summary>
+    /// Emitted when multiple active document sources generate the same document name.
+    /// </summary>
+    DS0232_DocumentSourcesDuplicateDocumentName
 }

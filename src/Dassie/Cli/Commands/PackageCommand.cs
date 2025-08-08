@@ -228,6 +228,15 @@ internal class PackageCommand : ICompilerCommand
                 sb.AppendLine($"    {directive.Identifier}");
         }
 
+        if (package.DocumentSources().Length != 0)
+        {
+            sb.AppendLine();
+            WriteHeading("Document sources");
+
+            foreach (IDocumentSource source in package.DocumentSources())
+                sb.AppendLine($"    {source.Name}: '{source.DocumentName}'");
+        }
+
         HelpCommand.DisplayLogo();
         Console.WriteLine(sb.ToString());
         return 0;

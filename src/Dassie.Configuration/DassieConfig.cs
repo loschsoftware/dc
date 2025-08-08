@@ -263,6 +263,11 @@ public sealed class DassieConfig
     [DefaultValue(null)]
     [XmlArray]
     public List<Extension> Extensions { get; set; }
+
+    [Description("Configures the active document sources provided by compiler extensions.")]
+    [DefaultValue(null)]
+    [XmlElement]
+    public DocumentSourceList DocumentSources { get; set; }
 }
 
 [Serializable]
