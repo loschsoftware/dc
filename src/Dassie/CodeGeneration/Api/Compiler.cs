@@ -79,6 +79,9 @@ public static class Compiler
             ConfigurationPath = configFileName
         };
 
+        if (string.IsNullOrEmpty(config.AssemblyName))
+            config.AssemblyName = "program";
+
         Context.FilePaths.AddRange(documents.Select(d => d.Name));
         string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
 
