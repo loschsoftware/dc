@@ -131,7 +131,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 SetColor();
             }
 
-            string errCode = error.ErrorCode == ErrorKind.CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
+            string errCode = error.ErrorCode == CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
             string codePos = "\b";
 
             // Legacy colors
@@ -149,17 +149,22 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
             if (!error.HideCodePosition)
                 codePos = $"({error.CodePosition.Line},{error.CodePosition.Column})";
 
+            string fileError = Path.GetFileName(error.File);
+
+            if (string.IsNullOrEmpty(fileError))
+                fileError = error.File;
+
             if (error.Severity == Severity.BuildLogMessage)
                 outBuilder.AppendLine($"{error.ErrorMessage}");
             else
             {
-                if (!error.HideCodePosition || !string.IsNullOrEmpty(Path.GetFileName(error.File)))
+                if (!error.HideCodePosition || !string.IsNullOrEmpty(fileError))
                 {
                     SetColorRgb(120, 120, 120);
 
-                    if (!string.IsNullOrEmpty(Path.GetFileName(error.File)))
+                    if (!string.IsNullOrEmpty(fileError))
                     {
-                        outBuilder.Append(Path.GetFileName(error.File));
+                        outBuilder.Append(fileError);
                         outBuilder.Append(' ');
                     }
 

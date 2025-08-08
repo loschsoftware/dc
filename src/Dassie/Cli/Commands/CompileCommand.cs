@@ -665,7 +665,16 @@ internal class CompileCommand : ICompilerCommand
             directory = "./";
 
         string filePattern = Path.GetFileName(pattern);
-        string[] matchingFiles = Directory.GetFiles(directory, filePattern);
+        string[] matchingFiles = [];
+
+        if (string.IsNullOrEmpty(filePattern))
+            filePattern = pattern;
+
+        try
+        {
+            matchingFiles = Directory.GetFiles(directory, filePattern);
+        }
+        catch { }
 
         if (filePattern.Contains('*') || filePattern.Contains('?'))
         {
@@ -706,7 +715,7 @@ internal class CompileCommand : ICompilerCommand
                 0, 0, 0,
                 DS0048_SourceFileNotFound,
                 $"The source file '{filePattern}' could not be found.",
-                Path.GetFileName(filePattern));
+                filePattern);
         }
 
         return matchingFiles;
