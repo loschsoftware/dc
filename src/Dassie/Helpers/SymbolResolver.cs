@@ -33,6 +33,17 @@ internal static class SymbolResolver
         public Type Type { get; init; }
     }
 
+    public static string GetIdentifier(this DassieParser.Identifier_atomContext atom)
+    {
+        if (atom == null)
+            return null;
+
+        if (atom.Identifier() != null)
+            return atom.Identifier().GetIdentifier();
+
+        return string.Join('.', atom.full_identifier().Identifier().Select(i => i.GetIdentifier()));
+    }
+
     public static string GetIdentifier(this ITerminalNode identifier)
     {
         if (identifier == null)
@@ -1308,8 +1319,10 @@ internal static class SymbolResolver
         return t;
     }
 
-    private static Type GetAliasedType(Type t, string name, int row, int col, int len, Generics.GenericArgumentContext[] genericArgs, bool noEmitDS0149, bool noErrors)
+    private static TypeSymbol GetAliasedType(TypeSymbol ts, string name, int row, int col, int len, Generics.GenericArgumentContext[] genericArgs, bool noEmitDS0149, bool noErrors)
     {
+        Type t = ts.RawType;
+
         if (t == null)
             return t;
 
@@ -1330,8 +1343,8 @@ internal static class SymbolResolver
             {
                 Type aliasType = alias.AliasedType;
 
-                // Special cases for Vector[T], Array[T, D] and Buffer[T, L]
-                // TODO: Support Buffer[T, L] properly
+                // Special cases for Vector[T], Array[T, 'D] and Buffer[T, 'L]
+                // TODO: Support Buffer properly
                 if (aliasType == typeof(Vector<>) || aliasType == typeof(Buffer<,>))
                 {
                     Type elemType = t.GetGenericArguments()[0];
@@ -1427,9 +1440,9 @@ internal static class SymbolResolver
         return t;
     }
 
-    public static Type ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
+    public static TypeSymbol ResolveTypeName(DassieParser.Type_nameContext name, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
     {
-        Type t = ResolveTypeNameInternal(name, out Generics.GenericArgumentContext[] genericArgs, noEmitFragments, noEmitDS0149, noErrors, disableBacktickGenericResolve);
+        TypeSymbol t = ResolveTypeNameInternal(name, out Generics.GenericArgumentContext[] genericArgs, noEmitFragments, noEmitDS0149, noErrors, disableBacktickGenericResolve);
         return GetAliasedType(
             t,
             name.GetText(),
@@ -1441,7 +1454,7 @@ internal static class SymbolResolver
             noErrors);
     }
 
-    private static Type ResolveTypeNameInternal(DassieParser.Type_nameContext name, out Generics.GenericArgumentContext[] genericArgs, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
+    private static TypeSymbol ResolveTypeNameInternal(DassieParser.Type_nameContext name, out Generics.GenericArgumentContext[] genericArgs, bool noEmitFragments = false, bool noEmitDS0149 = false, bool noErrors = false, bool disableBacktickGenericResolve = false)
     {
         genericArgs = null;
 
@@ -1524,7 +1537,7 @@ internal static class SymbolResolver
         return null;
     }
 
-    public static Type ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Generics.GenericArgumentContext[] genericParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
+    public static TypeSymbol ResolveTypeName(string name, int row = 0, int col = 0, int len = 0, bool noEmitFragments = false, Generics.GenericArgumentContext[] genericParams = null, int arrayDimensions = 0, bool noErrors = false, bool disableBacktickGenericResolve = false, bool doNotFillGenericTypeDefinition = false)
     {
         Type t = ResolveTypeNameInternal(name, row, col, len, noEmitFragments, genericParams, arrayDimensions, noErrors, disableBacktickGenericResolve, doNotFillGenericTypeDefinition);
         return GetAliasedType(

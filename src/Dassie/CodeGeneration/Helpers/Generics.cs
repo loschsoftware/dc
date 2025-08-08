@@ -28,6 +28,10 @@ internal static class Generics
 
             if (context.generic_argument()[i].type_name() != null)
                 ctx.Type = SymbolResolver.ResolveTypeName(context.generic_argument()[i].type_name());
+            else if (context.generic_argument()[i].predicate() != null)
+            {
+                throw new NotImplementedException();
+            }
             else
             {
                 Expression expr = ExpressionEvaluator.Instance.Visit(context.generic_argument()[i].expression());

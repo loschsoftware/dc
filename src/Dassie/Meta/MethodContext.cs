@@ -192,6 +192,8 @@ internal class MethodContext
 
     public List<GenericParameterContext> TypeParameters { get; set; } = [];
 
+    public List<string> TypeParameterNames { get; set; } = [];
+
     public List<SymbolInfo> CapturedSymbols { get; set; } = [];
 
     public List<MethodContext> LocalFunctions { get; set; } = [];

@@ -252,7 +252,7 @@ generic_parameter_list
 
 generic_parameter
     : generic_parameter_attribute* generic_parameter_variance? Identifier (Colon type_name (Comma type_name)*)?
-    | (Single_Quote | Double_Quote) Identifier (Colon type_name)? parameter_constraint?
+    | (Single_Quote | Double_Quote) Identifier (Colon type_name)?
     ;
 
 generic_parameter_attribute
@@ -327,11 +327,7 @@ parameter_modifier
     ;
 
 parameter
-    : attribute? (Val | Var)? parameter_modifier? Identifier Double_Dot? (Colon type_name)? parameter_constraint? (Equals expression)?
-    ;
-
-parameter_constraint
-    : Question_Mark? Open_Brace expression Close_Brace
+    : attribute? (Val | Var)? parameter_modifier? Identifier Double_Dot? (Colon type_name)? (Equals expression)?
     ;
 
 type_block
@@ -362,6 +358,29 @@ generic_arg_list
 generic_argument
     : type_name
     | expression
+    | predicate
+    ;
+
+predicate
+    : identifier_atom Exclamation_Mark
+    | inline_predicate
+    ;
+
+inline_predicate
+    : inline_predicate Double_Ampersand inline_predicate
+    | inline_predicate Double_Bar inline_predicate
+    | inline_predicate_atom
+    ;
+
+inline_predicate_atom
+    : Less_Than expression
+    | Less_Equals expression
+    | Greater_Than expression
+    | Greater_Equals expression
+    | Double_Equals expression
+    | Exclamation_Equals expression
+    | Exclamation_Mark expression
+    | Custom_Operator expression
     ;
 
 assignment_operator

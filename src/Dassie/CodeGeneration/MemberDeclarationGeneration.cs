@@ -281,12 +281,7 @@ internal static class MemberDeclarationGeneration
             }
 
             if (attrib.HasFlag(MethodAttributes.PinvokeImpl))
-            {
-                // TODO: Implement P/Invoke methods
-                //MethodBuilder pInvokeMethod = TypeContext.Current.Builder.DefinePInvokeMethod();
-
                 return;
-            }
 
             MethodInfo ovr = null;
 
@@ -335,11 +330,12 @@ internal static class MemberDeclarationGeneration
 
             if (context.generic_parameter_list() != null)
             {
-                List<GenericParameterContext> typeParamContexts = [];
+                CurrentMethod.TypeParameterNames = context.generic_parameter_list().generic_parameter().Select(p => p.Identifier().GetIdentifier()).ToList();
+                CurrentMethod.TypeParameters = [];
 
                 foreach (DassieParser.Generic_parameterContext typeParam in context.generic_parameter_list().generic_parameter())
                 {
-                    if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetIdentifier()))
+                    if (CurrentMethod.TypeParameters.Any(p => p.Name == typeParam.Identifier().GetIdentifier()))
                     {
                         EmitErrorMessage(
                             typeParam.Start.Line,
@@ -361,21 +357,19 @@ internal static class MemberDeclarationGeneration
                             $"The type parameter '{typeParam.Identifier().GetIdentifier()}' is already declared by the containing type '{Format(TypeContext.Current.Builder)}'.");
                     }
 
-                    typeParamContexts.Add(BuildTypeParameter(typeParam));
+                    CurrentMethod.TypeParameters.Add(BuildTypeParameter(typeParam));
                 }
 
-                GenericTypeParameterBuilder[] typeParams = mb.DefineGenericParameters(typeParamContexts.Select(t => t.Name).ToArray());
+                GenericTypeParameterBuilder[] typeParams = mb.DefineGenericParameters(CurrentMethod.TypeParameters.Select(t => t.Name).ToArray());
                 foreach (GenericTypeParameterBuilder typeParam in typeParams)
                 {
-                    GenericParameterContext tpc = typeParamContexts.First(c => c.Name == typeParam.Name);
+                    GenericParameterContext tpc = CurrentMethod.TypeParameters.First(c => c.Name == typeParam.Name);
                     typeParam.SetGenericParameterAttributes(tpc.Attributes);
                     typeParam.SetBaseTypeConstraint(tpc.BaseTypeConstraint);
                     typeParam.SetInterfaceConstraints(tpc.InterfaceConstraints.ToArray());
 
                     tpc.Builder = typeParam;
                 }
-
-                CurrentMethod.TypeParameters = typeParamContexts;
             }
 
             CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);

@@ -940,5 +940,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an operation was successful.
     /// </summary>
-    DS0229_Success
+    DS0229_Success,
+    /// <summary>
+    /// Emitted when a function declared as a <c>&lt;Predicate&gt;</c> does not return a value of type <see cref="bool"/>.
+    /// </summary>
+    DS0230_PredicateFunctionNotBoolean
 }

@@ -17,5 +17,7 @@ internal class GenericParameterContext
     public bool IsCompileTimeConstant { get; set; }
     public bool IsRuntimeValue { get; set; }
     public Type ValueType { get; set; }
-    public DassieParser.Parameter_constraintContext ValueConstraint { get; set; }
+
+    // TODO: Implement full refinement types + dependent types
+    //public DassieParser.Parameter_constraintContext ValueConstraint { get; set; }
 }

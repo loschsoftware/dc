@@ -5,6 +5,7 @@ using Dassie.Core;
 using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
+using NuGet.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -362,6 +363,21 @@ internal static class AttributeHelpers
 
             CurrentMethod.Builder.InitLocals = (bool)args[0];
             AddAttributeToCurrentMethod(con, args);
+        }
+
+        else if (attribType == typeof(PredicateAttribute))
+        {
+            CurrentMethod.IsLiteral = true;
+
+            if (CurrentMethod.Builder.ReturnType != typeof(bool))
+            {
+                EmitErrorMessage(
+                    context.expression().Start.Line,
+                    context.expression().Start.Column,
+                    context.expression().GetText().Length,
+                    DS0230_PredicateFunctionNotBoolean,
+                    $"'{CurrentMethod.Builder.Name}': Predicate functions must return a boolean value.");
+            }
         }
     }
 

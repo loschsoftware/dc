@@ -764,7 +764,7 @@ internal static class TypeHelpers
                     valueType = constraint;
                     continue;
                 }
-
+                
                 if (constraint.IsClass)
                 {
                     if (baseTypeConstraint != null)
@@ -807,8 +807,7 @@ internal static class TypeHelpers
             BaseTypeConstraint = baseTypeConstraint,
             IsCompileTimeConstant = context.Single_Quote() != null,
             IsRuntimeValue = context.Double_Quote() != null,
-            ValueType = valueType,
-            ValueConstraint = context.parameter_constraint()
+            ValueType = valueType
         };
     }
 
