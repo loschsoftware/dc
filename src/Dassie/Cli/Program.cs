@@ -59,6 +59,10 @@ internal class Program
         return exit;
     }
 
+    /// <summary>
+    /// Unloads all extensions and exits the application.
+    /// </summary>
+    /// <param name="errorCode">The application exit code.</param>
     public static void Exit(int errorCode)
     {
         if (errorCode == (int)DS0233_CompilationTerminated)
