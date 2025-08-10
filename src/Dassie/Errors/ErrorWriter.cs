@@ -1,4 +1,5 @@
-﻿using Dassie.Configuration;
+﻿using Dassie.Cli;
+using Dassie.Configuration;
 using Dassie.Configuration.Analysis;
 using Dassie.Errors.Devices;
 using Dassie.Extensions;
@@ -133,9 +134,6 @@ public static class ErrorWriter
         if (Messages.Any(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition))
             return;
 
-        if (Context.Configuration.MaxErrors > 0 && error.Severity == Severity.Error && Messages.Count(m => m.Severity == Severity.Error) >= Context.Configuration.MaxErrors)
-            throw new TerminationException();
-
         BuildLogSeverity severity = error.Severity switch
         {
             Severity.Warning => BuildLogSeverity.Warning,
@@ -155,6 +153,9 @@ public static class ErrorWriter
         }
 
         Messages.Add(error);
+
+        if (Context.Configuration.MaxErrors > 0 && Messages.Count(m => m.Severity == Severity.Error) >= Context.Configuration.MaxErrors)
+            Program.Exit((int)DS0233_CompilationTerminated);
     }
 
     /// <summary>

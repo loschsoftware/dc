@@ -38,17 +38,9 @@ internal class Program
                 string command = args[0];
                 if (CommandHandler.TryInvoke(command, args[1..], out int ret))
                     exit = ret;
-                else 
+                else
                     exit = CompileCommand.Instance.Invoke(args);
             }
-        }
-        catch (TerminationException)
-        {
-            EmitMessage(
-                0, 0, 0,
-                DS0233_CompilationTerminated, 
-                $"Compilation terminated after {Messages.Count} error{(Messages.Count > 1 ? "s" : "")}.",
-                CompilerExecutableName);
         }
         catch (Exception ex)
         {
@@ -63,7 +55,25 @@ internal class Program
                 throw;
         }
 
-        ExtensionLoader.UnloadAll();
+        Exit(exit);
         return exit;
+    }
+
+    public static void Exit(int errorCode)
+    {
+        if (errorCode == (int)DS0233_CompilationTerminated)
+        {
+            int msgCount = Messages.Count(e => e.Severity == Severity.Error);
+            Context.Configuration.MaxErrors = 0;
+
+            EmitMessage(
+                0, 0, 0,
+                DS0233_CompilationTerminated,
+                $"Compilation terminated after {msgCount} error{(msgCount > 1 ? "s" : "")}.",
+                CompilerExecutableName);
+        }
+
+        ExtensionLoader.UnloadAll();
+        Environment.Exit(errorCode);
     }
 }
