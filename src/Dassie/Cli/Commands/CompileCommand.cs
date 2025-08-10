@@ -139,7 +139,13 @@ internal class CompileCommand : ICompilerCommand
                 if (cachedFiles.SequenceEqual(currentFiles) && File.Exists(assembly))
                 {
                     if (Context.Configuration.MeasureElapsedTime)
-                        WriteLine($"\r\nElapsed time: {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms");
+                    {
+                        EmitMessage(
+                            0, 0, 0,
+                            DS0234_ElapsedTime,
+                            $"Compilation finished after {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
+                            CompilerExecutableName);
+                    }
 
                     return 0;
                 }
@@ -504,7 +510,13 @@ internal class CompileCommand : ICompilerCommand
         }
 
         if (Context.Configuration.MeasureElapsedTime)
-            WriteLine($"\r\nElapsed time: {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms");
+        {
+            EmitMessage(
+                0, 0, 0,
+                DS0234_ElapsedTime,
+                $"Compilation finished after {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
+                CompilerExecutableName);
+        }
 
         TextWriterBuildLogDevice.InfoOut?.Dispose();
         TextWriterBuildLogDevice.WarnOut?.Dispose();

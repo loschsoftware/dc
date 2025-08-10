@@ -268,6 +268,11 @@ public sealed class DassieConfig
     [DefaultValue(null)]
     [XmlElement]
     public DocumentSourceList DocumentSources { get; set; }
+
+    [Description("Once this number of compilation errors is reached, the build process is stopped immediately.")]
+    [DefaultValue(0)]
+    [XmlElement]
+    public int MaxErrors { get; set; }
 }
 
 [Serializable]

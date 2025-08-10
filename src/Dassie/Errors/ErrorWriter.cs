@@ -133,6 +133,9 @@ public static class ErrorWriter
         if (Messages.Any(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition))
             return;
 
+        if (Context.Configuration.MaxErrors > 0 && error.Severity == Severity.Error && Messages.Count(m => m.Severity == Severity.Error) >= Context.Configuration.MaxErrors)
+            throw new TerminationException();
+
         BuildLogSeverity severity = error.Severity switch
         {
             Severity.Warning => BuildLogSeverity.Warning,

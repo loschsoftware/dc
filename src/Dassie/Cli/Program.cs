@@ -42,6 +42,14 @@ internal class Program
                     exit = CompileCommand.Instance.Invoke(args);
             }
         }
+        catch (TerminationException)
+        {
+            EmitMessage(
+                0, 0, 0,
+                DS0233_CompilationTerminated, 
+                $"Compilation terminated after {Messages.Count} error{(Messages.Count > 1 ? "s" : "")}.",
+                CompilerExecutableName);
+        }
         catch (Exception ex)
         {
             bool verbose = EmitBuildLogMessage($"Unhandled exception occured. {ex}", 2);

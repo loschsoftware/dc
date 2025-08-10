@@ -1,4 +1,5 @@
-﻿using Dassie.Core;
+﻿using Dassie.Configuration;
+using Dassie.Core;
 using Dassie.Meta;
 using System;
 using System.Reflection.Emit;
@@ -952,5 +953,13 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when multiple active document sources generate the same document name.
     /// </summary>
-    DS0232_DocumentSourcesDuplicateDocumentName
+    DS0232_DocumentSourcesDuplicateDocumentName,
+    /// <summary>
+    /// Emitted when the compilation was terminated due to the maximum number of error messages being reached.
+    /// </summary>
+    DS0233_CompilationTerminated,
+    /// <summary>
+    /// Error code for informational messages caused by enabling the <see cref="DassieConfig.MeasureElapsedTime"/> option.
+    /// </summary>
+    DS0234_ElapsedTime
 }
