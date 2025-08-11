@@ -532,20 +532,20 @@ internal class CompileCommand : ICompilerCommand
                     Process.Start(psi);
                 }
             }
+
+            if (Context.Configuration.MeasureElapsedTime)
+            {
+                EmitMessage(
+                    0, 0, 0,
+                    DS0235_ElapsedTime,
+                    $"Compilation finished after {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
+                    CompilerExecutableName);
+            }
         }
         else if (GlobalConfig.BuildDirectoryCreated)
         {
             Directory.SetCurrentDirectory(workingDir);
             Directory.Delete(config.BuildOutputDirectory);
-        }
-
-        if (Context.Configuration.MeasureElapsedTime)
-        {
-            EmitMessage(
-                0, 0, 0,
-                DS0235_ElapsedTime,
-                $"Compilation finished after {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
-                CompilerExecutableName);
         }
 
         TextWriterBuildLogDevice.InfoOut?.Dispose();
