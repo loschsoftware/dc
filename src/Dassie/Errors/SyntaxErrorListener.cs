@@ -13,7 +13,7 @@ internal class ParserErrorListener : BaseErrorListener
         {
             CodePosition = (line, charPositionInLine),
             Length = offendingSymbol.Text.Length,
-            ErrorCode = DS0001_SyntaxError,
+            ErrorCode = DS0002_SyntaxError,
             ErrorMessage = msg,
             File = CurrentFile.Path,
             Severity = Severity.Error
@@ -28,7 +28,7 @@ internal class LexerErrorListener : IAntlrErrorListener<int>
         EmitGeneric(new()
         {
             CodePosition = (line, charPositionInLine),
-            ErrorCode = DS0001_SyntaxError,
+            ErrorCode = DS0002_SyntaxError,
             ErrorMessage = msg,
             File = CurrentFile.Path,
             Severity = Severity.Error

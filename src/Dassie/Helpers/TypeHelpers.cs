@@ -197,7 +197,7 @@ internal static class TypeHelpers
 
             EmitErrorMessage(
                 line, col, length,
-                DS0038_ConditionalExpressionClauseNotBoolean,
+                DS0039_ConditionalExpressionClauseNotBoolean,
                 $"The type '{t.FullName}' cannot be converted to type '{typeof(bool).FullName}'.");
         }
 
@@ -523,7 +523,7 @@ internal static class TypeHelpers
     {
         EmitErrorMessage(
             row, col, len,
-            DS0107_GenericTypeConstraintViolation,
+            DS0108_GenericTypeConstraintViolation,
             $"The generic {(isType ? "type" : "function")} '{name}' requires {paramCount} type argument{(paramCount > 1 ? "s" : "")}, but {(argCount == 0 ? "none" : argCount.ToString())} {(argCount == 1 ? "was" : "were")} specified.");
     }
 
@@ -571,7 +571,7 @@ internal static class TypeHelpers
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0203_InvalidGenericArgument,
+                    DS0204_InvalidGenericArgument,
                     $"Invalid generic argument '{TypeName(arg.Type)}': 'null' cannot be used as a type argument.");
             }
 
@@ -584,7 +584,7 @@ internal static class TypeHelpers
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0203_InvalidGenericArgument,
+                    DS0204_InvalidGenericArgument,
                     $"Invalid generic argument '{TypeName(arg.Type)}': References cannot be used as type arguments.");
             }
 
@@ -602,7 +602,7 @@ internal static class TypeHelpers
                 {
                     EmitErrorMessage(
                         row, col, len,
-                        DS0107_GenericTypeConstraintViolation,
+                        DS0108_GenericTypeConstraintViolation,
                         $"{errMsgStart}'{Format(param)}' only allows reference types.");
                 }
 
@@ -618,7 +618,7 @@ internal static class TypeHelpers
                 {
                     EmitErrorMessage(
                         row, col, len,
-                        DS0107_GenericTypeConstraintViolation,
+                        DS0108_GenericTypeConstraintViolation,
                         $"{errMsgStart}'{Format(param)}' only allows value types.");
                 }
 
@@ -634,7 +634,7 @@ internal static class TypeHelpers
                 {
                     EmitErrorMessage(
                         row, col, len,
-                        DS0107_GenericTypeConstraintViolation,
+                        DS0108_GenericTypeConstraintViolation,
                         $"{errMsgStart}The generic argument needs to define a parameterless constructor.");
                 }
 
@@ -652,7 +652,7 @@ internal static class TypeHelpers
                 {
                     EmitErrorMessage(
                         row, col, len,
-                        DS0107_GenericTypeConstraintViolation,
+                        DS0108_GenericTypeConstraintViolation,
                         $"{errMsgStart}'{Format(arg.Type)}' violates constraint '{Format(constraint)}'.");
 
                     result = false;
@@ -685,7 +685,7 @@ internal static class TypeHelpers
                     context.generic_parameter_variance().Start.Line,
                     context.generic_parameter_variance().Start.Column,
                     context.generic_parameter_variance().GetText().Length,
-                    DS0117_VarianceModifierOnConcreteType,
+                    DS0118_VarianceModifierOnConcreteType,
                     $"The variance modifier '{context.generic_parameter_variance().GetText()}' is invalid on type '{Format(TypeContext.Current.Builder)}'. Only type parameters of template types can have variance modifiers.");
             }
         }
@@ -729,7 +729,7 @@ internal static class TypeHelpers
                         attrib.Start.Line,
                         attrib.Start.Column,
                         attrib.GetText().Length,
-                        DS0110_DuplicateTypeParameterAttributes,
+                        DS0111_DuplicateTypeParameterAttributes,
                         $"Duplicate attribute '{attrib.GetText()}'.");
                 }
             }
@@ -740,7 +740,7 @@ internal static class TypeHelpers
                     context.Start.Line,
                     context.Start.Column,
                     context.GetText().Length,
-                    DS0113_InvalidTypeParameterAttributes,
+                    DS0114_InvalidTypeParameterAttributes,
                     $"The type parameter attributes 'ref' and 'val' are mutually exclusive.");
             }
         }
@@ -773,7 +773,7 @@ internal static class TypeHelpers
                             type.Start.Line,
                             type.Start.Column,
                             type.GetText().Length,
-                            DS0111_DuplicateTypeParameterConstraint,
+                            DS0112_DuplicateTypeParameterConstraint,
                             $"Duplicate base type constraint '{Format(constraint)}': A generic type parameter can only define one base type.");
 
                         continue;
@@ -789,7 +789,7 @@ internal static class TypeHelpers
                         type.Start.Line,
                         type.Start.Column,
                         type.GetText().Length,
-                        DS0111_DuplicateTypeParameterConstraint,
+                        DS0112_DuplicateTypeParameterConstraint,
                         $"Duplicate type constraint '{Format(constraint)}'");
 
                     continue;
@@ -834,7 +834,7 @@ internal static class TypeHelpers
                     typeName.Start.Line,
                     typeName.Start.Column,
                     typeName.GetText().Length,
-                    DS0051_MoreThanOneClassInInheritanceList,
+                    DS0052_MoreThanOneClassInInheritanceList,
                     "A type can only extend one base type."
                     );
             }
@@ -894,7 +894,7 @@ internal static class TypeHelpers
                     unionMember.Identifier().Symbol.Line,
                     unionMember.Identifier().Symbol.Column,
                     unionMemberName.Length,
-                    DS0182_UnionTypeDuplicateTagName,
+                    DS0183_UnionTypeDuplicateTagName,
                     $"{kind} type contains duplicate tag name '{unionMemberName}'.");
             }
 
@@ -904,7 +904,7 @@ internal static class TypeHelpers
                     unionMember.type_name().Start.Line,
                     unionMember.type_name().Start.Column,
                     unionMember.type_name().GetText().Length,
-                    DS0183_UnionTypeDuplicateTagType,
+                    DS0184_UnionTypeDuplicateTagType,
                     $"{kind} type contains multiple tags of type '{unionMemberName}'.");
             }
 
@@ -922,7 +922,7 @@ internal static class TypeHelpers
                 name.Start.Line,
                 name.Start.Column,
                 name.GetText().Length,
-                DS0184_UnionTypeMixedTags,
+                DS0185_UnionTypeMixedTags,
                 $"{kind} type cannot contain mixed named and unnamed tags. All tags need to be either named or unnamed.");
         }
 

@@ -43,7 +43,7 @@ internal static class AttributeHelpers
                 oopModifier.Start.Line,
                 oopModifier.Start.Column,
                 oopModifier.GetText().Length,
-                DS0052_InvalidAccessModifier,
+                DS0053_InvalidAccessModifier,
                 "The modifier 'closed' is not supported by this element.");
         }
 
@@ -66,7 +66,7 @@ internal static class AttributeHelpers
                 modifier.Start.Line,
                 modifier.Start.Column,
                 modifier.GetText().Length,
-                DS0052_InvalidAccessModifier,
+                DS0053_InvalidAccessModifier,
                 $"The modifier '{modifier.GetText()}' is not supported by this element.");
             }
         }
@@ -77,7 +77,7 @@ internal static class AttributeHelpers
                 specialModifiers.First(s => s.GetText() == "static").Start.Line,
                 specialModifiers.First(s => s.GetText() == "static").Start.Column,
                 specialModifiers.First(s => s.GetText() == "static").GetText().Length,
-                DS0058_RedundantModifier,
+                DS0059_RedundantModifier,
                 "The 'static' modifier is implicit for module members and can be omitted.");
         }
 
@@ -120,7 +120,7 @@ internal static class AttributeHelpers
                         oopModifier.Closed().Symbol.Line,
                         oopModifier.Closed().Symbol.Column,
                         oopModifier.Closed().GetText().Length,
-                        DS0058_RedundantModifier,
+                        DS0059_RedundantModifier,
                         "Redundant modifier 'closed'.");
                 }
             }
@@ -141,7 +141,7 @@ internal static class AttributeHelpers
                 specialModifiers.First(s => s.GetText() == "static").Start.Line,
                 specialModifiers.First(s => s.GetText() == "static").Start.Column,
                 specialModifiers.First(s => s.GetText() == "static").GetText().Length,
-                DS0058_RedundantModifier,
+                DS0059_RedundantModifier,
                 "Redundant modifier 'static'.");
         }
 
@@ -191,7 +191,7 @@ internal static class AttributeHelpers
                             attrib.Start.Line,
                             attrib.Start.Column,
                             attrib.GetText().Length,
-                            DS0213_VarArgsNonWindows,
+                            DS0214_VarArgsNonWindows,
                             "Varargs functions are currently only supported on Windows. Calling this function will always throw an exception.");
                     }
 
@@ -201,7 +201,7 @@ internal static class AttributeHelpers
                             attrib.Start.Line,
                             attrib.Start.Column,
                             attrib.GetText().Length,
-                            DS0212_AotVarArgsFunction,
+                            DS0213_AotVarArgsFunction,
                             "Varargs functions are unsupported when compiling ahead of time. Calling this function will always throw an exception.");
                     }
 
@@ -357,7 +357,7 @@ internal static class AttributeHelpers
                     context.Start.Line,
                     context.Start.Column,
                     context.GetText().Length,
-                    DS0208_UnverifiableCode,
+                    DS0209_UnverifiableCode,
                     $"Disabling the zero-initialization of local variables using the <InitLocals> attribute causes the generated code to be unverifiable.");
             }
 
@@ -375,7 +375,7 @@ internal static class AttributeHelpers
                     context.expression().Start.Line,
                     context.expression().Start.Column,
                     context.expression().GetText().Length,
-                    DS0230_PredicateFunctionNotBoolean,
+                    DS0231_PredicateFunctionNotBoolean,
                     $"'{CurrentMethod.Builder.Name}': Predicate functions must return a boolean value.");
             }
         }
@@ -421,7 +421,7 @@ internal static class AttributeHelpers
                         expr.Start.Line,
                         expr.Start.Column,
                         expr.GetText().Length,
-                        DS0178_InvalidAttributeArgument,
+                        DS0179_InvalidAttributeArgument,
                         "This expression cannot be used as an argument for an attribute, since its value is not known at compile-time.");
                 }
 
@@ -486,7 +486,7 @@ internal static class AttributeHelpers
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0166_ModuleInitializerInvalid,
+                DS0167_ModuleInitializerInvalid,
                 $"Module initializers must be defined inside of a module or explicitly marked as 'static'.");
         }
 
@@ -496,7 +496,7 @@ internal static class AttributeHelpers
                 context.parameter_list().Start.Line,
                 context.parameter_list().Start.Column,
                 context.parameter_list().GetText().Length,
-                DS0166_ModuleInitializerInvalid,
+                DS0167_ModuleInitializerInvalid,
                 $"Module initializers must be parameterless.");
         }
 
@@ -506,7 +506,7 @@ internal static class AttributeHelpers
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0166_ModuleInitializerInvalid,
+                DS0167_ModuleInitializerInvalid,
                 $"Module initializers cannot return a value.");
         }
 
@@ -516,7 +516,7 @@ internal static class AttributeHelpers
                 context.generic_parameter_list().Start.Line,
                 context.generic_parameter_list().Start.Column,
                 context.generic_parameter_list().GetText().Length,
-                DS0166_ModuleInitializerInvalid,
+                DS0167_ModuleInitializerInvalid,
                 $"Module initializers cannot be generic.");
         }
 
@@ -526,7 +526,7 @@ internal static class AttributeHelpers
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0166_ModuleInitializerInvalid,
+                DS0167_ModuleInitializerInvalid,
                 $"Module initializers cannot be contained in generic types.");
         }
     }
@@ -545,7 +545,7 @@ internal static class AttributeHelpers
             node.Symbol.Line,
             node.Symbol.Column,
             id.Length,
-            DS0181_InvalidAttributeTarget,
+            DS0182_InvalidAttributeTarget,
             $"'{id}' is not a valid attribute target.");
 
         return AttributeTarget.Type;

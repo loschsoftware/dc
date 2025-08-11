@@ -65,7 +65,7 @@ internal class RunCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0105_DCRunInsufficientInfo,
+                    DS0106_DCRunInsufficientInfo,
                     "Insufficient information for 'dc run': The files to execute could not be determined. Create a project file (dsconfig.xml) and set the required properties 'BuildDirectory' and 'AssemblyFileName' to enable this command.",
                     CompilerExecutableName);
 
@@ -86,7 +86,7 @@ internal class RunCommand : ICompilerCommand
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0105_DCRunInsufficientInfo,
+                        DS0106_DCRunInsufficientInfo,
                         "Project group does not define an executable project.",
                         CompilerExecutableName);
 
@@ -109,7 +109,7 @@ internal class RunCommand : ICompilerCommand
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0209_ProjectGroupExecutableInvalid,
+                        DS0210_ProjectGroupExecutableInvalid,
                         $"The executable component '{config.ProjectGroup.ExecutableComponent}' could not be found.",
                         CompilerExecutableName);
 
@@ -122,7 +122,7 @@ internal class RunCommand : ICompilerCommand
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0209_ProjectGroupExecutableInvalid,
+                        DS0210_ProjectGroupExecutableInvalid,
                         "Currently, project group executables can only be projects.",
                         CompilerExecutableName);
 
@@ -137,7 +137,7 @@ internal class RunCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0124_DCRunInvalidProjectType,
+                    DS0125_DCRunInvalidProjectType,
                     "The current project cannot be executed. Projects with an application type of 'Library' are not executable.",
                     CompilerExecutableName);
 

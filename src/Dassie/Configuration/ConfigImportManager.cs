@@ -40,7 +40,7 @@ internal static class ConfigImportManager
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0197_ImportedConfigFileNotFound,
+                    DS0198_ImportedConfigFileNotFound,
                     $"The imported configuration file '{importPath}' could not be found.",
                     fileName);
 
@@ -53,7 +53,7 @@ internal static class ConfigImportManager
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0198_ImportedConfigFileCircularDependency,
+                    DS0199_ImportedConfigFileCircularDependency,
                     $"Importing the configuration file '{importPath}' would lead to a circular dependency.",
                     fileName);
 

@@ -67,7 +67,7 @@ internal class LoweringListener : DassieParserBaseListener
                 context.member_access_modifier().Start.Line,
                 context.member_access_modifier().Start.Column,
                 context.member_access_modifier().GetText().Length,
-                DS0078_RedundantAccessModifierGroup,
+                DS0079_RedundantAccessModifierGroup,
                 "Access modifier group 'global' is redundant since it is the default access modifier.");
         }
 

@@ -57,7 +57,7 @@ internal static class ErrorMessageHelpers
             row,
             col,
             len,
-            DS0002_MethodNotFound,
+            DS0003_MethodNotFound,
             errorMsgBuilder.ToString());
     }
 
@@ -184,7 +184,7 @@ internal static class ErrorMessageHelpers
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0157_InheritingFromSealedType,
+                    DS0158_InheritingFromSealedType,
                     $"Cannot inherit from type '{TypeName(type)}' because it is sealed.",
                     tip: "If possible, mark the type as 'open' to allow inheritance.");
             }
@@ -192,14 +192,14 @@ internal static class ErrorMessageHelpers
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0146_ValueTypeInheritsFromClass,
+                    DS0147_ValueTypeInheritsFromClass,
                     $"Value types cannot inherit from reference types. Value types are only allowed to implement templates.");
             }
             else if (type == typeof(ValueType))
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0145_ValueTypeInherited,
+                    DS0146_ValueTypeInherited,
                     $"Inheriting from 'System.ValueType' is not permitted. To declare a value type, use 'val type'.");
             }
         }
@@ -207,7 +207,7 @@ internal static class ErrorMessageHelpers
         {
             EmitErrorMessage(
                 row, col, len,
-                DS0147_ValueTypeAsBaseType,
+                DS0148_ValueTypeAsBaseType,
                 $"Inheriting from value types is not permitted. Only reference types can be inherited.");
         }
     }

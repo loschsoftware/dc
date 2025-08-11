@@ -60,7 +60,7 @@ public static class Compiler
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0106_NoInputFiles,
+                DS0107_NoInputFiles,
                 "No input files specified.",
                 CompilerExecutableName);
 
@@ -129,7 +129,7 @@ public static class Compiler
 
         TypeFinalizer.CreateTypes(Context.Types);
 
-        if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == DS0027_EmptyProgram))
+        if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == DS0028_EmptyProgram))
         {
             // Create implicit entrypoint
 
@@ -145,7 +145,7 @@ public static class Compiler
 
             EmitWarningMessage(
                 0, 0, 0,
-                DS0030_NoEntryPoint,
+                DS0031_NoEntryPoint,
                 "Program contains no entry point. Use the '<EntryPoint>' attribute to set the application entry point or add executable code to generate an implicit entry point.",
                 CompilerExecutableName);
         }

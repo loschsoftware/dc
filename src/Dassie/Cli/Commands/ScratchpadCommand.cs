@@ -70,7 +70,7 @@ internal class ScratchpadCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0098_ScratchNotFound,
+                    DS0099_ScratchNotFound,
                     $"The scratch '{name}' could not be found.",
                     CompilerExecutableName);
 
@@ -93,7 +93,7 @@ internal class ScratchpadCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0098_ScratchNotFound,
+                    DS0099_ScratchNotFound,
                     $"The scratch '{name}' could not be found.",
                     CompilerExecutableName);
 

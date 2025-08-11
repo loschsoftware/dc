@@ -16,950 +16,954 @@ public enum ErrorKind
     /// </summary>
     CustomError = -1,
     /// <summary>
+    /// Specifies that an operation was successful.
+    /// </summary>
+    DS0000_Success,
+    /// <summary>
     /// An unknown and not further specified error or an unhandled exception.
     /// </summary>
-    DS0000_UnknownError,
+    DS0001_UnknownError,
     /// <summary>
     /// An error that occured during the parsing stage of the compilation process that was emitted by ANTLR.
     /// </summary>
-    DS0001_SyntaxError,
+    DS0002_SyntaxError,
     /// <summary>
     /// Emitted when the specified argument list does not match any available overload of this function.
     /// </summary>
-    DS0002_MethodNotFound,
+    DS0003_MethodNotFound,
     /// <summary>
     /// Emitted when the specified argument list does not match any available constructor for this type.
     /// </summary>
     [Obsolete("This error code is not emitted by the compiler anymore.")]
-    DS0003_ConstructorNotFound,
+    DS0004_ConstructorNotFound,
     /// <summary>
     /// Emitted when an import directive is used on a non-existent namespace.
     /// </summary>
-    DS0004_NamespaceNotFound,
+    DS0005_NamespaceNotFound,
     /// <summary>
     /// Emitted when an identifier contains invalid characters or is a language keyword.
     /// </summary>
-    DS0005_InvalidIdentifier,
+    DS0006_InvalidIdentifier,
     /// <summary>
     /// Emitted when the type of the new value of a variable does not match the type of the old value.
     /// </summary>
-    DS0006_VariableTypeChanged,
+    DS0007_VariableTypeChanged,
     /// <summary>
     /// Emitted when an access modifier is invalid for the specified object.
     /// </summary>
-    DS0007_InvalidModifier,
+    DS0008_InvalidModifier,
     /// <summary>
     /// Emitted when a function contains no expressions.
     /// </summary>
-    DS0008_NoExpressionInFunction,
+    DS0009_NoExpressionInFunction,
     /// <summary>
     /// Emitted when a specified type was not found.
     /// </summary>
-    DS0009_TypeNotFound,
+    DS0010_TypeNotFound,
     /// <summary>
     /// Emitted when the condition of a while loop is not a boolean.
     /// </summary>
     [Obsolete("Obsolete: This error is not emitted anymore by the Dassie compiler.")]
-    DS0010_LoopConditionNotBoolean,
+    DS0011_LoopConditionNotBoolean,
     /// <summary>
     /// 
     /// </summary>
-    DS0011_UndefinedValue,
+    DS0012_UndefinedValue,
     /// <summary>
     /// 
     /// </summary>
-    DS0012_InvalidArgument,
+    DS0013_InvalidArgument,
     /// <summary>
     /// Emitted when a conversion between two types is not implemented.
     /// </summary>
-    DS0013_InvalidConversion,
+    DS0014_InvalidConversion,
     /// <summary>
     /// Obsolete.
     /// </summary>
     [Obsolete("Obsolete: This error is not emitted anymore by the Dassie compiler.")]
-    DS0014_UnknownType,
+    DS0015_UnknownType,
     /// <summary>
     /// Emitted when a constant is being reassigned.
     /// </summary>
     [Obsolete("Obsolete: This error is not emitted anymore by the Dassie compiler.")]
-    DS0015_ConstantReassignment,
+    DS0016_ConstantReassignment,
     /// <summary>
     /// Emitted when a constant is declared without a value.
     /// </summary>
-    DS0016_UnassignedConstant,
+    DS0017_UnassignedConstant,
     /// <summary>
     /// Obsolete.
     /// </summary>
     [Obsolete("Obsolete: This error is not emitted anymore by the Dassie compiler.")]
-    DS0017_DoubleDefinition,
+    DS0018_DoubleDefinition,
     /// <summary>
     /// Emitted when a constant is being reassigned.
     /// </summary>
-    DS0018_ImmutableValueReassignment,
+    DS0019_ImmutableValueReassignment,
     /// <summary>
     /// 
     /// </summary>
-    DS0019_GenericValueTypeInvalid,
+    DS0020_GenericValueTypeInvalid,
     /// <summary>
     /// Emitted when a feature of a newer Dassie version is being used.
     /// </summary>
-    DS0020_FeatureNotAvailable,
+    DS0021_FeatureNotAvailable,
     /// <summary>
     /// 
     /// </summary>
-    DS0021_PropertyNotFound,
+    DS0022_PropertyNotFound,
     /// <summary>
     /// Emitted when an assembly reference could not be resolved.
     /// </summary>
-    DS0022_InvalidAssemblyReference,
+    DS0023_InvalidAssemblyReference,
     /// <summary>
     /// Emitted when a file reference could not be resolved.
     /// </summary>
-    DS0023_InvalidFileReference,
+    DS0024_InvalidFileReference,
     /// <summary>
     /// 
     /// </summary>
-    DS0024_ReadOnlyProperty,
+    DS0025_ReadOnlyProperty,
     /// <summary>
     /// Obsolete.
     /// </summary>
     [Obsolete("Obsolete: This error is not emitted anymore by the Dassie compiler.")]
-    DS0025_VariableAlreadyDefined,
+    DS0026_VariableAlreadyDefined,
     /// <summary>
     /// Emitted when an unknown escape sequence is being used.
     /// </summary>
-    DS0026_InvalidEscapeSequence,
+    DS0027_InvalidEscapeSequence,
     /// <summary>
     /// Emitted when the program contains no executable code.
     /// </summary>
-    DS0027_EmptyProgram,
+    DS0028_EmptyProgram,
     /// <summary>
     /// Emitted when a checked expression results in an integer overflow.
     /// </summary>
-    DS0028_IntegerOverflow,
+    DS0029_IntegerOverflow,
     /// <summary>
     /// Emitted when an IO error occurs, denying the Dassie compiler access to the source files or output file.
     /// </summary>
-    DS0029_FileAccessDenied,
+    DS0030_FileAccessDenied,
     /// <summary>
     /// Emitted when a Dassie code contains no suitable entry point.
     /// </summary>
-    DS0030_NoEntryPoint,
+    DS0031_NoEntryPoint,
     /// <summary>
     /// Obsolete.
     /// </summary>
     [Obsolete("Obsolete: This error is not emitted anymore by the Dassie compiler.")]
-    DS0031_InvalidClassModifiers,
+    DS0032_InvalidClassModifiers,
     /// <summary>
     /// Emitted when an argument violates a parameter constraint.
     /// </summary>
-    DS0032_ConstraintViolation,
+    DS0033_ConstraintViolation,
     /// <summary>
     /// Emitted when implicitly converting between two types is not possible.
     /// </summary>
-    DS0033_ImplicitConversionNotPossible,
+    DS0034_ImplicitConversionNotPossible,
     /// <summary>
     /// Emitted when explicitly converting between two types is not possible.
     /// </summary>
-    DS0034_ExplicitConversionNotPossible,
+    DS0035_ExplicitConversionNotPossible,
     /// <summary>
     /// Emitted when the entry point of a Dassie program is not a static function.
     /// </summary>
-    DS0035_EntryPointNotStatic,
+    DS0036_EntryPointNotStatic,
     /// <summary>
     /// General error message emitted for various kinds of arithmetic errors.
     /// </summary>
-    DS0036_ArithmeticError,
+    DS0037_ArithmeticError,
     /// <summary>
     /// Emitted when the return types of branches do not match.
     /// </summary>
-    DS0037_BranchExpressionTypesUnequal,
+    DS0038_BranchExpressionTypesUnequal,
     /// <summary>
     /// Emitted when the condition of a conditional expression is not a boolean.
     /// </summary>
-    DS0038_ConditionalExpressionClauseNotBoolean,
+    DS0039_ConditionalExpressionClauseNotBoolean,
     /// <summary>
     /// Emitted when a type does not include a specified field.
     /// </summary>
-    DS0039_FieldNotFound,
+    DS0040_FieldNotFound,
     /// <summary>
     /// Emitted when the specified name is not assigned to a value.
     /// </summary>
-    DS0040_VariableNotFound,
+    DS0041_VariableNotFound,
     /// <summary>
     /// Emitted when the types of list or array items are not the same.
     /// </summary>
-    DS0041_ListItemsHaveDifferentTypes,
+    DS0042_ListItemsHaveDifferentTypes,
     /// <summary>
     /// Emitted when the index expression of an array element assignment expression is not an integer.
     /// </summary>
-    DS0042_ArrayElementAssignmentIndexExpressionNotInteger,
+    DS0043_ArrayElementAssignmentIndexExpressionNotInteger,
     /// <summary>
     /// Emitted when the compiler thinks an infinite loop could be unintentional.
     /// </summary>
-    DS0043_PossiblyUnintentionalInfiniteLoop,
+    DS0044_PossiblyUnintentionalInfiniteLoop,
     /// <summary>
     /// Emitted when an update to dc is available. This is an information message, not an error.
     /// </summary>
-    DS0044_dcUpdateAvailable,
+    DS0045_DCUpdateAvailable,
     /// <summary>
     /// Emitted when an inline IL instruction has an invalid opcode.
     /// </summary>
-    DS0045_InlineILInvalidOpCode,
+    DS0046_InlineILInvalidOpCode,
     /// <summary>
     /// Emitted when an inline IL instruction has an invalid operand.
     /// </summary>
-    DS0046_InlineILInvalidOperand,
+    DS0047_InlineILInvalidOperand,
     /// <summary>
     /// Emitted when there are duplicate types in a union type.
     /// </summary>
-    DS0047_UnionTypeDuplicate,
+    DS0048_UnionTypeDuplicate,
     /// <summary>
     /// Emitted when a specified source file could not be found.
     /// </summary>
-    DS0048_SourceFileNotFound,
+    DS0049_SourceFileNotFound,
     /// <summary>
     /// Emitted when a for loop contains more than 3 expressions.
     /// </summary>
-    DS0049_InvalidForLoopSyntax,
+    DS0050_InvalidForLoopSyntax,
     /// <summary>
     /// Emitted when the return value of a top-level program is not an integer.
     /// </summary>
-    DS0050_ExpectedIntegerReturnValue,
+    DS0051_ExpectedIntegerReturnValue,
     /// <summary>
     /// Emitted when the inheritance list of a type contains more than one CLR class.
     /// </summary>
-    DS0051_MoreThanOneClassInInheritanceList,
+    DS0052_MoreThanOneClassInInheritanceList,
     /// <summary>
     /// Emitted when a type member has an invalid access modifier.
     /// </summary>
-    DS0052_InvalidAccessModifier,
+    DS0053_InvalidAccessModifier,
     /// <summary>
     /// Emitted when the return value of a function does not match the function signature.
     /// </summary>
-    DS0053_WrongReturnType,
+    DS0054_WrongReturnType,
     /// <summary>
     /// Emitted when a field is set to a value of the wrong type.
     /// </summary>
-    DS0054_WrongFieldType,
+    DS0055_WrongFieldType,
     /// <summary>
     /// Emitted when multiple functions are declared as application entry points.
     /// </summary>
-    DS0055_MultipleEntryPoints,
+    DS0056_MultipleEntryPoints,
     /// <summary>
     /// Generic error emitted when a symbol of various kinds could not be resolved.
     /// </summary>
-    DS0056_SymbolResolveError,
+    DS0057_SymbolResolveError,
     /// <summary>
     /// Emitted when a variable is assigned an expression of an incompatible type.
     /// </summary>
-    DS0057_IncompatibleType,
+    DS0058_IncompatibleType,
     /// <summary>
     /// Message emitted when a type or member is declared with a redundant access modifier.
     /// </summary>
-    DS0058_RedundantModifier,
+    DS0059_RedundantModifier,
     /// <summary>
     /// Emitted when a rethrow expression is used outside of a catch block.
     /// </summary>
-    DS0059_RethrowOutsideCatchBlock,
+    DS0060_RethrowOutsideCatchBlock,
     /// <summary>
     /// Emitted when the expression to be thrown is not a reference type.
     /// </summary>
-    DS0060_InvalidThrowExpression,
+    DS0061_InvalidThrowExpression,
     /// <summary>
     /// Emitted when a try block is not followed by a catch block.
     /// </summary>
-    DS0061_MissingCatchBranch,
+    DS0062_MissingCatchBranch,
     /// <summary>
     /// Emitted when a local is not in scope.
     /// </summary>
-    DS0062_LocalOutsideScope,
+    DS0063_LocalOutsideScope,
     /// <summary>
     /// Emitted when a feature that is not yet implemented is used.
     /// </summary>
-    DS0063_UnsupportedFeature,
+    DS0064_UnsupportedFeature,
     /// <summary>
     /// Emitted when something that shouldn't is used as an expression.
     /// </summary>
-    DS0064_InvalidExpression,
+    DS0065_InvalidExpression,
     /// <summary>
     /// Emitted when the left side of an assignment is invalid.
     /// </summary>
-    DS0065_AssignmentInvalidLeftSide,
+    DS0066_AssignmentInvalidLeftSide,
     /// <summary>
     /// Emitted when a property cannot be assigned to.
     /// </summary>
-    DS0066_PropertyNoSuitableSetter,
+    DS0067_PropertyNoSuitableSetter,
     /// <summary>
     /// Emitted when a resource specified in dsconfig.xml could not be located.
     /// </summary>
-    DS0067_ResourceFileNotFound,
+    DS0068_ResourceFileNotFound,
     /// <summary>
     /// Emitted when multiple unmanaged resources are specified in dsconfig.xml.
     /// </summary>
-    DS0068_MultipleUnmanagedResources,
+    DS0069_MultipleUnmanagedResources,
     /// <summary>
     /// Emitted when a required Windows SDK tool could not be located.
     /// </summary>
-    DS0069_WinSdkToolNotFound,
+    DS0070_WinSdkToolNotFound,
     /// <summary>
     /// Emitted when the <code>&lt;VersionInfo&gt;</code> tag is used in dsconfig.xml.
     /// </summary>
-    DS0070_AvoidVersionInfoTag,
+    DS0071_AvoidVersionInfoTag,
     /// <summary>
     /// Emitted when an ingored message is specified in dsconfig.xml that cannot be ignored.
     /// </summary>
-    DS0071_IllegalIgnoredMessage,
+    DS0072_IllegalIgnoredMessage,
     /// <summary>
     /// Emitted when 'dc build' is called but there are no source files.
     /// </summary>
-    DS0072_NoSourceFilesFound,
+    DS0073_NoSourceFilesFound,
     /// <summary>
     /// Emitted when the name of a type exceeds the .NET limit of 1024 characters.
     /// </summary>
-    DS0073_TypeNameTooLong,
+    DS0074_TypeNameTooLong,
     /// <summary>
     /// Emitted when more than 65535 locals are defined in a function.
     /// </summary>
-    DS0074_TooManyLocals,
+    DS0075_TooManyLocals,
     /// <summary>
     /// Emitted when an integer literal is too big for its type.
     /// </summary>
-    DS0075_Overflow,
+    DS0076_Overflow,
     /// <summary>
     /// Emitted when a character literal contains no character.
     /// </summary>
-    DS0076_EmptyCharacterLiteral,
+    DS0077_EmptyCharacterLiteral,
     /// <summary>
     /// Emitted when an import directive is invalid.
     /// </summary>
-    DS0077_InvalidImport,
+    DS0078_InvalidImport,
     /// <summary>
     /// Emitted when the modifier of an access modifier group is the default member modifier of the containing type.
     /// </summary>
-    DS0078_RedundantAccessModifierGroup,
+    DS0079_RedundantAccessModifierGroup,
     /// <summary>
     /// Emitted when an array has more than 32 dimensions.
     /// </summary>
-    DS0079_ArrayTooManyDimensions,
+    DS0080_ArrayTooManyDimensions,
     /// <summary>
     /// Emitted when an illegal identifier is used.
     /// </summary>
-    DS0080_ReservedIdentifier,
+    DS0081_ReservedIdentifier,
     /// <summary>
     /// Emitted when a project reference is invalid.
     /// </summary>
-    DS0081_InvalidProjectReference,
+    DS0082_InvalidProjectReference,
     /// <summary>
     /// Emitted when an invalid macro is used in dsconfig.xml.
     /// </summary>
-    DS0082_InvalidDSConfigMacro,
+    DS0083_InvalidDSConfigMacro,
     /// <summary>
     /// Emitted when the 'var' modifier is used on a method.
     /// </summary>
-    DS0083_InvalidVarModifier,
+    DS0084_InvalidVarModifier,
     /// <summary>
     /// Emitted when the 'this' keyword is used in a static function.
     /// </summary>
-    DS0084_ThisInStaticFunction,
+    DS0085_ThisInStaticFunction,
     /// <summary>
     /// Emitted when a <see cref="TypeBuilder"/> could not be associated with any <see cref="TypeContext"/> object. Critical error that should never be emitted under normal circumstances.
     /// </summary>
-    DS0085_TypeInfoCouldNotBeRead,
+    DS0086_TypeInfoCouldNotBeRead,
     /// <summary>
     /// Emitted when the command of a build profile or -event is invalid.
     /// </summary>
-    DS0086_InvalidCommand,
+    DS0087_InvalidCommand,
     /// <summary>
     /// Emitted when a build or debug profile does not exist.
     /// </summary>
-    DS0087_InvalidProfile,
+    DS0088_InvalidProfile,
     /// <summary>
     /// Emitted when a critical build event failed to run correctly.
     /// </summary>
-    DS0088_BuildEventFailedToRun,
+    DS0089_BuildEventFailedToRun,
     /// <summary>
     /// Emitted when a dsconfig.xml document contains an invalid property.
     /// </summary>
-    DS0089_InvalidDSConfigProperty,
+    DS0090_InvalidDSConfigProperty,
     /// <summary>
     /// Emitted when some part of dsconfig.xml is malformed, either syntactically or semantically.
     /// </summary>
-    DS0090_MalformedConfigurationFile,
+    DS0091_MalformedConfigurationFile,
     /// <summary>
     /// Emitted when the format of a dsconfig.xml file is newer than supported.
     /// </summary>
-    DS0091_ConfigurationFormatVersionTooNew,
+    DS0092_ConfigurationFormatVersionTooNew,
     /// <summary>
     /// Emitted when dsconfig.xml uses an outdated format.
     /// </summary>
-    DS0092_ConfigurationFormatVersionTooOld,
+    DS0093_ConfigurationFormatVersionTooOld,
     /// <summary>
     /// Emitted when a constructor returns a value, even though it is only allowed to return void.
     /// </summary>
-    DS0093_ConstructorReturnsValue,
+    DS0094_ConstructorReturnsValue,
     /// <summary>
     /// Emitted when an init-only field is assigned to outside of a constructor.
     /// </summary>
-    DS0094_InitOnlyFieldAssignedOutsideOfConstructor,
+    DS0095_InitOnlyFieldAssignedOutsideOfConstructor,
     /// <summary>
     /// Emitted when an immutable symbol is passed by reference.
     /// </summary>
-    DS0095_ImmutableSymbolPassedByReference,
+    DS0096_ImmutableSymbolPassedByReference,
     /// <summary>
     /// Emitted when a symbol is passed by reference without the reference operator (&amp;).
     /// </summary>
-    DS0096_PassByReferenceWithoutOperator,
+    DS0097_PassByReferenceWithoutOperator,
     /// <summary>
     /// Emitted when an expression to be passed by reference is not valid.
     /// </summary>
-    DS0097_InvalidExpressionPassedByReference,
+    DS0098_InvalidExpressionPassedByReference,
     /// <summary>
     /// Emitted when a specified scratch could not be found.
     /// </summary>
-    DS0098_ScratchNotFound,
+    DS0099_ScratchNotFound,
     /// <summary>
     /// Emitted when multiple installed compiler extensions define a command with the same name.
     /// </summary>
-    DS0099_DuplicateCompilerCommand,
+    DS0100_DuplicateCompilerCommand,
     /// <summary>
     /// Emitted when dc is called with an invalid command name.
     /// </summary>
-    DS0100_InvalidCommand,
+    DS0101_InvalidCommand,
     /// <summary>
     /// Diagnostic information message.
     /// </summary>
-    DS0101_DiagnosticInfo,
+    DS0102_DiagnosticInfo,
     /// <summary>
     /// Message displayed when compiling ahead of time informing of performance penalty.
     /// </summary>
-    DS0102_AotPerformanceWarning,
+    DS0103_AotPerformanceWarning,
     /// <summary>
     /// Emitted when an operation that requires an internet connection cannot be completed.
     /// </summary>
-    DS0103_NetworkError,
+    DS0104_NetworkError,
     /// <summary>
     /// Emitted when a package reference contains an invalid name or version number.
     /// </summary>
-    DS0104_InvalidPackageReference,
+    DS0105_InvalidPackageReference,
     /// <summary>
     /// Emitted when the 'dc run' command is invoked with insufficient information.
     /// </summary>
-    DS0105_DCRunInsufficientInfo,
+    DS0106_DCRunInsufficientInfo,
     /// <summary>
     /// Emitted when no input source files are specified.
     /// </summary>
-    DS0106_NoInputFiles,
+    DS0107_NoInputFiles,
     /// <summary>
     /// Emitted when a generic constraint is violated.
     /// </summary>
-    DS0107_GenericTypeConstraintViolation,
+    DS0108_GenericTypeConstraintViolation,
     /// <summary>
     /// Emitted when a generic method is called without arguments.
     /// </summary>
-    DS0108_GenericMethodCalledWithoutGenericArguments,
+    DS0109_GenericMethodCalledWithoutGenericArguments,
     /// <summary>
     /// Emitted when a local is defined with a name that already exists in a different scope.
     /// </summary>
-    DS0109_LocalDefinedInDifferentScope,
+    DS0110_LocalDefinedInDifferentScope,
     /// <summary>
     /// Emitted when a type parameter has multiple of the same attribute.
     /// </summary>
-    DS0110_DuplicateTypeParameterAttributes,
+    DS0111_DuplicateTypeParameterAttributes,
     /// <summary>
     /// Emitted when a type parameter has multiple of the same type constraints.
     /// </summary>
-    DS0111_DuplicateTypeParameterConstraint,
+    DS0112_DuplicateTypeParameterConstraint,
     /// <summary>
     /// Emitted when a type defines multiple type parameters with the same name.
     /// </summary>
-    DS0112_DuplicateTypeParameter,
+    DS0113_DuplicateTypeParameter,
     /// <summary>
     /// Emitted when a type parameter defines an invalid set of attributes.
     /// </summary>
-    DS0113_InvalidTypeParameterAttributes,
+    DS0114_InvalidTypeParameterAttributes,
     /// <summary>
     /// Emitted when a generic method defines a type parameter that is already defined by the containing type.
     /// </summary>
-    DS0114_TypeParameterIsDefinedInContainingScope,
+    DS0115_TypeParameterIsDefinedInContainingScope,
     /// <summary>
     /// Emitted when a non-abstract method does not have a body.
     /// </summary>
-    DS0115_NonAbstractMethodHasNoBody,
+    DS0116_NonAbstractMethodHasNoBody,
     /// <summary>
     /// Emitted when an abstract method has a body.
     /// </summary>
-    DS0116_AbstractMethodHasBody,
+    DS0117_AbstractMethodHasBody,
     /// <summary>
     /// Emitted when a variance modifier is applied to a type parameter of a type other than a <c>template</c>.
     /// </summary>
-    DS0117_VarianceModifierOnConcreteType,
+    DS0118_VarianceModifierOnConcreteType,
     /// <summary>
     /// Emitted when variant type parameters are used in invalid ways.
     /// </summary>
-    DS0118_InvalidVariance,
+    DS0119_InvalidVariance,
     /// <summary>
     /// Emitted when two types of the same name are defined.
     /// </summary>
-    DS0119_DuplicateTypeName,
+    DS0120_DuplicateTypeName,
     /// <summary>
     /// Emitted when two types of the same name with different type parameters are defined.
     /// </summary>
-    DS0120_DuplicateGenericTypeName,
+    DS0121_DuplicateGenericTypeName,
     /// <summary>
     /// Emitted when a function pointer is created for a function with more than 16 arguments.
     /// </summary>
-    DS0121_FunctionPointerTooManyArguments,
+    DS0122_FunctionPointerTooManyArguments,
     /// <summary>
     /// Emitted when a function pointer is created for an invalid expression.
     /// </summary>
-    DS0122_InvalidFunctionPointerTargetExpression,
+    DS0123_InvalidFunctionPointerTargetExpression,
     /// <summary>
     /// Emitted when an installed compiler extension is invalid.
     /// </summary>
-    DS0123_InvalidExtensionPackage,
+    DS0124_InvalidExtensionPackage,
     /// <summary>
     /// Emitted when the 'dc run' command is called on a project that is not executable.
     /// </summary>
-    DS0124_DCRunInvalidProjectType,
+    DS0125_DCRunInvalidProjectType,
     /// <summary>
     /// Emitted when a value is ignored implicitly.
     /// </summary>
-    DS0125_UnusedValue,
+    DS0126_UnusedValue,
     /// <summary>
     /// Emitted when a non-nested type is declared as 'local'.
     /// </summary>
-    DS0126_TopLevelTypeLocal,
+    DS0127_TopLevelTypeLocal,
     /// <summary>
     /// Emitted when a member cannot be accessed because of too restrictive access modifiers.
     /// </summary>
-    DS0127_AccessModifiersTooRestrictive,
+    DS0128_AccessModifiersTooRestrictive,
     /// <summary>
     /// Emitted when the 'dc deploy' command is run on a config file that does not represent a project group.
     /// </summary>
-    DS0128_DeployCommandInvalidProjectGroupFile,
+    DS0129_DeployCommandInvalidProjectGroupFile,
     /// <summary>
     /// Emitted when a project group contains no projects.
     /// </summary>
-    DS0129_ProjectGroupNoComponents,
+    DS0130_ProjectGroupNoComponents,
     /// <summary>
     /// Emitted when a project group defines no targets.
     /// </summary>
-    DS0130_ProjectGroupNoTargets,
+    DS0131_ProjectGroupNoTargets,
     /// <summary>
     /// Emitted when 'dc build' is used on a project group.
     /// </summary>
-    DS0131_DCBuildCalledOnProjectGroup,
+    DS0132_DCBuildCalledOnProjectGroup,
     /// <summary>
     /// Emitted when 'dc clean' is called but the working directory contains no compiler configuration file.
     /// </summary>
-    DS0132_DCCleanNoProjectFile,
+    DS0133_DCCleanNoProjectFile,
     /// <summary>
     /// Emitted when 'dc analyze' is called but the working directory contains no compiler configuration file.
     /// </summary>
-    DS0133_DCAnalyzeNoProjectFile,
+    DS0134_DCAnalyzeNoProjectFile,
     /// <summary>
     /// Emitted when 'dc analyze' is called using an analyzer that could not be found.
     /// </summary>
-    DS0134_DCAnalyzeInvalidAnalyzer,
+    DS0135_DCAnalyzeInvalidAnalyzer,
     /// <summary>
     /// Emitted when attempting to divide by the constant value 0.
     /// </summary>
-    DS0135_DivisionByConstantZero,
+    DS0136_DivisionByConstantZero,
     /// <summary>
     /// Emitted when a conversion between two types is not possible.
     /// </summary>
-    DS0136_InvalidConversion,
+    DS0137_InvalidConversion,
     /// <summary>
     /// Emitted when the 'literal' modifier is applied to a method.
     /// </summary>
-    DS0137_LiteralModifierOnMethod,
+    DS0138_LiteralModifierOnMethod,
     /// <summary>
     /// Emitted when a compile-time constant value is expected but was not provided.
     /// </summary>
-    DS0138_CompileTimeConstantRequired,
+    DS0139_CompileTimeConstantRequired,
     /// <summary>
     /// Emitted when trying to instantiate a module.
     /// </summary>
-    DS0139_ModuleInstantiation,
+    DS0140_ModuleInstantiation,
     /// <summary>
     /// Emitted when an enumeration is not an integer type.
     /// </summary>
-    DS0140_InvalidEnumerationType,
+    DS0141_InvalidEnumerationType,
     /// <summary>
     /// Emitted when an enumeration type contains a method.
     /// </summary>
-    DS0141_MethodInEnumeration,
+    DS0142_MethodInEnumeration,
     /// <summary>
     /// Emitted when an enumeration type is defined using the 'ref' modifier.
     /// </summary>
-    DS0142_EnumTypeExplicitlyRef,
+    DS0143_EnumTypeExplicitlyRef,
     /// <summary>
     /// Emitted when an enumeration type defines a base type other than System.Enum.
     /// </summary>
-    DS0143_EnumTypeBaseType,
+    DS0144_EnumTypeBaseType,
     /// <summary>
     /// Emitted when an enumeration type implements a template.
     /// </summary>
-    DS0144_EnumTypeImplementsTemplate,
+    DS0145_EnumTypeImplementsTemplate,
     /// <summary>
     /// Emitted when a type explicitly inherits from 'System.ValueType'.
     /// </summary>
-    DS0145_ValueTypeInherited,
+    DS0146_ValueTypeInherited,
     /// <summary>
     /// Emitted when the inheritance list of a value type contains a reference type.
     /// </summary>
-    DS0146_ValueTypeInheritsFromClass,
+    DS0147_ValueTypeInheritsFromClass,
     /// <summary>
     /// Emitted when inheriting from a value type.
     /// </summary>
-    DS0147_ValueTypeAsBaseType,
+    DS0148_ValueTypeAsBaseType,
     /// <summary>
     /// Emitted when an immutable value has a byref type.
     /// </summary>
-    DS0148_ImmutableValueOfByRefType,
+    DS0149_ImmutableValueOfByRefType,
     /// <summary>
     /// Emitted when a nested byref type (e.g. int&amp;&amp;) is used.
     /// </summary>
-    DS0149_NestedByRefType,
+    DS0150_NestedByRefType,
     /// <summary>
     /// Emitted when a field of a byref or byref-like type is declared outside of a byref-like type.
     /// </summary>
-    DS0150_ByRefFieldInNonByRefLikeType,
+    DS0151_ByRefFieldInNonByRefLikeType,
     /// <summary>
     /// Emitted when an immutable value type (val! type) contains a field explicitly marked as 'var'.
     /// </summary>
-    DS0151_VarFieldInImmutableType,
+    DS0152_VarFieldInImmutableType,
     /// <summary>
     /// Emitted when a function pointer is created for an instance method.
     /// </summary>
-    DS0152_FunctionPointerForInstanceMethod,
+    DS0153_FunctionPointerForInstanceMethod,
     /// <summary>
     /// Emitted when a list literal contains incompatible types.
     /// </summary>
-    DS0153_ListLiteralDifferentTypes,
+    DS0154_ListLiteralDifferentTypes,
     /// <summary>
     /// Emitted when an incompatible expression is appended to a list.
     /// </summary>
-    DS0154_ListAppendIncompatibleElement,
+    DS0155_ListAppendIncompatibleElement,
     /// <summary>
     /// Emitted when the operands of a range expression are not of type 'System.Index'.
     /// </summary>
-    DS0155_RangeInvalidOperands,
+    DS0156_RangeInvalidOperands,
     /// <summary>
     /// Emitted when a type implementing a template does not implement a required, abstract template member.
     /// </summary>
-    DS0156_RequiredInterfaceMembersNotImplemented,
+    DS0157_RequiredInterfaceMembersNotImplemented,
     /// <summary>
     /// Emitted when inheriting from a sealed type.
     /// </summary>
-    DS0157_InheritingFromSealedType,
+    DS0158_InheritingFromSealedType,
     /// <summary>
     /// Emitted when a template type contains an instance field.
     /// </summary>
-    DS0158_InstanceFieldInTemplate,
+    DS0159_InstanceFieldInTemplate,
     /// <summary>
     /// Displayed when a feature is not available due to a framework limitation.
     /// </summary>
-    DS0159_FrameworkLimitation,
+    DS0160_FrameworkLimitation,
     /// <summary>
     /// Emitted when a custom operator is defined outside of a module.
     /// </summary>
-    DS0160_CustomOperatorDefinedOutsideModule,
+    DS0161_CustomOperatorDefinedOutsideModule,
     /// <summary>
     /// Emitted when a custom operator has an access modifier other than 'global'.
     /// </summary>
-    DS0161_CustomOperatorNotGlobal,
+    DS0162_CustomOperatorNotGlobal,
     /// <summary>
     /// Emitted when a custom operator has more than two operands.
     /// </summary>
-    DS0162_CustomOperatorTooManyParameters,
+    DS0163_CustomOperatorTooManyParameters,
     /// <summary>
     /// Emitted when a custom operator has no body.
     /// </summary>
-    DS0163_CustomOperatorNoMethodBody,
+    DS0164_CustomOperatorNoMethodBody,
     /// <summary>
     /// Emitted when a custom operator could not be resolved.
     /// </summary>
-    DS0164_CustomOperatorNotFound,
+    DS0165_CustomOperatorNotFound,
     /// <summary>
     /// Emitted when a custom operator returns no value.
     /// </summary>
-    DS0165_CustomOperatorNoReturnValue,
+    DS0166_CustomOperatorNoReturnValue,
     /// <summary>
     /// Emitted when a module initializer does not fill all requirements.
     /// </summary>
-    DS0166_ModuleInitializerInvalid,
+    DS0167_ModuleInitializerInvalid,
     /// <summary>
     /// Emitted when a property is declared as a compile-time constant.
     /// </summary>
-    DS0167_PropertyLiteral,
+    DS0168_PropertyLiteral,
     /// <summary>
     /// Emitted when the ':?' operator is used on a value type.
     /// </summary>
-    DS0168_InstanceCheckOperatorOnValueType,
+    DS0169_InstanceCheckOperatorOnValueType,
     /// <summary>
     /// Warning emitted when a project file contains no build log devices, effectively disabling any error reporting.
     /// </summary>
-    DS0169_NoBuildLogDevices,
+    DS0170_NoBuildLogDevices,
     /// <summary>
     /// Emitted when an invalid build device is selected inside of a project file.
     /// </summary>
-    DS0170_InvalidBuildDeviceName,
+    DS0171_InvalidBuildDeviceName,
     /// <summary>
     /// Emitted when the <c>&lt;File&gt;</c> build log device is used without specifying a file path.
     /// </summary>
-    DS0171_FileBuildLogDeviceNoPathSpecified,
+    DS0172_FileBuildLogDeviceNoPathSpecified,
     /// <summary>
     /// Emitted when a field has the <c>&lt;Event&gt;</c> and <c>&lt;Auto&gt;</c> attributes applied at the same time.
     /// </summary>
-    DS0172_EventAndProperty,
+    DS0173_EventAndProperty,
     /// <summary>
     /// Emitted when an event has multiple 'add' or 'remove' handlers.
     /// </summary>
-    DS0173_EventHasMultipleHandlers,
+    DS0174_EventHasMultipleHandlers,
     /// <summary>
     /// Emitted when the field type of an event is not a delegate.
     /// </summary>
-    DS0174_EventFieldTypeNotDelegate,
+    DS0175_EventFieldTypeNotDelegate,
     /// <summary>
     /// Emitted when an event defines one of the required 'add' or 'remove' handlers, but not both.
     /// </summary>
-    DS0175_EventMissingHandlers,
+    DS0176_EventMissingHandlers,
     /// <summary>
     /// Emitted when the '$lock' statement is used on a value type.
     /// </summary>
-    DS0176_LockOnValueType,
+    DS0177_LockOnValueType,
     /// <summary>
     /// Emitted when a type is used as an attribute that does not inherit from <see cref="Attribute"/>.
     /// </summary>
-    DS0177_InvalidAttributeType,
+    DS0178_InvalidAttributeType,
     /// <summary>
     /// Emitted when an expression used as an attribute argument is not a compile-time constant.
     /// </summary>
-    DS0178_InvalidAttributeArgument,
+    DS0179_InvalidAttributeArgument,
     /// <summary>
     /// Emitted when an alias type has an attribute list.
     /// </summary>
-    DS0179_AttributesOnAliasType,
+    DS0180_AttributesOnAliasType,
     /// <summary>
     /// Emitted when an alias type has modifiers that are not permitted.
     /// </summary>
-    DS0180_AliasTypeInvalidModifiers,
+    DS0181_AliasTypeInvalidModifiers,
     /// <summary>
     /// Emitted when the target of an attribute is invalid.
     /// </summary>
-    DS0181_InvalidAttributeTarget,
+    DS0182_InvalidAttributeTarget,
     /// <summary>
     /// Emitted when an inline union type has multiple cases with the same name.
     /// </summary>
-    DS0182_UnionTypeDuplicateTagName,
+    DS0183_UnionTypeDuplicateTagName,
     /// <summary>
     /// Emitted when an inline union type has multiple cases with the same type.
     /// </summary>
-    DS0183_UnionTypeDuplicateTagType,
+    DS0184_UnionTypeDuplicateTagType,
     /// <summary>
     /// Emitted when an inline union type has some named and some unnamed tags.
     /// </summary>
-    DS0184_UnionTypeMixedTags,
+    DS0185_UnionTypeMixedTags,
     /// <summary>
     /// Emitted when a type alias implements one or more interfaces.
     /// </summary>
-    DS0185_AliasTypeImplementsInterface,
+    DS0186_AliasTypeImplementsInterface,
     /// <summary>
     /// Emitted when a type alias explicitly specifies a base type.
     /// </summary>
-    DS0186_AliasTypeExtendsType,
+    DS0187_AliasTypeExtendsType,
     /// <summary>
     /// Emitted when a type alias has a generic type parameter list. This restriction might get lifted in the future.
     /// </summary>
-    DS0187_GenericAliasType,
+    DS0188_GenericAliasType,
     /// <summary>
     /// Emitted when a string processor is used that cannot be resolved.
     /// </summary>
-    DS0188_InvalidStringProcessor,
+    DS0189_InvalidStringProcessor,
     /// <summary>
     /// Emitted when a processed string contains interpolations.
     /// </summary>
-    DS0189_ProcessedStringContainsInterpolations,
+    DS0190_ProcessedStringContainsInterpolations,
     /// <summary>
     /// Emitted when a string processor throws an exception at compile-time.
     /// </summary>
-    DS0190_StringProcessorThrewException,
+    DS0191_StringProcessorThrewException,
     /// <summary>
     /// Emitted when a program contains multiple explicit or implicit entry points.
     /// </summary>
-    DS0191_AmbiguousEntryPoint,
+    DS0192_AmbiguousEntryPoint,
     /// <summary>
     /// Emitted when an inheritance chain contains a circular reference.
     /// </summary>
-    DS0192_CircularReference,
+    DS0193_CircularReference,
     /// <summary>
     /// Emitted when a CLI command is invoked with an option or flag that requires a value but no value is set.
     /// </summary>
-    DS0193_ExpectedCliOptionValue,
+    DS0194_ExpectedCliOptionValue,
     /// <summary>
     /// Emitted when the 'dc watch' command is invoked with an invalid combination of arguments.
     /// </summary>
-    DS0194_DCWatchInvalidCombination,
+    DS0195_DCWatchInvalidCombination,
     /// <summary>
     /// Emitted when the 'EntryPoint' property is set in <c>dsconfig.xml</c> while the application also manually marks a method using the <see cref="EntryPointAttribute"/> attribute.
     /// </summary>
-    DS0195_EntryPointManuallySetWhenUsingDSConfigEntryPointProperty,
+    DS0196_EntryPointManuallySetWhenUsingDSConfigEntryPointProperty,
     /// <summary>
     /// Emitted when a string representation of a method is not a valid method identifier.
     /// </summary>
-    DS0196_InvalidMethodIdentifier,
+    DS0197_InvalidMethodIdentifier,
     /// <summary>
     /// Emitted when an imported project configuration file does not exist.
     /// </summary>
-    DS0197_ImportedConfigFileNotFound,
+    DS0198_ImportedConfigFileNotFound,
     /// <summary>
     /// Emitted when a project configuration import results in a circular dependency.
     /// </summary>
-    DS0198_ImportedConfigFileCircularDependency,
+    DS0199_ImportedConfigFileCircularDependency,
     /// <summary>
     /// Emitted when a file exports multiple namespaces.
     /// </summary>
-    DS0199_MultipleExports,
+    DS0200_MultipleExports,
     /// <summary>
     /// Emitted when a list literal constructed from an integer range does not use compile-time constant indices.
     /// </summary>
-    DS0200_ListFromRangeNotCompileTimeConstant,
+    DS0201_ListFromRangeNotCompileTimeConstant,
     /// <summary>
     /// Emitted when the designated application entry point has an invalid signature.
     /// </summary>
-    DS0201_EntryPointInvalidSignature,
+    DS0202_EntryPointInvalidSignature,
     /// <summary>
     /// Emitted when the condition of a conditional expression is a compile-time constant.
     /// </summary>
-    DS0202_ConditionConstant,
+    DS0203_ConditionConstant,
     /// <summary>
     /// Emitted when an invalid type is used as a generic argument.
     /// </summary>
-    DS0203_InvalidGenericArgument,
+    DS0204_InvalidGenericArgument,
     /// <summary>
     /// Emitted when a project structure contains a circular dependency.
     /// </summary>
-    DS0204_CircularProjectDependency,
+    DS0205_CircularProjectDependency,
     /// <summary>
     /// Emitted when the 'dc new' command is invoked with invalid arguments.
     /// </summary>
-    DS0205_DCNewInvalidArguments,
+    DS0206_DCNewInvalidArguments,
     /// <summary>
     /// Emitted when the 'dc new' command specifies a project directory that is not empty.
     /// </summary>
-    DS0206_DCNewNonEmptyDirectory,
+    DS0207_DCNewNonEmptyDirectory,
     /// <summary>
     /// Emitted when a resource file passed to the compiler is invalid.
     /// </summary>
-    DS0207_InvalidResourceFile,
+    DS0208_InvalidResourceFile,
     /// <summary>
     /// Emitted when the compiler produces code that is unverifiable.
     /// </summary>
-    DS0208_UnverifiableCode,
+    DS0209_UnverifiableCode,
     /// <summary>
     /// Emitted when the executable project defined in a project group file could not be found.
     /// </summary>
-    DS0209_ProjectGroupExecutableInvalid,
+    DS0210_ProjectGroupExecutableInvalid,
     /// <summary>
     /// Emitted when AOT compilation is attempted for a system other than the current one.
     /// </summary>
-    DS0210_CrossSystemAotCompilation,
+    DS0211_CrossSystemAotCompilation,
     /// <summary>
     /// Emitted when unexpected or invalid arguments are passed to a command.
     /// </summary>
-    DS0211_UnexpectedArgument,
+    DS0212_UnexpectedArgument,
     /// <summary>
     /// Emitted when a program that contains varargs function declarations is compiled ahead-of-time.
     /// </summary>
-    DS0212_AotVarArgsFunction,
+    DS0213_AotVarArgsFunction,
     /// <summary>
     /// Emitted when a program that contains a varargs function declaration is compiled for a platform other than Windows.
     /// </summary>
-    DS0213_VarArgsNonWindows,
+    DS0214_VarArgsNonWindows,
     /// <summary>
     /// Emitted when an 'extern' block contains another.
     /// </summary>
-    DS0214_NestedExternalBlock,
+    DS0215_NestedExternalBlock,
     /// <summary>
     /// Emitted when an external extension caused an unhandled exception.
     /// </summary>
-    DS0215_ExtensionThrewException,
+    DS0216_ExtensionThrewException,
     /// <summary>
     /// Emitted when a compiler directive is used as an expression.
     /// </summary>
-    DS0216_CompilerDirectiveAsExpression,
+    DS0217_CompilerDirectiveAsExpression,
     /// <summary>
     /// Emitted when a compiler directive is used that could not be found.
     /// </summary>
-    DS0217_InvalidCompilerDirective,
+    DS0218_InvalidCompilerDirective,
     /// <summary>
     /// Emitted when a compiler directive is called with invalid arguments.
     /// </summary>
-    DS0218_CompilerDirectiveInvalidArguments,
+    DS0219_CompilerDirectiveInvalidArguments,
     /// <summary>
     /// Emitted when a compiler directive is called in an invalid scope.
     /// </summary>
-    DS0219_CompilerDirectiveInvalidScope,
+    DS0220_CompilerDirectiveInvalidScope,
     /// <summary>
     /// Emitted when the target of an import compiler directive is invalid.
     /// </summary>
-    DS0220_ImportDirectiveInvalidTarget,
+    DS0221_ImportDirectiveInvalidTarget,
     /// <summary>
     /// Emitted when a specified extension file (.dll) does not exist.
     /// </summary>
-    DS0221_ExtensionFileNotFound,
+    DS0222_ExtensionFileNotFound,
     /// <summary>
     /// Emitted when a compiler extension is attempted to be initialized in an unsupported mode.
     /// </summary>
-    DS0222_ExtensionUnsupportedMode,
+    DS0223_ExtensionUnsupportedMode,
     /// <summary>
     /// Emitted when the initializer of an extension package returns a nonzero status code.
     /// </summary>
-    DS0223_ExtensionInitializerFailed,
+    DS0224_ExtensionInitializerFailed,
     /// <summary>
     /// Emitted when an extension is loaded multiple times in different modes.
     /// </summary>
-    DS0224_ExtensionDuplicateMode,
+    DS0225_ExtensionDuplicateMode,
     /// <summary>
     /// Emitted when an exception occured while loading extensions from a remote source.
     /// </summary>
-    DS0225_RemoteExtensionException,
+    DS0226_RemoteExtensionException,
     /// <summary>
     /// Emitted when the 'dc package install' command is used but the specified extension couldn't be found.
     /// </summary>
-    DS0226_PackageInstallNotFound,
+    DS0227_PackageInstallNotFound,
     /// <summary>
     /// Emitted when the 'dc package source' command is invoked with an invalid set of arguments.
     /// </summary>
-    DS0227_PackageSourceInvalidArguments,
+    DS0228_PackageSourceInvalidArguments,
     /// <summary>
     /// Emitted when the 'dc package install' command is used but the specified extension is already installed.
     /// </summary>
-    DS0228_PackageInstallAlreadyInstalled,
+    DS0229_PackageInstallAlreadyInstalled,
     /// <summary>
-    /// Emitted when an operation was successful.
+    /// Unused.
     /// </summary>
-    DS0229_Success,
+    DS0230_Unused,
     /// <summary>
     /// Emitted when a function declared as a <c>&lt;Predicate&gt;</c> does not return a value of type <see cref="bool"/>.
     /// </summary>
-    DS0230_PredicateFunctionNotBoolean,
+    DS0231_PredicateFunctionNotBoolean,
     /// <summary>
     /// Emitted when a specified document source cannot be found.
     /// </summary>
-    DS0231_DocumentSourceNotFound,
+    DS0232_DocumentSourceNotFound,
     /// <summary>
     /// Emitted when multiple active document sources generate the same document name.
     /// </summary>
-    DS0232_DocumentSourcesDuplicateDocumentName,
+    DS0233_DocumentSourcesDuplicateDocumentName,
     /// <summary>
     /// Emitted when the compilation was terminated due to the maximum number of error messages being reached.
     /// </summary>
-    DS0233_CompilationTerminated,
+    DS0234_CompilationTerminated,
     /// <summary>
     /// Error code for informational messages caused by enabling the <see cref="DassieConfig.MeasureElapsedTime"/> option.
     /// </summary>
-    DS0234_ElapsedTime
+    DS0235_ElapsedTime
 }

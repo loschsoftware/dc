@@ -39,7 +39,7 @@ internal static class ReferenceHandler
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0081_InvalidProjectReference,
+                DS0082_InvalidProjectReference,
                 $"The referenced project file '{reference.ProjectFile}' could not be found.",
                 ProjectConfigurationFileName);
 
@@ -69,7 +69,7 @@ internal static class ReferenceHandler
                     {
                         EmitErrorMessage(
                             0, 0, 0,
-                            DS0204_CircularProjectDependency,
+                            DS0205_CircularProjectDependency,
                             $"Project '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}' references itself.",
                             ProjectConfigurationFileName);
                     }
@@ -77,7 +77,7 @@ internal static class ReferenceHandler
                     {
                         EmitErrorMessage(
                             0, 0, 0,
-                            DS0204_CircularProjectDependency,
+                            DS0205_CircularProjectDependency,
                             $"Circular project dependency between '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(projRef.ProjectFile).Split(Path.DirectorySeparatorChar)[^1]}'.",
                             ProjectConfigurationFileName);
                     }
@@ -99,7 +99,7 @@ internal static class ReferenceHandler
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0081_InvalidProjectReference,
+                DS0082_InvalidProjectReference,
                 $"The referenced project '{reference.ProjectFile}' does not specify an assembly name.",
                 reference.ProjectFile);
 
@@ -110,7 +110,7 @@ internal static class ReferenceHandler
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0081_InvalidProjectReference,
+                DS0082_InvalidProjectReference,
                 $"The referenced project '{reference.ProjectFile}' does not specify an output directory, which is invalid if 'CopyToOutput' is set to 'true'.",
                 reference.ProjectFile);
 

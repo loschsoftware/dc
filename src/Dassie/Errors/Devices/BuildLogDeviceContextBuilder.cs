@@ -36,7 +36,7 @@ internal static class BuildLogDeviceContextBuilder
                     loc.Row,
                     loc.Column,
                     loc.Length,
-                    DS0170_InvalidBuildDeviceName,
+                    DS0171_InvalidBuildDeviceName,
                     $"The specified build log device '{deviceName}' is not installed.",
                     ProjectConfigurationFileName);
 

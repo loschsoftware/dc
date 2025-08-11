@@ -57,7 +57,7 @@ internal static class ConfigValidation
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0001_SyntaxError,
+                DS0002_SyntaxError,
                 $"Malformed document: {xmlEx.Message}",
                 ProjectConfigurationFileName);
 
@@ -72,7 +72,7 @@ internal static class ConfigValidation
                 {
                     CodePosition = (((IXmlLineInfo)element).LineNumber, ((IXmlLineInfo)element).LinePosition),
                     Length = element.Name.LocalName.Length + 2,
-                    ErrorCode = DS0089_InvalidDSConfigProperty,
+                    ErrorCode = DS0090_InvalidDSConfigProperty,
                     Severity = Severity.Warning,
                     ErrorMessage = $"Invalid property '{element.Name.LocalName}'.",
                     File = ProjectConfigurationFileName

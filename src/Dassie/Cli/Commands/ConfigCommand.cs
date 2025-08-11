@@ -32,7 +32,7 @@ internal class ConfigCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0211_UnexpectedArgument,
+                    DS0212_UnexpectedArgument,
                     $"Unexpected argument '{arg}'.",
                     CompilerExecutableName);
             }

@@ -1,4 +1,4 @@
-﻿using Dassie.Cli;
+﻿using Dassie.Cli.Commands;
 using Dassie.Configuration;
 using Dassie.Configuration.Analysis;
 using Dassie.Errors.Devices;
@@ -29,6 +29,8 @@ public static class ErrorWriter
     public static readonly List<ErrorInfo> Messages = [];
     
     private static readonly List<(ErrorInfo Error, int MinVerbosity)> _deferredMessages = [];
+
+    internal static bool BuildFailed => Messages.Any(m => m.Severity == Severity.Error);
 
     /// <summary>
     /// A list of build devices to use.
@@ -64,7 +66,7 @@ public static class ErrorWriter
 
             EmitWarningMessage(
                 0, 0, 0,
-                DS0215_ExtensionThrewException,
+                DS0216_ExtensionThrewException,
                 $"An unhandled exception of type '{ex.GetType()}' was caused by the build log device '{device.Name}'. This build log device will be disabled for the rest of the compilation.",
                 CompilerExecutableName);
             
@@ -118,7 +120,7 @@ public static class ErrorWriter
                     loc.Row,
                     loc.Column,
                     loc.Length,
-                    DS0071_IllegalIgnoredMessage,
+                    DS0072_IllegalIgnoredMessage,
                     $"The error code {error.ErrorCode.ToString().Split('_')[0]} cannot be ignored.",
                     ProjectConfigurationFileName);
             }
@@ -155,7 +157,7 @@ public static class ErrorWriter
         Messages.Add(error);
 
         if (Context.Configuration.MaxErrors > 0 && Messages.Count(m => m.Severity == Severity.Error) >= Context.Configuration.MaxErrors)
-            Program.Exit((int)DS0233_CompilationTerminated);
+            CompileCommand.Abort();
     }
 
     /// <summary>
@@ -174,7 +176,7 @@ public static class ErrorWriter
         {
             CodePosition = (0, 0),
             Length = 0,
-            ErrorCode = DS0101_DiagnosticInfo,
+            ErrorCode = DS0102_DiagnosticInfo,
             ErrorMessage = message,
             File = "",
             HideCodePosition = true,
@@ -218,7 +220,7 @@ public static class ErrorWriter
     /// <param name="file">The file name to use in the error message.</param>
     /// <param name="tip">An optional tip displayed in the message.</param>
     /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -260,7 +262,7 @@ public static class ErrorWriter
     /// <param name="file">The file name to use in the warning message.</param>
     /// <param name="tip">An optional tip displayed in the message.</param>
     /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
-    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -304,7 +306,7 @@ public static class ErrorWriter
     /// <param name="file">The file name to use in the message.</param>
     /// <param name="tip">An optional tip displayed in the message.</param>
     /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
-    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = DS0000_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 

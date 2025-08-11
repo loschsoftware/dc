@@ -54,7 +54,7 @@ internal static class CommandLineOptionParser
                 else if (args[i] == args.Last() || args[i + 1].StartsWith('-'))
                 {
                     EmitErrorMessage(0, 0, 0,
-                        DS0089_InvalidDSConfigProperty,
+                        DS0090_InvalidDSConfigProperty,
                         $"Expected argument for option '{arg}' (alias for '{option}').",
                         CompilerExecutableName);
 
@@ -77,7 +77,7 @@ internal static class CommandLineOptionParser
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0089_InvalidDSConfigProperty,
+                    DS0090_InvalidDSConfigProperty,
                     $"Invalid flag '{flag[1..]}'.",
                     CompilerExecutableName);
             }
@@ -120,7 +120,7 @@ internal static class CommandLineOptionParser
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0089_InvalidDSConfigProperty,
+                    DS0090_InvalidDSConfigProperty,
                     $"Invalid option '{arg[2..]}'.",
                     CompilerExecutableName);
             }
@@ -166,7 +166,7 @@ internal static class CommandLineOptionParser
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0089_InvalidDSConfigProperty,
+                    DS0090_InvalidDSConfigProperty,
                     $"Invalid property value for '{prop.Name}': '{value}' cannot be converted to '{prop.PropertyType.FullName}'.",
                     CompilerExecutableName);
             }
@@ -177,7 +177,7 @@ internal static class CommandLineOptionParser
 
         EmitErrorMessage(
             0, 0, 0,
-            DS0089_InvalidDSConfigProperty,
+            DS0090_InvalidDSConfigProperty,
             $"Invalid option '{identifier}'.",
             CompilerExecutableName);
     }
@@ -197,7 +197,7 @@ internal static class CommandLineOptionParser
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0022_InvalidAssemblyReference,
+                    DS0023_InvalidAssemblyReference,
                     $"Reference '{value}' could not be resolved.",
                     CompilerExecutableName);
 
@@ -316,7 +316,7 @@ internal static class CommandLineOptionParser
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0089_InvalidDSConfigProperty,
+                    DS0090_InvalidDSConfigProperty,
                     $"Invalid property value for '{_prop.Name}': '{value}' cannot be converted to '{_prop.PropertyType.FullName}'.",
                     CompilerExecutableName);
             }

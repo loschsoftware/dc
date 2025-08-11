@@ -119,7 +119,7 @@ internal class MacroParser
                 {
                     EmitWarningMessage(
                         0, 0, 0,
-                        DS0082_InvalidDSConfigMacro,
+                        DS0083_InvalidDSConfigMacro,
                         $"The macro '{match.Value[2..^1]}' does not exist and will be ignored.",
                         ProjectConfigurationFileName);
 

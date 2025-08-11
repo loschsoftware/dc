@@ -46,7 +46,7 @@ internal class BuildCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0131_DCBuildCalledOnProjectGroup,
+                DS0132_DCBuildCalledOnProjectGroup,
                 $"'dc build' can only be called on single projects. Use 'dc deploy' to build and deploy a project group.",
                 ProjectConfigurationFileName);
 
@@ -66,7 +66,7 @@ internal class BuildCommand : ICompilerCommand
 
             EmitErrorMessage(
                 0, 0, 0,
-                DS0087_InvalidProfile,
+                DS0088_InvalidProfile,
                 $"The build profile '{profileName}' could not be found.",
                 ProjectConfigurationFileName);
 
@@ -85,7 +85,7 @@ internal class BuildCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0029_FileAccessDenied,
+                DS0030_FileAccessDenied,
                 $"Files to compile could not be determined: {ex.Message}",
                 CompilerExecutableName);
         }
@@ -96,7 +96,7 @@ internal class BuildCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0072_NoSourceFilesFound,
+                DS0073_NoSourceFilesFound,
                 "No source files present.",
                 "build");
 
@@ -156,7 +156,7 @@ internal class BuildCommand : ICompilerCommand
                     {
                         EmitErrorMessage(
                             0, 0, 0,
-                            DS0087_InvalidProfile,
+                            DS0088_InvalidProfile,
                             errMsg,
                             ProjectConfigurationFileName);
 
@@ -166,7 +166,7 @@ internal class BuildCommand : ICompilerCommand
                     {
                         EmitWarningMessage(
                             0, 0, 0,
-                            DS0087_InvalidProfile,
+                            DS0088_InvalidProfile,
                             errMsg,
                             ProjectConfigurationFileName);
                     }
@@ -213,7 +213,7 @@ internal class BuildCommand : ICompilerCommand
                     {
                         EmitErrorMessage(
                             0, 0, 0,
-                            DS0087_InvalidProfile,
+                            DS0088_InvalidProfile,
                             errMsg,
                             ProjectConfigurationFileName);
 
@@ -223,7 +223,7 @@ internal class BuildCommand : ICompilerCommand
                     {
                         EmitWarningMessage(
                             0, 0, 0,
-                            DS0087_InvalidProfile,
+                            DS0088_InvalidProfile,
                             errMsg,
                             ProjectConfigurationFileName);
                     }

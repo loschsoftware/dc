@@ -55,7 +55,7 @@ internal static class TemplateBuilder
 
         if (args.Length < 2)
         {
-            EmitErrorMessage(0, 0, 0, DS0205_DCNewInvalidArguments, "Project template and name expected.", CompilerExecutableName);
+            EmitErrorMessage(0, 0, 0, DS0206_DCNewInvalidArguments, "Project template and name expected.", CompilerExecutableName);
             WriteLine("");
             PrintAvailableTemplates();
             return -1;
@@ -63,7 +63,7 @@ internal static class TemplateBuilder
 
         if (!availableTemplates.Any(t => string.Compare(t.Name, args[0], !t.IsCaseSensitive()) == 0))
         {
-            EmitErrorMessage(0, 0, 0, DS0205_DCNewInvalidArguments, $"The project template '{args[0]}' is not installed.", CompilerExecutableName);
+            EmitErrorMessage(0, 0, 0, DS0206_DCNewInvalidArguments, $"The project template '{args[0]}' is not installed.", CompilerExecutableName);
             WriteLine("");
             PrintAvailableTemplates();
             return -1;
@@ -81,7 +81,7 @@ internal static class TemplateBuilder
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0206_DCNewNonEmptyDirectory,
+                    DS0207_DCNewNonEmptyDirectory,
                     $"The project directory '{rootDir}' already exists and is not empty. Use the '-f' flag to delete the existing directory.",
                     CompilerExecutableName);
 

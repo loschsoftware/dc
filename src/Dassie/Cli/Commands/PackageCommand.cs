@@ -250,7 +250,7 @@ internal class PackageCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0226_PackageInstallNotFound,
+                DS0227_PackageInstallNotFound,
                 $"The extension '{name}' could not be found.",
                 CompilerExecutableName);
 
@@ -264,7 +264,7 @@ internal class PackageCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0228_PackageInstallAlreadyInstalled,
+                DS0229_PackageInstallAlreadyInstalled,
                 $"The extension '{name}' is already installed. Use the 'dc package update' command to update it to the newest version.",
                 CompilerExecutableName);
 
@@ -272,7 +272,7 @@ internal class PackageCommand : ICompilerCommand
         }
 
         File.WriteAllBytes(path, dataBytes);
-        EmitMessage(0, 0, 0, DS0229_Success, $"Successfully installed extension '{name}', version {extensions[0].Metadata.Version}.", CompilerExecutableName);
+        EmitMessage(0, 0, 0, DS0000_Success, $"Successfully installed extension '{name}', version {extensions[0].Metadata.Version}.", CompilerExecutableName);
         return 0;
     }
 
@@ -369,7 +369,7 @@ internal class PackageCommand : ICompilerCommand
     {
         EmitErrorMessage(
             0, 0, 0,
-            DS0063_UnsupportedFeature,
+            DS0064_UnsupportedFeature,
             "This command is not yet implemented.",
             CompilerExecutableName);
 

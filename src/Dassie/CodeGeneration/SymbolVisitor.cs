@@ -43,7 +43,7 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
                     pt.Start.Line,
                     pt.Start.Column,
                     pt.GetText().Length,
-                    DS0199_MultipleExports,
+                    DS0200_MultipleExports,
                     "A source file can export at most one namespace.");
             }
         }
@@ -79,7 +79,7 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
                         id.Start.Line,
                         id.Start.Column,
                         ns.Length,
-                        DS0077_InvalidImport,
+                        DS0078_InvalidImport,
                         "Only namespaces and modules can be imported.");
                 }
 

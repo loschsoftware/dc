@@ -23,7 +23,7 @@ internal static class DocumentSourceManager
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0231_DocumentSourceNotFound,
+                    DS0232_DocumentSourceNotFound,
                     $"The document source '{sourceName}' could not be found.",
                     ProjectConfigurationFileName);
 
@@ -40,7 +40,7 @@ internal static class DocumentSourceManager
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0232_DocumentSourcesDuplicateDocumentName,
+                    DS0233_DocumentSourcesDuplicateDocumentName,
                     $"Multiple document sources attempted to write to document '{source.DocumentName}'.",
                     ProjectConfigurationFileName);
 

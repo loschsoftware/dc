@@ -40,7 +40,7 @@ internal static class MemberDeclarationGeneration
                 context.member_access_modifier().Start.Line,
                 context.member_access_modifier().Start.Column,
                 context.member_access_modifier().GetText().Length,
-                DS0161_CustomOperatorNotGlobal,
+                DS0162_CustomOperatorNotGlobal,
                 "The only valid access modifier for a custom operator is 'global'.");
 
             return;
@@ -52,7 +52,7 @@ internal static class MemberDeclarationGeneration
                 context.parameter_list().Start.Line,
                 context.parameter_list().Start.Column,
                 context.parameter_list().GetText().Length,
-                DS0162_CustomOperatorTooManyParameters,
+                DS0163_CustomOperatorTooManyParameters,
                 "A custom operator cannot have more than two operands.");
 
             return;
@@ -64,7 +64,7 @@ internal static class MemberDeclarationGeneration
                 context.Custom_Operator().Symbol.Line,
                 context.Custom_Operator().Symbol.Column,
                 context.Custom_Operator().GetText().Length,
-                DS0163_CustomOperatorNoMethodBody,
+                DS0164_CustomOperatorNoMethodBody,
                 "Custom operators are required to have method bodies.");
 
             return;
@@ -158,7 +158,7 @@ internal static class MemberDeclarationGeneration
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0141_MethodInEnumeration,
+                DS0142_MethodInEnumeration,
                 "Enumeration types cannot contain constructors.");
         }
 
@@ -237,7 +237,7 @@ internal static class MemberDeclarationGeneration
                 context.Var().Symbol.Line,
                 context.Var().Symbol.Column,
                 context.Var().GetText().Length,
-                DS0083_InvalidVarModifier,
+                DS0084_InvalidVarModifier,
                 "The modifier 'var' cannot be used on methods.");
         }
 
@@ -256,7 +256,7 @@ internal static class MemberDeclarationGeneration
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
-                    DS0141_MethodInEnumeration,
+                    DS0142_MethodInEnumeration,
                     "Enumeration types cannot contain methods.");
             }
 
@@ -341,7 +341,7 @@ internal static class MemberDeclarationGeneration
                             typeParam.Start.Line,
                             typeParam.Start.Column,
                             typeParam.GetText().Length,
-                            DS0112_DuplicateTypeParameter,
+                            DS0113_DuplicateTypeParameter,
                             $"Duplicate type parameter '{typeParam.GetText()}'.");
 
                         continue;
@@ -353,7 +353,7 @@ internal static class MemberDeclarationGeneration
                             typeParam.Start.Line,
                             typeParam.Start.Column,
                             typeParam.GetText().Length,
-                            DS0114_TypeParameterIsDefinedInContainingScope,
+                            DS0115_TypeParameterIsDefinedInContainingScope,
                             $"The type parameter '{typeParam.Identifier().GetIdentifier()}' is already declared by the containing type '{Format(TypeContext.Current.Builder)}'.");
                     }
 
@@ -412,7 +412,7 @@ internal static class MemberDeclarationGeneration
                         context.Start.Line,
                         context.Start.Column,
                         context.GetText().Length,
-                        DS0115_NonAbstractMethodHasNoBody,
+                        DS0116_NonAbstractMethodHasNoBody,
                         $"The non-abstract member '{mb.Name}' needs to define a body.");
 
                     CurrentMethod.IL.Emit(OpCodes.Ret);
@@ -425,7 +425,7 @@ internal static class MemberDeclarationGeneration
                     context.Start.Line,
                     context.Start.Column,
                     context.GetText().Length,
-                    DS0116_AbstractMethodHasBody,
+                    DS0117_AbstractMethodHasBody,
                     $"The abstract member '{mb.Name}' cannot define a body.");
 
                 return;
@@ -527,7 +527,7 @@ internal static class MemberDeclarationGeneration
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0172_EventAndProperty,
+                DS0173_EventAndProperty,
                 $"The attributes '<Auto>' and '<Event>' cannot be combined.");
         }
 
@@ -540,7 +540,7 @@ internal static class MemberDeclarationGeneration
                 context.Var().Symbol.Line,
                 context.Var().Symbol.Column,
                 context.Var().GetText().Length,
-                DS0151_VarFieldInImmutableType,
+                DS0152_VarFieldInImmutableType,
                 $"The 'var' modifier is invalid on members of immutable value types. {memberKindPlural.ToUpper()} of immutable types are not allowed to be mutable.");
         }
 
@@ -553,7 +553,7 @@ internal static class MemberDeclarationGeneration
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0158_InstanceFieldInTemplate,
+                DS0159_InstanceFieldInTemplate,
                 $"Template types cannot contain instance {memberKindPlural}.");
         }
 
@@ -563,7 +563,7 @@ internal static class MemberDeclarationGeneration
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0150_ByRefFieldInNonByRefLikeType,
+                DS0151_ByRefFieldInNonByRefLikeType,
                 $"Invalid {memberKind} type '{TypeName(type)}'. References are only valid as part of ByRef-like value types (val& type).");
         }
 
@@ -578,7 +578,7 @@ internal static class MemberDeclarationGeneration
                     node.Symbol.Line,
                     node.Symbol.Column,
                     node.GetText().Length,
-                    DS0167_PropertyLiteral,
+                    DS0168_PropertyLiteral,
                     "The modifier 'literal' is not valid on properties.");
             }
 
@@ -642,7 +642,7 @@ internal static class MemberDeclarationGeneration
                     node.Symbol.Line,
                     node.Symbol.Column,
                     node.GetText().Length,
-                    DS0167_PropertyLiteral,
+                    DS0168_PropertyLiteral,
                     "The modifier 'literal' is not valid on events.");
             }
 
@@ -652,7 +652,7 @@ internal static class MemberDeclarationGeneration
                     context.type_name().Start.Line,
                     context.type_name().Start.Column,
                     context.type_name().GetText().Length,
-                    DS0174_EventFieldTypeNotDelegate,
+                    DS0175_EventFieldTypeNotDelegate,
                     "Event must be of a delegate type.");
 
                 return;
@@ -706,7 +706,7 @@ internal static class MemberDeclarationGeneration
                         context.property_or_event_block().add_handler()[1].Start.Line,
                         context.property_or_event_block().add_handler()[1].Start.Column,
                         context.property_or_event_block().add_handler()[1..].SelectMany(a => a.GetText()).Count(),
-                        DS0173_EventHasMultipleHandlers,
+                        DS0174_EventHasMultipleHandlers,
                         "An event can only contain one 'add' handler.");
                 }
 
@@ -739,7 +739,7 @@ internal static class MemberDeclarationGeneration
                         context.property_or_event_block().remove_handler()[1].Start.Line,
                         context.property_or_event_block().remove_handler()[1].Start.Column,
                         context.property_or_event_block().remove_handler()[1..].SelectMany(a => a.GetText()).Count(),
-                        DS0173_EventHasMultipleHandlers,
+                        DS0174_EventHasMultipleHandlers,
                         "An event can only contain one 'remove' handler.");
                 }
 
@@ -755,7 +755,7 @@ internal static class MemberDeclarationGeneration
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
-                    DS0175_EventMissingHandlers,
+                    DS0176_EventMissingHandlers,
                     $"Event '{eventName}' is missing a{(context.property_or_event_block().add_handler().Length == 0 ? "n" : "")} '{(context.property_or_event_block().add_handler().Length == 0 ? "add" : "remove")}' handler.");
             }
 
@@ -784,7 +784,7 @@ internal static class MemberDeclarationGeneration
                     context.expression().Start.Line,
                     context.expression().Start.Column,
                     context.expression().GetText().Length,
-                    DS0138_CompileTimeConstantRequired,
+                    DS0139_CompileTimeConstantRequired,
                     "Compile-time constant expected.");
 
                 return;
@@ -796,7 +796,7 @@ internal static class MemberDeclarationGeneration
                     context.expression().Start.Line,
                     context.expression().Start.Column,
                     context.expression().GetText().Length,
-                    DS0054_WrongFieldType,
+                    DS0055_WrongFieldType,
                     $"Expected expression of type '{TypeName(type)}', but got type '{TypeName(compileTimeConst.Type)}'.");
             }
             else

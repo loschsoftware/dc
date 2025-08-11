@@ -47,7 +47,7 @@ internal class AotCompiler
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0210_CrossSystemAotCompilation,
+                DS0211_CrossSystemAotCompilation,
                 $"Cross-system ahead-of-time compilation is not supported.",
                 CompilerExecutableName);
 

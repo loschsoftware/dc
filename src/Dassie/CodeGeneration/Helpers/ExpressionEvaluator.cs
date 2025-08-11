@@ -511,7 +511,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
-                DS0076_EmptyCharacterLiteral,
+                DS0077_EmptyCharacterLiteral,
                 "A character literal cannot be empty.");
 
             return new(typeof(char), ' ');
@@ -530,7 +530,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
-                DS0135_DivisionByConstantZero,
+                DS0136_DivisionByConstantZero,
                 "Division by constant zero.");
         }
 
@@ -625,7 +625,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
-                DS0075_Overflow,
+                DS0076_Overflow,
                 $"The literal is too large or too small for type '{literalType.FullName}'.");
         }
 
@@ -642,7 +642,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
-                DS0135_DivisionByConstantZero,
+                DS0136_DivisionByConstantZero,
                 "Division by constant zero.");
         }
 

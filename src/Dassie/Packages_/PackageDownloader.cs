@@ -49,7 +49,7 @@ internal static class PackageDownloader
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0103_NetworkError,
+                    DS0104_NetworkError,
                     $"Could not download package '{packageId}'.",
                     CompilerExecutableName);
 
@@ -70,7 +70,7 @@ internal static class PackageDownloader
             {
                 EmitWarningMessage(
                     0, 0, 0,
-                    DS0104_InvalidPackageReference,
+                    DS0105_InvalidPackageReference,
                     $"Version '{version}' not found in package '{packageId}'. Using latest version instead, which is '{targetVersion.ToFullString()}'.",
                     CompilerExecutableName);
             }

@@ -24,7 +24,7 @@ internal class FileBuildLogDevice : IBuildLogDevice, IDisposable
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0171_FileBuildLogDeviceNoPathSpecified,
+                DS0172_FileBuildLogDeviceNoPathSpecified,
                 $"'Path' attribute is required for <File> build log device.",
                 ProjectConfigurationFileName);
 

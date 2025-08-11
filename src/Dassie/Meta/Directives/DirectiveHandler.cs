@@ -46,7 +46,7 @@ internal static class DirectiveHandler
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
-                DS0217_InvalidCompilerDirective,
+                DS0218_InvalidCompilerDirective,
                 $"The compiler directive '{identifier}' could not be found.");
 
             return null;

@@ -37,7 +37,7 @@ internal class DeployCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0211_UnexpectedArgument,
+                    DS0212_UnexpectedArgument,
                     $"Unexpected argument '{arg}'.",
                     CompilerExecutableName);
             }
@@ -57,7 +57,7 @@ internal class DeployCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0128_DeployCommandInvalidProjectGroupFile,
+                DS0129_DeployCommandInvalidProjectGroupFile,
                 $"Current directory contains no configuration file ({ProjectConfigurationFileName}).",
                 ProjectConfigurationFileName);
 
@@ -68,7 +68,7 @@ internal class DeployCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0128_DeployCommandInvalidProjectGroupFile,
+                DS0129_DeployCommandInvalidProjectGroupFile,
                 $"Invalid configuration file: '{ProjectConfigurationFileName}' does not define a project group.",
                 ProjectConfigurationFileName);
 
@@ -79,7 +79,7 @@ internal class DeployCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0129_ProjectGroupNoComponents,
+                DS0130_ProjectGroupNoComponents,
                 $"Project group contains no components.",
                 ProjectConfigurationFileName);
 
@@ -106,7 +106,7 @@ internal class DeployCommand : ICompilerCommand
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0128_DeployCommandInvalidProjectGroupFile,
+                        DS0129_DeployCommandInvalidProjectGroupFile,
                         $"Component project group '{pg.Path}' could not be found.",
                         ProjectConfigurationFileName);
 
@@ -142,7 +142,7 @@ internal class DeployCommand : ICompilerCommand
         {
             EmitWarningMessage(
                 0, 0, 0,
-                DS0130_ProjectGroupNoTargets,
+                DS0131_ProjectGroupNoTargets,
                 "Project group defines no targets.",
                 ProjectConfigurationFileName);
         }

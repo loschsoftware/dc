@@ -29,7 +29,7 @@ static class ExtensionDownloader
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0225_RemoteExtensionException,
+                DS0226_RemoteExtensionException,
                 $"An error occured trying to fetch extension '{extensionId}': {ex.Message}",
                 CompilerExecutableName);
         }
@@ -70,7 +70,7 @@ static class ExtensionDownloader
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0225_RemoteExtensionException,
+                    DS0226_RemoteExtensionException,
                     $"An error occured trying to download extension '{metadata.Metadata.Name}' from URI '{metadata.Uri}': {ex.Message}",
                     CompilerExecutableName);
             }

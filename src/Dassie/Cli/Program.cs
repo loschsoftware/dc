@@ -47,13 +47,16 @@ internal class Program
             bool verbose = EmitBuildLogMessage($"Unhandled exception occured. {ex}", 2);
 
             if (!Messages.Any(m => m.Severity == Severity.Error))
-                EmitErrorMessage(0, 0, 0, DS0000_UnknownError, $"Unhandled exception of type '{ex.GetType()}'.", CompilerExecutableName);
+                EmitErrorMessage(0, 0, 0, DS0001_UnknownError, $"Unhandled exception of type '{ex.GetType()}'.", CompilerExecutableName);
 
             ConsoleHelper.PrintException(ex, verbose);
 
             if (Debugger.IsAttached)
                 throw;
         }
+
+        if (Messages.Any(m => m.Severity == Severity.Error))
+            exit = (int)Messages.First(m => m.Severity == Severity.Error).ErrorCode;
 
         Exit(exit);
         return exit;
@@ -65,18 +68,6 @@ internal class Program
     /// <param name="errorCode">The application exit code.</param>
     public static void Exit(int errorCode)
     {
-        if (errorCode == (int)DS0233_CompilationTerminated)
-        {
-            int msgCount = Messages.Count(e => e.Severity == Severity.Error);
-            Context.Configuration.MaxErrors = 0;
-
-            EmitMessage(
-                0, 0, 0,
-                DS0233_CompilationTerminated,
-                $"Compilation terminated after {msgCount} error{(msgCount > 1 ? "s" : "")}.",
-                CompilerExecutableName);
-        }
-
         ExtensionLoader.UnloadAll();
         Environment.Exit(errorCode);
     }

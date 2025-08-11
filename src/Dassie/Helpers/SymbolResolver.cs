@@ -221,7 +221,7 @@ internal static class SymbolResolver
                     row,
                     col,
                     len,
-                    DS0062_LocalOutsideScope,
+                    DS0063_LocalOutsideScope,
                     $"The local '{loc.Name}' is not in scope.");
             }
 
@@ -545,7 +545,7 @@ internal static class SymbolResolver
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0127_AccessModifiersTooRestrictive,
+                    DS0128_AccessModifiersTooRestrictive,
                     $"'{name}' cannot be called because its access modifiers are too restrictive.");
             }
         }
@@ -572,7 +572,7 @@ internal static class SymbolResolver
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0127_AccessModifiersTooRestrictive,
+                    DS0128_AccessModifiersTooRestrictive,
                     $"Field '{type.Name}.{f.Name}' cannot be accessed because its access modifiers are too restrictive.");
             }
 
@@ -714,7 +714,7 @@ internal static class SymbolResolver
                 row,
                 col,
                 len,
-                DS0085_TypeInfoCouldNotBeRead,
+                DS0086_TypeInfoCouldNotBeRead,
                 $"Members of '{tb.FullName}' could not be located.");
 
             return null;
@@ -733,7 +733,7 @@ internal static class SymbolResolver
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0139_ModuleInstantiation,
+                    DS0140_ModuleInstantiation,
                     $"Module '{name}' cannot be instantiated.");
 
                 return null;
@@ -845,7 +845,7 @@ internal static class SymbolResolver
             {
                 EmitErrorMessage(
                     row, col, len,
-                    DS0127_AccessModifiersTooRestrictive,
+                    DS0128_AccessModifiersTooRestrictive,
                     $"Field '{tc.Builder.Name}.{f.Builder.Name}' cannot be accessed because its access modifiers are too restrictive.");
             }
 
@@ -1308,7 +1308,7 @@ internal static class SymbolResolver
         {
             EmitErrorMessage(
                 row, col, len,
-                DS0177_InvalidAttributeType,
+                DS0178_InvalidAttributeType,
                 $"The type '{t}' cannot be used as an attribute.");
         }
 
@@ -1365,7 +1365,7 @@ internal static class SymbolResolver
                             row,
                             col,
                             len,
-                            DS0079_ArrayTooManyDimensions,
+                            DS0080_ArrayTooManyDimensions,
                             $"An array cannot have more than 32 dimensions.");
                     }
 
@@ -1382,7 +1382,7 @@ internal static class SymbolResolver
                             row,
                             col,
                             len,
-                            DS0149_NestedByRefType,
+                            DS0150_NestedByRefType,
                             $"Invalid type '{name}': Nested references are not permitted.");
                     }
 
@@ -1669,7 +1669,7 @@ internal static class SymbolResolver
                 row,
                 col,
                 len,
-                DS0009_TypeNotFound,
+                DS0010_TypeNotFound,
                 $"The name '{name}' could not be resolved.");
         }
         else

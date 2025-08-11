@@ -50,7 +50,7 @@ internal static class ProjectFileDeserializer
 
             EmitErrorMessage(
                 row, col, 0,
-                DS0090_MalformedConfigurationFile,
+                DS0091_MalformedConfigurationFile,
                 $"Invalid project file.{string.Join(':', ex.InnerException.Message.Split(':')[1..])}",
                 path);
         }

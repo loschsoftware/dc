@@ -26,7 +26,7 @@ internal static class TypeDeclarationGeneration
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0073_TypeNameTooLong,
+                DS0074_TypeNameTooLong,
                 "A type name cannot be longer than 1024 characters.");
 
             return new();
@@ -56,7 +56,7 @@ internal static class TypeDeclarationGeneration
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
-                    DS0120_DuplicateGenericTypeName,
+                    DS0121_DuplicateGenericTypeName,
                     $"Currently, the Dassie compiler does not allow creating types of the same name with different type parameters. This functionality might be added in the future. If you desperately need it, consider opening an issue on GitHub.");
             }
             else
@@ -73,7 +73,7 @@ internal static class TypeDeclarationGeneration
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
-                    DS0119_DuplicateTypeName,
+                    DS0120_DuplicateTypeName,
                     errMsg);
             }
         }
@@ -171,7 +171,7 @@ internal static class TypeDeclarationGeneration
                         context.type_kind().Ref().Symbol.Line,
                         context.type_kind().Ref().Symbol.Column,
                         3,
-                        DS0142_EnumTypeExplicitlyRef,
+                        DS0143_EnumTypeExplicitlyRef,
                         "The modifier 'ref' is invalid for enumeration types. Enumerations are always value types.");
                 }
 
@@ -181,7 +181,7 @@ internal static class TypeDeclarationGeneration
                         context.inheritance_list().Start.Line,
                         context.inheritance_list().Start.Column,
                         context.inheritance_list().GetText().Length,
-                        DS0143_EnumTypeBaseType,
+                        DS0144_EnumTypeBaseType,
                         "The only allowed base type for enumerations is 'System.Enum'.");
                 }
 
@@ -191,7 +191,7 @@ internal static class TypeDeclarationGeneration
                         context.inheritance_list().Start.Line,
                         context.inheritance_list().Start.Column,
                         context.inheritance_list().GetText().Length,
-                        DS0144_EnumTypeImplementsTemplate,
+                        DS0145_EnumTypeImplementsTemplate,
                         "Enumeration types cannot implement templates.");
                 }
 
@@ -237,7 +237,7 @@ internal static class TypeDeclarationGeneration
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
-                    DS0140_InvalidEnumerationType,
+                    DS0141_InvalidEnumerationType,
                     $"Invalid enumeration type '{instanceFieldType}'. The only allowed types are int8, uint8, int16, uint16, int, uint, int32, uint32, int64, uint64, native, unative.");
             }
 
@@ -277,7 +277,7 @@ internal static class TypeDeclarationGeneration
                         typeParam.Start.Line,
                         typeParam.Start.Column,
                         typeParam.GetText().Length,
-                        DS0112_DuplicateTypeParameter,
+                        DS0113_DuplicateTypeParameter,
                         $"Duplicate generic parameter '{typeParam.GetText()}'.");
 
                     continue;
@@ -357,7 +357,7 @@ internal static class TypeDeclarationGeneration
                         context.attribute()[0].Start.Line,
                         context.attribute()[0].Start.Column,
                         context.attribute()[0].GetText().Length,
-                        DS0179_AttributesOnAliasType,
+                        DS0180_AttributesOnAliasType,
                         "An alias type cannot use attributes.");
                 }
 
@@ -367,7 +367,7 @@ internal static class TypeDeclarationGeneration
                         context.type_special_modifier().Open().Symbol.Line,
                         context.type_special_modifier().Open().Symbol.Column,
                         context.type_special_modifier().Open().GetText().Length,
-                        DS0180_AliasTypeInvalidModifiers,
+                        DS0181_AliasTypeInvalidModifiers,
                         "The 'open' modifier is invalid on alias types.");
                 }
 
@@ -377,7 +377,7 @@ internal static class TypeDeclarationGeneration
                         context.inheritance_list().Start.Line,
                         context.inheritance_list().Start.Column,
                         context.inheritance_list().GetText().Length,
-                        DS0185_AliasTypeImplementsInterface,
+                        DS0186_AliasTypeImplementsInterface,
                         "Type aliases cannot implement templates.");
 
                     TypeContext.Current.RequiredInterfaceImplementations = [];
@@ -389,7 +389,7 @@ internal static class TypeDeclarationGeneration
                         context.inheritance_list().Start.Line,
                         context.inheritance_list().Start.Column,
                         context.inheritance_list().GetText().Length,
-                        DS0186_AliasTypeExtendsType,
+                        DS0187_AliasTypeExtendsType,
                         "Type aliases cannot explicitly set their base type.");
                 }
 
@@ -399,7 +399,7 @@ internal static class TypeDeclarationGeneration
                         context.generic_parameter_list().Start.Line,
                         context.generic_parameter_list().Start.Column,
                         context.generic_parameter_list().GetText().Length,
-                        DS0187_GenericAliasType,
+                        DS0188_GenericAliasType,
                         "Type aliases cannot define generic type parameters.");
                 }
 

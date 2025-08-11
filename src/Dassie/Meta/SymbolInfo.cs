@@ -77,7 +77,7 @@ internal class SymbolInfo
             {
                 EmitErrorMessage(
                     0, 0, 0, // TODO: Get correct location
-                    DS0095_ImmutableSymbolPassedByReference,
+                    DS0096_ImmutableSymbolPassedByReference,
                     $"The symbol '{Name()}' is immutable and cannot be passed by reference.");
             }
 

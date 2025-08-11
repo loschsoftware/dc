@@ -40,7 +40,7 @@ public static class FileCompiler
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0029_FileAccessDenied,
+                DS0030_FileAccessDenied,
                 $"Could not read from '{path}': {ex.Message}",
                 path);
         }

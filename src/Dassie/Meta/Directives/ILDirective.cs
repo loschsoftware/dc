@@ -17,7 +17,7 @@ internal class ILDirective : ICompilerDirective
                 context.Rule.Start.Line,
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
-                DS0218_CompilerDirectiveInvalidArguments,
+                DS0219_CompilerDirectiveInvalidArguments,
                 "Invalid arguments passed to 'il' directive. Expected [string].");
 
             return null;
@@ -29,7 +29,7 @@ internal class ILDirective : ICompilerDirective
                 context.Rule.Start.Line,
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
-                DS0219_CompilerDirectiveInvalidScope,
+                DS0220_CompilerDirectiveInvalidScope,
                 "The 'il' compiler directive can only be used inside of a function.");
 
             return null;

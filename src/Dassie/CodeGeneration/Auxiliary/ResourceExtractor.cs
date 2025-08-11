@@ -156,7 +156,7 @@ internal static class ResourceExtractor
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0207_InvalidResourceFile,
+                DS0208_InvalidResourceFile,
                 $"The resource file '{fileName}' is malformed or contains unsupported constructs.",
                 fileName);
         }

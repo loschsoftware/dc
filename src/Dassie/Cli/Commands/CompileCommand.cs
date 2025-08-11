@@ -44,6 +44,26 @@ internal class CompileCommand : ICompilerCommand
     public int Invoke(string[] args) => Compile(args);
     public int Invoke(string[] args, DassieConfig overrideSettings, string assemblyName = null) => Compile(args, overrideSettings, assemblyName);
 
+    internal static void Abort()
+    {
+        if (GlobalConfig.BuildDirectoryCreated)
+        {
+            Directory.SetCurrentDirectory(GlobalConfig.RelativePathResolverDirectory);
+            Directory.Delete(Context.Configuration.BuildOutputDirectory, true);
+        }
+
+        int msgCount = Messages.Count(e => e.Severity == Severity.Error);
+        Context.Configuration.MaxErrors = 0;
+
+        EmitMessage(
+            0, 0, 0,
+            DS0234_CompilationTerminated,
+            $"Compilation terminated after {msgCount} error{(msgCount > 1 ? "s" : "")}.",
+            CompilerExecutableName);
+
+        Program.Exit(234);
+    }
+
     private static int Compile(string[] args, DassieConfig overrideSettings = null, string assemblyName = null)
     {
         string workingDir = Directory.GetCurrentDirectory();
@@ -89,24 +109,29 @@ internal class CompileCommand : ICompilerCommand
         string relativePathResolverBaseDir = Directory.GetCurrentDirectory();
         GlobalConfig.RelativePathResolverDirectory = relativePathResolverBaseDir;
 
+        GlobalConfig.BuildDirectoryCreated = !Directory.Exists(config.BuildOutputDirectory);
+        config.BuildOutputDirectory ??= "";
+
         if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
         {
             try
             {
                 Directory.CreateDirectory(config.BuildOutputDirectory);
-                Directory.SetCurrentDirectory(config.BuildOutputDirectory);
             }
             catch (Exception ex)
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0029_FileAccessDenied,
+                    DS0030_FileAccessDenied,
                     $"Could not create build output directory: {ex.Message}",
                     CompilerExecutableName);
             }
         }
 
-        string assembly = Path.Combine(config.BuildOutputDirectory ?? "", $"{config.AssemblyName}.dll");
+        if (Directory.Exists(config.BuildOutputDirectory))
+            Directory.SetCurrentDirectory(config.BuildOutputDirectory);
+
+        string assembly = Path.Combine(config.BuildOutputDirectory, $"{config.AssemblyName}.dll");
         string msgPrefix = MessagePrefix;
 
         if (config.References != null)
@@ -142,7 +167,7 @@ internal class CompileCommand : ICompilerCommand
                     {
                         EmitMessage(
                             0, 0, 0,
-                            DS0234_ElapsedTime,
+                            DS0235_ElapsedTime,
                             $"Compilation finished after {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
                             CompilerExecutableName);
                     }
@@ -173,7 +198,7 @@ internal class CompileCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0029_FileAccessDenied,
+                    DS0030_FileAccessDenied,
                     ex.Message,
                     CompilerExecutableName);
             }
@@ -212,7 +237,7 @@ internal class CompileCommand : ICompilerCommand
         LineNumberOffset = 0;
         UnionTypeCodeGeneration._createdUnionTypes.Clear();
 
-        if (Messages.Any(m => m.ErrorCode == DS0106_NoInputFiles))
+        if (Messages.Any(m => m.ErrorCode == DS0107_NoInputFiles))
             return -1;
 
         EmitBuildLogMessage("Starting second pass.", 2);
@@ -231,7 +256,7 @@ internal class CompileCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0068_MultipleUnmanagedResources,
+                    DS0069_MultipleUnmanagedResources,
                     "An assembly can only contain one unmanaged resource file.",
                     ProjectConfigurationFileName);
             }
@@ -243,7 +268,7 @@ internal class CompileCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0090_MalformedConfigurationFile,
+                    DS0091_MalformedConfigurationFile,
                     $"The 'VersionInfo' tag cannot be used if an unmanaged resource file is specified.",
                     ProjectConfigurationFileName);
             }
@@ -255,7 +280,7 @@ internal class CompileCommand : ICompilerCommand
                 {
                     EmitWarningMessage(
                         0, 0, 0,
-                        DS0069_WinSdkToolNotFound,
+                        DS0070_WinSdkToolNotFound,
                         $"The Windows SDK tool 'rc.exe' could not be located. Setting version information failed. Consider precompiling your version info and including it as an unmanaged resource.",
                         ProjectConfigurationFileName);
 
@@ -281,7 +306,7 @@ internal class CompileCommand : ICompilerCommand
 
                                 EmitErrorMessage(
                                     0, 0, 0,
-                                    DS0089_InvalidDSConfigProperty,
+                                    DS0090_InvalidDSConfigProperty,
                                     $"Invalid language code '{v.Language}'.",
                                     ProjectConfigurationFileName);
                             }
@@ -306,7 +331,7 @@ internal class CompileCommand : ICompilerCommand
                         {
                             EmitErrorMessage(
                                 0, 0, 0,
-                                DS0089_InvalidDSConfigProperty,
+                                DS0090_InvalidDSConfigProperty,
                                 $"Configuration file contains multiple version info resources for language '{new CultureInfo(lcid).Name}'.",
                                 ProjectConfigurationFileName);
                         }
@@ -350,7 +375,7 @@ internal class CompileCommand : ICompilerCommand
                 {
                     EmitErrorMessage(
                        0, 0, 0,
-                       DS0067_ResourceFileNotFound,
+                       DS0068_ResourceFileNotFound,
                        $"The specified icon file '{Context.Configuration.IconFile}' could not be found.",
                        ProjectConfigurationFileName);
 
@@ -361,7 +386,7 @@ internal class CompileCommand : ICompilerCommand
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0067_ResourceFileNotFound,
+                        DS0068_ResourceFileNotFound,
                         $"The specified manifest file '{Context.Configuration.AssemblyManifest}' could not be found.",
                         ProjectConfigurationFileName);
 
@@ -396,7 +421,7 @@ internal class CompileCommand : ICompilerCommand
         foreach (Resource res in Context.Configuration.Resources ?? [])
             AddResource(res, Directory.GetCurrentDirectory(), relativePathResolverBaseDir);
 
-        if (!Messages.Any(m => m.Severity == Severity.Error))
+        if (!BuildFailed)
         {
             ResourceExtractor.Resource[] resources = [];
 
@@ -426,7 +451,7 @@ internal class CompileCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0029_FileAccessDenied,
+                    DS0030_FileAccessDenied,
                     $"Output assembly could not be saved: {ex.Message}",
                     CompilerExecutableName);
             }
@@ -453,67 +478,72 @@ internal class CompileCommand : ICompilerCommand
                 AotCompiler compiler = new(Context.Configuration, ProjectConfigurationFileName);
                 compiler.Compile();
             }
-        }
 
-        if (!config.NoStdLib)
-        {
-            string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
-
-            if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory))
+            if (!config.NoStdLib)
             {
-                try
+                string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
+
+                if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory))
                 {
-                    File.Copy(coreLib, Path.Combine(Directory.GetCurrentDirectory(), "Dassie.Core.dll"), true);
+                    try
+                    {
+                        File.Copy(coreLib, Path.Combine(Directory.GetCurrentDirectory(), "Dassie.Core.dll"), true);
+                    }
+                    catch (IOException) { }
                 }
-                catch (IOException) { }
             }
-        }
 
-        foreach (string dependency in Context.ReferencedAssemblies.Select(a => a.Location))
-        {
-            if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(Path.GetDirectoryName(dependency)))
+            foreach (string dependency in Context.ReferencedAssemblies.Select(a => a.Location))
             {
-                try
+                if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(Path.GetDirectoryName(dependency)))
                 {
-                    File.Copy(dependency, Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(dependency)), true);
+                    try
+                    {
+                        File.Copy(dependency, Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(dependency)), true);
+                    }
+                    catch (IOException) { }
                 }
-                catch (IOException) { }
+            }
+
+            RuntimeConfigWriter.GenerateRuntimeConfigFile(Path.GetFileNameWithoutExtension(assembly) + ".runtimeconfig.json");
+
+            if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
+                File.Delete(resFile);
+
+            if (Directory.Exists(TemporaryBuildDirectoryName) && !Context.Configuration.KeepIntermediateFiles)
+                Directory.Delete(TemporaryBuildDirectoryName, true);
+
+            if (Context.Configuration.GenerateILFiles)
+            {
+                string ildasm = WinSdkHelper.GetFrameworkToolPath("ildasm.exe", "GenerateILFiles") ?? "";
+
+                if (File.Exists(ildasm))
+                {
+                    DirectoryInfo dir = Directory.CreateDirectory(ILFilesDirectoryName);
+
+                    ProcessStartInfo psi = new()
+                    {
+                        FileName = ildasm,
+                        Arguments = $"{Path.GetFullPath(Path.GetFileName(assembly))} /out={Path.Combine(dir.FullName, Path.GetFileNameWithoutExtension(assembly) + ".il")}",
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
+                    };
+
+                    Process.Start(psi);
+                }
             }
         }
-
-        RuntimeConfigWriter.GenerateRuntimeConfigFile(Path.GetFileNameWithoutExtension(assembly) + ".runtimeconfig.json");
-
-        if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
-            File.Delete(resFile);
-
-        if (Directory.Exists(TemporaryBuildDirectoryName) && !Context.Configuration.KeepIntermediateFiles)
-            Directory.Delete(TemporaryBuildDirectoryName, true);
-
-        if (Context.Configuration.GenerateILFiles)
+        else if (GlobalConfig.BuildDirectoryCreated)
         {
-            string ildasm = WinSdkHelper.GetFrameworkToolPath("ildasm.exe", "GenerateILFiles") ?? "";
-
-            if (File.Exists(ildasm))
-            {
-                DirectoryInfo dir = Directory.CreateDirectory(ILFilesDirectoryName);
-
-                ProcessStartInfo psi = new()
-                {
-                    FileName = ildasm,
-                    Arguments = $"{Path.GetFullPath(Path.GetFileName(assembly))} /out={Path.Combine(dir.FullName, Path.GetFileNameWithoutExtension(assembly) + ".il")}",
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
-
-                Process.Start(psi);
-            }
+            Directory.SetCurrentDirectory(workingDir);
+            Directory.Delete(config.BuildOutputDirectory);
         }
 
         if (Context.Configuration.MeasureElapsedTime)
         {
             EmitMessage(
                 0, 0, 0,
-                DS0234_ElapsedTime,
+                DS0235_ElapsedTime,
                 $"Compilation finished after {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
                 CompilerExecutableName);
         }
@@ -591,7 +621,7 @@ internal class CompileCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0067_ResourceFileNotFound,
+                DS0068_ResourceFileNotFound,
                 $"The resource file '{res.Path}' could not be located.",
                 ProjectConfigurationFileName);
         }
@@ -607,7 +637,7 @@ internal class CompileCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0068_MultipleUnmanagedResources,
+                    DS0069_MultipleUnmanagedResources,
                     "An assembly can only contain one unmanaged resource file.",
                     ProjectConfigurationFileName);
             }
@@ -657,7 +687,7 @@ internal class CompileCommand : ICompilerCommand
         static bool IsFileMatchingPattern(string filePath, string filePattern)
         {
             string fileName = Path.GetFileName(filePath);
-            string[] patternSegments = filePattern.Split([ '*', '?' ], StringSplitOptions.RemoveEmptyEntries);
+            string[] patternSegments = filePattern.Split(['*', '?'], StringSplitOptions.RemoveEmptyEntries);
 
             int index = 0;
             foreach (string segment in patternSegments)
@@ -717,7 +747,7 @@ internal class CompileCommand : ICompilerCommand
 
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0100_InvalidCommand,
+                    DS0101_InvalidCommand,
                     errorMsg.ToString(),
                     CompilerExecutableName);
 
@@ -726,7 +756,7 @@ internal class CompileCommand : ICompilerCommand
 
             EmitErrorMessage(
                 0, 0, 0,
-                DS0048_SourceFileNotFound,
+                DS0049_SourceFileNotFound,
                 $"The source file '{filePattern}' could not be found.",
                 filePattern);
         }

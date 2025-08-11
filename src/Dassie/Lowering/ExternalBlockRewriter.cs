@@ -27,7 +27,7 @@ internal class ExternalBlockRewriter : ITreeToStringRewriter
                     rule.Identifier()[0].Symbol.Line,
                     rule.Identifier()[0].Symbol.Column,
                     rule.Identifier()[0].GetText().Length,
-                    DS0001_SyntaxError,
+                    DS0002_SyntaxError,
                     $"Unexpected token '{rule.Identifier()[1].GetText()}'. Expected 'as'.");
             }
 
@@ -42,7 +42,7 @@ internal class ExternalBlockRewriter : ITreeToStringRewriter
                     member.Start.Line,
                     member.Start.Column,
                     member.GetText().Length,
-                    DS0214_NestedExternalBlock,
+                    DS0215_NestedExternalBlock,
                     $"'extern' blocks cannot be nested.");
 
                 continue;

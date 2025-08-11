@@ -125,7 +125,7 @@ internal static class ExtensionLoader
         if (!File.Exists(assembly))
         {
             EmitErrorMessage(0, 0, 0,
-                DS0221_ExtensionFileNotFound,
+                DS0222_ExtensionFileNotFound,
                 $"Extension package '{assembly}' could not be found.",
                 CompilerExecutableName);
 
@@ -148,7 +148,7 @@ internal static class ExtensionLoader
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0222_ExtensionUnsupportedMode,
+                        DS0223_ExtensionUnsupportedMode,
                         $"The extension '{package.Metadata.Name}' cannot be loaded in transient mode.",
                         CompilerExecutableName);
 
@@ -159,7 +159,7 @@ internal static class ExtensionLoader
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0222_ExtensionUnsupportedMode,
+                        DS0223_ExtensionUnsupportedMode,
                         $"The extension '{package.Metadata.Name}' cannot be loaded in global mode.",
                         CompilerExecutableName);
 
@@ -177,7 +177,7 @@ internal static class ExtensionLoader
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0223_ExtensionInitializerFailed,
+                        DS0224_ExtensionInitializerFailed,
                         $"The extension initializer of '{package.Metadata.Name}' threw an exception.",
                         CompilerExecutableName);
 
@@ -191,7 +191,7 @@ internal static class ExtensionLoader
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0223_ExtensionInitializerFailed,
+                        DS0224_ExtensionInitializerFailed,
                         $"The extension initializer of '{package.Metadata.Name}' exited with a nonzero status code.",
                         CompilerExecutableName);
 
@@ -202,7 +202,7 @@ internal static class ExtensionLoader
                 {
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0224_ExtensionDuplicateMode,
+                        DS0225_ExtensionDuplicateMode,
                         $"Extension '{package.Metadata.Name}' was loaded twice in different modes. Global mode will be unloaded.",
                         CompilerExecutableName);
 
@@ -220,7 +220,7 @@ internal static class ExtensionLoader
         catch (ReflectionTypeLoadException)
         {
             EmitWarningMessage(0, 0, 0,
-                DS0123_InvalidExtensionPackage,
+                DS0124_InvalidExtensionPackage,
                 $"Extension package '{extensionAssembly.GetName().Name}' is malformed and will be ignored.",
                 CompilerExecutableName);
         }
@@ -238,7 +238,7 @@ internal static class ExtensionLoader
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0223_ExtensionInitializerFailed,
+                DS0224_ExtensionInitializerFailed,
                 $"Finalizer of extension '{package.Metadata.Name}' threw an exception.",
                 CompilerExecutableName);
 

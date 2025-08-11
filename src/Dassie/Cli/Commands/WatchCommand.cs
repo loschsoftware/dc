@@ -52,7 +52,7 @@ internal class WatchCommand : ICompilerCommand
                     {
                         EmitErrorMessage(
                             0, 0, 0,
-                            DS0193_ExpectedCliOptionValue,
+                            DS0194_ExpectedCliOptionValue,
                             $"Expected value for option '{args[i]}'.",
                             CompilerExecutableName);
 
@@ -67,7 +67,7 @@ internal class WatchCommand : ICompilerCommand
                         error = true;
                         EmitErrorMessage(
                             0, 0, 0,
-                            DS0194_DCWatchInvalidCombination,
+                            DS0195_DCWatchInvalidCombination,
                             $"'dc watch': Command to execute was already set to '{command}'",
                             CompilerExecutableName);
                     }
@@ -83,7 +83,7 @@ internal class WatchCommand : ICompilerCommand
                         error = true;
                         EmitErrorMessage(
                             0, 0, 0,
-                            DS0194_DCWatchInvalidCombination,
+                            DS0195_DCWatchInvalidCombination,
                             $"'dc watch': Build profile was already set to '{profile}'",
                             CompilerExecutableName);
                     }
@@ -97,7 +97,7 @@ internal class WatchCommand : ICompilerCommand
                     error = true;
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0194_DCWatchInvalidCombination,
+                        DS0195_DCWatchInvalidCombination,
                         "'dc watch': Compilation target can only be manually specified if neither '--profile' nor '--command' are set.",
                         CompilerExecutableName);
                 }
@@ -107,7 +107,7 @@ internal class WatchCommand : ICompilerCommand
                     error = true;
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0194_DCWatchInvalidCombination,
+                        DS0195_DCWatchInvalidCombination,
                         $"'dc watch': Directory '{args[i]}' does not exist.",
                         CompilerExecutableName);
                 }
@@ -117,7 +117,7 @@ internal class WatchCommand : ICompilerCommand
                     error = true;
                     EmitErrorMessage(
                         0, 0, 0,
-                        DS0194_DCWatchInvalidCombination,
+                        DS0195_DCWatchInvalidCombination,
                         $"'dc watch': Compilation target directory was already set to '{args[i]}'.",
                         CompilerExecutableName);
                 }
@@ -131,7 +131,7 @@ internal class WatchCommand : ICompilerCommand
             error = true;
             EmitErrorMessage(
                 0, 0, 0,
-                DS0194_DCWatchInvalidCombination,
+                DS0195_DCWatchInvalidCombination,
                 "'dc watch': The options '--command' and '--profile' cannot be combined.",
                 CompilerExecutableName);
         }

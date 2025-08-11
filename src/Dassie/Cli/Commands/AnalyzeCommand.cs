@@ -59,7 +59,7 @@ internal class AnalyzeCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0211_UnexpectedArgument,
+                    DS0212_UnexpectedArgument,
                     $"Unexpected argument '{arg}'.",
                     CompilerExecutableName);
             }
@@ -89,7 +89,7 @@ internal class AnalyzeCommand : ICompilerCommand
             {
                 EmitErrorMessage(
                     0, 0, 0,
-                    DS0134_DCAnalyzeInvalidAnalyzer,
+                    DS0135_DCAnalyzeInvalidAnalyzer,
                     $"The analyzer '{analyzerName}' could not be found.",
                     CompilerExecutableName);
 
@@ -133,7 +133,7 @@ internal class AnalyzeCommand : ICompilerCommand
         {
             EmitErrorMessage(
                 0, 0, 0,
-                DS0133_DCAnalyzeNoProjectFile,
+                DS0134_DCAnalyzeNoProjectFile,
                 "The current directory contains no project file.",
                 file: CompilerExecutableName);
 

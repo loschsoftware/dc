@@ -381,7 +381,7 @@ internal static class EmitHelpers
                 line,
                 column,
                 length,
-                DS0045_InlineILInvalidOpCode,
+                DS0046_InlineILInvalidOpCode,
                 $"'{rawOpcode}' is not a valid IL opcode."
                 );
             return;
