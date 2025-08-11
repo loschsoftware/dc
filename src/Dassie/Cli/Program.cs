@@ -47,7 +47,7 @@ internal class Program
             bool verbose = EmitBuildLogMessage($"Unhandled exception occured. {ex}", 2);
 
             if (!Messages.Any(m => m.Severity == Severity.Error))
-                EmitErrorMessage(0, 0, 0, DS0001_UnknownError, $"Unhandled exception of type '{ex.GetType()}'.", CompilerExecutableName);
+                EmitErrorMessage(0, 0, 0, DS0001_UnknownError, $"Internal compiler error. Unhandled exception of type '{ex.GetType()}'.", CompilerExecutableName);
 
             ConsoleHelper.PrintException(ex, verbose);
 
