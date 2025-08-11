@@ -34,7 +34,12 @@ internal class CorePackage : IPackage
 
     public IProjectTemplate[] ProjectTemplates() => [LibraryProject.Instance, ConsoleProject.Instance];
 
-    public IBuildLogDevice[] BuildLogDevices() => [TextWriterBuildLogDevice.Instance, new FileBuildLogDevice()];
+    public IBuildLogDevice[] BuildLogDevices() =>
+    [
+        TextWriterBuildLogDevice.Instance,
+        new FileBuildLogDevice(),
+        new FastConsoleBuildLogDevice()
+    ];
 
     public ICompilerDirective[] CompilerDirectives() =>
     [
