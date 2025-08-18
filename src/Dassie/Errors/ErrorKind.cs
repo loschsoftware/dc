@@ -965,5 +965,9 @@ public enum ErrorKind
     /// <summary>
     /// Error code for informational messages caused by enabling the <see cref="DassieConfig.MeasureElapsedTime"/> option.
     /// </summary>
-    DS0235_ElapsedTime
+    DS0235_ElapsedTime,
+    /// <summary>
+    /// Emitted when the 'dc test' command is used in a directory that does not contain a project file.
+    /// </summary>
+    DS0236_DCTestNoProjectFile
 }
