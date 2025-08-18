@@ -33,7 +33,7 @@ public static class Assert
     /// <param name="obj2"></param>
     /// <exception cref="AssertionException"/>
     public static void assertEqual(object obj1, object obj2)
-        => assert(obj1 == obj2, $"Assertion failed.{Environment.NewLine}\tExpected: {obj1.Dump()}{Environment.NewLine}\tActual: {obj2.Dump()}");
+        => assert(obj1 == obj2, $"Assertion failed.{Environment.NewLine}\tExpected: {obj1.Dump()}\tActual: {obj2.Dump()}");
 
     /// <summary>
     /// Checks for a condition; if the condition is <see langword="false"/>, throws a runtime exception with the specified message.
