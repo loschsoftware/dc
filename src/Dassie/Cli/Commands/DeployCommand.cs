@@ -21,10 +21,12 @@ internal class DeployCommand : ICompilerCommand
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = Description,
-        Usage = ["dc deploy [Options]"],
+        Usage = ["dc deploy [--ignore-missing] [--fail-fast] [Options]"],
         Remarks = $"This is the primary command for interacting with project groups. The 'deploy' command first builds all component projects and then executes all targets defined in the project group file. A project group is defined using the <ProjectGroup> tag inside of a compiler configuration file ({ProjectConfigurationFileName}).",
         Options =
         [
+            ("--ignore-missing", "Ignore missing targets and resume deployment."),
+            ("--fail-fast", "Cancel deployment immediately if any target fails."),
             ("Options", "Additional options passed to the compiler for each project being built.")
         ]
     };
@@ -74,6 +76,9 @@ internal class DeployCommand : ICompilerCommand
             return -1;
         }
 
+        bool ignoreMissing = args.Contains("--ignore-missing");
+        bool failFast = args.Contains("--fail-fast");
+
         string tempDir = Path.Combine(baseDir, TemporaryBuildDirectoryName);
         Directory.CreateDirectory(tempDir);
 
@@ -119,7 +124,7 @@ internal class DeployCommand : ICompilerCommand
                 reference,
                 projectConfig,
                 tempDir,
-                args: args,
+                args: args.Except(["--ignore-missing", "--fail-fast"]).ToArray(),
                 track: false);
 
             if (!result)
@@ -141,6 +146,9 @@ internal class DeployCommand : ICompilerCommand
         {
             if (!ExtensionLoader.DeploymentTargets.Any(t => t.Name == target.Name))
             {
+                if (ignoreMissing)
+                    continue;
+
                 EmitErrorMessage(
                     0, 0, 0,
                     DS0237_DeploymentTargetNotFound,
@@ -167,10 +175,23 @@ internal class DeployCommand : ICompilerCommand
 
             if (ret != 0)
             {
+                string msg = $"Deployment target '{target.Name}' ended with a nonzero exit code.";
+
+                if (failFast)
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0238_DeploymentTargetFailed,
+                        msg,
+                        CompilerExecutableName);
+
+                    return 238;
+                }
+
                 EmitWarningMessage(
                     0, 0, 0,
                     DS0238_DeploymentTargetFailed,
-                    $"Deployment target '{target.Name}' ended with a nonzero exit code.",
+                    msg,
                     CompilerExecutableName);
             }
         }
