@@ -31,8 +31,9 @@ internal static class ReferenceHandler
     /// <param name="destDir">The directory to copy build output files to.</param>
     /// <param name="referenceResolverBaseDir">The directory used as a reference point to resolve relative paths. By default, is the current directory.</param>
     /// <param name="args">Additional command-line arguments passed to the compiler.</param>
+    /// <param name="track">Wheter or not to track the project reference for cycle detection.</param>
     /// <returns>Wheter or not the compilation of the project reference was successful.</returns>
-    public static bool HandleProjectReference(ProjectReference reference, DassieConfig currentConfig, string destDir, string referenceResolverBaseDir = null, string[] args = null)
+    public static bool HandleProjectReference(ProjectReference reference, DassieConfig currentConfig, string destDir, string referenceResolverBaseDir = null, string[] args = null, bool track = true)
     {
         ResolveProjectReference(reference, referenceResolverBaseDir);
 
@@ -55,7 +56,8 @@ internal static class ReferenceHandler
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
         ProjectFileDeserializer.Reload();
 
-        _referencedProjectPaths.Add(ProjectFileDeserializer.Path);
+        if (track)
+            _referencedProjectPaths.Add(ProjectFileDeserializer.Path);
 
         if (ProjectFileDeserializer.DassieConfig.References != null && ProjectFileDeserializer.DassieConfig.References.Any(r => r is ProjectReference))
         {

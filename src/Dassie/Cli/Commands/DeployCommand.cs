@@ -2,7 +2,6 @@
 using Dassie.Configuration.Macros;
 using Dassie.Configuration.ProjectGroups;
 using Dassie.Extensions;
-using Microsoft.VisualBasic.FileIO;
 using System.Linq;
 using System.Xml;
 
@@ -120,7 +119,8 @@ internal class DeployCommand : ICompilerCommand
                 reference,
                 projectConfig,
                 tempDir,
-                args: args);
+                args: args,
+                track: false);
 
             if (!result)
                 return -1;
@@ -150,7 +150,7 @@ internal class DeployCommand : ICompilerCommand
                 continue;
             }
 
-            (int exit, string path) = ProjectGroupHelpers.GetExecutableProject(config);
+            (int exit, string path) = ProjectGroupHelpers.GetExecutableProject(config, false);
             if (exit != 0)
                 return exit;
 

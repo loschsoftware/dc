@@ -7,15 +7,18 @@ namespace Dassie.Helpers;
 
 internal static class ProjectGroupHelpers
 {
-    public static (int ExitCode, string Path) GetExecutableProject(DassieConfig config)
+    public static (int ExitCode, string Path) GetExecutableProject(DassieConfig config, bool requireExecutable = true)
     {
         if (string.IsNullOrEmpty(config.ProjectGroup.ExecutableComponent))
         {
-            EmitErrorMessage(
-                0, 0, 0,
-                DS0106_DCRunInsufficientInfo,
-                "Project group does not define an executable project.",
-                CompilerExecutableName);
+            if (requireExecutable)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0106_DCRunInsufficientInfo,
+                    "Project group does not define an executable project.",
+                    CompilerExecutableName);
+            }
 
             return (-1, null);
         }
