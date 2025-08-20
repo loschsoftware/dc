@@ -2,9 +2,9 @@
 using Dassie.Configuration.Macros;
 using Dassie.Configuration.ProjectGroups;
 using Dassie.Extensions;
-using Dassie.Helpers;
 using Microsoft.VisualBasic.FileIO;
-using DirectoryTarget = Dassie.Configuration.Build.Targets.Directory;
+using System.Linq;
+using System.Xml;
 
 namespace Dassie.Cli.Commands;
 
@@ -15,36 +15,25 @@ internal class DeployCommand : ICompilerCommand
 
     public string Command => "deploy";
 
-    public string UsageString => "deploy";
+    public string UsageString => "deploy [Options]";
 
     public string Description => "Builds and deploys a project group.";
 
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = Description,
-        Usage = ["dc deploy"],
+        Usage = ["dc deploy [Options]"],
         Remarks = $"This is the primary command for interacting with project groups. The 'deploy' command first builds all component projects and then executes all targets defined in the project group file. A project group is defined using the <ProjectGroup> tag inside of a compiler configuration file ({ProjectConfigurationFileName}).",
-        Options = []
+        Options =
+        [
+            ("Options", "Additional options passed to the compiler for each project being built.")
+        ]
     };
 
     public int Invoke(string[] args) => Deploy(args, Directory.GetCurrentDirectory(), false);
 
     private static int Deploy(string[] args, string baseDir, bool noDeleteTempDirectory)
     {
-        if (args.Length > 0)
-        {
-            foreach (string arg in args)
-            {
-                EmitErrorMessage(
-                    0, 0, 0,
-                    DS0212_UnexpectedArgument,
-                    $"Unexpected argument '{arg}'.",
-                    CompilerExecutableName);
-            }
-
-            return -1;
-        }
-
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
         config ??= new();
 
@@ -130,7 +119,8 @@ internal class DeployCommand : ICompilerCommand
             bool result = ReferenceHandler.HandleProjectReference(
                 reference,
                 projectConfig,
-                tempDir);
+                tempDir,
+                args: args);
 
             if (!result)
                 return -1;
@@ -138,7 +128,7 @@ internal class DeployCommand : ICompilerCommand
 
         MessagePrefix = "";
 
-        if ((group.Targets ??= []).Length == 0)
+        if (((group.Targets ??= new()).Targets ??= []).Length == 0)
         {
             EmitWarningMessage(
                 0, 0, 0,
@@ -147,12 +137,42 @@ internal class DeployCommand : ICompilerCommand
                 ProjectConfigurationFileName);
         }
 
-        foreach (DeploymentTarget target in group.Targets)
+        foreach (XmlNode target in group.Targets.Targets)
         {
-            // TODO: Add more targets and handle them elsewhere
+            if (!ExtensionLoader.DeploymentTargets.Any(t => t.Name == target.Name))
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0237_DeploymentTargetNotFound,
+                    $"The deployment target '{target.Name}' could not be found.",
+                    CompilerExecutableName);
 
-            if (target is DirectoryTarget dir)
-                FileSystem.CopyDirectory(tempDir, dir.Path, true);
+                continue;
+            }
+
+            (int exit, string path) = ProjectGroupHelpers.GetExecutableProject(config);
+            if (exit != 0)
+                return exit;
+
+            DassieConfig executableProj = ProjectFileDeserializer.Deserialize(path);
+            XmlAttribute[] attribs = new XmlAttribute[target.Attributes.Count];
+            target.Attributes.CopyTo(attribs, 0);
+
+            int ret = ExtensionLoader.DeploymentTargets.First(t => t.Name == target.Name).Execute(new(
+                tempDir,
+                config,
+                executableProj,
+                attribs.ToList(),
+                target.ChildNodes.Cast<XmlNode>().ToList()));
+
+            if (ret != 0)
+            {
+                EmitWarningMessage(
+                    0, 0, 0,
+                    DS0238_DeploymentTargetFailed,
+                    $"Deployment target '{target.Name}' ended with a nonzero exit code.",
+                    CompilerExecutableName);
+            }
         }
 
         if (!noDeleteTempDirectory)

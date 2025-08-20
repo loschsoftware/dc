@@ -30,8 +30,9 @@ internal static class ReferenceHandler
     /// <param name="currentConfig">Compiler configuration for the current project.</param>
     /// <param name="destDir">The directory to copy build output files to.</param>
     /// <param name="referenceResolverBaseDir">The directory used as a reference point to resolve relative paths. By default, is the current directory.</param>
+    /// <param name="args">Additional command-line arguments passed to the compiler.</param>
     /// <returns>Wheter or not the compilation of the project reference was successful.</returns>
-    public static bool HandleProjectReference(ProjectReference reference, DassieConfig currentConfig, string destDir, string referenceResolverBaseDir = null)
+    public static bool HandleProjectReference(ProjectReference reference, DassieConfig currentConfig, string destDir, string referenceResolverBaseDir = null, string[] args = null)
     {
         ResolveProjectReference(reference, referenceResolverBaseDir);
 
@@ -90,7 +91,7 @@ internal static class ReferenceHandler
             }
         }
 
-        int errCode = BuildCommand.Instance.Invoke([]);
+        int errCode = BuildCommand.Instance.Invoke(args ?? []);
 
         if (errCode != 0)
             return false;

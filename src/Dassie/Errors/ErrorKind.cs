@@ -969,5 +969,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the 'dc test' command is used in a directory that does not contain a project file.
     /// </summary>
-    DS0236_DCTestNoProjectFile
+    DS0236_DCTestNoProjectFile,
+    /// <summary>
+    /// Emitted when a target specified in a project group could not be found.
+    /// </summary>
+    DS0237_DeploymentTargetNotFound,
+    /// <summary>
+    /// Emitted when a deployment target exits with a nonzero exit code.
+    /// </summary>
+    DS0238_DeploymentTargetFailed,
+    /// <summary>
+    /// Emitted when the <c>&lt;Directory&gt;</c> deployment target is used but no path is specified.
+    /// </summary>
+    DS0239_DirectoryTargetPathRequired
 }

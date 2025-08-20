@@ -60,6 +60,9 @@ internal static class ExtensionLoader
     private static IEnumerable<IDocumentSource> _documentSources = [];
     public static IEnumerable<IDocumentSource> DocumentSources => _documentSources;
 
+    private static IEnumerable<IDeploymentTarget> _deploymentTargets = [];
+    public static IEnumerable<IDeploymentTarget> DeploymentTargets => _deploymentTargets;
+
     private static void Update(object sender, NotifyCollectionChangedEventArgs e)
     {
         _commands = InstalledExtensions.SelectMany(p => p.Commands());
@@ -69,6 +72,7 @@ internal static class ExtensionLoader
         _projectTemplates = InstalledExtensions.SelectMany(p => p.ProjectTemplates());
         _compilerDirectives = InstalledExtensions.SelectMany(p => p.CompilerDirectives());
         _documentSources = InstalledExtensions.SelectMany(p => p.DocumentSources());
+        _deploymentTargets = InstalledExtensions.SelectMany(p => p.DeploymentTargets());
     }
 
     private static List<IPackage> LoadInstalledExtensions()

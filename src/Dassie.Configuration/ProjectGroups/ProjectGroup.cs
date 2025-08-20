@@ -1,4 +1,4 @@
-﻿using Dassie.Configuration.Build.Targets;
+﻿using System.Xml;
 
 namespace Dassie.Configuration.ProjectGroups;
 
@@ -6,6 +6,14 @@ namespace Dassie.Configuration.ProjectGroups;
 [XmlRoot]
 public class ProjectGroup
 {
+    [Serializable]
+    [XmlRoot]
+    public class TargetList
+    {
+        [XmlAnyElement]
+        public XmlNode[] Targets { get; set; }
+    }
+
     [XmlArray]
     [XmlArrayItem(typeof(Project))]
     [XmlArrayItem(typeof(ProjectGroupComponent))]
@@ -14,7 +22,6 @@ public class ProjectGroup
     [XmlElement("Executable")]
     public string ExecutableComponent { get; set; }
 
-    [XmlArray]
-    [XmlArrayItem(typeof(Directory))]
-    public DeploymentTarget[] Targets { get; set; }
+    [XmlElement]
+    public TargetList Targets { get; set; }
 }

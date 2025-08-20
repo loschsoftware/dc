@@ -1,4 +1,5 @@
-﻿using Dassie.Errors.Devices;
+﻿using Dassie.Deployment;
+using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using Dassie.Meta.Directives;
 using Dassie.Templates;
@@ -48,5 +49,10 @@ internal class CorePackage : IPackage
         TodoDirective.Instance,
         ILDirective.Instance,
         ImportDirective.Instance
+    ];
+
+    public IDeploymentTarget[] DeploymentTargets() =>
+    [
+        new DirectoryTarget()
     ];
 }

@@ -85,4 +85,9 @@ public interface IPackage
     /// An array of document sources.
     /// </summary>
     public virtual IDocumentSource[] DocumentSources() => [];
+
+    /// <summary>
+    /// An array of deployment targets.
+    /// </summary>
+    public virtual IDeploymentTarget[] DeploymentTargets() => [];
 }
