@@ -5,9 +5,11 @@ using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using Dassie.Text.Tooltips;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 
 namespace Dassie.Errors;
 
@@ -16,6 +18,10 @@ namespace Dassie.Errors;
 /// </summary>
 public static class ErrorWriter
 {
+    private static readonly Lock _lockObject = new();
+    private static readonly ReaderWriterLockSlim _buildLogDevicesLock = new();
+    private static readonly Lock _deferredMessagesLock = new();
+
     static ErrorWriter()
     {
         CurrentFile ??= new("");
@@ -26,33 +32,121 @@ public static class ErrorWriter
     /// <summary>
     /// A list of all build messages emitted so far.
     /// </summary>
-    public static readonly List<ErrorInfo> Messages = [];
+    public static readonly ConcurrentBag<ErrorInfo> Messages = [];
     
     private static readonly List<(ErrorInfo Error, int MinVerbosity)> _deferredMessages = [];
 
-    internal static bool BuildFailed => Messages.Any(m => m.Severity == Severity.Error);
+    internal static bool BuildFailed
+    {
+        get
+        {
+            lock (_lockObject)
+            {
+                return Messages.Any(m => m.Severity == Severity.Error);
+            }
+        }
+    }
+
+    private static List<IBuildLogDevice> _buildLogDevices = [TextWriterBuildLogDevice.Instance];
 
     /// <summary>
     /// A list of build devices to use.
     /// </summary>
-    public static List<IBuildLogDevice> BuildLogDevices { get; set; } = [TextWriterBuildLogDevice.Instance];
+    public static List<IBuildLogDevice> BuildLogDevices 
+    { 
+        get
+        {
+            _buildLogDevicesLock.EnterReadLock();
+            try
+            {
+                return [.. _buildLogDevices];
+            }
+            finally
+            {
+                _buildLogDevicesLock.ExitReadLock();
+            }
+        }
+        set
+        {
+            _buildLogDevicesLock.EnterWriteLock();
+            try
+            {
+                _buildLogDevices = value ?? [TextWriterBuildLogDevice.Instance];
+            }
+            finally
+            {
+                _buildLogDevicesLock.ExitWriteLock();
+            }
+        }
+    }
 
-    private static readonly List<IBuildLogDevice> _disabledDevices = [];
+    private static readonly ConcurrentBag<IBuildLogDevice> _disabledDevices = [];
 
+    private static string _messagePrefix = "";
     /// <summary>
     /// A prefix of all error messages, indicating which project the error is from.
     /// </summary>
-    public static string MessagePrefix { get; set; } = "";
+    public static string MessagePrefix 
+    { 
+        get
+        {
+            lock (_lockObject)
+            {
+                return _messagePrefix;
+            }
+        }
+        set
+        {
+            lock (_lockObject)
+            {
+                _messagePrefix = value ?? "";
+            }
+        }
+    }
 
+    private static bool _disabled = false;
     /// <summary>
     /// Used to completely disable the error writer.
     /// </summary>
-    public static bool Disabled { get; set; } = false;
+    public static bool Disabled 
+    { 
+        get
+        {
+            lock (_lockObject)
+            {
+                return _disabled;
+            }
+        }
+        set
+        {
+            lock (_lockObject)
+            {
+                _disabled = value;
+            }
+        }
+    }
 
+    private static int _lineNumberOffset = 0;
     /// <summary>
     /// A value added to the line number of every error message.
     /// </summary>
-    public static int LineNumberOffset { get; set; } = 0;
+    public static int LineNumberOffset 
+    { 
+        get
+        {
+            lock (_lockObject)
+            {
+                return _lineNumberOffset;
+            }
+        }
+        set
+        {
+            lock (_lockObject)
+            {
+                _lineNumberOffset = value;
+            }
+        }
+    }
 
     private static void BuildLogDeviceSafeCall(IBuildLogDevice device, Action<IBuildLogDevice> func)
     {
@@ -133,8 +227,11 @@ public static class ErrorWriter
             return;
 
         // Filter out duplicate messages
-        if (Messages.Any(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition))
-            return;
+        lock (_lockObject)
+        {
+            if (Messages.Any(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition))
+                return;
+        }
 
         BuildLogSeverity severity = error.Severity switch
         {
@@ -143,7 +240,8 @@ public static class ErrorWriter
             _ => BuildLogSeverity.Message
         };
 
-        foreach (IBuildLogDevice device in BuildLogDevices)
+        List<IBuildLogDevice> devices = BuildLogDevices; // Get a thread-safe copy
+        foreach (IBuildLogDevice device in devices)
         {
             if (_disabledDevices.Contains(device))
                 continue;
@@ -187,7 +285,10 @@ public static class ErrorWriter
 
         if (defer)
         {
-            _deferredMessages.Add((msg, minimumVerbosity));
+            lock (_deferredMessagesLock)
+            {
+                _deferredMessages.Add((msg, minimumVerbosity));
+            }
             return true;
         }
 
@@ -200,13 +301,16 @@ public static class ErrorWriter
     /// </summary>
     public static void EmitDeferredBuildLogMessages()
     {
-        foreach ((ErrorInfo error, int v) in _deferredMessages)
+        lock (_deferredMessagesLock)
         {
-            if (Context.Configuration.Verbosity >= v)
-                EmitGeneric(error);
-        }
+            foreach ((ErrorInfo error, int v) in _deferredMessages)
+            {
+                if (Context.Configuration.Verbosity >= v)
+                    EmitGeneric(error);
+            }
 
-        _deferredMessages.Clear();
+            _deferredMessages.Clear();
+        }
     }
 
     /// <summary>
@@ -349,7 +453,8 @@ public static class ErrorWriter
         if (Context.Configuration.Verbosity < 1)
             return;
 
-        foreach (IBuildLogDevice device in BuildLogDevices)
+        List<IBuildLogDevice> devices = BuildLogDevices; // Get a thread-safe copy
+        foreach (IBuildLogDevice device in devices)
         {
             if (_disabledDevices.Contains(device))
                 continue;

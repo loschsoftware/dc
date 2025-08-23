@@ -17,55 +17,167 @@ namespace Dassie.Errors;
 /// </remarks>
 public class ErrorTextWriter : TextWriter
 {
+    private readonly Lock _syncRoot = new();
     private bool _isStored;
     private TextWriter[] _store;
 
     private TextWriter[] _writers;
-    private bool _isDisposed;
+    private volatile bool _isDisposed;
 
     public ErrorTextWriter(TextWriter[] writers)
     {
-        _writers = writers;
+        _writers = writers ?? throw new ArgumentNullException(nameof(writers));
     }
 
-    public TextWriter[] Writers => _writers;
+    public TextWriter[] Writers 
+    { 
+        get
+        {
+            lock (_syncRoot)
+            {
+                return _writers.ToArray(); // Return a copy to prevent external modification
+            }
+        }
+    }
 
     public override Encoding Encoding => throw new NotImplementedException();
 
     public override void Write(string value)
     {
-        foreach (TextWriter writer in _writers)
-            writer.Write(value);
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+        TextWriter[] writersCopy;
+        lock (_syncRoot)
+        {
+            writersCopy = _writers.ToArray();
+        }
+
+        foreach (TextWriter writer in writersCopy)
+        {
+            try
+            {
+                writer.Write(value);
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore disposed writers
+            }
+        }
     }
 
     public override void WriteLine()
     {
-        foreach (TextWriter writer in _writers)
-            writer.WriteLine();
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+        TextWriter[] writersCopy;
+        lock (_syncRoot)
+        {
+            writersCopy = _writers.ToArray();
+        }
+
+        foreach (TextWriter writer in writersCopy)
+        {
+            try
+            {
+                writer.WriteLine();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore disposed writers
+            }
+        }
     }
 
     public override void WriteLine(string value)
     {
-        foreach (TextWriter writer in _writers)
-            writer.WriteLine(value);
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+        TextWriter[] writersCopy;
+        lock (_syncRoot)
+        {
+            writersCopy = _writers.ToArray();
+        }
+
+        foreach (TextWriter writer in writersCopy)
+        {
+            try
+            {
+                writer.WriteLine(value);
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore disposed writers
+            }
+        }
     }
 
     public override void Flush()
     {
-        foreach (TextWriter writer in _writers)
-            writer.Flush();
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+        TextWriter[] writersCopy;
+        lock (_syncRoot)
+        {
+            writersCopy = _writers.ToArray();
+        }
+
+        foreach (TextWriter writer in writersCopy)
+        {
+            try
+            {
+                writer.Flush();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore disposed writers
+            }
+        }
     }
 
     public override async Task FlushAsync()
     {
-        foreach (TextWriter writer in _writers)
-            await writer.FlushAsync();
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+        TextWriter[] writersCopy;
+        lock (_syncRoot)
+        {
+            writersCopy = _writers.ToArray();
+        }
+
+        foreach (TextWriter writer in writersCopy)
+        {
+            try
+            {
+                await writer.FlushAsync();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore disposed writers
+            }
+        }
     }
 
     public override async Task FlushAsync(CancellationToken cancellationToken)
     {
-        foreach (TextWriter writer in _writers)
-            await writer.FlushAsync(cancellationToken);
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+        TextWriter[] writersCopy;
+        lock (_syncRoot)
+        {
+            writersCopy = _writers.ToArray();
+        }
+
+        foreach (TextWriter writer in writersCopy)
+        {
+            try
+            {
+                await writer.FlushAsync(cancellationToken);
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore disposed writers
+            }
+        }
     }
 
     protected override void Dispose(bool disposing)
@@ -75,53 +187,97 @@ public class ErrorTextWriter : TextWriter
 
         if (disposing)
         {
-            foreach (TextWriter writer in _writers)
-                writer.Dispose();
+            lock (_syncRoot)
+            {
+                foreach (TextWriter writer in _writers)
+                {
+                    try
+                    {
+                        writer.Dispose();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Ignore already disposed writers
+                    }
+                }
+                _writers = [];
+            }
         }
 
         _isDisposed = true;
+        base.Dispose(disposing);
     }
 
     public new void Dispose()
     {
         Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     public void Store()
     {
-        if (_isStored)
-            return;
+        lock (_syncRoot)
+        {
+            if (_isStored)
+                return;
 
-        _store = _writers;
-        _writers = [];
-        _isStored = true;
+            _store = _writers;
+            _writers = [];
+            _isStored = true;
+        }
     }
 
     public void Restore()
     {
-        if (_isStored)
-            return;
+        lock (_syncRoot)
+        {
+            if (!_isStored)
+                return;
 
-        _writers = _store;
+            _writers = _store;
+            _store = null;
+            _isStored = false;
+        }
     }
 
     public void AddWriter(TextWriter writer)
     {
-        _writers = _writers.Append(writer).ToArray();
+        ArgumentNullException.ThrowIfNull(writer);
+
+        lock (_syncRoot)
+        {
+            _writers = _writers.Append(writer).ToArray();
+        }
     }
 
-    public void AddWriters(TextWriter[] writer)
+    public void AddWriters(TextWriter[] writers)
     {
-        _writers = _writers.Concat(writer).ToArray();
+        ArgumentNullException.ThrowIfNull(writers);
+
+        lock (_syncRoot)
+        {
+            _writers = _writers.Concat(writers).ToArray();
+        }
     }
 
     public void SetWriters(TextWriter[] writers)
     {
-        _writers = writers;
+        ArgumentNullException.ThrowIfNull(writers);
+
+        lock (_syncRoot)
+        {
+            _writers = writers.ToArray(); // Create a copy to prevent external modification
+        }
     }
 
     public void RemoveWriter(TextWriter writer)
     {
-        _writers = _writers.Where(w => w != writer).ToArray();
+        if (writer == null)
+            return;
+
+        lock (_syncRoot)
+        {
+            _writers = _writers.Where(w => w != writer).ToArray();
+        }
     }
 }

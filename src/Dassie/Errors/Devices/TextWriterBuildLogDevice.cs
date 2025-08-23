@@ -6,7 +6,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Xml;
+
+#pragma warning disable CS0420
 
 namespace Dassie.Errors.Devices;
 
@@ -15,9 +18,26 @@ namespace Dassie.Errors.Devices;
 /// </summary>
 internal class TextWriterBuildLogDevice : IBuildLogDevice
 {
+    private static readonly Lock _lockObject = new();
+    private static volatile TextWriterBuildLogDevice _instance = null;
+
     private TextWriterBuildLogDevice() { }
-    private static TextWriterBuildLogDevice _instance = null;
-    public static TextWriterBuildLogDevice Instance => _instance ??= new();
+
+    public static TextWriterBuildLogDevice Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                lock (_lockObject)
+                {
+                    _instance ??= new();
+                }
+            }
+
+            return _instance;
+        }
+    }
 
     /// <summary>
     /// The output text writer used for error messages.
@@ -35,7 +55,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
     public string Name => "Default";
     public BuildLogSeverity SeverityLevel => BuildLogSeverity.All;
 
-    private bool _disabled;
+    private volatile bool _disabled;
 
     public void Initialize(List<XmlAttribute> attributes, List<XmlNode> elements)
     {
@@ -64,7 +84,6 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
         try
         {
             ConsoleColor defaultColor = Console.ForegroundColor;
-
             StringBuilder outBuilder = new();
 
             void SetColorRgb(byte r, byte g, byte b)
@@ -96,17 +115,21 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                     outBuilder.Append($"\x1b[0m");
             }
 
-            Console.CursorLeft = 0;
-            Console.ForegroundColor = ConsoleColor.Gray;
+            lock (_lockObject)
+            {
+                Console.CursorLeft = 0;
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
 
             string prefix = "\r\n";
 
             if (error.Severity == Severity.BuildLogMessage)
                 prefix = "";
 
-            if (!string.IsNullOrEmpty(MessagePrefix) && error.Severity != Severity.BuildLogMessage)
+            string messagePrefix = MessagePrefix; // Thread-safe read
+            if (!string.IsNullOrEmpty(messagePrefix) && error.Severity != Severity.BuildLogMessage)
             {
-                outBuilder.Append($"\r\n[{MessagePrefix}] ");
+                outBuilder.Append($"\r\n[{messagePrefix}] ");
                 prefix = "";
             }
 
@@ -137,13 +160,16 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
             // Legacy colors
             if (!ConsoleHelper.AnsiEscapeSequenceSupported && (output == Console.Out || output == Console.Error))
             {
-                Console.ForegroundColor = error.Severity switch
+                lock (_lockObject)
                 {
-                    Severity.Error => ConsoleColor.Red,
-                    Severity.Warning => ConsoleColor.Yellow,
-                    Severity.Information => ConsoleColor.Cyan,
-                    _ => ConsoleColor.Gray
-                };
+                    Console.ForegroundColor = error.Severity switch
+                    {
+                        Severity.Error => ConsoleColor.Red,
+                        Severity.Warning => ConsoleColor.Yellow,
+                        Severity.Information => ConsoleColor.Cyan,
+                        _ => ConsoleColor.Gray
+                    };
+                }
             }
 
             if (!error.HideCodePosition)
@@ -202,17 +228,26 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 ResetColor();
             }
 
-            output.Write(outBuilder.ToString());
-            output.Flush();
+            lock (output)
+            {
+                output.Write(outBuilder.ToString());
+                output.Flush();
+            }
             outBuilder.Clear();
 
             if (!string.IsNullOrEmpty(error.Tip) && Context.Configuration.EnableTips)
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                lock (_lockObject)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                }
                 InfoOut.WriteLine(error.Tip);
             }
 
-            Console.ForegroundColor = defaultColor;
+            lock (_lockObject)
+            {
+                Console.ForegroundColor = defaultColor;
+            }
 
             if (Context.Configuration.AdvancedErrorMessages && error.Severity != Severity.BuildLogMessage)
             {
@@ -229,32 +264,52 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                     outBuilder.Append(new string(' ', error.CodePosition.Column));
 
                     ResetColor();
-                    output.Write(outBuilder.ToString());
+                    lock (output)
+                    {
+                        output.Write(outBuilder.ToString());
+                    }
                     outBuilder.Clear();
 
-                    Console.ForegroundColor = error.Severity switch
+                    lock (_lockObject)
                     {
-                        Severity.Error => ConsoleColor.DarkRed,
-                        Severity.Warning => ConsoleColor.DarkYellow,
-                        _ => ConsoleColor.DarkCyan
-                    };
+                        Console.ForegroundColor = error.Severity switch
+                        {
+                            Severity.Error => ConsoleColor.DarkRed,
+                            Severity.Warning => ConsoleColor.DarkYellow,
+                            _ => ConsoleColor.DarkCyan
+                        };
+                    }
 
                     outBuilder.Append('^');
                     outBuilder.AppendLine(new string('~', Math.Max(error.Length, 0)));
 
                     ResetColor();
-                    output.Write(outBuilder.ToString());
+                    lock (output)
+                    {
+                        output.Write(outBuilder.ToString());
+                    }
                     outBuilder.Clear();
 
-                    Console.ForegroundColor = defaultColor;
+                    lock (_lockObject)
+                    {
+                        Console.ForegroundColor = defaultColor;
+                    }
                 }
                 catch (Exception)
                 {
                     ResetColor();
-                    Console.ForegroundColor = defaultColor;
+                    lock (_lockObject)
+                    {
+                        Console.ForegroundColor = defaultColor;
+                    }
 
                     if (addToErrorList)
-                        CurrentFile.Errors.Add(error);
+                    {
+                        lock (CurrentFile.Errors)
+                        {
+                            CurrentFile.Errors.Add(error);
+                        }
+                    }
 
                     if (treatAsError || error.Severity == Severity.Error)
                         CurrentFile.CompilationFailed = true;
@@ -265,14 +320,25 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 CurrentFile.CompilationFailed = true;
 
             if (addToErrorList)
-                CurrentFile.Errors.Add(error);
+            {
+                lock (CurrentFile.Errors)
+                {
+                    CurrentFile.Errors.Add(error);
+                }
+            }
 
             ResetColor();
-            output.Write(outBuilder.ToString());
+            lock (output)
+            {
+                output.Write(outBuilder.ToString());
+            }
         }
         catch (IOException)
         {
-            CurrentFile.Errors.Add(error);
+            lock (CurrentFile.Errors)
+            {
+                CurrentFile.Errors.Add(error);
+            }
             return;
         }
     }
@@ -286,7 +352,13 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
             _ => InfoOut
         };
 
-        foreach (TextWriter writer in outStream.Writers)
-            Log(error, writer);
+        TextWriter[] writers;
+        lock (outStream)
+        {
+            writers = outStream.Writers.ToArray();
+        }
+
+        foreach (TextWriter writer in writers)
+            Log(error, writer, treatAsError, addToErrorList, applyFormatting);
     }
 }
