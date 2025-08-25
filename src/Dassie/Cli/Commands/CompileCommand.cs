@@ -186,26 +186,7 @@ internal class CompileCommand : ICompilerCommand
                 File.Copy(ProjectConfigurationFileName, Path.Combine(".cache", ProjectConfigurationFileName), true);
         }
 
-        List<InputDocument> documents = files.Select(f =>
-        {
-            string text = "";
-
-            try
-            {
-                text = File.ReadAllText(f);
-            }
-            catch (Exception ex)
-            {
-                EmitErrorMessage(
-                    0, 0, 0,
-                    DS0030_FileAccessDenied,
-                    ex.Message,
-                    CompilerExecutableName);
-            }
-
-            return new InputDocument(text, f);
-        }).ToList();
-
+        List<InputDocument> documents = files.Select(DocumentHelpers.FromFile).ToList();
         documents.AddRange(DocumentCommandLineManager.ExtractDocuments(documentArgs));
         documents.AddRange(DocumentSourceManager.GetDocuments(Context.Configuration));
 

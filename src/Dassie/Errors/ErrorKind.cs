@@ -981,5 +981,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the <c>&lt;Directory&gt;</c> deployment target is used but no path is specified.
     /// </summary>
-    DS0239_DirectoryTargetPathRequired
+    DS0239_DirectoryTargetPathRequired,
+    /// <summary>
+    /// Emitted when a source file is larger than the maximum allowed size of a <see cref="string"/>.
+    /// </summary>
+    DS0240_SourceFileTooLarge
 }

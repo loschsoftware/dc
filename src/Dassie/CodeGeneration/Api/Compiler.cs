@@ -162,7 +162,7 @@ public static class Compiler
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
     public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
     {
-        return CompileSource(sourceFiles.Select(s => new InputDocument(File.ReadAllText(s), s)), config, configFileName)
+        return CompileSource(sourceFiles.Select(DocumentHelpers.FromFile), config, configFileName)
             .Select(l => l.ToArray());
     }
 
