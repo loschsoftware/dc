@@ -5055,14 +5055,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             SymbolType = SymbolInfo.SymType.Local
         };
 
-        string ds0074Message = $"'{CurrentMethod.Builder.Name}': Only {ushort.MaxValue} locals can be declared per function.";
-        if (localSymbol.Index() > ushort.MaxValue && !Messages.Any(m => m.ErrorMessage == ds0074Message))
+        string ds0074Message = $"'{CurrentMethod.Builder.Name}': The number of local variables in a function cannot exceed {ushort.MaxValue - 1}.";
+        if (localSymbol.Index() > (ushort.MaxValue - 1) && !Messages.Any(m => m.ErrorMessage == ds0074Message))
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetText().Length,
-                DS0075_TooManyLocals,
+                DS0075_MetadataLimitExceeded,
                 ds0074Message);
         }
 

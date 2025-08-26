@@ -136,18 +136,44 @@ internal class CompileCommand : ICompilerCommand
 
         if (config.References != null)
         {
-            foreach (PackageReference packRef in config.References.Where(r => r is PackageReference).Cast<PackageReference>())
+            if (config.References.Length > (ushort.MaxValue + 1))
             {
-                ReferenceHandler.HandlePackageReference(packRef, config);
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0075_MetadataLimitExceeded,
+                    $"Assembly has too many references ({config.References.Length}). The maximum allowed number is {ushort.MaxValue + 1}.",
+                    ProjectConfigurationFileName);
             }
 
-            foreach (ProjectReference projRef in config.References.Where(r => r is ProjectReference).Cast<ProjectReference>())
+            foreach (PackageReference packRef in config.References.OfType<PackageReference>())
+                ReferenceHandler.HandlePackageReference(packRef, config);
+
+            foreach (ProjectReference projRef in config.References.OfType<ProjectReference>())
             {
                 if (!ReferenceHandler.HandleProjectReference(projRef, config, Path.GetFullPath("./"), relativePathResolverBaseDir))
                     return -1;
             }
 
             MessagePrefix = msgPrefix;
+
+            IEnumerable<Configuration.AssemblyReference> asmRefs = config.References.OfType<Configuration.AssemblyReference>();
+            if (asmRefs.Count() != asmRefs.DistinctBy(r => Path.GetFullPath(r.AssemblyPath)).Count())
+            {
+                var duplicates = asmRefs.GroupBy(r => Path.GetFullPath(r.AssemblyPath))
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key);
+
+                foreach (string duplicate in duplicates)
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0241_DuplicateReference,
+                        $"Duplicate reference '{duplicate}'.",
+                        ProjectConfigurationFileName);
+                }
+
+                config.References = config.References.Where(r => r is not Configuration.AssemblyReference ar || !duplicates.Contains(ar.AssemblyPath)).ToArray();
+            }
         }
 
         if (config.CacheSourceFiles)
@@ -514,7 +540,7 @@ internal class CompileCommand : ICompilerCommand
                 }
             }
 
-            if (Context.Configuration.MeasureElapsedTime)
+            if (config.MeasureElapsedTime)
             {
                 EmitMessage(
                     0, 0, 0,
@@ -528,10 +554,6 @@ internal class CompileCommand : ICompilerCommand
             Directory.SetCurrentDirectory(workingDir);
             Directory.Delete(config.BuildOutputDirectory);
         }
-
-        TextWriterBuildLogDevice.InfoOut?.Dispose();
-        TextWriterBuildLogDevice.WarnOut?.Dispose();
-        TextWriterBuildLogDevice.ErrorOut?.Dispose();
 
         return errors.SelectMany(e => e).Count(e => e.Severity == Severity.Error);
     }

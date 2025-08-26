@@ -2,6 +2,7 @@
 using Dassie.Configuration;
 using Dassie.Core;
 using Dassie.Errors;
+using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using System;
 using System.Diagnostics;
@@ -47,7 +48,7 @@ internal class Program
             bool verbose = EmitBuildLogMessage($"Unhandled exception occured. {ex}", 2);
 
             if (!Messages.Any(m => m.Severity == Severity.Error))
-                EmitErrorMessage(0, 0, 0, DS0001_UnknownError, $"Internal compiler error. Unhandled exception of type '{ex.GetType()}'.", CompilerExecutableName);
+                EmitErrorMessage(0, 0, 0, DS0001_UnknownError, $"An internal compiler error or limitation was encountered. Unhandled exception of type '{ex.GetType()}'.", CompilerExecutableName);
 
             ConsoleHelper.PrintException(ex, verbose);
 
@@ -69,6 +70,9 @@ internal class Program
     public static void Exit(int errorCode)
     {
         ExtensionLoader.UnloadAll();
+        TextWriterBuildLogDevice.InfoOut?.Dispose();
+        TextWriterBuildLogDevice.WarnOut?.Dispose();
+        TextWriterBuildLogDevice.ErrorOut?.Dispose();
         Environment.Exit(errorCode);
     }
 }

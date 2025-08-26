@@ -26,8 +26,8 @@ internal static class TypeDeclarationGeneration
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                DS0074_TypeNameTooLong,
-                "A type name cannot be longer than 1024 characters.");
+                DS0075_MetadataLimitExceeded,
+                $"'{context.Identifier().GetIdentifier()[0..32]}...': The fully qualified name of a type cannot exceed 1024 characters.");
 
             return new();
         }
@@ -267,6 +267,16 @@ internal static class TypeDeclarationGeneration
 
         if (context.generic_parameter_list() != null)
         {
+            if (context.generic_parameter_list().generic_parameter().Length > ushort.MaxValue)
+            {
+                EmitErrorMessage(
+                    context.generic_parameter_list().Start.Line,
+                    context.generic_parameter_list().Start.Column,
+                    context.generic_parameter_list().GetText().Length,
+                    DS0075_MetadataLimitExceeded,
+                    $"'{context.Identifier().GetIdentifier()}': Types cannot have more than {ushort.MaxValue} generic type parameters.");
+            }
+
             List<GenericParameterContext> typeParamContexts = [];
 
             foreach (DassieParser.Generic_parameterContext typeParam in context.generic_parameter_list().generic_parameter())

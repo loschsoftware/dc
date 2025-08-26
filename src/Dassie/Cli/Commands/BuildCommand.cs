@@ -33,8 +33,15 @@ internal class BuildCommand : ICompilerCommand
     };
 
     public int Invoke(string[] args)
+        => Invoke(args, null);
+
+    internal int Invoke(string[] args, DassieConfig overrideConfig)
     {
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
+
+        if (overrideConfig != null)
+            config = overrideConfig;
+
         config ??= new();
         config.BuildProfiles ??= [];
 

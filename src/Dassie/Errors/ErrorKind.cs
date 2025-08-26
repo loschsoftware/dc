@@ -319,13 +319,22 @@ public enum ErrorKind
     /// </summary>
     DS0073_NoSourceFilesFound,
     /// <summary>
-    /// Emitted when the name of a type exceeds the .NET limit of 1024 characters.
+    /// Unused.
     /// </summary>
-    DS0074_TypeNameTooLong,
+    DS0074_Unused,
     /// <summary>
-    /// Emitted when more than 65535 locals are defined in a function.
+    /// Emitted when one of the conditions in the following list is met. These restrictions are dictated either by the ECMA-335 specification, implementation-specific restrictions of the Microsoft implementation of ECMA-335, or practical restrictions of the Dassie compiler.
+    /// <list type="bullet">
+    /// <item>A fully qualified type name, member name, type parameter or formal parameter name is longer than 1024 characters.</item>
+    /// <item>A function contains more than 65,534 local variables, type parameters or formal parameters.</item>
+    /// <item>The IL body of a function exceeds 2,147,483,647 bytes.</item>
+    /// <item>A type contains more than 65,535 generic type parameters or members.</item>
+    /// <item>An assembly contains more than 16,777,215 metadata entries.</item>
+    /// <item>The value of one or more fields of the version number of the assembly exceeds 4,294,967,295.</item>
+    /// <item>An assembly contains more than 65,536 assembly references.</item>
+    /// </list>
     /// </summary>
-    DS0075_TooManyLocals,
+    DS0075_MetadataLimitExceeded,
     /// <summary>
     /// Emitted when an integer literal is too big for its type.
     /// </summary>
@@ -985,5 +994,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a source file is larger than the maximum allowed size of a <see cref="string"/>.
     /// </summary>
-    DS0240_SourceFileTooLarge
+    DS0240_SourceFileTooLarge,
+    /// <summary>
+    /// Emitted when a project file declares a duplicate reference.
+    /// </summary>
+    DS0241_DuplicateReference
 }

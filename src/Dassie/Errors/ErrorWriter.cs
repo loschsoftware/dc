@@ -265,7 +265,7 @@ public static class ErrorWriter
     /// <param name="minimumVerbosity">The minimum verbosity at which the message is printed.</param>
     /// <param name="defer">If <see langword="true"/>, defers the emission of the message until the next call to <see cref="EmitDeferredBuildLogMessages"/>.</param>
     /// <returns><see langword="true"/> if the message was emitted or deferred. <see langword="false"/> if the message was not emitted due to an insufficient verbosity configuration.</returns>
-    public static bool EmitBuildLogMessage(string message, int minimumVerbosity = 1, bool defer = false)
+    public static bool EmitBuildLogMessage(string message, int minimumVerbosity = 2, bool defer = false)
     {
         if (!defer && Context.Configuration.Verbosity < minimumVerbosity)
             return false;

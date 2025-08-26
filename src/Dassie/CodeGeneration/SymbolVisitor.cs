@@ -127,6 +127,16 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
         foreach (IParseTree prog in context.full_program() ?? [])
             Visit(prog);
 
+        if ((context.type_member() ?? []).Length > ushort.MaxValue)
+        {
+            EmitErrorMessage(
+                context.type_member()[^1].Start.Line,
+                context.type_member()[^1].Start.Column,
+                context.type_member()[^1].GetText().Length,
+                DS0075_MetadataLimitExceeded,
+                $"Files cannot contain more than {ushort.MaxValue} top-level functions.");
+        }
+
         foreach (DassieParser.Type_memberContext member in context.type_member() ?? [])
         {
             if (member.member_special_modifier() == null || !member.member_special_modifier().Any(a => a.Static() != null))
@@ -194,6 +204,16 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
 
         if (context.type_block() != null && context.type_block().type_member() != null)
         {
+            if (context.type_block().type_member().Length > ushort.MaxValue)
+            {
+                EmitErrorMessage(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetText().Length,
+                    DS0075_MetadataLimitExceeded,
+                    $"'{context.Identifier().GetIdentifier()}': Types cannot have more than {ushort.MaxValue} members.");
+            }
+
             foreach (DassieParser.Type_memberContext member in context.type_block().type_member())
                 MemberDeclarationGeneration.GenerateMember(member, tc);
         }

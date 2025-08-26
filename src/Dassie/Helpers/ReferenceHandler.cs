@@ -1,5 +1,6 @@
 ﻿using Dassie.Cli.Commands;
 using Dassie.Configuration;
+using Dassie.Errors.Devices;
 using Dassie.Packages;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,8 @@ internal static class ReferenceHandler
             return false;
         }
 
+        EmitBuildLogMessage($"Compiling project reference '{reference.ProjectFile}'.");
+
         MessagePrefix = Path.GetDirectoryName(reference.ProjectFile).Split(Path.DirectorySeparatorChar).Last();
 
         string dir = Directory.GetCurrentDirectory();
@@ -55,6 +58,7 @@ internal static class ReferenceHandler
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
         ProjectFileDeserializer.Reload();
+        ProjectFileDeserializer.DassieConfig.Verbosity = prevConfig.Verbosity;
 
         if (track)
             _referencedProjectPaths.Add(ProjectFileDeserializer.Path);
@@ -93,7 +97,9 @@ internal static class ReferenceHandler
             }
         }
 
-        int errCode = BuildCommand.Instance.Invoke(args ?? []);
+        int errCode = BuildCommand.Instance.Invoke(args ?? [], ProjectFileDeserializer.DassieConfig);
+        Context.Configuration.Verbosity = prevConfig.Verbosity;
+        EmitBuildLogMessage($"Compilation of project reference '{reference.ProjectFile}' ended with exit code {errCode}.");
 
         if (errCode != 0)
             return false;
@@ -151,16 +157,20 @@ internal static class ReferenceHandler
 
                 if (Path.GetFileName(fsEntry) == Path.GetFileName(outFile))
                 {
+                    string assemblyPath = Path.Combine(destDir, Path.GetFileName(fsEntry));
                     currentConfig.References = currentConfig.References.Append(new AssemblyReference()
                     {
-                        AssemblyPath = Path.Combine(destDir, Path.GetFileName(fsEntry))
+                        AssemblyPath = assemblyPath
                     }).ToArray();
+
+                    EmitBuildLogMessage($"Converted project reference '{reference.ProjectFile}' to assembly reference '{assemblyPath}'.");
                 }
             }
         }
 
         Directory.SetCurrentDirectory(dir);
         ProjectFileDeserializer.Set(prevConfig);
+        Context.Configuration = prevConfig;
         return true;
     }
 
