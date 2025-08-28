@@ -998,5 +998,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a project file declares a duplicate reference.
     /// </summary>
-    DS0241_DuplicateReference
+    DS0241_DuplicateReference,
+    /// <summary>
+    /// Emitted when a value type has a cyclic dependency on itself through one of its fields.
+    /// </summary>
+    DS0242_ValueTypeFieldCycle
 }

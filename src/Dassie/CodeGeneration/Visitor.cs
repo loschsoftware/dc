@@ -1345,31 +1345,29 @@ internal class Visitor : DassieParserBaseVisitor<Type>
             return typeof(bool);
         }
 
-        if ((op_eq == null && op_ineq == null) || (IsNumericType(t) && IsNumericType(t2)))
+        // TODO: Do this for all operators
+        if (((IsNumericType(t) || t.IsEnum) && (IsNumericType(t2) || t2.IsEnum)) || (IsBoolean(t) && IsBoolean(t2)))
         {
-            if ((IsNumericType(t) && IsNumericType(t2)) || (IsBoolean(t) && IsBoolean(t2)))
+            if (IsFloatingPointType(t) && !IsFloatingPointType(t2))
             {
-                if (IsFloatingPointType(t) && !IsFloatingPointType(t2))
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Conv_R8);
-                }
-                else if (IsFloatingPointType(t2) && !IsFloatingPointType(t))
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Pop);
-                    CurrentMethod.IL.Emit(OpCodes.Conv_R8);
-                    Visit(context.expression()[1]);
-                }
-
-                CurrentMethod.IL.Emit(OpCodes.Ceq);
-
-                if (context.op.Text == "!=")
-                {
-                    CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
-                    CurrentMethod.IL.Emit(OpCodes.Ceq);
-                }
-
-                return typeof(bool);
+                CurrentMethod.IL.Emit(OpCodes.Conv_R8);
             }
+            else if (IsFloatingPointType(t2) && !IsFloatingPointType(t))
+            {
+                CurrentMethod.IL.Emit(OpCodes.Pop);
+                CurrentMethod.IL.Emit(OpCodes.Conv_R8);
+                Visit(context.expression()[1]);
+            }
+
+            CurrentMethod.IL.Emit(OpCodes.Ceq);
+
+            if (context.op.Text == "!=")
+            {
+                CurrentMethod.IL.Emit(OpCodes.Ldc_I4_S, (byte)0);
+                CurrentMethod.IL.Emit(OpCodes.Ceq);
+            }
+
+            return typeof(bool);
         }
 
         MethodInfo equalsMethod = t.GetMethods().Where(m => m.Name == "Equals").First();
