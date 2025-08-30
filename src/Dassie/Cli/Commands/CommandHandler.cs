@@ -29,6 +29,18 @@ internal static class CommandHandler
                 return true;
             }
 
+            if (selectedCommand.Command == "compile")
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0250_DCCompileInvoked,
+                    $"The command 'compile' cannot be executed directly. To compile Dassie source files, use 'dc <Files>'.",
+                    CompilerExecutableName);
+
+                errorCode = 250;
+                return true;
+            }
+
             errorCode = selectedCommand.Invoke(args);
             return true;
         }

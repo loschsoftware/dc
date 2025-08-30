@@ -209,13 +209,13 @@ internal class HelpCommand : ICompilerCommand
         sb.AppendLine();
         sb.AppendLine("Usage:");
 
-        sb.Append("    dc [Command] [Options]".PadRight(50));
+        sb.Append("    dc <FileNames> [Options]".PadRight(35));
+        sb.Append(FormatLines("Compiles the specified source files. Use 'dc help compile' for more information."));
+
+        sb.Append("    dc [Command] [Options]".PadRight(35));
         sb.Append(FormatLines("Executes a command from the list below."));
 
-        sb.Append("    dc <FileNames> [Options]".PadRight(50));
-        sb.Append(FormatLines("Compiles the specified source files."));
-
-        sb.Append("    dc help <Command>".PadRight(50));
+        sb.Append("    dc help <Command>".PadRight(35));
         sb.Append(FormatLines("Displays more information about a specific command."));
 
         sb.AppendLine();
@@ -228,7 +228,7 @@ internal class HelpCommand : ICompilerCommand
 
         foreach (ICompilerCommand command in internalCommands)
         {
-            sb.Append($"    {command.Command}".PadRight(50));
+            sb.Append($"    {command.Command}".PadRight(35));
             sb.Append(FormatLines(command.Description));
         }
 
@@ -238,21 +238,8 @@ internal class HelpCommand : ICompilerCommand
             sb.AppendLine("External commands:");
 
             foreach (ICompilerCommand cmd in externalCommands)
-                sb.Append($"{$"    {cmd.Command}",-50}{FormatLines(cmd.Description)}");
+                sb.Append($"{$"    {cmd.Command}",-35}{FormatLines(cmd.Description)}");
         }
-
-        sb.AppendLine();
-        sb.AppendLine("Options:");
-        sb.AppendLine(FormatLines("Options from project files (dsconfig.xml) can be included in the following way:", true, 4));
-
-        sb.Append("    --<PropertyName>=<Value>".PadRight(50));
-        sb.Append(FormatLines("For simple properties of type 'string', 'bool' or 'enum'. The property name is case-insensitive. For boolean properties, 0 and 1 are aliases for false and true. Example: --MeasureElapsedTime=true"));
-
-        sb.Append("    --<ArrayPropertyName>+<Value>".PadRight(50));
-        sb.Append(FormatLines("To add elements to an array property. Property names are recognized by the first characters, where 'References' takes precedence over 'Resources'. Example: --R+\"assembly.dll\""));
-
-        sb.Append("    --<PropertyName>::<ChildProperty>=<Value>".PadRight(50));
-        sb.Append(FormatLines("For setting child properties of more complex objects. Object names are recognized by first characters. Example: --VersionInfo::Description=\"Application\""));
 
         LogOut.Write(sb.ToString());
         return 0;

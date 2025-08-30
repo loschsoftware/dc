@@ -21,12 +21,12 @@ internal class BuildCommand : ICompilerCommand
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = Description,
-        Usage = ["dc build [BuildProfile]"],
+        Usage = ["dc build [BuildProfile] [Options]"],
         Remarks = "This is the primary command for building Dassie projects. By default, this command will compile all Dassie source files in the current directory as well as all subdirectories. If no project file is present in the root directory, the default configuration is used.",
         Options =
         [
-            ("[BuildProfile]", "Specifies the build profile to execute. If not set, the default profile is executed."),
-            ("[Options]", "Additional options to pass to the compiler. For a list of available options, use 'dc help -o'.")
+            ("BuildProfile", "Specifies the build profile to execute. If not set, the default profile is executed."),
+            ("Options", "Additional options to pass to the compiler. For a list of available options, use 'dc help -o'.")
         ]
     };
 

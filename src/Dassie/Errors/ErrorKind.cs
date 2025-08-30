@@ -1030,5 +1030,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when 'dc test' is invoked on a project group.
     /// </summary>
-    DS0249_DCTestProjectGroup
+    DS0249_DCTestProjectGroup,
+    /// <summary>
+    /// Emitted when the hidden 'dc compile' command is used. This command only exists to provide help details for the 'dc &lt;Files&gt;' command.
+    /// </summary>
+    DS0250_DCCompileInvoked
 }

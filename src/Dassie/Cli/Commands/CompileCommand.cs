@@ -34,10 +34,36 @@ internal class CompileCommand : ICompilerCommand
     private static CompileCommand _instance;
     public static CompileCommand Instance => _instance ??= new();
 
-    // All empty because this command can never be called like a regular command
-    public string Command => "";
-    public string Description => "";
+    public string Command => "compile";
+    public string Description => "Compiles the specified source files.";
     public bool Hidden() => true;
+
+    public CommandHelpDetails HelpDetails()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine(HelpCommand.FormatLines("Options from project files (dsconfig.xml) can be included in the following way:", true, 4));
+
+        sb.Append("    --<PropertyName>=<Value>".PadRight(50));
+        sb.Append(HelpCommand.FormatLines("For simple properties of type 'string', 'bool' or 'enum'. The property name is case-insensitive. For boolean properties, 0 and 1 are aliases for false and true. Example: --MeasureElapsedTime=true"));
+
+        sb.Append("    --<ArrayPropertyName>+<Value>".PadRight(50));
+        sb.Append(HelpCommand.FormatLines("To add elements to an array property. Property names are recognized by the first characters, where 'References' takes precedence over 'Resources'. Example: --R+\"assembly.dll\""));
+
+        sb.Append("    --<PropertyName>::<ChildProperty>=<Value>".PadRight(50));
+        sb.Append(HelpCommand.FormatLines("For setting child properties of more complex objects. Object names are recognized by first characters. Example: --VersionInfo::Description=\"Application\""));
+
+        return new()
+        {
+            Description = Description,
+            Usage = ["dc <Files> [Options]"],
+            Options =
+            [
+                ("Files", "One or more Dassie source files to compile."),
+                ("Options", "Additional options as mentioned below. For a list of available options, use 'dc help -o'.")
+            ],
+            CustomSections = [("Advanced options", sb.ToString())],
+        };
+    }
 
     public int Invoke(string[] args) => Compile(args);
     public int Invoke(string[] args, DassieConfig overrideSettings, string assemblyName = null) => Compile(args, overrideSettings, assemblyName);
