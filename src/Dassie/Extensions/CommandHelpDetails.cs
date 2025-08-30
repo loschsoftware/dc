@@ -13,7 +13,7 @@ public class CommandHelpDetails
     public string Description { get; set; }
 
     /// <summary>
-    /// A list of usage strings for the command. Most of the time, this list has only a single entry that is the same as <see cref="ICompilerCommand.UsageString"/>.
+    /// A list of usage strings for the command. Most of the time, this list has only a single entry that represents the command with all its flags and options.
     /// </summary>
     public List<string> Usage { get; set; }
 

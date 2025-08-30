@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Dassie.Cli.Commands;
 
@@ -20,8 +19,6 @@ internal class AnalyzeCommand : ICompilerCommand
     public static AnalyzeCommand Instance => _instance ??= new();
 
     public string Command => "analyze";
-
-    public string UsageString => "analyze [Options]";
 
     public string Description => "Runs code analyzers on the current project or on a list of source files.";
 

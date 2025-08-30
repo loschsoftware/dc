@@ -5,7 +5,6 @@ using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Data;
 using Dassie.Errors;
-using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Unmanaged;
@@ -37,7 +36,6 @@ internal class CompileCommand : ICompilerCommand
 
     // All empty because this command can never be called like a regular command
     public string Command => "";
-    public string UsageString => "";
     public string Description => "";
     public bool Hidden() => true;
 

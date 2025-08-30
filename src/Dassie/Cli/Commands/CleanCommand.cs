@@ -1,11 +1,7 @@
-﻿using Dassie.Configuration.Macros;
-using Dassie.Configuration;
-using Dassie.Extensions;
+﻿using Dassie.Configuration;
+using Dassie.Configuration.Macros;
 using Dassie.Configuration.ProjectGroups;
-using System.Linq;
-using System.Text;
-using System;
-using Dassie.Errors;
+using Dassie.Extensions;
 
 namespace Dassie.Cli.Commands;
 
@@ -15,8 +11,6 @@ internal class CleanCommand : ICompilerCommand
     public static CleanCommand Instance => _instance ??= new();
 
     public string Command => "clean";
-
-    public string UsageString => "clean";
 
     public string Description => "Clears build artifacts and temporary files of a project or project group.";
 

@@ -18,11 +18,6 @@ public interface ICompilerCommand
     public virtual List<string> Aliases() => [];
 
     /// <summary>
-    /// A usage hint displayed in the compiler help screen.
-    /// </summary>
-    public string UsageString { get; }
-
-    /// <summary>
     /// A short description of the command.
     /// </summary>
     public string Description { get; }

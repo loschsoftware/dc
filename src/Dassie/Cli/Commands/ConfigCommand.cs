@@ -13,8 +13,6 @@ internal class ConfigCommand : ICompilerCommand
 
     public string Command => "config";
 
-    public string UsageString => "config";
-
     public string Description => "Creates a new dsconfig.xml file with default values.";
 
     public CommandHelpDetails HelpDetails() => new()

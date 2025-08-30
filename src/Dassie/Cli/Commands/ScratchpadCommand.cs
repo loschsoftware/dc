@@ -239,8 +239,6 @@ internal class ScratchpadCommand : ICompilerCommand
 
     public string Command => "scratchpad";
 
-    public string UsageString => "scratchpad, sp [Command] [Options]";
-
     public string Description => "Allows compiling and running Dassie source code from the console. Use 'dc scratchpad help' to display available commands.";
 
     public List<string> Aliases() => ["sp"];

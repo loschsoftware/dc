@@ -14,8 +14,6 @@ internal class DeployCommand : ICompilerCommand
 
     public string Command => "deploy";
 
-    public string UsageString => "deploy [Options]";
-
     public string Description => "Builds and deploys a project group.";
 
     public CommandHelpDetails HelpDetails() => new()

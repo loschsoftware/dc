@@ -19,8 +19,6 @@ internal class RunCommand : ICompilerCommand
 
     public string Command => "run";
 
-    public string UsageString => "run [Arguments]";
-
     public string Description => "Automatically compiles using the default profile and then runs the output executable with the specified arguments.";
 
     public CommandHelpDetails HelpDetails() => new()

@@ -18,7 +18,6 @@ internal class VersionCommand : ICompilerCommand
 
     public bool Hidden() => true;
 
-    public string UsageString => "";
     public string Description => "";
 
     public int Invoke(string[] args)

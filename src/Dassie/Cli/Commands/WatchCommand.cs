@@ -16,8 +16,6 @@ internal class WatchCommand : ICompilerCommand
 
     public string Command => "watch";
 
-    public string UsageString => "watch, auto [Options]";
-
     public string Description => "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.";
 
     public List<string> Aliases() => ["auto"];

@@ -21,8 +21,6 @@ internal class PackageCommand : ICompilerCommand
 
     public string Command => "package";
 
-    public string UsageString => "package [Command] [Options]";
-
     public string Description => "Used to install and manage compiler extensions. Use 'dc package help' to display available commands.";
 
     public CommandHelpDetails HelpDetails()
@@ -180,7 +178,7 @@ internal class PackageCommand : ICompilerCommand
             WriteHeading("Commands");
 
             foreach (ICompilerCommand cmd in definedCommands)
-                sb.AppendLine($"{$"    {cmd.UsageString}",-50}{cmd.Description}");
+                sb.AppendLine($"{$"    {cmd.Command}",-50}{cmd.Description}");
         }
 
         if (package.CodeAnalyzers().Length != 0)

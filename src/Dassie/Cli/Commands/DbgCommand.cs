@@ -10,7 +10,7 @@ internal class DbgCommand : ICompilerCommand
 
     public string Command => "dbg";
 
-    public string UsageString => "dbg [Command]";
+    public string UsageString => "dbg";
 
     public string Description => "Commands used for debugging and testing the compiler. To be used by compiler developers.";
 

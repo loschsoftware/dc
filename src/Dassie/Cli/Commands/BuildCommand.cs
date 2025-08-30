@@ -16,8 +16,6 @@ internal class BuildCommand : ICompilerCommand
 
     public string Command => "build";
 
-    public string UsageString => "build [BuildProfile]";
-
     public string Description => "Executes the specified build profile, or compiles all source files in the current folder structure if none is specified.";
 
     public CommandHelpDetails HelpDetails() => new()

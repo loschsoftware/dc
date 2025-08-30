@@ -19,8 +19,6 @@ internal class HelpCommand : ICompilerCommand
 
     public List<string> Aliases() => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
 
-    public string UsageString => "help, ? [Options]";
-
     public string Description => "Lists all available commands.";
 
     public CommandHelpDetails HelpDetails() => new()
@@ -215,7 +213,10 @@ internal class HelpCommand : ICompilerCommand
         sb.Append(FormatLines("Executes a command from the list below."));
 
         sb.Append("    dc <FileNames> [Options]".PadRight(50));
-        sb.AppendLine("Compiles the specified source files.");
+        sb.Append(FormatLines("Compiles the specified source files."));
+
+        sb.Append("    dc help <Command>".PadRight(50));
+        sb.Append(FormatLines("Displays more information about a specific command."));
 
         sb.AppendLine();
         sb.AppendLine("Commands:");
@@ -227,7 +228,7 @@ internal class HelpCommand : ICompilerCommand
 
         foreach (ICompilerCommand command in internalCommands)
         {
-            sb.Append($"    {command.UsageString}".PadRight(50));
+            sb.Append($"    {command.Command}".PadRight(50));
             sb.Append(FormatLines(command.Description));
         }
 
@@ -237,7 +238,7 @@ internal class HelpCommand : ICompilerCommand
             sb.AppendLine("External commands:");
 
             foreach (ICompilerCommand cmd in externalCommands)
-                sb.Append($"{$"    {cmd.UsageString}",-50}{FormatLines(cmd.Description)}");
+                sb.Append($"{$"    {cmd.Command}",-50}{FormatLines(cmd.Description)}");
         }
 
         sb.AppendLine();
@@ -245,7 +246,7 @@ internal class HelpCommand : ICompilerCommand
         sb.AppendLine(FormatLines("Options from project files (dsconfig.xml) can be included in the following way:", true, 4));
 
         sb.Append("    --<PropertyName>=<Value>".PadRight(50));
-        sb.Append(FormatLines("For simple properties of type 'string', 'bool' or 'enum'. The property name is case-insensitive. For boolean properties, 0 and 1 are supported aliases for false and true. Example: --MeasureElapsedTime=true"));
+        sb.Append(FormatLines("For simple properties of type 'string', 'bool' or 'enum'. The property name is case-insensitive. For boolean properties, 0 and 1 are aliases for false and true. Example: --MeasureElapsedTime=true"));
 
         sb.Append("    --<ArrayPropertyName>+<Value>".PadRight(50));
         sb.Append(FormatLines("To add elements to an array property. Property names are recognized by the first characters, where 'References' takes precedence over 'Resources'. Example: --R+\"assembly.dll\""));
@@ -276,7 +277,7 @@ internal class HelpCommand : ICompilerCommand
 
         sb.Append("Usage:");
         if (hd.Usage == null || hd.Usage.Count == 0)
-            sb.AppendLine($" {command.UsageString}");
+            sb.AppendLine($" {command.Command}");
         else if (hd.Usage.Count == 1)
             sb.AppendLine($" {hd.Usage[0]}");
         else

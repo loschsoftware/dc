@@ -15,8 +15,6 @@ internal class TestCommand : ICompilerCommand
 
     public string Command => "test";
 
-    public string UsageString => "test";
-
     public string Description => "Runs unit tests defined for the current project or project group.";
 
     public CommandHelpDetails HelpDetails() => new()
