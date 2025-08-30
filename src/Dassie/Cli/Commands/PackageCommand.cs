@@ -21,7 +21,7 @@ internal class PackageCommand : ICompilerCommand
 
     public string Command => "package";
 
-    public string Description => "Used to install and manage compiler extensions. Use 'dc package help' to display available commands.";
+    public string Description => "Manages compiler extensions.";
 
     public CommandHelpDetails HelpDetails()
     {
