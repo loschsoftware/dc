@@ -1,6 +1,5 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Macros;
-using Dassie.Configuration.ProjectGroups;
 using Dassie.Errors;
 using Dassie.Extensions;
 using Dassie.Validation;
@@ -37,6 +36,43 @@ internal class RunCommand : ICompilerCommand
 
     public int Invoke(string[] args)
     {
+        (int status, string assemblyPath, bool isNative, ApplicationType appType, _) = Compile();
+
+        if (status != 0)
+            return status;
+
+        if (appType == ApplicationType.Library)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0125_DCRunInvalidProjectType,
+                "The current project cannot be executed. Projects with an application type of 'Library' are not executable.",
+                CompilerExecutableName);
+
+            return -1;
+        }
+
+        string process = "dotnet";
+        string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. args]);
+
+        if (isNative)
+        {
+            process = assemblyPath;
+            arglist = string.Join(' ', arglist.Split(' ').Skip(1));
+        }
+
+        ProcessStartInfo psi = new()
+        {
+            FileName = process,
+            Arguments = arglist
+        };
+
+        Process.Start(psi).WaitForExit();
+        return 0;
+    }
+
+    internal static (int Status, string AssemblyPath, bool IsNative, ApplicationType Type, bool IsProjectGroup) Compile(bool ignoreDS0031 = false, bool isProjectGroup = false)
+    {
         DassieConfig config = null;
 
         if (File.Exists(ProjectConfigurationFileName))
@@ -46,7 +82,7 @@ internal class RunCommand : ICompilerCommand
                 if (error.Severity == Severity.Error)
                 {
                     EmitGeneric(error);
-                    return -1;
+                    return (-1, null, false, 0, isProjectGroup);
                 }
             }
 
@@ -55,9 +91,12 @@ internal class RunCommand : ICompilerCommand
             config = (DassieConfig)xmls.Deserialize(sr);
         }
 
+        if (ignoreDS0031)
+            IgnoredCodes.Add(DS0031_NoEntryPoint);
+
         string defaultPath = Path.Combine(Directory.GetCurrentDirectory(), "build", $"{Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Last()}.dll");
-        bool isNative = false;
         string assemblyPath;
+        bool isNative = false;
 
         if (config == null)
         {
@@ -66,10 +105,10 @@ internal class RunCommand : ICompilerCommand
                 EmitErrorMessage(
                     0, 0, 0,
                     DS0106_DCRunInsufficientInfo,
-                    "Insufficient information for 'dc run': The files to execute could not be determined. Create a project file (dsconfig.xml) and set the required properties 'BuildDirectory' and 'AssemblyFileName' to enable this command.",
+                    "Insufficient information: The files to execute could not be determined. Create a project file (dsconfig.xml) and set the required properties 'BuildDirectory' and 'AssemblyFileName' to enable this command.",
                     CompilerExecutableName);
 
-                return -1;
+                return (-1, null, false, 0, isProjectGroup);
             }
 
             assemblyPath = defaultPath;
@@ -85,21 +124,10 @@ internal class RunCommand : ICompilerCommand
                 (int code, string path) = ProjectGroupHelpers.GetExecutableProject(config);
 
                 if (code != 0)
-                    return code;
+                    return (code, null, false, 0, isProjectGroup || config.ProjectGroup != null);
 
                 Directory.SetCurrentDirectory(path);
-                return Invoke([]);
-            }
-
-            if (config.ApplicationType == ApplicationType.Library)
-            {
-                EmitErrorMessage(
-                    0, 0, 0,
-                    DS0125_DCRunInvalidProjectType,
-                    "The current project cannot be executed. Projects with an application type of 'Library' are not executable.",
-                    CompilerExecutableName);
-
-                return -1;
+                return Compile(isProjectGroup: true);
             }
 
             string assemblyName = Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Last();
@@ -151,25 +179,9 @@ internal class RunCommand : ICompilerCommand
         {
             int ret = BuildCommand.Instance.Invoke([]);
             if (ret != 0 || Messages.Where(m => m.Severity == Severity.Error).Any())
-                return -1;
+                return (-1, null, false, 0, isProjectGroup || config.ProjectGroup != null);
         }
 
-        string process = "dotnet";
-        string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. args]);
-
-        if (isNative)
-        {
-            process = assemblyPath;
-            arglist = string.Join(' ', arglist.Split(' ').Skip(1));
-        }
-
-        ProcessStartInfo psi = new()
-        {
-            FileName = process,
-            Arguments = arglist
-        };
-
-        Process.Start(psi).WaitForExit();
-        return 0;
+        return (0, assemblyPath, isNative, ApplicationType.Console, isProjectGroup || config.ProjectGroup != null);
     }
 }

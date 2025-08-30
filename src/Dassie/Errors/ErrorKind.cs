@@ -1014,5 +1014,21 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a module appears in the inheritance list of a type.
     /// </summary>
-    DS0245_ModuleInherited
+    DS0245_ModuleInherited,
+    /// <summary>
+    /// Emitted when the 'dc test' command is invoked but the project to be tested contains no test modules.
+    /// </summary>
+    DS0246_DCTestNoTestModules,
+    /// <summary>
+    /// Emitted when the 'dc test' command is invoked with an invalid assembly.
+    /// </summary>
+    DS0247_DCTestAssemblyNotFound,
+    /// <summary>
+    /// Emitted when the 'dc test' command is invoked with an invalid module name.
+    /// </summary>
+    DS0248_DCTestInvalidModule,
+    /// <summary>
+    /// Emitted when 'dc test' is invoked on a project group.
+    /// </summary>
+    DS0249_DCTestProjectGroup
 }

@@ -52,8 +52,8 @@ public static class ErrorWriter
     /// <summary>
     /// A list of build devices to use.
     /// </summary>
-    public static List<IBuildLogDevice> BuildLogDevices 
-    { 
+    public static List<IBuildLogDevice> BuildLogDevices
+    {
         get
         {
             _buildLogDevicesLock.EnterReadLock();
@@ -79,6 +79,11 @@ public static class ErrorWriter
             }
         }
     }
+
+    /// <summary>
+    /// A list of error codes to ignore.
+    /// </summary>
+    public static List<ErrorKind> IgnoredCodes { get; set; } = [];
 
     private static readonly ConcurrentBag<IBuildLogDevice> _disabledDevices = [];
 
@@ -201,6 +206,9 @@ public static class ErrorWriter
 
         if (Context.Configuration.TreatWarningsAsErrors && error.Severity == Severity.Warning)
             error.Severity = Severity.Error;
+
+        if (IgnoredCodes != null && IgnoredCodes.Contains(error.ErrorCode))
+            return;
 
         if (Context.Configuration.IgnoredMessages.Any(i => i.Code == error.ErrorCode.ToString().Split('_')[0]))
         {
