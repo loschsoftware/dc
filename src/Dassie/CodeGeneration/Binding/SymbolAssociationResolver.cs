@@ -1,8 +1,12 @@
-﻿using Dassie.Errors;
+﻿using Dassie.Core;
+using Dassie.Errors;
 using Dassie.Meta;
 using Dassie.Parser;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Dassie.CodeGeneration.Binding;
 
@@ -32,22 +36,113 @@ internal static class SymbolAssociationResolver
         }
     }
 
-    public static void ResolveMethodSignature(MethodContext context)
+    public static void SetMethodSignature(MethodContext context)
     {
-        if (context.UnresolvedReturnType && context.ReturnTypeName != null)
+        // TODO: Also handle constructors and operators here
+
+        if (context.ConstructorBuilder != null)
+            return;
+
+        if (context.IsCustomOperator)
+            return;
+
+        if (context.ParserRule == null)
+            return;
+
+        TypeContext typeCtx = TypeContext.Current;
+        TypeContext.Current = Context.Types.First(t => t.Methods.Contains(context));
+
+        MethodContext methodCtx = CurrentMethod;
+        CurrentMethod = context;
+
+        Type ret = typeof(void);
+        CustomAttributeBuilder[] retAttribs = [];
+        Type[] retModReq = [];
+        Type[] retModOpt = [];
+
+        if (context.ReturnTypeName != null)
         {
-            Type ret = SymbolResolver.ResolveTypeName(context.ReturnTypeName);
-            context.Builder.SetReturnType(ret);
+            ret = SymbolResolver.ResolveTypeName(context.ReturnTypeName);
+
+            if (TypeHelpers.IsNewTypeAlias(ret))
+            {
+                CustomAttributeBuilder cab = new(typeof(NewTypeCallSiteAttribute).GetConstructor([typeof(Type)]), [ret]);
+                retAttribs = [cab];
+                ret = TypeHelpers.GetAliasType(ret);
+            }
         }
+
+        List<Type> paramTypes = [];
+        List<CustomAttributeBuilder[]> paramCustomAttributes = [];
+        List<Type[]> paramModReq = [];
+        List<Type[]> paramModOpt = [];
 
         if (context.ParameterTypeNames != null && context.ParameterTypeNames.Count > 0)
         {
-            List<Type> parameters = [];
-
             foreach (DassieParser.Type_nameContext name in context.ParameterTypeNames)
-                parameters.Add(SymbolResolver.ResolveTypeName(name));
+            {
+                Type paramType = SymbolResolver.ResolveTypeName(name);
 
-            context.Builder.SetParameters(parameters.ToArray());
+                if (!TypeHelpers.IsNewTypeAlias(paramType))
+                {
+                    paramTypes.Add(paramType);
+                    paramCustomAttributes.Add([]);
+                    paramModReq.Add([]);
+                    paramModOpt.Add([]);
+                    continue;
+                }
+
+                paramTypes.Add(TypeHelpers.GetAliasType(paramType));
+                CustomAttributeBuilder cab = new(typeof(NewTypeCallSiteAttribute).GetConstructor([typeof(Type)]), [paramType]);
+                paramCustomAttributes.Add([cab]);
+
+                paramModReq.Add([]);
+                paramModOpt.Add([]);
+            }
         }
+
+        context.Builder.SetSignature(
+            ret,
+            retModReq,
+            retModOpt,
+            paramTypes.ToArray(),
+            paramModReq.ToArray(),
+            paramModOpt.ToArray());
+
+        ParameterBuilder returnBuilder = context.Builder.DefineParameter(
+            0, ParameterAttributes.None, null);
+
+        foreach (CustomAttributeBuilder cab in retAttribs)
+            returnBuilder.SetCustomAttribute(cab);
+
+        var paramList = Visitor.ResolveParameterList(context.ParserRule.parameter_list(), true);
+        for (int i = 0; i < paramTypes.Count; i++)
+        {
+            ParameterBuilder pb = context.Builder.DefineParameter(
+                context.ParameterIndex++ + 1,
+                AttributeHelpers.GetParameterAttributes(paramList[i].Context.parameter_modifier(), paramList[i].Context.Equals() != null),
+                paramList[i].Context.Identifier().GetIdentifier());
+
+            foreach (CustomAttributeBuilder cab in paramCustomAttributes[i])
+                pb.SetCustomAttribute(cab);
+
+            context.Parameters.Add(new(paramList[i].Context.Identifier().GetIdentifier(), paramTypes[i], pb, pb.Position, paramList[i].Context.Var() != null)
+            {
+                ModReq = paramModReq[i].ToList(),
+                ModOpt = paramModOpt[i].ToList()
+            });
+        }
+
+        if (CurrentMethod.Builder.IsStatic)
+        {
+            foreach (var _param in CurrentMethod.Parameters)
+            {
+                if (_param.Index > 0)
+                    _param.Index--;
+            }
+        }
+
+        TypeContext.Current = typeCtx;
+        CurrentMethod = methodCtx;
     }
 }

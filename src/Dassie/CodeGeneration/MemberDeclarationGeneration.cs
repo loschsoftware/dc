@@ -114,10 +114,9 @@ internal static class MemberDeclarationGeneration
         if (context.type_name() != null)
         {
             tReturn = SymbolResolver.ResolveTypeName(context.type_name());
+            CurrentMethod.ReturnTypeName = context.type_name();
 
-            if (tReturn == null)
-                CurrentMethod.ReturnTypeName = context.type_name();
-            else
+            if (tReturn != null)
             {
                 mb.SetReturnType(tReturn);
                 CurrentMethod.UnresolvedReturnType = false;
@@ -373,34 +372,7 @@ internal static class MemberDeclarationGeneration
             }
 
             CurrentMethod.FilesWhereDefined.Add(CurrentFile.Path);
-
-            var paramTypes = Visitor.ResolveParameterList(context.parameter_list(), true);
-
-            if (paramTypes.Any(p => p.Type == null))
-                CurrentMethod.ParameterTypeNames = context.parameter_list().parameter().Select(p => p.type_name()).ToList();
-            else
-            {
-                mb.SetParameters(paramTypes.Select(p => p.Type).ToArray());
-
-                foreach (var param in paramTypes)
-                {
-                    ParameterBuilder pb = mb.DefineParameter(
-                        CurrentMethod.ParameterIndex++ + 1, // Add 1 so parameter indices start at 1 -> 0 is always the current instance of the containing type
-                        AttributeHelpers.GetParameterAttributes(param.Context.parameter_modifier(), param.Context.Equals() != null),
-                        param.Context.Identifier().GetIdentifier());
-
-                    CurrentMethod.Parameters.Add(new(param.Context.Identifier().GetIdentifier(), param.Type, pb, pb.Position, param.Context.Var() != null));
-
-                    if (CurrentMethod.Builder.IsStatic)
-                    {
-                        foreach (var _param in CurrentMethod.Parameters)
-                        {
-                            if (_param.Index > 0)
-                                _param.Index--;
-                        }
-                    }
-                }
-            }
+            CurrentMethod.ParameterTypeNames = context.parameter_list().parameter().Select(p => p.type_name()).ToList();
 
             if (context.expression() == null)
             {
@@ -447,15 +419,7 @@ internal static class MemberDeclarationGeneration
             Type tReturn = _tReturn;
             if (context.type_name() != null)
             {
-                tReturn = SymbolResolver.ResolveTypeName(context.type_name());
-
-                if (tReturn == null)
-                    CurrentMethod.ReturnTypeName = context.type_name();
-                else
-                {
-                    mb.SetReturnType(tReturn);
-                    CurrentMethod.UnresolvedReturnType = false;
-                }
+                CurrentMethod.ReturnTypeName = context.type_name();
             }
 
             // Remove default implementation of static interface method

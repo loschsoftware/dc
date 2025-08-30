@@ -235,7 +235,6 @@ type_access_modifier
 
 nested_type_access_modifier
     : type_access_modifier
-    | Protected Internal?
     ;
 
 type_special_modifier
@@ -283,7 +282,6 @@ member_access_modifier
     : Global
     | Local
     | Internal
-    | Protected
     ;
 
 member_oop_modifier

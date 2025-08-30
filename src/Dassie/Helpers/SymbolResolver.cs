@@ -33,6 +33,13 @@ internal static class SymbolResolver
         public Type Type { get; init; }
     }
 
+    // Marker type for <NewType> aliases
+    public class NewTypeInstantiation
+    {
+        public Type BaseType { get; set; }
+        public Type NewType { get; set; }
+    }
+
     public static string GetIdentifier(this DassieParser.Identifier_atomContext atom)
     {
         if (atom == null)
@@ -705,7 +712,6 @@ internal static class SymbolResolver
         //    return ResolveMember((Type)tb, name, row, col, len, noEmitFragments, argumentTypes, flags, throwErrors, getDefaultOverload, true);
 
         TypeContext[] types = Context.Types.Where(c => c.Builder == tb).ToArray();
-
         Generics.GenericArgumentContext[] typeArgs = [];
 
         if (types.Length == 0 && throwErrors)
@@ -729,6 +735,19 @@ internal static class SymbolResolver
         // 0. Constructors
         if (name == tb.Name || name == tb.FullName)
         {
+            if (TypeHelpers.IsNewTypeAlias(tb))
+            {
+                return new NewTypeInstantiation()
+                {
+                    BaseType = GetAliasedType(new()
+                    {
+                        RawType = tb
+                    },
+                    tb.FullName, 0, 0, 0, [], true, true, true),
+                    NewType = tb
+                };
+            }
+
             if (tb.IsAbstract && tb.IsSealed)
             {
                 EmitErrorMessage(
@@ -1319,7 +1338,7 @@ internal static class SymbolResolver
         return t;
     }
 
-    private static TypeSymbol GetAliasedType(TypeSymbol ts, string name, int row, int col, int len, Generics.GenericArgumentContext[] genericArgs, bool noEmitDS0149, bool noErrors)
+    public static TypeSymbol GetAliasedType(TypeSymbol ts, string name, int row, int col, int len, Generics.GenericArgumentContext[] genericArgs, bool noEmitDS0149, bool noErrors, bool getAliasOfNewType = false)
     {
         Type t = ts.RawType;
 
@@ -1329,6 +1348,9 @@ internal static class SymbolResolver
         if (t is TypeBuilder)
         {
             if (!Context.Types.Where(tc => tc.FullName == t.FullName).Any())
+                return t;
+
+            if (!getAliasOfNewType && Context.Types.First(tc => tc.FullName == t.FullName).IsNewType)
                 return t;
 
             if (Context.Types.First(tc => tc.FullName == t.FullName).IsAlias)
@@ -1341,6 +1363,9 @@ internal static class SymbolResolver
         {
             if (t.GetCustomAttribute<AliasAttribute>() is AliasAttribute alias)
             {
+                if (!getAliasOfNewType && t.GetCustomAttribute<NewTypeAttribute>() is not null)
+                    return t;
+
                 Type aliasType = alias.AliasedType;
 
                 // Special cases for Vector[T], Array[T, 'D] and Buffer[T, 'L]

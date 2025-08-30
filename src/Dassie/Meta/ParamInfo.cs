@@ -27,6 +27,9 @@ internal class ParamInfo : IEquatable<ParamInfo>
 
     public int Index { get; set; }
 
+    public List<Type> ModReq { get; set; } = [];
+    public List<Type> ModOpt { get; set; } = [];
+
     public override bool Equals(object obj)
     {
         return Equals(obj as ParamInfo);

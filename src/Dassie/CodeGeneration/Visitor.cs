@@ -3627,6 +3627,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 if (VisitorStep1CurrentMethod != null)
                     CurrentMethod.ParameterBoxIndices.Clear();
             }
+
+            else if (member is SymbolResolver.NewTypeInstantiation nti)
+                return (nti.NewType, null);
         }
 
         //CurrentMethod.ParameterBoxIndices.Clear();

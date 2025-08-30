@@ -238,9 +238,19 @@ internal static class AttributeHelpers
         return baseAttributes;
     }
 
-    public static TypeAttributes GetTypeAttributes(DassieParser.Type_kindContext typeKind, DassieParser.Type_access_modifierContext typeAccess, DassieParser.Nested_type_access_modifierContext nestedTypeAccess, DassieParser.Type_special_modifierContext modifiers, bool isNested)
+    public static TypeAttributes GetTypeAttributes(DassieParser.Type_kindContext typeKind, DassieParser.Type_access_modifierContext typeAccess, DassieParser.Nested_type_access_modifierContext nestedTypeAccess, DassieParser.Type_special_modifierContext modifiers, bool isNested, bool isAlias)
     {
         TypeAttributes baseAttributes = TypeAttributes.Class;
+
+        if (typeKind.Module() != null && modifiers?.Open() != null)
+        {
+            EmitErrorMessage(
+                modifiers.Open().Symbol.Line,
+                modifiers.Open().Symbol.Column,
+                modifiers.Open().GetText().Length,
+                DS0244_ModuleInvalidModifiers,
+                "The modifier 'open' is invalid on modules.");
+        }
 
         if (typeKind.Template() != null)
             baseAttributes = TypeAttributes.Interface | TypeAttributes.Abstract | TypeAttributes.BeforeFieldInit;
@@ -271,18 +281,17 @@ internal static class AttributeHelpers
         }
         else if (nestedTypeAccess != null)
         {
-            if (nestedTypeAccess.Protected() != null && nestedTypeAccess.Internal() != null)
-                baseAttributes |= TypeAttributes.NestedFamORAssem;
-
-            else if (nestedTypeAccess.Protected() != null)
-                baseAttributes |= TypeAttributes.NestedFamily;
-
-            else if (nestedTypeAccess.type_access_modifier().Global() != null)
+            if (nestedTypeAccess.type_access_modifier().Global() != null)
                 baseAttributes |= TypeAttributes.NestedPublic;
 
             else
                 baseAttributes |= TypeAttributes.NestedAssembly;
         }
+
+        if (isAlias && !baseAttributes.HasFlag(TypeAttributes.Sealed))
+            baseAttributes |= TypeAttributes.Sealed;
+        if (isAlias && !baseAttributes.HasFlag(TypeAttributes.Abstract))
+            baseAttributes |= TypeAttributes.Abstract;
 
         return baseAttributes;
     }

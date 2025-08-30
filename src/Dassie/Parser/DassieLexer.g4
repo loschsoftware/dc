@@ -27,7 +27,6 @@ Global: 'global';
 Local: 'local';
 Internal: 'internal';
 Static: 'static';
-Protected: 'protected';
 Open: 'open';
 Closed: 'closed';
 Abstract: 'abstract';

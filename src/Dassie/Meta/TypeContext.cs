@@ -82,6 +82,8 @@ internal class TypeContext
 
     public Type AliasedType { get; set; }
 
+    public bool IsNewType { get; set; }
+
     public List<DassieParser.Type_nameContext> UnresolvedAssociatedTypeNames { get; set; } = [];
 
     public DassieParser.Parameter_listContext PrimaryConstructorParameterList { get; set; }

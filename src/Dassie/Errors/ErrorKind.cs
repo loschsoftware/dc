@@ -251,7 +251,7 @@ public enum ErrorKind
     /// </summary>
     DS0056_MultipleEntryPoints,
     /// <summary>
-    /// Generic error emitted when a symbol of various kinds could not be resolved.
+    /// Generic error emitted when a symbol of unspecific type could not be resolved.
     /// </summary>
     DS0057_SymbolResolveError,
     /// <summary>
@@ -1002,5 +1002,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when a value type has a cyclic dependency on itself through one of its fields.
     /// </summary>
-    DS0242_ValueTypeFieldCycle
+    DS0242_ValueTypeFieldCycle,
+    /// <summary>
+    /// Emitted when a module inherits from a type or implements an interface.
+    /// </summary>
+    DS0243_ModuleInheritance,
+    /// <summary>
+    /// Emitted when a module has invalid modifiers like 'open'.
+    /// </summary>
+    DS0244_ModuleInvalidModifiers,
+    /// <summary>
+    /// Emitted when a module appears in the inheritance list of a type.
+    /// </summary>
+    DS0245_ModuleInherited
 }

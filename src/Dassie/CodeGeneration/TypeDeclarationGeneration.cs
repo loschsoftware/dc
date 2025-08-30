@@ -32,19 +32,20 @@ internal static class TypeDeclarationGeneration
             return new();
         }
 
+        bool isAlias = context.type_block() != null && context.type_block().type_name() != null;
         TypeBuilder tb;
 
         if (enclosingType == null)
         {
             tb = Context.Module.DefineType(
                 GetTypeName(context),
-                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false));
+                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), false, isAlias));
         }
         else
         {
             tb = enclosingType.DefineNestedType(
                 context.Identifier().GetIdentifier(),
-                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true));
+                AttributeHelpers.GetTypeAttributes(context.type_kind(), context.type_access_modifier(), context.nested_type_access_modifier(), context.type_special_modifier(), true, isAlias));
         }
 
         if (Context.Types.Any(t => t.FullName == tb.FullName))
@@ -145,12 +146,36 @@ internal static class TypeDeclarationGeneration
 
                 if (type.IsClass)
                 {
-                    explicitBaseType = true;
-                    parent = type;
+                    if (context.type_kind().Module() != null && type != typeof(object))
+                    {
+                        EmitErrorMessage(
+                            context.inheritance_list().Start.Line,
+                            context.inheritance_list().Start.Column,
+                            context.inheritance_list().GetText().Length,
+                            DS0243_ModuleInheritance,
+                            $"Module '{TypeName(tb)}' cannot inherit from types other than 'object'.");
+                    }
+                    else
+                    {
+                        explicitBaseType = true;
+                        parent = type;
+                    }
                 }
 
                 if (type.IsInterface)
-                    interfaces.Add(type);
+                {
+                    if (context.type_kind().Module() != null)
+                    {
+                        EmitErrorMessage(
+                            context.inheritance_list().Start.Line,
+                            context.inheritance_list().Start.Column,
+                            context.inheritance_list().GetText().Length,
+                            DS0243_ModuleInheritance,
+                            $"Module '{TypeName(tb)}' cannot implement template '{TypeName(type)}'.");
+                    }
+                    else
+                        interfaces.Add(type);
+                }
             }
         }
 
@@ -361,16 +386,6 @@ internal static class TypeDeclarationGeneration
             // Alias type
             if (context.type_block().type_name() != null)
             {
-                if (context.attribute().Length > 0)
-                {
-                    EmitErrorMessage(
-                        context.attribute()[0].Start.Line,
-                        context.attribute()[0].Start.Column,
-                        context.attribute()[0].GetText().Length,
-                        DS0180_AttributesOnAliasType,
-                        "An alias type cannot use attributes.");
-                }
-
                 if (context.type_special_modifier() != null && context.type_special_modifier().Open() != null)
                 {
                     EmitErrorMessage(
@@ -411,6 +426,17 @@ internal static class TypeDeclarationGeneration
                         context.generic_parameter_list().GetText().Length,
                         DS0188_GenericAliasType,
                         "Type aliases cannot define generic type parameters.");
+                }
+
+                if (context.attribute().Length > 0)
+                {
+                    foreach (DassieParser.AttributeContext attribute in context.attribute())
+                    {
+                        Type attribType = SymbolResolver.ResolveAttributeTypeName(attribute.type_name(), true);
+
+                        if (attribType != null && attribType == typeof(NewTypeAttribute))
+                            TypeContext.Current.IsNewType = true;
+                    }
                 }
 
                 Type aliasedType = SymbolResolver.ResolveTypeName(context.type_block().type_name());

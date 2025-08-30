@@ -94,7 +94,8 @@ internal class AnalyzingListener : DassieParserBaseListener
             context.type_access_modifier(),
             context.nested_type_access_modifier(),
             context.type_special_modifier(),
-            false);
+            false,
+            context.type_block() != null && context.type_block().type_name() != null);
 
         if (string.IsNullOrEmpty(_exportedNamespace) && attribs.HasFlag(TypeAttributes.Public))
         {

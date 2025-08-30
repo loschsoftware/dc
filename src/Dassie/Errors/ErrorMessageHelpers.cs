@@ -182,11 +182,21 @@ internal static class ErrorMessageHelpers
         {
             if (type.IsSealed)
             {
-                EmitErrorMessage(
-                    row, col, len,
-                    DS0158_InheritingFromSealedType,
-                    $"Cannot inherit from type '{TypeName(type)}' because it is sealed.",
-                    tip: "If possible, mark the type as 'open' to allow inheritance.");
+                if (type.IsAbstract)
+                {
+                    EmitErrorMessage(
+                        row, col, len,
+                        DS0245_ModuleInherited,
+                        $"Cannot inherit from module '{TypeName(type)}'.");
+                }
+                else
+                {
+                    EmitErrorMessage(
+                        row, col, len,
+                        DS0158_InheritingFromSealedType,
+                        $"Cannot inherit from type '{TypeName(type)}' because it is sealed.",
+                        tip: "If possible, mark the type as 'open' to allow inheritance.");
+                }
             }
             else if (childTypeIsValueType)
             {

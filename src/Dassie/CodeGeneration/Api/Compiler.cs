@@ -121,7 +121,7 @@ public static class Compiler
             SymbolAssociationResolver.ResolveType(context);
 
             foreach (MethodContext method in context.Methods)
-                SymbolAssociationResolver.ResolveMethodSignature(method);
+                SymbolAssociationResolver.SetMethodSignature(method);
         }
 
         foreach ((InputDocument doc, IParseTree compilationUnit, string intermediatePath, DassieParser parser) in docs)

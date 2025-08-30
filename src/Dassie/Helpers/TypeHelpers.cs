@@ -3,6 +3,7 @@ using Dassie.Core;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Symbols;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Dassie.Helpers;
 #pragma warning disable IDE0305
 
 /// <summary>
-/// Provides helper methods regarding data types.
+/// Provides helper methods for working with data types.
 /// </summary>
 internal static class TypeHelpers
 {
@@ -961,4 +962,49 @@ internal static class TypeHelpers
 
     public static string GetTypeName(DassieParser.TypeContext context)
         => $"{(string.IsNullOrEmpty(CurrentFile.ExportedNamespace) ? "" : $"{CurrentFile.ExportedNamespace}.")}{context.Identifier().GetIdentifier()}";
+
+    public static bool IsNewTypeAlias(Type t)
+    {
+        if (t.IsGenericTypeParameter || t.IsGenericMethodParameter)
+            return false;
+
+        t = RemoveByRef(t);
+
+        if (t is TypeBuilder)
+        {
+            if (Context.Types.First(tc => tc.FullName == t.FullName).IsNewType)
+                return true;
+
+            return false;
+        }
+
+        return t.GetCustomAttribute<NewTypeAttribute>() != null;
+    }
+
+    public static Type GetAliasType(Type t)
+    {
+        Type ret = t;
+
+        while (IsNewTypeAlias(ret))
+        {
+            ret = SymbolResolver.GetAliasedType(new()
+            {
+                RawType = t
+            }, t.Name, 0, 0, 0, [], true, true, true);
+        }
+
+        return ret;
+    }
+
+    public static ConstructorInfo GetGenericDefaultConstructor(Type t)
+    {
+        try
+        {
+            return TypeBuilder.GetConstructor(t, t.GetGenericTypeDefinition().GetConstructors()[0]);
+        }
+        catch (ArgumentException)
+        {
+            return t.GetConstructors()[0];
+        }
+    }
 }
