@@ -64,9 +64,9 @@ internal class HelpCommand : ICompilerCommand
         Console.ForegroundColor = def;
     }
 
-    public static string FormatLines(string text, bool initialPadLeft = false, int indentWidth = 50)
+    public static string FormatLines(string text, bool initialPadLeft = false, int indentWidth = 35)
     {
-        int maxWidth = Console.BufferWidth - 50 - 5;
+        int maxWidth = Console.BufferWidth - indentWidth;
 
         if (maxWidth < 30)
             return $"{text}{Environment.NewLine}";
