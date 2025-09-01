@@ -63,6 +63,9 @@ internal static class ExtensionLoader
     private static IEnumerable<IDeploymentTarget> _deploymentTargets = [];
     public static IEnumerable<IDeploymentTarget> DeploymentTargets => _deploymentTargets;
 
+    private static IEnumerable<ISubsystem> _subsystems = [];
+    public static IEnumerable<ISubsystem> Subsystems => _subsystems;
+
     private static void Update(object sender, NotifyCollectionChangedEventArgs e)
     {
         _commands = InstalledExtensions.SelectMany(p => p.Commands());
@@ -73,6 +76,7 @@ internal static class ExtensionLoader
         _compilerDirectives = InstalledExtensions.SelectMany(p => p.CompilerDirectives());
         _documentSources = InstalledExtensions.SelectMany(p => p.DocumentSources());
         _deploymentTargets = InstalledExtensions.SelectMany(p => p.DeploymentTargets());
+        _subsystems = InstalledExtensions.SelectMany(p => p.Subsystems());
     }
 
     private static List<IPackage> LoadInstalledExtensions()
@@ -319,5 +323,22 @@ internal static class ExtensionLoader
             if (writers.Severity.HasFlag(BuildLogSeverity.Error))
                 TextWriterBuildLogDevice.ErrorOut.AddWriters(writers.Writers);
         }
+    }
+
+    public static ISubsystem GetSubsystem(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return Configuration.Subsystems.Console.Instance;
+
+        if (Subsystems.Any(s => s.Name == name))
+            return Subsystems.First(s => s.Name == name);
+
+        EmitErrorMessage(
+            0, 0, 0,
+            DS0251_InvalidSubsystem,
+            $"The subsystem '{name}' could not be resolved.",
+            ProjectConfigurationFileName);
+
+        return Configuration.Subsystems.Console.Instance;
     }
 }

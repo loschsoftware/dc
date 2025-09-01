@@ -90,4 +90,9 @@ public interface IPackage
     /// An array of deployment targets.
     /// </summary>
     public virtual IDeploymentTarget[] DeploymentTargets() => [];
+
+    /// <summary>
+    /// An array of subsystems.
+    /// </summary>
+    public virtual ISubsystem[] Subsystems() => [];
 }

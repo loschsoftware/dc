@@ -6,6 +6,7 @@ using Dassie.Configuration;
 using Dassie.Core;
 using Dassie.Data;
 using Dassie.Errors;
+using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Symbols;
@@ -34,10 +35,10 @@ public static class Compiler
     /// <param name="type">The type of the application.</param>
     /// <param name="config">Additional configuration.</param>
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
-    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, string outputPath, ApplicationType type, DassieConfig config = null)
+    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, string outputPath, ISubsystem type, DassieConfig config = null)
     {
         config.AssemblyName = outputPath;
-        config.ApplicationType = type;
+        config.ApplicationType = type.Name;
 
         return CompileSource(sourceFiles, config ?? new());
     }
@@ -54,7 +55,7 @@ public static class Compiler
         return CompileSource(Directory.EnumerateFiles(rootDirectory, "*.ds", includeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToArray(), config);
     }
 
-    internal static List<List<ErrorInfo>> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
+    internal static List<List<ErrorInfo>> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName, string[] imports = null)
     {
         if (!documents.Any() && Messages.Count(m => m.Severity == Severity.Error) == 0)
         {
@@ -79,12 +80,13 @@ public static class Compiler
             ConfigurationPath = configFileName
         };
 
+        if (imports != null)
+            Context.GlobalImports.AddRange(imports);
+
         if (string.IsNullOrEmpty(config.AssemblyName))
             config.AssemblyName = "program";
 
         Context.FilePaths.AddRange(documents.Select(d => d.Name));
-        string asmFileName = $"{config.AssemblyName}{(config.ApplicationType == ApplicationType.Library ? ".dll" : ".exe")}";
-
         AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(documents.First().Name) : config.AssemblyName);
         //PersistedAssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, PersistedAssemblyBuilderAccess.RunAndSave);
         PersistedAssemblyBuilder ab = new(name, typeof(object).Assembly);
@@ -129,7 +131,8 @@ public static class Compiler
 
         TypeFinalizer.CreateTypes(Context.Types);
 
-        if (config.ApplicationType != ApplicationType.Library && !Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == DS0028_EmptyProgram))
+        ISubsystem subsystem = ExtensionLoader.GetSubsystem(config.ApplicationType);
+        if (subsystem.IsExecutable && !Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == DS0028_EmptyProgram))
         {
             // Create implicit entrypoint
 

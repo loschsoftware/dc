@@ -1,9 +1,9 @@
 ﻿using Dassie.Configuration;
+using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Unmanaged;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -189,7 +189,8 @@ internal class AotCommandLineBuilder
 
     private void AddAdditionalConfig()
     {
-        if (_config.Config.ApplicationType == ApplicationType.Library)
+        ISubsystem subsystem = ExtensionLoader.GetSubsystem(_config.Config.ApplicationType);
+        if (!subsystem.IsExecutable)
             _arglistBuilder.AppendLine("--nativelib");
 
         _arglistBuilder.AppendLine($@"--export-dynamic-symbol:DotNetRuntimeDebugHeader,DATA
@@ -305,7 +306,8 @@ internal class AotCommandLineBuilder
 /OPT:ICF
 ");
 
-        if (_config.Config.ApplicationType == ApplicationType.Library)
+        ISubsystem subsystem = ExtensionLoader.GetSubsystem(_config.Config.ApplicationType);
+        if (!subsystem.IsExecutable)
             _linkerArglistBuilder.AppendLine("/DLL");
     }
 }

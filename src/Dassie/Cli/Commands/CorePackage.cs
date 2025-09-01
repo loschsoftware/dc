@@ -1,9 +1,9 @@
-﻿using Dassie.Deployment;
+﻿using Dassie.Configuration.Subsystems;
+using Dassie.Deployment;
 using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using Dassie.Meta.Directives;
 using Dassie.Templates;
-using System;
 using System.Linq;
 using System.Reflection;
 
@@ -54,5 +54,12 @@ internal class CorePackage : IPackage
     public IDeploymentTarget[] DeploymentTargets() =>
     [
         new DirectoryTarget()
+    ];
+
+    public ISubsystem[] Subsystems() =>
+    [
+        Console.Instance,
+        Library.Instance,
+        WinExe.Instance
     ];
 }

@@ -1034,5 +1034,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the hidden 'dc compile' command is used. This command only exists to provide help details for the 'dc &lt;Files&gt;' command.
     /// </summary>
-    DS0250_DCCompileInvoked
+    DS0250_DCCompileInvoked,
+    /// <summary>
+    /// Emitted when an invalid subsystem is specified.
+    /// </summary>
+    DS0251_InvalidSubsystem
 }

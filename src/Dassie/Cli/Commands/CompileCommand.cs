@@ -158,6 +158,11 @@ internal class CompileCommand : ICompilerCommand
         string assembly = Path.Combine(config.BuildOutputDirectory, $"{config.AssemblyName}.dll");
         string msgPrefix = MessagePrefix;
 
+        ISubsystem subsystem = ExtensionLoader.GetSubsystem(Context.Configuration.ApplicationType);
+
+        if (subsystem.References != null && subsystem.References.Length > 0)
+            config.References = [.. config.References ?? [], .. subsystem.References];
+
         if (config.References != null)
         {
             if (config.References.Length > (ushort.MaxValue + 1))
@@ -263,7 +268,7 @@ internal class CompileCommand : ICompilerCommand
         }
 
         // Step 1
-        CompileSource(documents, config);
+        CompileSource(documents, config, imports: subsystem.Imports);
         VisitorStep1 = Context;
         LineNumberOffset = 0;
         UnionTypeCodeGeneration._createdUnionTypes.Clear();
@@ -274,7 +279,7 @@ internal class CompileCommand : ICompilerCommand
         EmitBuildLogMessage("Starting second pass.", 2);
 
         // Step 2
-        IEnumerable<ErrorInfo[]> errors = CompileSource(documents, config).Select(l => l.ToArray());
+        IEnumerable<ErrorInfo[]> errors = CompileSource(documents, config, imports: subsystem.Imports).Select(l => l.ToArray());
 
         string resFile = "";
 
@@ -374,7 +379,7 @@ internal class CompileCommand : ICompilerCommand
                 if (Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0)
                 {
                     rsw.SetLanguage(0);
-                    rsw.BeginVersionInfo(Context.Configuration.ApplicationType == ApplicationType.Library ? 2 : 1);
+                    rsw.BeginVersionInfo(subsystem.IsExecutable ? 1 : 2);
                     rsw.AddFileVersion(Context.Configuration.VersionInfo[0].FileVersion);
                     rsw.AddProductVersion(Context.Configuration.VersionInfo[0].Version);
 
@@ -490,7 +495,7 @@ internal class CompileCommand : ICompilerCommand
             peBlob.WriteContentTo(fs);
             fs.Dispose();
 
-            if (config.ApplicationType != ApplicationType.Library && config.GenerateNativeAppHost)
+            if (subsystem.IsExecutable && config.GenerateNativeAppHost)
             {
                 string executableExtension = OperatingSystem.IsWindows() ? "exe" : "";
                 string frameworkBaseDir = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk")).Last();
@@ -500,7 +505,7 @@ internal class CompileCommand : ICompilerCommand
                     Directory.GetFiles(Path.Combine(frameworkBaseDir, "AppHostTemplate")).First(),
                     Path.ChangeExtension(asmPath, executableExtension),
                     asmPath,
-                    config.ApplicationType == ApplicationType.WinExe,
+                    subsystem.WindowsGui,
                     asmPath);
             }
 

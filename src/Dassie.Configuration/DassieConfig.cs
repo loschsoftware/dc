@@ -52,8 +52,8 @@ public sealed class DassieConfig
 
     [Description("Sets the application type and subsystem of the program.")]
     [XmlElement("ApplicationType")]
-    [DefaultValue(ApplicationType.Console)]
-    public ApplicationType ApplicationType { get; set; } = ApplicationType.Console;
+    [DefaultValue("Console")]
+    public string ApplicationType { get; set; } = "Console";
 
     [Description("Sets the runtime of the application. Valid values are 'Jit' and 'Aot'.")]
     [XmlElement]
@@ -273,15 +273,6 @@ public sealed class DassieConfig
     [DefaultValue(0)]
     [XmlElement]
     public int MaxErrors { get; set; }
-}
-
-[Serializable]
-public enum ApplicationType
-{
-    Console,
-    WinExe,
-    Library,
-    Installer
 }
 
 [Serializable]

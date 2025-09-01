@@ -59,17 +59,17 @@ internal class RunCommand : ICompilerCommand
                 _args = [.. args.Where(a => a != $"-p={profile}" && a != $"--profile={profile}")];
         }
 
-        (int status, string assemblyPath, bool isNative, ApplicationType appType, _) = Compile(buildProfile: profile);
+        (int status, string assemblyPath, bool isNative, ISubsystem appType, _) = Compile(buildProfile: profile);
 
         if (status != 0)
             return status;
 
-        if (appType == ApplicationType.Library)
+        if (!appType.IsExecutable)
         {
             EmitErrorMessage(
                 0, 0, 0,
                 DS0125_DCRunInvalidProjectType,
-                "The current project cannot be executed. Projects with an application type of 'Library' are not executable.",
+                $"The current project cannot be executed. Projects with an application type of '{appType.Name}' are not executable.",
                 CompilerExecutableName);
 
             return -1;
@@ -94,7 +94,7 @@ internal class RunCommand : ICompilerCommand
         return 0;
     }
 
-    internal static (int Status, string AssemblyPath, bool IsNative, ApplicationType Type, bool IsProjectGroup) Compile(bool ignoreDS0031 = false, bool isProjectGroup = false, string buildProfile = null)
+    internal static (int Status, string AssemblyPath, bool IsNative, ISubsystem Type, bool IsProjectGroup) Compile(bool ignoreDS0031 = false, bool isProjectGroup = false, string buildProfile = null)
     {
         DassieConfig config = null;
 
@@ -105,7 +105,7 @@ internal class RunCommand : ICompilerCommand
                 if (error.Severity == Severity.Error)
                 {
                     EmitGeneric(error);
-                    return (-1, null, false, 0, isProjectGroup);
+                    return (-1, null, false, default, isProjectGroup);
                 }
             }
 
@@ -131,7 +131,7 @@ internal class RunCommand : ICompilerCommand
                     "Insufficient information: The files to execute could not be determined. Create a project file (dsconfig.xml) and set the required properties 'BuildDirectory' and 'AssemblyFileName' to enable this command.",
                     CompilerExecutableName);
 
-                return (-1, null, false, 0, isProjectGroup);
+                return (-1, null, false, default, isProjectGroup);
             }
 
             assemblyPath = defaultPath;
@@ -147,7 +147,7 @@ internal class RunCommand : ICompilerCommand
                 (int code, string path) = ProjectGroupHelpers.GetExecutableProject(config);
 
                 if (code != 0)
-                    return (code, null, false, 0, isProjectGroup || config.ProjectGroup != null);
+                    return (code, null, false, default, isProjectGroup || config.ProjectGroup != null);
 
                 Directory.SetCurrentDirectory(path);
                 return Compile(isProjectGroup: true);
@@ -202,9 +202,14 @@ internal class RunCommand : ICompilerCommand
         {
             int ret = BuildCommand.Instance.Invoke(buildProfile == null ? [] : [buildProfile]);
             if (ret != 0 || Messages.Where(m => m.Severity == Severity.Error).Any())
-                return (-1, null, false, 0, isProjectGroup || config.ProjectGroup != null);
+                return (-1, null, false, default, isProjectGroup || config.ProjectGroup != null);
         }
 
-        return (0, assemblyPath, isNative, ApplicationType.Console, isProjectGroup || config.ProjectGroup != null);
+        ISubsystem subsystem = Configuration.Subsystems.Console.Instance;
+
+        if (config != null && config.ApplicationType != null && ExtensionLoader.Subsystems.Any(s => s.Name == config.ApplicationType))
+            subsystem = ExtensionLoader.Subsystems.First(s => s.Name == config.ApplicationType);
+
+        return (0, assemblyPath, isNative, subsystem, isProjectGroup || config.ProjectGroup != null);
     }
 }
