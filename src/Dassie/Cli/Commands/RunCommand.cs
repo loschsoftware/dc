@@ -24,22 +24,42 @@ internal class RunCommand : ICompilerCommand
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = Description,
-        Usage = ["dc run [Arguments]"],
-        Remarks = "This command requires the presence of a project or project group. If it is executed on a project group, the project that is executed is determined by the <Executable> property in the project group definition.",
+        Usage =
+        [
+            "dc run [Arguments]",
+            "dc run -p|--profile=<Profile> -- [Arguments]"
+        ],
+        Remarks = "This command requires the presence of a project or project group. If it is executed on a project group, the project that is executed is determined by the <Executable> property in the project group definition."
+                 + $"{Environment.NewLine}This command only recompiles the project if the source files have been updated since the last compilation or the output files have been deleted. Otherwise, the executable is launched immediately.",
         Options =
         [
-            ("Arguments", "Command-line arguments passed to the program that is executed.")
+            ("Arguments", "Command-line arguments passed to the program that is executed."),
+            ("-p|--profile=<Profile>", "The build profile to use for compilation. If not specified, the default profile is used.")
         ],
         Examples =
         [
             ("dc run", "Compiles the current project and runs the resulting executable without any arguments."),
-            ("dc run arg1 arg2", "Compiles the current project and runs the resulting executable with the arguments 'arg1' and 'arg2'.")
+            ("dc run arg1 arg2", "Compiles the current project and runs the resulting executable with the arguments 'arg1' and 'arg2'."),
+            ("dc run -p=CustomProfile", "Compiles the project with a specific build profile and runs the resulting executable without any arguments.")
         ]
     };
 
     public int Invoke(string[] args)
     {
-        (int status, string assemblyPath, bool isNative, ApplicationType appType, _) = Compile();
+        string[] _args = args;
+        string profile = null;
+        if (args.Any(a => a.StartsWith("-p=") || a.StartsWith("--profile=")))
+        {
+            profile = string.Join('=', args.First(a => a.StartsWith("-p=") || a.StartsWith("--profile=")).Split('=')[1..]);
+            _args = [];
+
+            if (args.Any(a => a == "--"))
+                _args = [.. args.SkipWhile(a => a != "--").Skip(1)];
+            else
+                _args = [.. args.Where(a => a != $"-p={profile}" && a != $"--profile={profile}")];
+        }
+
+        (int status, string assemblyPath, bool isNative, ApplicationType appType, _) = Compile(buildProfile: profile);
 
         if (status != 0)
             return status;
@@ -56,7 +76,7 @@ internal class RunCommand : ICompilerCommand
         }
 
         string process = "dotnet";
-        string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. args]);
+        string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. _args]);
 
         if (isNative)
         {
@@ -74,7 +94,7 @@ internal class RunCommand : ICompilerCommand
         return 0;
     }
 
-    internal static (int Status, string AssemblyPath, bool IsNative, ApplicationType Type, bool IsProjectGroup) Compile(bool ignoreDS0031 = false, bool isProjectGroup = false)
+    internal static (int Status, string AssemblyPath, bool IsNative, ApplicationType Type, bool IsProjectGroup) Compile(bool ignoreDS0031 = false, bool isProjectGroup = false, string buildProfile = null)
     {
         DassieConfig config = null;
 
@@ -180,7 +200,7 @@ internal class RunCommand : ICompilerCommand
 
         if (recompile)
         {
-            int ret = BuildCommand.Instance.Invoke([]);
+            int ret = BuildCommand.Instance.Invoke(buildProfile == null ? [] : [buildProfile]);
             if (ret != 0 || Messages.Where(m => m.Severity == Severity.Error).Any())
                 return (-1, null, false, 0, isProjectGroup || config.ProjectGroup != null);
         }
