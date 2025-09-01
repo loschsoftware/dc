@@ -255,7 +255,7 @@ internal static class ExtensionLoader
 
     public static void UnloadAll()
     {
-        foreach (IPackage package in InstalledExtensions)
+        foreach (IPackage package in InstalledExtensions.Except([CorePackage.Instance]))
             Unload(package);
 
         InstalledExtensions.Clear();
