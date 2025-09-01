@@ -29,6 +29,11 @@ internal class RunCommand : ICompilerCommand
         Options =
         [
             ("Arguments", "Command-line arguments passed to the program that is executed.")
+        ],
+        Examples =
+        [
+            ("dc run", "Compiles the current project and runs the resulting executable without any arguments."),
+            ("dc run arg1 arg2", "Compiles the current project and runs the resulting executable with the arguments 'arg1' and 'arg2'.")
         ]
     };
 

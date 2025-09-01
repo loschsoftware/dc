@@ -19,18 +19,26 @@ internal class HelpCommand : ICompilerCommand
 
     public List<string> Aliases() => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
 
-    public string Description => "Lists all available commands.";
+    public string Description => "Lists all available commands and shows help for specific commands or compiler features.";
 
     public CommandHelpDetails HelpDetails() => new()
     {
-        Description = "Shows a list of available subcommands.",
-        Usage = ["dc help [(-o|--options) | (-s|--simple) | --no-external]"],
+        Description = "Shows a list of available commands or advanced information about a specific command or topic.",
+        Usage = ["dc help [(-o|--options) | (-s|--simple) | --no-external | <Command>]"],
         Options =
         [
             ("-o|--options", "Shows a list of all available project file properties."),
             ("-s|--simple", "Shows a simplified selection of commands suitable for minimalist developers."),
-            ("--no-external", "Does not display commands defined by external packages.")
-        ]
+            ("--no-external", "Does not display commands defined by external packages."),
+            ("Command", "The name of a compiler command to show help for.")
+        ],
+        Examples =
+        [
+            ("dc help", "Displays a list of all available commands."),
+            ("dc help --no-external", "Displays a list of all commands, excluding ones from external packages."),
+            ("dc help -o", "Displays a list of all available project file properties."),
+            ("dc help build", "Displays detailed help for the 'build' command.")
+        ],
     };
 
     public int Invoke(string[] args)
@@ -296,7 +304,26 @@ internal class HelpCommand : ICompilerCommand
         if (!string.IsNullOrEmpty(hd.Remarks))
         {
             sb.AppendLine("Remarks:");
-            sb.AppendLine(FormatLines(hd.Remarks, true, 4));
+            if (hd.Remarks.Contains(Environment.NewLine))
+            {
+                foreach (string line in hd.Remarks.Split(Environment.NewLine))
+                    sb.Append(FormatLines(line, true, 4));
+                sb.AppendLine();
+            }
+            else
+                sb.AppendLine(FormatLines(hd.Remarks, true, 4));
+        }
+
+        if (hd.Examples != null && hd.Examples.Count > 0)
+        {
+            sb.AppendLine("Examples:");
+            int maxCmdLength = hd.Examples.Max(e => e.Command.Length);
+            foreach ((string cmd, string desc) in hd.Examples)
+            {
+                int indent = Math.Max(35, maxCmdLength + 5);
+                sb.Append($"{$"    {cmd}".PadRight(indent)}");
+                sb.Append(FormatLines(desc, indentWidth: indent));
+            }
         }
 
         DisplayLogo();

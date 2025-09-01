@@ -26,6 +26,13 @@ internal class DeployCommand : ICompilerCommand
             ("--ignore-missing", "Ignore missing targets and resume deployment."),
             ("--fail-fast", "Cancel deployment immediately if any target fails."),
             ("Options", "Additional options passed to the compiler for each project being built.")
+        ],
+        Examples =
+        [
+            ("dc deploy", "Builds and deploys the project group defined in the current directory."),
+            ("dc deploy --ignore-missing", "Builds and deploys the project group, ignoring any missing targets."),
+            ("dc deploy --fail-fast", "Builds and deploys the project group, stopping immediately if any target fails."),
+            ("dc deploy -l", "Builds and deploys the project group, passing the '-l' flag to the compiler for each project being built.")
         ]
     };
 

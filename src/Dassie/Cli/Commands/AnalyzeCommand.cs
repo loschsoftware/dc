@@ -35,6 +35,13 @@ internal class AnalyzeCommand : ICompilerCommand
         [
             ("(--analyzer | -a)=<Name>", "The name of the code analyzer to run. If none is specified, the default analyzer is used."),
             ("Files", "A list of source files to analyze. If this option is not used, all source files in the current project will be analyzed.")
+        ],
+        Examples =
+        [
+            ("dc analyze", "Runs the default code analyzer on all source files in the current project."),
+            ("dc analyze --analyzer=CustomAnalyzer", "Runs 'CustomAnalyzer' on all source files in the current project."),
+            ("dc analyze ./src/File1.ds ./src/File2.ds", "Runs the default code analyzer on the specified source files."),
+            ("dc analyze ./src/File1.ds ./src/File2.ds -a=CustomAnalyzer", "Runs 'CustomAnalyzer' on the specified source files.")
         ]
     };
 

@@ -23,13 +23,26 @@ internal class WatchCommand : ICompilerCommand
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.",
-        Usage = ["dc watch [(--command|-c) <Command>] [(--profile|-p) <Profile>] [Directory]"],
+        Usage =
+        [
+            "dc watch",
+            "dc watch -c|--command <Command>",
+            "dc watch -p|--profile <Profile>",
+            "dc watch <Directory>"
+        ],
         Remarks = "Use the 'dc quit' command to stop all file watchers.",
         Options =
         [
             ("-c|--command <Command>", "Specifies the compiler command that is executed when files are changed. The default value is 'build'."),
             ("-p|--profile <Profile>", "Specifies the build profile that is used when files are changed. If this option is set, the '--command' option cannot be used."),
             ("<Directory>", "Specifies the directory that is watched for changed source files. Cannot be combined with the '--command' and '--profile' options.")
+        ],
+        Examples =
+        [
+            ("dc watch", "Watches all .ds files in the current directory and its subdirectories and automatically recompiles using the default build profile when files are changed."),
+            ("dc watch -c run", "Watches all .ds files in the current directory and its subdirectories and automatically executes the 'dc run' command when files are changed."),
+            ("dc watch -p CustomProfile", "Watches all .ds files in the current directory and its subdirectories and automatically recompiles using the 'CustomProfile' build profile when files are changed."),
+            ("dc watch ./src", "Watches all .ds files in the './src' directory and its subdirectories and automatically recompiles using the default build profile when files are changed.")
         ]
     };
 

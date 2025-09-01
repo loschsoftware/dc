@@ -28,6 +28,11 @@ public class CommandHelpDetails
     public string Remarks { get; set; }
 
     /// <summary>
+    /// A list of example invocations, along with their description.
+    /// </summary>
+    public List<(string Command, string Description)> Examples { get; set; }
+
+    /// <summary>
     /// A list of custom help sections.
     /// </summary>
     public List<(string Heading, string Text)> CustomSections { get; set; }

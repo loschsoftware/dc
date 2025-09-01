@@ -25,47 +25,50 @@ internal static class TemplateBuilder
         baseDir.Delete(true);
     }
 
+    private static void PrintAvailableTemplates()
+    {
+        int templateNameWidth = ExtensionLoader.ProjectTemplates.Select(t => t.Name).Append("Template Name").Select(n => n.Length).Max();
+        WriteLine($"The following project templates are available:{Environment.NewLine}");
+
+        string tableHeader = $"{"Template Name".PadRight(templateNameWidth)}\t\tPackage";
+        int headerWidth = tableHeader.Length + ExtensionLoader.InstalledExtensions.Where(t => t.ProjectTemplates()?.Length > 0).Select(p => p.Metadata.Name).Append("Preinstalled").Select(p => p.Length).Max();
+
+        WriteLine(tableHeader);
+        WriteLine(new('-', headerWidth));
+
+        foreach (IProjectTemplate template in ExtensionLoader.ProjectTemplates.OrderBy(t => t.Name))
+        {
+            string packageName = "";
+
+            if (ExtensionLoader.InstalledExtensions.Any(p => p.ProjectTemplates() != null && p.ProjectTemplates().Any(t => t.GetType() == template.GetType())))
+                packageName = ExtensionLoader.InstalledExtensions.First(p => p.ProjectTemplates() != null && p.ProjectTemplates().Any(t => t.GetType() == template.GetType())).Metadata.Name;
+
+            if (packageName == "Core")
+                packageName = "Preinstalled";
+
+            WriteLine($"{template.Name.PadRight(templateNameWidth)}\t\t{packageName}");
+        }
+    }
+
     public static int CreateStructure(string[] args)
     {
-        IEnumerable<IProjectTemplate> availableTemplates = ExtensionLoader.ProjectTemplates;
-
-        void PrintAvailableTemplates()
+        if (args.Any(a => a == "--list-templates"))
         {
-            int templateNameWidth = availableTemplates.Select(t => t.Name).Append("Template Name").Select(n => n.Length).Max();
-            WriteLine($"The following project templates are available:{Environment.NewLine}");
-
-            string tableHeader = $"{"Template Name".PadRight(templateNameWidth)}\t\tPackage";
-            int headerWidth = tableHeader.Length + ExtensionLoader.InstalledExtensions.Where(t => t.ProjectTemplates()?.Length > 0).Select(p => p.Metadata.Name).Append("Preinstalled").Select(p => p.Length).Max();
-
-            WriteLine(tableHeader);
-            WriteLine(new('-', headerWidth));
-
-            foreach (IProjectTemplate template in availableTemplates.OrderBy(t => t.Name))
-            {
-                string packageName;
-
-                if (ExtensionLoader.InstalledExtensions.Any(p => p.ProjectTemplates() != null && p.ProjectTemplates().Any(t => t.GetType() == template.GetType())))
-                    packageName = ExtensionLoader.InstalledExtensions.First(p => p.ProjectTemplates() != null && p.ProjectTemplates().Any(t => t.GetType() == template.GetType())).Metadata.Name;
-                else
-                    packageName = "Preinstalled";
-
-                WriteLine($"{template.Name.PadRight(templateNameWidth)}\t\t{packageName}");
-            }
+            PrintAvailableTemplates();
+            return 0;
         }
+
+        IEnumerable<IProjectTemplate> availableTemplates = ExtensionLoader.ProjectTemplates;
 
         if (args.Length < 2)
         {
             EmitErrorMessage(0, 0, 0, DS0206_DCNewInvalidArguments, "Project template and name expected.", CompilerExecutableName);
-            WriteLine("");
-            PrintAvailableTemplates();
             return -1;
         }
 
         if (!availableTemplates.Any(t => string.Compare(t.Name, args[0], !t.IsCaseSensitive()) == 0))
         {
             EmitErrorMessage(0, 0, 0, DS0206_DCNewInvalidArguments, $"The project template '{args[0]}' is not installed.", CompilerExecutableName);
-            WriteLine("");
-            PrintAvailableTemplates();
             return -1;
         }
 

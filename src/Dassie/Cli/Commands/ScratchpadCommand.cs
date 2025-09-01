@@ -270,6 +270,13 @@ internal class ScratchpadCommand : ICompilerCommand
             CustomSections =
             [
                 ("Available commands", commandsSb.ToString())
+            ],
+            Examples =
+            [
+                ("dc scratchpad", "Starts a new scratchpad session, allowing the user to enter Dassie source code from standard input."),
+                ("dc scratchpad new --name=myScratch", "Starts a new scratchpad session named 'myScratch'."),
+                ("dc scratchpad list", "Lists all saved scratches."),
+                ("dc scratchpad clear", "Deletes all saved scratches.")
             ]
         };
     } 

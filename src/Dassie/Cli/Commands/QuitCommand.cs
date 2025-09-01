@@ -17,7 +17,11 @@ internal class QuitCommand : ICompilerCommand
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = Description,
-        Usage = ["dc quit"]
+        Usage = ["dc quit"],
+        Examples =
+        [
+            ("dc quit", "Stops all file watchers.")
+        ]
     };
 
     public int Invoke(string[] args)

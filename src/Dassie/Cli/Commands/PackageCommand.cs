@@ -46,6 +46,14 @@ internal class PackageCommand : ICompilerCommand
             CustomSections =
             [
                 ("Available commands", commandsSb.ToString())
+            ],
+            Examples =
+            [
+                ("dc package list", "Displays a list of installed extensions."),
+                ("dc package info MyExtension", "Displays information about the extension 'MyExtension'."),
+                ("dc package install MyExtension", "Installs the extension 'MyExtension' from the package repository."),
+                ("dc package import ./extension.dll", "Installs an extension from the specified file path."),
+                ("dc package remove MyExtension", "Uninstalls the extension 'MyExtension'.")
             ]
         };
     }

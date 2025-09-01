@@ -22,12 +22,20 @@ internal class TestCommand : ICompilerCommand
         Description = Description,
         Usage = ["dc test [(-a|--assembly)=<Assembly>] [(-m|--module)=<Module>] [--failed]"],
         Remarks = $"If ran on a project, this command first compiles the project and then collects and runs all unit tests defined in the project or specified module. "
-                  + "If ran on a project group, the command collects and runs all unit tests from all projects in the group.",
+                  + "If ran on a project group, the command collects and runs all unit tests from all projects in the group."
+                  + $"{Environment.NewLine}A 'test module' is a module decorated with the <TestModule> attribute from the Dassie unit test library (Dassie.Tests). A test is a method of a test module decorated with the <Test> attribute.",
         Options =
         [
             ("-a|--assembly", "Run tests from the specified assembly."),
             ("-m|--module", "Run tests from the specified test module. Multiple modules can be specified by using the option multiple times."),
             ("--failed", "Only display failed tests")
+        ],
+        Examples =
+        [
+            ("dc test", "Compiles the current project and runs all unit tests defined in it."),
+            ("dc test --failed", "Compiles the current project and runs all unit tests defined in it, only displaying failed tests."),
+            ("dc test -m=MyNamespace.MyTestModule", "Compiles the current project and runs all unit tests defined in the test module 'MyNamespace.MyTestModule'."),
+            ("dc test -a=./path/to/assembly.dll", "Runs all unit tests defined in the specified assembly.")
         ]
     };
 

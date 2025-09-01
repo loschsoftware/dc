@@ -19,7 +19,11 @@ internal class ConfigCommand : ICompilerCommand
     {
         Description = Description,
         Usage = ["dc config"],
-        Remarks = "This command provides an alternative way of initializing a project to the 'dc new' command. It is primarily useful when creating a project out of an existing file structure of source files.",
+        Remarks = "This command provides an alternative way of initializing a project to the 'dc new' command. It is primarily useful when creating a project out of an existing structure of source files.",
+        Examples =
+        [
+            ("dc config", "Creates a new project file with default values.")
+        ]
     };
 
     public int Invoke(string[] args)

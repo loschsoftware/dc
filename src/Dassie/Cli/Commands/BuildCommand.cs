@@ -27,6 +27,12 @@ internal class BuildCommand : ICompilerCommand
         [
             ("BuildProfile", "Specifies the build profile to execute. If not set, the default profile is executed."),
             ("Options", "Additional options to pass to the compiler. For a list of available options, use 'dc help -o'.")
+        ],
+        Examples =
+        [
+            ("dc build", "Builds the current project with the default build profile."),
+            ("dc build CustomProfile", "Builds the current project with the 'CustomProfile' build profile."),
+            ("dc build CustomProfile -r Aot", "Builds the current project with the 'CustomProfile' build profile using the AOT compiler.")
         ]
     };
 
