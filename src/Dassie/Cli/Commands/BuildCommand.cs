@@ -108,8 +108,9 @@ internal class BuildCommand : ICompilerCommand
             return -1;
         }
 
-        string dirName = Path.GetDirectoryName(Path.GetFullPath(filesToCompile[0])).Split(Path.DirectorySeparatorChar)[^1];
-        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray(), null, config.AssemblyName != null ? null : dirName);
+        string asmName = File.Exists(ProjectConfigurationFileName) ? ProjectConfigurationFileName : filesToCompile[0];
+        asmName = Path.GetDirectoryName(Path.GetFullPath(asmName)).Split(Path.DirectorySeparatorChar)[^1];
+        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray(), null, config.AssemblyName != null ? null : asmName);
     }
 
     private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config, string[] args)

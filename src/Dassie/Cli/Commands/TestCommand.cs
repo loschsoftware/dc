@@ -73,8 +73,20 @@ internal class TestCommand : ICompilerCommand
                 return status;
         }
 
+        assemblyPath = Path.GetFullPath(assemblyPath);
+        if (!File.Exists(assemblyPath))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0247_DCTestAssemblyNotFound,
+                $"Assembly '{assemblyPath}' could not be found. Consider setting the <AssemblyFileName> property in the project file.",
+                CompilerExecutableName);
+
+            return -1;
+        }
+
         bool failed = false;
-        Assembly asm = Assembly.LoadFile(Path.GetFullPath(assemblyPath));
+        Assembly asm = Assembly.LoadFile(assemblyPath);
         IEnumerable<Type> testModules = [];
 
         if (args.Any(a => a.StartsWith("-m=") || a.StartsWith("--module=")))
