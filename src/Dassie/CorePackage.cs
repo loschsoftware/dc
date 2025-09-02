@@ -7,7 +7,7 @@ using Dassie.Templates;
 using System.Linq;
 using System.Reflection;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie;
 
 /// <summary>
 /// Acts as an extension package for all builtin commands, project templates, build log devices and compiler directives.
