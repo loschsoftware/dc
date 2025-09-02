@@ -44,13 +44,13 @@ internal class CompileCommand : ICompilerCommand
         sb.AppendLine(HelpCommand.FormatLines("Options from project files (dsconfig.xml) can be included in the following way:", true, 4));
 
         sb.Append("    --<PropertyName>=<Value>".PadRight(50));
-        sb.Append(HelpCommand.FormatLines("For simple properties of type 'string', 'bool' or 'enum'. The property name is case-insensitive. For boolean properties, 0 and 1 are aliases for false and true. Example: --MeasureElapsedTime=true"));
+        sb.Append(HelpCommand.FormatLines("For simple properties of type 'string', 'bool' or 'enum'. The property name is case-insensitive. For boolean properties, 0 and 1 are aliases for false and true. Example: --MeasureElapsedTime=true", indentWidth: 50));
 
         sb.Append("    --<ArrayPropertyName>+<Value>".PadRight(50));
-        sb.Append(HelpCommand.FormatLines("To add elements to an array property. Property names are recognized by the first characters, where 'References' takes precedence over 'Resources'. Example: --R+\"assembly.dll\""));
+        sb.Append(HelpCommand.FormatLines("To add elements to an array property. Property names are recognized by the first characters, where 'References' takes precedence over 'Resources'. Example: --R+\"assembly.dll\"", indentWidth: 50));
 
         sb.Append("    --<PropertyName>::<ChildProperty>=<Value>".PadRight(50));
-        sb.Append(HelpCommand.FormatLines("For setting child properties of more complex objects. Object names are recognized by first characters. Example: --VersionInfo::Description=\"Application\""));
+        sb.Append(HelpCommand.FormatLines("For setting child properties of more complex objects. Object names are recognized by first characters. Example: --VersionInfo::Description=\"Application\"", indentWidth: 50));
 
         return new()
         {
@@ -62,6 +62,11 @@ internal class CompileCommand : ICompilerCommand
                 ("Options", "Additional options as mentioned below. For a list of available options, use 'dc help -o'.")
             ],
             CustomSections = [("Advanced options", sb.ToString())],
+            Examples =
+            [
+                ("dc file1.ds file2.ds", "Compiles the specified source files."),
+                ("dc main.ds -v 2 -l", "Compiles a source file with log verbosity level 2, displaying the elapsed time at the end.")
+            ]
         };
     }
 
