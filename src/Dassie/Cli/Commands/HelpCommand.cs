@@ -24,13 +24,19 @@ internal class HelpCommand : ICompilerCommand
     public CommandHelpDetails HelpDetails() => new()
     {
         Description = "Shows a list of available commands or advanced information about a specific command or topic.",
-        Usage = ["dc help [(-o|--options) | (-s|--simple) | --no-external | <Command>]"],
+        Usage =
+        [
+            "dc help",
+            "dc help <Command>",
+            "dc help <(--options | --simple | --no-external | --commands)>"
+        ],
         Options =
         [
+            ("Command", "The name of a compiler command to show help for."),
             ("-o|--options", "Shows a list of all available project file properties."),
             ("-s|--simple", "Shows a simplified selection of commands suitable for minimalist developers."),
-            ("--no-external", "Does not display commands defined by external packages."),
-            ("Command", "The name of a compiler command to show help for.")
+            ("--commands", "Prints a comma-separated list of available commands."),
+            ("--no-external", "Does not display commands defined by external packages.")
         ],
         Examples =
         [
@@ -144,6 +150,20 @@ internal class HelpCommand : ICompilerCommand
             sb.AppendLine("       Compiles the specified source files.");
             LogOut.Write(sb.ToString());
 
+            return 0;
+        }
+
+        if (args.Contains("--commands"))
+        {
+            IEnumerable<ICompilerCommand> commands = ExtensionLoader.Commands;
+
+            if (args.Contains("--no-external"))
+                commands = commands.Where(c => c.GetType().Assembly == Assembly.GetExecutingAssembly());
+
+            if (!args.Contains("--show-hidden"))
+                commands = commands.Where(c => !c.Hidden());
+
+            LogOut.WriteLine(string.Join(',', commands.Select(c => c.Command).OrderBy(c => c)));
             return 0;
         }
 
