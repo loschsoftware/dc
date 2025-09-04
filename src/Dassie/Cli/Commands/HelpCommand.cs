@@ -268,6 +268,10 @@ internal class HelpCommand : ICompilerCommand
 
         sb.AppendLine();
         sb.AppendLine($"dc {command.Command}: {(string.IsNullOrEmpty(hd.Description) ? command.Description : hd.Description)}");
+
+        if (command.Aliases() != null && command.Aliases().Count > 0)
+            sb.AppendLine($"Alias{(command.Aliases().Count > 1 ? "es" : "")}: {(command.Aliases().Count == 1 ? command.Aliases().Single() : string.Join(", ", command.Aliases()))}");
+
         sb.AppendLine();
 
         sb.Append("Usage:");
