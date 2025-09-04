@@ -259,7 +259,7 @@ internal class HelpCommand : ICompilerCommand
         {
             DisplayLogo();
             LogOut.WriteLine();
-            LogOut.WriteLine($"The command '{command.Command}' does not define help details.");
+            LogOut.WriteLine($"The command '{command.Command}' does not specify any help details.");
             return 0;
         }
 
