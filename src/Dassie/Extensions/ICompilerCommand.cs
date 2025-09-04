@@ -29,11 +29,6 @@ public interface ICompilerCommand
     public virtual CommandHelpDetails HelpDetails() => null;
 
     /// <summary>
-    /// An extended help text displayed when using the 'dc help &lt;Command&gt;' command.
-    /// </summary>
-    public virtual string Help() => "";
-
-    /// <summary>
     /// Determines wheter or not the command is hidden, which makes it not visible on the help page.
     /// </summary>
     /// <returns>Returns <see langword="false"/> by default.</returns>
