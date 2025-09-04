@@ -260,7 +260,6 @@ internal class ScratchpadCommand : ICompilerCommand
         commandsSb.Append($"{"    list",-35}{HelpCommand.FormatLines("Lists all saved scratches.", indentWidth: 35)}");
         commandsSb.Append($"{"    delete <Name>",-35}{HelpCommand.FormatLines("Deletes the specified scratch.", indentWidth: 35)}");
         commandsSb.Append($"{"    clear",-35}{HelpCommand.FormatLines("Deletes all saved scratches.", indentWidth: 35)}");
-        commandsSb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
 
         return new()
         {

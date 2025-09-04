@@ -32,7 +32,6 @@ internal class PackageCommand : ICompilerCommand
         commandsSb.Append($"{"    import <Path> [-o] [-g]",-35}{HelpCommand.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
         commandsSb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
         commandsSb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
-        commandsSb.Append($"{"    help",-35}{HelpCommand.FormatLines("Shows this list.", indentWidth: 35)}");
 
         return new()
         {
