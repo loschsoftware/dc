@@ -266,7 +266,7 @@ internal class ScratchpadCommand : ICompilerCommand
         {
             Description = "Allows compiling and running Dassie source code from standard input.",
             Usage = ["dc scratchpad [Command] [Options]"],
-            Remarks = "The 'scratchpad' command reads source code from standard input, compiles it into a temporary executable and immediately executes it. If standard input has been redirected (e.g. through a pipe), the command will produce no output other than the output from the executed program. If no command is specified, the command 'new' is used implicitly.",
+            Remarks = "The 'scratchpad' command reads source code from standard input, compiles it into a temporary executable and immediately executes it. If standard input has been redirected (e.g. through a pipe) and the compilation is successful, the command will produce no output other than the output from the executed program. If no command is specified, the command 'new' is used implicitly.",
             Options =
             [
                 ("Command", "The subcommand to execute."),
