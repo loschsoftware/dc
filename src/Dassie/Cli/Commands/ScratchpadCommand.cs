@@ -139,13 +139,18 @@ internal class ScratchpadCommand : ICompilerCommand
         /// <returns>The exit code.</returns>
         private static int CompileFromStdIn(string[] args)
         {
-            HelpCommand.DisplayLogo();
-            Console.WriteLine();
-            Console.WriteLine("To mark the end of the input, press Ctrl+Z in an empty line and hit Enter.");
-            Console.WriteLine();
+            if (!Console.IsInputRedirected)
+            {
+                HelpCommand.DisplayLogo();
+                Console.WriteLine();
+                Console.WriteLine("To mark the end of the input, press Ctrl+Z in an empty line and hit Enter.");
+                Console.WriteLine();
+            }
 
             string src = Console.In.ReadToEnd();
-            Console.WriteLine();
+
+            if (!Console.IsInputRedirected)
+                Console.WriteLine();
 
             string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Dassie", "Scratchpad")).FullName;
             string scratchName = "scratch";
