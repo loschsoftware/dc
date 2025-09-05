@@ -29,7 +29,7 @@ namespace Dassie.Cli.Commands
                 string indent = new(' ', indentLevel * 2);
 
                 if (node is TerminalNodeImpl terminalNode)
-                    sb.AppendLine($"{indent}{terminalNode.GetText()}");
+                    sb.AppendLine($"{indent}\"{terminalNode.GetText()}\"");
                 else if (node is ParserRuleContext ruleContext)
                 {
                     string ruleName = parser.RuleNames[ruleContext.RuleIndex];
