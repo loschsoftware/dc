@@ -49,6 +49,8 @@ internal static class SymbolAssociationResolver
         if (context.ParserRule == null)
             return;
 
+        EmitBuildLogMessage($"Finalizing method signature of '{context.Builder.DeclaringType.FullName}::{context.Builder.Name}':", 3);
+
         TypeContext typeCtx = TypeContext.Current;
         TypeContext.Current = Context.Types.First(t => t.Methods.Contains(context));
 
@@ -56,7 +58,7 @@ internal static class SymbolAssociationResolver
         CurrentMethod = context;
 
         Type ret = typeof(void);
-        CustomAttributeBuilder[] retAttribs = [];
+        (Type, CustomAttributeBuilder)[] retAttribs = [];
         Type[] retModReq = [];
         Type[] retModOpt = [];
 
@@ -67,13 +69,13 @@ internal static class SymbolAssociationResolver
             if (TypeHelpers.IsNewTypeAlias(ret))
             {
                 CustomAttributeBuilder cab = new(typeof(NewTypeCallSiteAttribute).GetConstructor([typeof(Type)]), [ret]);
-                retAttribs = [cab];
+                retAttribs = [(typeof(NewTypeCallSiteAttribute), cab)];
                 ret = TypeHelpers.GetAliasType(ret);
             }
         }
 
         List<Type> paramTypes = [];
-        List<CustomAttributeBuilder[]> paramCustomAttributes = [];
+        List<(Type, CustomAttributeBuilder)[]> paramCustomAttributes = [];
         List<Type[]> paramModReq = [];
         List<Type[]> paramModOpt = [];
 
@@ -94,7 +96,7 @@ internal static class SymbolAssociationResolver
 
                 paramTypes.Add(TypeHelpers.GetAliasType(paramType));
                 CustomAttributeBuilder cab = new(typeof(NewTypeCallSiteAttribute).GetConstructor([typeof(Type)]), [paramType]);
-                paramCustomAttributes.Add([cab]);
+                paramCustomAttributes.Add([(typeof(NewTypeCallSiteAttribute), cab)]);
 
                 paramModReq.Add([]);
                 paramModOpt.Add([]);
@@ -112,7 +114,7 @@ internal static class SymbolAssociationResolver
         ParameterBuilder returnBuilder = context.Builder.DefineParameter(
             0, ParameterAttributes.None, null);
 
-        foreach (CustomAttributeBuilder cab in retAttribs)
+        foreach ((_, CustomAttributeBuilder cab) in retAttribs)
             returnBuilder.SetCustomAttribute(cab);
 
         var paramList = Visitor.ResolveParameterList(context.ParserRule.parameter_list(), true);
@@ -123,7 +125,7 @@ internal static class SymbolAssociationResolver
                 AttributeHelpers.GetParameterAttributes(paramList[i].Context.parameter_modifier(), paramList[i].Context.Equals() != null),
                 paramList[i].Context.Identifier().GetIdentifier());
 
-            foreach (CustomAttributeBuilder cab in paramCustomAttributes[i])
+            foreach ((_, CustomAttributeBuilder cab) in paramCustomAttributes[i])
                 pb.SetCustomAttribute(cab);
 
             context.Parameters.Add(new(paramList[i].Context.Identifier().GetIdentifier(), paramTypes[i], pb, pb.Position, paramList[i].Context.Var() != null)
@@ -141,6 +143,15 @@ internal static class SymbolAssociationResolver
                     _param.Index--;
             }
         }
+
+        EmitBuildLogMessage($"    - Return type: {ret.FullName}", 3);
+        EmitBuildLogMessage($"    - Return type attributes: [{string.Join(", ", retAttribs.Select(c => c.Item1.FullName))}]", 3);
+        EmitBuildLogMessage($"    - Return type required custom modifiers: [{string.Join(", ", retModReq.Select(t => t.FullName))}]", 3);
+        EmitBuildLogMessage($"    - Return type optional custom modifiers: [{string.Join(", ", retModReq.Select(t => t.FullName))}]", 3);
+        EmitBuildLogMessage($"    - Parameter types: [{string.Join(", ", paramTypes.Select(t => t.FullName))}]", 3);
+        EmitBuildLogMessage($"    - Parameter type attributes: [{string.Join(", ", paramCustomAttributes.Select(t => $"[{string.Join(", ", t.Select(t => t.Item1.FullName))}]"))}]", 3);
+        EmitBuildLogMessage($"    - Parameter type required custom modifiers: [{string.Join(", ", paramModReq.Select(t => $"[{string.Join(", ", t.Select(t => t.FullName))}]"))}]", 3);
+        EmitBuildLogMessage($"    - Parameter type optional custom modifiers: [{string.Join(", ", paramModOpt.Select(t => $"[{string.Join(", ", t.Select(t => t.FullName))}]"))}]", 3);
 
         TypeContext.Current = typeCtx;
         CurrentMethod = methodCtx;
