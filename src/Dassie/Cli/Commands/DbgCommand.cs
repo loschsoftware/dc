@@ -1,9 +1,11 @@
 ﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Dassie.Debug;
 using Dassie.Extensions;
 using Dassie.Parser;
 using System;
+using System.Linq;
 using System.Text;
 
 namespace Dassie.Debug
@@ -61,7 +63,10 @@ namespace Dassie.Cli.Commands
                 return Fail();
 
             if (args[0] == "ast")
-                return PrintTree(args[1..]);
+                return PrintParseTree(args[1..]);
+
+            if (args[0] == "tokens")
+                return PrintTokens(args[1..]);
 
             LogOut.WriteLine($"Invalid command '{args[0]}'.");
             return -1;
@@ -72,7 +77,7 @@ namespace Dassie.Cli.Commands
             throw new DebugException("Exception thrown due to call of 'dbg fail'");
         }
 
-        private static int PrintTree(string[] args)
+        private static int Print(bool tree, string[] args)
         {
             if (args == null || args.Length == 0)
             {
@@ -89,14 +94,35 @@ namespace Dassie.Cli.Commands
             string text = File.ReadAllText(args[0]);
             ICharStream charStream = CharStreams.fromString(text);
             DassieLexer lexer = new(charStream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
+            CommonTokenStream tokens = new(lexer);
             DassieParser parser = new(tokens);
 
-            if (args.Contains("-c") || args.Contains("--compressed"))
-                LogOut.WriteLine(parser.compilation_unit().ToStringTree(parser));
-            else
-                LogOut.WriteLine(ParseTreePrinter.PrintTree(parser.compilation_unit(), parser));
+            // Print parse tree
+            if (tree)
+            {
+                if (args.Contains("-c") || args.Contains("--compressed"))
+                    LogOut.WriteLine(parser.compilation_unit().ToStringTree(parser));
+                else
+                    LogOut.WriteLine(ParseTreePrinter.PrintTree(parser.compilation_unit(), parser));
+
+                return 0;
+            }
+
+            // Print tokens
+            foreach ((int i, IToken token) in lexer.GetAllTokens().Index())
+                LogOut.WriteLine($"#{i + 1} [{token.StartIndex}-{token.StopIndex}] {DassieLexer.DefaultVocabulary.GetSymbolicName(token.Type)}: \"{token.Text}\"");
+
             return 0;
+        }
+
+        private static int PrintParseTree(string[] args)
+        {
+            return Print(true, args);
+        }
+
+        private static int PrintTokens(string[] args)
+        {
+            return Print(false, args);
         }
     }
 }
