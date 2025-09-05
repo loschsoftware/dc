@@ -35,7 +35,6 @@ internal static class DocumentCompiler
         lexer.AddErrorListener(new LexerErrorListener());
         parser.RemoveErrorListeners();
         parser.AddErrorListener(new ParserErrorListener());
-
         return parser;
     }
 

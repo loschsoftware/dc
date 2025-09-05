@@ -1,5 +1,4 @@
 ﻿using Antlr4.Runtime;
-using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Dassie.Debug;
 using Dassie.Extensions;
@@ -17,7 +16,7 @@ namespace Dassie.Cli.Commands
 {
     internal class DbgCommand : ICompilerCommand
     {
-        private class ParseTreePrinter
+        internal class ParseTreePrinter
         {
             public static string PrintTree(IParseTree tree, DassieParser parser, int indentLevel = 0)
             {
