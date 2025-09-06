@@ -27,7 +27,7 @@ public static class DassieCompiler
             arglist.Add($"--Document:{doc.SymbolicName}:{doc.SourceText}");
 
         int result = CompileCommand.Instance.Invoke(arglist.ToArray(), context.Configuration);
-        bool success = result == 0 && !ErrorWriter.Messages.Where(m => m.Severity == Severity.Error).Any();
+        bool success = result == 0 && !ErrorWriter.Messages.Any(m => m.Severity == Severity.Error);
         return new(success, ErrorWriter.Messages.ToList());
     }
 
@@ -35,11 +35,11 @@ public static class DassieCompiler
     {
         ArgumentNullException.ThrowIfNull(projectFilePath);
         if (!File.Exists(projectFilePath))
-            throw new FileNotFoundException();
+            throw new FileNotFoundException($"Project file '{projectFilePath}' could not be found.", projectFilePath);
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(projectFilePath));
         int result = BuildCommand.Instance.Invoke(args);
-        bool success = result == 0 && !ErrorWriter.Messages.Where(m => m.Severity == Severity.Error).Any();
+        bool success = result == 0 && !ErrorWriter.Messages.Any(m => m.Severity == Severity.Error);
         return new(success, ErrorWriter.Messages.ToList());
     }
 
