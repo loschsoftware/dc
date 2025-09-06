@@ -181,6 +181,12 @@ internal static class AttributeHelpers
                 if (attribType == typeof(NewSlotAttribute) && !baseAttributes.HasFlag(MethodAttributes.NewSlot))
                     baseAttributes |= MethodAttributes.NewSlot;
 
+                if (attribType == typeof(Core.SpecialNameAttribute) && !baseAttributes.HasFlag(MethodAttributes.SpecialName))
+                    baseAttributes |= MethodAttributes.SpecialName;
+
+                if (attribType == typeof(RTSpecialNameAttribute) && !baseAttributes.HasFlag(MethodAttributes.RTSpecialName))
+                    baseAttributes |= MethodAttributes.RTSpecialName;
+
                 if (attribType == typeof(VarArgsAttribute))
                 {
                     Disabled = disableErrorWriter;

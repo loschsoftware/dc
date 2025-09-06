@@ -11,6 +11,18 @@ namespace Dassie.Core;
 public class RuntimeImplementedAttribute : Attribute { }
 
 /// <summary>
+/// Sets the 'specialname' method attribute.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+public class SpecialNameAttribute : Attribute { }
+
+/// <summary>
+/// Sets the 'rtspecialname' method attribute.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+public class RTSpecialNameAttribute : Attribute { }
+
+/// <summary>
 /// Sets the 'hidebysig' method attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
