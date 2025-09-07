@@ -422,25 +422,28 @@ internal static class MemberDeclarationGeneration
                 CurrentMethod.ReturnTypeName = context.type_name();
             }
 
+            // TODO: Fix this. This is broken because methods don't specify their return types and parameters in here anymore,
+            // they are unset until they are resolved by SymbolAssociationResolver. Because of this, the following code would
+            // incorrectly remove overloads of static methods.
+
             // Remove default implementation of static interface method
+            //if (TypeContext.Current.Methods.Count(m =>
+            //    m.Builder != null
+            //    && m.Builder.IsStatic
+            //    && m.Builder.Name == mb.Name
+            //    && m.Builder.ReturnType == mb.ReturnType
+            //    && m.Builder.GetParameters().SequenceEqual(mb.GetParameters()))
+            //    > 1)
+            //{
+            //    MethodContext[] overloads = TypeContext.Current.Methods.Where(m =>
+            //        m.Builder != null
+            //        && m.Builder.IsStatic
+            //        && m.Builder.Name == mb.Name
+            //        && m.Builder.ReturnType == mb.ReturnType
+            //        && m.Builder.GetParameters().SequenceEqual(mb.GetParameters())).ToArray()[..^1];
 
-            if (TypeContext.Current.Methods.Count(m =>
-                m.Builder != null
-                && m.Builder.IsStatic
-                && m.Builder.Name == mb.Name
-                && m.Builder.ReturnType == mb.ReturnType
-                && m.Builder.GetParameters().SequenceEqual(mb.GetParameters()))
-                > 1)
-            {
-                MethodContext[] overloads = TypeContext.Current.Methods.Where(m =>
-                    m.Builder != null
-                    && m.Builder.IsStatic
-                    && m.Builder.Name == mb.Name
-                    && m.Builder.ReturnType == mb.ReturnType
-                    && m.Builder.GetParameters().SequenceEqual(mb.GetParameters())).ToArray()[..^1];
-
-                TypeContext.Current.Methods = TypeContext.Current.Methods.Except(overloads).ToList();
-            }
+            //    TypeContext.Current.Methods = TypeContext.Current.Methods.Except(overloads).ToList();
+            //}
 
             return;
         }
