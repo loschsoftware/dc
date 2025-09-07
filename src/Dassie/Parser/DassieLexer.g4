@@ -13,7 +13,6 @@ NewLine
 
 Single_Line_Comment: '#' InputCharacter* -> channel(Comments_Channel);
 Delimited_Comment: '#[' (Delimited_Comment | .)*? ']#' -> channel(Comments_Channel);
-Documentation_Comment: '##' InputCharacter* -> channel(Comments_Channel);
 
 Special_Symbol_Start: '${';
 

@@ -29,19 +29,27 @@ internal class AnalyzeCommand : ICompilerCommand
         [
             "dc analyze [(--analyzer|-a)=<Name>]",
             "dc analyze <Files> [(--analyzer|-a)=<Name>]",
+            "dc analyze --markers [--marker:<Marker>] [--exclude:<Marker>] [Files]",
         ],
-        Remarks = "Code analyzers other than the default one are installed as part of compiler extensions (packages). Managing compiler extensions is facilitated through the 'dc package' command.",
+        Remarks = "A code analyzer is a tool that examines source code for potential issues and style violations. " +
+        "Code analyzers other than the default one are installed as part of compiler extensions (packages). " +
+        $"Managing compiler extensions is facilitated through the 'dc package' command.{Environment.NewLine}{Environment.NewLine}" +
+        "The '--markers' option provides a simple way to scan for code comments with marker symbols such as 'TODO', 'NOTE' or 'FIXME'. It searches through the current project or specified files and displays all according comments in a structured list.",
         Options =
         [
             ("(--analyzer | -a)=<Name>", "The name of the code analyzer to run. If none is specified, the default analyzer is used."),
-            ("Files", "A list of source files to analyze. If this option is not used, all source files in the current project will be analyzed.")
+            ("Files", "A list of source files to analyze. If this option is not used, all source files in the current project will be analyzed."),
+            ("--markers [Options] [Files]", "Extracts and displays all comments containing markers such as TODO from the current project or the specified source files."),
+            ("    --marker:<Marker>", "Specifies a custom marker to include in the search. Multiple can be specified."),
+            ("    --exclude:<Marker>", "Specifies a marker to ignore in the search. Multiple can be specified.")
         ],
         Examples =
         [
             ("dc analyze", "Runs the default code analyzer on all source files in the current project."),
             ("dc analyze --analyzer=CustomAnalyzer", "Runs 'CustomAnalyzer' on all source files in the current project."),
             ("dc analyze ./src/File1.ds ./src/File2.ds", "Runs the default code analyzer on the specified source files."),
-            ("dc analyze ./src/File1.ds ./src/File2.ds -a=CustomAnalyzer", "Runs 'CustomAnalyzer' on the specified source files.")
+            ("dc analyze ./src/File1.ds ./src/File2.ds -a=CustomAnalyzer", "Runs 'CustomAnalyzer' on the specified source files."),
+            ("dc analyze --markers", "Displays all comments with markers in the current project.")
         ]
     };
 
@@ -49,6 +57,22 @@ internal class AnalyzeCommand : ICompilerCommand
     {
         IEnumerable<string> files = args.Where(File.Exists);
         string analyzerName = null;
+
+        if (args.Contains("--markers"))
+        {
+            TaskAnalyzer analyzer;
+            if (files.Any())
+                analyzer = new(files);
+            else
+                analyzer = new(Directory.GetCurrentDirectory());
+
+            IEnumerable<string> customMarkers = args.Where(a => a.StartsWith("--marker:")).Select(a => string.Join(':', a.Split(':')[1..]));
+            IEnumerable<string> excludedMarkers = args.Where(a => a.StartsWith("--exclude:")).Select(a => string.Join(':', a.Split(':')[1..]));
+            analyzer.ConfigureMarkers(customMarkers.Select(s => new KeyValuePair<string, int>(s, 155)).ToDictionary(), excludedMarkers.ToList());
+
+            analyzer.PrintAll();
+            return 0;
+        }
 
         if (args.Any(a => a.StartsWith("-a=") || a.StartsWith("--analyzer=")))
             analyzerName = string.Join('=', args.First(a => a.StartsWith("-a=") || a.StartsWith("--analyzer=")).Split('=')[1..]);
