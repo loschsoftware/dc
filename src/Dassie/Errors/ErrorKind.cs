@@ -1038,5 +1038,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when an invalid subsystem is specified.
     /// </summary>
-    DS0251_InvalidSubsystem
+    DS0251_InvalidSubsystem,
+    /// <summary>
+    /// Emitted when the &lt;EntryPoint&gt; attribute is applied to a function inside of a library.
+    /// </summary>
+    DS0252_EntryPointInNonExecutableProgram
 }

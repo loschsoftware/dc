@@ -6,6 +6,7 @@ using Dassie.CodeGeneration.Structure;
 using Dassie.Core;
 using Dassie.Core.Meta;
 using Dassie.Errors;
+using Dassie.Extensions;
 using Dassie.Intrinsics;
 using Dassie.Meta;
 using Dassie.Meta.Directives;
@@ -668,7 +669,17 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 {
                     if (attribType == typeof(EntryPointAttribute))
                     {
-                        if (Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == ErrorKind.DS0192_AmbiguousEntryPoint))
+                        if (!Context.Subsystem.IsExecutable)
+                        {
+                            EmitWarningMessage(
+                                context.attribute()[i].Start.Line,
+                                context.attribute()[i].Start.Column,
+                                context.attribute()[i].GetText().Length,
+                                DS0252_EntryPointInNonExecutableProgram,
+                                $"The project type ('{Context.Configuration.ApplicationType}') does not produce an executable, so the <EntryPoint> attribute is ignored.");
+                        }
+
+                        if (Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == DS0192_AmbiguousEntryPoint))
                         {
                             EmitErrorMessage(
                                 context.attribute()[i].Start.Line,

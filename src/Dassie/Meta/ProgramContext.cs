@@ -1,5 +1,6 @@
 ﻿using Dassie.Configuration;
 using Dassie.Errors;
+using Dassie.Extensions;
 using Dassie.Parser;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,8 @@ internal class ProgramContext
     public TypeContext GetType(string name) => Types.Where(t => t.FullName == name).First();
 
     public DassieConfig Configuration { get; set; }
+
+    public ISubsystem Subsystem => ExtensionLoader.GetSubsystem(Configuration.ApplicationType);
 
     public string ConfigurationPath { get; set; }
 
