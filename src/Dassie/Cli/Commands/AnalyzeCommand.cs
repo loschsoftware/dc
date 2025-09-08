@@ -58,6 +58,15 @@ internal class AnalyzeCommand : ICompilerCommand
         IEnumerable<string> files = args.Where(File.Exists);
         string analyzerName = null;
 
+        foreach (string arg in args.Where(a => !a.StartsWith('-') && !File.Exists(a)))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0049_SourceFileNotFound,
+                $"The file '{arg}' could not be found.",
+                CompilerExecutableName);
+        }
+
         if (args.Contains("--markers"))
         {
             TaskAnalyzer analyzer;
@@ -79,21 +88,6 @@ internal class AnalyzeCommand : ICompilerCommand
 
         if (files.Any())
             return AnalyzeFiles(files, analyzerName: analyzerName);
-
-        Func<string, bool> predicate = static a => !a.StartsWith("-a=") && !a.StartsWith("--analyzer=") && !File.Exists(a);
-        if (args.Any(predicate))
-        {
-            foreach (string arg in args.Where(predicate))
-            {
-                EmitErrorMessage(
-                    0, 0, 0,
-                    DS0212_UnexpectedArgument,
-                    $"Unexpected argument '{arg}'.",
-                    CompilerExecutableName);
-            }
-
-            return -1;
-        }
 
         return AnalyzeProject(analyzerName);
     }

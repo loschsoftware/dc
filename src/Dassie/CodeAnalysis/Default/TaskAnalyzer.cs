@@ -2,6 +2,7 @@
 using Dassie.Parser;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -47,8 +48,20 @@ internal class TaskAnalyzer
     public void PrintAll()
     {
         List<Task> tasks = [];
-        foreach (string file in _files)
-            tasks.AddRange(GetTasks(file));
+
+        try
+        {
+            foreach (string file in _files)
+                tasks.AddRange(GetTasks(file));
+        }
+        catch (Exception ex)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0030_FileAccessDenied,
+                $"Could not read files: {ex.Message}",
+                CompilerExecutableName);
+        }
 
         PrintTasks(tasks, _basePath);
     }
@@ -56,8 +69,23 @@ internal class TaskAnalyzer
     private List<Task> GetTasks(string path)
     {
         List<Task> tasks = [];
+        string source;
 
-        string source = File.ReadAllText(path);
+        try
+        {
+            source = File.ReadAllText(path);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0030_FileAccessDenied,
+                $"Could not access file '{path}': {ex.Message}",
+                CompilerExecutableName);
+
+            return [];
+        }
+
         ICharStream charStream = CharStreams.fromString(source);
         DassieLexer lexer = new(charStream);
         List<IToken> tokens = lexer
