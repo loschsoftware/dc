@@ -134,13 +134,28 @@ Use target-typed new expressions wherever possible. Do not use ``var`` except fo
 
 **❌ Wrong:**
 ````csharp
-var items = List<string>();
-List<string> items = new List<string>();
+StreamWriter writer = new StreamWriter("file.txt");
+var writer = new StreamWriter("file.txt");
 ````
 
 **✔️ Correct:**
 ````csharp
+StreamWriter writer = new("file.txt");
+````
+
+## Collection initialization
+Use C# 12 collection expressions.
+
+**❌ Wrong:**
+````csharp
 List<string> items = new();
+int[] numbers = { 1, 2, 3 };
+````
+
+**✔️ Correct:**
+````csharp
+List<string> items = [];
+int[] numbers = [1, 2, 3];
 ````
 
 ## LINQ
