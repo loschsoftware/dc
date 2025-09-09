@@ -21,6 +21,12 @@ internal static class ExtensionLoader
         InstalledExtensions.CollectionChanged += Update;
     }
 
+    private static readonly IEnvironmentInfo _env = new CompilerEnvironmentInfo()
+    {
+        ConfigurationFunc = () => Context.Configuration,
+        ExtensionsFunc = () => InstalledExtensions
+    };
+
     public static readonly string DefaultExtensionSource = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Extensions")).FullName;
     public static readonly string GlobalToolsPath = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")).FullName;
 
@@ -76,6 +82,47 @@ internal static class ExtensionLoader
         _documentSources = InstalledExtensions.SelectMany(p => p.DocumentSources());
         _deploymentTargets = InstalledExtensions.SelectMany(p => p.DeploymentTargets());
         _subsystems = InstalledExtensions.SelectMany(p => p.Subsystems());
+
+        Verify();
+    }
+
+    private static void Verify()
+    {
+        if (_commands == null || !_commands.Any())
+            return;
+
+        Dictionary<string, (ICompilerCommand command, IPackage package)> seenCommands = [];
+        
+        foreach (IPackage package in InstalledExtensions)
+        {
+            foreach (ICompilerCommand cmd in package.Commands())
+            {
+                if (seenCommands.TryGetValue(cmd.Command, out var existing))
+                {
+                    EmitWarningMessage(
+                        0, 0, 0,
+                        DS0100_DuplicateCompilerCommand,
+                        $"Ambiguous command: The command '{cmd.Command}' is defined by multiple extensions. The command defined in '{existing.package.Metadata.Name}' will be used.",
+                        CompilerExecutableName);
+                }
+                else
+                    seenCommands[cmd.Command] = (cmd, package);
+
+                foreach (string alias in cmd.Aliases() ?? [])
+                {
+                    if (seenCommands.TryGetValue(alias, out existing))
+                    {
+                        EmitWarningMessage(
+                            0, 0, 0,
+                            DS0100_DuplicateCompilerCommand,
+                            $"Ambiguous command: The command alias '{alias}' is defined by multiple extensions. The command defined in '{existing.package.Metadata.Name}' will be used.",
+                            CompilerExecutableName);
+                    }
+                    else
+                        seenCommands[alias] = (cmd, package);
+                }
+            }
+        }
     }
 
     private static List<IPackage> LoadInstalledExtensions()
@@ -176,9 +223,9 @@ internal static class ExtensionLoader
                 try
                 {
                     if (loadTransient)
-                        ret = (int)typeof(IPackage).GetMethod("InitializeTransient").Invoke(package, [xmlAttributes, xmlElements]);
+                        ret = package.InitializeTransient(_env, xmlAttributes, xmlElements);
                     else
-                        ret = (int)typeof(IPackage).GetMethod("InitializeGlobal").Invoke(package, []);
+                        ret = package.InitializeGlobal(_env);
                 }
                 catch (Exception ex)
                 {
@@ -264,36 +311,6 @@ internal static class ExtensionLoader
         InstalledExtensions.Clear();
     }
 
-    //public static List<ICompilerCommand> GetAllCommands(List<IPackage> packages)
-    //{
-    //    List<ICompilerCommand> commands = [];
-
-    //    foreach (IPackage package in packages)
-    //    {
-    //        var cmds = GetCommands(package);
-
-    //        foreach (ICompilerCommand cmd in cmds)
-    //        {
-    //            if (commands.Any(c => c.Command == cmd.Command || c.Aliases().Intersect(cmd.Aliases()).Any()))
-    //            {
-    //                StringBuilder errMsg = new();
-    //                errMsg.Append($"Ambiguous command: The command '{cmd.Command}' is defined by multiple extensions. ");
-    //                errMsg.AppendLine($"The command defined in '{package.Metadata.Name}, version {package.Metadata.Version}' will be used.");
-
-    //                EmitWarningMessage(
-    //                    0, 0, 0,
-    //                    DS0099_DuplicateCompilerCommand,
-    //                    errMsg.ToString(),
-    //                    CompilerExecutableName);
-    //            }
-
-    //            commands.Add(cmd);
-    //        }
-    //    }
-
-    //    return commands;
-    //}
-
     public static bool TryGetAnalyzer(string name, out IAnalyzer<IParseTree> analyzer)
     {
         if (CodeAnalyzers.Any(a => a.Name == name))
@@ -331,7 +348,7 @@ internal static class ExtensionLoader
 
         if (Subsystems.Any(s => s.Name == name))
             return Subsystems.First(s => s.Name == name);
-
+        
         EmitErrorMessage(
             0, 0, 0,
             DS0251_InvalidSubsystem,

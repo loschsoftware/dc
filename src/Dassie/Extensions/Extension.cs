@@ -21,13 +21,13 @@ public abstract class Extension : IPackage
     public virtual bool Hidden() => false;
 
     /// <inheritdoc/>
-    public virtual int InitializeGlobal() => 0;
-
-    /// <inheritdoc/>
-    public virtual int InitializeTransient(List<XmlAttribute> attributes, List<XmlElement> elements) => 0;
-
-    /// <inheritdoc/>
     public virtual ExtensionModes Modes() => ExtensionModes.Global | ExtensionModes.Transient;
+
+    /// <inheritdoc/>
+    public virtual int InitializeGlobal(IEnvironmentInfo environment) => 0;
+
+    /// <inheritdoc/>
+    public virtual int InitializeTransient(IEnvironmentInfo environment, List<XmlAttribute> attributes, List<XmlElement> elements) => 0;
 
     /// <inheritdoc/>
     public virtual void Unload() { }
@@ -55,4 +55,10 @@ public abstract class Extension : IPackage
 
     /// <inheritdoc/>
     public virtual IDocumentSource[] DocumentSources() => [];
+
+    /// <inheritdoc/>
+    public virtual IDeploymentTarget[] DeploymentTargets() => [];
+
+    /// <inheritdoc/>
+    public virtual ISubsystem[] Subsystems() => [];
 }
