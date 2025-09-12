@@ -1,7 +1,7 @@
 # Dassie Compiler
 <img alt="GitHub commit activity (branch)" src="https://img.shields.io/github/commit-activity/m/loschsoftware/dc"> <img alt="GitHub issues" src="https://img.shields.io/github/issues/loschsoftware/dc">
 
-The official .NET compiler for the [Dassie](https://github.com/loschsoftware/dassie) programming language.
+This project aims to implement a .NET compiler for the [Dassie](https://github.com/loschsoftware/dassie) programming language. It acts as the reference implementation of the language.
 
 ## Getting started
 To get started with Dassie development, either download a binary from the 'Releases' section of this repository or build the compiler from source. An installation of .NET 9 is required if compiling from source or using a framework-dependent compiler binary.
