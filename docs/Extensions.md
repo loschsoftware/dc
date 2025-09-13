@@ -27,6 +27,7 @@ The command ``dc package`` is used to manage extensions in global mode. To insta
 
 ## Extension API features
 All features of the API are supported through interfaces in the [``Dassie.Extensions``](../src/Dassie/Extensions) namespace. All features of an extension are centrally registered in ``IPackage`` through its various virtual methods. The following is a list of all available interfaces:
+- **[``GlobalConfigProperty``](../src/Dassie/Extensions/GlobalConfigProperty.cs):** Defines a global configuration property.
 - **[``ICompilerCommand``](../src/Dassie/Extensions/ICompilerCommand.cs):** Defines a custom compiler command to integrate external tools with the compiler.
 - **[``IProjectTemplate``](../src/Dassie/Extensions/IProjectTemplate.cs):** Defines a custom project template used in combination with the ``dc new`` command.
 - **[``IConfigurationProvider``](../src/Dassie/Extensions/IConfigurationProvider.cs):** Defines a configuration provider that serves as a template for a project file. This is used in combination with the [``Import``](./Projects.md#importing-project-files) attribute of project files.
@@ -34,6 +35,9 @@ All features of the API are supported through interfaces in the [``Dassie.Extens
 - **[``IBuildLogWriter``](../src/Dassie/Extensions/IBuildLogWriter.cs):** Allows the redirection of build message to an arbitrary ``TextWriter`` object. Requires the usage of the default build log device.
 - **[``IBuildLogDevice``](../src/Dassie/Extensions/IBuildLogDevice.cs):** Enables the implementation of custom logic for serializing build messages. Can be configured with XML attributes and elements in project files.
 - **[``ICompilerDirective``](../src/Dassie/Extensions/ICompilerDirective.cs):** Defines a custom **compiler directive** that can be used in code.
+- **[``IDocumentSource``](../src/Dassie/Extensions/IDocumentSource.cs):** Defines a document source which is used to inject arbitrary Dassie source code into a compilation.
+- **[``IDeploymentTarget``](../src/Dassie/Extensions/IDeploymentTarget.cs):** Defines a deployment target that is used in conjunction with the ``dc deploy`` compiler command.
+- **[``ISubsystem``](../src/Dassie/Extensions/ISubsystem.cs):** Defines the characteristics of the application type of a Dassie project.
 
 ## Creating a custom extension
 The following example implements a minimal compiler extension that adds a new command to the compiler.
@@ -49,7 +53,7 @@ The following example implements a minimal compiler extension that adds a new co
 
    public class DemoExtensionPackage : IPackage
    {
-       public PackageMetadata Metadata { get; } = new()
+       public PackageMetadata Metadata => new()
        {
            Name = "EchoExtension",
            Author = "Losch",
@@ -57,7 +61,7 @@ The following example implements a minimal compiler extension that adds a new co
            Description = "A demo extension that repeats the specified text when executed."
        };
 
-       public Type[] Commands { get; } = throw new NotImplementedException(); // Update after step 3
+       public Type[] Commands => throw new NotImplementedException(); // Update after step 3
    }
    ````
 3. Add a type implementing the ``ICompilerCommand`` interface and reference it in the extension package.
@@ -70,9 +74,8 @@ The following example implements a minimal compiler extension that adds a new co
 
    public class EchoCommand : ICompilerCommand
    {
-       public string Command { get; } = "echo";
-       public string UsageString { get; } = "echo <Text>";
-       public string Description { get; } = "Repeats the specified text.";
+       public string Command => "echo";
+       public string Description => "Repeats the specified text.";
 
        public int Invoke(string[] args)
        {
