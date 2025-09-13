@@ -28,7 +28,7 @@ Here is the classic "Hello World" program in Dassie:
 ````dassie
 println "Hello World!"
 ````
-To compile the above source code, save it to a file (subsequently called ``main.ds``) and compile it like follows:
+To compile the above source code, save it to a file (subsequently called ``main.ds``) and compile it as follows:
 ````
 dc main.ds
 ````
