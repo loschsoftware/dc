@@ -17,7 +17,7 @@ Compiler extensions can be loaded in one of two modes:
 - **Global:** The extension is enabled globally and is initialized as soon as the compiler is launched. It is active for every build. Managing global extensions is done through the ``dc package`` command.
 - **Transient:** The extension is enabled only for a single build process. Managing transient extensions is done through the [``<Extensions>``](./Projects.md#transient-extensions) tag in a project file.
 
-``IPackage`` contains the virtual methods [``InitializeGlobal``](../src/Dassie/Extensions/IPackage.cs#L28) and [``InitializeTransient``](../src/Dassie/Extensions/IPackage.cs#L36) that can be overridden to implement custom behavior when the extension is loaded. Similarly, the [``Unload``](../src/Dassie/Extensions/IPackage.cs#L46) method provides a way of performing an action when the extension is unloaded, regardless of loading mode.
+``IPackage`` contains the virtual methods [``InitializeGlobal``](../src/Dassie/Extensions/IPackage.cs#L34) and [``InitializeTransient``](../src/Dassie/Extensions/IPackage.cs#L43) that can be overridden to implement custom behavior when the extension is loaded. Similarly, the [``Unload``](../src/Dassie/Extensions/IPackage.cs#L48) method provides a way of performing an action when the extension is unloaded, regardless of loading mode.
 
 > [!CAUTION]
 > Do not rely on ``IDisposable`` for freeing resources of extensions, as the Dassie compiler does **not** invoke the ``Dispose`` method when they are unloaded. Always call ``Dispose`` in ``Unload`` to ensure the extension is disposed correctly.
