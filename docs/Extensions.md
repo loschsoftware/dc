@@ -10,7 +10,7 @@ The Dassie compiler provides a rich API for extending its functionality with cus
 |[Creating a custom extension](./Extensions.md#creating-a-custom-extension)|
 
 ## Format
-An **extension** is a .NET type implementing the [``Dassie.Extensions.IPackage``](../src/Dassie/Extensions/IPackage.cs) interface. An **extension package** is a .NET assembly containing one or more extensions.
+An **extension** is a .NET type implementing the [``Dassie.Extensions.IPackage``](../src/Dassie/Extensions/IPackage.cs) interface. An **extension package** is a .NET assembly containing one or more extensions. For an improved developer experience, the API also provides the abstract base class [``Extension``](../src/Dassie/Extensions/Extension.cs) which implements ``IPackage``.
 
 ## Extension lifecycle
 Compiler extensions can be loaded in one of two modes:
