@@ -1,4 +1,5 @@
-﻿using Dassie.Extensions;
+﻿using Dassie.Core.Commands;
+using Dassie.Extensions;
 using System.Linq;
 
 namespace Dassie.Cli.Commands;
@@ -19,13 +20,13 @@ internal static class CommandHandler
     /// <returns><see langword="true"/>, if the command was executed. <see langword="false"/>, if the command could not be found.</returns>
     public static bool TryInvoke(string name, string[] args, out int errorCode)
     {
-        if (ExtensionLoader.Commands.Any(c => c.Command == name || c.Aliases().Any(a => a == name)))
+        if (ExtensionLoader.Commands.Any(c => c.Command == name || c.Aliases.Any(a => a == name)))
         {
-            ICompilerCommand selectedCommand = ExtensionLoader.Commands.First(c => c.Command == name || c.Aliases().Any(a => a == name));
+            ICompilerCommand selectedCommand = ExtensionLoader.Commands.First(c => c.Command == name || c.Aliases.Any(a => a == name));
 
-            if (args.Any(a => _helpOptions.Contains(a)))
+            if (args != null && args.Length >= 1 && _helpOptions.Contains(args[0]) && !selectedCommand.Options.HasFlag(CommandOptions.NoHelpRouting))
             {
-                errorCode = HelpCommand.DisplayHelpForCommand(selectedCommand);
+                errorCode = HelpCommand.Instance.Invoke([selectedCommand.Command]);
                 return true;
             }
 

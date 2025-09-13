@@ -48,6 +48,11 @@ public interface IPackage
     public virtual void Unload() { }
 
     /// <summary>
+    /// An array of global configuration properties.
+    /// </summary>
+    public virtual GlobalConfigProperty[] GlobalProperties() => [];
+
+    /// <summary>
     /// An array of compiler commands added by this extension.
     /// </summary>
     public virtual ICompilerCommand[] Commands() => [];

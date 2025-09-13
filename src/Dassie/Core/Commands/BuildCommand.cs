@@ -6,19 +6,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using SDProcess = System.Diagnostics.Process;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class BuildCommand : ICompilerCommand
+internal class BuildCommand : CompilerCommand
 {
     private static BuildCommand _instance;
     public static BuildCommand Instance => _instance ??= new();
 
-    public string Command => "build";
+    public override string Command => "build";
 
-    public string Description => "Executes the specified build profile, or compiles all source files in the current folder structure if none is specified.";
+    public override string Description => "Executes the specified build profile, or compiles all source files in the current folder structure if none is specified.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage = ["dc build [BuildProfile] [Options]"],
@@ -36,7 +37,7 @@ internal class BuildCommand : ICompilerCommand
         ]
     };
 
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
         => Invoke(args, null);
 
     internal int Invoke(string[] args, DassieConfig overrideConfig)
@@ -116,7 +117,7 @@ internal class BuildCommand : ICompilerCommand
 
         string asmName = File.Exists(ProjectConfigurationFileName) ? ProjectConfigurationFileName : filesToCompile[0];
         asmName = Path.GetDirectoryName(Path.GetFullPath(asmName)).Split(Path.DirectorySeparatorChar)[^1];
-        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray(), null, config.AssemblyName != null ? null : asmName);
+        return CompileCommand.Instance.Invoke(filesToCompile.Concat(args).ToArray(), null, config.AssemblyFileName != null ? null : asmName);
     }
 
     private static int ExecuteBuildProfile(BuildProfile profile, DassieConfig config, string[] args)
@@ -155,7 +156,7 @@ internal class BuildCommand : ICompilerCommand
                 if (preEvent.RunAsAdministrator)
                     psi.Verb = "runas";
 
-                Process proc = Process.Start(psi);
+                SDProcess proc = SDProcess.Start(psi);
 
                 if (preEvent.WaitForExit)
                     proc.WaitForExit();
@@ -212,7 +213,7 @@ internal class BuildCommand : ICompilerCommand
                 if (postEvent.RunAsAdministrator)
                     psi.Verb = "runas";
 
-                Process proc = Process.Start(psi);
+                SDProcess proc = SDProcess.Start(psi);
 
                 if (postEvent.WaitForExit)
                     proc.WaitForExit();

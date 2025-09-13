@@ -70,7 +70,7 @@ public enum ErrorKind
     /// </summary>
     DS0012_UndefinedValue,
     /// <summary>
-    /// 
+    /// General error emitted if a command is invoked with an invalid set of arguments.
     /// </summary>
     DS0013_InvalidArgument,
     /// <summary>
@@ -824,7 +824,7 @@ public enum ErrorKind
     /// </summary>
     DS0197_InvalidMethodIdentifier,
     /// <summary>
-    /// Emitted when an imported project configuration file does not exist.
+    /// Emitted when an imported project or global configuration file does not exist.
     /// </summary>
     DS0198_ImportedConfigFileNotFound,
     /// <summary>
@@ -1042,5 +1042,33 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the &lt;EntryPoint&gt; attribute is applied to a function inside of a library.
     /// </summary>
-    DS0252_EntryPointInNonExecutableProgram
+    DS0252_EntryPointInNonExecutableProgram,
+    /// <summary>
+    /// Emitted when an invalid valid property (from a project file or the global configuration) is referenced in a call to the 'dc config' command.
+    /// </summary>
+    DS0253_DCConfigInvalidProperty,
+    /// <summary>
+    /// Emitted when 'dc config' was invoked to modify a property, but the data type of the property is not supported.
+    /// </summary>
+    DS0254_DCConfigUnsupportedDataType,
+    /// <summary>
+    /// Emitted when the value of a property modified through 'dc config' is invalid.
+    /// </summary>
+    DS0255_DCConfigInvalidValue,
+    /// <summary>
+    /// Emitted when the global configuration file contains a namespace not associated with any extension or a property not defined by an extension.
+    /// </summary>
+    DS0256_GlobalConfigInvalidElement,
+    /// <summary>
+    /// Emitted when the global configuration file is not a valid XML document.
+    /// </summary>
+    DS0257_GlobalConfigFileMalformed,
+    /// <summary>
+    /// Emitted when the value of a global property is invalid for the data type of the property.
+    /// </summary>
+    DS0258_GlobalConfigPropertyValueMalformed,
+    /// <summary>
+    /// Emitted when the 'dc scratchpad load' command is used and the editor is set to 'default'.
+    /// </summary>
+    DS0259_DCScratchpadLoadDefaultEditor
 }

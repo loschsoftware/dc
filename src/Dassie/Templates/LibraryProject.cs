@@ -29,9 +29,9 @@ internal class LibraryProject : IProjectTemplate
             new ProjectFile() {
                 Content = new() {
                     ApplicationType = "Library",
-                    BuildOutputDirectory = "./build",
+                    BuildDirectory = "./build",
                     RootNamespace = "$(ProjectName)",
-                    AssemblyName = "$(ProjectName)"
+                    AssemblyFileName = "$(ProjectName)"
                 }
             }
         ];

@@ -1,4 +1,5 @@
 ﻿using Dassie.Aot;
+using Dassie.Cli;
 using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
@@ -22,23 +23,25 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Text;
+using SDProcess = System.Diagnostics.Process;
 
 #pragma warning disable IDE0079
 #pragma warning disable IL3000
 #pragma warning disable CA1822
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class CompileCommand : ICompilerCommand
+internal class CompileCommand : CompilerCommand
 {
     private static CompileCommand _instance;
     public static CompileCommand Instance => _instance ??= new();
 
-    public string Command => "compile";
-    public string Description => "Compiles the specified source files.";
-    public bool Hidden() => true;
+    public override string Command => "compile";
+    public override string Description => "Compiles the specified source files.";
+    public override CommandOptions Options => CommandOptions.Hidden;
 
-    public CommandHelpDetails HelpDetails()
+    public override CommandHelpDetails HelpDetails => GetHelpDetails();
+    private CommandHelpDetails GetHelpDetails()
     {
         StringBuilder sb = new();
         sb.AppendLine(HelpCommand.FormatLines("Options from project files (dsconfig.xml) can be included in the following way:", true, 4));
@@ -70,7 +73,7 @@ internal class CompileCommand : ICompilerCommand
         };
     }
 
-    public int Invoke(string[] args) => Compile(args);
+    public override int Invoke(string[] args) => Compile(args);
     public int Invoke(string[] args, DassieConfig overrideSettings, string assemblyName = null) => Compile(args, overrideSettings, assemblyName);
 
     internal static void Abort()
@@ -78,7 +81,7 @@ internal class CompileCommand : ICompilerCommand
         if (GlobalConfig.BuildDirectoryCreated)
         {
             Directory.SetCurrentDirectory(GlobalConfig.RelativePathResolverDirectory);
-            Directory.Delete(Context.Configuration.BuildOutputDirectory, true);
+            Directory.Delete(Context.Configuration.BuildDirectory, true);
         }
 
         int msgCount = Messages.Count(e => e.Severity == Severity.Error);
@@ -108,7 +111,7 @@ internal class CompileCommand : ICompilerCommand
             asmName = assemblyName;
 
         config ??= new();
-        config.AssemblyName ??= asmName;
+        config.AssemblyFileName ??= asmName;
 
         string[] documentArgs = args.Where(a => a.StartsWith("--Document:")).ToArray();
         args = args.Where(a => !documentArgs.Contains(a)).ToArray();
@@ -138,14 +141,14 @@ internal class CompileCommand : ICompilerCommand
         string relativePathResolverBaseDir = Directory.GetCurrentDirectory();
         GlobalConfig.RelativePathResolverDirectory = relativePathResolverBaseDir;
 
-        GlobalConfig.BuildDirectoryCreated = !Directory.Exists(config.BuildOutputDirectory);
-        config.BuildOutputDirectory ??= "";
+        GlobalConfig.BuildDirectoryCreated = !Directory.Exists(config.BuildDirectory);
+        config.BuildDirectory ??= "";
 
-        if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
+        if (!string.IsNullOrEmpty(config.BuildDirectory))
         {
             try
             {
-                Directory.CreateDirectory(config.BuildOutputDirectory);
+                Directory.CreateDirectory(config.BuildDirectory);
             }
             catch (Exception ex)
             {
@@ -157,10 +160,10 @@ internal class CompileCommand : ICompilerCommand
             }
         }
 
-        if (Directory.Exists(config.BuildOutputDirectory))
-            Directory.SetCurrentDirectory(config.BuildOutputDirectory);
+        if (Directory.Exists(config.BuildDirectory))
+            Directory.SetCurrentDirectory(config.BuildDirectory);
 
-        string assembly = Path.Combine(config.BuildOutputDirectory, $"{config.AssemblyName}.dll");
+        string assembly = Path.Combine(config.BuildDirectory, $"{config.AssemblyFileName}.dll");
         string msgPrefix = MessagePrefix;
 
         ISubsystem subsystem = ExtensionLoader.GetSubsystem(Context.Configuration.ApplicationType);
@@ -170,7 +173,7 @@ internal class CompileCommand : ICompilerCommand
 
         if (config.References != null)
         {
-            if (config.References.Length > (ushort.MaxValue + 1))
+            if (config.References.Length > ushort.MaxValue + 1)
             {
                 EmitErrorMessage(
                     0, 0, 0,
@@ -303,9 +306,9 @@ internal class CompileCommand : ICompilerCommand
             }
         }
 
-        if ((Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0) || !string.IsNullOrEmpty(Context.Configuration.IconFile) || !string.IsNullOrEmpty(Context.Configuration.AssemblyManifest))
+        if (Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0 || !string.IsNullOrEmpty(Context.Configuration.IconFile) || !string.IsNullOrEmpty(Context.Configuration.AssemblyManifest))
         {
-            if (!string.IsNullOrEmpty(resFile) && (Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0))
+            if (!string.IsNullOrEmpty(resFile) && Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0)
             {
                 EmitErrorMessage(
                     0, 0, 0,
@@ -360,7 +363,7 @@ internal class CompileCommand : ICompilerCommand
                     }).ToArray();
                 }
 
-                string rcPath = Path.ChangeExtension(config.AssemblyName, "rc");
+                string rcPath = Path.ChangeExtension(config.AssemblyFileName, "rc");
                 ResourceScriptWriter rsw = new(rcPath, lcids);
 
                 if (lcids.Distinct().Count() != lcids.Length)
@@ -450,7 +453,7 @@ internal class CompileCommand : ICompilerCommand
                     WindowStyle = ProcessWindowStyle.Hidden
                 };
 
-                Process.Start(psi).WaitForExit();
+                SDProcess.Start(psi).WaitForExit();
 
                 resFile = Path.ChangeExtension(rcPath, ".res");
 
@@ -476,7 +479,7 @@ internal class CompileCommand : ICompilerCommand
                 Context.EntryPoint,
                 resources,
                 assembly,
-                config.Configuration == ApplicationConfiguration.Debug || config.CreatePdb,
+                config.Configuration == ApplicationConfiguration.Debug || config.EmitPdb,
                 config.Platform == Platform.x86);
 
             BlobBuilder peBlob = new();
@@ -569,8 +572,8 @@ internal class CompileCommand : ICompilerCommand
                         CreateNoWindow = true,
                         WindowStyle = ProcessWindowStyle.Hidden
                     };
-
-                    Process.Start(psi);
+                    
+                    SDProcess.Start(psi);
                 }
             }
 
@@ -586,7 +589,7 @@ internal class CompileCommand : ICompilerCommand
         else if (GlobalConfig.BuildDirectoryCreated)
         {
             Directory.SetCurrentDirectory(workingDir);
-            Directory.Delete(config.BuildOutputDirectory);
+            Directory.Delete(config.BuildDirectory);
         }
 
         return errors.SelectMany(e => e).Count(e => e.Severity == Severity.Error);
@@ -708,7 +711,7 @@ internal class CompileCommand : ICompilerCommand
         {
             for (int j = 1; j <= len2; j++)
             {
-                int cost = (str1[i - 1] == str2[j - 1]) ? 0 : 1;
+                int cost = str1[i - 1] == str2[j - 1] ? 0 : 1;
 
                 dp[i, j] = Math.Min(
                     Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1),
@@ -766,7 +769,7 @@ internal class CompileCommand : ICompilerCommand
         {
             if (pattern.All(c => char.IsLetter(c) || c == '-'))
             {
-                IEnumerable<string> cmds = ExtensionLoader.Commands.Where(c => !c.Hidden()).Select(c => c.Command.ToLowerInvariant()).Where(c => c.Length > 0).OrderBy(c => Distance(pattern.ToLowerInvariant(), c));
+                IEnumerable<string> cmds = ExtensionLoader.Commands.Where(c => !c.Options.HasFlag(CommandOptions.Hidden)).Select(c => c.Command.ToLowerInvariant()).Where(c => c.Length > 0).OrderBy(c => Distance(pattern.ToLowerInvariant(), c));
                 int dist = int.MaxValue;
 
                 if (cmds.Any())

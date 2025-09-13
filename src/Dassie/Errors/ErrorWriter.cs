@@ -1,6 +1,6 @@
-﻿using Dassie.Cli.Commands;
-using Dassie.Configuration;
+﻿using Dassie.Configuration;
 using Dassie.Configuration.Analysis;
+using Dassie.Core.Commands;
 using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using Dassie.Text.Tooltips;
@@ -198,10 +198,10 @@ public static class ErrorWriter
 
         error.CodePosition = (error.CodePosition.Line + LineNumberOffset, error.CodePosition.Column);
 
-        if (Context.Configuration.IgnoreMessages && (error.Severity == Severity.Information || error.Severity == Severity.BuildLogMessage))
+        if (Context.Configuration.IgnoreAllMessages && (error.Severity == Severity.Information || error.Severity == Severity.BuildLogMessage))
             return;
 
-        if (Context.Configuration.IgnoreWarnings && error.Severity == Severity.Warning)
+        if (Context.Configuration.IgnoreAllWarnings && error.Severity == Severity.Warning)
             return;
 
         if (Context.Configuration.TreatWarningsAsErrors && error.Severity == Severity.Warning)

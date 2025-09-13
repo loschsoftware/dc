@@ -33,6 +33,9 @@ public abstract class Extension : IPackage
     public virtual void Unload() { }
 
     /// <inheritdoc/>
+    public virtual GlobalConfigProperty[] GlobalProperties() => [];
+
+    /// <inheritdoc/>
     public virtual ICompilerCommand[] Commands() => [];
 
     /// <inheritdoc/>

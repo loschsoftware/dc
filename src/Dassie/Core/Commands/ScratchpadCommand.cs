@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration;
+using Dassie.Core.Properties;
 using Dassie.Errors;
 using Dassie.Extensions;
 using System;
@@ -6,10 +7,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using SDProcess = System.Diagnostics.Process;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class ScratchpadCommand : ICompilerCommand
+internal class ScratchpadCommand : CompilerCommand
 {
     /// <summary>
     /// Provides tools for managing and starting "scratchpad" sessions, which allow the user to compile and execute applications using source code from standard input.
@@ -38,7 +40,7 @@ internal class ScratchpadCommand : ICompilerCommand
                 return LoadScratch(args[1]);
 
             if (command == "new" || command.StartsWith("--"))
-                return CompileFromStdIn(args);
+                return CompileFromEditor(args);
 
             return ShowUsage();
         }
@@ -100,6 +102,17 @@ internal class ScratchpadCommand : ICompilerCommand
                 return -1;
             }
 
+            if (EditorProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0259_DCScratchpadLoadDefaultEditor,
+                    $"The command 'load' is not supported if the editor is set to 'default'. Use 'dc config --global core.scratchpad.editor=<Editor>' to set a different editor.",
+                    CompilerExecutableName);
+
+                return -1;
+            }
+
             throw new NotImplementedException("Loading existing scratches is not yet implemented.");
         }
 
@@ -137,21 +150,8 @@ internal class ScratchpadCommand : ICompilerCommand
         /// Allows the user to enter Dassie source code from the console, which will be compiled and executed.
         /// </summary>
         /// <returns>The exit code.</returns>
-        private static int CompileFromStdIn(string[] args)
+        private static int CompileFromEditor(string[] args)
         {
-            if (!Console.IsInputRedirected)
-            {
-                HelpCommand.DisplayLogo();
-                Console.WriteLine();
-                Console.WriteLine("To mark the end of the input, press Ctrl+Z in an empty line and hit Enter.");
-                Console.WriteLine();
-            }
-
-            string src = Console.In.ReadToEnd();
-
-            if (!Console.IsInputRedirected)
-                Console.WriteLine();
-
             string dir = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Dassie", "Scratchpad")).FullName;
             string scratchName = "scratch";
             int lowestAvailableScratchIndex = 0;
@@ -184,7 +184,31 @@ internal class ScratchpadCommand : ICompilerCommand
             }
 
             string file = Path.Combine(dir, "scratch.ds");
-            File.WriteAllText(file, src);
+
+            if (!Console.IsInputRedirected)
+            {
+                HelpCommand.DisplayLogo();
+                Console.WriteLine();
+            }
+
+            if (EditorProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!Console.IsInputRedirected)
+                {
+                    Console.WriteLine("To mark the end of the input, press Ctrl+Z in an empty line and hit Enter.");
+                    Console.WriteLine();
+                }
+
+                File.WriteAllText(file, Console.In.ReadToEnd());
+
+                if (!Console.IsInputRedirected)
+                    Console.WriteLine();
+            }
+            else
+            {
+                File.Create(file).Dispose();
+                SDProcess.Start(EditorProperty.Instance.GetValue().ToString(), Path.GetFullPath(file)).WaitForExit();
+            }
 
             Directory.SetCurrentDirectory(dir);
 
@@ -197,19 +221,19 @@ internal class ScratchpadCommand : ICompilerCommand
 
             if (cfg != null)
             {
-                if (!string.IsNullOrEmpty(cfg.BuildOutputDirectory))
+                if (!string.IsNullOrEmpty(cfg.BuildDirectory))
                 {
-                    if (Directory.Exists(cfg.BuildOutputDirectory))
-                        outDir = cfg.BuildOutputDirectory;
+                    if (Directory.Exists(cfg.BuildDirectory))
+                        outDir = cfg.BuildDirectory;
 
                     else // relative path
-                        outDir = Path.Combine(dir, cfg.BuildOutputDirectory);
+                        outDir = Path.Combine(dir, cfg.BuildDirectory);
 
                     asm = Path.Combine(outDir, Path.ChangeExtension(file, "dll"));
                 }
 
-                if (!string.IsNullOrEmpty(cfg.AssemblyName))
-                    asm = Path.Combine(outDir, $"{cfg.AssemblyName}.dll");
+                if (!string.IsNullOrEmpty(cfg.AssemblyFileName))
+                    asm = Path.Combine(outDir, $"{cfg.AssemblyFileName}.dll");
             }
 
             if (File.Exists(asm) && !Messages.Any(e => e.Severity == Severity.Error))
@@ -222,7 +246,7 @@ internal class ScratchpadCommand : ICompilerCommand
                     WindowStyle = ProcessWindowStyle.Normal
                 };
 
-                Process.Start(psi).WaitForExit();
+                SDProcess.Start(psi).WaitForExit();
             }
 
             return result;
@@ -242,13 +266,14 @@ internal class ScratchpadCommand : ICompilerCommand
     private static ScratchpadCommand _instance;
     public static ScratchpadCommand Instance => _instance ??= new();
 
-    public string Command => "scratchpad";
+    public override string Command => "scratchpad";
 
-    public string Description => "Allows compiling and running Dassie source code from standard input.";
+    public override string Description => "Allows compiling and running Dassie source code from standard input.";
 
-    public List<string> Aliases() => ["sp"];
+    public override List<string> Aliases => ["sp"];
 
-    public CommandHelpDetails HelpDetails()
+    public override CommandHelpDetails HelpDetails => GetHelpDetails();
+    private static CommandHelpDetails GetHelpDetails()
     {
         StringBuilder commandsSb = new();
         commandsSb.Append($"{"    new [Options]",-35}{HelpCommand.FormatLines("Creates a new scratch.", indentWidth: 35)}");
@@ -283,7 +308,7 @@ internal class ScratchpadCommand : ICompilerCommand
                 ("dc scratchpad clear", "Deletes all saved scratches.")
             ]
         };
-    } 
+    }
 
-    public int Invoke(string[] args) => Scratchpad.HandleScratchpadCommands(args);
+    public override int Invoke(string[] args) => Scratchpad.HandleScratchpadCommands(args);
 }

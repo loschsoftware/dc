@@ -3,18 +3,18 @@ using Dassie.Configuration.Macros;
 using Dassie.Configuration.ProjectGroups;
 using Dassie.Extensions;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class CleanCommand : ICompilerCommand
+internal class CleanCommand : CompilerCommand
 {
     private static CleanCommand _instance;
     public static CleanCommand Instance => _instance ??= new();
 
-    public string Command => "clean";
+    public override string Command => "clean";
 
-    public string Description => "Clears build artifacts and temporary files of a project or project group.";
+    public override string Description => "Clears build artifacts and temporary files of a project or project group.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage = ["dc clean"],
@@ -26,7 +26,7 @@ internal class CleanCommand : ICompilerCommand
         ]
     };
 
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
         if (args.Length > 0)
         {
@@ -94,8 +94,8 @@ internal class CleanCommand : ICompilerCommand
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
 
-        if (Directory.Exists(config.BuildOutputDirectory))
-            Directory.Delete(config.BuildOutputDirectory, true);
+        if (Directory.Exists(config.BuildDirectory))
+            Directory.Delete(config.BuildDirectory, true);
 
         if (Directory.Exists(TemporaryBuildDirectoryName))
             Directory.Delete(TemporaryBuildDirectoryName, true);

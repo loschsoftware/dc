@@ -48,7 +48,7 @@ public sealed class DassieConfig
 
     [Description("Sets the name of the ouput assembly (without file extension).")]
     [XmlElement("AssemblyFileName")]
-    public string AssemblyName { get; set; }
+    public string AssemblyFileName { get; set; }
 
     [Description("Sets the application type and subsystem of the program.")]
     [XmlElement("ApplicationType")]
@@ -82,22 +82,22 @@ public sealed class DassieConfig
     [Description("Sets the directory where the compiled assemblies will be placed.")]
     [XmlElement("BuildDirectory")]
     [DefaultValue("./build")]
-    public string BuildOutputDirectory { get; set; } = "./build";
+    public string BuildDirectory { get; set; } = "./build";
 
     [Description("Toggles generation of debug symbol data.")]
     [DefaultValue(false)]
     [XmlElement("EmitPdb")]
-    public bool CreatePdb { get; set; }
+    public bool EmitPdb { get; set; }
 
     [Description("If set, all 'information' messages are ignored.")]
     [DefaultValue(false)]
     [XmlElement("IgnoreAllMessages")]
-    public bool IgnoreMessages { get; set; }
+    public bool IgnoreAllMessages { get; set; }
 
     [Description("If set, all 'warning' messages are ignored.")]
     [DefaultValue(false)]
     [XmlElement("IgnoreAllWarnings")]
-    public bool IgnoreWarnings { get; set; }
+    public bool IgnoreAllWarnings { get; set; }
 
     [Description("If set, all 'warning' messages will be treated as errors.")]
     [DefaultValue(false)]
@@ -162,7 +162,7 @@ public sealed class DassieConfig
     [Description("A list of log devices to write build messages to.")]
     [DefaultValue(null)]
     [XmlElement("BuildLogDevices")]
-    public BuildLogOptions BuildLogOptions { get; set; }
+    public BuildLogOptions BuildLogDevices { get; set; }
 
     [Description("If set, generates CIL files in human-readable form.")]
     [DefaultValue(false)]

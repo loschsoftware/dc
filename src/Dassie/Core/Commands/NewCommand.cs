@@ -1,18 +1,18 @@
 ﻿using Dassie.Extensions;
 using Dassie.Templates;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class NewCommand : ICompilerCommand
+internal class NewCommand : CompilerCommand
 {
     private static NewCommand _instance;
     public static NewCommand Instance => _instance ??= new();
 
-    public string Command => "new";
+    public override string Command => "new";
 
-    public string Description => "Creates the file structure of a Dassie project.";
+    public override string Description => "Creates the file structure of a Dassie project.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage =
@@ -36,5 +36,5 @@ internal class NewCommand : ICompilerCommand
         ]
     };
 
-    public int Invoke(string[] args) => TemplateBuilder.CreateStructure(args);
+    public override int Invoke(string[] args) => TemplateBuilder.CreateStructure(args);
 }

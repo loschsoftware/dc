@@ -27,9 +27,9 @@ internal class ConsoleProject : IProjectTemplate
             srcDir,
             new ProjectFile() {
                 Content = new() {
-                    BuildOutputDirectory = "./build",
+                    BuildDirectory = "./build",
                     RootNamespace = "$(ProjectName)",
-                    AssemblyName = "$(ProjectName)"
+                    AssemblyFileName = "$(ProjectName)"
                 }
             }
         ];

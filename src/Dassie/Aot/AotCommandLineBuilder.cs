@@ -42,8 +42,8 @@ internal class AotCommandLineBuilder
         _tempOutputDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), TemporaryBuildDirectoryName, AotBuildDirectoryName)).FullName;
         _outputDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), AotBuildDirectoryName)).FullName;
 
-        _objectFile = Path.Combine(_tempOutputDirectory, $"{_config.Config.AssemblyName}.obj");
-        _exportsFile = Path.Combine(_tempOutputDirectory, $"{_config.Config.AssemblyName}.def");
+        _objectFile = Path.Combine(_tempOutputDirectory, $"{_config.Config.AssemblyFileName}.obj");
+        _exportsFile = Path.Combine(_tempOutputDirectory, $"{_config.Config.AssemblyFileName}.def");
 
         _os = _config.Config.RuntimeIdentifier.Split('-')[0];
         _architecture = _config.Config.RuntimeIdentifier.Split('-')[1];
@@ -80,7 +80,7 @@ internal class AotCommandLineBuilder
     {
         // The input .NET executable to compile
         //string inputFile = Path.Combine(Path.GetFullPath(_config.Config.BuildOutputDirectory), $"{_config.Config.AssemblyName}.dll");
-        string inputFile = Path.Combine(Directory.GetCurrentDirectory(), $"{_config.Config.AssemblyName}.dll");
+        string inputFile = Path.Combine(Directory.GetCurrentDirectory(), $"{_config.Config.AssemblyFileName}.dll");
 
         _arglistBuilder.AppendLine($"\"{inputFile}\"");
         _arglistBuilder.AppendLine($"-o:\"{_objectFile}\"");
@@ -218,7 +218,7 @@ internal class AotCommandLineBuilder
     private void AddLinkerFileSpecificArguments()
     {
         _linkerArglistBuilder.AppendLine($"\"{_objectFile}\"");
-        _linkerArglistBuilder.AppendLine($"/OUT:\"{Path.Combine(_outputDirectory, $"{_config.Config.AssemblyName}{(_os == "win" ? ".exe" : "")}")}\"");
+        _linkerArglistBuilder.AppendLine($"/OUT:\"{Path.Combine(_outputDirectory, $"{_config.Config.AssemblyFileName}{(_os == "win" ? ".exe" : "")}")}\"");
         _linkerArglistBuilder.AppendLine($"/DEF:\"{_exportsFile}\"");
     }
 

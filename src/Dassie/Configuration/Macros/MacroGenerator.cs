@@ -11,7 +11,7 @@ internal static class MacroGenerator
 
         macros.Add("projectdir", Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)) + Path.DirectorySeparatorChar);
         macros.Add("projectname", Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)).Split(Path.DirectorySeparatorChar).Last());
-        macros.Add("outputdir", Path.GetFullPath(cfg.BuildOutputDirectory ?? Directory.GetCurrentDirectory()) + Path.DirectorySeparatorChar);
+        macros.Add("outputdir", Path.GetFullPath(cfg.BuildDirectory ?? Directory.GetCurrentDirectory()) + Path.DirectorySeparatorChar);
 
         if (cfg.MacroDefinitions != null)
         {

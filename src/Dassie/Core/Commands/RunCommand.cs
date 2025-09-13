@@ -9,19 +9,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using SDProcess = System.Diagnostics.Process;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class RunCommand : ICompilerCommand
+internal class RunCommand : CompilerCommand
 {
     private static RunCommand _instance;
     public static RunCommand Instance => _instance ??= new();
 
-    public string Command => "run";
+    public override string Command => "run";
 
-    public string Description => "Automatically compiles using the default profile and then runs the output executable with the specified arguments.";
+    public override string Description => "Automatically compiles using the default profile and then runs the output executable with the specified arguments.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage =
@@ -44,7 +45,7 @@ internal class RunCommand : ICompilerCommand
         ]
     };
 
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
         string[] _args = args;
         string profile = null;
@@ -89,8 +90,8 @@ internal class RunCommand : ICompilerCommand
             FileName = process,
             Arguments = arglist
         };
-
-        Process.Start(psi).WaitForExit();
+        
+        SDProcess.Start(psi).WaitForExit();
         return 0;
     }
 
@@ -154,12 +155,12 @@ internal class RunCommand : ICompilerCommand
             }
 
             string assemblyName = Directory.GetCurrentDirectory().Split(Path.DirectorySeparatorChar).Last();
-            if (!string.IsNullOrEmpty(config.AssemblyName))
-                assemblyName = config.AssemblyName;
+            if (!string.IsNullOrEmpty(config.AssemblyFileName))
+                assemblyName = config.AssemblyFileName;
 
             string dir = Path.Combine(Directory.GetCurrentDirectory(), "build");
-            if (!string.IsNullOrEmpty(config.BuildOutputDirectory))
-                dir = config.BuildOutputDirectory;
+            if (!string.IsNullOrEmpty(config.BuildDirectory))
+                dir = config.BuildDirectory;
 
             if (config.Runtime == Configuration.Runtime.Aot)
             {

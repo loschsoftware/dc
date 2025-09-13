@@ -5,22 +5,19 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class VersionCommand : ICompilerCommand
+internal class VersionCommand : CompilerCommand
 {
     private static VersionCommand _instance;
     public static VersionCommand Instance => _instance ??= new();
 
-    public string Command => "--version";
+    public override string Command => "--version";
+    public override List<string> Aliases => ["-v", "--env", "--environment"];
+    public override CommandOptions Options => CommandOptions.Hidden | CommandOptions.NoHelpRouting;
+    public override string Description => "";
 
-    public List<string> Aliases() => ["-v", "--env", "--environment"];
-
-    public bool Hidden() => true;
-
-    public string Description => "";
-
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
         StringBuilder output = new();
 
@@ -66,19 +63,16 @@ output.AppendLine("AOT, statically linked");
     }
 }
 
-internal class IdCommand : ICompilerCommand
+internal class IdCommand : CompilerCommand
 {
     private static IdCommand _instance;
     public static IdCommand Instance => _instance ??= new();
 
-    public string Command => "--build-id";
+    public override string Command => "--build-id";
+    public override string Description => "";
+    public override CommandOptions Options => CommandOptions.Hidden | CommandOptions.NoHelpRouting;
 
-    public bool Hidden() => true;
-
-    public string UsageString => "";
-    public string Description => "";
-
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
         Version v = Assembly.GetExecutingAssembly().GetName().Version;
         Version version = new(v.Major, v.Minor, v.Build - 8517);

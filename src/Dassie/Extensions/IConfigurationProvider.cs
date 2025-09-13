@@ -10,10 +10,10 @@ public interface IConfigurationProvider
     /// <summary>
     /// The name of the configuration provider.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; }
 
     /// <summary>
     /// The project configuration encapsulated by this configuration provider.
     /// </summary>
-    public DassieConfig Configuration { get; set; }
+    public DassieConfig Configuration { get; }
 }

@@ -1,20 +1,20 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using Dassie.Debug;
+using Dassie.Core.Commands;
 using Dassie.Extensions;
 using Dassie.Parser;
 using System;
 using System.Linq;
 using System.Text;
 
-namespace Dassie.Debug
+namespace Dassie.Core.Commands
 {
     internal class DebugException(string message) : Exception(message) { }
 }
 
 namespace Dassie.Cli.Commands
 {
-    internal class DbgCommand : ICompilerCommand
+    internal class DbgCommand : CompilerCommand
     {
         internal class ParseTreePrinter
         {
@@ -45,12 +45,12 @@ namespace Dassie.Cli.Commands
         private static DbgCommand _instance;
         public static DbgCommand Instance => _instance ??= new();
 
-        public string Command => "dbg";
+        public override string Command => "dbg";
 
-        public string Description => "Commands used for debugging and testing the compiler. To be used by compiler developers.";
-        public bool Hidden() => true;
+        public override string Description => "Commands used for debugging and testing the compiler. To be used by compiler developers.";
+        public override CommandOptions Options => CommandOptions.Hidden;
 
-        public int Invoke(string[] args)
+        public override int Invoke(string[] args)
         {
             if (args == null || args.Length == 0)
             {

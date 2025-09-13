@@ -1,13 +1,15 @@
-﻿using Dassie.Configuration.Subsystems;
+﻿using Dassie.Cli.Commands;
+using Dassie.Configuration.Subsystems;
+using Dassie.Core.Commands;
+using Dassie.Core.Properties;
 using Dassie.Deployment;
 using Dassie.Errors.Devices;
 using Dassie.Extensions;
 using Dassie.Meta.Directives;
 using Dassie.Templates;
-using System.Linq;
 using System.Reflection;
 
-namespace Dassie;
+namespace Dassie.Core;
 
 /// <summary>
 /// Acts as an extension package for all builtin commands, project templates, build log devices and compiler directives.
@@ -27,11 +29,31 @@ internal class CorePackage : IPackage
         Version = Assembly.GetCallingAssembly().GetName().Version
     };
 
-    private ICompilerCommand[] _commands;
-    public ICompilerCommand[] Commands() => _commands ??= [..Assembly.GetExecutingAssembly().GetTypes()
-        .Where(t => t.GetInterfaces().Contains(typeof(ICompilerCommand)))
-        .Select(t => t.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null))
-        .Cast<ICompilerCommand>()];
+    public ICompilerCommand[] Commands() =>
+    [
+        AnalyzeCommand.Instance,
+        BuildCommand.Instance,
+        CleanCommand.Instance,
+        CompileCommand.Instance,
+        ConfigCommand.Instance,
+        DbgCommand.Instance,
+        DeployCommand.Instance,
+        HelpCommand.Instance,
+        IdCommand.Instance,
+        NewCommand.Instance,
+        PackageCommand.Instance,
+        RunCommand.Instance,
+        ScratchpadCommand.Instance,
+        TestCommand.Instance,
+        VersionCommand.Instance,
+        WatchCommand.Instance,
+        WatchIndefinetlyCommand.Instance
+    ];
+
+    public GlobalConfigProperty[] GlobalProperties() =>
+    [
+        EditorProperty.Instance
+    ];
 
     public IProjectTemplate[] ProjectTemplates() => [LibraryProject.Instance, ConsoleProject.Instance];
 

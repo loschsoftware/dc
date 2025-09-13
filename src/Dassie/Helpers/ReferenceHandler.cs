@@ -1,5 +1,5 @@
-﻿using Dassie.Cli.Commands;
-using Dassie.Configuration;
+﻿using Dassie.Configuration;
+using Dassie.Core.Commands;
 using Dassie.Errors.Devices;
 using Dassie.Packages;
 using System;
@@ -104,7 +104,7 @@ internal static class ReferenceHandler
         if (errCode != 0)
             return false;
 
-        if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.AssemblyName))
+        if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.AssemblyFileName))
         {
             EmitErrorMessage(
                 0, 0, 0,
@@ -115,7 +115,7 @@ internal static class ReferenceHandler
             return false;
         }
 
-        if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildOutputDirectory) && reference.CopyToOutput)
+        if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildDirectory) && reference.CopyToOutput)
         {
             EmitErrorMessage(
                 0, 0, 0,
@@ -126,10 +126,10 @@ internal static class ReferenceHandler
             return false;
         }
 
-        string outFile = $"{ProjectFileDeserializer.DassieConfig.AssemblyName}.dll";
+        string outFile = $"{ProjectFileDeserializer.DassieConfig.AssemblyFileName}.dll";
 
-        if (!string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildOutputDirectory))
-            outFile = Path.Combine(ProjectFileDeserializer.DassieConfig.BuildOutputDirectory, outFile);
+        if (!string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildDirectory))
+            outFile = Path.Combine(ProjectFileDeserializer.DassieConfig.BuildDirectory, outFile);
 
         if (!reference.CopyToOutput)
         {

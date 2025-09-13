@@ -3,24 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using SDProcess = System.Diagnostics.Process;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class WatchCommand : ICompilerCommand
+internal class WatchCommand : CompilerCommand
 {
     private static WatchCommand _instance;
     public static WatchCommand Instance => _instance ??= new();
+    
+    internal static SDProcess watchProcess = null;
 
-    internal static Process watchProcess = null;
+    public override string Command => "watch";
 
-    public string Command => "watch";
+    public override string Description => "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.";
 
-    public string Description => "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.";
+    public override List<string> Aliases => ["auto"];
 
-    public List<string> Aliases() => ["auto"];
-
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.",
         Usage =
@@ -28,26 +30,31 @@ internal class WatchCommand : ICompilerCommand
             "dc watch",
             "dc watch -c|--command <Command>",
             "dc watch -p|--profile <Profile>",
-            "dc watch <Directory>"
+            "dc watch <Directory>",
+            "dc watch --quit"
         ],
-        Remarks = "Use the 'dc quit' command to stop all file watchers.",
         Options =
         [
             ("-c|--command <Command>", "Specifies the compiler command that is executed when files are changed. The default value is 'build'."),
             ("-p|--profile <Profile>", "Specifies the build profile that is used when files are changed. If this option is set, the '--command' option cannot be used."),
-            ("<Directory>", "Specifies the directory that is watched for changed source files. Cannot be combined with the '--command' and '--profile' options.")
+            ("<Directory>", "Specifies the directory that is watched for changed source files. Cannot be combined with the '--command' and '--profile' options."),
+            ("--quit", "Stops all currently running watchers.")
         ],
         Examples =
         [
             ("dc watch", "Watches all .ds files in the current directory and its subdirectories and automatically recompiles using the default build profile when files are changed."),
             ("dc watch -c run", "Watches all .ds files in the current directory and its subdirectories and automatically executes the 'dc run' command when files are changed."),
             ("dc watch -p CustomProfile", "Watches all .ds files in the current directory and its subdirectories and automatically recompiles using the 'CustomProfile' build profile when files are changed."),
-            ("dc watch ./src", "Watches all .ds files in the './src' directory and its subdirectories and automatically recompiles using the default build profile when files are changed.")
+            ("dc watch ./src", "Watches all .ds files in the './src' directory and its subdirectories and automatically recompiles using the default build profile when files are changed."),
+            ("dc watch --quit", "Stops all file watchers.")
         ]
     };
 
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
+        if (args.Contains("--quit"))
+            return Quit(args.Except(["--quit"]).ToArray());
+
         bool error = false;
         string command = "";
         string profile = "";
@@ -164,12 +171,12 @@ internal class WatchCommand : ICompilerCommand
         LogOut.Write("Watching file changes. Use ");
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("dc quit");
+        LogOut.Write("dc watch --quit");
         Console.ForegroundColor = ConsoleColor.Gray;
 
         LogOut.WriteLine(" to stop watching changes.");
-
-        watchProcess = new Process();
+        
+        watchProcess = new SDProcess();
 #if STANDALONE
         watchProcess.StartInfo.FileName = $"{Environment.GetCommandLineArgs()[0]}";
         watchProcess.StartInfo.Arguments = $"watch-indefinetly {processArgs}";
@@ -210,7 +217,7 @@ internal class WatchCommand : ICompilerCommand
 
         void Compile(object sender, FileSystemEventArgs e)
         {
-            var buildProcess = new Process();
+            var buildProcess = new SDProcess();
 #if STANDALONE
                 buildProcess.StartInfo.FileName = cmd.Split(' ')[0];
                 buildProcess.StartInfo.Arguments = cmd.Split(' ')[1];
@@ -225,5 +232,42 @@ internal class WatchCommand : ICompilerCommand
 
         while (true)
             watcher.WaitForChanged(WatcherChangeTypes.All);
+    }
+
+    private static int Quit(string[] args)
+    {
+        if (args.Length > 0)
+        {
+            foreach (string arg in args)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0212_UnexpectedArgument,
+                    $"Unexpected argument '{arg}'.",
+                    CompilerExecutableName);
+            }
+
+            return -1;
+        }
+
+        SDProcess[] processes = SDProcess.GetProcesses();
+
+        string pidFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "pid.txt");
+        if (!File.Exists(pidFilePath))
+        {
+            LogOut.WriteLine("No file watchers running.");
+            return 0;
+        }
+
+        File.ReadAllLines(pidFilePath).Select(int.Parse).ToList().ForEach(i =>
+        {
+            if (processes.Any(p => p.Id == i))
+                SDProcess.GetProcessById(i).Kill();
+        });
+
+        File.Delete(pidFilePath);
+
+        LogOut.WriteLine("No longer watching file changes.");
+        return 0;
     }
 }

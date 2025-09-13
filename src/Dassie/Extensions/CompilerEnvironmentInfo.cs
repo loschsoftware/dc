@@ -1,6 +1,8 @@
 ﻿using Dassie.Configuration;
+using Dassie.Configuration.Global;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dassie.Extensions;
 
@@ -17,4 +19,10 @@ internal class CompilerEnvironmentInfo : IEnvironmentInfo
 
     /// <inheritdoc/>
     public IEnumerable<IPackage> InstalledExtensions() => ExtensionsFunc();
+
+    /// <inheritdoc/>
+    public Dictionary<string, object> GlobalConfiguration()
+    {
+        return GlobalConfigManager.Properties.Select(t => new KeyValuePair<string, object>(t.Key, t.Value)).ToDictionary();
+    }
 }

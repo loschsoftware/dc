@@ -6,18 +6,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class TestCommand : ICompilerCommand
+internal class TestCommand : CompilerCommand
 {
     private static TestCommand _instance;
     public static TestCommand Instance => _instance ??= new();
 
-    public string Command => "test";
+    public override string Command => "test";
 
-    public string Description => "Runs unit tests defined for the current project or project group.";
+    public override string Description => "Runs unit tests defined for the current project or project group.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage = ["dc test [(-a|--assembly)=<Assembly>] [(-m|--module)=<Module>] [--failed]"],
@@ -39,7 +39,7 @@ internal class TestCommand : ICompilerCommand
         ]
     };
 
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
         string assemblyPath;
         string projectName;

@@ -11,18 +11,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class AnalyzeCommand : ICompilerCommand
+internal class AnalyzeCommand : CompilerCommand
 {
     private static AnalyzeCommand _instance;
     public static AnalyzeCommand Instance => _instance ??= new();
 
-    public string Command => "analyze";
+    public override string Command => "analyze";
 
-    public string Description => "Runs code analyzers on the current project or on a list of source files.";
+    public override string Description => "Runs code analyzers on the current project or on a list of source files.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage =
@@ -53,7 +53,7 @@ internal class AnalyzeCommand : ICompilerCommand
         ]
     };
 
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
         IEnumerable<string> files = args.Where(File.Exists);
         string analyzerName = null;

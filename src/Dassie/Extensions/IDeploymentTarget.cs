@@ -10,7 +10,7 @@ public interface IDeploymentTarget
     /// <summary>
     /// The name of the deployment target.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; }
 
     /// <summary>
     /// The method called when the deployment target is executed.

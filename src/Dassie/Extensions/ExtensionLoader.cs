@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
+using Dassie.Core;
 using Dassie.Errors.Devices;
 using NuGet.Packaging;
 using System;
@@ -44,6 +45,9 @@ internal static class ExtensionLoader
         }
     }
 
+    private static IEnumerable<GlobalConfigProperty> _gloablConfigProperties = [];
+    public static IEnumerable<GlobalConfigProperty> GlobalConfigProperties => _gloablConfigProperties;
+
     private static IEnumerable<ICompilerCommand> _commands = [];
     public static IEnumerable<ICompilerCommand> Commands => _commands;
 
@@ -73,6 +77,7 @@ internal static class ExtensionLoader
 
     private static void Update(object sender, NotifyCollectionChangedEventArgs e)
     {
+        _gloablConfigProperties = InstalledExtensions.SelectMany(p => p.GlobalProperties());
         _commands = InstalledExtensions.SelectMany(p => p.Commands());
         _configurationProviders = InstalledExtensions.SelectMany(p => p.ConfigurationProviders());
         _codeAnalyzers = InstalledExtensions.SelectMany(p => p.CodeAnalyzers());
@@ -108,7 +113,7 @@ internal static class ExtensionLoader
                 else
                     seenCommands[cmd.Command] = (cmd, package);
 
-                foreach (string alias in cmd.Aliases() ?? [])
+                foreach (string alias in cmd.Aliases ?? [])
                 {
                     if (seenCommands.TryGetValue(alias, out existing))
                     {

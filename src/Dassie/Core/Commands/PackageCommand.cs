@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Tree;
+using Dassie.Cli;
 using Dassie.CodeAnalysis;
 using Dassie.Extensions;
 using Dassie.Extensions.Web;
@@ -12,18 +13,19 @@ using System.Text;
 #pragma warning disable IDE0079
 #pragma warning disable IL3000
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class PackageCommand : ICompilerCommand
+internal class PackageCommand : CompilerCommand
 {
     private static PackageCommand _instance;
     public static PackageCommand Instance => _instance ??= new();
 
-    public string Command => "package";
+    public override string Command => "package";
 
-    public string Description => "Manages compiler extensions.";
+    public override string Description => "Manages compiler extensions.";
 
-    public CommandHelpDetails HelpDetails()
+    public override CommandHelpDetails HelpDetails => GetHelpDetails();
+    private static CommandHelpDetails GetHelpDetails()
     {
         StringBuilder commandsSb = new();
         commandsSb.Append($"{"    list",-35}{HelpCommand.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
@@ -57,7 +59,7 @@ internal class PackageCommand : ICompilerCommand
         };
     }
 
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
         args ??= [];
 

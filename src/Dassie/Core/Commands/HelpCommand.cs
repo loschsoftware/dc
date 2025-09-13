@@ -1,4 +1,5 @@
-﻿using Dassie.Configuration;
+﻿using Dassie.Cli;
+using Dassie.Configuration;
 using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
@@ -6,22 +7,23 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class HelpCommand : ICompilerCommand
+internal class HelpCommand : CompilerCommand
 {
     private static HelpCommand _instance;
     public static HelpCommand Instance => _instance ??= new();
 
-    public string Command => "help";
+    public override string Command => "help";
 
-    public List<string> Aliases() => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
+    public override List<string> Aliases => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
 
-    public string Description => "Lists all available commands and shows help for specific commands or compiler features.";
+    public override string Description => "Lists all available commands and shows help for specific commands or compiler features.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = "Shows a list of available commands or advanced information about a specific command or topic.",
         Usage =
@@ -47,13 +49,10 @@ internal class HelpCommand : ICompilerCommand
         ],
     };
 
-    public int Invoke(string[] args)
+    public override int Invoke(string[] args)
     {
-        if (args.Any(a => !a.StartsWith('-')))
-        {
-            if (CommandHandler.TryInvoke(args.First(a => !a.StartsWith('-')), ["--help"], out int exit))
-                return exit;
-        }
+        if (args != null && args.Length > 0 && ExtensionLoader.Commands.Any(c => c.Command == args[0] || c.Aliases.Any(a => a == args[0])))
+            return DisplayHelpForCommand(ExtensionLoader.Commands.First(c => c.Command == args[0] || c.Aliases.Any(a => a == args[0])));
 
         return DisplayHelpMessage(args);
     }
@@ -109,7 +108,7 @@ internal class HelpCommand : ICompilerCommand
         return sb.ToString();
     }
 
-    private static string GetPropertyTypeName(Type t)
+    internal static string GetPropertyTypeName(Type t)
     {
         if (t == typeof(bool))
             return "Bool";
@@ -121,10 +120,10 @@ internal class HelpCommand : ICompilerCommand
             return "Int";
 
         if (t.IsArray)
-            return $"List<{GetPropertyTypeName(t.GetElementType())}>";
+            return $"List[{GetPropertyTypeName(t.GetElementType())}]";
 
         if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))
-            return $"List<{GetPropertyTypeName(t.GetGenericArguments().First())}>";
+            return $"List[{GetPropertyTypeName(t.GetGenericArguments().First())}]";
 
         if (t.IsEnum)
             return "Enum";
@@ -161,7 +160,7 @@ internal class HelpCommand : ICompilerCommand
                 commands = commands.Where(c => c.GetType().Assembly == Assembly.GetExecutingAssembly());
 
             if (!args.Contains("--show-hidden"))
-                commands = commands.Where(c => !c.Hidden());
+                commands = commands.Where(c => !c.Options.HasFlag(CommandOptions.Hidden));
 
             LogOut.WriteLine(string.Join(',', commands.Select(c => c.Command).OrderBy(c => c)));
             return 0;
@@ -249,10 +248,10 @@ internal class HelpCommand : ICompilerCommand
         sb.AppendLine();
         sb.AppendLine("Commands:");
 
-        IEnumerable<ICompilerCommand> internalCommands = ExtensionLoader.Commands.OrderBy(c => c.Command).Where(c => !c.Hidden()
+        IEnumerable<ICompilerCommand> internalCommands = ExtensionLoader.Commands.OrderBy(c => c.Command).Where(c => !c.Options.HasFlag(CommandOptions.Hidden)
             && c.GetType().Assembly == Assembly.GetExecutingAssembly());
 
-        IEnumerable<ICompilerCommand> externalCommands = ExtensionLoader.Commands.Where(c => !c.Hidden()).Except(internalCommands);
+        IEnumerable<ICompilerCommand> externalCommands = ExtensionLoader.Commands.Where(c => !c.Options.HasFlag(CommandOptions.Hidden)).Except(internalCommands);
 
         foreach (ICompilerCommand command in internalCommands)
         {
@@ -275,7 +274,7 @@ internal class HelpCommand : ICompilerCommand
 
     public static int DisplayHelpForCommand(ICompilerCommand command)
     {
-        if (command.HelpDetails() == null)
+        if (command.HelpDetails == null)
         {
             DisplayLogo();
             LogOut.WriteLine();
@@ -283,14 +282,14 @@ internal class HelpCommand : ICompilerCommand
             return 0;
         }
 
-        CommandHelpDetails hd = command.HelpDetails();
+        CommandHelpDetails hd = command.HelpDetails;
         StringBuilder sb = new();
 
         sb.AppendLine();
         sb.AppendLine($"dc {command.Command}: {(string.IsNullOrEmpty(hd.Description) ? command.Description : hd.Description)}");
 
-        if (command.Aliases() != null && command.Aliases().Count > 0)
-            sb.AppendLine($"Alias{(command.Aliases().Count > 1 ? "es" : "")}: {(command.Aliases().Count == 1 ? command.Aliases().Single() : string.Join(", ", command.Aliases()))}");
+        if (command.Aliases != null && command.Aliases.Count > 0)
+            sb.AppendLine($"Alias{(command.Aliases.Count > 1 ? "es" : "")}: {(command.Aliases.Count == 1 ? command.Aliases.Single() : string.Join(", ", command.Aliases))}");
 
         sb.AppendLine();
 

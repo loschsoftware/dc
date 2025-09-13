@@ -15,6 +15,12 @@ public interface IEnvironmentInfo
     public DassieConfig Configuration();
 
     /// <summary>
+    /// Retrieves the full set of global configuration properties with their current values.
+    /// </summary>
+    /// <returns>A dictionary matching every global property with its value.</returns>
+    public Dictionary<string, object> GlobalConfiguration();
+
+    /// <summary>
     /// Retrieves the currently loaded extension packages.
     /// </summary>
     /// <returns>An enumerable of compiler extensions that are currently loaded.</returns>

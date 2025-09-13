@@ -5,18 +5,18 @@ using Dassie.Extensions;
 using System.Linq;
 using System.Xml;
 
-namespace Dassie.Cli.Commands;
+namespace Dassie.Core.Commands;
 
-internal class DeployCommand : ICompilerCommand
+internal class DeployCommand : CompilerCommand
 {
     private static DeployCommand _instance;
     public static DeployCommand Instance => _instance ??= new();
 
-    public string Command => "deploy";
+    public override string Command => "deploy";
 
-    public string Description => "Builds and deploys a project group.";
+    public override string Description => "Builds and deploys a project group.";
 
-    public CommandHelpDetails HelpDetails() => new()
+    public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage = ["dc deploy [--ignore-missing] [--fail-fast] [Options]"],
@@ -36,7 +36,7 @@ internal class DeployCommand : ICompilerCommand
         ]
     };
 
-    public int Invoke(string[] args) => Deploy(args, Directory.GetCurrentDirectory(), false);
+    public override int Invoke(string[] args) => Deploy(args, Directory.GetCurrentDirectory(), false);
 
     private static int Deploy(string[] args, string baseDir, bool noDeleteTempDirectory)
     {

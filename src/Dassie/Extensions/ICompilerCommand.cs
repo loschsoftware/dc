@@ -13,26 +13,26 @@ public interface ICompilerCommand
     public string Command { get; }
 
     /// <summary>
-    /// A list of alternative command names.
-    /// </summary>
-    public virtual List<string> Aliases() => [];
-
-    /// <summary>
     /// A short description of the command.
     /// </summary>
     public string Description { get; }
 
     /// <summary>
+    /// A list of alternative command names.
+    /// </summary>
+    public virtual List<string> Aliases => [];
+
+    /// <summary>
     /// Represents the information displayed on the command's help page.
     /// </summary>
     /// <returns>Returns <see langword="null"/> by default.</returns>
-    public virtual CommandHelpDetails HelpDetails() => null;
+    public virtual CommandHelpDetails HelpDetails => null;
 
     /// <summary>
-    /// Determines wheter or not the command is hidden, which makes it not visible on the help page.
+    /// Advanced options regarding the command within the command loading system.
     /// </summary>
-    /// <returns>Returns <see langword="false"/> by default.</returns>
-    public virtual bool Hidden() => false;
+    /// <returns>The options specified for the command.</returns>
+    public virtual CommandOptions Options => CommandOptions.None;
 
     /// <summary>
     /// The method that is executed when the command is invoked.

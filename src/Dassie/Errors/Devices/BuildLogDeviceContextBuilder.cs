@@ -22,10 +22,10 @@ internal static class BuildLogDeviceContextBuilder
         IEnumerable<IBuildLogDevice> availableDevices = ExtensionLoader.BuildLogDevices;
         List<IBuildLogDevice> devices = [TextWriterBuildLogDevice.Instance];
 
-        if (config.BuildLogOptions == null)
+        if (config.BuildLogDevices == null)
             return;
 
-        foreach (XmlElement element in config.BuildLogOptions.Elements)
+        foreach (XmlElement element in config.BuildLogDevices.Elements)
         {
             var loc = XmlLocationService.GetElementLocation(configPath, "BuildLogDevices");
             string deviceName = element.Name;

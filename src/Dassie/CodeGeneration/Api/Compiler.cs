@@ -37,7 +37,7 @@ public static class Compiler
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
     public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, string outputPath, ISubsystem type, DassieConfig config = null)
     {
-        config.AssemblyName = outputPath;
+        config.AssemblyFileName = outputPath;
         config.ApplicationType = type.Name;
 
         return CompileSource(sourceFiles, config ?? new());
@@ -83,11 +83,11 @@ public static class Compiler
         if (imports != null)
             Context.GlobalImports.AddRange(imports);
 
-        if (string.IsNullOrEmpty(config.AssemblyName))
-            config.AssemblyName = "program";
+        if (string.IsNullOrEmpty(config.AssemblyFileName))
+            config.AssemblyFileName = "program";
 
         Context.FilePaths.AddRange(documents.Select(d => d.Name));
-        AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyName) ? Path.GetFileNameWithoutExtension(documents.First().Name) : config.AssemblyName);
+        AssemblyName name = new(string.IsNullOrEmpty(config.AssemblyFileName) ? Path.GetFileNameWithoutExtension(documents.First().Name) : config.AssemblyFileName);
         //PersistedAssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, PersistedAssemblyBuilderAccess.RunAndSave);
         PersistedAssemblyBuilder ab = new(name, typeof(object).Assembly);
 
