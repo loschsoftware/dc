@@ -20,7 +20,7 @@ Compiler extensions can be loaded in one of two modes:
 ``IPackage`` contains the virtual methods [``InitializeGlobal``](../src/Dassie/Extensions/IPackage.cs#L34) and [``InitializeTransient``](../src/Dassie/Extensions/IPackage.cs#L43) that can be overridden to implement custom behavior when the extension is loaded. Similarly, the [``Unload``](../src/Dassie/Extensions/IPackage.cs#L48) method provides a way of performing an action when the extension is unloaded, regardless of loading mode.
 
 > [!CAUTION]
-> Do not rely on ``IDisposable`` for freeing resources of extensions, as the Dassie compiler does **not** invoke the ``Dispose`` method when they are unloaded. Always call ``Dispose`` in ``Unload`` to ensure the extension is disposed correctly.
+> Do not rely on ``IDisposable`` for freeing resources of extensions, as the Dassie compiler does **not** invoke the ``Dispose`` method when they are unloaded. Always call ``Dispose`` in ``Unload`` to ensure unmanaged resources are cleaned up properly.
 
 ## Installing compiler extensions
 The command ``dc package`` is used to manage extensions in global mode. To install extensions from an extension package stored on disk, use the ``dc package import`` subcommand. To install them from the online extension registry, use the ``dc package install`` command. This command is not supported yet.
