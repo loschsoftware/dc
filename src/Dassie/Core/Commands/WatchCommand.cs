@@ -55,6 +55,9 @@ internal class WatchCommand : CompilerCommand
         if (args.Contains("--quit"))
             return Quit(args.Except(["--quit"]).ToArray());
 
+        if (args.Contains("--indefinetly"))
+            return WatchIndefinetly(args.Except(["--indefinetly"]).ToArray());
+
         bool error = false;
         string command = "";
         string profile = "";
@@ -182,7 +185,7 @@ internal class WatchCommand : CompilerCommand
         watchProcess.StartInfo.Arguments = $"watch-indefinetly {processArgs}";
 #else
         watchProcess.StartInfo.FileName = "dotnet";
-        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} watch-indefinetly {processArgs}";
+        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} watch --indefinetly {processArgs}";
 #endif
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;

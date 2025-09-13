@@ -46,8 +46,7 @@ internal class CorePackage : IPackage
         ScratchpadCommand.Instance,
         TestCommand.Instance,
         VersionCommand.Instance,
-        WatchCommand.Instance,
-        WatchIndefinetlyCommand.Instance
+        WatchCommand.Instance
     ];
 
     public GlobalConfigProperty[] GlobalProperties() =>

@@ -184,7 +184,7 @@ internal class RunCommand : CompilerCommand
         bool recompile = !File.Exists(assemblyPath);
         List<FileInfo> sourceFiles = [];
 
-        foreach (string dir in (config.References ?? []).Where(r => r is ProjectReference).Cast<ProjectReference>().Select(p => Path.GetDirectoryName(p.ProjectFile)).Append(Directory.GetCurrentDirectory()))
+        foreach (string dir in ((config ??= new()).References ?? []).Where(r => r is ProjectReference).Cast<ProjectReference>().Select(p => Path.GetDirectoryName(p.ProjectFile)).Append(Directory.GetCurrentDirectory()))
         {
             sourceFiles.AddRange(Directory.GetFiles(dir, "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)));
 
