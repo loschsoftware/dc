@@ -10,23 +10,24 @@ The Dassie compiler provides a rich API for extending its functionality with cus
 |[Creating a custom extension](./Extensions.md#creating-a-custom-extension)|
 
 ## Format
-An **extension** is a .NET type implementing the [``Dassie.Extensions.IPackage``](../src/Dassie/Extensions/IPackage.cs) interface. An **extension package** is a .NET assembly containing one or more extensions.
+An **extension** is a .NET type implementing the [``Dassie.Extensions.IPackage``](../src/Dassie/Extensions/IPackage.cs) interface. An **extension package** is a .NET assembly containing one or more extensions. For an improved developer experience, the API also provides the abstract base class [``Extension``](../src/Dassie/Extensions/Extension.cs) which implements ``IPackage``.
 
 ## Extension lifecycle
 Compiler extensions can be loaded in one of two modes:
 - **Global:** The extension is enabled globally and is initialized as soon as the compiler is launched. It is active for every build. Managing global extensions is done through the ``dc package`` command.
 - **Transient:** The extension is enabled only for a single build process. Managing transient extensions is done through the [``<Extensions>``](./Projects.md#transient-extensions) tag in a project file.
 
-``IPackage`` contains the virtual methods [``InitializeGlobal``](../src/Dassie/Extensions/IPackage.cs#L28) and [``InitializeTransient``](../src/Dassie/Extensions/IPackage.cs#L36) that can be overridden to implement custom behavior when the extension is loaded. Similarly, the [``Unload``](../src/Dassie/Extensions/IPackage.cs#L46) method provides a way of performing an action when the extension is unloaded, regardless of loading mode.
+``IPackage`` contains the virtual methods [``InitializeGlobal``](../src/Dassie/Extensions/IPackage.cs#L34) and [``InitializeTransient``](../src/Dassie/Extensions/IPackage.cs#L43) that can be overridden to implement custom behavior when the extension is loaded. Similarly, the [``Unload``](../src/Dassie/Extensions/IPackage.cs#L48) method provides a way of performing an action when the extension is unloaded, regardless of loading mode.
 
 > [!CAUTION]
-> Do not rely on ``IDisposable`` for freeing resources of extensions, as the Dassie compiler does **not** invoke the ``Dispose`` method when they are unloaded. Always call ``Dispose`` in ``Unload`` to ensure the extension is disposed correctly.
+> Do not rely on ``IDisposable`` for freeing resources of extensions, as the Dassie compiler does **not** invoke the ``Dispose`` method when they are unloaded. Always call ``Dispose`` in ``Unload`` to ensure unmanaged resources are cleaned up properly.
 
 ## Installing compiler extensions
 The command ``dc package`` is used to manage extensions in global mode. To install extensions from an extension package stored on disk, use the ``dc package import`` subcommand. To install them from the online extension registry, use the ``dc package install`` command. This command is not supported yet.
 
 ## Extension API features
 All features of the API are supported through interfaces in the [``Dassie.Extensions``](../src/Dassie/Extensions) namespace. All features of an extension are centrally registered in ``IPackage`` through its various virtual methods. The following is a list of all available interfaces:
+- **[``GlobalConfigProperty``](../src/Dassie/Extensions/GlobalConfigProperty.cs):** Defines a global configuration property.
 - **[``ICompilerCommand``](../src/Dassie/Extensions/ICompilerCommand.cs):** Defines a custom compiler command to integrate external tools with the compiler.
 - **[``IProjectTemplate``](../src/Dassie/Extensions/IProjectTemplate.cs):** Defines a custom project template used in combination with the ``dc new`` command.
 - **[``IConfigurationProvider``](../src/Dassie/Extensions/IConfigurationProvider.cs):** Defines a configuration provider that serves as a template for a project file. This is used in combination with the [``Import``](./Projects.md#importing-project-files) attribute of project files.
@@ -34,6 +35,9 @@ All features of the API are supported through interfaces in the [``Dassie.Extens
 - **[``IBuildLogWriter``](../src/Dassie/Extensions/IBuildLogWriter.cs):** Allows the redirection of build message to an arbitrary ``TextWriter`` object. Requires the usage of the default build log device.
 - **[``IBuildLogDevice``](../src/Dassie/Extensions/IBuildLogDevice.cs):** Enables the implementation of custom logic for serializing build messages. Can be configured with XML attributes and elements in project files.
 - **[``ICompilerDirective``](../src/Dassie/Extensions/ICompilerDirective.cs):** Defines a custom **compiler directive** that can be used in code.
+- **[``IDocumentSource``](../src/Dassie/Extensions/IDocumentSource.cs):** Defines a document source which is used to inject arbitrary Dassie source code into a compilation.
+- **[``IDeploymentTarget``](../src/Dassie/Extensions/IDeploymentTarget.cs):** Defines a deployment target that is used in conjunction with the ``dc deploy`` compiler command.
+- **[``ISubsystem``](../src/Dassie/Extensions/ISubsystem.cs):** Defines the characteristics of the application type of a Dassie project.
 
 ## Creating a custom extension
 The following example implements a minimal compiler extension that adds a new command to the compiler.
@@ -49,7 +53,7 @@ The following example implements a minimal compiler extension that adds a new co
 
    public class DemoExtensionPackage : IPackage
    {
-       public PackageMetadata Metadata { get; } = new()
+       public PackageMetadata Metadata => new()
        {
            Name = "EchoExtension",
            Author = "Losch",
@@ -57,7 +61,7 @@ The following example implements a minimal compiler extension that adds a new co
            Description = "A demo extension that repeats the specified text when executed."
        };
 
-       public Type[] Commands { get; } = throw new NotImplementedException(); // Update after step 3
+       public Type[] Commands => throw new NotImplementedException(); // Update after step 3
    }
    ````
 3. Add a type implementing the ``ICompilerCommand`` interface and reference it in the extension package.
@@ -70,9 +74,8 @@ The following example implements a minimal compiler extension that adds a new co
 
    public class EchoCommand : ICompilerCommand
    {
-       public string Command { get; } = "echo";
-       public string UsageString { get; } = "echo <Text>";
-       public string Description { get; } = "Repeats the specified text.";
+       public string Command => "echo";
+       public string Description => "Repeats the specified text.";
 
        public int Invoke(string[] args)
        {
