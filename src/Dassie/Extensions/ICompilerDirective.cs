@@ -36,7 +36,7 @@ public interface ICompilerDirective
     /// <summary>
     /// The name of the compiler directive.
     /// </summary>
-    public string Identifier { get; set; }
+    public string Identifier { get; }
 
     /// <summary>
     /// The method that is called when the compiler directive is invoked.
