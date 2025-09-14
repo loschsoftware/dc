@@ -1,6 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using Dassie.Cli.Commands;
+using Dassie.Core.Commands;
 using Dassie.Parser;
 using System.Collections.Generic;
 using System.Linq;

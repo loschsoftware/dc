@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace Dassie.Core.Commands;
@@ -236,10 +235,10 @@ internal class HelpCommand : CompilerCommand
         sb.AppendLine();
         sb.AppendLine("Usage:");
 
-        sb.Append("    dc <FileNames> [Options]".PadRight(35));
+        sb.Append("    dc <Files> [Options]".PadRight(35));
         sb.Append(FormatLines("Compiles the specified source files. Use 'dc help compile' for more information."));
 
-        sb.Append("    dc [Command] [Options]".PadRight(35));
+        sb.Append("    dc <Command> [Options]".PadRight(35));
         sb.Append(FormatLines("Executes a command from the list below."));
 
         sb.Append("    dc help <Command>".PadRight(35));
