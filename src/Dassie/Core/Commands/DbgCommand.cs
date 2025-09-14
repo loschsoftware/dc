@@ -1,8 +1,14 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using Dassie.CodeGeneration.Api;
+using Dassie.CodeGeneration.Structure;
+using Dassie.Configuration;
 using Dassie.Core.Commands;
 using Dassie.Extensions;
+using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Text;
+using Dassie.Text.Tooltips;
 using System;
 using System.Linq;
 using System.Text;
@@ -67,8 +73,41 @@ namespace Dassie.Cli.Commands
             if (args[0] == "tokens")
                 return PrintTokens(args[1..]);
 
+            if (args[0] == "fragments")
+                return PrintFragments(args[1..]);
+
             LogOut.WriteLine($"Invalid command '{args[0]}'.");
             return -1;
+        }
+
+        private static int PrintFragments(string[] args)
+        {
+            if (args.Any(p => !File.Exists(p)))
+            {
+                foreach (string path in args.Where(p => !File.Exists(p)))
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0049_SourceFileNotFound,
+                        $"The specified source file '{path}' could not be found.",
+                        CompilerExecutableName);
+                }
+            }
+
+            CompileCommand.Instance.Invoke([.. args.Where(File.Exists)]);
+
+            foreach (FileContext file in Context.Files)
+            {
+                Console.WriteLine($"{file.Path}:");
+
+                foreach (Fragment fragment in file.Fragments)
+                {
+                    Console.Write($"    {fragment.Color} ({fragment.Line},{fragment.Column})+{fragment.Length}: ");
+                    ConsoleOut.WriteLine(fragment.ToolTip);
+                }
+            }
+
+            return 0;
         }
 
         private static int Fail()
