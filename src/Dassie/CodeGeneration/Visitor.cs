@@ -15,6 +15,7 @@ using Dassie.Runtime;
 using Dassie.Symbols;
 using Dassie.Text.Tooltips;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -6464,7 +6465,16 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         if (ret == null)
             return typeof(void);
 
-        EmitConst(ret);
+        if (!EmitConst(ret))
+        {
+            EmitErrorMessage(
+                context.special_symbol().Start.Line,
+                context.special_symbol().Start.Column,
+                context.special_symbol().GetText().Length,
+                DS0260_CompilerDirectiveResultNotConstant,
+                $"The result of compiler directive '{context.special_symbol().Identifier().GetIdentifier()}' was not a compile time constant. The type of the result was '{TypeName(ret.GetType())}'.");
+        }
+
         return ret.GetType();
     }
 }

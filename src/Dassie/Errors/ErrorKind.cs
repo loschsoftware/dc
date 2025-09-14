@@ -1070,5 +1070,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the 'dc scratchpad load' command is used and the editor is set to 'default'.
     /// </summary>
-    DS0259_DCScratchpadLoadDefaultEditor
+    DS0259_DCScratchpadLoadDefaultEditor,
+    /// <summary>
+    /// Emitted when the result of a compiler directive invocation is not a compile-time constant.
+    /// </summary>
+    DS0260_CompilerDirectiveResultNotConstant
 }
