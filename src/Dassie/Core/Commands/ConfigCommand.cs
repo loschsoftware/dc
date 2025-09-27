@@ -63,6 +63,15 @@ internal class ConfigCommand : CompilerCommand
             }).ToDictionary();
         }
 
+        foreach (string arg in args.Where(a => !a.StartsWith('-') && !a.Contains('=')))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0013_InvalidArgument,
+                $"Unexpected argument '{arg}'.",
+                CompilerExecutableName);
+        }
+
         if (args.Contains("--global"))
         {
             if (args.Contains("--reset"))
