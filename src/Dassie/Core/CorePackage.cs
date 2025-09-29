@@ -69,7 +69,8 @@ internal class CorePackage : IPackage
         SourceDirective.Instance,
         TodoDirective.Instance,
         ILDirective.Instance,
-        ImportDirective.Instance
+        ImportDirective.Instance,
+        TypeOfDirective.Instance
     ];
 
     public IDeploymentTarget[] DeploymentTargets() =>

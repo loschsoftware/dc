@@ -39,6 +39,11 @@ public interface ICompilerDirective
     public string Identifier { get; }
 
     /// <summary>
+    /// If <see langword="true"/>, all arguments will be passed as strings implicitly.
+    /// </summary>
+    public virtual bool IgnoreArgumentTypes => false;
+
+    /// <summary>
     /// The method that is called when the compiler directive is invoked.
     /// </summary>
     /// <param name="context">An object of type <see cref="DirectiveContext"/> representing the metadata associated with the directive invocation.</param>

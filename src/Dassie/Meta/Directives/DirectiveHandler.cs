@@ -51,20 +51,24 @@ internal static class DirectiveHandler
 
             return null;
         }
-        
-        DirectiveContext dc = new()
-        {
-            Arguments = (context.expression() ?? []).Select(e => ExpressionEvaluator.Instance.Visit(e).Value).ToArray(),
-            DocumentName = CurrentFile.Path,
-            LineNumber = context.Start.Line,
-            Rule = context
-        };
 
         IEnumerable<ICompilerDirective> dirs = ExtensionLoader.CompilerDirectives.Where(c => c.Identifier == identifier);
         object ret = null;
 
         foreach (ICompilerDirective dir in dirs)
+        {
+            DassieParser.ExpressionContext[] args = context.expression() ?? [];
+
+            DirectiveContext dc = new()
+            {
+                Arguments = dir.IgnoreArgumentTypes ? args.Select(a => a.GetText()).ToArray() : args.Select(e => ExpressionEvaluator.Instance.Visit(e).Value).ToArray(),
+                DocumentName = CurrentFile.Path,
+                LineNumber = context.Start.Line,
+                Rule = context
+            };
+
             ret = dir.Invoke(dc);
+        }
 
         return ret;
     }

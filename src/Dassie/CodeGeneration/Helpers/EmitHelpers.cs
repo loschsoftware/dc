@@ -302,6 +302,14 @@ internal static class EmitHelpers
             return true;
         }
 
+        if (value is Type t)
+        {
+            CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
+            MethodInfo typeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", [typeof(RuntimeTypeHandle)]);
+            CurrentMethod.IL.EmitCall(OpCodes.Call, typeFromHandle, null);
+            return true;
+        }
+
         if (value.GetType().IsEnum)
         {
             EmitLdcI4((int)value);

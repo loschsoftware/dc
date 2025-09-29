@@ -2436,49 +2436,6 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return op.ReturnType;
     }
 
-    public override Type VisitTypeof_expression([NotNull] DassieParser.Typeof_expressionContext context)
-    {
-        CurrentFile.Fragments.Add(new()
-        {
-            Color = Color.Word,
-            Line = context.Caret_Backslash().Symbol.Line,
-            Column = context.Caret_Backslash().Symbol.Column,
-            Length = context.Caret_Backslash().GetText().Length,
-        });
-
-        Type t = SymbolResolver.ResolveTypeName(context.type_name());
-        CurrentMethod.IL.Emit(OpCodes.Ldtoken, t);
-
-        MethodInfo typeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", new Type[] { typeof(RuntimeTypeHandle) });
-        CurrentMethod.IL.EmitCall(OpCodes.Call, typeFromHandle, null);
-
-        return typeof(Type);
-    }
-
-    public override Type VisitNameof_expression([NotNull] DassieParser.Nameof_expressionContext context)
-    {
-        CurrentFile.Fragments.Add(new()
-        {
-            Color = Color.Word,
-            Line = context.Dollar_Backslash().Symbol.Line,
-            Column = context.Dollar_Backslash().Symbol.Column,
-            Length = context.Dollar_Backslash().GetText().Length,
-        });
-
-        CurrentMethod.IL.DeclareLocal(typeof(int).MakeByRefType());
-
-        CurrentFile.Fragments.Add(new()
-        {
-            Color = Color.ExpressionString,
-            Line = context.expression().Start.Line,
-            Column = context.expression().Start.Column,
-            Length = context.expression().GetText().Length,
-        });
-
-        CurrentMethod.IL.Emit(OpCodes.Ldstr, context.expression().GetText());
-        return typeof(string);
-    }
-
     public override Type VisitByref_expression([NotNull] DassieParser.Byref_expressionContext context)
     {
         CurrentMethod.LoadReference = true;
@@ -6472,6 +6429,9 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 DS0260_CompilerDirectiveResultNotConstant,
                 $"The result of compiler directive '{context.special_symbol().Identifier().GetIdentifier()}' was not a compile time constant. The type of the result was '{TypeName(ret.GetType())}'.");
         }
+
+        if (ret is Type)
+            return typeof(Type);
 
         return ret.GetType();
     }
