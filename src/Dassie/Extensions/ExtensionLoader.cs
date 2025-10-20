@@ -10,6 +10,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Dassie.Extensions;
 
@@ -28,8 +29,8 @@ internal static class ExtensionLoader
         ExtensionsFunc = () => InstalledExtensions
     };
 
-    public static readonly string DefaultExtensionSource = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Extensions")).FullName;
-    public static readonly string GlobalToolsPath = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")).FullName;
+    public static string DefaultExtensionSource => field ??= GetExtensionLocationFromConfig();
+    public static string GlobalToolsPath => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")).FullName;
 
     public static ObservableCollection<IPackage> InstalledExtensions
     {
@@ -361,5 +362,40 @@ internal static class ExtensionLoader
             ProjectConfigurationFileName);
 
         return Configuration.Subsystems.Console.Instance;
+    }
+
+    private static string GetExtensionLocationFromConfig()
+    {
+        string configPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+            "Dassie", 
+            GlobalConfigurationFileName);
+
+        string path = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+            "Dassie", 
+            "Extensions");
+
+        if (!File.Exists(configPath))
+            return Directory.CreateDirectory(path).FullName;
+
+        try
+        {
+            XDocument doc = XDocument.Load(configPath);
+            XElement coreModule = doc.Root?.Elements()
+                .FirstOrDefault(e => e.Name.LocalName.Equals("Core", StringComparison.OrdinalIgnoreCase));
+
+            if (coreModule == null)
+                return Directory.CreateDirectory(path).FullName;
+
+            XElement extensionLocationElement = coreModule.Elements()
+                .FirstOrDefault(e => e.Name.LocalName.Equals("Locations.Extensions", StringComparison.OrdinalIgnoreCase));
+
+            if (extensionLocationElement != null && !string.IsNullOrWhiteSpace(extensionLocationElement.Value))
+                path = extensionLocationElement.Value.Trim();
+        }
+        catch (XmlException) { }
+
+        return Directory.CreateDirectory(path).FullName;
     }
 }

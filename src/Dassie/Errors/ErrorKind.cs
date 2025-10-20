@@ -1074,5 +1074,9 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the result of a compiler directive invocation is not a compile-time constant.
     /// </summary>
-    DS0260_CompilerDirectiveResultNotConstant
+    DS0260_CompilerDirectiveResultNotConstant,
+    /// <summary>
+    /// Emitted when the value of the 'core.locations.extensions' global property is set to an invalid path.
+    /// </summary>
+    DS0261_ExtensionsLocationPropertyInvalidPath
 }

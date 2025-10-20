@@ -70,6 +70,20 @@ public abstract class GlobalConfigProperty
         if (ExtensionIdentifier == null || !GlobalConfigManager.Properties.ContainsKey(key))
             throw new InvalidOperationException($"The property '{Name}' has not been registered.");
 
+        foreach (var validator in Validators ?? [])
+        {
+            if (!validator(value))
+                return;
+        }
+
         GlobalConfigManager.Set(key, Type, value);
     }
+
+    /// <summary>
+    /// An array of validation delegates that are invoked every time the property is set. The parameter of the validator represents the new value
+    /// of the property. The return value of the validator should indicate wheter or not the specified property value is valid. 
+    /// In case of failure, the validator should handle the emission of error messages itself. If one of the validators returns <see langword="false"/>,
+    /// the set operation is aborted and none of the remaining validators are invoked.
+    /// </summary>
+    public virtual Func<object, bool>[] Validators => [];
 }

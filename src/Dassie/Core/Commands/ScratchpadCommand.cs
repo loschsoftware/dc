@@ -102,7 +102,7 @@ internal class ScratchpadCommand : CompilerCommand
                 return -1;
             }
 
-            if (EditorProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
+            if (ExtensionLocationProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
             {
                 EmitErrorMessage(
                     0, 0, 0,
@@ -191,7 +191,7 @@ internal class ScratchpadCommand : CompilerCommand
                 Console.WriteLine();
             }
 
-            if (EditorProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
+            if (ExtensionLocationProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
             {
                 if (!Console.IsInputRedirected)
                 {
@@ -207,7 +207,7 @@ internal class ScratchpadCommand : CompilerCommand
             else
             {
                 File.Create(file).Dispose();
-                SDProcess.Start(EditorProperty.Instance.GetValue().ToString(), Path.GetFullPath(file)).WaitForExit();
+                SDProcess.Start(ExtensionLocationProperty.Instance.GetValue().ToString(), Path.GetFullPath(file)).WaitForExit();
             }
 
             Directory.SetCurrentDirectory(dir);

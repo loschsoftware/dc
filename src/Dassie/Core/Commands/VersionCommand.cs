@@ -1,4 +1,5 @@
-﻿using Dassie.Extensions;
+﻿using Dassie.Core.Properties;
+using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -53,7 +54,7 @@ output.AppendLine("AOT, statically linked");
 
         output.AppendLine();
         output.AppendLine("Locations:");
-        output.AppendLine($"{"    - Extension storage:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Extensions")}\"");
+        output.AppendLine($"{"    - Extension storage:".PadRight(padding)}\"{ExtensionLocationProperty.Instance.GetValue()}\"");
         output.AppendLine($"{"    - Global tools storage:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")}\"");
         output.AppendLine($"{"    - NuGet package storage:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages")}\"");
         output.AppendLine($"{"    - Tool paths file:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "tools.xml")}\"");
