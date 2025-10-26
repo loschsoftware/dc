@@ -102,7 +102,7 @@ internal class ScratchpadCommand : CompilerCommand
                 return -1;
             }
 
-            if (ExtensionLocationProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
+            if (EditorProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
             {
                 EmitErrorMessage(
                     0, 0, 0,
@@ -124,7 +124,7 @@ internal class ScratchpadCommand : CompilerCommand
         {
             Console.WriteLine("Saved scratches:");
             Console.WriteLine();
-
+            
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Dassie", "Scratchpad");
 
             if (!Directory.Exists(path))
@@ -191,7 +191,7 @@ internal class ScratchpadCommand : CompilerCommand
                 Console.WriteLine();
             }
 
-            if (ExtensionLocationProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
+            if (EditorProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
             {
                 if (!Console.IsInputRedirected)
                 {
@@ -207,7 +207,7 @@ internal class ScratchpadCommand : CompilerCommand
             else
             {
                 File.Create(file).Dispose();
-                SDProcess.Start(ExtensionLocationProperty.Instance.GetValue().ToString(), Path.GetFullPath(file)).WaitForExit();
+                SDProcess.Start(EditorProperty.Instance.GetValue().ToString(), Path.GetFullPath(file)).WaitForExit();
             }
 
             Directory.SetCurrentDirectory(dir);
