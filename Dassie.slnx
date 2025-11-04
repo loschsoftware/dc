@@ -1,0 +1,28 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="src/Dassie.Compiler/Dassie.Compiler.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="src/Dassie.Configuration/Dassie.Configuration.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="Debug|Any CPU" Project="x64" />
+  </Project>
+  <Project Path="src/Dassie.Core/Dassie.Core.csproj">
+    <Platform Project="x64" />
+    <Build Solution="Debug|Any CPU" Project="false" />
+  </Project>
+  <Project Path="src/Dassie.Text/Dassie.Text.csproj">
+    <Platform Project="x64" />
+    <Build Solution="Debug|Any CPU" Project="false" />
+  </Project>
+  <Project Path="src/Dassie/Dassie.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="Debug|Any CPU" Project="x64" />
+  </Project>
+</Solution>
