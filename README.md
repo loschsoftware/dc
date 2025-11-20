@@ -8,7 +8,7 @@ To get started with Dassie development, either download a binary from the 'Relea
 
 ### Compiling from source
 > [!IMPORTANT]
-> Sometimes, the build script (``build.sh`` or ``build.cmd``) will fail on the first attempt. $$\color{red}This \space is \space normal \space and \space expected!$$ Simply run the script again and it should successfully compile. This only needs to be done once, every subsequent build will work normally.
+> Sometimes, the build script (``build.sh`` or ``build.cmd``) will fail on the first attempt. *This is normal and expected!* Simply run the script again and it should successfully compile. This only needs to be done once, every subsequent build will work normally.
 
 **Linux:**
 ````bash
