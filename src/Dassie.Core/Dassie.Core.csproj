@@ -1,16 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>13</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Platforms>AnyCPU;x64</Platforms>
 		<RootNamespace>Dassie</RootNamespace>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<Deterministic>false</Deterministic>
 	</PropertyGroup>
-	<ItemGroup>
-	  <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Dassie.Text\Dassie.Text.csproj" />
 	</ItemGroup>
