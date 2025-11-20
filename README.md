@@ -4,11 +4,11 @@
 This project aims to implement a .NET compiler for the [Dassie](https://github.com/loschsoftware/dassie) programming language. It acts as the reference implementation of the language.
 
 ## Getting started
-To get started with Dassie development, either download a binary from the 'Releases' section of this repository or build the compiler from source. An installation of .NET 9 is required if compiling from source or using a framework-dependent compiler binary.
+To get started with Dassie development, either download a binary from the 'Releases' section of this repository or build the compiler from source. An installation of .NET 10 is required if compiling from source or using a framework-dependent compiler binary.
 
 ### Compiling from source
 > [!IMPORTANT]
-> Sometimes, the build script (``build.sh`` or ``build.cmd``) will fail on the first attempt. *This is normal and expected!* Simply run the script again and it should successfully compile. This only needs to be done once, every subsequent build will work normally.
+> Sometimes, the build script (``build.sh`` or ``build.cmd``) will fail on the first attempt. **This is normal and expected!** Simply run the script again and it should successfully compile. This only needs to be done once, every subsequent build will work normally.
 
 **Linux:**
 ````bash
