@@ -34,7 +34,7 @@ public class Worker
 ````
 
 ## Namespaces
-Always use file-scoped namespaces. Separate namespace declarations from using directives and type declarations by an empty line.
+Always use file-scoped namespaces. Separate namespace declarations from using directives and type declarations with an empty line.
 
 **❌ Wrong:**
 ````csharp
