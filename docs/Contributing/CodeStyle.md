@@ -56,7 +56,7 @@ class ExampleType
 ````
 
 ## Braces
-Follow the Microsoft convention of placing each brace in its own line.
+Use Allman style braces.
 
 **❌ Wrong:**
 ````csharp
