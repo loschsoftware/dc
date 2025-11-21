@@ -3,6 +3,7 @@ using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using System;
+using System.CommandLine.Parsing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -144,7 +145,7 @@ internal class BuildCommand : CompilerCommand
         }
 
         if (!string.IsNullOrEmpty(profile.Arguments))
-            CompileCommand.Instance.Invoke(profile.Arguments.Split(' ').Concat(args).ToArray(), config);
+            CompileCommand.Instance.Invoke(CommandLineParser.SplitCommandLine(profile.Arguments).Concat(args).ToArray(), config);
 
         if (profile.PostBuildEvents != null && profile.PostBuildEvents.Any())
         {
