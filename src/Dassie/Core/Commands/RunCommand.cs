@@ -20,7 +20,7 @@ internal class RunCommand : CompilerCommand
 
     public override string Command => "run";
 
-    public override string Description => "Automatically compiles using the default profile and then runs the output executable with the specified arguments.";
+    public override string Description => "Compiles a project or project group and then runs the output executable with the specified arguments.";
 
     public override CommandHelpDetails HelpDetails => new()
     {
