@@ -34,7 +34,7 @@ public class Worker
 ````
 
 ## Namespaces
-Always use file-scoped namespaces. Separate namespace declarations from using directives and type declarations by an empty line.
+Always use file-scoped namespaces. Separate namespace declarations from using directives and type declarations with an empty line.
 
 **❌ Wrong:**
 ````csharp
@@ -56,7 +56,7 @@ class ExampleType
 ````
 
 ## Braces
-Follow the Microsoft convention of placing each brace in its own line.
+Use Allman style braces.
 
 **❌ Wrong:**
 ````csharp
