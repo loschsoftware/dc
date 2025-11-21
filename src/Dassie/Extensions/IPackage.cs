@@ -102,4 +102,9 @@ public interface IPackage
     /// An array of subsystems.
     /// </summary>
     public virtual ISubsystem[] Subsystems() => [];
+
+    /// <summary>
+    /// An array of build actions.
+    /// </summary>
+    public virtual IBuildAction[] BuildActions() => [];
 }

@@ -1,12 +1,11 @@
-﻿using Dassie.Configuration;
+﻿using Dassie.Build;
+using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using SDProcess = System.Diagnostics.Process;
 
 namespace Dassie.Core.Commands;
 
@@ -137,53 +136,10 @@ internal class BuildCommand : CompilerCommand
         {
             foreach (BuildEvent preEvent in profile.PreBuildEvents)
             {
-                if (string.IsNullOrEmpty(preEvent.Command))
-                    continue;
+                if (string.IsNullOrEmpty(preEvent.Name))
+                    preEvent.Name = profile.PreBuildEvents.IndexOf(preEvent).ToString();
 
-                ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden;
-
-                if (!preEvent.Hidden)
-                    windowStyle = ProcessWindowStyle.Normal;
-
-                ProcessStartInfo psi = new()
-                {
-                    FileName = "cmd.exe",
-                    Arguments = $"/c {preEvent.Command}",
-                    CreateNoWindow = false,
-                    WindowStyle = windowStyle
-                };
-
-                if (preEvent.RunAsAdministrator)
-                    psi.Verb = "runas";
-
-                SDProcess proc = SDProcess.Start(psi);
-
-                if (preEvent.WaitForExit)
-                    proc.WaitForExit();
-
-                string errMsg = $"The command '{preEvent.Command}' ended with a non-zero exit code.";
-
-                if (preEvent.WaitForExit)
-                {
-                    if (proc.ExitCode != 0 && preEvent.Critical)
-                    {
-                        EmitErrorMessage(
-                            0, 0, 0,
-                            DS0088_InvalidProfile,
-                            errMsg,
-                            ProjectConfigurationFileName);
-
-                        return -1;
-                    }
-                    else if (proc.ExitCode != 0)
-                    {
-                        EmitWarningMessage(
-                            0, 0, 0,
-                            DS0088_InvalidProfile,
-                            errMsg,
-                            ProjectConfigurationFileName);
-                    }
-                }
+                BuildEventHandler.ExecuteBuildEvent(preEvent, true);
             }
         }
 
@@ -194,53 +150,10 @@ internal class BuildCommand : CompilerCommand
         {
             foreach (BuildEvent postEvent in profile.PostBuildEvents)
             {
-                if (string.IsNullOrEmpty(postEvent.Command))
-                    continue;
+                if (string.IsNullOrEmpty(postEvent.Name))
+                    postEvent.Name = profile.PostBuildEvents.IndexOf(postEvent).ToString();
 
-                ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden;
-
-                if (!postEvent.Hidden)
-                    windowStyle = ProcessWindowStyle.Normal;
-
-                ProcessStartInfo psi = new()
-                {
-                    FileName = "cmd.exe",
-                    Arguments = $"/c {postEvent.Command}",
-                    CreateNoWindow = false,
-                    WindowStyle = windowStyle
-                };
-
-                if (postEvent.RunAsAdministrator)
-                    psi.Verb = "runas";
-
-                SDProcess proc = SDProcess.Start(psi);
-
-                if (postEvent.WaitForExit)
-                    proc.WaitForExit();
-
-                string errMsg = $"The command '{postEvent.Command}' ended with a non-zero exit code.";
-
-                if (postEvent.WaitForExit)
-                {
-                    if (proc.ExitCode != 0 && postEvent.Critical)
-                    {
-                        EmitErrorMessage(
-                            0, 0, 0,
-                            DS0088_InvalidProfile,
-                            errMsg,
-                            ProjectConfigurationFileName);
-
-                        return -1;
-                    }
-                    else if (proc.ExitCode != 0)
-                    {
-                        EmitWarningMessage(
-                            0, 0, 0,
-                            DS0088_InvalidProfile,
-                            errMsg,
-                            ProjectConfigurationFileName);
-                    }
-                }
+                BuildEventHandler.ExecuteBuildEvent(postEvent, false);
             }
         }
 

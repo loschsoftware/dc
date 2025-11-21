@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Xml;
 
 namespace Dassie.Configuration;
 
@@ -6,22 +8,14 @@ namespace Dassie.Configuration;
 [XmlRoot]
 public class BuildEvent
 {
-    [XmlElement]
-    public string Command { get; set; }
+    [DefaultValue("")]
+    [XmlAttribute]
+    public string Name { get; set; }
 
     [DefaultValue(true)]
     [XmlAttribute]
     public bool Critical { get; set; }
 
-    [DefaultValue(true)]
-    [XmlAttribute]
-    public bool Hidden { get; set; }
-
-    [DefaultValue(false)]
-    [XmlAttribute]
-    public bool RunAsAdministrator { get; set; }
-
-    [DefaultValue(true)]
-    [XmlAttribute]
-    public bool WaitForExit { get; set; }
+    [XmlAnyElement]
+    public List<XmlElement> CommandNodes { get; set; }
 }

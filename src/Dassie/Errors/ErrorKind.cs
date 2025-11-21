@@ -1078,5 +1078,17 @@ public enum ErrorKind
     /// <summary>
     /// Emitted when the value of the 'core.locations.extensions' global property is set to an invalid path.
     /// </summary>
-    DS0261_ExtensionsLocationPropertyInvalidPath
+    DS0261_ExtensionsLocationPropertyInvalidPath,
+    /// <summary>
+    /// Emitted when an action that is referenced in a build profile does not exist.
+    /// </summary>
+    DS0262_DCBuildInvalidActionName,
+    /// <summary>
+    /// Emitted when a build action is executed in an invalid mode.
+    /// </summary>
+    DS0263_BuildActionInvalidMode,
+    /// <summary>
+    /// Emitted when a build action ends with a nonzero exit code.
+    /// </summary>
+    DS0264_BuildActionFailed
 }

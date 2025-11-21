@@ -64,4 +64,7 @@ public abstract class Extension : IPackage
 
     /// <inheritdoc/>
     public virtual ISubsystem[] Subsystems() => [];
+
+    /// <inheritdoc/>
+    public virtual IBuildAction[] BuildActions() => [];
 }

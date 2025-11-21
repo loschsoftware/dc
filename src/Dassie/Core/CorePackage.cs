@@ -1,5 +1,5 @@
-﻿using Dassie.Cli.Commands;
-using Dassie.Configuration.Subsystems;
+﻿using Dassie.Configuration.Subsystems;
+using Dassie.Core.Actions;
 using Dassie.Core.Commands;
 using Dassie.Core.Properties;
 using Dassie.Deployment;
@@ -12,7 +12,7 @@ using System.Reflection;
 namespace Dassie.Core;
 
 /// <summary>
-/// Acts as an extension package for all builtin commands, project templates, build log devices and compiler directives.
+/// Acts as an extension package for all built-in commands, project templates, build log devices, compiler directives, subsystems and actions.
 /// </summary>
 internal class CorePackage : IPackage
 {
@@ -84,5 +84,11 @@ internal class CorePackage : IPackage
         Console.Instance,
         Library.Instance,
         WinExe.Instance
+    ];
+
+    public IBuildAction[] BuildActions() =>
+    [
+        new CompilerCommandBuildAction(),
+        new ShellCommandBuildAction()
     ];
 }

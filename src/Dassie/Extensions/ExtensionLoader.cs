@@ -76,6 +76,9 @@ internal static class ExtensionLoader
     private static IEnumerable<ISubsystem> _subsystems = [];
     public static IEnumerable<ISubsystem> Subsystems => _subsystems;
 
+    private static IEnumerable<IBuildAction> _buildActions = [];
+    public static IEnumerable<IBuildAction> BuildActions => _buildActions;
+
     private static void Update(object sender, NotifyCollectionChangedEventArgs e)
     {
         _gloablConfigProperties = InstalledExtensions.SelectMany(p => p.GlobalProperties());
@@ -88,6 +91,7 @@ internal static class ExtensionLoader
         _documentSources = InstalledExtensions.SelectMany(p => p.DocumentSources());
         _deploymentTargets = InstalledExtensions.SelectMany(p => p.DeploymentTargets());
         _subsystems = InstalledExtensions.SelectMany(p => p.Subsystems());
+        _buildActions = InstalledExtensions.SelectMany(p => p.BuildActions());
 
         Verify();
     }
