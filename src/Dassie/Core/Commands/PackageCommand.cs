@@ -170,6 +170,18 @@ internal class PackageCommand : CompilerCommand
             sb.AppendLine(":");
         }
 
+        void PrintFeatures(string category, IEnumerable<string> values)
+        {
+            if (values == null || values.Count() == 0)
+                return;
+
+            sb.AppendLine();
+            WriteHeading(category);
+
+            foreach (string feature in values)
+                sb.AppendLine($"    {feature}");
+        }
+
         sb.AppendLine();
         WriteHeading("Details");
 
@@ -180,69 +192,16 @@ internal class PackageCommand : CompilerCommand
         sb.AppendLine($"{"    File:",-50}{package.GetType().Assembly.Location}");
 
         IEnumerable<ICompilerCommand> definedCommands = ExtensionLoader.Commands.Where(c => c.GetType().Assembly == package.GetType().Assembly);
-
-        if (definedCommands.Any())
-        {
-            sb.AppendLine();
-            WriteHeading("Commands");
-
-            foreach (ICompilerCommand cmd in definedCommands)
-                sb.AppendLine($"{$"    {cmd.Command}",-50}{cmd.Description}");
-        }
-
-        if (package.CodeAnalyzers().Length != 0)
-        {
-            sb.AppendLine();
-            WriteHeading("Code analyzers");
-
-            foreach (IAnalyzer<IParseTree> analyzer in package.CodeAnalyzers())
-                sb.AppendLine($"    {analyzer.Name}");
-        }
-
-        if (package.ConfigurationProviders().Length != 0)
-        {
-            sb.AppendLine();
-            WriteHeading("Configuration providers");
-
-            foreach (IConfigurationProvider provider in package.ConfigurationProviders())
-                sb.AppendLine($"    {provider.Name}");
-        }
-
-        if (package.ProjectTemplates().Length != 0)
-        {
-            sb.AppendLine();
-            WriteHeading("Project templates");
-
-            foreach (IProjectTemplate template in package.ProjectTemplates())
-                sb.AppendLine($"    {template.Name}");
-        }
-
-        if (package.BuildLogDevices().Length != 0)
-        {
-            sb.AppendLine();
-            WriteHeading("Build log devices");
-
-            foreach (IBuildLogDevice device in package.BuildLogDevices())
-                sb.AppendLine($"    {device.Name}");
-        }
-
-        if (package.CompilerDirectives().Length != 0)
-        {
-            sb.AppendLine();
-            WriteHeading("Compiler directives");
-
-            foreach (ICompilerDirective directive in package.CompilerDirectives())
-                sb.AppendLine($"    {directive.Identifier}");
-        }
-
-        if (package.DocumentSources().Length != 0)
-        {
-            sb.AppendLine();
-            WriteHeading("Document sources");
-
-            foreach (IDocumentSource source in package.DocumentSources())
-                sb.AppendLine($"    {source.Name}: '{source.DocumentName}'");
-        }
+        PrintFeatures("Commands", definedCommands.Select(cmd => $"{$"{cmd.Command}",-46}{cmd.Description}"));
+        PrintFeatures("Code analyzers", package.CodeAnalyzers().Select(a => a.Name));
+        PrintFeatures("Configuration providers", package.ConfigurationProviders().Select(p => p.Name));
+        PrintFeatures("Project templates", package.ProjectTemplates().Select(t => t.Name));
+        PrintFeatures("Build log devices", package.BuildLogDevices().Select(d => d.Name));
+        PrintFeatures("Compiler directives", package.CompilerDirectives().Select(d => d.Identifier));
+        PrintFeatures("Document sources", package.DocumentSources().Select(s => $"{s.Name}: '{s.DocumentName}'"));
+        PrintFeatures("Deployment targets", package.DeploymentTargets().Select(t => t.Name));
+        PrintFeatures("Subsystems", package.Subsystems().Select(s => s.Name));
+        PrintFeatures("Build actions", package.BuildActions().Select(b => b.Name));
 
         HelpCommand.DisplayLogo();
         Console.WriteLine(sb.ToString());
