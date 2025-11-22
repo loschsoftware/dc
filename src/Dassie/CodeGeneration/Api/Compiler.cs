@@ -5,8 +5,8 @@ using Dassie.CodeGeneration.Binding;
 using Dassie.Configuration;
 using Dassie.Core;
 using Dassie.Data;
-using Dassie.Errors;
 using Dassie.Extensions;
+using Dassie.Messages;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Symbols;
@@ -35,7 +35,7 @@ public static class Compiler
     /// <param name="type">The type of the application.</param>
     /// <param name="config">Additional configuration.</param>
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
-    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, string outputPath, ISubsystem type, DassieConfig config = null)
+    public static IEnumerable<MessageInfo[]> CompileSource(string[] sourceFiles, string outputPath, ISubsystem type, DassieConfig config = null)
     {
         config.AssemblyFileName = outputPath;
         config.ApplicationType = type.Name;
@@ -50,14 +50,14 @@ public static class Compiler
     /// <param name="includeSubDirectories">Specifies wheter source files in subdirectories should be included in the compilation process.</param>
     /// <param name="config">Optional configuration for the compiler.</param>
     /// <returns></returns>
-    public static IEnumerable<ErrorInfo[]> CompileSource(string rootDirectory, bool includeSubDirectories, DassieConfig config = null)
+    public static IEnumerable<MessageInfo[]> CompileSource(string rootDirectory, bool includeSubDirectories, DassieConfig config = null)
     {
         return CompileSource(Directory.EnumerateFiles(rootDirectory, "*.ds", includeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToArray(), config);
     }
 
-    internal static List<List<ErrorInfo>> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName, string[] imports = null)
+    internal static List<List<MessageInfo>> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName, string[] imports = null)
     {
-        if (!documents.Any() && Messages.Count(m => m.Severity == Severity.Error) == 0)
+        if (!documents.Any() && EmittedMessages.Count(m => m.Severity == Severity.Error) == 0)
         {
             EmitErrorMessage(
                 0, 0, 0,
@@ -96,7 +96,7 @@ public static class Compiler
         Context.Assembly = ab;
         Context.Module = mb;
 
-        List<List<ErrorInfo>> errors = [];
+        List<List<MessageInfo>> errors = [];
 
         Reference[] refs = ReferenceValidator.ValidateReferences(config.References);
         var refsToAdd = refs.Where(r => r is AssemblyReference).Select(r => Assembly.LoadFrom(Path.GetFullPath(Path.Combine(GlobalConfig.RelativePathResolverDirectory, (r as AssemblyReference).AssemblyPath))));
@@ -132,7 +132,7 @@ public static class Compiler
         TypeFinalizer.CreateTypes(Context.Types);
 
         ISubsystem subsystem = ExtensionLoader.GetSubsystem(config.ApplicationType);
-        if (subsystem.IsExecutable && !Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == DS0028_EmptyProgram))
+        if (subsystem.IsExecutable && !Context.EntryPointIsSet && !EmittedMessages.Any(m => m.Code == DS0028_EmptyProgram))
         {
             // Create implicit entrypoint
 
@@ -163,7 +163,7 @@ public static class Compiler
     /// <param name="config">Optional configuration for the compiler.</param>
     /// <param name="configFileName">The file path to the configuration file.</param>
     /// <returns>Returns a list of errors that occured during compilation for every file.</returns>
-    public static IEnumerable<ErrorInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
+    public static IEnumerable<MessageInfo[]> CompileSource(string[] sourceFiles, DassieConfig config = null, string configFileName = ProjectConfigurationFileName)
     {
         return CompileSource(sourceFiles.Select(DocumentHelpers.FromFile), config, configFileName)
             .Select(l => l.ToArray());

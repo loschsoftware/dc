@@ -11,7 +11,7 @@ using System.Xml;
 
 #pragma warning disable CS0420
 
-namespace Dassie.Errors.Devices;
+namespace Dassie.Messages.Devices;
 
 /// <summary>
 /// Provides a singleton build log device used for logging to one or more <see cref="TextWriter"/> objects.
@@ -42,15 +42,15 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
     /// <summary>
     /// The output text writer used for error messages.
     /// </summary>
-    public static ErrorTextWriter ErrorOut { get; set; } = new([Console.Error]);
+    public static MessageTextWriter ErrorOut { get; set; } = new([Console.Error]);
     /// <summary>
     /// The output text writer used for warning messages.
     /// </summary>
-    public static ErrorTextWriter WarnOut { get; set; } = new([Console.Out]);
+    public static MessageTextWriter WarnOut { get; set; } = new([Console.Out]);
     /// <summary>
     /// The output text writer used for information messages.
     /// </summary>
-    public static ErrorTextWriter InfoOut { get; set; } = new([Console.Out]);
+    public static MessageTextWriter InfoOut { get; set; } = new([Console.Out]);
 
     public string Name => "Default";
     public BuildLogSeverity SeverityLevel => BuildLogSeverity.All;
@@ -71,7 +71,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
         InfoOut.Write(input);
     }
 
-    public void Log(ErrorInfo error)
+    public void Log(MessageInfo error)
     {
         if (_disabled)
             return;
@@ -79,7 +79,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
         Log(error, false, true);
     }
 
-    internal static void Log(ErrorInfo error, TextWriter output, bool treatAsError = false, bool addToErrorList = true, bool applyFormatting = false)
+    internal static void Log(MessageInfo error, TextWriter output, bool treatAsError = false, bool addToErrorList = true, bool applyFormatting = false)
     {
         try
         {
@@ -154,7 +154,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 SetColor();
             }
 
-            string errCode = error.ErrorCode == CustomError ? error.CustomErrorCode : error.ErrorCode.ToString().Split('_')[0];
+            string errCode = error.Code == Custom ? error.CustomCode : error.Code.ToString().Split('_')[0];
             string codePos = "\b";
 
             // Legacy colors
@@ -173,7 +173,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
             }
 
             if (!error.HideCodePosition)
-                codePos = $"({error.CodePosition.Line},{error.CodePosition.Column})";
+                codePos = $"({error.Location.Line},{error.Location.Column})";
 
             string fileError = Path.GetFileName(error.File);
 
@@ -181,7 +181,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 fileError = error.File;
 
             if (error.Severity == Severity.BuildLogMessage)
-                outBuilder.AppendLine($"{error.ErrorMessage}");
+                outBuilder.AppendLine($"{error.Text}");
             else
             {
                 if (!error.HideCodePosition || !string.IsNullOrEmpty(fileError))
@@ -199,7 +199,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                     ResetColor();
                 }
 
-                if (error.Source != ErrorSource.Compiler)
+                if (error.Source != MessageSource.Compiler)
                 {
                     SetColorRgb(34, 139, 34);
                     outBuilder.Append($"[{error.Source.ToString()}] ");
@@ -224,7 +224,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 ResetColor();
 
                 SetColorRgb(255, 255, 255);
-                outBuilder.AppendLine(error.ErrorMessage);
+                outBuilder.AppendLine(error.Text);
                 ResetColor();
             }
 
@@ -258,10 +258,10 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                     using StreamReader sr = new(CurrentFile.Path);
                     string line = "";
 
-                    for (int i = 0; i < error.CodePosition.Line; i++, line = sr.ReadLine()) ;
+                    for (int i = 0; i < error.Location.Line; i++, line = sr.ReadLine()) ;
 
                     outBuilder.AppendLine(line);
-                    outBuilder.Append(new string(' ', error.CodePosition.Column));
+                    outBuilder.Append(new string(' ', error.Location.Column));
 
                     ResetColor();
                     lock (output)
@@ -343,7 +343,7 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
         }
     }
 
-    internal static void Log(ErrorInfo error, bool treatAsError = false, bool addToErrorList = true, bool applyFormatting = true)
+    internal static void Log(MessageInfo error, bool treatAsError = false, bool addToErrorList = true, bool applyFormatting = true)
     {
         var outStream = error.Severity switch
         {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 
-namespace Dassie.Errors.Devices;
+namespace Dassie.Messages.Devices;
 
 /// <summary>
 /// Provides methods for instantiating and registering build log devices.

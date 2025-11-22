@@ -1,7 +1,7 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Macros;
-using Dassie.Errors;
 using Dassie.Extensions;
+using Dassie.Messages;
 using Dassie.Validation;
 using System;
 using System.Collections.Generic;
@@ -101,11 +101,11 @@ internal class RunCommand : CompilerCommand
 
         if (File.Exists(ProjectConfigurationFileName))
         {
-            foreach (ErrorInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
+            foreach (MessageInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
             {
                 if (error.Severity == Severity.Error)
                 {
-                    EmitGeneric(error);
+                    Emit(error);
                     return (-1, null, false, default, isProjectGroup);
                 }
             }
@@ -202,7 +202,7 @@ internal class RunCommand : CompilerCommand
         if (recompile)
         {
             int ret = BuildCommand.Instance.Invoke(buildProfile == null ? [] : [buildProfile]);
-            if (ret != 0 || Messages.Where(m => m.Severity == Severity.Error).Any())
+            if (ret != 0 || EmittedMessages.Where(m => m.Severity == Severity.Error).Any())
                 return (-1, null, false, default, isProjectGroup || config.ProjectGroup != null);
         }
 

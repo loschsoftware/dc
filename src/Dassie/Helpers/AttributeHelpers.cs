@@ -2,7 +2,7 @@
 using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Core;
-using Dassie.Errors;
+using Dassie.Messages;
 using Dassie.Meta;
 using Dassie.Parser;
 using NuGet.Protocol;
@@ -481,7 +481,7 @@ internal static class AttributeHelpers
             }
         }
 
-        ErrorMessageHelpers.EmitDS0002Error(
+        MessageHelpers.EmitDS0002Error(
             attrib.Start.Line,
             attrib.Start.Column,
             attrib.GetText().Length,

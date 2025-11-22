@@ -1,6 +1,6 @@
-﻿using Dassie.Errors;
-using Dassie.Errors.Devices;
+﻿using Dassie.Messages.Devices;
 using Dassie.Extensions;
+using Dassie.Messages;
 using Dassie.Validation;
 using System;
 using System.IO;
@@ -61,8 +61,8 @@ internal static class ProjectFileDeserializer
         if (handleImports)
             ConfigImportManager.Merge(config);
 
-        foreach (ErrorInfo error in ConfigValidation.Validate(path))
-            EmitGeneric(error);
+        foreach (MessageInfo error in ConfigValidation.Validate(path))
+            Emit(error);
 
         BuildLogDeviceContextBuilder.RegisterBuildLogDevices(config, path);
         return config;

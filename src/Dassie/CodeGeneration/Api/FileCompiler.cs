@@ -1,11 +1,10 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Configuration;
 using Dassie.Core;
 using Dassie.Data;
-using Dassie.Errors;
+using Dassie.Messages;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Text.FragmentStore;
@@ -28,7 +27,7 @@ public static class FileCompiler
     /// <param name="path">The path to the file to compile.</param>
     /// <param name="config">The compiler configuration.</param>
     /// <returns>An array of compilation errors that occured during the compilation. If no errors occured, this is an empty array.</returns>
-    public static ErrorInfo[] CompileSingleFile(string path, DassieConfig config)
+    public static MessageInfo[] CompileSingleFile(string path, DassieConfig config)
     {
         string text = "";
 

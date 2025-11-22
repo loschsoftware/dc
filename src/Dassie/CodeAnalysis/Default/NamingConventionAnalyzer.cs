@@ -1,6 +1,6 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.Configuration;
-using Dassie.Errors;
+using Dassie.Messages;
 using Dassie.Parser;
 using System.Collections.Generic;
 
@@ -11,9 +11,9 @@ internal class NamingConventionAnalyzer : ParseTreeAnalyzer<IParseTree>
     private readonly CodeAnalysisConfiguration _config;
     public NamingConventionAnalyzer(DassieConfig config = null) => _config = (config ?? new()).CodeAnalysisConfiguration;
 
-    public override List<ErrorInfo> Analyze(List<IParseTree> trees)
+    public override List<MessageInfo> Analyze(List<IParseTree> trees)
     {
-        List<ErrorInfo> allMessages = [];
+        List<MessageInfo> allMessages = [];
         
         foreach (IParseTree tree in trees)
             allMessages.AddRange(AnalyzeCompilationUnit((DassieParser.Compilation_unitContext)tree));
@@ -21,7 +21,7 @@ internal class NamingConventionAnalyzer : ParseTreeAnalyzer<IParseTree>
         return allMessages;
     }
 
-    private List<ErrorInfo> AnalyzeCompilationUnit(DassieParser.Compilation_unitContext compilationUnit)
+    private List<MessageInfo> AnalyzeCompilationUnit(DassieParser.Compilation_unitContext compilationUnit)
     {
         AnalyzingListener listener = new(config: _config);
         ParseTreeWalker.Default.Walk(listener, compilationUnit);

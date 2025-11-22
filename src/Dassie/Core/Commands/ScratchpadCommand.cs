@@ -1,7 +1,7 @@
 ﻿using Dassie.Configuration;
 using Dassie.Core.Properties;
-using Dassie.Errors;
 using Dassie.Extensions;
+using Dassie.Messages;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -236,7 +236,7 @@ internal class ScratchpadCommand : CompilerCommand
                     asm = Path.Combine(outDir, $"{cfg.AssemblyFileName}.dll");
             }
 
-            if (File.Exists(asm) && !Messages.Any(e => e.Severity == Severity.Error))
+            if (File.Exists(asm) && !EmittedMessages.Any(e => e.Severity == Severity.Error))
             {
                 ProcessStartInfo psi = new()
                 {

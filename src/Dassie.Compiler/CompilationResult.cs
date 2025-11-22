@@ -1,4 +1,4 @@
-﻿using Dassie.Errors;
+﻿using Dassie.Messages;
 using System.Collections.Generic;
 
 namespace Dassie.Compiler;
@@ -7,5 +7,5 @@ namespace Dassie.Compiler;
 /// Represents the result of a Dassie compilation.
 /// </summary>
 /// <param name="Success">Wheter or not the compilation was successful.</param>
-/// <param name="Errors">A list of compiler errors and messages emitted during the compilation.</param>
-public record CompilationResult(bool Success, List<ErrorInfo> Errors);
+/// <param name="Messages">A list of diagnostic messages emitted during the compilation.</param>
+public record CompilationResult(bool Success, List<MessageInfo> Messages);

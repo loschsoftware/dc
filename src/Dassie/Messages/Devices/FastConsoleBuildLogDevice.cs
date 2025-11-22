@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 
-namespace Dassie.Errors.Devices;
+namespace Dassie.Messages.Devices;
 
 /// <summary>
 /// Provides a singleton build log device for performant error logging to the console.
@@ -18,7 +18,7 @@ internal class FastConsoleBuildLogDevice : IBuildLogDevice
         BuildLogDevices.RemoveAll(b => b.Name == "Default");
     }
 
-    public void Log(ErrorInfo error)
+    public void Log(MessageInfo error)
     {
         string msg = error.ToString();
 

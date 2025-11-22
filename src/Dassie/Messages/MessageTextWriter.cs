@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dassie.Errors;
+namespace Dassie.Messages;
 
 #pragma warning disable CS1591
 
@@ -13,9 +13,9 @@ namespace Dassie.Errors;
 /// Implements a text writer which writes to multiple different text writers at once.
 /// </summary>
 /// <remarks>
-/// Only overrides members used by <see cref="ErrorWriter"/>.
+/// Only overrides members internally used by <see cref="MessageWriter"/>.
 /// </remarks>
-public class ErrorTextWriter : TextWriter
+public class MessageTextWriter : TextWriter
 {
     private readonly Lock _syncRoot = new();
     private bool _isStored;
@@ -24,7 +24,7 @@ public class ErrorTextWriter : TextWriter
     private TextWriter[] _writers;
     private volatile bool _isDisposed;
 
-    public ErrorTextWriter(TextWriter[] writers)
+    public MessageTextWriter(TextWriter[] writers)
     {
         _writers = writers ?? throw new ArgumentNullException(nameof(writers));
     }

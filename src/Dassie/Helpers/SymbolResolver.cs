@@ -2,7 +2,7 @@
 using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Helpers;
 using Dassie.Core;
-using Dassie.Errors;
+using Dassie.Messages;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Runtime;
@@ -700,7 +700,7 @@ internal static class SymbolResolver
             if (name == type.Name || name == type.FullName || name == type.AssemblyQualifiedName)
                 overloads = type.GetConstructors();
 
-            ErrorMessageHelpers.EmitDS0002Error(row, col, len, name, type, overloads, argumentTypes);
+            MessageHelpers.EmitDS0002Error(row, col, len, name, type, overloads, argumentTypes);
         }
 
         return null;
@@ -1053,7 +1053,7 @@ internal static class SymbolResolver
             if (name == tb.Name || name == tb.FullName)
                 overloads = tc.ConstructorContexts.Select(c => c.ConstructorBuilder);
 
-            ErrorMessageHelpers.EmitDS0002Error(row, col, len, name, tc.Builder, overloads, argumentTypes);
+            MessageHelpers.EmitDS0002Error(row, col, len, name, tc.Builder, overloads, argumentTypes);
         }
 
         return false;

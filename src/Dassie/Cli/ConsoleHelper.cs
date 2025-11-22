@@ -1,5 +1,5 @@
 ﻿using Dassie.Configuration;
-using Dassie.Errors.Devices;
+using Dassie.Messages.Devices;
 using System;
 using System.Runtime.InteropServices;
 

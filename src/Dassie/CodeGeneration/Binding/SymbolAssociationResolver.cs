@@ -1,5 +1,5 @@
 ﻿using Dassie.Core;
-using Dassie.Errors;
+using Dassie.Messages;
 using Dassie.Meta;
 using Dassie.Parser;
 using System;
@@ -19,7 +19,7 @@ internal static class SymbolAssociationResolver
             foreach (DassieParser.Type_nameContext typeName in context.UnresolvedAssociatedTypeNames)
             {
                 Type type = SymbolResolver.ResolveTypeName(typeName);
-                ErrorMessageHelpers.EnsureBaseTypeCompatibility(type, context.Builder.IsValueType,
+                MessageHelpers.EnsureBaseTypeCompatibility(type, context.Builder.IsValueType,
                     typeName.Start.Line,
                     typeName.Start.Column,
                     typeName.GetText().Length);

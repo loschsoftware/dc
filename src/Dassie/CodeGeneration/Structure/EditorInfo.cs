@@ -1,4 +1,4 @@
-﻿using Dassie.Errors;
+﻿using Dassie.Messages;
 using Dassie.Text.FragmentStore;
 using Dassie.Text.Regions;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ public class EditorInfo
     /// <summary>
     /// The errors in the code.
     /// </summary>
-    public List<ErrorInfo> Errors { get; set; } = new();
+    public List<MessageInfo> Errors { get; set; } = new();
 
     /// <summary>
     /// Fragments to support semantic syntax highlighting.

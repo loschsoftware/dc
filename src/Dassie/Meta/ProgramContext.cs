@@ -1,5 +1,5 @@
 ﻿using Dassie.Configuration;
-using Dassie.Errors;
+using Dassie.Messages;
 using Dassie.Extensions;
 using Dassie.Parser;
 using System;
@@ -64,7 +64,7 @@ internal class ProgramContext
 
     public bool ShouldThrowDS0027 { get; set; } = false;
 
-    public List<ErrorKind> CompilerSuppressedMessages { get; } = [];
+    public List<MessageCode> CompilerSuppressedMessages { get; } = [];
 
     public List<(ConstructorInfo Constructor, object[] Data)> Attributes { get; set; } = [];
 

@@ -3,8 +3,8 @@ using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using Dassie.CodeAnalysis.Default;
 using Dassie.Configuration;
-using Dassie.Errors;
 using Dassie.Extensions;
+using Dassie.Messages;
 using Dassie.Parser;
 using System;
 using System.Collections.Generic;
@@ -119,7 +119,7 @@ internal class AnalyzeCommand : CompilerCommand
             }
         }
 
-        List<ErrorInfo> errors = [];
+        List<MessageInfo> errors = [];
 
         foreach (string file in files)
         {
@@ -140,8 +140,8 @@ internal class AnalyzeCommand : CompilerCommand
             errors.AddRange(analyzer.Analyze([compilationUnit]));
         }
 
-        foreach (ErrorInfo error in errors)
-            EmitGeneric(error);
+        foreach (MessageInfo error in errors)
+            Emit(error);
 
         if (errors.Count == 0)
             WriteLine($"{Environment.NewLine}Analysis completed without messages.");

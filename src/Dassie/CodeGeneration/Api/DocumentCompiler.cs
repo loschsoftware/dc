@@ -2,8 +2,8 @@
 using Antlr4.Runtime.Tree;
 using Dassie.Configuration;
 using Dassie.Data;
-using Dassie.Errors;
 using Dassie.Lowering;
+using Dassie.Messages;
 using Dassie.Parser;
 using System.Collections.Generic;
 
@@ -38,7 +38,7 @@ internal static class DocumentCompiler
         return parser;
     }
 
-    public static List<ErrorInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath, DassieParser parser)
+    public static List<MessageInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath, DassieParser parser)
     {
         EmitBuildLogMessage($"Compiling document '{document.Name}'.", 2);
 
@@ -72,7 +72,7 @@ internal static class DocumentCompiler
         return CurrentFile.Errors;
     }
 
-    public static List<ErrorInfo> DeclareSymbols(InputDocument document, DassieConfig config, IParseTree compilationUnit)
+    public static List<MessageInfo> DeclareSymbols(InputDocument document, DassieConfig config, IParseTree compilationUnit)
     {
         SetupBogusAssembly();
         CurrentFile = Context.GetFile(document.Name);

@@ -1,5 +1,5 @@
 ﻿using Dassie.Configuration;
-using Dassie.Errors;
+using Dassie.Messages;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
@@ -44,9 +44,9 @@ internal static class ConfigValidation
     /// </summary>
     /// <param name="path">The path to the config file.</param>
     /// <returns>A list of errors in the specified project file.</returns>
-    public static List<ErrorInfo> Validate(string path)
+    public static List<MessageInfo> Validate(string path)
     {
-        List<ErrorInfo> errors = [];
+        List<MessageInfo> errors = [];
         XDocument doc = null;
 
         try
@@ -68,13 +68,13 @@ internal static class ConfigValidation
         {
             if (!_validProperties.Contains(element.Name.LocalName))
             {
-                errors.Add(new ErrorInfo()
+                errors.Add(new MessageInfo()
                 {
-                    CodePosition = (((IXmlLineInfo)element).LineNumber, ((IXmlLineInfo)element).LinePosition),
+                    Location = (((IXmlLineInfo)element).LineNumber, ((IXmlLineInfo)element).LinePosition),
                     Length = element.Name.LocalName.Length + 2,
-                    ErrorCode = DS0090_InvalidDSConfigProperty,
+                    Code = DS0090_InvalidDSConfigProperty,
                     Severity = Severity.Warning,
-                    ErrorMessage = $"Invalid property '{element.Name.LocalName}'.",
+                    Text = $"Invalid property '{element.Name.LocalName}'.",
                     File = ProjectConfigurationFileName
                 });
             }

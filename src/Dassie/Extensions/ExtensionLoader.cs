@@ -1,7 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using Dassie.Core;
-using Dassie.Errors.Devices;
+using Dassie.Messages.Devices;
 using NuGet.Packaging;
 using System;
 using System.Collections.Generic;

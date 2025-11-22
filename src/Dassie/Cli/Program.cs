@@ -3,9 +3,9 @@ using Dassie.Configuration;
 using Dassie.Configuration.Global;
 using Dassie.Core;
 using Dassie.Core.Commands;
-using Dassie.Errors;
-using Dassie.Errors.Devices;
+using Dassie.Messages.Devices;
 using Dassie.Extensions;
+using Dassie.Messages;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -50,7 +50,7 @@ internal class Program
         {
             bool verbose = EmitBuildLogMessage($"Unhandled exception occured. {ex}", 2);
 
-            if (!Messages.Any(m => m.Severity == Severity.Error))
+            if (!EmittedMessages.Any(m => m.Severity == Severity.Error))
                 EmitErrorMessage(0, 0, 0, DS0001_UnknownError, $"An internal compiler error or limitation was encountered. Unhandled exception of type '{ex.GetType()}'.", CompilerExecutableName);
 
             ConsoleHelper.PrintException(ex, verbose);
@@ -59,8 +59,8 @@ internal class Program
                 throw;
         }
 
-        if (Messages.Any(m => m.Severity == Severity.Error))
-            exit = (int)Messages.First(m => m.Severity == Severity.Error).ErrorCode;
+        if (EmittedMessages.Any(m => m.Severity == Severity.Error))
+            exit = (int)EmittedMessages.First(m => m.Severity == Severity.Error).Code;
 
         Exit(exit);
         return exit;

@@ -59,7 +59,7 @@ output.AppendLine("AOT, statically linked");
         output.AppendLine($"{"    - NuGet package storage:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages")}\"");
         output.AppendLine($"{"    - Tool paths file:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "tools.xml")}\"");
 
-        WriteOutString(output.ToString());
+        WriteString(output.ToString());
         return 0;
     }
 }
@@ -77,7 +77,7 @@ internal class IdCommand : CompilerCommand
     {
         Version v = Assembly.GetExecutingAssembly().GetName().Version;
         Version version = new(v.Major, v.Minor, v.Build - 8517);
-        WriteOutString($"{GetBuildID(version)}{Environment.NewLine}");
+        WriteString($"{GetBuildID(version)}{Environment.NewLine}");
         return 0;
     }
 

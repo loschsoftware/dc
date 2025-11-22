@@ -9,7 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using static Dassie.Errors.ErrorMessageHelpers;
+using static Dassie.Messages.MessageHelpers;
 using static Dassie.Helpers.TypeHelpers;
 
 #pragma warning disable IDE0305

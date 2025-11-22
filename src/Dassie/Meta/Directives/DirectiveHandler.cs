@@ -1,6 +1,6 @@
 ﻿using Dassie.CodeGeneration.Helpers;
-using Dassie.Errors;
 using Dassie.Extensions;
+using Dassie.Messages;
 using Dassie.Parser;
 using System;
 using System.Collections.Generic;
@@ -10,23 +10,23 @@ namespace Dassie.Meta.Directives;
 
 internal static class DirectiveHandler
 {
-    public static void Error(ErrorInfo error)
+    public static void Error(MessageInfo error)
     {
         if (!(string.IsNullOrEmpty(Context.CodeSource) || Context.CodeSource.Equals("user", StringComparison.InvariantCultureIgnoreCase)))
             return;
 
-        EmitGeneric(error);
+        Emit(error);
     }
 
-    public static void Error(int row, int col, int length, ErrorKind error, string message, string file = null)
+    public static void Error(int row, int col, int length, MessageCode error, string message, string file = null)
     {
         Error(new()
         {
-            CodePosition = (row, col),
+            Location = (row, col),
             Length = length,
             Severity = Severity.Error,
-            ErrorCode = error,
-            ErrorMessage = message,
+            Code = error,
+            Text = message,
             File = file ?? Path.GetFileName(CurrentFile.Path)
         });
     }

@@ -1,4 +1,4 @@
-﻿using Dassie.Errors;
+﻿using Dassie.Messages;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -30,7 +30,7 @@ public interface IBuildLogDevice
     /// The method called when a compiler message is emitted.
     /// </summary>
     /// <param name="error">The compiler message that was emitted.</param>
-    public void Log(ErrorInfo error);
+    public void Log(MessageInfo error);
 
     /// <summary>
     /// The method called when a string is written to the message output.

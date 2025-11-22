@@ -3,7 +3,7 @@ using Dassie.Core.Actions;
 using Dassie.Core.Commands;
 using Dassie.Core.Properties;
 using Dassie.Deployment;
-using Dassie.Errors.Devices;
+using Dassie.Messages.Devices;
 using Dassie.Extensions;
 using Dassie.Meta.Directives;
 using Dassie.Templates;

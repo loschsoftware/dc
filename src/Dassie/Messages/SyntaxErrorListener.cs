@@ -1,7 +1,7 @@
 ﻿using Antlr4.Runtime;
 using System.IO;
 
-namespace Dassie.Errors;
+namespace Dassie.Messages;
 
 internal class ParserErrorListener : BaseErrorListener
 {
@@ -9,12 +9,12 @@ internal class ParserErrorListener : BaseErrorListener
     {
         base.SyntaxError(output, recognizer, offendingSymbol, line, charPositionInLine, msg, e);
 
-        EmitGeneric(new()
+        Emit(new()
         {
-            CodePosition = (line, charPositionInLine),
+            Location = (line, charPositionInLine),
             Length = offendingSymbol.Text.Length,
-            ErrorCode = DS0002_SyntaxError,
-            ErrorMessage = new([char.ToUpperInvariant(msg[0]), .. msg[1..], '.']),
+            Code = DS0002_SyntaxError,
+            Text = new([char.ToUpperInvariant(msg[0]), .. msg[1..], '.']),
             File = CurrentFile.Path,
             Severity = Severity.Error
         });
@@ -25,11 +25,11 @@ internal class LexerErrorListener : IAntlrErrorListener<int>
 {
     public void SyntaxError(TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
     {
-        EmitGeneric(new()
+        Emit(new()
         {
-            CodePosition = (line, charPositionInLine),
-            ErrorCode = DS0002_SyntaxError,
-            ErrorMessage = new([char.ToUpperInvariant(msg[0]), .. msg[1..], '.']),
+            Location = (line, charPositionInLine),
+            Code = DS0002_SyntaxError,
+            Text = new([char.ToUpperInvariant(msg[0]), .. msg[1..], '.']),
             File = CurrentFile.Path,
             Severity = Severity.Error
         });

@@ -1,6 +1,6 @@
 ﻿using Dassie.Configuration;
-using Dassie.Errors;
-using Dassie.Errors.Devices;
+using Dassie.Messages.Devices;
+using Dassie.Messages;
 using System;
 using System.Collections.Generic;
 using System.IO;

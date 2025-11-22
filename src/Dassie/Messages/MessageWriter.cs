@@ -1,7 +1,7 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Analysis;
 using Dassie.Core.Commands;
-using Dassie.Errors.Devices;
+using Dassie.Messages.Devices;
 using Dassie.Extensions;
 using Dassie.Text.Tooltips;
 using System;
@@ -11,18 +11,18 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 
-namespace Dassie.Errors;
+namespace Dassie.Messages;
 
 /// <summary>
 /// Provides methods for emitting diagnostic messages.
 /// </summary>
-public static class ErrorWriter
+public static class MessageWriter
 {
     private static readonly Lock _lockObject = new();
     private static readonly ReaderWriterLockSlim _buildLogDevicesLock = new();
     private static readonly Lock _deferredMessagesLock = new();
 
-    static ErrorWriter()
+    static MessageWriter()
     {
         CurrentFile ??= new("");
         Context ??= new();
@@ -32,9 +32,9 @@ public static class ErrorWriter
     /// <summary>
     /// A list of all build messages emitted so far.
     /// </summary>
-    public static readonly ConcurrentBag<ErrorInfo> Messages = [];
+    internal static readonly ConcurrentBag<MessageInfo> EmittedMessages = [];
     
-    private static readonly List<(ErrorInfo Error, int MinVerbosity)> _deferredMessages = [];
+    private static readonly List<(MessageInfo Error, int MinVerbosity)> _deferredMessages = [];
 
     internal static bool BuildFailed
     {
@@ -42,7 +42,7 @@ public static class ErrorWriter
         {
             lock (_lockObject)
             {
-                return Messages.Any(m => m.Severity == Severity.Error);
+                return EmittedMessages.Any(m => m.Severity == Severity.Error);
             }
         }
     }
@@ -52,7 +52,7 @@ public static class ErrorWriter
     /// <summary>
     /// A list of build devices to use.
     /// </summary>
-    public static List<IBuildLogDevice> BuildLogDevices
+    internal static List<IBuildLogDevice> BuildLogDevices
     {
         get
         {
@@ -83,7 +83,7 @@ public static class ErrorWriter
     /// <summary>
     /// A list of error codes to ignore.
     /// </summary>
-    public static List<ErrorKind> IgnoredCodes { get; set; } = [];
+    internal static List<MessageCode> IgnoredCodes { get; set; } = [];
 
     private static readonly ConcurrentBag<IBuildLogDevice> _disabledDevices = [];
 
@@ -91,7 +91,7 @@ public static class ErrorWriter
     /// <summary>
     /// A prefix of all error messages, indicating which project the error is from.
     /// </summary>
-    public static string MessagePrefix 
+    internal static string MessagePrefix 
     { 
         get
         {
@@ -113,7 +113,7 @@ public static class ErrorWriter
     /// <summary>
     /// Used to completely disable the error writer.
     /// </summary>
-    public static bool Disabled 
+    internal static bool Disabled 
     { 
         get
         {
@@ -135,7 +135,7 @@ public static class ErrorWriter
     /// <summary>
     /// A value added to the line number of every error message.
     /// </summary>
-    public static int LineNumberOffset 
+    internal static int LineNumberOffset 
     { 
         get
         {
@@ -179,10 +179,10 @@ public static class ErrorWriter
     }
 
     /// <summary>
-    /// Emits a build message.
+    /// Emits a message.
     /// </summary>
     /// <param name="error">The message to emit.</param>
-    public static void EmitGeneric(ErrorInfo error)
+    public static void Emit(MessageInfo error)
     {
         if (Disabled)
             return;
@@ -196,7 +196,7 @@ public static class ErrorWriter
         if (Context.Configuration.Verbosity < 1)
             return;
 
-        error.CodePosition = (error.CodePosition.Line + LineNumberOffset, error.CodePosition.Column);
+        error.Location = (error.Location.Line + LineNumberOffset, error.Location.Column);
 
         if (Context.Configuration.IgnoreAllMessages && (error.Severity == Severity.Information || error.Severity == Severity.BuildLogMessage))
             return;
@@ -207,10 +207,10 @@ public static class ErrorWriter
         if (Context.Configuration.TreatWarningsAsErrors && error.Severity == Severity.Warning)
             error.Severity = Severity.Error;
 
-        if (IgnoredCodes != null && IgnoredCodes.Contains(error.ErrorCode))
+        if (IgnoredCodes != null && IgnoredCodes.Contains(error.Code))
             return;
 
-        if (Context.Configuration.IgnoredMessages.Any(i => i.Code == error.ErrorCode.ToString().Split('_')[0]))
+        if (Context.Configuration.IgnoredMessages.Any(i => i.Code == error.Code.ToString().Split('_')[0]))
         {
             if (error.Severity == Severity.Error)
             {
@@ -223,7 +223,7 @@ public static class ErrorWriter
                     loc.Column,
                     loc.Length,
                     DS0072_IllegalIgnoredMessage,
-                    $"The error code {error.ErrorCode.ToString().Split('_')[0]} cannot be ignored.",
+                    $"The error code {error.Code.ToString().Split('_')[0]} cannot be ignored.",
                     ProjectConfigurationFileName);
             }
 
@@ -231,13 +231,13 @@ public static class ErrorWriter
                 return;
         }
 
-        if (Context.CompilerSuppressedMessages.Any(e => e == error.ErrorCode))
+        if (Context.CompilerSuppressedMessages.Any(e => e == error.Code))
             return;
 
         // Filter out duplicate messages
         lock (_lockObject)
         {
-            if (Messages.Any(e => e.ErrorMessage == error.ErrorMessage && e.CodePosition == error.CodePosition))
+            if (EmittedMessages.Any(e => e.Text == error.Text && e.Location == error.Location))
                 return;
         }
 
@@ -260,9 +260,9 @@ public static class ErrorWriter
             BuildLogDeviceSafeCall(device, d => d.Log(error));
         }
 
-        Messages.Add(error);
+        EmittedMessages.Add(error);
 
-        if (Context.Configuration.MaxErrors > 0 && Messages.Count(m => m.Severity == Severity.Error) >= Context.Configuration.MaxErrors)
+        if (Context.Configuration.MaxErrors > 0 && EmittedMessages.Count(m => m.Severity == Severity.Error) >= Context.Configuration.MaxErrors)
             CompileCommand.Abort();
     }
 
@@ -278,12 +278,12 @@ public static class ErrorWriter
         if (!defer && Context.Configuration.Verbosity < minimumVerbosity)
             return false;
 
-        ErrorInfo msg = new()
+        MessageInfo msg = new()
         {
-            CodePosition = (0, 0),
+            Location = (0, 0),
             Length = 0,
-            ErrorCode = DS0102_DiagnosticInfo,
-            ErrorMessage = message,
+            Code = DS0102_DiagnosticInfo,
+            Text = message,
             File = "",
             HideCodePosition = true,
             Severity = Severity.BuildLogMessage,
@@ -300,21 +300,21 @@ public static class ErrorWriter
             return true;
         }
 
-        EmitGeneric(msg);
+        Emit(msg);
         return true;
     }
 
     /// <summary>
     /// Emits all build log messages marked as "deferred" by calls to <see cref="EmitBuildLogMessage(string, int, bool)"/>.
     /// </summary>
-    public static void EmitDeferredBuildLogMessages()
+    internal static void EmitDeferredBuildLogMessages()
     {
         lock (_deferredMessagesLock)
         {
-            foreach ((ErrorInfo error, int v) in _deferredMessages)
+            foreach ((MessageInfo error, int v) in _deferredMessages)
             {
                 if (Context.Configuration.Verbosity >= v)
-                    EmitGeneric(error);
+                    Emit(error);
             }
 
             _deferredMessages.Clear();
@@ -331,8 +331,8 @@ public static class ErrorWriter
     /// <param name="msg">The error message.</param>
     /// <param name="file">The file name to use in the error message.</param>
     /// <param name="tip">An optional tip displayed in the message.</param>
-    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, MessageCode errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -344,13 +344,13 @@ public static class ErrorWriter
             }
         ];
 
-        EmitGeneric(new ErrorInfo()
+        Emit(new MessageInfo()
         {
-            CodePosition = (ln, col),
+            Location = (ln, col),
             Length = length,
-            ErrorCode = errorType,
-            CustomErrorCode = customErrorCode,
-            ErrorMessage = msg,
+            Code = errorType,
+            CustomCode = customErrorCode,
+            Text = msg,
             File = file ?? CurrentFile.Path,
             Severity = Severity.Error,
             Tip = tip,
@@ -373,8 +373,8 @@ public static class ErrorWriter
     /// <param name="msg">The warning message.</param>
     /// <param name="file">The file name to use in the warning message.</param>
     /// <param name="tip">An optional tip displayed in the message.</param>
-    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
-    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = ErrorKind.DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
+    public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, MessageCode errorType = MessageCode.DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -386,13 +386,13 @@ public static class ErrorWriter
             }
         ];
 
-        ErrorInfo err = new()
+        MessageInfo err = new()
         {
-            CodePosition = (ln, col),
+            Location = (ln, col),
             Length = length,
-            ErrorCode = errorType,
-            CustomErrorCode = customErrorCode,
-            ErrorMessage = msg,
+            Code = errorType,
+            CustomCode = customErrorCode,
+            Text = msg,
             File = file ?? CurrentFile.Path,
             Severity = Severity.Warning,
             Tip = tip,
@@ -404,7 +404,7 @@ public static class ErrorWriter
             }
         };
 
-        EmitGeneric(err);
+        Emit(err);
     }
 
     /// <summary>
@@ -417,8 +417,8 @@ public static class ErrorWriter
     /// <param name="msg">The message.</param>
     /// <param name="file">The file name to use in the message.</param>
     /// <param name="tip">An optional tip displayed in the message.</param>
-    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="CustomError"/>.</param>
-    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, ErrorKind errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
+    public static void EmitMessage(int ln = 0, int col = 0, int length = 0, MessageCode errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -430,13 +430,13 @@ public static class ErrorWriter
             }
         ];
 
-        EmitGeneric(new ErrorInfo()
+        Emit(new MessageInfo()
         {
-            CodePosition = (ln, col),
+            Location = (ln, col),
             Length = length,
-            ErrorCode = errorType,
-            CustomErrorCode = customErrorCode,
-            ErrorMessage = msg,
+            Code = errorType,
+            CustomCode = customErrorCode,
+            Text = msg,
             File = file ?? CurrentFile.Path,
             Severity = Severity.Information,
             Tip = tip,
@@ -453,7 +453,7 @@ public static class ErrorWriter
     /// Writes a string to the designated information outputs.
     /// </summary>
     /// <param name="str">The string to write.</param>
-    public static void WriteOutString(string str)
+    public static void WriteString(string str)
     {
         if (Disabled)
             return;
@@ -477,6 +477,6 @@ public static class ErrorWriter
     /// <param name="str">The string to write.</param>
     public static void WriteLine(string str)
     {
-        WriteOutString($"{str}{Environment.NewLine}");
+        WriteString($"{str}{Environment.NewLine}");
     }
 }

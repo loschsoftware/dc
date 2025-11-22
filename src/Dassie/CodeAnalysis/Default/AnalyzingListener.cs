@@ -1,8 +1,8 @@
 ﻿using Antlr4.Runtime.Misc;
 using Dassie.CodeAnalysis.Rules;
 using Dassie.Configuration;
-using Dassie.Errors;
 using Dassie.Helpers;
+using Dassie.Messages;
 using Dassie.Parser;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Dassie.CodeAnalysis.Default;
 
 internal class AnalyzingListener : DassieParserBaseListener
 {
-    public List<ErrorInfo> Messages { get; } = [];
+    public List<MessageInfo> Messages { get; } = [];
     public AnalysisRuleSet RuleSet { get; }
     public CodeAnalysisConfiguration Configuration { get; }
 

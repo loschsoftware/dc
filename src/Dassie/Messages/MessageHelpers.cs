@@ -7,9 +7,9 @@ using System.Reflection;
 using System.Text;
 using static Dassie.Helpers.TypeHelpers;
 
-namespace Dassie.Errors;
+namespace Dassie.Messages;
 
-internal static class ErrorMessageHelpers
+internal static class MessageHelpers
 {
     public static string GenerateParamList(Type[] types)
     {

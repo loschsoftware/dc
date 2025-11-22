@@ -5,8 +5,8 @@ using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
 using Dassie.Configuration.Macros;
 using Dassie.Data;
-using Dassie.Errors;
 using Dassie.Extensions;
+using Dassie.Messages;
 using Dassie.Meta;
 using Dassie.Unmanaged;
 using Microsoft.NET.HostModel.AppHost;
@@ -84,7 +84,7 @@ internal class CompileCommand : CompilerCommand
             Directory.Delete(Context.Configuration.BuildDirectory, true);
         }
 
-        int msgCount = Messages.Count(e => e.Severity == Severity.Error);
+        int msgCount = EmittedMessages.Count(e => e.Severity == Severity.Error);
         Context.Configuration.MaxErrors = 0;
 
         EmitMessage(
@@ -281,13 +281,13 @@ internal class CompileCommand : CompilerCommand
         LineNumberOffset = 0;
         UnionTypeCodeGeneration._createdUnionTypes.Clear();
 
-        if (Messages.Any(m => m.ErrorCode == DS0107_NoInputFiles))
+        if (EmittedMessages.Any(m => m.Code == DS0107_NoInputFiles))
             return -1;
 
         EmitBuildLogMessage("Starting second pass.", 2);
 
         // Step 2
-        IEnumerable<ErrorInfo[]> errors = CompileSource(documents, config, imports: subsystem.Imports).Select(l => l.ToArray());
+        IEnumerable<MessageInfo[]> errors = CompileSource(documents, config, imports: subsystem.Imports).Select(l => l.ToArray());
 
         string resFile = "";
 

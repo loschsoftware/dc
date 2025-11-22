@@ -5,7 +5,7 @@ using Dassie.CodeGeneration.Helpers;
 using Dassie.CodeGeneration.Structure;
 using Dassie.Core;
 using Dassie.Core.Meta;
-using Dassie.Errors;
+using Dassie.Messages;
 using Dassie.Intrinsics;
 using Dassie.Meta;
 using Dassie.Meta.Directives;
@@ -678,7 +678,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                                 $"The project type ('{Context.Configuration.ApplicationType}') does not produce an executable, so the <EntryPoint> attribute is ignored.");
                         }
 
-                        if (Context.EntryPointIsSet && !Messages.Any(m => m.ErrorCode == DS0192_AmbiguousEntryPoint))
+                        if (Context.EntryPointIsSet && !EmittedMessages.Any(m => m.Code == DS0192_AmbiguousEntryPoint))
                         {
                             EmitErrorMessage(
                                 context.attribute()[i].Start.Line,
@@ -706,7 +706,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                                 context.Identifier().GetIdentifier().Length,
                                 DS0202_EntryPointInvalidSignature,
                                 $"""
-                                The application entry point has an invalid signature ({ErrorMessageHelpers.GenerateParamList(CurrentMethod.Parameters.Select(p => p.Type).ToArray())} -> {TypeName(tReturn)}). The only allowed signatures are:
+                                The application entry point has an invalid signature ({MessageHelpers.GenerateParamList(CurrentMethod.Parameters.Select(p => p.Type).ToArray())} -> {TypeName(tReturn)}). The only allowed signatures are:
                                     * [] -> null
                                     * [] -> int
                                     * [] -> uint
@@ -3200,7 +3200,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                         argTypes = null;
                 }
 
-                ErrorMessageHelpers.EmitDS0002ErrorIfInvalid(
+                MessageHelpers.EmitDS0002ErrorIfInvalid(
                     context.full_identifier().Identifier()[0].Symbol.Line,
                     context.full_identifier().Identifier()[0].Symbol.Column,
                     context.full_identifier().Identifier()[0].GetText().Length,
@@ -5024,7 +5024,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         };
 
         string ds0074Message = $"'{CurrentMethod.Builder.Name}': The number of local variables in a function cannot exceed {ushort.MaxValue - 1}.";
-        if (localSymbol.Index() > (ushort.MaxValue - 1) && !Messages.Any(m => m.ErrorMessage == ds0074Message))
+        if (localSymbol.Index() > (ushort.MaxValue - 1) && !EmittedMessages.Any(m => m.Text == ds0074Message))
         {
             EmitErrorMessage(
                 context.Identifier().Symbol.Line,
@@ -6289,7 +6289,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (final == null)
         {
-            ErrorMessageHelpers.EmitDS0002Error(
+            MessageHelpers.EmitDS0002Error(
                 context.Custom_Operator().Symbol.Line,
                 context.Custom_Operator().Symbol.Column,
                 context.Custom_Operator().GetText().Length,

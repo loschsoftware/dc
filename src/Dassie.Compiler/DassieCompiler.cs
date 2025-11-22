@@ -1,5 +1,5 @@
 ﻿using Dassie.Core.Commands;
-using Dassie.Errors;
+using Dassie.Messages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,8 +27,8 @@ public static class DassieCompiler
             arglist.Add($"--Document:{doc.SymbolicName}:{doc.SourceText}");
 
         int result = CompileCommand.Instance.Invoke(arglist.ToArray(), context.Configuration);
-        bool success = result == 0 && !ErrorWriter.Messages.Any(m => m.Severity == Severity.Error);
-        return new(success, ErrorWriter.Messages.ToList());
+        bool success = result == 0 && !MessageWriter.EmittedMessages.Any(m => m.Severity == Severity.Error);
+        return new(success, MessageWriter.EmittedMessages.ToList());
     }
 
     private static CompilationResult CompileProjectWithArguments(string projectFilePath, string[] args)
@@ -39,8 +39,8 @@ public static class DassieCompiler
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(projectFilePath));
         int result = BuildCommand.Instance.Invoke(args);
-        bool success = result == 0 && !ErrorWriter.Messages.Any(m => m.Severity == Severity.Error);
-        return new(success, ErrorWriter.Messages.ToList());
+        bool success = result == 0 && !MessageWriter.EmittedMessages.Any(m => m.Severity == Severity.Error);
+        return new(success, MessageWriter.EmittedMessages.ToList());
     }
 
     /// <summary>

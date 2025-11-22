@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 
-namespace Dassie.Errors.Devices;
+namespace Dassie.Messages.Devices;
 
 /// <summary>
 /// Provides a build log device for logging to files.
@@ -42,7 +42,7 @@ internal class FileBuildLogDevice : IBuildLogDevice, IDisposable
     // No logic here, since it is handled by TextWriterBuildLogDevice
 
     /// <inheritdoc/>
-    public void Log(ErrorInfo error) { }
+    public void Log(MessageInfo error) { }
     /// <inheritdoc/>
     public void WriteString(string input) { }
 

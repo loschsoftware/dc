@@ -4,17 +4,17 @@ using Dassie.Meta;
 using System;
 using System.Reflection.Emit;
 
-namespace Dassie.Errors;
+namespace Dassie.Messages;
 
 /// <summary>
-/// Specifies the type of a Dassie error.
+/// Specifies the code of a diagnostic message.
 /// </summary>
-public enum ErrorKind
+public enum MessageCode
 {
     /// <summary>
-    /// Represents a custom error message emitted by tools such as code analyzers.
+    /// Represents a custom message emitted by tools such as code analyzers.
     /// </summary>
-    CustomError = -1,
+    Custom = -1,
     /// <summary>
     /// Specifies that an operation was successful.
     /// </summary>

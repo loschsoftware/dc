@@ -1,5 +1,5 @@
 ﻿using Antlr4.Runtime;
-using Dassie.Errors;
+using Dassie.Messages;
 using Dassie.Parser;
 using Dassie.Text;
 using Dassie.Text.Regions;
@@ -52,7 +52,7 @@ internal class FileContext
 
     public bool CompilationFailed { get; set; }
 
-    public List<ErrorInfo> Errors { get; } = [];
+    public List<MessageInfo> Errors { get; } = [];
 
     public List<FoldingRegion> FoldingRegions { get; } = [];
 
