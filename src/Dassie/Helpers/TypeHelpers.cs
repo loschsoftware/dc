@@ -970,12 +970,12 @@ internal static class TypeHelpers
 
         t = RemoveByRef(t);
 
-        if (t is TypeBuilder)
+        if (t is TypeBuilder || t.GetType().Name == "TypeBuilderInstantiation")
         {
-            if (Context.Types.First(tc => tc.FullName == t.FullName).IsNewType)
-                return true;
+            if (!Context.Types.Any(tc => tc.FullName == t.FullName))
+                return false;
 
-            return false;
+            return Context.Types.First(tc => tc.FullName == t.FullName).IsNewType;
         }
 
         return t.GetCustomAttribute<NewTypeAttribute>() != null;
