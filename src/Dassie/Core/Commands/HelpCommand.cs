@@ -50,8 +50,22 @@ internal class HelpCommand : CompilerCommand
 
     public override int Invoke(string[] args)
     {
-        if (args != null && args.Length > 0 && ExtensionLoader.Commands.Any(c => c.Command == args[0] || c.Aliases.Any(a => a == args[0])))
-            return DisplayHelpForCommand(ExtensionLoader.Commands.First(c => c.Command == args[0] || c.Aliases.Any(a => a == args[0])));
+        if (args != null && args.Length == 1)
+        {
+            if (ExtensionLoader.Commands.Any(c => c.Command == args[0] || c.Aliases.Any(a => a == args[0])))
+                return DisplayHelpForCommand(ExtensionLoader.Commands.First(c => c.Command == args[0] || c.Aliases.Any(a => a == args[0])));
+
+            if (args[0].TrimStart("-") == args[0])
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0101_InvalidCommand,
+                    $"Could not load help details for '{args[0]}': Command not found.",
+                    CompilerExecutableName);
+
+                return -1;
+            }
+        }
 
         return DisplayHelpMessage(args);
     }
