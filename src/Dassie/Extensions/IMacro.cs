@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Dassie.Extensions;
+﻿namespace Dassie.Extensions;
 
 /// <summary>
 /// Defines a mechanism for extensions to provide build system macros.
