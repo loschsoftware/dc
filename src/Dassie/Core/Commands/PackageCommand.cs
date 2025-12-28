@@ -202,6 +202,7 @@ internal class PackageCommand : CompilerCommand
         PrintFeatures("Deployment targets", package.DeploymentTargets().Select(t => t.Name));
         PrintFeatures("Subsystems", package.Subsystems().Select(s => s.Name));
         PrintFeatures("Build actions", package.BuildActions().Select(b => b.Name));
+        PrintFeatures("Macros", package.Macros().Select(b => b.Macro));
 
         HelpCommand.DisplayLogo();
         Console.WriteLine(sb.ToString());

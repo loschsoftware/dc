@@ -107,4 +107,9 @@ public interface IPackage
     /// An array of build actions.
     /// </summary>
     public virtual IBuildAction[] BuildActions() => [];
+
+    /// <summary>
+    /// An array of macros defined by this extension.
+    /// </summary>
+    public virtual IMacro[] Macros() => [];
 }

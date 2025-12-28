@@ -67,4 +67,7 @@ public abstract class Extension : IPackage
 
     /// <inheritdoc/>
     public virtual IBuildAction[] BuildActions() => [];
+
+    /// <inheritdoc/>
+    public virtual IMacro[] Macros() => [];
 }

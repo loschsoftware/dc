@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dassie.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -39,12 +40,12 @@ internal class MacroParser
 
         Dictionary<string, string> macros = new()
         {
-            { "time", DateTime.Now.ToShortTimeString() },
-            { "timeexact", DateTime.Now.ToString("HH:mm:ss.ffff") },
-            { "date", DateTime.Now.ToShortDateString() },
-            { "year", DateTime.Now.Year.ToString() },
-            { "compilerdirectory", compilerDir },
-            { "compilerpath", compilerPath }
+            { "Time", DateTime.Now.ToShortTimeString() },
+            { "TimeExact", DateTime.Now.ToString("HH:mm:ss.ffff") },
+            { "Date", DateTime.Now.ToShortDateString() },
+            { "Year", DateTime.Now.Year.ToString() },
+            { "CompilerDir", compilerDir },
+            { "CompilerPath", compilerPath }
         };
 
         foreach (var macro in macros)
@@ -115,20 +116,26 @@ internal class MacroParser
             Regex macroRegex = new(@"\$\(.+?\)");
             foreach (Match match in macroRegex.Matches(val))
             {
-                if (!_macros.Any(k => k.Key == match.Value[2..^1].ToLowerInvariant()))
+                string macroName = match.Value[2..^1];
+                string expansion;
+
+                if (_macros.Any(k => k.Key == macroName))
+                    expansion = _macros[macroName];
+                else if (ExtensionLoader.Macros.Any(m => m.Macro == macroName))
+                    expansion = ExtensionLoader.Macros.First(m => m.Macro == macroName).Expand();
+                else
                 {
                     EmitWarningMessage(
                         0, 0, 0,
                         DS0083_InvalidDSConfigMacro,
-                        $"The macro '{match.Value[2..^1]}' does not exist and will be ignored.",
+                        $"The macro '{macroName}' does not exist and will be ignored.",
                         ProjectConfigurationFileName);
 
                     val = val.Replace(match.Value, "");
-
                     break;
                 }
 
-                val = val.Replace(match.Value, _macros[match.Value[2..^1].ToLowerInvariant()], StringComparison.InvariantCultureIgnoreCase);
+                val = val.Replace(match.Value, expansion);
             }
 
             if (prop.SetMethod != null)
@@ -155,8 +162,12 @@ internal class MacroParser
                         while ((char)sr.Peek() != ')')
                             macroNameBuilder.Append((char)sr.Read());
 
-                        if (_macros.TryGetValue(macroNameBuilder.ToString(), out string value))
+                        string macroName = macroNameBuilder.ToString();
+
+                        if (_macros.TryGetValue(macroName, out string value))
                             result.Append(value);
+                        else if (ExtensionLoader.Macros.Any(m => m.Macro == macroName))
+                            result.Append(ExtensionLoader.Macros.First(m => m.Macro == macroName).Expand());
 
                         sr.Read();
                         break;

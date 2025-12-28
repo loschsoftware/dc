@@ -9,9 +9,9 @@ internal static class MacroGenerator
     {
         Dictionary<string, string> macros = [];
 
-        macros.Add("projectdir", Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)) + Path.DirectorySeparatorChar);
-        macros.Add("projectname", Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)).Split(Path.DirectorySeparatorChar).Last());
-        macros.Add("outputdir", Path.GetFullPath(cfg.BuildDirectory ?? Directory.GetCurrentDirectory()) + Path.DirectorySeparatorChar);
+        macros.Add("ProjectDir", Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)) + Path.DirectorySeparatorChar);
+        macros.Add("ProjectName", Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)).Split(Path.DirectorySeparatorChar).Last());
+        macros.Add("OutputDir", Path.GetFullPath(cfg.BuildDirectory ?? Directory.GetCurrentDirectory()) + Path.DirectorySeparatorChar);
 
         if (cfg.MacroDefinitions != null)
         {
@@ -20,7 +20,7 @@ internal static class MacroGenerator
                 if (macro.Name == null)
                     continue;
 
-                macros.Add(macro.Name.ToLowerInvariant(), macro.Value ?? "");
+                macros.Add(macro.Name, macro.Value ?? "");
             }
         }
 
