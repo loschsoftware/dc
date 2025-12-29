@@ -18,7 +18,7 @@ internal partial class MacroParser
             AddDefaultMacros();
     }
 
-    [GeneratedRegex(@"\$\(.+?\)")]
+    [GeneratedRegex(@"\$\([^$\(\r\n]+?\)")]
     private static partial Regex MacroRegex();
 
     private readonly Dictionary<string, string> _macros = [];
