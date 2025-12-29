@@ -101,8 +101,8 @@ internal static class TemplateBuilder
         MacroParser parser = new(true);
         parser.ImportMacros(new()
         {
-            ["projectname"] = args[1],
-            ["projectdir"] = rootDir
+            ["ProjectName"] = args[1],
+            ["ProjectDir"] = rootDir
         });
 
         parser.Normalize(config);

@@ -22,7 +22,7 @@ internal static class ProjectFileDeserializer
 
     private static DassieConfig Deserialize()
         => Deserialize(ProjectConfigurationFileName);
-
+    
     public static DassieConfig Deserialize(string path, bool handleImports = true)
     {
         if (!File.Exists(path))

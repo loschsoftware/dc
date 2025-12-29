@@ -97,23 +97,7 @@ internal class RunCommand : CompilerCommand
 
     internal static (int Status, string AssemblyPath, bool IsNative, ISubsystem Type, bool IsProjectGroup) Compile(bool ignoreDS0031 = false, bool isProjectGroup = false, string buildProfile = null)
     {
-        DassieConfig config = null;
-
-        if (File.Exists(ProjectConfigurationFileName))
-        {
-            foreach (MessageInfo error in ConfigValidation.Validate(ProjectConfigurationFileName))
-            {
-                if (error.Severity == Severity.Error)
-                {
-                    Emit(error);
-                    return (-1, null, false, default, isProjectGroup);
-                }
-            }
-
-            XmlSerializer xmls = new(typeof(DassieConfig));
-            using StreamReader sr = new(ProjectConfigurationFileName);
-            config = (DassieConfig)xmls.Deserialize(sr);
-        }
+        DassieConfig config = ProjectFileDeserializer.DassieConfig;
 
         if (ignoreDS0031)
             IgnoredCodes.Add(DS0031_NoEntryPoint);
@@ -139,10 +123,6 @@ internal class RunCommand : CompilerCommand
         }
         else
         {
-            MacroParser parser = new();
-            parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
-            parser.Normalize(config);
-
             if (config.ProjectGroup != null)
             {
                 (int code, string path) = ProjectGroupHelpers.GetExecutableProject(config);
