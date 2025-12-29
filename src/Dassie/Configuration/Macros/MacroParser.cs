@@ -19,6 +19,7 @@ internal partial class MacroParser
     [GeneratedRegex(@"\$\([^$\)\(\r\n]+?\)")]
     private static partial Regex MacroRegex();
 
+    private static readonly int _maxDepth = 100;
     private readonly Dictionary<string, string> _macros = [];
 
     public void ImportMacros(Dictionary<string, string> macros)
@@ -125,14 +126,16 @@ internal partial class MacroParser
     {
         string result = str;
         string previous;
+        int depth = 0;
         Regex macroRegex = MacroRegex();
 
         do
         {
+            string macroName = "";
             previous = result;
             result = macroRegex.Replace(result, match =>
             {
-                string macroName = match.Value[2..^1];
+                macroName = match.Value[2..^1];
 
                 if (_macros.TryGetValue(macroName, out string value))
                     return value;
@@ -140,14 +143,25 @@ internal partial class MacroParser
                 if (ExtensionLoader.Macros.Any(m => m.Macro == macroName))
                     return ExtensionLoader.Macros.First(m => m.Macro == macroName).Expand();
 
-                EmitWarningMessage(
+                EmitErrorMessage(
                     0, 0, 0,
                     DS0083_InvalidDSConfigMacro,
-                    $"The macro '{macroName}' does not exist and will be ignored.",
+                    $"Failed to expand macro '{macroName}': Macro is not defined.",
                     ProjectConfigurationFileName);
 
                 return "";
             });
+
+            if (depth++ >= _maxDepth)
+            {
+                EmitErrorMessage(
+                    0, 0, 0,
+                    DS0266_MacroRecursionLimitReached,
+                    $"Failed to expand macro '{macroName}': Maximum recursion depth reached.",
+                    ProjectConfigurationFileName);
+
+                return "";
+            }
         }
         while (result != previous && macroRegex.IsMatch(result));
 

@@ -1094,5 +1094,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when the user attempts to uninstall the built-in "Core" package.
     /// </summary>
-    DS0265_CorePackageRemoved
+    DS0265_CorePackageRemoved,
+    /// <summary>
+    /// Emitted when a macro expansion reaches the maximum allowed recursion depth.
+    /// </summary>
+    DS0266_MacroRecursionLimitReached
 }
