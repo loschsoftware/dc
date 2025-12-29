@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace Dassie.Configuration.Macros;
 
-internal class MacroParser
+internal partial class MacroParser
 {
     public MacroParser(bool addDefaults = true)
     {
@@ -18,7 +18,10 @@ internal class MacroParser
             AddDefaultMacros();
     }
 
-    private Dictionary<string, string> _macros = [];
+    [GeneratedRegex(@"\$\(.+?\)")]
+    private static partial Regex MacroRegex();
+
+    private readonly Dictionary<string, string> _macros = [];
 
     public void ImportMacros(Dictionary<string, string> macros)
     {
@@ -113,7 +116,7 @@ internal class MacroParser
             if (val == null)
                 continue;
 
-            Regex macroRegex = new(@"\$\(.+?\)");
+            Regex macroRegex = MacroRegex();
             foreach (Match match in macroRegex.Matches(val))
             {
                 string macroName = match.Value[2..^1];

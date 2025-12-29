@@ -180,7 +180,6 @@ internal class AnalyzeCommand : CompilerCommand
         }
 
         files = files.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();
-
         return AnalyzeFiles(files, ProjectFileDeserializer.DassieConfig, analyzerName);
     }
 }
