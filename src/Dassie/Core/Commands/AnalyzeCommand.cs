@@ -162,7 +162,23 @@ internal class AnalyzeCommand : CompilerCommand
             return -1;
         }
 
-        string[] files = Directory.EnumerateFiles("./", "*.ds", SearchOption.AllDirectories).ToArray();
+        string[] files;
+
+        try
+        {
+            files = Directory.EnumerateFiles("./", "*.ds", SearchOption.AllDirectories).ToArray();
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0030_FileAccessDenied,
+                $"Could not determine source files to analyze: {ex.Message}",
+                CompilerExecutableName);
+
+            return -1;
+        }
+
         files = files.Where(f => Path.GetDirectoryName(f).Split(Path.DirectorySeparatorChar).Last() != TemporaryBuildDirectoryName).ToArray();
 
         return AnalyzeFiles(files, ProjectFileDeserializer.DassieConfig, analyzerName);
