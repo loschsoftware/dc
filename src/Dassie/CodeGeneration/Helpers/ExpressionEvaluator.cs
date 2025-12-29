@@ -467,7 +467,7 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         return (char)int.Parse(sequence.ToString(), NumberStyles.HexNumber);
     }
 
-    private static string GetRawString(string str)
+    public static string GetRawString(string str)
     {
         StringReader sr = new(str);
         StringBuilder sb = new();

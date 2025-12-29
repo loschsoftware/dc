@@ -89,6 +89,7 @@ internal class CorePackage : IPackage
     public IBuildAction[] BuildActions() =>
     [
         new CompilerCommandBuildAction(),
-        new ShellCommandBuildAction()
+        new ShellCommandBuildAction(),
+        new PrintAction()
     ];
 }
