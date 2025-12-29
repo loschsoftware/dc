@@ -186,7 +186,15 @@ internal class RunCommand : CompilerCommand
 
         foreach (string dir in ((config ??= new()).References ?? []).Where(r => r is ProjectReference).Cast<ProjectReference>().Select(p => Path.GetDirectoryName(p.ProjectFile)).Append(Directory.GetCurrentDirectory()))
         {
-            sourceFiles.AddRange(Directory.GetFiles(dir, "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)));
+            try
+            {
+                sourceFiles.AddRange(Directory.GetFiles(dir, "*.ds", SearchOption.AllDirectories).Select(p => new FileInfo(p)));
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+            {
+                // Appropriate error is displayed elsewhere
+                continue;
+            }
 
             string projectFile = Path.Combine(dir, ProjectConfigurationFileName);
             if (File.Exists(projectFile))
