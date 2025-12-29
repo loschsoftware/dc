@@ -192,7 +192,7 @@ internal class RunCommand : CompilerCommand
             }
             catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
             {
-                // Appropriate error is displayed elsewhere
+                // Appropriate error is emitted elsewhere
                 continue;
             }
 
