@@ -1090,5 +1090,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when a build action ends with a nonzero exit code.
     /// </summary>
-    DS0264_BuildActionFailed
+    DS0264_BuildActionFailed,
+    /// <summary>
+    /// Emitted when the user attempts to uninstall the built-in "Core" package.
+    /// </summary>
+    DS0265_CorePackageRemoved
 }

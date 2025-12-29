@@ -106,6 +106,10 @@ internal class PackageCommand : CompilerCommand
     {
         List<IPackage> packages = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
 
+        int corePackageIndex = packages.IndexOf(CorePackage.Instance);
+        packages.RemoveAt(corePackageIndex);
+        packages.Insert(0, CorePackage.Instance);
+
         if (packages.Count == 0)
         {
             Console.WriteLine("No extensions installed.");
@@ -114,20 +118,20 @@ internal class PackageCommand : CompilerCommand
 
         HelpCommand.DisplayLogo();
         Console.WriteLine();
-        Console.WriteLine("Installed extensions:");
+        Console.WriteLine("Installed modules and extensions:");
         Console.WriteLine();
 
         string header = $"{"\e[1mName\e[22m",-59}\e[1mVersion\e[22m";
         Console.WriteLine(header);
         Console.WriteLine(new string('-', header.Length - 18));
 
-        foreach (IPackage package in packages.Where(p => p.Metadata.Name != "Default"))
+        foreach (IPackage package in packages)
         {
-            string packageDisplay = package.Metadata.Name;
+            string packageDisplay = $"{(package == CorePackage.Instance ? "\e[1;31m[Built-in]\e[0m " : "")}{package.Metadata.Name}";
             if (packageDisplay.Length > 45)
                 packageDisplay = packageDisplay[0..45] + "...";
 
-            Console.WriteLine($"{packageDisplay,-50}{package.Metadata.Version}");
+            Console.WriteLine($"{packageDisplay,-50}{(package == CorePackage.Instance ? new string(' ', 11) : "")}{package.Metadata.Version}");
         }
 
         return 0;
@@ -191,7 +195,7 @@ internal class PackageCommand : CompilerCommand
         sb.AppendLine($"{"    Version:",-50}{package.Metadata.Version}");
         sb.AppendLine($"{"    File:",-50}{package.GetType().Assembly.Location}");
 
-        IEnumerable<ICompilerCommand> definedCommands = ExtensionLoader.Commands.Where(c => c.GetType().Assembly == package.GetType().Assembly);
+        IEnumerable<ICompilerCommand> definedCommands = ExtensionLoader.Commands.Where(c => !c.Options.HasFlag(CommandOptions.Hidden) && c.GetType().Assembly == package.GetType().Assembly);
         PrintFeatures("Commands", definedCommands.Select(cmd => $"{$"{cmd.Command}",-46}{cmd.Description}"));
         PrintFeatures("Code analyzers", package.CodeAnalyzers().Select(a => a.Name));
         PrintFeatures("Configuration providers", package.ConfigurationProviders().Select(p => p.Name));
@@ -303,6 +307,17 @@ internal class PackageCommand : CompilerCommand
 
     private static int Remove(string name)
     {
+        if (name == CorePackage.Instance.Metadata.Name)
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0265_CorePackageRemoved,
+                $"The built-in module '{CorePackage.Instance.Metadata.Name}' cannot be uninstalled.",
+                CompilerExecutableName);
+
+            return -1;
+        }
+
         List<IPackage> installed = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
 
         if (!installed.Any(p => p.Metadata.Name == name))

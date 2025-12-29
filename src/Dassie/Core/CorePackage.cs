@@ -19,7 +19,7 @@ internal class CorePackage : IPackage
     private static CorePackage _instance;
     public static CorePackage Instance => _instance ??= new();
 
-    public bool Hidden() => true;
+    public bool Hidden() => false;
 
     public PackageMetadata Metadata => new()
     {
