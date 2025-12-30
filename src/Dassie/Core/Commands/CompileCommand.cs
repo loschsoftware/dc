@@ -98,6 +98,9 @@ internal class CompileCommand : CompilerCommand
 
     private static int Compile(string[] args, DassieConfig overrideSettings = null, string assemblyName = null)
     {
+        if (!ExtensionLoader.Commands.Contains(Instance))
+            return HelpCommand.Instance.Invoke([]);
+
         string workingDir = Directory.GetCurrentDirectory();
         long stopwatchTimeStamp = Stopwatch.GetTimestamp();
 
@@ -782,7 +785,7 @@ internal class CompileCommand : CompilerCommand
                     errorMsg.Append($"Did you mean '{cmds.First()}'?");
                 else if (dist < 5)
                     errorMsg.Append($"Closest match is '{cmds.First()}'.");
-                else
+                else if (ExtensionLoader.Commands.Contains(HelpCommand.Instance))
                     errorMsg.Append("Use 'dc help' for a list of available commands.");
 
                 EmitErrorMessage(

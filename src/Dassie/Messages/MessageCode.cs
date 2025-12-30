@@ -1098,5 +1098,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when a macro expansion reaches the maximum allowed recursion depth.
     /// </summary>
-    DS0266_MacroRecursionLimitReached
+    DS0266_MacroRecursionLimitReached,
+    /// <summary>
+    /// Emitted when no commands are available for execution.
+    /// </summary>
+    DS0267_NoCommandsAvailable
 }

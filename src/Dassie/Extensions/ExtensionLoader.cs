@@ -298,6 +298,9 @@ internal static class ExtensionLoader
 
     public static void Unload(IPackage package)
     {
+        if (!InstalledExtensions.Contains(package))
+            return;
+
         try
         {
             package?.Unload();
@@ -314,15 +317,14 @@ internal static class ExtensionLoader
                 TextWriterBuildLogDevice.ErrorOut.WriteLine(ex.ToString());
         }
 
+        InstalledExtensions.Remove(package);
         EmitBuildLogMessage($"Unloaded extension '{package.Metadata.Name}'.", 2);
     }
 
     public static void UnloadAll()
     {
-        foreach (IPackage package in InstalledExtensions.Except([CorePackage.Instance]))
+        foreach (IPackage package in InstalledExtensions.ToArray())
             Unload(package);
-
-        InstalledExtensions.Clear();
     }
 
     public static bool TryGetAnalyzer(string name, out IAnalyzer<IParseTree> analyzer)

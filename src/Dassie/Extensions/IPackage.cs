@@ -16,7 +16,7 @@ public interface IPackage
     public PackageMetadata Metadata { get; }
 
     /// <summary>
-    /// If <see langword="true"/>, the extension is hidden and does not appear in extension lists.
+    /// If <see langword="true"/>, the extension is hidden and does not appear in the list of installed extensions.
     /// </summary>
     /// <returns>Wheter or not the package is hidden.</returns>
     public virtual bool Hidden() => false;
@@ -27,24 +27,28 @@ public interface IPackage
     public virtual ExtensionModes Modes() => ExtensionModes.Global | ExtensionModes.Transient;
 
     /// <summary>
-    /// The method called when the extension is initialized in global mode. This method is only called if the extension is configured to allow initialization in global mode.
+    /// The method that is called immediately after the extension was loaded in global mode. This method is only called if the extension is configured to allow initialization in global mode.
     /// </summary>
-    /// <param name="environment">The environment the extension is loaded in.</param>
-    /// <returns>A status code representing the result of the initialization. If nonzero, the compiler will emit an error.</returns>
+    /// <param name="environment">The environment the extension was loaded in.</param>
+    /// <returns>A status code representing the result of the initialization. If non-zero, the compiler will emit an error.</returns>
     public virtual int InitializeGlobal(IEnvironmentInfo environment) => 0;
 
     /// <summary>
-    /// The method called when the extension is initialized in transient mode. This method is only called if the extension is configured to allow initialization in transient mode.
+    /// The method that is called immediately after the extension was loaded in transient mode. This method is only called if the extension is configured to allow initialization in transient mode.
     /// </summary>
-    /// <param name="environment">The environment the extension is loaded in.</param>
+    /// <param name="environment">The environment the extension was loaded in.</param>
     /// <param name="attributes">The XML attributes the extension is initialized with.</param>
     /// <param name="elements">The XML elements the extension is initialized with.</param>
-    /// <returns>A status code representing the result of the initialization. If nonzero, the compiler will emit an error.</returns>
+    /// <returns>A status code representing the result of the initialization. If non-zero, the compiler will emit an error.</returns>
     public virtual int InitializeTransient(IEnvironmentInfo environment, List<XmlAttribute> attributes, List<XmlElement> elements) => 0;
 
     /// <summary>
-    /// The method that is called when the extension is unloaded.
+    /// The method that is called immediately before the extension is unloaded.
     /// </summary>
+    /// <remarks>
+    /// Under normal operation, the unloading of an extension coincides with the termination of the compiler process.
+    /// The <see cref="Unload"/> method is only called if the compiler process is ending gracefully.
+    /// </remarks>
     public virtual void Unload() { }
 
     /// <summary>

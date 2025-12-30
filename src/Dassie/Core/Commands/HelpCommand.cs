@@ -244,32 +244,57 @@ internal class HelpCommand : CompilerCommand
             Console.ForegroundColor = prev;
         }
 
+        bool commandsAvailable = ExtensionLoader.Commands.Any();
+        bool helpCommandAvailable = ExtensionLoader.Commands.Contains(Instance);
+
         StringBuilder sb = new();
 
-        sb.AppendLine();
-        sb.AppendLine("Usage:");
+        if (commandsAvailable)
+        {
+            sb.AppendLine();
+            sb.AppendLine("Usage:");
 
-        sb.Append("    dc <Files> [Options]".PadRight(35));
-        sb.Append(FormatLines("Compiles the specified source files. Use 'dc help compile' for more information."));
+            if (ExtensionLoader.Commands.Contains(CompileCommand.Instance))
+            {
+                sb.Append("    dc <Files> [Options]".PadRight(35));
+                sb.Append(FormatLines($"Compiles the specified source files. {(helpCommandAvailable ? "Use 'dc help compile' for more information." : "")}"));
+            }
 
-        sb.Append("    dc <Command> [Options]".PadRight(35));
-        sb.Append(FormatLines("Executes a command from the list below."));
+            sb.Append("    dc <Command> [Options]".PadRight(35));
+            sb.Append(FormatLines("Executes a command from the list below."));
 
-        sb.Append("    dc help <Command>".PadRight(35));
-        sb.Append(FormatLines("Displays more information about a specific command."));
+            if (helpCommandAvailable)
+            {
+                sb.Append("    dc help <Command>".PadRight(35));
+                sb.Append(FormatLines("Displays more information about a specific command."));
+            }
+        }
+        else
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0267_NoCommandsAvailable,
+                $"No commands are installed. If the issue persists, please try to install an appropriate package or reinstall the application.",
+                CompilerExecutableName);
 
-        sb.AppendLine();
-        sb.AppendLine("Commands:");
+            return -1;
+        }
 
         IEnumerable<ICompilerCommand> internalCommands = ExtensionLoader.Commands.OrderBy(c => c.Command).Where(c => !c.Options.HasFlag(CommandOptions.Hidden)
             && c.GetType().Assembly == Assembly.GetExecutingAssembly());
 
         IEnumerable<ICompilerCommand> externalCommands = ExtensionLoader.Commands.Where(c => !c.Options.HasFlag(CommandOptions.Hidden)).Except(internalCommands);
 
-        foreach (ICompilerCommand command in internalCommands)
+        if (internalCommands.Any())
         {
-            sb.Append($"    {command.Command}".PadRight(35));
-            sb.Append(FormatLines(command.Description));
+            sb.AppendLine();
+            sb.AppendLine("Commands:");
+
+            foreach (ICompilerCommand command in internalCommands)
+            {
+                sb.Append($"    {command.Command}".PadRight(35));
+                sb.Append(FormatLines(command.Description));
+            }
         }
 
         if (externalCommands.Any() && !Environment.GetCommandLineArgs().Any(c => c == "--no-external"))
