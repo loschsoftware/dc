@@ -30,7 +30,12 @@ internal static class ExtensionLoader
         ExtensionsFunc = () => InstalledExtensions
     };
 
-    public static string DefaultExtensionSource => field ??= Directory.CreateDirectory(GetProperty("Locations.Extensions")).FullName;
+    private static readonly string _extensionsDefaultPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "Dassie",
+        "Extensions");
+
+    public static string DefaultExtensionSource => field ??= Directory.CreateDirectory(GetProperty("Locations.Extensions") ?? _extensionsDefaultPath).FullName;
     public static string GlobalToolsPath => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")).FullName;
 
     public static ObservableCollection<IPackage> InstalledExtensions
@@ -173,13 +178,18 @@ internal static class ExtensionLoader
 
         List<IPackage> packages = [];
 
-        if (bool.Parse(GetProperty("EnableExtensions")))
+        string enableExtensionsStr = GetProperty("EnableExtensions");
+        string enableCorePackageStr = GetProperty("EnableCorePackage");
+
+        if (enableExtensionsStr == null || (bool.TryParse(enableExtensionsStr, out bool enableExtensions) && enableExtensions))
         {
             foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))
                 packages.AddRange(LoadInstalledExtensions(file));
         }
+        
+        if (enableCorePackageStr == null || (bool.TryParse(enableCorePackageStr, out bool enableCorePackage) && enableCorePackage))
+            packages.Add(CorePackage.Instance);
 
-        packages.Add(CorePackage.Instance);
         ActivateBuildLogWriters(packages);
         return packages;
     }
@@ -392,13 +402,8 @@ internal static class ExtensionLoader
             "Dassie", 
             GlobalConfigurationFileName);
 
-        string path = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
-            "Dassie", 
-            "Extensions");
-
         if (!File.Exists(configPath))
-            return Directory.CreateDirectory(path).FullName;
+            return null;
 
         try
         {
@@ -407,7 +412,7 @@ internal static class ExtensionLoader
                 .FirstOrDefault(e => e.Name.LocalName.Equals("Core", StringComparison.OrdinalIgnoreCase));
 
             if (coreModule == null)
-                return Directory.CreateDirectory(path).FullName;
+                return null;
 
             XElement extensionLocationElement = coreModule.Elements()
                 .FirstOrDefault(e => e.Name.LocalName.Equals(name, StringComparison.OrdinalIgnoreCase));
