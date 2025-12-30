@@ -52,7 +52,8 @@ internal class CorePackage : IPackage
     public GlobalConfigProperty[] GlobalProperties() =>
     [
         EditorProperty.Instance,
-        ExtensionLocationProperty.Instance
+        ExtensionLocationProperty.Instance,
+        EnableExtensionsProperty.Instance
     ];
 
     public IProjectTemplate[] ProjectTemplates() => [LibraryProject.Instance, ConsoleProject.Instance];

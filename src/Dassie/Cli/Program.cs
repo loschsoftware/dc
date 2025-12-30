@@ -31,8 +31,9 @@ internal class Program
         try
         {
             Console.OutputEncoding = Encoding.Unicode;
-            ToolPaths.GetOrCreateToolPathsFile();
+            ExtensionLoader.Initialize();
             GlobalConfigManager.Initialize();
+            ToolPaths.GetOrCreateToolPathsFile();
 
             args ??= [];
             if (args.Length == 0)

@@ -11,6 +11,5 @@ internal class EditorProperty : GlobalConfigProperty
     
     public override string Name => "Scratchpad.Editor";
     public override GlobalConfigDataType Type => new(GlobalConfigBaseType.String, false);
-
     public override object DefaultValue => "default";
 }

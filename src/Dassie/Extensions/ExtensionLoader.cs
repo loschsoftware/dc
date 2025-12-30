@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using Dassie.Core;
+using Dassie.Core.Properties;
 using Dassie.Messages.Devices;
 using NuGet.Packaging;
 using System;
@@ -16,7 +17,7 @@ namespace Dassie.Extensions;
 
 internal static class ExtensionLoader
 {
-    static ExtensionLoader()
+    public static void Initialize()
     {
         InstalledExtensions = [];
         InstalledExtensions.AddRange(LoadInstalledExtensions());
@@ -29,7 +30,7 @@ internal static class ExtensionLoader
         ExtensionsFunc = () => InstalledExtensions
     };
 
-    public static string DefaultExtensionSource => field ??= GetExtensionLocationFromConfig();
+    public static string DefaultExtensionSource => field ??= Directory.CreateDirectory(GetProperty("Locations.Extensions")).FullName;
     public static string GlobalToolsPath => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")).FullName;
 
     public static ObservableCollection<IPackage> InstalledExtensions
@@ -82,7 +83,7 @@ internal static class ExtensionLoader
     private static IEnumerable<IMacro> _macros = [];
     public static IEnumerable<IMacro> Macros => _macros;
 
-    private static void Update(object sender, NotifyCollectionChangedEventArgs e)
+    private static void Update()
     {
         _gloablConfigProperties = InstalledExtensions.SelectMany(p => p.GlobalProperties());
         _commands = InstalledExtensions.SelectMany(p => p.Commands());
@@ -96,7 +97,11 @@ internal static class ExtensionLoader
         _subsystems = InstalledExtensions.SelectMany(p => p.Subsystems());
         _buildActions = InstalledExtensions.SelectMany(p => p.BuildActions());
         _macros = InstalledExtensions.SelectMany(p => p.Macros());
+    }
 
+    private static void Update(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        Update();
         Verify();
     }
 
@@ -168,8 +173,11 @@ internal static class ExtensionLoader
 
         List<IPackage> packages = [];
 
-        foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))
-            packages.AddRange(LoadInstalledExtensions(file));
+        if (bool.Parse(GetProperty("EnableExtensions")))
+        {
+            foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))
+                packages.AddRange(LoadInstalledExtensions(file));
+        }
 
         packages.Add(CorePackage.Instance);
         ActivateBuildLogWriters(packages);
@@ -323,6 +331,9 @@ internal static class ExtensionLoader
 
     public static void UnloadAll()
     {
+        if (InstalledExtensions == null)
+            return;
+
         foreach (IPackage package in InstalledExtensions.ToArray())
             Unload(package);
     }
@@ -374,7 +385,7 @@ internal static class ExtensionLoader
         return Configuration.Subsystems.Console.Instance;
     }
 
-    private static string GetExtensionLocationFromConfig()
+    private static string GetProperty(string name)
     {
         string configPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
@@ -399,13 +410,13 @@ internal static class ExtensionLoader
                 return Directory.CreateDirectory(path).FullName;
 
             XElement extensionLocationElement = coreModule.Elements()
-                .FirstOrDefault(e => e.Name.LocalName.Equals("Locations.Extensions", StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(e => e.Name.LocalName.Equals(name, StringComparison.OrdinalIgnoreCase));
 
             if (extensionLocationElement != null && !string.IsNullOrWhiteSpace(extensionLocationElement.Value))
-                path = extensionLocationElement.Value.Trim();
+                return extensionLocationElement.Value.Trim();
         }
         catch (XmlException) { }
 
-        return Directory.CreateDirectory(path).FullName;
+        return null;
     }
 }
