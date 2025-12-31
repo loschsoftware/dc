@@ -12,4 +12,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyProduct("Dassie")]
 [assembly: AssemblyDescription("Dassie Compiler")]
 [assembly: AssemblyTitle("Dassie Compiler")]
-[assembly: AssemblyCopyright("© 2025 Losch")]
+[assembly: AssemblyCopyright("© 2023-2026 Losch")]

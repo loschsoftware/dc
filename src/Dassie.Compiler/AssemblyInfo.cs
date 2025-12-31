@@ -6,4 +6,4 @@
 [assembly: AssemblyProduct("Dassie")]
 [assembly: AssemblyDescription("Dassie Compiler API")]
 [assembly: AssemblyTitle("Dassie Compiler API")]
-[assembly: AssemblyCopyright("© 2025 Losch")]
+[assembly: AssemblyCopyright("© 2023-2026 Losch")]
