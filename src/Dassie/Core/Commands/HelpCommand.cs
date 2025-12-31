@@ -185,7 +185,7 @@ internal class HelpCommand : CompilerCommand
         {
             StringBuilder outputBuilder = new();
 
-            string header = $"{"A "}{"Name",-30}{"Type",-20}{"Default",-10}{"Description"}";
+            string header = $"{"(Alias) Name",-30}{"Type",-20}{"Default",-10}{"Description"}";
             outputBuilder.AppendLine();
             outputBuilder.AppendLine(header);
             outputBuilder.AppendLine(new string('-', Console.WindowWidth));
@@ -216,12 +216,12 @@ internal class HelpCommand : CompilerCommand
 
                 string alias = "";
                 if (CommandLineOptionParser.Aliases.ContainsValue(name))
-                    alias = CommandLineOptionParser.Aliases.First(a => a.Value == name).Key;
+                    alias = $"({CommandLineOptionParser.Aliases.First(a => a.Value == name).Key})";
 
                 string descriptionText = CommandLineOptionParser.GetDescription(property.Name);
                 string descriptionFormatted = FormatLines(descriptionText, false, 62);
 
-                propertyLines.Add((name, $"{alias,-1} {property.Name,-30}{GetPropertyTypeName(property.PropertyType),-20}{defaultVal,-10}{descriptionFormatted}"));
+                propertyLines.Add((name, $"{alias,-3} {property.Name,-30}{GetPropertyTypeName(property.PropertyType),-20}{defaultVal,-10}{descriptionFormatted}"));
             }
 
             foreach (string prop in propertyLines.OrderBy(p => p.PropertyName).Select(p => p.Text))
