@@ -27,8 +27,8 @@ internal class ConfigCommand : CompilerCommand
         Description = Description,
         Usage =
         [
-            "dc config [<Property>=[Value]]..",
-            "dc config --global [--reset] [--import <Path>] [<Property>=[Value]].."
+            "dc config [<Property>=[Value]]...",
+            "dc config --global [--reset] [--import <Path>] [<Property>=[Value]]..."
         ],
         Options =
         [
