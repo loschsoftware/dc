@@ -185,7 +185,7 @@ internal class HelpCommand : CompilerCommand
         {
             StringBuilder outputBuilder = new();
 
-            string header = $"{"(Alias) Name",-30}{"Type",-20}{"Default",-10}{"Description"}";
+            string header = $"{"(Alias) Name",-34}{"Type",-20}{"Default",-10}{"Description"}";
             outputBuilder.AppendLine();
             outputBuilder.AppendLine(header);
             outputBuilder.AppendLine(new string('-', Console.WindowWidth));
