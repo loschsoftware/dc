@@ -42,11 +42,10 @@ internal class WatchCommand : CompilerCommand
         ],
         Examples =
         [
-            ("dc watch", "Watches all .ds files in the current directory and its subdirectories and automatically recompiles using the default build profile when files are changed."),
-            ("dc watch -c run", "Watches all .ds files in the current directory and its subdirectories and automatically executes the 'dc run' command when files are changed."),
-            ("dc watch -p CustomProfile", "Watches all .ds files in the current directory and its subdirectories and automatically recompiles using the 'CustomProfile' build profile when files are changed."),
-            ("dc watch ./src", "Watches all .ds files in the './src' directory and its subdirectories and automatically recompiles using the default build profile when files are changed."),
-            ("dc watch --quit", "Stops all file watchers.")
+            ("dc watch", "Rebuild whenever any .ds file changes."),
+            ("dc watch -c run", "Re-run the application automatically on save."),
+            ("dc watch -p Release", "Watch and rebuild using the Release profile."),
+            ("dc watch ./src", "Monitor the ./src folder only.")
         ]
     };
 
