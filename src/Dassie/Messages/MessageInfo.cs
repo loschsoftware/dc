@@ -69,7 +69,12 @@ public class MessageInfo
     public override string ToString()
     {
         string code = Code == MessageCode.Custom ? CustomCode : Code.ToString().Split('_')[0];
-        return $"{File} ({Location.Item1},{Location.Item2}): error {code}: {Text}\r\n";
+        return $"{File}{(HideCodePosition ? "" : $" ({Location.Line},{Location.Column})")}: {Severity switch
+        {
+            Severity.Warning => "warning",
+            Severity.Error => "error",
+            _ => "message"
+        }} {code}: {Text}\r\n";
     }
 }
 
