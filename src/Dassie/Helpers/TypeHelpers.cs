@@ -1,4 +1,5 @@
-﻿using Dassie.CodeGeneration.Helpers;
+﻿using Antlr4.Runtime.Misc;
+using Dassie.CodeGeneration.Helpers;
 using Dassie.Core;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -1006,5 +1007,21 @@ internal static class TypeHelpers
         {
             return t.GetConstructors()[0];
         }
+    }
+
+    public static ConstructorInfo GenericGetConstructor(Type t, Type[] args)
+    {
+        if (t.GetType().Name == "TypeBuilderInstantiation")
+            return TypeBuilder.GetConstructor(t, t.GetGenericTypeDefinition().GetConstructor(args));
+
+        return t.GetConstructor(args);
+    }
+
+    public static MethodInfo GenericGetMethod(Type t, string name)
+    {
+        if (t.GetType().Name == "TypeBuilderInstantiation")
+            return TypeBuilder.GetMethod(t, t.GetGenericTypeDefinition().GetMethod(name));
+
+        return t.GetMethod(name);
     }
 }

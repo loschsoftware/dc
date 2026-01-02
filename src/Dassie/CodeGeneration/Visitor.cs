@@ -5292,11 +5292,11 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         EmitStloc(CurrentMethod.LocalIndex);
 
         Type listType = typeof(List<>).MakeGenericType(itemType);
-        CurrentMethod.IL.Emit(OpCodes.Newobj, listType.GetConstructor([]));
+        CurrentMethod.IL.Emit(OpCodes.Newobj, GenericGetConstructor(listType, []));
         CurrentMethod.IL.Emit(OpCodes.Dup);
 
         EmitLdloc(CurrentMethod.LocalIndex);
-        CurrentMethod.IL.Emit(OpCodes.Callvirt, listType.GetMethod("Add"));
+        CurrentMethod.IL.Emit(OpCodes.Callvirt, GenericGetMethod(listType, "Add"));
 
         foreach (ParserRuleContext expr in context.expression()[1..])
         {
