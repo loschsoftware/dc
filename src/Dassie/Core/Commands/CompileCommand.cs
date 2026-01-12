@@ -234,7 +234,7 @@ internal class CompileCommand : CompilerCommand
                         EmitMessage(
                             0, 0, 0,
                             DS0235_ElapsedTime,
-                            $"Compilation finished after {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
+                            $"Compilation finished in {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
                             CompilerExecutableName);
                     }
 
@@ -585,7 +585,7 @@ internal class CompileCommand : CompilerCommand
                 EmitMessage(
                     0, 0, 0,
                     DS0235_ElapsedTime,
-                    $"Compilation finished after {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
+                    $"Compilation finished in {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
                     CompilerExecutableName);
             }
         }
