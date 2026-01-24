@@ -39,12 +39,12 @@ For configuring compiler behavior and to simplify the build process of larger pr
 ````
 dc new console Project01
 ````
-The above command creates the folder structure for a console application called ``Project01`` as well as the main project file, ``dsconfig.xml``. It is used to configure compiler settings as well as to manage the resources and references associated with the application. All features offered by the project system are documented [here](https://github.com/loschsoftware/dc/blob/main/docs/Projects.md).
+The above command creates the folder structure for a console application called ``Project01`` as well as the main project file, ``dsconfig.xml``. It is used to configure compiler settings as well as to manage the resources and references associated with the application. All features offered by the project system are documented [here](https://loschsoftware.github.io/dc/docs/projects.html).
 
 ## Documentation
-Further documentation on the compiler can be found in the [docs](./docs) directory. Documentation on the language itself, including more code examples, can be found in the [dassie](https://github.com/loschsoftware/dassie) repository.
+Further documentation on the compiler can be found [here](https://loschsoftware.github.io/dc/docs/index.html). Documentation on the language itself, including more code examples, can be found in the [dassie](https://github.com/loschsoftware/dassie) repository.
 
 ## Contributing
-Code contributions to the compiler are welcome. Useful information for contributors can be found [here](./docs/Contributing). To report bugs or request a feature, use the [issues](https://github.com/loschsoftware/dc/issues) section of this repository. If you have a feature request for the language itself, open an issue [here](https://github.com/loschsoftware/dassie/issues) instead.
+Code contributions to the compiler are welcome. Useful information for contributors can be found [here](https://loschsoftware.github.io/dc/docs/contributing/index.html). To report bugs or request a feature, use the [issues](https://github.com/loschsoftware/dc/issues) section of this repository. If you have a feature request for the language itself, open an issue [here](https://github.com/loschsoftware/dassie/issues) instead.
 
 If you wish to support the project monetarily instead, you can donate [here](https://www.paypal.com/donate/?hosted_button_id=R6XM6EX8WU9RN).
