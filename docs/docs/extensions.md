@@ -7,7 +7,7 @@ An **extension** is a .NET type implementing the [``Dassie.Extensions.IPackage``
 ## Extension lifecycle
 Compiler extensions can be loaded in one of two modes:
 - **Global:** The extension is enabled globally and is initialized as soon as the compiler is launched. It is active for every build. Managing global extensions is done through the ``dc package`` command.
-- **Transient:** The extension is enabled only for a single build process. Managing transient extensions is done through the [``<Extensions>``](https://github.com/loschsoftware/dc/blob/main/Projects.md#transient-extensions) tag in a project file.
+- **Transient:** The extension is enabled only for a single build process. Managing transient extensions is done through the [``<Extensions>``](https://loschsoftware.github.io/dc/docs/projects.html#transient-extensions) tag in a project file.
 
 ``IPackage`` contains the virtual methods [``InitializeGlobal``](https://github.com/loschsoftware/dc/blob/main/src/Dassie/Extensions/IPackage.cs#L34) and [``InitializeTransient``](https://github.com/loschsoftware/dc/blob/main/src/Dassie/Extensions/IPackage.cs#L43) that can be overridden to implement custom behavior when the extension is loaded. Similarly, the [``Unload``](https://github.com/loschsoftware/dc/blob/main/src/Dassie/Extensions/IPackage.cs#L48) method provides a way of performing an action when the extension is unloaded, regardless of loading mode.
 
