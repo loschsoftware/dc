@@ -4,7 +4,7 @@
     {
       "src": [
         {
-          "src": "C:\\Users\\Jonas\\Source\\Repos\\dassie",
+          "src": "../",
           "files": [
             "**/*.csproj"
           ]
