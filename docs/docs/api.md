@@ -1,5 +1,5 @@
 # Calling the Dassie compiler programmatically - The ``Dassie.Compiler`` library
-The [Dassie.Compiler](https://github.com/loschsoftware/dc/tree/main/src/Dassie.Compiler) project contains a simple API for interacting with the Dassie compiler from .NET applications. Here is a quick example on how to use it, a more thorough documentation will follow later.
+The [Dassie.Compiler](https://github.com/loschsoftware/dc/tree/main/src/Dassie.Compiler) project contains a simple API for interacting with the Dassie compiler from .NET applications. Below is a simple example on how to use it, a more thorough documentation will follow later. For API documentation, visit [this page](https://loschsoftware.github.io/dc/api/Dassie.Compiler.html).
 ````csharp
 using Dassie.Compiler;
 using Dassie.Configuration;
