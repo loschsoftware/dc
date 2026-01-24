@@ -28,8 +28,24 @@ jobs:
         with:
           dotnet-version: 10.x
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Install DocFX
         run: dotnet tool update -g docfx
+
+      - name: Generate ANTLR Parser
+        run: |
+          java -jar ./tools/antlr-4.13.1-complete.jar \
+            -visitor \
+            -Dlanguage=CSharp \
+            -package Dassie.Parser \
+            -o ./Parser/Generated \
+            ./Parser/DassieLexer.g4 \
+            ./Parser/DassieParser.g4
 
       - name: Build Documentation
         run: docfx docs/docfx.json
