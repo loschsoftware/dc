@@ -37,6 +37,10 @@ jobs:
       - name: Install DocFX
         run: dotnet tool update -g docfx
 
+      - name: Setup ANTLR
+        run: |
+          mkdir src/Dassie/Parser/Generated
+
       - name: Generate ANTLR Parser
         run: |
           java -jar tools/antlr-4.13.1-complete.jar \
