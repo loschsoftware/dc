@@ -44,6 +44,7 @@ jobs:
             -Dlanguage=CSharp \
             -package Dassie.Parser \
             -o src/Dassie/Parser/Generated \
+            -lib src/Dassie/Parser/Generated \
             src/Dassie/Parser/DassieLexer.g4 \
             src/Dassie/Parser/DassieParser.g4
 
