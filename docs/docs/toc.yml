@@ -1,14 +1,22 @@
 - name: Overview
   href: index.md
-- name: Command-line arguments
+- name: Getting Started
+  href: getting-started.md
+- name: Command-Line Reference
   href: cli.md
-- name: Error codes
-  href: errors.md
-- name: Project files
+- name: Project Files
   href: projects.md
+- name: Project Groups
+  href: project-groups.md
+- name: Error Codes
+  href: errors.md
+- name: Scratchpad
+  href: scratchpad.md
+- name: Unit Testing
+  href: testing.md
 - name: Compiler API
   href: api.md
-- name: Compiler extensions
+- name: Compiler Extensions
   href: extensions.md
 - name: Editor API
   href: editors.md
@@ -16,7 +24,7 @@
   items:
   - name: Overview
     href: contributing/index.md
-  - name: Code style guidelines
+  - name: Code Style Guidelines
     href: contributing/codestyle.md
   - name: Extension API
     href: contributing/extensions.md

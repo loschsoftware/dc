@@ -11,6 +11,7 @@ The following documentation is about format version 1.0, which is the most recen
 
 ## General settings
 These settings are at the top level of the XML tree and configure the behavior of the compiler as well as resources associated with the project.
+
 |Name|Possible values|Description|Notes|
 |----|----|----|----|
 |``AdvancedErrorMessages``|``true`` or ``false``|If ``true``, every error message will visually display the code section where it originated.||
@@ -79,6 +80,7 @@ Build profiles are used in combination with the ``dc build [BuildProfile]`` comm
 The above example first launches the compiler with the default arguments and then appends some text to a log file after the build is completed. The following tables list all features supported by build events:
 
 **``<BuildProfile>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Name``|Attribute|Any string|Sets the name of the build profile.|
@@ -89,6 +91,7 @@ The above example first launches the compiler with the default arguments and the
 
 
 **``<BuildEvent>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Critical``|Attribute|``true`` or ``false``|If ``true``, the compiler emits an error if the command returns a non-zero exit code. Otherwise, a warning is emitted. ``true`` by default.|
@@ -107,7 +110,9 @@ Debug profiles are used by a debugging environment to configure arguments passed
   </DebugProfile>
 </DebugProfiles>
 ````
+
 ``<DebugProfile>`` has the following options:
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Name``|Attribute|Any string|Sets the name of the profile.|
@@ -134,18 +139,21 @@ References are used to declare dependencies on assemblies, other Dassie projects
 The structure of these elements is described below.
 
 **``<AssemblyReference>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``CopyToOutput``|Attribute|``true`` or ``false``|Determines wheter or not to copy the referenced file to the build output directory. ``true`` by default.|
 ||Text|Any string|The path to the referenced file.|
 
 **``<ProjectReference>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``CopyToOutput``|Attribute|``true`` or ``false``|Determines wheter or not to copy the output of the referenced project to the build output directory. ``true`` by default.|
 ||Text|Any string|The project file of the referenced project.|
 
 **``<PackageReference>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Version``|Attribute|Any string|Determines which version of the package to reference.|
@@ -162,11 +170,13 @@ There are two kinds of resources which can be included in a .NET assembly: **Nat
 These two types of resources have the following options:
 
 **``<UnmanagedResource>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 ||Text|Any string|The path to the resource file.|
 
 **``<ManagedResource>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Name``|Attribute|Any string|An alias that identifies the resource inside the program.|
@@ -180,7 +190,9 @@ Version information is used to display metadata about the program. It is visible
   <Copyright>(C) 2024 My company</Copyright>
 </VersionInfo>
 ````
+
 These fields are supported by the ``<VersionInfo>`` object:
+
 |Name|Description|
 |---|---|
 |``Description``|A short description of the application.|
@@ -202,6 +214,7 @@ Macros are identifiers that are replaced with a specific value by the compiler b
 ````
 
 ### Predefined macros
+
 |Macro name|Description|
 |----|----|
 |``$(Time)``|The current time at the start of the build, formatted as ``HH:mm``.|
@@ -247,7 +260,8 @@ The ``Import`` attribute can be used on the ``<DassieConfig>`` object to specify
 ````
 Besides configuration files, the ``Import`` attribute also supports **configuration providers** from compiler extensions.
 
-## Transient extensions
+## Transient Extensions
+
 With **transient extensions**, projects can declare dependencies on Dassie compiler extensions. These extensions will then be active during the build process only. Additionally, the extension behavior can be customized with XML attributes and elements.
 
 Transient extensions are declared in the ``<Extensions>`` tag, like in the following example:
@@ -260,3 +274,74 @@ Transient extensions are declared in the ``<Extensions>`` tag, like in the follo
 
 > [!IMPORTANT]
 > Not every extension can be loaded in transient mode. Extension developers can customize which "loading modes" are supported.
+
+For more information about compiler extensions, see [Compiler Extensions](./extensions.md).
+
+## Code Analysis Configuration
+
+The ``<CodeAnalysis>`` element allows you to configure how the built-in code analyzer treats specific diagnostic messages:
+
+````xml
+<CodeAnalysis>
+  <Messages>
+    <Configure Code="DS0043" Severity="Error"/>
+    <Configure Code="DS0058" Severity="Warning"/>
+    <Configure Code="DS0070" Severity="Information"/>
+  </Messages>
+</CodeAnalysis>
+````
+
+### Message Severity Levels
+
+| Severity | Description |
+|----------|-------------|
+| ``Information`` | Informational message that does not affect compilation |
+| ``Warning`` | Warning that may indicate a potential issue |
+| ``Error`` | Error that prevents successful compilation |
+
+### Automatic Analysis
+
+To automatically run code analyzers before every build:
+
+````xml
+<RunAnalyzers>true</RunAnalyzers>
+````
+
+## Additional Settings
+
+### Maximum Errors
+
+Stop compilation after a certain number of errors:
+
+````xml
+<MaxErrors>10</MaxErrors>
+````
+
+Setting this to `0` (default) allows unlimited errors.
+
+### Severity Indicators
+
+Display icons in compiler output to distinguish message severity:
+
+````xml
+<EnableSeverityIndicators>true</EnableSeverityIndicators>
+````
+
+### Document Sources
+
+Configure document sources provided by compiler extensions:
+
+````xml
+<DocumentSources>
+  <Source Name="MyDocSource">
+    <Option>value</Option>
+  </Source>
+</DocumentSources>
+````
+
+## See Also
+
+- [Error Codes](./errors.md) - Complete list of compiler error codes
+- [Compiler Extensions](./extensions.md) - Creating and using compiler extensions
+- [Project Groups](./project-groups.md) - Multi-project solutions
+- [Command-Line Reference](./cli.md) - Building and running projects
