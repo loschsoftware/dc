@@ -8,7 +8,7 @@
   href: projects.md
 - name: Compiler API
   href: api.md
-- name: Compiler Extensions
+- name: Compiler extensions
   href: extensions.md
 - name: Editor API
   href: editors.md
