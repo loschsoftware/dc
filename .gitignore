@@ -405,3 +405,12 @@ launchSettings.json
 build/
 /.editorconfig
 /src/Dassie/Parser/Generated/
+
+# DocFX
+docs/_site/
+docs/_site_*/
+docs/api/
+docs/obj/
+docs/log/
+docs/.manifest
+docs/.publish.json
