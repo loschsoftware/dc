@@ -1,6 +1,6 @@
 # Project file format
 
-A "project" is a collection of Dassie source files that are all compiled into a single assembly. The Dassie project system is based on the central project file ``dsconfig.xml`` that lies in the root directory of every project and is used to configure compiler settings. The content of such a file looks like this:
+A **project** is a collection of Dassie source files that is compiled into a single assembly. The Dassie project system is based on the central project file ``dsconfig.xml`` that lies in the root directory of every project and is used to configure compiler settings and define resources. The content of such a file looks like this:
 ````xml
 <?xml version="1.0" encoding="utf-8"?>
 <DassieConfig FormatVersion="1.0">
