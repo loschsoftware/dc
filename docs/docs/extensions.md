@@ -1,4 +1,4 @@
-# Dassie Compiler Extensions
+# Compiler Extensions
 The Dassie compiler provides a rich API for extending its functionality with custom plug-ins, which are called **extensions**. This document intends to give an overview of the capabilities of the Extension API as well as what to look out for when implementing custom extensions.
 
 ## Format
