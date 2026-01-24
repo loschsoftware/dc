@@ -1,4 +1,4 @@
-# Dassie Compiler Contribution Guidelines – Code Style
+# Code style guidelines
 
 Follow these code style guidelines whenever editing C# code of the compiler. Compliance with these guidelines is required for pull requests to be merged.
 
