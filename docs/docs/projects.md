@@ -1,16 +1,19 @@
 # Project file format
 
 A **project** is a collection of Dassie source files that is compiled into a single assembly. The Dassie project system is based on the central project file ``dsconfig.xml`` that lies in the root directory of every project and is used to configure compiler settings and define resources. The content of such a file looks like this:
+
 ````xml
 <?xml version="1.0" encoding="utf-8"?>
 <DassieConfig FormatVersion="1.0">
   <!--Settings, references and build profiles, see below-->
 </DassieConfig>
 ````
+
 The following documentation is about format version 1.0, which is the most recent version. Once the format is updated, the documentation for old versions will be archived in this repository.
 
 ## General settings
 These settings are at the top level of the XML tree and configure the behavior of the compiler as well as resources associated with the project.
+
 |Name|Possible values|Description|Notes|
 |----|----|----|----|
 |``AdvancedErrorMessages``|``true`` or ``false``|If ``true``, every error message will visually display the code section where it originated.||
@@ -64,6 +67,7 @@ These settings are at the top level of the XML tree and configure the behavior o
 
 ## Build profiles
 Build profiles are used in combination with the ``dc build [BuildProfile]`` command and configure the scope of a build as well as custom settings and build events. Here is an example of a build profile:
+
 ````xml
 <BuildProfiles>
   <BuildProfile Name="BuildAndLog">
@@ -76,9 +80,11 @@ Build profiles are used in combination with the ``dc build [BuildProfile]`` comm
   </BuildProfile>
 </BuildProfiles>
 ````
+
 The above example first launches the compiler with the default arguments and then appends some text to a log file after the build is completed. The following tables list all features supported by build events:
 
 **``<BuildProfile>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Name``|Attribute|Any string|Sets the name of the build profile.|
@@ -89,6 +95,7 @@ The above example first launches the compiler with the default arguments and the
 
 
 **``<BuildEvent>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Critical``|Attribute|``true`` or ``false``|If ``true``, the compiler emits an error if the command returns a non-zero exit code. Otherwise, a warning is emitted. ``true`` by default.|
@@ -99,6 +106,7 @@ The above example first launches the compiler with the default arguments and the
 
 ## Debug profiles
 Debug profiles are used by a debugging environment to configure arguments passed to the debuggee. Their markup structure looks like this:
+
 ````xml
 <DebugProfiles>
   <DebugProfile Name="Default">
@@ -107,7 +115,9 @@ Debug profiles are used by a debugging environment to configure arguments passed
   </DebugProfile>
 </DebugProfiles>
 ````
+
 ``<DebugProfile>`` has the following options:
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Name``|Attribute|Any string|Sets the name of the profile.|
@@ -116,6 +126,7 @@ Debug profiles are used by a debugging environment to configure arguments passed
 
 ## Ignoring compiler messages
 The ``<IgnoredMessages>`` object is used to disable specific compiler error codes. Only information and warning messages can be ignored. To disable a message, add a child node corresponding to the kind of message that is to be disabled (information, warning) containing its error code. A list of error codes can be found [here](./Errors.md).
+
 ````xml
 <IgnoredMessages>
   <Message>DS0070</Message>
@@ -124,6 +135,7 @@ The ``<IgnoredMessages>`` object is used to disable specific compiler error code
 
 ## References
 References are used to declare dependencies on assemblies, other Dassie projects or NuGet packages. Here is an example:
+
 ````xml
 <References>
   <AssemblyReference>C:\libs\sdk.dll</AssemblyReference>
@@ -131,21 +143,25 @@ References are used to declare dependencies on assemblies, other Dassie projects
   <PackageReference Version="2.4.1">Package01</PackageReference>
 </References>
 ````
+
 The structure of these elements is described below.
 
 **``<AssemblyReference>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``CopyToOutput``|Attribute|``true`` or ``false``|Determines wheter or not to copy the referenced file to the build output directory. ``true`` by default.|
 ||Text|Any string|The path to the referenced file.|
 
 **``<ProjectReference>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``CopyToOutput``|Attribute|``true`` or ``false``|Determines wheter or not to copy the output of the referenced project to the build output directory. ``true`` by default.|
 ||Text|Any string|The project file of the referenced project.|
 
 **``<PackageReference>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Version``|Attribute|Any string|Determines which version of the package to reference.|
@@ -153,20 +169,24 @@ The structure of these elements is described below.
 
 ## Resources
 There are two kinds of resources which can be included in a .NET assembly: **Native** (unmanaged) resources, which are stored in the ``.rsrc`` section of the PE file and are handled by the operating system, and **managed** resources that are handled by the .NET runtime. Here is an example:
+
 ````xml
 <Resources>
   <UnmanagedResource>version.res</UnmanagedResource>
   <ManagedResource Name="Painting">image.png</ManagedResource>
 </Resources>
 ````
+
 These two types of resources have the following options:
 
 **``<UnmanagedResource>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 ||Text|Any string|The path to the resource file.|
 
 **``<ManagedResource>`` object**
+
 |Name|Type|Allowed values|Description|
 |---|---|---|---|
 |``Name``|Attribute|Any string|An alias that identifies the resource inside the program.|
@@ -174,13 +194,16 @@ These two types of resources have the following options:
 
 ## Version information
 Version information is used to display metadata about the program. It is visible in the 'Details' tab of a file's properties in Windows.
+
 ````xml
 <VersionInfo>
   <Description>My program</Description>
   <Copyright>(C) 2024 My company</Copyright>
 </VersionInfo>
 ````
+
 These fields are supported by the ``<VersionInfo>`` object:
+
 |Name|Description|
 |---|---|
 |``Description``|A short description of the application.|
@@ -194,6 +217,7 @@ These fields are supported by the ``<VersionInfo>`` object:
 
 ## Macros
 Macros are identifiers that are replaced with a specific value by the compiler before the start of the compilation. In addition to a set of predefined macros, a project file can contain custom macro declarations. Macro names are always case-insensitive. Here is an example of how macros are used:
+
 ````xml
 <VersionInfo>
   <!--Assuming the year is 2024, this will be expanded to "(C) 2024 My company".-->
@@ -202,6 +226,7 @@ Macros are identifiers that are replaced with a specific value by the compiler b
 ````
 
 ### Predefined macros
+
 |Macro name|Description|
 |----|----|
 |``$(Time)``|The current time at the start of the build, formatted as ``HH:mm``.|
@@ -221,6 +246,7 @@ Macros are identifiers that are replaced with a specific value by the compiler b
 
 ### Custom macros
 Custom macros are contained in the ``<MacroDefinitions>`` tag. Here is an example of how to use them:
+
 ````xml
 <MacroDefinitions>
   <Define Macro="Author">My company</Define>
@@ -233,6 +259,7 @@ Custom macros are contained in the ``<MacroDefinitions>`` tag. Here is an exampl
 
 ## Importing project files
 The ``Import`` attribute can be used on the ``<DassieConfig>`` object to specify a configuration file to inherit settings from. When the compiler encounters this attribute, it loads the specified configuration file and applies all settings to the current configuration file. If the current file already contains a setting that is set by the imported configuration file, the inherited value is overwritten.
+
 ````xml
 <!--measurements.xml-->
 <DassieConfig>
@@ -245,12 +272,14 @@ The ``Import`` attribute can be used on the ``<DassieConfig>`` object to specify
   <!--...-->
 </DassieConfig>
 ````
+
 Besides configuration files, the ``Import`` attribute also supports **configuration providers** from compiler extensions.
 
 ## Transient extensions
 With **transient extensions**, projects can declare dependencies on Dassie compiler extensions. These extensions will then be active during the build process only. Additionally, the extension behavior can be customized with XML attributes and elements.
 
 Transient extensions are declared in the ``<Extensions>`` tag, like in the following example:
+
 ````xml
 <Extensions>
   <Extension Path="./tools/Extension1.dll"/>
@@ -259,4 +288,4 @@ Transient extensions are declared in the ``<Extensions>`` tag, like in the follo
 ````
 
 > [!IMPORTANT]
-> Not every extension can be loaded in transient mode. Extension developers can customize which "loading modes" are supported.
+> Not every extension can be loaded in transient mode. Extension developers can customize which *loading modes* are supported.
