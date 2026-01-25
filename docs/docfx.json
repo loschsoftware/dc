@@ -41,6 +41,7 @@
     "globalMetadata": {
       "_appName": "Dassie",
       "_appTitle": "Dassie Compiler Documentation",
+      "_appFooter": "<span>© 2026 Losch</span>",
       "_enableSearch": true,
       "pdf": false
     }
