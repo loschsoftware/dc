@@ -35,6 +35,25 @@ h6 {
     font-size: 0.9rem;
 }
 
+code {
+    font-family: var(--font-family-monospace);
+    font-size: 0.875em;
+    color: var(--text-primary);
+    background-color: var(--code-background);
+    padding: 0.2em 0.4em;
+    border-radius: var(--border-radius-sm);
+}
+
+pre code {
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0;
+}
+
+pre {
+    font-family: var(--font-family-monospace);
+}
+
 .navbar-brand img {
     display: none !important;
 }
