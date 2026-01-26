@@ -92,7 +92,7 @@ internal class CorePackage : IPackage
     [
         new CompilerCommandBuildAction(),
         new ShellCommandBuildAction(),
-        new PrintAction(),
-        new LogAction()
+        new PrintBuildAction(),
+        new LogBuildAction()
     ];
 }

@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace Dassie.Core.Actions;
 
-internal class PrintAction : IBuildAction
+internal class PrintBuildAction : IBuildAction
 {
     public string Name => "Print";
     public ActionModes SupportedModes => ActionModes.All;

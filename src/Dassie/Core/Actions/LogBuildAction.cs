@@ -2,7 +2,7 @@
 
 namespace Dassie.Core.Actions;
 
-internal class LogAction : IBuildAction
+internal class LogBuildAction : IBuildAction
 {
     public string Name => "Log";
     public ActionModes SupportedModes => ActionModes.All;
