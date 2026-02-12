@@ -68,6 +68,9 @@ internal class DbgCommand : CompilerCommand
         if (args[0] == "fragments")
             return PrintFragments(args[1..]);
 
+        if (args[0] == "clear-cache")
+            return ClearPackageCache();
+
         LogOut.WriteLine($"Invalid command '{args[0]}'.");
         return -1;
     }
@@ -153,5 +156,11 @@ internal class DbgCommand : CompilerCommand
     private static int PrintTokens(string[] args)
     {
         return Print(false, args);
+    }
+
+    private static int ClearPackageCache()
+    {
+        Directory.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages"), true);
+        return 0;
     }
 }
