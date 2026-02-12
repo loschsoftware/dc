@@ -68,7 +68,7 @@ internal class AotCompiler
 
     private void DownloadRuntime()
     {
-        string packageId = $"Microsoft.NETCore.App.Runtime.{_config.Config.RuntimeIdentifier}";
+        string packageId = $"Microsoft.NETCore.App.Runtime.NativeAOT.{_config.Config.RuntimeIdentifier}";
         string version = PackageDownloader.DownloadPackage(packageId);
         _config.RuntimePackageRootDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages", packageId, version);
     }
@@ -89,9 +89,11 @@ internal class AotCompiler
 
     private void InvokeCompiler()
     {
+        string rspFile = Path.Combine(TemporaryBuildDirectoryName, AotBuildDirectoryName, Path.ChangeExtension(_config.Config.AssemblyFileName, "rsp"));
         string args = _cmdLineBuilder.GenerateIlcArgumentList();
+        File.WriteAllText(rspFile, args);
         EmitBuildLogMessage($"Invoking IL compiler with following arguments: {args}", 3);
-        Process.Start(Path.Combine(_config.ILCompilerPackageRootDirectory, "tools", "ilc.exe"), args).WaitForExit();
+        Process.Start(Path.Combine(_config.ILCompilerPackageRootDirectory, "tools", "ilc.exe"), $"@{rspFile}").WaitForExit();
     }
 
     private void InvokeLinker()

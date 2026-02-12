@@ -33,3 +33,53 @@ internal class ExtensionLocationProperty : GlobalConfigProperty
         }
     }];
 }
+
+internal class MsvcRootPathProperty : GlobalConfigProperty
+{
+    private static MsvcRootPathProperty _instance;
+    public static MsvcRootPathProperty Instance => _instance ??= new();
+    private MsvcRootPathProperty() { }
+
+    public override string Name => "Locations.MsvcRootPath";
+    public override GlobalConfigDataType Type => new(GlobalConfigBaseType.String, false);
+
+    public override Func<object, bool>[] Validators => [value =>
+    {
+        if (!Directory.Exists(value.ToString()))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0261_ExtensionsLocationPropertyInvalidPath,
+                $"The specified directory '{value}' does not exist.");
+
+            return false;
+        }
+
+        return true;
+    }];
+}
+
+internal class ILDasmPathProperty : GlobalConfigProperty
+{
+    private static ILDasmPathProperty _instance;
+    public static ILDasmPathProperty Instance => _instance ??= new();
+    private ILDasmPathProperty() { }
+
+    public override string Name => "Locations.ILDasmPath";
+    public override GlobalConfigDataType Type => new(GlobalConfigBaseType.String, false);
+
+    public override Func<object, bool>[] Validators => [value =>
+    {
+        if (!File.Exists(value.ToString()))
+        {
+            EmitErrorMessage(
+                0, 0, 0,
+                DS0261_ExtensionsLocationPropertyInvalidPath,
+                $"The specified file '{value}' does not exist.");
+
+            return false;
+        }
+
+        return true;
+    }];
+}

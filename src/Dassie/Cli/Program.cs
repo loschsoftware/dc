@@ -33,7 +33,6 @@ internal class Program
             Console.OutputEncoding = Encoding.Unicode;
             ExtensionLoader.Initialize();
             GlobalConfigManager.Initialize();
-            ToolPaths.GetOrCreateToolPathsFile();
 
             args ??= [];
             if (args.Length == 0)

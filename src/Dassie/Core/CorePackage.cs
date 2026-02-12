@@ -54,7 +54,9 @@ internal class CorePackage : IPackage
         EditorProperty.Instance,
         ExtensionLocationProperty.Instance,
         EnableExtensionsProperty.Instance,
-        EnableCorePackageProperty.Instance
+        EnableCorePackageProperty.Instance,
+        MsvcRootPathProperty.Instance,
+        ILDasmPathProperty.Instance
     ];
 
     public IProjectTemplate[] ProjectTemplates() => [LibraryProject.Instance, ConsoleProject.Instance];

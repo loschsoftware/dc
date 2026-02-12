@@ -18,11 +18,8 @@ internal class AotConfig
     public string RuntimeIndependentILCompilerPackageRootDirectory { get; set; }
 
     /// <summary>
-    /// The root directory of the Microsoft.NETCore.App.Runtime package.
+    /// The root directory of the Microsoft.NETCore.App.Runtime.NativeAOT package.
     /// </summary>
-    /// <remarks>
-    /// This package is "for internal use only" and "should not be referenced directly". This feels strangely illegal.
-    /// </remarks>
     public string RuntimePackageRootDirectory { get; set; }
 
     /// <summary>

@@ -4,6 +4,7 @@ using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
 using Dassie.Configuration.Macros;
+using Dassie.Core.Properties;
 using Dassie.Data;
 using Dassie.Extensions;
 using Dassie.Messages;
@@ -562,9 +563,16 @@ internal class CompileCommand : CompilerCommand
 
             if (Context.Configuration.GenerateILFiles)
             {
-                string ildasm = WinSdkHelper.GetFrameworkToolPath("ildasm.exe", "GenerateILFiles") ?? "";
+                string ildasm = (string)ILDasmPathProperty.Instance.GetValue() ?? "";
 
-                if (File.Exists(ildasm))
+                if (!File.Exists(ildasm))
+                {
+                    EmitErrorMessage(
+                        0, 0, 0,
+                        DS0261_ExtensionsLocationPropertyInvalidPath,
+                        $"To enable IL file generation, set the 'Locations.ILDasmPath' global property to the path of current installation of the .NET ILDasm executable. This needs to be done only once.");
+                }
+                else
                 {
                     DirectoryInfo dir = Directory.CreateDirectory(ILFilesDirectoryName);
 
@@ -575,7 +583,7 @@ internal class CompileCommand : CompilerCommand
                         CreateNoWindow = true,
                         WindowStyle = ProcessWindowStyle.Hidden
                     };
-                    
+
                     SDProcess.Start(psi);
                 }
             }

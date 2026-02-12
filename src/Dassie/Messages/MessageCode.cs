@@ -1076,7 +1076,7 @@ public enum MessageCode
     /// </summary>
     DS0260_CompilerDirectiveResultNotConstant,
     /// <summary>
-    /// Emitted when the value of the 'core.locations.extensions' global property is set to an invalid path.
+    /// Emitted when a global property is set to an invalid path.
     /// </summary>
     DS0261_ExtensionsLocationPropertyInvalidPath,
     /// <summary>
