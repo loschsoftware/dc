@@ -160,7 +160,11 @@ internal class DbgCommand : CompilerCommand
 
     private static int ClearPackageCache()
     {
-        Directory.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages"), true);
+        string packageDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages");
+        if (!Directory.Exists(packageDir))
+            return 0;
+
+        Directory.Delete(packageDir, true);
         return 0;
     }
 }
