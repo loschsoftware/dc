@@ -4318,7 +4318,7 @@ internal class Visitor : DassieParserBaseVisitor<Type>
                 context.identifier_atom().Start.Column,
                 context.identifier_atom().GetText().Length,
                 DS0191_StringProcessorThrewException,
-                $"Expression value could not be determined because string processor '{context.identifier_atom().GetText()}' threw an exception at compile-time.");
+                $"Expression value could not be determined because string processor '{context.identifier_atom().GetText()}' threw an exception at compile time.");
 
             CurrentMethod.IL.Emit(OpCodes.Ldstr, rawText);
             return typeof(string);

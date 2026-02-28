@@ -269,11 +269,12 @@ public static class MessageWriter
     /// <summary>
     /// Emits a build log message that is not caused by an error in the code.
     /// </summary>
-    /// <param name="message">The message to emit.</param>
+    /// <param name="identifier">The resource identifier of the message text.</param>
+    /// <param name="args"></param>
     /// <param name="minimumVerbosity">The minimum verbosity at which the message is printed.</param>
     /// <param name="defer">If <see langword="true"/>, defers the emission of the message until the next call to <see cref="EmitDeferredBuildLogMessages"/>.</param>
     /// <returns><see langword="true"/> if the message was emitted or deferred. <see langword="false"/> if the message was not emitted due to an insufficient verbosity configuration.</returns>
-    public static bool EmitBuildLogMessage(string message, int minimumVerbosity = 2, bool defer = false)
+    public static bool EmitBuildLogMessageFormatted(string identifier, object[] args = null, int minimumVerbosity = 2, bool defer = false)
     {
         if (!defer && Context.Configuration.Verbosity < minimumVerbosity)
             return false;
@@ -283,7 +284,8 @@ public static class MessageWriter
             Location = (0, 0),
             Length = 0,
             Code = DS0102_DiagnosticInfo,
-            Text = message,
+            Text = "",
+            TextTemplate = (identifier, args),
             File = "",
             HideCodePosition = true,
             Severity = Severity.BuildLogMessage,
@@ -303,6 +305,16 @@ public static class MessageWriter
         Emit(msg);
         return true;
     }
+
+    /// <summary>
+    /// Emits a build log message that is not caused by an error in the code.
+    /// </summary>
+    /// <param name="message">The message to emit.</param>
+    /// <param name="minimumVerbosity">The minimum verbosity at which the message is printed.</param>
+    /// <param name="defer">If <see langword="true"/>, defers the emission of the message until the next call to <see cref="EmitDeferredBuildLogMessages"/>.</param>
+    /// <returns><see langword="true"/> if the message was emitted or deferred. <see langword="false"/> if the message was not emitted due to an insufficient verbosity configuration.</returns>
+    public static bool EmitBuildLogMessage(string message, int minimumVerbosity = 2, bool defer = false)
+        => EmitBuildLogMessageFormatted(message, null, minimumVerbosity, defer);
 
     /// <summary>
     /// Emits all build log messages marked as "deferred" by calls to <see cref="EmitBuildLogMessage(string, int, bool)"/>.
@@ -328,11 +340,13 @@ public static class MessageWriter
     /// <param name="col">The column of the error.</param>
     /// <param name="length">The length the error.</param>
     /// <param name="errorType">The error code of the message.</param>
-    /// <param name="msg">The error message.</param>
+    /// <param name="identifier">The resource identifier of the error message.</param>
+    /// <param name="args"></param>
     /// <param name="file">The file name to use in the error message.</param>
-    /// <param name="tip">An optional tip displayed in the message.</param>
+    /// <param name="tipId">The resource identifier of the tip to display.</param>
+    /// <param name="tipArgs"></param>
     /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
-    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, MessageCode errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+    public static void EmitErrorMessageFormatted(int ln = 0, int col = 0, int length = 0, MessageCode errorType = DS0001_UnknownError, string identifier = "Unknown error.", object[] args = null, string file = null, string tipId = "", object[] tipArgs = null, string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -340,7 +354,7 @@ public static class MessageWriter
         [
             new()
             {
-                Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
+                Text = $"{errorType.ToString().Split('_')[0]}: {StringHelper.Format(identifier, args)}"
             }
         ];
 
@@ -350,10 +364,12 @@ public static class MessageWriter
             Length = length,
             Code = errorType,
             CustomCode = customErrorCode,
-            Text = msg,
+            Text = "",
+            TextTemplate = (identifier, args),
             File = file ?? CurrentFile.Path,
             Severity = Severity.Error,
-            Tip = tip,
+            Tip = "",
+            TipTemplate = (tipId, tipArgs),
             HideCodePosition = hideCodePosition,
             ToolTip = new()
             {
@@ -361,6 +377,68 @@ public static class MessageWriter
                 Words = words
             }
         });
+    }
+
+    /// <summary>
+    /// Writes an error message to the designated error outputs.
+    /// </summary>
+    /// <param name="ln">The line of the error.</param>
+    /// <param name="col">The column of the error.</param>
+    /// <param name="length">The length the error.</param>
+    /// <param name="errorType">The error code of the message.</param>
+    /// <param name="msg">The error message.</param>
+    /// <param name="file">The file name to use in the error message.</param>
+    /// <param name="tip">An optional tip displayed in the message.</param>
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
+    public static void EmitErrorMessage(int ln = 0, int col = 0, int length = 0, MessageCode errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+        => EmitErrorMessageFormatted(ln, col, length, errorType, msg, null, file, tip, null, customErrorCode);
+
+    /// <summary>
+    /// Writes a warning message to the designated warning outputs.
+    /// </summary>
+    /// <param name="ln">The line of the warning.</param>
+    /// <param name="col">The column of the warning.</param>
+    /// <param name="length">The length the warning.</param>
+    /// <param name="errorType">The error code of the message.</param>
+    /// <param name="identifier">The resource identifier of the warning message.</param>
+    /// <param name="args"></param>
+    /// <param name="file">The file name to use in the warning message.</param>
+    /// <param name="tipId">The resource identifier of the tip to display.</param>
+    /// <param name="tipArgs"></param>
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
+    public static void EmitWarningMessageFormatted(int ln = 0, int col = 0, int length = 0, MessageCode errorType = DS0001_UnknownError, string identifier = "Unknown error.", object[] args = null, string file = null, string tipId = "", object[] tipArgs = null, string customErrorCode = null)
+    {
+        bool hideCodePosition = ln == 0 && col == 0 && length == 0;
+
+        ObservableCollection<Word> words =
+        [
+            new()
+            {
+                Text = $"{errorType.ToString().Split('_')[0]}: {StringHelper.Format(identifier, args)}"
+            }
+        ];
+
+        MessageInfo err = new()
+        {
+            Location = (ln, col),
+            Length = length,
+            Code = errorType,
+            CustomCode = customErrorCode,
+            Text = "",
+            TextTemplate = (identifier, args),
+            File = file ?? CurrentFile.Path,
+            Severity = Severity.Warning,
+            Tip = "",
+            TipTemplate = (tipId, tipArgs),
+            HideCodePosition = hideCodePosition,
+            ToolTip = new()
+            {
+                Words = words,
+                IconResourceName = Context.Configuration.TreatWarningsAsErrors ? "CodeErrorRule" : "CodeWarningRule"
+            }
+        };
+
+        Emit(err);
     }
 
     /// <summary>
@@ -375,6 +453,22 @@ public static class MessageWriter
     /// <param name="tip">An optional tip displayed in the message.</param>
     /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
     public static void EmitWarningMessage(int ln = 0, int col = 0, int length = 0, MessageCode errorType = MessageCode.DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
+        => EmitWarningMessageFormatted(ln, col, length, errorType, msg, null, file, tip, null, customErrorCode);
+
+    /// <summary>
+    /// Writes a message to the designated information outputs.
+    /// </summary>
+    /// <param name="ln">The line of the message.</param>
+    /// <param name="col">The column of the message.</param>
+    /// <param name="length">The length the message.</param>
+    /// <param name="errorType">The error code of the message.</param>
+    /// <param name="identifier">The resource identifier of the message.</param>
+    /// <param name="args"></param>
+    /// <param name="file">The file name to use in the message.</param>
+    /// <param name="tipId">The resource identifier of the tip to display.</param>
+    /// <param name="tipArgs"></param>
+    /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
+    public static void EmitMessageFormatted(int ln = 0, int col = 0, int length = 0, MessageCode errorType = DS0001_UnknownError, string identifier = "Unknown error.", object[] args = null, string file = null, string tipId = "", object[] tipArgs = null, string customErrorCode = null)
     {
         bool hideCodePosition = ln == 0 && col == 0 && length == 0;
 
@@ -382,29 +476,29 @@ public static class MessageWriter
         [
             new()
             {
-                Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
+                Text = $"{errorType.ToString().Split('_')[0]}: {StringHelper.Format(identifier, args)}"
             }
         ];
 
-        MessageInfo err = new()
+        Emit(new MessageInfo()
         {
             Location = (ln, col),
             Length = length,
             Code = errorType,
             CustomCode = customErrorCode,
-            Text = msg,
+            Text = "",
+            TextTemplate = (identifier, args),
             File = file ?? CurrentFile.Path,
-            Severity = Severity.Warning,
-            Tip = tip,
+            Severity = Severity.Information,
+            Tip = "",
+            TipTemplate = (tipId, tipArgs),
             HideCodePosition = hideCodePosition,
             ToolTip = new()
             {
                 Words = words,
-                IconResourceName = Context.Configuration.TreatWarningsAsErrors ? "CodeErrorRule" : "CodeWarningRule"
+                IconResourceName = "CodeInformation"
             }
-        };
-
-        Emit(err);
+        });
     }
 
     /// <summary>
@@ -419,35 +513,15 @@ public static class MessageWriter
     /// <param name="tip">An optional tip displayed in the message.</param>
     /// <param name="customErrorCode">A custom error code. Can only be used if <paramref name="errorType"/> is set to <see cref="Custom"/>.</param>
     public static void EmitMessage(int ln = 0, int col = 0, int length = 0, MessageCode errorType = DS0001_UnknownError, string msg = "Unknown error.", string file = null, string tip = "", string customErrorCode = null)
-    {
-        bool hideCodePosition = ln == 0 && col == 0 && length == 0;
+        => EmitMessageFormatted(ln, col, length, errorType, msg, null, file, tip, null, customErrorCode);
 
-        ObservableCollection<Word> words =
-        [
-            new()
-            {
-                Text = $"{errorType.ToString().Split('_')[0]}: {msg}"
-            }
-        ];
-
-        Emit(new MessageInfo()
-        {
-            Location = (ln, col),
-            Length = length,
-            Code = errorType,
-            CustomCode = customErrorCode,
-            Text = msg,
-            File = file ?? CurrentFile.Path,
-            Severity = Severity.Information,
-            Tip = tip,
-            HideCodePosition = hideCodePosition,
-            ToolTip = new()
-            {
-                Words = words,
-                IconResourceName = "CodeInformation"
-            }
-        });
-    }
+    /// <summary>
+    /// Writes a string to the designated information outputs.
+    /// </summary>
+    /// <param name="identifier">The resource identifier of the string to write.</param>
+    /// <param name="args"></param>
+    public static void WriteStringFormatted(string identifier, object[] args = null)
+        => WriteString(StringHelper.Format(identifier, args));
 
     /// <summary>
     /// Writes a string to the designated information outputs.
@@ -470,6 +544,14 @@ public static class MessageWriter
             BuildLogDeviceSafeCall(device, d => d.WriteString(str));
         }
     }
+
+    /// <summary>
+    /// Writes a string followed by a newline sequence to the designated information outputs.
+    /// </summary>
+    /// <param name="identifier">The resource identifier of the string to write.</param>
+    /// <param name="args"></param>
+    public static void WriteLineFormatted(string identifier, object[] args = null)
+        => WriteLine(StringHelper.Format(identifier, args));
 
     /// <summary>
     /// Writes a string followed by a newline sequence to the designated information outputs.

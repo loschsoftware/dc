@@ -17,10 +17,28 @@ public class MessageInfo
     /// </summary>
     public string CustomCode { get; set; }
 
+    private string _text;
+
     /// <summary>
     /// The text of the message.
     /// </summary>
-    public string Text { get; set; }
+    public string Text
+    {
+        get
+        {
+            if (TextTemplate == default)
+                return _text;
+
+            return StringHelper.Format(TextTemplate.Identifier, TextTemplate.Arguments);
+        }
+
+        set => _text = value;
+    }
+
+    /// <summary>
+    /// A text template for the message.
+    /// </summary>
+    public (string Identifier, object[] Arguments) TextTemplate { get; set; }
 
     /// <summary>
     /// The name of the document the message originates from.
@@ -57,10 +75,28 @@ public class MessageInfo
     /// </summary>
     public Tooltip ToolTip { get; set; }
 
+    private string _tip;
+
     /// <summary>
     /// Advanced information about the message aiding the user in debugging the cause of an error.
     /// </summary>
-    public string Tip { get; set; }
+    public string Tip
+    {
+        get
+        {
+            if (TipTemplate == default)
+                return _tip;
+
+            return StringHelper.Format(TipTemplate.Identifier, TipTemplate.Arguments);
+        }
+
+        set => _tip = value;
+    }
+
+    /// <summary>
+    /// A text template for the tip.
+    /// </summary>
+    public (string Identifier, object[] Arguments) TipTemplate { get; set; }
 
     /// <summary>
     /// Converts the message into a human-readable format.

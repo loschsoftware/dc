@@ -12,3 +12,4 @@ global using DirectoryInfo = System.IO.DirectoryInfo;
 global using File = System.IO.File;
 global using Path = System.IO.Path;
 global using SearchOption = System.IO.SearchOption;
+global using Dassie.Resources;
