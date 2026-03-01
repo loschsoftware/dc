@@ -507,12 +507,12 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
     {
         if (context.GetText().Length < 3)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
                 DS0077_EmptyCharacterLiteral,
-                "A character literal cannot be empty.");
+                nameof(StringHelper.ExpressionEvaluator_InvalidCharacterLiteral), []);
 
             return new(typeof(char), ' ');
         }
@@ -526,12 +526,12 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
         if (false && RequireNonZeroValue && result.Value == 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
                 DS0136_DivisionByConstantZero,
-                "Division by constant zero.");
+                nameof(StringHelper.ExpressionEvaluator_DivisionByConstantZero), []);
         }
 
         return result;
@@ -621,12 +621,12 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
         }
         catch (OverflowException)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
                 DS0076_Overflow,
-                $"The literal is too large or too small for type '{literalType.FullName}'.");
+                nameof(StringHelper.ExpressionEvaluator_ArithmeticOverflow), [literalType.FullName]);
         }
 
         return new(typeof(int), 1);
@@ -638,12 +638,12 @@ internal class ExpressionEvaluator : DassieParserBaseVisitor<Expression>
 
         if (false && RequireNonZeroValue && result.Value == 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Start.Line,
                 context.Start.Column,
                 context.GetText().Length,
                 DS0136_DivisionByConstantZero,
-                "Division by constant zero.");
+                nameof(StringHelper.ExpressionEvaluator_DivisionByConstantZero), []);
         }
 
         return result;

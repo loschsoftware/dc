@@ -385,13 +385,13 @@ internal static class EmitHelpers
 
         if (opcodeField == null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 line,
                 column,
                 length,
                 DS0046_InlineILInvalidOpCode,
-                $"'{rawOpcode}' is not a valid IL opcode."
-                );
+                nameof(StringHelper.EmitHelpers_InvalidILInstruction), [rawOpcode]);
+
             return;
         }
 

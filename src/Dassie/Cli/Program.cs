@@ -33,6 +33,7 @@ internal class Program
             Console.OutputEncoding = Encoding.Unicode;
             ExtensionLoader.Initialize();
             GlobalConfigManager.Initialize();
+            StringHelper.Initialize();
 
             args ??= [];
             if (args.Length == 0)

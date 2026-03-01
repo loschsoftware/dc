@@ -193,22 +193,22 @@ internal static class AttributeHelpers
 
                     if (!string.IsNullOrEmpty(Context.Configuration.RuntimeIdentifier) && Context.Configuration.RuntimeIdentifier.Split('-')[0] != "win")
                     {
-                        EmitWarningMessage(
+                        EmitWarningMessageFormatted(
                             attrib.Start.Line,
                             attrib.Start.Column,
                             attrib.GetText().Length,
                             DS0214_VarArgsNonWindows,
-                            "Varargs functions are currently only supported on Windows. Calling this function will always throw an exception.");
+                            nameof(StringHelper.AttributeHelpers_VarArgsNonWindows), []);
                     }
 
                     if (Context.Configuration.Runtime == Configuration.Runtime.Aot)
                     {
-                        EmitWarningMessage(
+                        EmitWarningMessageFormatted(
                             attrib.Start.Line,
                             attrib.Start.Column,
                             attrib.GetText().Length,
                             DS0213_AotVarArgsFunction,
-                            "Varargs functions are unsupported when compiling ahead of time. Calling this function will always throw an exception.");
+                            nameof(StringHelper.AttributeHelpers_AotVarArgsFunction), []);
                     }
 
                     Disabled = true;
@@ -368,12 +368,12 @@ internal static class AttributeHelpers
         {
             if (!(bool)args[0])
             {
-                EmitWarningMessage(
+                EmitWarningMessageFormatted(
                     context.Start.Line,
                     context.Start.Column,
                     context.GetText().Length,
                     DS0209_UnverifiableCode,
-                    $"Disabling the zero-initialization of local variables using the <InitLocals> attribute causes the generated code to be unverifiable.");
+                    nameof(StringHelper.AttributeHelpers_InitLocalsWarning), []);
             }
 
             CurrentMethod.Builder.InitLocals = (bool)args[0];
@@ -386,12 +386,12 @@ internal static class AttributeHelpers
 
             if (CurrentMethod.Builder.ReturnType != typeof(bool))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.expression().Start.Line,
                     context.expression().Start.Column,
                     context.expression().GetText().Length,
                     DS0231_PredicateFunctionNotBoolean,
-                    $"'{CurrentMethod.Builder.Name}': Predicate functions must return a boolean value.");
+                    nameof(StringHelper.AttributeHelpers_PredicateNotBoolean), [CurrentMethod.Builder.Name]);
             }
         }
     }

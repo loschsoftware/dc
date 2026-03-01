@@ -45,14 +45,14 @@ internal class DbgCommand : CompilerCommand
 
     public override string Command => "dbg";
 
-    public override string Description => "Commands used for debugging and testing the compiler. To be used by compiler developers.";
+    public override string Description => StringHelper.DbgCommand_Description;
     public override CommandOptions Options => CommandOptions.Hidden;
 
     public override int Invoke(string[] args)
     {
         if (args == null || args.Length == 0)
         {
-            LogOut.WriteLine("No command specified.");
+            LogOut.WriteLine(StringHelper.DbgCommand_NoCommandSpecified);
             return -1;
         }
 
@@ -71,7 +71,7 @@ internal class DbgCommand : CompilerCommand
         if (args[0] == "clear-cache")
             return ClearPackageCache();
 
-        LogOut.WriteLine($"Invalid command '{args[0]}'.");
+        LogOut.WriteLine(StringHelper.Format(nameof(StringHelper.DbgCommand_InvalidCommand), args[0]));
         return -1;
     }
 
@@ -81,10 +81,10 @@ internal class DbgCommand : CompilerCommand
         {
             foreach (string path in args.Where(p => !File.Exists(p)))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0049_SourceFileNotFound,
-                    $"The specified source file '{path}' could not be found.",
+                    nameof(StringHelper.DbgCommand_SourceFileNotFound), [path],
                     CompilerExecutableName);
             }
         }
@@ -114,13 +114,13 @@ internal class DbgCommand : CompilerCommand
     {
         if (args == null || args.Length == 0)
         {
-            LogOut.WriteLine("No file specified.");
+            LogOut.WriteLine(StringHelper.DbgCommand_NoFileSpecified);
             return -1;
         }
 
         if (!File.Exists(args[0]))
         {
-            LogOut.WriteLine("The specified file does not exist.");
+            LogOut.WriteLine(StringHelper.DbgCommand_FileDoesNotExist);
             return -1;
         }
 

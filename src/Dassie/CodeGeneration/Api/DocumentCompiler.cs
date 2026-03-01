@@ -17,14 +17,14 @@ internal static class DocumentCompiler
             CurrentFile.Path = document.Name;
 
         intermediatePath = Path.Combine(TemporaryBuildDirectoryName, Path.GetFileNameWithoutExtension(document.Name) + ".i.ds");
-        EmitBuildLogMessage($"Rewriting document '{document.Name}' -> '{intermediatePath}'.", 2);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.DocumentCompiler_RewritingDocument), [document.Name, intermediatePath], 2);
 
         string lowered = SourceFileRewriter.Rewrite(document.Text);
 
         Directory.CreateDirectory(TemporaryBuildDirectoryName);
         File.WriteAllText(intermediatePath, lowered);
 
-        EmitBuildLogMessage($"Parsing document '{intermediatePath}'.", 2);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.DocumentCompiler_ParsingDocument), [intermediatePath], 2);
 
         CurrentFile.CharStream = CharStreams.fromString(lowered);
         DassieLexer lexer = new(CurrentFile.CharStream);
@@ -40,7 +40,7 @@ internal static class DocumentCompiler
 
     public static List<MessageInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath, DassieParser parser)
     {
-        EmitBuildLogMessage($"Compiling document '{document.Name}'.", 2);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.DocumentCompiler_CompilingDocument), [document.Name], 2);
 
         SetupBogusAssembly();
         CurrentFile = Context.GetFile(document.Name);

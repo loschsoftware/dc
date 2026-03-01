@@ -38,23 +38,23 @@ internal class CompileCommand : CompilerCommand
     public static CompileCommand Instance => _instance ??= new();
 
     public override string Command => "compile";
-    public override string Description => "Compiles the specified source files.";
+    public override string Description => StringHelper.CompileCommand_Description;
     public override CommandOptions Options => CommandOptions.Hidden;
 
     public override CommandHelpDetails HelpDetails => GetHelpDetails();
     private CommandHelpDetails GetHelpDetails()
     {
         StringBuilder sb = new();
-        sb.AppendLine(HelpCommand.FormatLines("Options from project files (dsconfig.xml) can be included in the following way:", true, 4));
+        sb.AppendLine(HelpCommand.FormatLines(StringHelper.CompileCommand_AdvancedOptionsLine1, true, 4));
 
         sb.Append("    --<PropertyName>=<Value>".PadRight(50));
-        sb.Append(HelpCommand.FormatLines("For simple properties of type 'string', 'bool' or 'enum'. The property name is case-insensitive. For boolean properties, 0 and 1 are aliases for false and true. Example: --MeasureElapsedTime=true", indentWidth: 50));
+        sb.Append(HelpCommand.FormatLines(StringHelper.CompileCommand_AdvancedOptionsLine2, indentWidth: 50));
 
         sb.Append("    --<ArrayPropertyName>+<Value>".PadRight(50));
-        sb.Append(HelpCommand.FormatLines("To add elements to an array property. Property names are recognized by the first characters, where 'References' takes precedence over 'Resources'. Example: --R+\"assembly.dll\"", indentWidth: 50));
+        sb.Append(HelpCommand.FormatLines(StringHelper.CompileCommand_AdvancedOptionsLine3, indentWidth: 50));
 
         sb.Append("    --<PropertyName>::<ChildProperty>=<Value>".PadRight(50));
-        sb.Append(HelpCommand.FormatLines("For setting child properties of more complex objects. Object names are recognized by first characters. Example: --VersionInfo::Description=\"Application\"", indentWidth: 50));
+        sb.Append(HelpCommand.FormatLines(StringHelper.CompileCommand_AdvancedOptionsLine4, indentWidth: 50));
 
         return new()
         {
@@ -62,14 +62,14 @@ internal class CompileCommand : CompilerCommand
             Usage = ["dc <Files> [Options]"],
             Options =
             [
-                ("Files", "One or more Dassie source files to compile."),
-                ("Options", "Additional options as mentioned below. For a list of available options, use 'dc help -o'.")
+                ("Files", StringHelper.CompileCommand_FilesOption),
+                ("Options", StringHelper.CompileCommand_OptionsOption)
             ],
-            CustomSections = [("Advanced options", sb.ToString())],
+            CustomSections = [(StringHelper.CompileCommand_AdvancedOptions, sb.ToString())],
             Examples =
             [
-                ("dc file1.ds file2.ds", "Compiles the specified source files."),
-                ("dc main.ds -v 2 -l", "Compiles a source file with log verbosity level 2, displaying the elapsed time at the end.")
+                ("dc file1.ds file2.ds", StringHelper.CompileCommand_Example1),
+                ("dc main.ds -v 2 -l", StringHelper.CompileCommand_Example2)
             ]
         };
     }
@@ -88,10 +88,11 @@ internal class CompileCommand : CompilerCommand
         int msgCount = EmittedMessages.Count(e => e.Severity == Severity.Error);
         Context.Configuration.MaxErrors = 0;
 
-        EmitMessage(
+        EmitMessageFormatted(
             0, 0, 0,
             DS0234_CompilationTerminated,
-            $"Compilation terminated after {msgCount} error{(msgCount > 1 ? "s" : "")}.",
+            msgCount == 1 ? nameof(StringHelper.CompileCommand_CompilationAborted1) : nameof(StringHelper.CompileCommand_CompilationAborted),
+            msgCount == 1 ? [] : [msgCount],
             CompilerExecutableName);
 
         Program.Exit(234);
@@ -128,7 +129,7 @@ internal class CompileCommand : CompilerCommand
         Context ??= new();
         Context.Configuration = config;
 
-        EmitBuildLogMessage($"Compilation started. Log verbosity is {config.Verbosity}.", 2);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_CompilationStarted), [config.Verbosity], 2);
         EmitDeferredBuildLogMessages();
 
         MacroParser parser = new();
@@ -156,10 +157,10 @@ internal class CompileCommand : CompilerCommand
             }
             catch (Exception ex)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0030_FileAccessDenied,
-                    $"Could not create build output directory: {ex.Message}",
+                    nameof(StringHelper.CompileCommand_CouldNotCreateOutputDirectory), [ex.Message],
                     CompilerExecutableName);
             }
         }
@@ -179,10 +180,10 @@ internal class CompileCommand : CompilerCommand
         {
             if (config.References.Length > ushort.MaxValue + 1)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0075_MetadataLimitExceeded,
-                    $"Assembly has too many references ({config.References.Length}). The maximum allowed number is {ushort.MaxValue + 1}.",
+                    nameof(StringHelper.CompileCommand_AssemblyTooManyReferences), [config.References.Length, ushort.MaxValue + 1],
                     ProjectConfigurationFileName);
             }
 
@@ -206,10 +207,10 @@ internal class CompileCommand : CompilerCommand
 
                 foreach (string duplicate in duplicates)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0241_DuplicateReference,
-                        $"Duplicate reference '{duplicate}'.",
+                        nameof(StringHelper.CompileCommand_DuplicateReference), [duplicate],
                         ProjectConfigurationFileName);
                 }
 
@@ -232,10 +233,10 @@ internal class CompileCommand : CompilerCommand
                 {
                     if (Context.Configuration.MeasureElapsedTime)
                     {
-                        EmitMessage(
+                        EmitMessageFormatted(
                             0, 0, 0,
                             DS0235_ElapsedTime,
-                            $"Compilation finished in {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
+                            nameof(StringHelper.CompileCommand_CompilationFinished), [Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds],
                             CompilerExecutableName);
                     }
 
@@ -259,10 +260,10 @@ internal class CompileCommand : CompilerCommand
 
         if (Context.Configuration.Verbosity >= 2)
         {
-            EmitBuildLogMessage("Determined documents to compile:", 2);
+            EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_DeterminedDocumentsToCompile), [], 2);
 
             if (documents.Count == 0)
-                EmitBuildLogMessage("    None.", 2);
+                EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_None), [], 2);
             else
             {
                 foreach (InputDocument doc in documents)
@@ -288,7 +289,7 @@ internal class CompileCommand : CompilerCommand
         if (EmittedMessages.Any(m => m.Code == DS0107_NoInputFiles))
             return -1;
 
-        EmitBuildLogMessage("Starting second pass.", 2);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_StartingSecondPass), [], 2);
 
         // Step 2
         IEnumerable<MessageInfo[]> errors = CompileSource(documents, config, imports: subsystem.Imports).Select(l => l.ToArray());
@@ -302,10 +303,10 @@ internal class CompileCommand : CompilerCommand
 
             if ((Context.Configuration.Resources ?? []).Where(r => r is UnmanagedResource).Count() > 1)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0069_MultipleUnmanagedResources,
-                    "An assembly can only contain one unmanaged resource file.",
+                    nameof(StringHelper.CompileCommand_OnlyOneUnmanagedResourceFile), [],
                     ProjectConfigurationFileName);
             }
         }
@@ -314,10 +315,10 @@ internal class CompileCommand : CompilerCommand
         {
             if (!string.IsNullOrEmpty(resFile) && Context.Configuration.VersionInfo != null && Context.Configuration.VersionInfo.Count > 0)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0091_MalformedConfigurationFile,
-                    $"The 'VersionInfo' tag cannot be used if an unmanaged resource file is specified.",
+                    nameof(StringHelper.CompileCommand_VersionInfoInvalid), [],
                     ProjectConfigurationFileName);
             }
             else
@@ -326,10 +327,10 @@ internal class CompileCommand : CompilerCommand
 
                 if (string.IsNullOrEmpty(rc))
                 {
-                    EmitWarningMessage(
+                    EmitWarningMessageFormatted(
                         0, 0, 0,
                         DS0070_WinSdkToolNotFound,
-                        $"The Windows SDK tool 'rc.exe' could not be located. Setting version information failed. Consider precompiling your version info and including it as an unmanaged resource.",
+                        nameof(StringHelper.CompileCommand_RCNotFound), [],
                         ProjectConfigurationFileName);
 
                     return -1;
@@ -352,10 +353,10 @@ internal class CompileCommand : CompilerCommand
                                 if (v.Language.Equals("default", StringComparison.InvariantCultureIgnoreCase))
                                     return 0;
 
-                                EmitErrorMessage(
+                                EmitErrorMessageFormatted(
                                     0, 0, 0,
                                     DS0090_InvalidDSConfigProperty,
-                                    $"Invalid language code '{v.Language}'.",
+                                    nameof(StringHelper.CompileCommand_InvalidLanguageCode), [v.Language],
                                     ProjectConfigurationFileName);
                             }
 
@@ -377,10 +378,10 @@ internal class CompileCommand : CompilerCommand
                     {
                         if (seen.Contains(lcid))
                         {
-                            EmitErrorMessage(
+                            EmitErrorMessageFormatted(
                                 0, 0, 0,
                                 DS0090_InvalidDSConfigProperty,
-                                $"Configuration file contains multiple version info resources for language '{new CultureInfo(lcid).Name}'.",
+                                nameof(StringHelper.CompileCommand_DuplicateVersionInfo), [new CultureInfo(lcid).Name],
                                 ProjectConfigurationFileName);
                         }
 
@@ -421,10 +422,10 @@ internal class CompileCommand : CompilerCommand
 
                 if (!string.IsNullOrEmpty(Context.Configuration.IconFile) && !File.Exists(icoFile))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                        0, 0, 0,
                        DS0068_ResourceFileNotFound,
-                       $"The specified icon file '{Context.Configuration.IconFile}' could not be found.",
+                       nameof(StringHelper.CompileCommand_IconFileNotFound), [Context.Configuration.IconFile],
                        ProjectConfigurationFileName);
 
                     return -1;
@@ -432,10 +433,10 @@ internal class CompileCommand : CompilerCommand
 
                 if (!string.IsNullOrEmpty(Context.Configuration.AssemblyManifest) && !File.Exists(manifest))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0068_ResourceFileNotFound,
-                        $"The specified manifest file '{Context.Configuration.AssemblyManifest}' could not be found.",
+                        nameof(StringHelper.CompileCommand_ManifestFileNotFound), [Context.Configuration.AssemblyManifest],
                         ProjectConfigurationFileName);
 
                     return -1;
@@ -497,10 +498,10 @@ internal class CompileCommand : CompilerCommand
             }
             catch (IOException ex)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0030_FileAccessDenied,
-                    $"Output assembly could not be saved: {ex.Message}",
+                    nameof(StringHelper.CompileCommand_AssemblySaveError), [ex.Message],
                     CompilerExecutableName);
             }
 
@@ -567,10 +568,10 @@ internal class CompileCommand : CompilerCommand
 
                 if (!File.Exists(ildasm))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0261_ExtensionsLocationPropertyInvalidPath,
-                        $"To enable IL file generation, set the 'Locations.ILDasmPath' global property to the path of current installation of the .NET ILDasm executable. This needs to be done only once.");
+                        nameof(StringHelper.CompileCommand_ILDasmPathPrompt), []);
                 }
                 else
                 {
@@ -590,10 +591,10 @@ internal class CompileCommand : CompilerCommand
 
             if (config.MeasureElapsedTime)
             {
-                EmitMessage(
+                EmitMessageFormatted(
                     0, 0, 0,
                     DS0235_ElapsedTime,
-                    $"Compilation finished in {Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds} ms.",
+                    nameof(StringHelper.CompileCommand_CompilationFinished), [Stopwatch.GetElapsedTime(stopwatchTimeStamp).TotalMilliseconds],
                     CompilerExecutableName);
             }
         }
@@ -670,10 +671,10 @@ internal class CompileCommand : CompilerCommand
 
         if (!File.Exists(res.Path))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0068_ResourceFileNotFound,
-                $"The resource file '{res.Path}' could not be located.",
+                nameof(StringHelper.CompileCommand_ResourceFileNotFound), [res.Path],
                 ProjectConfigurationFileName);
         }
 
@@ -686,10 +687,10 @@ internal class CompileCommand : CompilerCommand
             }
             catch (ArgumentException)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0069_MultipleUnmanagedResources,
-                    "An assembly can only contain one unmanaged resource file.",
+                    nameof(StringHelper.CompileCommand_OnlyOneUnmanagedResourceFile), [],
                     ProjectConfigurationFileName);
             }
         }
@@ -787,14 +788,14 @@ internal class CompileCommand : CompilerCommand
                     dist = Distance(pattern.ToLowerInvariant(), cmds.First().ToLowerInvariant());
 
                 StringBuilder errorMsg = new();
-                errorMsg.Append($"Unrecognized command '{pattern}'. ");
+                errorMsg.Append(StringHelper.Format(nameof(StringHelper.CompileCommand_UnrecognizedCommand), pattern));
 
                 if (dist < 2)
-                    errorMsg.Append($"Did you mean '{cmds.First()}'?");
+                    errorMsg.Append(StringHelper.Format(nameof(StringHelper.CompileCommand_DidYouMean), cmds.First()));
                 else if (dist < 5)
-                    errorMsg.Append($"Closest match is '{cmds.First()}'.");
+                    errorMsg.Append(StringHelper.Format(nameof(StringHelper.CompileCommand_ClosestMatch), cmds.First()));
                 else if (ExtensionLoader.Commands.Contains(HelpCommand.Instance))
-                    errorMsg.Append("Use 'dc help' for a list of available commands.");
+                    errorMsg.Append(StringHelper.CompileCommand_DCHelp);
 
                 EmitErrorMessage(
                     0, 0, 0,
@@ -805,10 +806,10 @@ internal class CompileCommand : CompilerCommand
                 Environment.Exit(-1);
             }
 
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0049_SourceFileNotFound,
-                $"The source file '{filePattern}' could not be found.",
+                nameof(StringHelper.CompileCommand_SourceFileNotFound), [filePattern],
                 filePattern);
         }
 

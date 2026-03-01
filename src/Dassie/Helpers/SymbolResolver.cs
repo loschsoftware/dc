@@ -224,12 +224,12 @@ internal static class SymbolResolver
 
             if (loc.Scope > CurrentMethod.CurrentScope && throwErrors)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row,
                     col,
                     len,
                     DS0063_LocalOutsideScope,
-                    $"The local '{loc.Name}' is not in scope.");
+                    nameof(StringHelper.SymbolResolver_LocalOutOfScope), [loc.Name]);
             }
 
             if (CurrentMethod.CaptureSymbols)
@@ -548,12 +548,12 @@ internal static class SymbolResolver
                 return final;
             }
 
-            if (allCons.Count > 0)
+        if (allCons.Count > 0)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row, col, len,
                     DS0128_AccessModifiersTooRestrictive,
-                    $"'{name}' cannot be called because its access modifiers are too restrictive.");
+                    nameof(StringHelper.SymbolResolver_AccessModifiersTooRestrictive), [name]);
             }
         }
 
@@ -577,10 +577,10 @@ internal static class SymbolResolver
         {
             if (!IsFieldAvailable(type, f))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row, col, len,
                     DS0128_AccessModifiersTooRestrictive,
-                    $"Field '{type.Name}.{f.Name}' cannot be accessed because its access modifiers are too restrictive.");
+                    nameof(StringHelper.SymbolResolver_FieldAccessModifiersTooRestrictive), [type.Name, f.Name]);
             }
 
             if (type.GetType().Name != "TypeBuilderInstantiation" && type.IsEnum)
@@ -716,12 +716,12 @@ internal static class SymbolResolver
 
         if (types.Length == 0 && throwErrors)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 row,
                 col,
                 len,
                 DS0086_TypeInfoCouldNotBeRead,
-                $"Members of '{tb.FullName}' could not be located.");
+                nameof(StringHelper.SymbolResolver_MembersNotFound), [tb.FullName]);
 
             return null;
         }
@@ -750,10 +750,10 @@ internal static class SymbolResolver
 
             if (tb.IsAbstract && tb.IsSealed)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row, col, len,
                     DS0140_ModuleInstantiation,
-                    $"Module '{name}' cannot be instantiated.");
+                    nameof(StringHelper.SymbolResolver_ModuleCannotBeInstantiated), [name]);
 
                 return null;
             }
@@ -862,10 +862,10 @@ internal static class SymbolResolver
 
             if (!IsFieldAvailable(tc.Builder, f.Builder))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row, col, len,
                     DS0128_AccessModifiersTooRestrictive,
-                    $"Field '{tc.Builder.Name}.{f.Builder.Name}' cannot be accessed because its access modifiers are too restrictive.");
+                    nameof(StringHelper.SymbolResolver_FieldAccessModifiersTooRestrictive), [tc.Builder.Name, f.Builder.Name]);
             }
 
             if (f.Builder.DeclaringType.IsEnum)
@@ -1325,10 +1325,10 @@ internal static class SymbolResolver
 
         if (t != null && !t.IsAssignableTo(typeof(Attribute)))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 row, col, len,
                 DS0178_InvalidAttributeType,
-                $"The type '{t}' cannot be used as an attribute.");
+                nameof(StringHelper.SymbolResolver_InvalidAttributeType), [t]);
         }
 
         if (t != null)
@@ -1386,12 +1386,12 @@ internal static class SymbolResolver
 
                     if (rank > 32)
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             row,
                             col,
                             len,
                             DS0080_ArrayTooManyDimensions,
-                            $"An array cannot have more than 32 dimensions.");
+                            nameof(StringHelper.SymbolResolver_ArrayTooManyDimensions), []);
                     }
 
                     return elemType.MakeArrayType(rank);
@@ -1403,12 +1403,12 @@ internal static class SymbolResolver
 
                     if (type.IsByRef && !noEmitDS0149 && !noErrors)
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             row,
                             col,
                             len,
                             DS0150_NestedByRefType,
-                            $"Invalid type '{name}': Nested references are not permitted.");
+                            nameof(StringHelper.SymbolResolver_NestedByRefNotPermitted), [name]);
                     }
 
                     return type.MakeByRefType();
@@ -1690,12 +1690,12 @@ internal static class SymbolResolver
 
         if (type == null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 row,
                 col,
                 len,
                 DS0010_TypeNotFound,
-                $"The name '{name}' could not be resolved.");
+                nameof(StringHelper.SymbolResolver_NameNotResolved), [name]);
         }
         else
         {

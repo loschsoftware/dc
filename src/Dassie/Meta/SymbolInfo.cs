@@ -75,10 +75,10 @@ internal class SymbolInfo
         {
             if (!IsMutable())
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0, // TODO: Get correct location
                     DS0096_ImmutableSymbolPassedByReference,
-                    $"The symbol '{Name()}' is immutable and cannot be passed by reference.");
+                    nameof(StringHelper.SymbolInfo_ImmutableSymbolByReference), [Name()]);
             }
 
             LoadAddress();

@@ -12,10 +12,10 @@ internal static class ProjectFileCompatibilityTool
 
         if (!Version.TryParse(config.FormatVersion, out Version formatVersion))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0091_MalformedConfigurationFile,
-                "Invalid format version.",
+                nameof(StringHelper.ProjectFileCompatibilityTool_InvalidFormatVersion), [],
                 ProjectConfigurationFileName);
 
             return;
@@ -23,19 +23,19 @@ internal static class ProjectFileCompatibilityTool
 
         if (formatVersion.Major > current.Major)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0092_ConfigurationFormatVersionTooNew,
-                $"Project configuration file uses a newer format than supported by this compiler. This compiler only supports project files up to format version {current.ToString(1)}.",
+                nameof(StringHelper.ProjectFileCompatibilityTool_FormatVersionTooNew), [current.ToString(1)],
                 ProjectConfigurationFileName);
         }
 
         if (formatVersion.Major < current.Major)
         {
-            EmitWarningMessage(
+            EmitWarningMessageFormatted(
                 0, 0, 0,
                 DS0093_ConfigurationFormatVersionTooOld,
-                $"Project configuration file uses an outdated format. For best compatibility, the project file should be updated to version {current.ToString(2)}. Use the 'dc config update' command to perform this action automatically.",
+                nameof(StringHelper.ProjectFileCompatibilityTool_FormatVersionTooOld), [current.ToString(2)],
                 ProjectConfigurationFileName);
         }
     }

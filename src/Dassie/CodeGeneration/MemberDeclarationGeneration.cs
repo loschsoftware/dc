@@ -36,36 +36,36 @@ internal static class MemberDeclarationGeneration
 
         if (context.member_access_modifier() != null && context.member_access_modifier().Global() == null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.member_access_modifier().Start.Line,
                 context.member_access_modifier().Start.Column,
                 context.member_access_modifier().GetText().Length,
                 DS0162_CustomOperatorNotGlobal,
-                "The only valid access modifier for a custom operator is 'global'.");
+                nameof(StringHelper.MemberDeclarationGeneration_CustomOperatorNotGlobal), []);
 
             return;
         }
 
         if (context.parameter_list().parameter().Length > 2)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.parameter_list().Start.Line,
                 context.parameter_list().Start.Column,
                 context.parameter_list().GetText().Length,
                 DS0163_CustomOperatorTooManyParameters,
-                "A custom operator cannot have more than two operands.");
+                nameof(StringHelper.MemberDeclarationGeneration_CustomOperatorTooManyParams), []);
 
             return;
         }
 
         if (context.expression() == null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Custom_Operator().Symbol.Line,
                 context.Custom_Operator().Symbol.Column,
                 context.Custom_Operator().GetText().Length,
                 DS0164_CustomOperatorNoMethodBody,
-                "Custom operators are required to have method bodies.");
+                nameof(StringHelper.MemberDeclarationGeneration_CustomOperatorNoBody), []);
 
             return;
         }
@@ -153,12 +153,12 @@ internal static class MemberDeclarationGeneration
     {
         if (parent.IsEnumeration)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
                 DS0142_MethodInEnumeration,
-                "Enumeration types cannot contain constructors.");
+                nameof(StringHelper.MemberDeclarationGeneration_ConstructorInEnumeration), []);
         }
 
         CallingConventions callingConventions = CallingConventions.HasThis;
@@ -232,12 +232,12 @@ internal static class MemberDeclarationGeneration
 
         if (context.Var() != null && context.parameter_list() != null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Var().Symbol.Line,
                 context.Var().Symbol.Column,
                 context.Var().GetText().Length,
                 DS0084_InvalidVarModifier,
-                "The modifier 'var' cannot be used on methods.");
+                nameof(StringHelper.MemberDeclarationGeneration_VarOnMethod), []);
         }
 
         bool isLiteral = false;
@@ -251,12 +251,12 @@ internal static class MemberDeclarationGeneration
         {
             if (TypeContext.Current.IsEnumeration)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
                     DS0142_MethodInEnumeration,
-                    "Enumeration types cannot contain methods.");
+                    nameof(StringHelper.MemberDeclarationGeneration_MethodInEnumeration), []);
             }
 
             CallingConventions callingConventions = CallingConventions.HasThis;
@@ -336,24 +336,24 @@ internal static class MemberDeclarationGeneration
                 {
                     if (CurrentMethod.TypeParameters.Any(p => p.Name == typeParam.Identifier().GetIdentifier()))
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             typeParam.Start.Line,
                             typeParam.Start.Column,
                             typeParam.GetText().Length,
                             DS0113_DuplicateTypeParameter,
-                            $"Duplicate type parameter '{typeParam.GetText()}'.");
+                            nameof(StringHelper.MemberDeclarationGeneration_DuplicateTypeParameter), [typeParam.GetText()]);
 
                         continue;
                     }
 
                     if (TypeContext.Current.GenericParameters.Any(t => t.Name == typeParam.Identifier().GetIdentifier()))
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             typeParam.Start.Line,
                             typeParam.Start.Column,
                             typeParam.GetText().Length,
                             DS0115_TypeParameterIsDefinedInContainingScope,
-                            $"The type parameter '{typeParam.Identifier().GetIdentifier()}' is already declared by the containing type '{Format(TypeContext.Current.Builder)}'.");
+                            nameof(StringHelper.MemberDeclarationGeneration_TypeParameterDeclaredByParent), [typeParam.Identifier().GetIdentifier(), Format(TypeContext.Current.Builder)]);
                     }
 
                     CurrentMethod.TypeParameters.Add(BuildTypeParameter(typeParam));
@@ -380,12 +380,12 @@ internal static class MemberDeclarationGeneration
                     && !implementationFlags.HasFlag(MethodImplAttributes.Runtime)
                     && !isExtern)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         context.Start.Line,
                         context.Start.Column,
                         context.GetText().Length,
                         DS0116_NonAbstractMethodHasNoBody,
-                        $"The non-abstract member '{mb.Name}' needs to define a body.");
+                        nameof(StringHelper.MemberDeclarationGeneration_NonAbstractMemberNeedsBody), [mb.Name]);
 
                     CurrentMethod.IL.Emit(OpCodes.Ret);
                 }
@@ -393,12 +393,12 @@ internal static class MemberDeclarationGeneration
 
             if (attrib.HasFlag(MethodAttributes.Abstract) && context.expression() != null)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.Start.Line,
                     context.Start.Column,
                     context.GetText().Length,
                     DS0117_AbstractMethodHasBody,
-                    $"The abstract member '{mb.Name}' cannot define a body.");
+                    nameof(StringHelper.MemberDeclarationGeneration_AbstractMemberCannotHaveBody), [mb.Name]);
 
                 return;
             }
@@ -490,318 +490,320 @@ internal static class MemberDeclarationGeneration
 
         if (isAutoEvent && isAutoProperty)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
                 DS0173_EventAndProperty,
-                $"The attributes '<Auto>' and '<Event>' cannot be combined.");
+                nameof(StringHelper.MemberDeclarationGeneration_AutoEventAttributesCombined), []);
         }
 
-        string memberKind = !isAutoProperty ? "field" : "property";
-        string memberKindPlural = !isAutoProperty ? "fields" : "properties";
+        string memberKind = !isAutoProperty ? StringHelper.MemberDeclarationGeneration_MemberKindFieldSingular : StringHelper.MemberDeclarationGeneration_MemberKindPropertySingular;
+        string memberKindPlural = !isAutoProperty ? StringHelper.MemberDeclarationGeneration_MemberKindFieldPlural : StringHelper.MemberDeclarationGeneration_MemberKindPropertyPlural;
 
         if (TypeContext.Current.IsImmutable && context.Var() != null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Var().Symbol.Line,
                 context.Var().Symbol.Column,
                 context.Var().GetText().Length,
                 DS0152_VarFieldInImmutableType,
-                $"The 'var' modifier is invalid on members of immutable value types. {memberKindPlural.ToUpper()} of immutable types are not allowed to be mutable.");
-        }
+                nameof(StringHelper.MemberDeclarationGeneration_VarMemberOnImmutableType), [memberKindPlural.ToUpper()]);
 
-        bool isInitOnly = declaringType.IsImmutable || context.Val() != null;
-        FieldAttributes fieldAttribs = AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), isInitOnly);
+            bool isInitOnly = declaringType.IsImmutable || context.Val() != null;
+            FieldAttributes fieldAttribs = AttributeHelpers.GetFieldAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), isInitOnly);
 
-        if (declaringType.Builder.IsInterface && !fieldAttribs.HasFlag(FieldAttributes.Static))
-        {
-            EmitErrorMessage(
-                context.Identifier().Symbol.Line,
-                context.Identifier().Symbol.Column,
-                context.Identifier().GetIdentifier().Length,
-                DS0159_InstanceFieldInTemplate,
-                $"Template types cannot contain instance {memberKindPlural}.");
-        }
-
-        if ((type.IsByRef /*|| type.IsByRefLike*/) && !TypeContext.Current.IsByRefLike)
-        {
-            EmitErrorMessage(
-                context.Identifier().Symbol.Line,
-                context.Identifier().Symbol.Column,
-                context.Identifier().GetIdentifier().Length,
-                DS0151_ByRefFieldInNonByRefLikeType,
-                $"Invalid {memberKind} type '{TypeName(type)}'. References are only valid as part of ByRef-like value types (val& type).");
-        }
-
-        // Auto-implemented property
-        if (isAutoProperty)
-        {
-            if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+            if (declaringType.Builder.IsInterface && !fieldAttribs.HasFlag(FieldAttributes.Static))
             {
-                ITerminalNode node = context.member_special_modifier().First(l => l.Literal() != null).Literal();
-
-                EmitErrorMessage(
-                    node.Symbol.Line,
-                    node.Symbol.Column,
-                    node.GetText().Length,
-                    DS0168_PropertyLiteral,
-                    "The modifier 'literal' is not valid on properties.");
-            }
-
-            string propName = context.Identifier().GetIdentifier();
-            FieldBuilder backingField = declaringType.Builder.DefineField(
-                SymbolNameGenerator.GetPropertyBackingFieldName(propName),
-                type,
-                FieldAttributes.Private);
-
-            PropertyBuilder pb = declaringType.Builder.DefineProperty(
-                propName,
-                PropertyAttributes.None,
-                type, []);
-
-            TypeContext.Current.Properties.Add(pb);
-
-            (MethodAttributes attribs, _, _, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
-            attribs |= MethodAttributes.SpecialName;
-
-            if (!attribs.HasFlag(MethodAttributes.HideBySig))
-                attribs |= MethodAttributes.HideBySig;
-
-            MethodBuilder getter = TypeContext.Current.Builder.DefineMethod($"get_{propName}", attribs, type, []);
-            ILGenerator ilGet = getter.GetILGenerator();
-            ilGet.Emit(OpCodes.Ldarg_0);
-            ilGet.Emit(OpCodes.Ldfld, backingField);
-            ilGet.Emit(OpCodes.Ret);
-            pb.SetGetMethod(getter);
-
-            if (context.Var() != null)
-            {
-                MethodBuilder setter = TypeContext.Current.Builder.DefineMethod($"set_{propName}", attribs, typeof(void), [type]);
-                ILGenerator ilSet = setter.GetILGenerator();
-                ilSet.Emit(OpCodes.Ldarg_0);
-                ilSet.Emit(OpCodes.Ldarg_1);
-                ilSet.Emit(OpCodes.Stfld, backingField);
-                ilSet.Emit(OpCodes.Ret);
-                pb.SetSetMethod(setter);
-            }
-
-            CurrentFile.Fragments.Add(new()
-            {
-                Color = Color.Property,
-                Column = context.Identifier().Symbol.Column,
-                Line = context.Identifier().Symbol.Line,
-                Length = context.Identifier().GetIdentifier().Length,
-                ToolTip = TooltipGenerator.Property(pb),
-                IsNavigationTarget = true
-            });
-
-            return;
-        }
-
-        if (isAutoEvent)
-        {
-            if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
-            {
-                ITerminalNode node = context.member_special_modifier().First(l => l.Literal() != null).Literal();
-
-                EmitErrorMessage(
-                    node.Symbol.Line,
-                    node.Symbol.Column,
-                    node.GetText().Length,
-                    DS0168_PropertyLiteral,
-                    "The modifier 'literal' is not valid on events.");
-            }
-
-            if (!(type.BaseType == typeof(Delegate) || type.BaseType == typeof(MulticastDelegate)))
-            {
-                EmitErrorMessage(
-                    context.type_name().Start.Line,
-                    context.type_name().Start.Column,
-                    context.type_name().GetText().Length,
-                    DS0175_EventFieldTypeNotDelegate,
-                    "Event must be of a delegate type.");
-
-                return;
-            }
-
-            string eventName = context.Identifier().GetIdentifier();
-
-            FieldBuilder eventField = declaringType.Builder.DefineField(
-                eventName,
-                type,
-                fieldAttribs);
-
-            TypeContext.Current.Fields.Add(new()
-            {
-                Builder = eventField,
-                Name = eventName
-            });
-
-            EventBuilder eb = declaringType.Builder.DefineEvent(
-                eventName,
-                EventAttributes.None,
-                type);
-
-            MethodAttributes handlerMethodAttribs = MethodAttributes.Public | MethodAttributes.SpecialName;
-
-            if (eventField.IsStatic)
-                handlerMethodAttribs |= MethodAttributes.Static;
-
-            MethodBuilder addMethod = TypeContext.Current.Builder.DefineMethod(
-                $"add_{eventName}",
-                handlerMethodAttribs);
-
-            addMethod.SetReturnType(typeof(void));
-            addMethod.SetParameters(type);
-
-            ILGenerator addMethodIL = addMethod.GetILGenerator();
-
-            MethodContext current = CurrentMethod;
-
-            MethodContext addContext = new()
-            {
-                Builder = addMethod,
-                IL = addMethodIL
-            };
-
-            if (context.property_or_event_block() != null && context.property_or_event_block().add_handler().Length > 0)
-            {
-                if (context.property_or_event_block().add_handler().Length > 1)
-                {
-                    EmitErrorMessage(
-                        context.property_or_event_block().add_handler()[1].Start.Line,
-                        context.property_or_event_block().add_handler()[1].Start.Column,
-                        context.property_or_event_block().add_handler()[1..].SelectMany(a => a.GetText()).Count(),
-                        DS0174_EventHasMultipleHandlers,
-                        "An event can only contain one 'add' handler.");
-                }
-
-                //Visit(context.property_or_event_block().add_handler()[0].expression());
-                addMethodIL.Emit(OpCodes.Ret);
-            }
-            else
-                EventDefaultHandlerCodeGeneration.GenerateDefaultAddHandlerImplementation(eventField);
-
-            MethodBuilder removeMethod = TypeContext.Current.Builder.DefineMethod(
-                $"remove_{eventName}",
-                handlerMethodAttribs);
-
-            removeMethod.SetReturnType(typeof(void));
-            removeMethod.SetParameters(type);
-
-            ILGenerator removeMethodIL = removeMethod.GetILGenerator();
-
-            MethodContext removeContext = new()
-            {
-                Builder = removeMethod,
-                IL = removeMethodIL
-            };
-
-            if (context.property_or_event_block() != null && context.property_or_event_block().remove_handler().Length > 0)
-            {
-                if (context.property_or_event_block().remove_handler().Length > 1)
-                {
-                    EmitErrorMessage(
-                        context.property_or_event_block().remove_handler()[1].Start.Line,
-                        context.property_or_event_block().remove_handler()[1].Start.Column,
-                        context.property_or_event_block().remove_handler()[1..].SelectMany(a => a.GetText()).Count(),
-                        DS0174_EventHasMultipleHandlers,
-                        "An event can only contain one 'remove' handler.");
-                }
-
-                //Visit(context.property_or_event_block().remove_handler()[0].expression());
-                removeMethodIL.Emit(OpCodes.Ret);
-            }
-            else
-                EventDefaultHandlerCodeGeneration.GenerateDefaultRemoveHandlerImplementation(eventField);
-
-            if (context.property_or_event_block() != null && (context.property_or_event_block().add_handler().Length == 0 ^ context.property_or_event_block().remove_handler().Length == 0))
-            {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
-                    DS0176_EventMissingHandlers,
-                    $"Event '{eventName}' is missing a{(context.property_or_event_block().add_handler().Length == 0 ? "n" : "")} '{(context.property_or_event_block().add_handler().Length == 0 ? "add" : "remove")}' handler.");
+                    DS0159_InstanceFieldInTemplate,
+                    nameof(StringHelper.MemberDeclarationGeneration_TemplateTypeInstanceFieldOrProperty), [memberKindPlural]);
             }
 
-            eb.SetAddOnMethod(addMethod);
-            eb.SetRemoveOnMethod(removeMethod);
-
-            CurrentMethod = current;
-            return;
-        }
-
-        if (TypeContext.Current.IsEnumeration)
-        {
-            type = TypeContext.Current.EnumerationBaseType;
-            explicitFieldType = true;
-        }
-
-        Expression compileTimeConst = null;
-
-        if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
-        {
-            compileTimeConst = ExpressionEvaluator.Instance.Visit(context.expression());
-
-            if (compileTimeConst == null)
+            if ((type.IsByRef /*|| type.IsByRefLike*/) && !TypeContext.Current.IsByRefLike)
             {
-                EmitErrorMessage(
-                    context.expression().Start.Line,
-                    context.expression().Start.Column,
-                    context.expression().GetText().Length,
-                    DS0139_CompileTimeConstantRequired,
-                    "Compile-time constant expected.");
+                EmitErrorMessageFormatted(
+                    context.Identifier().Symbol.Line,
+                    context.Identifier().Symbol.Column,
+                    context.Identifier().GetIdentifier().Length,
+                    DS0151_ByRefFieldInNonByRefLikeType,
+                    nameof(StringHelper.MemberDeclarationGeneration_ByRefFieldOnNonByRefType), [memberKind, TypeName(type)]);
+            }
+
+            // Auto-implemented property
+            if (isAutoProperty)
+            {
+                if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+                {
+                    ITerminalNode node = context.member_special_modifier().First(l => l.Literal() != null).Literal();
+
+                    EmitErrorMessageFormatted(
+                        node.Symbol.Line,
+                        node.Symbol.Column,
+                        node.GetText().Length,
+                        DS0168_PropertyLiteral,
+                        nameof(StringHelper.MemberDeclarationGeneration_LiteralOnProperty), []);
+                }
+
+                string propName = context.Identifier().GetIdentifier();
+                FieldBuilder backingField = declaringType.Builder.DefineField(
+                    SymbolNameGenerator.GetPropertyBackingFieldName(propName),
+                    type,
+                    FieldAttributes.Private);
+
+                PropertyBuilder pb = declaringType.Builder.DefineProperty(
+                    propName,
+                    PropertyAttributes.None,
+                    type, []);
+
+                TypeContext.Current.Properties.Add(pb);
+
+                (MethodAttributes attribs, _, _, _) = AttributeHelpers.GetMethodAttributes(context.member_access_modifier(), context.member_oop_modifier(), context.member_special_modifier(), []);
+                attribs |= MethodAttributes.SpecialName;
+
+                if (!attribs.HasFlag(MethodAttributes.HideBySig))
+                    attribs |= MethodAttributes.HideBySig;
+
+                MethodBuilder getter = TypeContext.Current.Builder.DefineMethod($"get_{propName}", attribs, type, []);
+                ILGenerator ilGet = getter.GetILGenerator();
+                ilGet.Emit(OpCodes.Ldarg_0);
+                ilGet.Emit(OpCodes.Ldfld, backingField);
+                ilGet.Emit(OpCodes.Ret);
+                pb.SetGetMethod(getter);
+
+                if (context.Var() != null)
+                {
+                    MethodBuilder setter = TypeContext.Current.Builder.DefineMethod($"set_{propName}", attribs, typeof(void), [type]);
+                    ILGenerator ilSet = setter.GetILGenerator();
+                    ilSet.Emit(OpCodes.Ldarg_0);
+                    ilSet.Emit(OpCodes.Ldarg_1);
+                    ilSet.Emit(OpCodes.Stfld, backingField);
+                    ilSet.Emit(OpCodes.Ret);
+                    pb.SetSetMethod(setter);
+                }
+
+                CurrentFile.Fragments.Add(new()
+                {
+                    Color = Color.Property,
+                    Column = context.Identifier().Symbol.Column,
+                    Line = context.Identifier().Symbol.Line,
+                    Length = context.Identifier().GetIdentifier().Length,
+                    ToolTip = TooltipGenerator.Property(pb),
+                    IsNavigationTarget = true
+                });
 
                 return;
             }
 
-            if (explicitFieldType && type != compileTimeConst.Type && type != typeof(object) && compileTimeConst.Type != typeof(object))
+            if (isAutoEvent)
             {
-                EmitErrorMessage(
-                    context.expression().Start.Line,
-                    context.expression().Start.Column,
-                    context.expression().GetText().Length,
-                    DS0055_WrongFieldType,
-                    $"Expected expression of type '{TypeName(type)}', but got type '{TypeName(compileTimeConst.Type)}'.");
+                if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+                {
+                    ITerminalNode node = context.member_special_modifier().First(l => l.Literal() != null).Literal();
+
+                    EmitErrorMessageFormatted(
+                        node.Symbol.Line,
+                        node.Symbol.Column,
+                        node.GetText().Length,
+                        DS0168_PropertyLiteral,
+                        nameof(StringHelper.MemberDeclarationGeneration_LiteralOnEvent), []);
+                }
+
+                if (!(type.BaseType == typeof(Delegate) || type.BaseType == typeof(MulticastDelegate)))
+                {
+                    EmitErrorMessageFormatted(
+                        context.type_name().Start.Line,
+                        context.type_name().Start.Column,
+                        context.type_name().GetText().Length,
+                        DS0175_EventFieldTypeNotDelegate,
+                        nameof(StringHelper.MemberDeclarationGeneration_EventNonDelegateType), []);
+
+                    return;
+                }
+
+                string eventName = context.Identifier().GetIdentifier();
+
+                FieldBuilder eventField = declaringType.Builder.DefineField(
+                    eventName,
+                    type,
+                    fieldAttribs);
+
+                TypeContext.Current.Fields.Add(new()
+                {
+                    Builder = eventField,
+                    Name = eventName
+                });
+
+                EventBuilder eb = declaringType.Builder.DefineEvent(
+                    eventName,
+                    EventAttributes.None,
+                    type);
+
+                MethodAttributes handlerMethodAttribs = MethodAttributes.Public | MethodAttributes.SpecialName;
+
+                if (eventField.IsStatic)
+                    handlerMethodAttribs |= MethodAttributes.Static;
+
+                MethodBuilder addMethod = TypeContext.Current.Builder.DefineMethod(
+                    $"add_{eventName}",
+                    handlerMethodAttribs);
+
+                addMethod.SetReturnType(typeof(void));
+                addMethod.SetParameters(type);
+
+                ILGenerator addMethodIL = addMethod.GetILGenerator();
+
+                MethodContext current = CurrentMethod;
+
+                MethodContext addContext = new()
+                {
+                    Builder = addMethod,
+                    IL = addMethodIL
+                };
+
+                if (context.property_or_event_block() != null && context.property_or_event_block().add_handler().Length > 0)
+                {
+                    if (context.property_or_event_block().add_handler().Length > 1)
+                    {
+                        EmitErrorMessageFormatted(
+                            context.property_or_event_block().add_handler()[1].Start.Line,
+                            context.property_or_event_block().add_handler()[1].Start.Column,
+                            context.property_or_event_block().add_handler()[1..].SelectMany(a => a.GetText()).Count(),
+                            DS0174_EventHasMultipleHandlers,
+                            nameof(StringHelper.MemberDeclarationGeneration_EventOneAddHandler), []);
+                    }
+
+                    //Visit(context.property_or_event_block().add_handler()[0].expression());
+                    addMethodIL.Emit(OpCodes.Ret);
+                }
+                else
+                    EventDefaultHandlerCodeGeneration.GenerateDefaultAddHandlerImplementation(eventField);
+
+                MethodBuilder removeMethod = TypeContext.Current.Builder.DefineMethod(
+                    $"remove_{eventName}",
+                    handlerMethodAttribs);
+
+                removeMethod.SetReturnType(typeof(void));
+                removeMethod.SetParameters(type);
+
+                ILGenerator removeMethodIL = removeMethod.GetILGenerator();
+
+                MethodContext removeContext = new()
+                {
+                    Builder = removeMethod,
+                    IL = removeMethodIL
+                };
+
+                if (context.property_or_event_block() != null && context.property_or_event_block().remove_handler().Length > 0)
+                {
+                    if (context.property_or_event_block().remove_handler().Length > 1)
+                    {
+                        EmitErrorMessageFormatted(
+                            context.property_or_event_block().remove_handler()[1].Start.Line,
+                            context.property_or_event_block().remove_handler()[1].Start.Column,
+                            context.property_or_event_block().remove_handler()[1..].SelectMany(a => a.GetText()).Count(),
+                            DS0174_EventHasMultipleHandlers,
+                            nameof(StringHelper.MemberDeclarationGeneration_EventOneRemoveHandler), []);
+                    }
+
+                    //Visit(context.property_or_event_block().remove_handler()[0].expression());
+                    removeMethodIL.Emit(OpCodes.Ret);
+                }
+                else
+                    EventDefaultHandlerCodeGeneration.GenerateDefaultRemoveHandlerImplementation(eventField);
+
+                if (context.property_or_event_block() != null && (context.property_or_event_block().add_handler().Length == 0 ^ context.property_or_event_block().remove_handler().Length == 0))
+                {
+                    string key = context.property_or_event_block().add_handler().Length == 0 ? nameof(StringHelper.MemberDeclarationGeneration_EventMissingAddHandler) : nameof(StringHelper.MemberDeclarationGeneration_EventMissingRemoveHandler);
+
+                    EmitErrorMessageFormatted(
+                        context.Identifier().Symbol.Line,
+                        context.Identifier().Symbol.Column,
+                        context.Identifier().GetIdentifier().Length,
+                        DS0176_EventMissingHandlers,
+                        key, [eventName]);
+                }
+
+                eb.SetAddOnMethod(addMethod);
+                eb.SetRemoveOnMethod(removeMethod);
+
+                CurrentMethod = current;
+                return;
             }
-            else
-                type = compileTimeConst.Type;
+
+            if (TypeContext.Current.IsEnumeration)
+            {
+                type = TypeContext.Current.EnumerationBaseType;
+                explicitFieldType = true;
+            }
+
+            Expression compileTimeConst = null;
+
+            if (context.member_special_modifier() != null && context.member_special_modifier().Any(l => l.Literal() != null))
+            {
+                compileTimeConst = ExpressionEvaluator.Instance.Visit(context.expression());
+
+                if (compileTimeConst == null)
+                {
+                    EmitErrorMessageFormatted(
+                        context.expression().Start.Line,
+                        context.expression().Start.Column,
+                        context.expression().GetText().Length,
+                        DS0139_CompileTimeConstantRequired,
+                        nameof(StringHelper.MemberDeclarationGeneration_CompileTimeConstantExpected), []);
+
+                    return;
+                }
+
+                if (explicitFieldType && type != compileTimeConst.Type && type != typeof(object) && compileTimeConst.Type != typeof(object))
+                {
+                    EmitErrorMessageFormatted(
+                        context.expression().Start.Line,
+                        context.expression().Start.Column,
+                        context.expression().GetText().Length,
+                        DS0055_WrongFieldType,
+                        nameof(StringHelper.MemberDeclarationGeneration_WrongExpressionType), [TypeName(type), TypeName(compileTimeConst.Type)]);
+                }
+                else
+                    type = compileTimeConst.Type;
+            }
+
+            FieldBuilder fb = TypeContext.Current.Builder.DefineField(
+                context.Identifier().GetIdentifier(),
+                type,
+                modreq.ToArray(),
+                modopt.ToArray(),
+                fieldAttribs);
+
+            foreach (CustomAttributeBuilder cab in customAttribs)
+                fb.SetCustomAttribute(cab);
+
+            MetaFieldInfo mfi = new(context.Identifier().GetIdentifier(), fb);
+            mfi.ParserRule = context;
+
+            if (compileTimeConst != null)
+            {
+                mfi.ConstantValue = compileTimeConst.Value;
+                fb.SetConstant(compileTimeConst.Value);
+            }
+
+            else if (context.expression() != null && !context.member_special_modifier().Any(s => s.Literal() != null))
+                TypeContext.Current.FieldInitializers.Add((fb, context.expression()));
+
+            TypeContext.Current.Fields.Add(mfi);
+
+            CurrentFile.Fragments.Add(new()
+            {
+                Color = Color.Field,
+                Column = context.Identifier().Symbol.Column,
+                Line = context.Identifier().Symbol.Line,
+                Length = context.Identifier().GetIdentifier().Length,
+                ToolTip = TooltipGenerator.Field(fb),
+                IsNavigationTarget = true
+            });
         }
-
-        FieldBuilder fb = TypeContext.Current.Builder.DefineField(
-            context.Identifier().GetIdentifier(),
-            type,
-            modreq.ToArray(),
-            modopt.ToArray(),
-            fieldAttribs);
-
-        foreach (CustomAttributeBuilder cab in customAttribs)
-            fb.SetCustomAttribute(cab);
-
-        MetaFieldInfo mfi = new(context.Identifier().GetIdentifier(), fb);
-        mfi.ParserRule = context;
-
-        if (compileTimeConst != null)
-        {
-            mfi.ConstantValue = compileTimeConst.Value;
-            fb.SetConstant(compileTimeConst.Value);
-        }
-
-        else if (context.expression() != null && !context.member_special_modifier().Any(s => s.Literal() != null))
-            TypeContext.Current.FieldInitializers.Add((fb, context.expression()));
-
-        TypeContext.Current.Fields.Add(mfi);
-
-        CurrentFile.Fragments.Add(new()
-        {
-            Color = Color.Field,
-            Column = context.Identifier().Symbol.Column,
-            Line = context.Identifier().Symbol.Line,
-            Length = context.Identifier().GetIdentifier().Length,
-            ToolTip = TooltipGenerator.Field(fb),
-            IsNavigationTarget = true
-        });
     }
 }

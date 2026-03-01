@@ -143,10 +143,10 @@ internal partial class MacroParser
                 if (ExtensionLoader.Macros.Any(m => m.Macro == macroName))
                     return ExtensionLoader.Macros.First(m => m.Macro == macroName).Expand();
 
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0083_InvalidDSConfigMacro,
-                    $"Failed to expand macro '{macroName}': Macro is not defined.",
+                    nameof(StringHelper.MacroParser_MacroNotDefined), [macroName],
                     ProjectConfigurationFileName);
 
                 return "";
@@ -154,10 +154,10 @@ internal partial class MacroParser
 
             if (depth++ >= _maxDepth)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0266_MacroRecursionLimitReached,
-                    $"Failed to expand macro '{macroName}': Maximum recursion depth reached.",
+                    nameof(StringHelper.MacroParser_RecursionDepthReached), [macroName],
                     ProjectConfigurationFileName);
 
                 return "";

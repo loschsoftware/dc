@@ -23,12 +23,12 @@ internal class ExternalBlockRewriter : ITreeToStringRewriter
 
             if (rule.Identifier()[0].GetText() != "as")
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     rule.Identifier()[0].Symbol.Line,
                     rule.Identifier()[0].Symbol.Column,
                     rule.Identifier()[0].GetText().Length,
                     DS0002_SyntaxError,
-                    $"Unexpected token '{rule.Identifier()[1].GetText()}'. Expected 'as'.");
+                    nameof(StringHelper.ExternalBlockRewriter_UnexpectedToken), [rule.Identifier()[1].GetText()]);
             }
 
             sb.AppendLine($"module {rule.Identifier()[1].GetText()} = {{");
@@ -38,12 +38,12 @@ internal class ExternalBlockRewriter : ITreeToStringRewriter
         {
             if (member.external_block() != null)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     member.Start.Line,
                     member.Start.Column,
                     member.GetText().Length,
                     DS0215_NestedExternalBlock,
-                    $"'extern' blocks cannot be nested.");
+                    nameof(StringHelper.ExternalBlockRewriter_NestedExternalBlock), []);
 
                 continue;
             }

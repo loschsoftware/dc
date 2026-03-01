@@ -13,10 +13,10 @@ internal static class ProjectGroupHelpers
         {
             if (requireExecutable)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0106_DCRunInsufficientInfo,
-                    "Project group does not define an executable project.",
+                    nameof(StringHelper.ProjectGroupHelpers_NoExecutableProject), [],
                     CompilerExecutableName);
             }
 
@@ -37,10 +37,10 @@ internal static class ProjectGroupHelpers
 
         if (!config.ProjectGroup.Components.Any(predicate))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0210_ProjectGroupExecutableInvalid,
-                $"The executable component '{config.ProjectGroup.ExecutableComponent}' could not be found.",
+                nameof(StringHelper.ProjectGroupHelpers_ExecutableNotFound), [config.ProjectGroup.ExecutableComponent],
                 CompilerExecutableName);
 
             return (-1, null);
@@ -50,10 +50,10 @@ internal static class ProjectGroupHelpers
 
         if (com is ProjectGroupComponent)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0210_ProjectGroupExecutableInvalid,
-                "Currently, project group executables can only be projects.",
+                nameof(StringHelper.ProjectGroupHelpers_OnlyProjectsAsExecutable), [],
                 CompilerExecutableName);
 
             return (-1, null);

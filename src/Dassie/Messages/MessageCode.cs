@@ -1102,5 +1102,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when no commands are available for execution.
     /// </summary>
-    DS0267_NoCommandsAvailable
+    DS0267_NoCommandsAvailable,
+    /// <summary>
+    /// Emitted when the requested language is not found.
+    /// </summary>
+    DS0268_LanguageNotFound
 }

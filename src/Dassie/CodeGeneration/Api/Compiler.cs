@@ -59,13 +59,13 @@ public static class Compiler
     {
         if (!documents.Any() && EmittedMessages.Count(m => m.Severity == Severity.Error) == 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0107_NoInputFiles,
-                "No input files specified.",
+                nameof(StringHelper.Compiler_NoInputFiles), [],
                 CompilerExecutableName);
 
-            EmitBuildLogMessage("Ending compilation.", 2);
+            EmitBuildLogMessageFormatted(nameof(StringHelper.Compiler_CompilationEnding), [], 2);
             return [];
         }
 
@@ -146,10 +146,10 @@ public static class Compiler
             Context.EntryPointIsSet = true;
             Context.EntryPoint = entryMb;
 
-            EmitWarningMessage(
+            EmitWarningMessageFormatted(
                 0, 0, 0,
                 DS0031_NoEntryPoint,
-                "Program contains no entry point. Use the '<EntryPoint>' attribute to set the application entry point or add executable code to generate an implicit entry point.",
+                nameof(StringHelper.Compiler_NoEntryPoint), [],
                 CompilerExecutableName);
         }
 

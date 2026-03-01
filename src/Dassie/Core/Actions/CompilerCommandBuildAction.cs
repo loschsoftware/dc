@@ -14,10 +14,10 @@ internal class CompilerCommandBuildAction : IBuildAction
     {
         if (context.XmlAttributes is null or [] || !context.XmlAttributes.Any(a => a.Name == "Command"))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0090_InvalidDSConfigProperty,
-                $"Build action '{Name}': Missing required attribute 'Command'.",
+                nameof(StringHelper.CompilerCommandBuildAction_MissingCommand), [Name],
                 ProjectConfigurationFileName);
 
             return -1;

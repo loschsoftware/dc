@@ -14,25 +14,25 @@ internal class DeployCommand : CompilerCommand
 
     public override string Command => "deploy";
 
-    public override string Description => "Builds and deploys a project group.";
+    public override string Description => StringHelper.DeployCommand_Description;
 
     public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage = ["dc deploy [--ignore-missing] [--fail-fast] [Options]"],
-        Remarks = $"This is the primary command for interacting with project groups. The 'deploy' command first builds all component projects and then executes all targets defined in the project group file. A project group is defined using the <ProjectGroup> tag inside of a compiler configuration file ({ProjectConfigurationFileName}).",
+        Remarks = StringHelper.Format(nameof(StringHelper.DeployCommand_Remarks), ProjectConfigurationFileName),
         Options =
         [
-            ("--ignore-missing", "Ignore missing targets and resume deployment."),
-            ("--fail-fast", "Cancel deployment immediately if any target fails."),
-            ("Options", "Additional options passed to the compiler for each project being built.")
+            ("--ignore-missing", StringHelper.DeployCommand_IgnoreMissingOption),
+            ("--fail-fast", StringHelper.DeployCommand_FailFastOption),
+            ("Options", StringHelper.DeployCommand_OptionsOption)
         ],
         Examples =
         [
-            ("dc deploy", "Builds and deploys the project group defined in the current directory."),
-            ("dc deploy --ignore-missing", "Builds and deploys the project group, ignoring any missing targets."),
-            ("dc deploy --fail-fast", "Builds and deploys the project group, stopping immediately if any target fails."),
-            ("dc deploy -l", "Builds and deploys the project group, passing the '-l' flag to the compiler for each project being built.")
+            ("dc deploy", StringHelper.DeployCommand_Example1),
+            ("dc deploy --ignore-missing", StringHelper.DeployCommand_Example2),
+            ("dc deploy --fail-fast", StringHelper.DeployCommand_Example3),
+            ("dc deploy -l", StringHelper.DeployCommand_Example4)
         ]
     };
 
@@ -50,10 +50,10 @@ internal class DeployCommand : CompilerCommand
 
         if (!File.Exists(ProjectConfigurationFileName))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0129_DeployCommandInvalidProjectGroupFile,
-                $"Current directory contains no configuration file ({ProjectConfigurationFileName}).",
+                nameof(StringHelper.DeployCommand_NoConfigurationFileInCurrentDirectory), [ProjectConfigurationFileName],
                 ProjectConfigurationFileName);
 
             return -1;
@@ -61,10 +61,10 @@ internal class DeployCommand : CompilerCommand
 
         if (group == null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0129_DeployCommandInvalidProjectGroupFile,
-                $"Invalid configuration file: '{ProjectConfigurationFileName}' does not define a project group.",
+                nameof(StringHelper.DeployCommand_ConfigurationFileDefinesNoProjectGroup), [ProjectConfigurationFileName],
                 ProjectConfigurationFileName);
 
             return -1;
@@ -72,10 +72,10 @@ internal class DeployCommand : CompilerCommand
 
         if (group.Components == null || group.Components.Length == 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0130_ProjectGroupNoComponents,
-                $"Project group contains no components.",
+                nameof(StringHelper.DeployCommand_NoComponents), [],
                 ProjectConfigurationFileName);
 
             return -1;
@@ -102,10 +102,10 @@ internal class DeployCommand : CompilerCommand
 
                 else
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0129_DeployCommandInvalidProjectGroupFile,
-                        $"Component project group '{pg.Path}' could not be found.",
+                        nameof(StringHelper.DeployCommand_ComponentProjectGroupNotFound), [pg.Path],
                         ProjectConfigurationFileName);
 
                     return -1;
@@ -140,10 +140,10 @@ internal class DeployCommand : CompilerCommand
 
         if (((group.Targets ??= new()).Targets ??= []).Length == 0)
         {
-            EmitWarningMessage(
+            EmitWarningMessageFormatted(
                 0, 0, 0,
                 DS0131_ProjectGroupNoTargets,
-                "Project group defines no targets.",
+                nameof(StringHelper.DeployCommand_NoTargets), [],
                 ProjectConfigurationFileName);
         }
 
@@ -154,10 +154,10 @@ internal class DeployCommand : CompilerCommand
                 if (ignoreMissing)
                     continue;
 
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0237_DeploymentTargetNotFound,
-                    $"The deployment target '{target.Name}' could not be found.",
+                    nameof(StringHelper.DeployCommand_DeploymentTargetNotFound), [target.Name],
                     CompilerExecutableName);
 
                 continue;
@@ -180,23 +180,24 @@ internal class DeployCommand : CompilerCommand
 
             if (ret != 0)
             {
-                string msg = $"Deployment target '{target.Name}' ended with a nonzero exit code.";
+                string msg = nameof(StringHelper.DeployCommand_DeploymentTargetNonzeroExit);
+                object[] msgArgs = [target.Name];
 
                 if (failFast)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0238_DeploymentTargetFailed,
-                        msg,
+                        msg, msgArgs,
                         CompilerExecutableName);
 
                     return 238;
                 }
 
-                EmitWarningMessage(
+                EmitWarningMessageFormatted(
                     0, 0, 0,
                     DS0238_DeploymentTargetFailed,
-                    msg,
+                    msg, msgArgs,
                     CompilerExecutableName);
             }
         }

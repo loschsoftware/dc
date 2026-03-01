@@ -116,4 +116,9 @@ public interface IPackage
     /// An array of macros defined by this extension.
     /// </summary>
     public virtual IMacro[] Macros() => [];
+
+    /// <summary>
+    /// A list of localization resource providers defined by this extension.
+    /// </summary>
+    public virtual IResourceProvider<string>[] LocalizationResourceProviders() => [];
 }

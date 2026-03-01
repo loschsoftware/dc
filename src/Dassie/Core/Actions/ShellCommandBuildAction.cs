@@ -27,10 +27,10 @@ internal class ShellCommandBuildAction : IBuildAction
             {
                 if (!knownProperties.Contains(attrib.Name))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0090_InvalidDSConfigProperty,
-                        $"Build event '{context.BuildEventName}': Invalid property '{attrib.Name}'.",
+                        nameof(StringHelper.ShellCommandBuildAction_InvalidProperty), [context.BuildEventName, attrib.Name],
                         ProjectConfigurationFileName);
 
                     continue;
@@ -38,10 +38,10 @@ internal class ShellCommandBuildAction : IBuildAction
 
                 if (!bool.TryParse(attrib.Value, out bool value))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0090_InvalidDSConfigProperty,
-                        $"Build event '{context.BuildEventName}': Invalid value for option '{attrib.Name}'. Expected 'true' or 'false'.",
+                        nameof(StringHelper.ShellCommandBuildAction_InvalidValueForBooleanProperty), [context.BuildEventName, attrib.Name],
                         ProjectConfigurationFileName);
 
                     continue;

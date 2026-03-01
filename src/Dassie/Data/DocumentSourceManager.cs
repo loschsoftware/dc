@@ -21,10 +21,10 @@ internal static class DocumentSourceManager
 
             if (!ExtensionLoader.DocumentSources.Any(d => d.Name == sourceName))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0232_DocumentSourceNotFound,
-                    $"The document source '{sourceName}' could not be found.",
+                    nameof(StringHelper.DocumentSourceManager_SourceNotFound), [sourceName],
                     ProjectConfigurationFileName);
 
                 continue;
@@ -38,10 +38,10 @@ internal static class DocumentSourceManager
 
             if (docs.Any(d => d.Name == source.DocumentName))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0233_DocumentSourcesDuplicateDocumentName,
-                    $"Multiple document sources attempted to write to document '{source.DocumentName}'.",
+                    nameof(StringHelper.DocumentSourceManager_DuplicateDocument), [source.DocumentName],
                     ProjectConfigurationFileName);
 
                 continue;

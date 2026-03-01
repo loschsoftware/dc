@@ -30,7 +30,7 @@ internal class VersionCommand : CompilerCommand
         int padding = 35;
 
         output.AppendLine();
-        output.AppendLine(ProductName);
+        output.AppendLine(StringHelper.ProductNameFull);
         output.AppendLine($"(C) 2023-{buildDate.Year} Losch");
 
         output.AppendLine();

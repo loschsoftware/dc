@@ -42,12 +42,12 @@ internal static class TypeFinalizer
         {
             TypeContext context = typeContextMap[typeBuilder];
 
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.ParserRule.Identifier().Symbol.Line,
                 context.ParserRule.Identifier().Symbol.Column,
                 context.ParserRule.Identifier().GetIdentifier().Length,
                 DS0193_CircularReference,
-                $"Circular base type dependency involving '{context.FullName}' and '{context.Builder.BaseType.FullName}'.");
+                nameof(StringHelper.TypeFinalizer_CircularBaseDependency), [context.FullName, context.Builder.BaseType.FullName]);
 
             return false;
         }

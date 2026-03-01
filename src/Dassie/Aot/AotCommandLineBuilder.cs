@@ -240,7 +240,8 @@ internal class AotCommandLineBuilder
             EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0064_UnsupportedFeature,
-                nameof(StringHelper.AotCommandLineBuilder_UnsupportedOS));
+                nameof(StringHelper.AotCommandLineBuilder_UnsupportedOS), [],
+                CompilerExecutableName);
 
             linkerPath = "";
             return;
@@ -261,7 +262,8 @@ internal class AotCommandLineBuilder
             EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0261_ExtensionsLocationPropertyInvalidPath,
-                nameof(StringHelper.AotCommandLineBuilder_MsvcPathPrompt));
+                nameof(StringHelper.AotCommandLineBuilder_MsvcPathPrompt), [],
+                CompilerExecutableName);
 
             linkerPath = null;
             return;

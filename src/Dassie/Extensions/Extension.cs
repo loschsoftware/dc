@@ -70,4 +70,7 @@ public abstract class Extension : IPackage
 
     /// <inheritdoc/>
     public virtual IMacro[] Macros() => [];
+
+    /// <inheritdoc/>
+    public virtual IResourceProvider<string>[] LocalizationResourceProviders() => [];
 }

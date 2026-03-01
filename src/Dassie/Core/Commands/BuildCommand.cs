@@ -17,23 +17,23 @@ internal class BuildCommand : CompilerCommand
 
     public override string Command => "build";
 
-    public override string Description => "Executes the specified build profile, or compiles all source files in the current folder structure if none is specified.";
+    public override string Description => StringHelper.BuildCommand_Description;
 
     public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage = ["dc build [BuildProfile] [Options]"],
-        Remarks = "This is the primary command for building Dassie projects. By default, this command will compile all Dassie source files in the current directory as well as all subdirectories. If no project file is present in the root directory, the default configuration is used.",
+        Remarks = StringHelper.BuildCommand_Remarks,
         Options =
         [
-            ("BuildProfile", "Specifies the build profile to execute. If not set, the default profile is executed."),
-            ("Options", "Additional options to pass to the compiler. For a list of available options, use 'dc help -o'.")
+            ("BuildProfile", StringHelper.BuildCommand_BuildProfileOptionDescription),
+            ("Options", StringHelper.BuildCommand_OptionsOptionDescription)
         ],
         Examples =
         [
-            ("dc build", "Builds the current project with the default build profile."),
-            ("dc build CustomProfile", "Builds the current project with the 'CustomProfile' build profile."),
-            ("dc build CustomProfile -r Aot", "Builds the current project with the 'CustomProfile' build profile using the AOT compiler.")
+            ("dc build", StringHelper.BuildCommand_Example1),
+            ("dc build CustomProfile", StringHelper.BuildCommand_Example2),
+            ("dc build CustomProfile -r Aot", StringHelper.BuildCommand_Example3)
         ]
     };
 
@@ -56,10 +56,10 @@ internal class BuildCommand : CompilerCommand
 
         if (config.ProjectGroup != null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0132_DCBuildCalledOnProjectGroup,
-                $"'dc build' can only be called on single projects. Use 'dc deploy' to build and deploy a project group.",
+                nameof(StringHelper.BuildCommand_ProjectGroupNotSupported), [],
                 ProjectConfigurationFileName);
 
             return -1;
@@ -76,10 +76,10 @@ internal class BuildCommand : CompilerCommand
                 return ExecuteBuildProfile(profile, config, additionalArgs);
             }
 
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0088_InvalidProfile,
-                $"The build profile '{profileName}' could not be found.",
+                nameof(StringHelper.BuildCommand_BuildProfileNotFound), [profileName],
                 ProjectConfigurationFileName);
 
             return -1;
@@ -95,10 +95,10 @@ internal class BuildCommand : CompilerCommand
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0030_FileAccessDenied,
-                $"Files to compile could not be determined: {ex.Message}",
+                nameof(StringHelper.BuildCommand_FailedToCollectFiles), [ex.Message],
                 CompilerExecutableName);
         }
 
@@ -106,10 +106,10 @@ internal class BuildCommand : CompilerCommand
 
         if (filesToCompile.Length < 1)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0073_NoSourceFilesFound,
-                "No source files present.",
+                nameof(StringHelper.BuildCommand_NoSourceFilesPresent), [],
                 "build");
 
             return -1;

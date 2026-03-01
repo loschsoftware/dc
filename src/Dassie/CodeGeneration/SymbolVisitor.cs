@@ -1,7 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Symbols;
@@ -39,12 +38,12 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
         {
             foreach (ParserRuleContext pt in context.export_directive().Skip(1))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     pt.Start.Line,
                     pt.Start.Column,
                     pt.GetText().Length,
                     DS0200_MultipleExports,
-                    "A source file can export at most one namespace.");
+                    nameof(StringHelper.SymbolVisitor_MultipleExports), []);
             }
         }
 
@@ -75,12 +74,12 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
             {
                 if (!(t.IsAbstract && t.IsSealed))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         id.Start.Line,
                         id.Start.Column,
                         ns.Length,
                         DS0078_InvalidImport,
-                        "Only namespaces and modules can be imported.");
+                        nameof(StringHelper.SymbolVisitor_OnlyNamespacesAndModules), []);
                 }
 
                 if (context.Exclamation_Mark() != null)
@@ -129,12 +128,12 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
 
         if ((context.type_member() ?? []).Length > ushort.MaxValue)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.type_member()[^1].Start.Line,
                 context.type_member()[^1].Start.Column,
                 context.type_member()[^1].GetText().Length,
                 DS0075_MetadataLimitExceeded,
-                $"Files cannot contain more than {ushort.MaxValue} top-level functions.");
+                nameof(StringHelper.SymbolVisitor_TooManyTopLevelFunctions), [ushort.MaxValue]);
         }
 
         foreach (DassieParser.Type_memberContext member in context.type_member() ?? [])
@@ -206,12 +205,12 @@ internal class SymbolVisitor : DassieParserBaseVisitor<object>
         {
             if (context.type_block().type_member().Length > ushort.MaxValue)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetText().Length,
                     DS0075_MetadataLimitExceeded,
-                    $"'{context.Identifier().GetIdentifier()}': Types cannot have more than {ushort.MaxValue} members.");
+                    nameof(StringHelper.SymbolVisitor_TooManyMembers), [context.Identifier().GetIdentifier(), ushort.MaxValue]);
             }
 
             foreach (DassieParser.Type_memberContext member in context.type_block().type_member())

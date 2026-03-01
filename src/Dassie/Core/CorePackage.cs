@@ -54,6 +54,7 @@ internal class CorePackage : IPackage
         EditorProperty.Instance,
         ExtensionLocationProperty.Instance,
         EnableExtensionsProperty.Instance,
+        LanguageProperty.Instance,
         EnableCorePackageProperty.Instance,
         MsvcRootPathProperty.Instance,
         ILDasmPathProperty.Instance
@@ -96,5 +97,10 @@ internal class CorePackage : IPackage
         new ShellCommandBuildAction(),
         new PrintBuildAction(),
         new LogBuildAction()
+    ];
+
+    public IResourceProvider<string>[] LocalizationResourceProviders() =>
+    [
+        DefaultStrings.Instance
     ];
 }

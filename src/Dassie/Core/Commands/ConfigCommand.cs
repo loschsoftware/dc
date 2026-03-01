@@ -20,7 +20,7 @@ internal class ConfigCommand : CompilerCommand
 
     public override string Command => "config";
 
-    public override string Description => "Manages compiler settings and project configurations.";
+    public override string Description => StringHelper.ConfigCommand_Description;
 
     public override CommandHelpDetails HelpDetails => new()
     {
@@ -32,19 +32,18 @@ internal class ConfigCommand : CompilerCommand
         ],
         Options =
         [
-            ("Property=[Value]", "The property to modify. Multiple can be specified, separated by spaces. The value is optional, if omitted, the default value is used. Note that the equals sign (=) is still required."),
-            ("--global", "Indicates that the operation displays or modifies the global configuration, as opposed to a project file."),
-            ("    --reset", "Resets all global properties to their default value."),
-            ("    --import <Path>", "Imports the global configuration from the specified file.")
+            ("Property=[Value]", StringHelper.ConfigCommand_PropertyOption),
+            ("--global", StringHelper.ConfigCommand_GlobalOption),
+            ("    --reset", StringHelper.ConfigCommand_ResetOption),
+            ("    --import <Path>", StringHelper.ConfigCommand_ImportOption)
         ],
-        Remarks = $"This command is used to display or change global or project-specific compiler settings. If this command is called without arguments in a directory containing a project file, it will display the current project configuration. Similarly, the '--global' flag is used to change or show the global configuration.{Environment.NewLine}{Environment.NewLine}"
-        + "If 'dc config' is called in a directory not containing a project file, a new project file will be created. This is useful for initializing a Dassie project in an existing directory structure, as opposed to the 'dc new' command which creates a new project structure based on a template. If property values are supplied to the command as arguments, they will be applied to the generated project file.",
+        Remarks = StringHelper.ConfigCommand_Remarks,
         Examples =
         [
-            ("dc config", "Creates a new project file with default values in the current directory, or displays the current project configuration if one already exists."),
-            ("dc config MeasureElapsedTime=true Verbosity=2", "Changes two settings of the project configuration."),
-            ("dc config --global", "Displays the global compiler configuration."),
-            ("dc config --global core.scratchpad.editor=vim", "Changes a setting of the global configuration.")
+            ("dc config", StringHelper.ConfigCommand_Example1),
+            ("dc config MeasureElapsedTime=true Verbosity=2", StringHelper.ConfigCommand_Example2),
+            ("dc config --global", StringHelper.ConfigCommand_Example3),
+            ("dc config --global core.scratchpad.editor=vim", StringHelper.ConfigCommand_Example4)
         ]
     };
 
@@ -65,10 +64,10 @@ internal class ConfigCommand : CompilerCommand
 
         foreach (string arg in args.Where(a => !a.StartsWith('-') && !a.Contains('=')))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0013_InvalidArgument,
-                $"Unexpected argument '{arg}'.",
+                nameof(StringHelper.ConfigCommand_UnexpectedArgument), [arg],
                 CompilerExecutableName);
         }
 
@@ -85,10 +84,10 @@ internal class ConfigCommand : CompilerCommand
             {
                 if (args.Length <= args.IndexOf("--import") + 1)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0013_InvalidArgument,
-                        $"File path to import from required.",
+                        nameof(StringHelper.ConfigCommand_ImportFilePathRequired), [],
                         CompilerExecutableName);
 
                     return -1;
@@ -97,10 +96,10 @@ internal class ConfigCommand : CompilerCommand
                 string path = args[args.IndexOf("--import") + 1];
                 if (!File.Exists(path))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0198_ImportedConfigFileNotFound,
-                        $"The specified file '{path}' could not be found.",
+                        nameof(StringHelper.ConfigCommand_FileNotFound), [path],
                         CompilerExecutableName);
 
                     return -1;
@@ -121,10 +120,10 @@ internal class ConfigCommand : CompilerCommand
             {
                 if (!GlobalConfigManager.Properties.Any(p => p.Key.Equals(prop.Key, StringComparison.OrdinalIgnoreCase)))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0253_DCConfigInvalidProperty,
-                        $"Invalid global property '{prop.Key}'. Use 'dc config --global' to display all global properties.",
+                        nameof(StringHelper.ConfigCommand_InvalidGlobalProperty), [prop.Key],
                         CompilerExecutableName);
 
                     continue;
@@ -190,10 +189,10 @@ internal class ConfigCommand : CompilerCommand
 
                 if (dsconfigProperty == null)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0253_DCConfigInvalidProperty,
-                        $"Invalid project file property '{prop.Key}'.",
+                        nameof(StringHelper.ConfigCommand_InvalidProjectFileProperty), [prop.Key],
                         CompilerExecutableName);
 
                     continue;
@@ -206,10 +205,10 @@ internal class ConfigCommand : CompilerCommand
 
                 if (propertyType != typeof(string) && !propertyType.IsPrimitive && !propertyType.IsEnum)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0254_DCConfigUnsupportedDataType,
-                        $"The property '{dsconfigProperty.Name}' has an unsupported data type ({TypeHelpers.TypeName(propertyType)}). 'dc config' only supports properties of type 'string' or of enum or primitive types.",
+                        nameof(StringHelper.ConfigCommand_UnsupportedPropertyType), [dsconfigProperty.Name, TypeHelpers.TypeName(propertyType)],
                         CompilerExecutableName);
 
                     continue;
@@ -224,10 +223,10 @@ internal class ConfigCommand : CompilerCommand
                 {
                     if (!bool.TryParse(format.ToLowerInvariant(), out _))
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0255_DCConfigInvalidValue,
-                            $"'{format}' is not a valid value for properties of type 'bool'. Allowed values are 'true' and 'false'.",
+                            nameof(StringHelper.ConfigCommand_InvalidValueForBool), [format],
                             CompilerExecutableName);
 
                         continue;
@@ -241,10 +240,10 @@ internal class ConfigCommand : CompilerCommand
                     string[] names = Enum.GetNames(propertyType);
                     if (!names.Contains(format, StringComparer.OrdinalIgnoreCase))
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0255_DCConfigInvalidValue,
-                            $"'{format}' is not a valid value for properties of type '{propertyType}'. Allowed values are [{string.Join(", ", names)}].",
+                            nameof(StringHelper.ConfigCommand_InvalidValueForEnum), [format, propertyType, string.Join(", ", names)],
                             CompilerExecutableName);
 
                         continue;
@@ -285,12 +284,12 @@ internal class ConfigCommand : CompilerCommand
 
         if (properties.Count == 0)
         {
-            LogOut.WriteLine($"Created new {ProjectConfigurationFileName} with default values.");
+            LogOut.WriteLine(StringHelper.Format(nameof(StringHelper.ConfigCommand_CreatedNewProjectFileDefaultSettings), ProjectConfigurationFileName));
             return 0;
         }
 
         Invoke(args);
-        LogOut.WriteLine($"Created new {ProjectConfigurationFileName} with specified settings.");
+        LogOut.WriteLine(StringHelper.Format(nameof(StringHelper.ConfigCommand_CreatedNewProjectFileSpecifiedSettings), ProjectConfigurationFileName));
         return 0;
     }
 
@@ -298,7 +297,7 @@ internal class ConfigCommand : CompilerCommand
     {
         if (properties == null || properties.Count == 0)
         {
-            Console.WriteLine("No properties to display.");
+            LogOut.WriteLine(StringHelper.ConfigCommand_NoPropertiesToDisplay);
             return;
         }
 
@@ -306,9 +305,9 @@ internal class ConfigCommand : CompilerCommand
         IEnumerable<string> types = properties.Select(p => p.TypeName);
         IEnumerable<string> values = properties.Select(p => p.Value);
 
-        string nameColumn = "Name";
-        string typeColumn = "Type";
-        string valueColumn = "Value";
+        string nameColumn = StringHelper.ConfigCommand_Name;
+        string typeColumn = StringHelper.ConfigCommand_Type;
+        string valueColumn = StringHelper.ConfigCommand_Value;
         string space = "    ";
 
         int nameColumnWidth = Math.Max(nameColumn.Length, keys.MaxBy(k => k.Length).Length);

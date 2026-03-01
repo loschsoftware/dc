@@ -55,10 +55,10 @@ internal static class ConfigValidation
         }
         catch (XmlException xmlEx)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0002_SyntaxError,
-                $"Malformed document: {xmlEx.Message}",
+                nameof(StringHelper.ConfigValidation_MalformedDocument), [xmlEx.Message],
                 ProjectConfigurationFileName);
 
             return errors;
@@ -74,7 +74,7 @@ internal static class ConfigValidation
                     Length = element.Name.LocalName.Length + 2,
                     Code = DS0090_InvalidDSConfigProperty,
                     Severity = Severity.Warning,
-                    Text = $"Invalid property '{element.Name.LocalName}'.",
+                    Text = StringHelper.Format(nameof(StringHelper.ConfigValidation_InvalidProperty), element.Name.LocalName),
                     File = ProjectConfigurationFileName
                 });
             }

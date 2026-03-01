@@ -20,7 +20,7 @@ internal class AnalyzeCommand : CompilerCommand
 
     public override string Command => "analyze";
 
-    public override string Description => "Runs code analyzers on the current project or on a list of source files.";
+    public override string Description => StringHelper.AnalyzeCommand_Description;
 
     public override CommandHelpDetails HelpDetails => new()
     {
@@ -31,25 +31,22 @@ internal class AnalyzeCommand : CompilerCommand
             "dc analyze <Files> [(--analyzer|-a)=<Name>]",
             "dc analyze --markers [--marker:<Marker>] [--exclude:<Marker>] [Files]",
         ],
-        Remarks = "A code analyzer is a tool that examines source code for potential issues and style violations. " +
-        "Code analyzers other than the default one are installed as part of compiler extensions (packages). " +
-        $"Managing compiler extensions is facilitated through the 'dc package' command.{Environment.NewLine}{Environment.NewLine}" +
-        "The '--markers' option provides a simple way to scan for code comments with marker symbols such as 'TODO', 'NOTE' or 'FIXME'. It searches through the current project or specified files and displays all according comments in a structured list.",
+        Remarks = StringHelper.AnalyzeCommand_Remarks,
         Options =
         [
-            ("(--analyzer | -a)=<Name>", "The name of the code analyzer to run. If none is specified, the default analyzer is used."),
-            ("Files", "A list of source files to analyze. If this option is not used, all source files in the current project will be analyzed."),
-            ("--markers [Options] [Files]", "Extracts and displays all comments containing markers such as TODO from the current project or the specified source files."),
-            ("    --marker:<Marker>", "Specifies a custom marker to include in the search. Multiple can be specified."),
-            ("    --exclude:<Marker>", "Specifies a marker to ignore in the search. Multiple can be specified.")
+            ("(--analyzer | -a)=<Name>", StringHelper.AnalyzeCommand_AnalyzerOptionDescription),
+            ("Files", StringHelper.AnalyzeCommand_FilesOptionDescription),
+            ("--markers [Options] [Files]", StringHelper.AnalyzeCommand_MarkersOptionDescription),
+            ("    --marker:<Marker>", StringHelper.AnalyzeCommand_MarkerOptionDescription),
+            ("    --exclude:<Marker>", StringHelper.AnalyzeCommand_ExcludeOptionDescription)
         ],
         Examples =
         [
-            ("dc analyze", "Runs the default code analyzer on all source files in the current project."),
-            ("dc analyze --analyzer=CustomAnalyzer", "Runs 'CustomAnalyzer' on all source files in the current project."),
-            ("dc analyze ./src/File1.ds ./src/File2.ds", "Runs the default code analyzer on the specified source files."),
-            ("dc analyze ./src/File1.ds ./src/File2.ds -a=CustomAnalyzer", "Runs 'CustomAnalyzer' on the specified source files."),
-            ("dc analyze --markers", "Displays all comments with markers in the current project.")
+            ("dc analyze", StringHelper.AnalyzeCommand_Example1),
+            ("dc analyze --analyzer=CustomAnalyzer", StringHelper.AnalyzeCommand_Example2),
+            ("dc analyze ./src/File1.ds ./src/File2.ds", StringHelper.AnalyzeCommand_Example3),
+            ("dc analyze ./src/File1.ds ./src/File2.ds -a=CustomAnalyzer", StringHelper.AnalyzeCommand_Example4),
+            ("dc analyze --markers", StringHelper.AnalyzeCommand_Example5)
         ]
     };
 
@@ -60,10 +57,10 @@ internal class AnalyzeCommand : CompilerCommand
 
         foreach (string arg in args.Where(a => !a.StartsWith('-') && !File.Exists(a)))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0049_SourceFileNotFound,
-                $"The file '{arg}' could not be found.",
+                nameof(StringHelper.AnalyzeCommand_SourceFileNotFound), [arg],
                 CompilerExecutableName);
         }
 
@@ -109,10 +106,10 @@ internal class AnalyzeCommand : CompilerCommand
             }
             else
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0135_DCAnalyzeInvalidAnalyzer,
-                    $"The analyzer '{analyzerName}' could not be found.",
+                    nameof(StringHelper.AnalyzeCommand_AnalyzerNotFound), [analyzerName],
                     CompilerExecutableName);
 
                 return -1;
@@ -144,7 +141,7 @@ internal class AnalyzeCommand : CompilerCommand
             Emit(error);
 
         if (errors.Count == 0)
-            WriteLine($"{Environment.NewLine}Analysis completed without messages.");
+            WriteLine(StringHelper.AnalyzeCommand_AnalysisCompletedNoMessages);
 
         return 0;
     }
@@ -153,10 +150,10 @@ internal class AnalyzeCommand : CompilerCommand
     {
         if (!File.Exists(ProjectConfigurationFileName))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0134_DCAnalyzeNoProjectFile,
-                "The current directory contains no project file.",
+                nameof(StringHelper.AnalyzeCommand_NoProjectFileFound), [],
                 file: CompilerExecutableName);
 
             return -1;
@@ -170,10 +167,10 @@ internal class AnalyzeCommand : CompilerCommand
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0030_FileAccessDenied,
-                $"Could not determine source files to analyze: {ex.Message}",
+                nameof(StringHelper.AnalyzeCommand_FailedToCollectFiles), [ex.Message],
                 CompilerExecutableName);
 
             return -1;

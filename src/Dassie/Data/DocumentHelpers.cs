@@ -22,10 +22,10 @@ internal static class DocumentHelpers
             FileInfo fi = new(path);
             if (fi.Exists && fi.Length > int.MaxValue)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0240_SourceFileTooLarge,
-                    $"The source file '{path}' is too large: The Dassie compiler is limited to input documents smaller than 2 GiB.",
+                    nameof(StringHelper.DocumentHelpers_SourceFileTooLarge), [path],
                     path);
 
                 return new("", path);

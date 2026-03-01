@@ -22,12 +22,12 @@ internal static class TypeDeclarationGeneration
     {
         if (context.Identifier().GetIdentifier().Length + (CurrentFile.ExportedNamespace ?? "").Length > 1024)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
                 DS0075_MetadataLimitExceeded,
-                $"'{context.Identifier().GetIdentifier()[0..32]}...': The fully qualified name of a type cannot exceed 1024 characters.");
+                nameof(StringHelper.TypeDeclarationGeneration_TypeNameTooLong), [context.Identifier().GetIdentifier()[0..32]]);
 
             return new();
         }
@@ -53,29 +53,33 @@ internal static class TypeDeclarationGeneration
             TypeContext duplicate = Context.Types.First(t => t.FullName == tb.FullName);
             if (duplicate.GenericParameters != null && context.generic_parameter_list() != null && duplicate.GenericParameters.Count != context.generic_parameter_list().generic_parameter().Length)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
                     DS0121_DuplicateGenericTypeName,
-                    $"Currently, the Dassie compiler does not allow creating types of the same name with different type parameters. This functionality might be added in the future. If you desperately need it, consider opening an issue on GitHub.");
+                    nameof(StringHelper.TypeDeclarationGeneration_DuplicateGenericTypeName), []);
             }
             else
             {
-                string errMsg = "";
                 if (string.IsNullOrEmpty(CurrentFile.ExportedNamespace))
-                    errMsg = $"The global namespace";
+                {
+                    EmitErrorMessageFormatted(
+                        context.Identifier().Symbol.Line,
+                        context.Identifier().Symbol.Column,
+                        context.Identifier().GetIdentifier().Length,
+                        DS0120_DuplicateTypeName,
+                        nameof(StringHelper.TypeDeclarationGeneration_DuplicateTypeNameGlobal), [tb.Name]);
+                }
                 else
-                    errMsg = $"The namespace '{CurrentFile.ExportedNamespace}'";
-
-                errMsg += $" already contains a definition for the type '{tb.Name}'.";
-
-                EmitErrorMessage(
-                    context.Identifier().Symbol.Line,
-                    context.Identifier().Symbol.Column,
-                    context.Identifier().GetIdentifier().Length,
-                    DS0120_DuplicateTypeName,
-                    errMsg);
+                {
+                    EmitErrorMessageFormatted(
+                        context.Identifier().Symbol.Line,
+                        context.Identifier().Symbol.Column,
+                        context.Identifier().GetIdentifier().Length,
+                        DS0120_DuplicateTypeName,
+                        nameof(StringHelper.TypeDeclarationGeneration_DuplicateTypeNameInNamespace), [CurrentFile.ExportedNamespace, tb.Name]);
+                }
             }
         }
 
@@ -148,12 +152,12 @@ internal static class TypeDeclarationGeneration
                 {
                     if (context.type_kind().Module() != null && type != typeof(object))
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             context.inheritance_list().Start.Line,
                             context.inheritance_list().Start.Column,
                             context.inheritance_list().GetText().Length,
                             DS0243_ModuleInheritance,
-                            $"Module '{TypeName(tb)}' cannot inherit from types other than 'object'.");
+                            nameof(StringHelper.TypeDeclarationGeneration_ModuleCannotInherit), [TypeName(tb)]);
                     }
                     else
                     {
@@ -166,12 +170,12 @@ internal static class TypeDeclarationGeneration
                 {
                     if (context.type_kind().Module() != null)
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             context.inheritance_list().Start.Line,
                             context.inheritance_list().Start.Column,
                             context.inheritance_list().GetText().Length,
                             DS0243_ModuleInheritance,
-                            $"Module '{TypeName(tb)}' cannot implement template '{TypeName(type)}'.");
+                            nameof(StringHelper.TypeDeclarationGeneration_ModuleCannotImplement), [TypeName(tb), TypeName(type)]);
                     }
                     else
                         interfaces.Add(type);
@@ -192,32 +196,32 @@ internal static class TypeDeclarationGeneration
 
                 if (context.type_kind().Ref() != null)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         context.type_kind().Ref().Symbol.Line,
                         context.type_kind().Ref().Symbol.Column,
                         3,
                         DS0143_EnumTypeExplicitlyRef,
-                        "The modifier 'ref' is invalid for enumeration types. Enumerations are always value types.");
+                        nameof(StringHelper.TypeDeclarationGeneration_EnumRefInvalid), []);
                 }
 
                 if (explicitBaseType && parent != null && parent != typeof(Enum))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         context.inheritance_list().Start.Line,
                         context.inheritance_list().Start.Column,
                         context.inheritance_list().GetText().Length,
                         DS0144_EnumTypeBaseType,
-                        "The only allowed base type for enumerations is 'System.Enum'.");
+                        nameof(StringHelper.TypeDeclarationGeneration_EnumBaseTypeInvalid), []);
                 }
 
                 if (interfaces.Count > 0)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         context.inheritance_list().Start.Line,
                         context.inheritance_list().Start.Column,
                         context.inheritance_list().GetText().Length,
                         DS0145_EnumTypeImplementsTemplate,
-                        "Enumeration types cannot implement templates.");
+                        nameof(StringHelper.TypeDeclarationGeneration_EnumCannotImplement), []);
                 }
 
                 parent = typeof(Enum);
@@ -258,12 +262,12 @@ internal static class TypeDeclarationGeneration
 
             if (!IsIntegerType(instanceFieldType))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
                     DS0141_InvalidEnumerationType,
-                    $"Invalid enumeration type '{instanceFieldType}'. The only allowed types are int8, uint8, int16, uint16, int, uint, int32, uint32, int64, uint64, native, unative.");
+                    nameof(StringHelper.TypeDeclarationGeneration_InvalidEnumType), [instanceFieldType]);
             }
 
             tb.DefineField("value__", instanceFieldType,
@@ -294,12 +298,12 @@ internal static class TypeDeclarationGeneration
         {
             if (context.generic_parameter_list().generic_parameter().Length > ushort.MaxValue)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.generic_parameter_list().Start.Line,
                     context.generic_parameter_list().Start.Column,
                     context.generic_parameter_list().GetText().Length,
                     DS0075_MetadataLimitExceeded,
-                    $"'{context.Identifier().GetIdentifier()}': Types cannot have more than {ushort.MaxValue} generic type parameters.");
+                    nameof(StringHelper.TypeDeclarationGeneration_TooManyTypeParams), [context.Identifier().GetIdentifier(), ushort.MaxValue]);
             }
 
             List<GenericParameterContext> typeParamContexts = [];
@@ -308,12 +312,12 @@ internal static class TypeDeclarationGeneration
             {
                 if (typeParamContexts.Any(p => p.Name == typeParam.Identifier().GetIdentifier()))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         typeParam.Start.Line,
                         typeParam.Start.Column,
                         typeParam.GetText().Length,
                         DS0113_DuplicateTypeParameter,
-                        $"Duplicate generic parameter '{typeParam.GetText()}'.");
+                        nameof(StringHelper.TypeDeclarationGeneration_DuplicateTypeParam), [typeParam.GetText()]);
 
                     continue;
                 }
@@ -386,46 +390,46 @@ internal static class TypeDeclarationGeneration
             // Alias type
             if (context.type_block().type_name() != null)
             {
-                if (context.type_special_modifier() != null && context.type_special_modifier().Open() != null)
+            if (context.type_special_modifier() != null && context.type_special_modifier().Open() != null)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         context.type_special_modifier().Open().Symbol.Line,
                         context.type_special_modifier().Open().Symbol.Column,
                         context.type_special_modifier().Open().GetText().Length,
                         DS0181_AliasTypeInvalidModifiers,
-                        "The 'open' modifier is invalid on alias types.");
+                        nameof(StringHelper.TypeDeclarationGeneration_AliasOpenModifierInvalid), []);
                 }
 
                 if (interfaces.Count > 0)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         context.inheritance_list().Start.Line,
                         context.inheritance_list().Start.Column,
                         context.inheritance_list().GetText().Length,
                         DS0186_AliasTypeImplementsInterface,
-                        "Type aliases cannot implement templates.");
+                        nameof(StringHelper.TypeDeclarationGeneration_AliasCannotImplement), []);
 
                     TypeContext.Current.RequiredInterfaceImplementations = [];
                 }
 
                 if (explicitBaseType)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         context.inheritance_list().Start.Line,
                         context.inheritance_list().Start.Column,
                         context.inheritance_list().GetText().Length,
                         DS0187_AliasTypeExtendsType,
-                        "Type aliases cannot explicitly set their base type.");
+                        nameof(StringHelper.TypeDeclarationGeneration_AliasCannotExtend), []);
                 }
 
                 if (context.generic_parameter_list() != null)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         context.generic_parameter_list().Start.Line,
                         context.generic_parameter_list().Start.Column,
                         context.generic_parameter_list().GetText().Length,
                         DS0188_GenericAliasType,
-                        "Type aliases cannot define generic type parameters.");
+                        nameof(StringHelper.TypeDeclarationGeneration_AliasCannotBeGeneric), []);
                 }
 
                 if (context.attribute().Length > 0)

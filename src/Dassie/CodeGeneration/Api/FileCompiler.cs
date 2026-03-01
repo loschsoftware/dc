@@ -37,10 +37,10 @@ public static class FileCompiler
         }
         catch (IOException ex)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0030_FileAccessDenied,
-                $"Could not read from '{path}': {ex.Message}",
+                nameof(StringHelper.FileCompiler_ReadFileFailed), [path, ex.Message],
                 path);
         }
 

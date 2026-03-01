@@ -1,7 +1,6 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using Dassie.Core;
-using Dassie.Core.Properties;
 using Dassie.Messages.Devices;
 using NuGet.Packaging;
 using System;
@@ -88,6 +87,9 @@ internal static class ExtensionLoader
     private static IEnumerable<IMacro> _macros = [];
     public static IEnumerable<IMacro> Macros => _macros;
 
+    private static IEnumerable<IResourceProvider<string>> _localizationResourceProviders = [];
+    public static IEnumerable<IResourceProvider<string>> LocalizationResourceProviders => _localizationResourceProviders;
+
     private static void Update()
     {
         _gloablConfigProperties = InstalledExtensions.SelectMany(p => p.GlobalProperties());
@@ -102,6 +104,7 @@ internal static class ExtensionLoader
         _subsystems = InstalledExtensions.SelectMany(p => p.Subsystems());
         _buildActions = InstalledExtensions.SelectMany(p => p.BuildActions());
         _macros = InstalledExtensions.SelectMany(p => p.Macros());
+        _localizationResourceProviders = InstalledExtensions.SelectMany(p => p.LocalizationResourceProviders());
     }
 
     private static void Update(object sender, NotifyCollectionChangedEventArgs e)
@@ -123,10 +126,10 @@ internal static class ExtensionLoader
             {
                 if (seenCommands.TryGetValue(cmd.Command, out var existing))
                 {
-                    EmitWarningMessage(
+                    EmitWarningMessageFormatted(
                         0, 0, 0,
                         DS0100_DuplicateCompilerCommand,
-                        $"Ambiguous command: The command '{cmd.Command}' is defined by multiple extensions. The command defined in '{existing.package.Metadata.Name}' will be used.",
+                        nameof(StringHelper.ExtensionLoader_AmbiguousCommand), [cmd.Command, existing.package.Metadata.Name],
                         CompilerExecutableName);
                 }
                 else
@@ -136,10 +139,10 @@ internal static class ExtensionLoader
                 {
                     if (seenCommands.TryGetValue(alias, out existing))
                     {
-                        EmitWarningMessage(
+                        EmitWarningMessageFormatted(
                             0, 0, 0,
                             DS0100_DuplicateCompilerCommand,
-                            $"Ambiguous command: The command alias '{alias}' is defined by multiple extensions. The command defined in '{existing.package.Metadata.Name}' will be used.",
+                            nameof(StringHelper.ExtensionLoader_AmbiguousAlias), [alias, existing.package.Metadata.Name],
                             CompilerExecutableName);
                     }
                     else
@@ -198,7 +201,7 @@ internal static class ExtensionLoader
     {
         foreach ((string path, List<XmlAttribute> attribs, List<XmlElement> elems) in paths)
         {
-            EmitBuildLogMessage($"Loaded transient extension '{path}'.", 2, true);
+            EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_TransientExtensionLoaded), [path], 2, true);
             InstalledExtensions.AddRange(LoadInstalledExtensions(path, true, attribs, elems));
         }
     }
@@ -298,16 +301,16 @@ internal static class ExtensionLoader
                 }
 
                 if (!loadTransient)
-                    EmitBuildLogMessage($"Loaded extension '{package.Metadata.Name}'.", 2, true);
+                    EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_ExtensionLoaded), [package.Metadata.Name], 2, true);
 
                 packages.Add(package);
             }
         }
         catch (ReflectionTypeLoadException)
         {
-            EmitWarningMessage(0, 0, 0,
+            EmitWarningMessageFormatted(0, 0, 0,
                 DS0124_InvalidExtensionPackage,
-                $"Extension package '{extensionAssembly.GetName().Name}' is malformed and will be ignored.",
+                nameof(StringHelper.ExtensionLoader_MalformedPackage), [extensionAssembly.GetName().Name],
                 CompilerExecutableName);
         }
 
@@ -336,7 +339,7 @@ internal static class ExtensionLoader
         }
 
         InstalledExtensions.Remove(package);
-        EmitBuildLogMessage($"Unloaded extension '{package.Metadata.Name}'.", 2);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_ExtensionUnloaded), [package.Metadata.Name], 2);
     }
 
     public static void UnloadAll()

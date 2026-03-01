@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 
 namespace Dassie.Extensions;
 
@@ -7,6 +8,11 @@ namespace Dassie.Extensions;
 /// </summary>
 public interface IResourceProvider<TRes>
 {
+    /// <summary>
+    /// The culture of the resource provider.
+    /// </summary>
+    public string Culture { get; }
+
     /// <summary>
     /// The resources defined by the resource provider, stored as a dictionary with string keys.
     /// </summary>

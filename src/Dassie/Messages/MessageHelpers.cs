@@ -184,41 +184,41 @@ internal static class MessageHelpers
             {
                 if (type.IsAbstract)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         row, col, len,
                         DS0245_ModuleInherited,
-                        $"Cannot inherit from module '{TypeName(type)}'.");
+                        nameof(StringHelper.MessageHelpers_CannotInheritFromModule), [TypeName(type)]);
                 }
                 else
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         row, col, len,
                         DS0158_InheritingFromSealedType,
-                        $"Cannot inherit from type '{TypeName(type)}' because it is sealed.",
-                        tip: "If possible, mark the type as 'open' to allow inheritance.");
+                        nameof(StringHelper.MessageHelpers_CannotInheritFromSealedType), [TypeName(type)],
+                        tip: StringHelper.MessageHelpers_CannotInheritFromSealedTypeTip);
                 }
             }
             else if (childTypeIsValueType)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row, col, len,
                     DS0147_ValueTypeInheritsFromClass,
-                    $"Value types cannot inherit from reference types. Value types are only allowed to implement templates.");
+                    nameof(StringHelper.MessageHelpers_ValueTypeCannotInheritFromReferenceType), []);
             }
             else if (type == typeof(ValueType))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row, col, len,
                     DS0146_ValueTypeInherited,
-                    $"Inheriting from 'System.ValueType' is not permitted. To declare a value type, use 'val type'.");
+                    nameof(StringHelper.MessageHelpers_CannotInheritFromValueType), []);
             }
         }
         else if (type.IsValueType)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 row, col, len,
                 DS0148_ValueTypeAsBaseType,
-                $"Inheriting from value types is not permitted. Only reference types can be inherited.");
+                nameof(StringHelper.MessageHelpers_CannotInheritFromValueTypes), []);
         }
     }
 }

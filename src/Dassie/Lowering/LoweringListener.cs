@@ -63,12 +63,12 @@ internal class LoweringListener : DassieParserBaseListener
     {
         if (context.member_access_modifier() != null && context.member_access_modifier().Global() != null)
         {
-            EmitWarningMessage(
+            EmitWarningMessageFormatted(
                 context.member_access_modifier().Start.Line,
                 context.member_access_modifier().Start.Column,
                 context.member_access_modifier().GetText().Length,
                 DS0079_RedundantAccessModifierGroup,
-                "Access modifier group 'global' is redundant since it is the default access modifier.");
+                nameof(StringHelper.LoweringListener_RedundantAccessModifierGroup), []);
         }
 
         Text = Replace(accessModifierGroupRewriter.Rewrite(context, this), context);

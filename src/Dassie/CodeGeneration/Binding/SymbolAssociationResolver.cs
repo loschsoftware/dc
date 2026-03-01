@@ -49,7 +49,7 @@ internal static class SymbolAssociationResolver
         if (context.ParserRule == null)
             return;
 
-        EmitBuildLogMessage($"Finalizing method signature of '{context.Builder.DeclaringType.FullName}::{context.Builder.Name}':", 3);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.SymbolAssociationResolver_FinalizingMethodSignature), [$"{context.Builder.DeclaringType.FullName}::{context.Builder.Name}"], 3);
 
         TypeContext typeCtx = TypeContext.Current;
         TypeContext.Current = Context.Types.First(t => t.Methods.Contains(context));
@@ -144,14 +144,14 @@ internal static class SymbolAssociationResolver
             }
         }
 
-        EmitBuildLogMessage($"    - Return type: {ret.FullName}", 3);
-        EmitBuildLogMessage($"    - Return type attributes: [{string.Join(", ", retAttribs.Select(c => c.Item1.FullName))}]", 3);
-        EmitBuildLogMessage($"    - Return type required custom modifiers: [{string.Join(", ", retModReq.Select(t => t.FullName))}]", 3);
-        EmitBuildLogMessage($"    - Return type optional custom modifiers: [{string.Join(", ", retModReq.Select(t => t.FullName))}]", 3);
-        EmitBuildLogMessage($"    - Parameter types: [{string.Join(", ", paramTypes.Select(t => t.FullName))}]", 3);
-        EmitBuildLogMessage($"    - Parameter type attributes: [{string.Join(", ", paramCustomAttributes.Select(t => $"[{string.Join(", ", t.Select(t => t.Item1.FullName))}]"))}]", 3);
-        EmitBuildLogMessage($"    - Parameter type required custom modifiers: [{string.Join(", ", paramModReq.Select(t => $"[{string.Join(", ", t.Select(t => t.FullName))}]"))}]", 3);
-        EmitBuildLogMessage($"    - Parameter type optional custom modifiers: [{string.Join(", ", paramModOpt.Select(t => $"[{string.Join(", ", t.Select(t => t.FullName))}]"))}]", 3);
+        EmitBuildLogMessageFormatted(StringHelper.SymbolAssociationResolver_ReturnType, [ret.FullName], 3);
+        EmitBuildLogMessageFormatted(StringHelper.SymbolAssociationResolver_ReturnTypeAttributes, [string.Join(", ", retAttribs.Select(c => c.Item1.FullName))], 3);
+        EmitBuildLogMessageFormatted(StringHelper.SymbolAssociationResolver_ReturnTypeModReqs, [string.Join(", ", retModReq.Select(t => t.FullName))], 3);
+        EmitBuildLogMessageFormatted(StringHelper.SymbolAssociationResolver_ReturnTypeModOpts, [string.Join(", ", retModOpt.Select(t => t.FullName))], 3);
+        EmitBuildLogMessageFormatted(StringHelper.SymbolAssociationResolver_ParameterTypes, [string.Join(", ", paramTypes.Select(t => t.FullName))], 3);
+        EmitBuildLogMessageFormatted(StringHelper.SymbolAssociationResolver_ParameterTypeAttributes, [string.Join(", ", paramCustomAttributes.Select(t => $"[{string.Join(", ", t.Select(t => t.Item1.FullName))}]"))], 3);
+        EmitBuildLogMessageFormatted(StringHelper.SymbolAssociationResolver_ParameterTypeModReqs, [string.Join(", ", paramModReq.Select(t => $"[{string.Join(", ", t.Select(t => t.FullName))}]"))], 3);
+        EmitBuildLogMessageFormatted(StringHelper.SymbolAssociationResolver_ParameterTypeModOpts, [string.Join(", ", paramModOpt.Select(t => $"[{string.Join(", ", t.Select(t => t.FullName))}]"))], 3);
 
         TypeContext.Current = typeCtx;
         CurrentMethod = methodCtx;

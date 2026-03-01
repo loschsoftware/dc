@@ -38,10 +38,10 @@ internal static class ConfigImportManager
         {
             if (!File.Exists(importPath))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0198_ImportedConfigFileNotFound,
-                    $"The imported configuration file '{importPath}' could not be found.",
+                    nameof(StringHelper.ConfigImportManager_ImportNotFound), [importPath],
                     fileName);
 
                 return;
@@ -51,10 +51,10 @@ internal static class ConfigImportManager
 
             if (!visitedFiles.Add(importPath))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0199_ImportedConfigFileCircularDependency,
-                    $"Importing the configuration file '{importPath}' would lead to a circular dependency.",
+                    nameof(StringHelper.ConfigImportManager_CircularImport), [importPath],
                     fileName);
 
                 return;

@@ -154,10 +154,10 @@ internal static class ResourceExtractor
         }
         catch (Exception)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0208_InvalidResourceFile,
-                $"The resource file '{fileName}' is malformed or contains unsupported constructs.",
+                nameof(StringHelper.ResourceExtractor_MalformedResourceFile), [fileName],
                 fileName);
         }
 

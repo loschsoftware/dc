@@ -62,13 +62,13 @@ internal static class TemplateBuilder
 
         if (args.Length < 2)
         {
-            EmitErrorMessage(0, 0, 0, DS0206_DCNewInvalidArguments, "Project template and name expected.", CompilerExecutableName);
+            EmitErrorMessageFormatted(0, 0, 0, DS0206_DCNewInvalidArguments, nameof(StringHelper.TemplateBuilder_TemplateAndNameExpected), [], CompilerExecutableName);
             return -1;
         }
 
         if (!availableTemplates.Any(t => string.Compare(t.Name, args[0], !t.IsCaseSensitive()) == 0))
         {
-            EmitErrorMessage(0, 0, 0, DS0206_DCNewInvalidArguments, $"The project template '{args[0]}' is not installed.", CompilerExecutableName);
+            EmitErrorMessageFormatted(0, 0, 0, DS0206_DCNewInvalidArguments, nameof(StringHelper.TemplateBuilder_TemplateNotInstalled), [args[0]], CompilerExecutableName);
             return -1;
         }
 
@@ -82,10 +82,10 @@ internal static class TemplateBuilder
                 RecursiveDelete(new(rootDir));
             else
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0207_DCNewNonEmptyDirectory,
-                    $"The project directory '{rootDir}' already exists and is not empty. Use the '-f' flag to delete the existing directory.",
+                    nameof(StringHelper.TemplateBuilder_DirectoryNotEmpty), [rootDir],
                     CompilerExecutableName);
 
                 return -1;

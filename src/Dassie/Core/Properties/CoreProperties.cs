@@ -24,3 +24,14 @@ internal class EnableExtensionsProperty : GlobalConfigProperty
     public override GlobalConfigDataType Type => new(GlobalConfigBaseType.Boolean, false);
     public override object DefaultValue => true;
 }
+
+internal class LanguageProperty : GlobalConfigProperty
+{
+    private static LanguageProperty _instance;
+    public static LanguageProperty Instance => _instance ??= new();
+    private LanguageProperty() { }
+
+    public override string Name => "Language";
+    public override GlobalConfigDataType Type => new(GlobalConfigBaseType.String, false);
+    public override object DefaultValue => "en-US";
+}

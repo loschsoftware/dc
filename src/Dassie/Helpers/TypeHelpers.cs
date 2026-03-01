@@ -195,10 +195,10 @@ internal static class TypeHelpers
             if (!throwError)
                 return;
 
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 line, col, length,
                 DS0039_ConditionalExpressionClauseNotBoolean,
-                $"The type '{t.FullName}' cannot be converted to type '{typeof(bool).FullName}'.");
+                nameof(StringHelper.TypeHelpers_CannotConvertToBoolean), [t.FullName, typeof(bool).FullName]);
         }
 
         if (t != typeof(bool))
@@ -521,10 +521,10 @@ internal static class TypeHelpers
 
     public static void ThrowErrorForInvalidTypeArgumentCount(int row, int col, int len, bool isType, string name, int paramCount, int argCount)
     {
-        EmitErrorMessage(
+        EmitErrorMessageFormatted(
             row, col, len,
             DS0108_GenericTypeConstraintViolation,
-            $"The generic {(isType ? "type" : "function")} '{name}' requires {paramCount} type argument{(paramCount > 1 ? "s" : "")}, but {(argCount == 0 ? "none" : argCount.ToString())} {(argCount == 1 ? "was" : "were")} specified.");
+            nameof(StringHelper.TypeHelpers_GenericTypeArgumentCount), [isType ? "type" : "function", name, paramCount, paramCount > 1 ? "s" : "", argCount == 0 ? "none" : argCount.ToString(), argCount == 1 ? "was" : "were"]);
     }
 
     private static bool CheckGenericCompatibility(string name, bool isType, Type[] parameters, Generics.GenericArgumentContext[] arguments, int row, int col, int len, bool emitErrors)

@@ -40,16 +40,16 @@ internal static class ReferenceHandler
 
         if (!File.Exists(reference.ProjectFile))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0082_InvalidProjectReference,
-                $"The referenced project file '{reference.ProjectFile}' could not be found.",
+                nameof(StringHelper.ReferenceHandler_ProjectNotFound), [reference.ProjectFile],
                 ProjectConfigurationFileName);
 
             return false;
         }
 
-        EmitBuildLogMessage($"Compiling project reference '{reference.ProjectFile}'.");
+        EmitBuildLogMessageFormatted(nameof(StringHelper.ReferenceHandler_CompilingProjectReference), [reference.ProjectFile]);
 
         MessagePrefix = Path.GetDirectoryName(reference.ProjectFile).Split(Path.DirectorySeparatorChar).Last();
 
@@ -74,18 +74,18 @@ internal static class ReferenceHandler
                 {
                     if (ProjectFileDeserializer.Path == projRef.ProjectFile)
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0205_CircularProjectDependency,
-                            $"Project '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}' references itself.",
+                            nameof(StringHelper.ReferenceHandler_SelfReference), [Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]],
                             ProjectConfigurationFileName);
                     }
                     else
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0205_CircularProjectDependency,
-                            $"Circular project dependency between '{Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]}' and '{Path.GetDirectoryName(projRef.ProjectFile).Split(Path.DirectorySeparatorChar)[^1]}'.",
+                            nameof(StringHelper.ReferenceHandler_CircularDependency), [Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1], Path.GetDirectoryName(projRef.ProjectFile).Split(Path.DirectorySeparatorChar)[^1]],
                             ProjectConfigurationFileName);
                     }
 
@@ -99,17 +99,17 @@ internal static class ReferenceHandler
 
         int errCode = BuildCommand.Instance.Invoke(args ?? [], ProjectFileDeserializer.DassieConfig);
         Context.Configuration.Verbosity = prevConfig.Verbosity;
-        EmitBuildLogMessage($"Compilation of project reference '{reference.ProjectFile}' ended with exit code {errCode}.");
+        EmitBuildLogMessageFormatted(nameof(StringHelper.ReferenceHandler_ProjectReferenceCompilationEnded), [reference.ProjectFile, errCode]);
 
         if (errCode != 0)
             return false;
 
         if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.AssemblyFileName))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0082_InvalidProjectReference,
-                $"The referenced project '{reference.ProjectFile}' does not specify an assembly name.",
+                nameof(StringHelper.ReferenceHandler_NoAssemblyName), [reference.ProjectFile],
                 reference.ProjectFile);
 
             return false;
@@ -117,10 +117,10 @@ internal static class ReferenceHandler
 
         if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildDirectory) && reference.CopyToOutput)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0082_InvalidProjectReference,
-                $"The referenced project '{reference.ProjectFile}' does not specify an output directory, which is invalid if 'CopyToOutput' is set to 'true'.",
+                nameof(StringHelper.ReferenceHandler_NoOutputDirectory), [reference.ProjectFile],
                 reference.ProjectFile);
 
             return false;
@@ -163,7 +163,7 @@ internal static class ReferenceHandler
                         AssemblyPath = assemblyPath
                     }).ToArray();
 
-                    EmitBuildLogMessage($"Converted project reference '{reference.ProjectFile}' to assembly reference '{assemblyPath}'.");
+                    EmitBuildLogMessageFormatted(nameof(StringHelper.ReferenceHandler_ConvertedProjectReference), [reference.ProjectFile, assemblyPath]);
                 }
             }
         }

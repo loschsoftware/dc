@@ -20,11 +20,11 @@ internal class HelpCommand : CompilerCommand
 
     public override List<string> Aliases => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
 
-    public override string Description => "Lists all available commands and shows help for specific commands or compiler features.";
+    public override string Description => StringHelper.HelpCommand_Description;
 
     public override CommandHelpDetails HelpDetails => new()
     {
-        Description = "Shows a list of available commands or advanced information about a specific command or topic.",
+        Description = StringHelper.HelpCommand_HelpDetailsDescription,
         Usage =
         [
             "dc help",
@@ -33,18 +33,18 @@ internal class HelpCommand : CompilerCommand
         ],
         Options =
         [
-            ("Command", "The name of a compiler command to show help for."),
-            ("-o|--options", "Shows a list of all available project file properties."),
-            ("-s|--simple", "Shows a simplified selection of commands suitable for minimalist developers."),
-            ("--commands", "Prints a comma-separated list of available commands."),
-            ("--no-external", "Does not display commands defined by external packages.")
+            ("Command", StringHelper.HelpCommand_CommandOption),
+            ("-o|--options", StringHelper.HelpCommand_OptionsOption),
+            ("-s|--simple", StringHelper.HelpCommand_SimpleOption),
+            ("--commands", StringHelper.HelpCommand_CommandsOption),
+            ("--no-external", StringHelper.HelpCommand_NoExternalOption)
         ],
         Examples =
         [
-            ("dc help", "Displays a list of all available commands."),
-            ("dc help --no-external", "Displays a list of all commands, excluding ones from external packages."),
-            ("dc help -o", "Displays a list of all available project file properties."),
-            ("dc help build", "Displays detailed help for the 'build' command.")
+            ("dc help", StringHelper.HelpCommand_Example1),
+            ("dc help --no-external", StringHelper.HelpCommand_Example2),
+            ("dc help -o", StringHelper.HelpCommand_Example3),
+            ("dc help build", StringHelper.HelpCommand_Example4)
         ],
     };
 
@@ -57,10 +57,10 @@ internal class HelpCommand : CompilerCommand
 
             if (args[0].TrimStart("-") == args[0])
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0101_InvalidCommand,
-                    $"Could not load help details for '{args[0]}': Command not found.",
+                    nameof(StringHelper.HelpCommand_CommandNotFound), [args[0]],
                     CompilerExecutableName);
 
                 return -1;
@@ -81,8 +81,8 @@ internal class HelpCommand : CompilerCommand
         DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
 
         logoBuilder.AppendLine();
-        logoBuilder.AppendLine($"{ProductName} for .NET {typeof(object).Assembly.GetName().Version.ToString(2)}");
-        logoBuilder.AppendLine($"Version {version.ToString(2)}, Build {version.Build} ({buildDate.ToShortDateString()})");
+        logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductNameString), StringHelper.ProductNameFull, typeof(object).Assembly.GetName().Version.ToString(2)));
+        logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductVersionString), version.ToString(2), version.Build, buildDate.ToShortDateString()));
 
         ConsoleColor def = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -155,11 +155,11 @@ internal class HelpCommand : CompilerCommand
 
             StringBuilder sb = new();
             sb.AppendLine();
-            sb.AppendLine($"Dassie Compiler - Build {version.Build} ({buildDate.ToShortDateString()})");
-            sb.AppendLine("Simplified Mode");
+            sb.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_SimplifiedModeHeader), StringHelper.ProductName, version.Build, buildDate.ToShortDateString()));
+            sb.AppendLine(StringHelper.HelpCommand_SimplifiedMode);
             sb.AppendLine();
-            sb.AppendLine("Usage: dc <Files>");
-            sb.AppendLine("       Compiles the specified source files.");
+            sb.AppendLine(StringHelper.HelpCommand_SimplifiedModeUsage);
+            sb.AppendLine(StringHelper.HelpCommand_SimplifiedModeUsageDescription);
             LogOut.Write(sb.ToString());
 
             return 0;
@@ -185,7 +185,7 @@ internal class HelpCommand : CompilerCommand
         {
             StringBuilder outputBuilder = new();
 
-            string header = $"{"(Alias) Name",-34}{"Type",-20}{"Default",-10}{"Description"}";
+            string header = $"{StringHelper.HelpCommand_PropertyAliasName,-34}{StringHelper.HelpCommand_PropertyType,-20}{StringHelper.HelpCommand_PropertyDefault,-10}{StringHelper.HelpCommand_PropertyDescription}";
             outputBuilder.AppendLine();
             outputBuilder.AppendLine(header);
             outputBuilder.AppendLine(new string('-', Console.WindowWidth));
@@ -240,7 +240,7 @@ internal class HelpCommand : CompilerCommand
         {
             ConsoleColor prev = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Increase the console width for a better viewing experience.");
+            Console.WriteLine(StringHelper.HelpCommand_IncreaseConsoleWidth);
             Console.ForegroundColor = prev;
         }
 
@@ -252,29 +252,29 @@ internal class HelpCommand : CompilerCommand
         if (commandsAvailable)
         {
             sb.AppendLine();
-            sb.AppendLine("Usage:");
+            sb.AppendLine(StringHelper.HelpCommand_Usage);
 
             if (ExtensionLoader.Commands.Contains(CompileCommand.Instance))
             {
                 sb.Append("    dc <Files> [Options]".PadRight(35));
-                sb.Append(FormatLines($"Compiles the specified source files. {(helpCommandAvailable ? "Use 'dc help compile' for more information." : "")}"));
+                sb.Append(FormatLines($"{StringHelper.HelpCommand_CompilesSpecifiedSourceFiles} {(helpCommandAvailable ? StringHelper.HelpCommand_DCCompileMoreInformation : "")}"));
             }
 
             sb.Append("    dc <Command> [Options]".PadRight(35));
-            sb.Append(FormatLines("Executes a command from the list below."));
+            sb.Append(FormatLines(StringHelper.HelpCommand_ExecutesCommandFromList));
 
             if (helpCommandAvailable)
             {
                 sb.Append("    dc help <Command>".PadRight(35));
-                sb.Append(FormatLines("Displays more information about a specific command."));
+                sb.Append(FormatLines(StringHelper.HelpCommand_DisplayInformationAboutCommand));
             }
         }
         else
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0267_NoCommandsAvailable,
-                $"No commands are installed. If the issue persists, please try to install an appropriate package or reinstall the application.",
+                nameof(StringHelper.HelpCommand_NoCommandsAvailable), [],
                 CompilerExecutableName);
 
             return -1;
@@ -288,7 +288,7 @@ internal class HelpCommand : CompilerCommand
         if (internalCommands.Any())
         {
             sb.AppendLine();
-            sb.AppendLine("Commands:");
+            sb.AppendLine(StringHelper.HelpCommand_Commands);
 
             foreach (ICompilerCommand command in internalCommands)
             {
@@ -300,7 +300,7 @@ internal class HelpCommand : CompilerCommand
         if (externalCommands.Any() && !Environment.GetCommandLineArgs().Any(c => c == "--no-external"))
         {
             sb.AppendLine();
-            sb.AppendLine("External commands:");
+            sb.AppendLine(StringHelper.HelpCommand_ExternalCommands);
 
             foreach (ICompilerCommand cmd in externalCommands)
                 sb.Append($"{$"    {cmd.Command}",-35}{FormatLines(cmd.Description)}");
@@ -316,7 +316,7 @@ internal class HelpCommand : CompilerCommand
         {
             DisplayLogo();
             LogOut.WriteLine();
-            LogOut.WriteLine($"The command '{command.Command}' does not specify any help details.");
+            LogOut.WriteLine(StringHelper.Format(nameof(StringHelper.HelpCommand_CommandNoHelpDetails), [command.Command]));
             return 0;
         }
 
@@ -327,11 +327,11 @@ internal class HelpCommand : CompilerCommand
         sb.AppendLine($"dc {command.Command}: {(string.IsNullOrEmpty(hd.Description) ? command.Description : hd.Description)}");
 
         if (command.Aliases != null && command.Aliases.Count > 0)
-            sb.AppendLine($"Alias{(command.Aliases.Count > 1 ? "es" : "")}: {(command.Aliases.Count == 1 ? command.Aliases.Single() : string.Join(", ", command.Aliases))}");
+            sb.AppendLine($"{(command.Aliases.Count > 1 ? StringHelper.HelpCommand_AliasPlural : StringHelper.HelpCommand_AliasSingular)} {(command.Aliases.Count == 1 ? command.Aliases.Single() : string.Join(", ", command.Aliases))}");
 
         sb.AppendLine();
 
-        sb.Append("Usage:");
+        sb.Append(StringHelper.HelpCommand_Usage);
         if (hd.Usage == null || hd.Usage.Count == 0)
             sb.AppendLine($" {command.Command}");
         else if (hd.Usage.Count == 1)
@@ -347,7 +347,7 @@ internal class HelpCommand : CompilerCommand
 
         if (hd.Options != null && hd.Options.Count > 0)
         {
-            sb.AppendLine("Options:");
+            sb.AppendLine(StringHelper.HelpCommand_Options);
             foreach ((string opt, string desc) in hd.Options)
                 sb.Append($"{$"    {opt}",-35}{FormatLines(desc, indentWidth: 35)}");
             sb.AppendLine();
@@ -364,10 +364,10 @@ internal class HelpCommand : CompilerCommand
 
         if (!string.IsNullOrEmpty(hd.Remarks))
         {
-            sb.AppendLine("Remarks:");
-            if (hd.Remarks.Contains(Environment.NewLine))
+            sb.AppendLine(StringHelper.HelpCommand_Remarks);
+            if (hd.Remarks.Contains('\n'))
             {
-                foreach (string line in hd.Remarks.Split(Environment.NewLine))
+                foreach (string line in hd.Remarks.Split('\n'))
                     sb.Append(FormatLines(line, true, 4));
                 sb.AppendLine();
             }
@@ -377,7 +377,7 @@ internal class HelpCommand : CompilerCommand
 
         if (hd.Examples != null && hd.Examples.Count > 0)
         {
-            sb.AppendLine("Examples:");
+            sb.AppendLine(StringHelper.HelpCommand_Examples);
             int maxCmdLength = hd.Examples.Max(e => e.Command.Length);
             foreach ((string cmd, string desc) in hd.Examples)
             {

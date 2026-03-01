@@ -1,15 +1,13 @@
 ﻿using Dassie.Extensions;
-using System.Collections.Generic;
 
 namespace Dassie.Resources;
 
-internal class DefaultStrings : IResourceProvider<string>
+internal partial class DefaultStrings : IResourceProvider<string>
 {
     private static DefaultStrings _instance;
     public static DefaultStrings Instance => _instance ??= new();
 
-    public Dictionary<string, string> Resources => new()
-    {
-        // TODO: Fill this out at some point
-    };
+    public string Culture => "en-US";
+
+    // String table is source-generated from strings.en-US.json
 }

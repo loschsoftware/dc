@@ -48,10 +48,10 @@ internal static class ProjectFileDeserializer
                 col = int.Parse(ex.Message.Split('(')[1].Split(',')[1][1..^2]);
             }
 
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 row, col, 0,
                 DS0091_MalformedConfigurationFile,
-                $"Invalid project file.{string.Join(':', ex.InnerException.Message.Split(':')[1..])}",
+                nameof(StringHelper.ProjectFileDeserializer_InvalidProjectFile), [string.Join(':', ex.InnerException.Message.Split(':')[1..])],
                 path);
         }
 

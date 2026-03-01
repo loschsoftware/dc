@@ -53,10 +53,10 @@ internal static class GlobalConfigManager
         }
         catch (XmlException xex)
         {
-            EmitWarningMessage(
+            EmitWarningMessageFormatted(
                 0, 0, 0,
                 DS0257_GlobalConfigFileMalformed,
-                $"The global configuration file is malformed: {xex.Message} The default property values will be used.",
+                nameof(StringHelper.GlobalConfigManager_MalformedConfigFile), [xex.Message],
                 ConfigPath);
 
             modules = [];
@@ -69,10 +69,10 @@ internal static class GlobalConfigManager
         {
             foreach (string unknownNs in modules.Where(m => !extNames.Contains(m.Name.LocalName, StringComparer.OrdinalIgnoreCase)).Select(e => e.Name.LocalName))
             {
-                EmitWarningMessage(
+                EmitWarningMessageFormatted(
                     0, 0, 0,
                     DS0256_GlobalConfigInvalidElement,
-                    $"The configuration namespace '{unknownNs}' does not match any installed package.",
+                    nameof(StringHelper.GlobalConfigManager_ConfigNamespaceInvalid), [unknownNs],
                     ConfigPath);
 
                 unknownModules.Add(unknownNs);
@@ -109,10 +109,10 @@ internal static class GlobalConfigManager
             {
                 if (!properties.Any(p => p.Name.Equals(property.Name.LocalName, StringComparison.OrdinalIgnoreCase)))
                 {
-                    EmitWarningMessage(
+                    EmitWarningMessageFormatted(
                         0, 0, 0,
                         DS0256_GlobalConfigInvalidElement,
-                        $"The package '{package.Metadata.Name}' does not define a global configuration property named '{property.Name.LocalName}'.",
+                        nameof(StringHelper.GlobalConfigManager_ConfigPropertyInvalid), [package.Metadata.Name, property.Name.LocalName],
                         ConfigPath);
 
                     continue;
@@ -144,10 +144,10 @@ internal static class GlobalConfigManager
         error = false;
         void Error()
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0258_GlobalConfigPropertyValueMalformed,
-                $"Malformed property value: '{format}' is not a valid value for a property of type '{TypeName(type)}'.",
+                nameof(StringHelper.GlobalConfigManager_ConfigPropertyValueInvalid), [format, TypeName(type)],
                 ConfigPath);
         }
 

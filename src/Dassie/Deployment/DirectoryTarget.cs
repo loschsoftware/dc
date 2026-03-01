@@ -11,10 +11,10 @@ internal class DirectoryTarget : IDeploymentTarget
     {
         if (context.Elements == null || context.Elements.Count == 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0239_DirectoryTargetPathRequired,
-                $"Path required for 'Directory' deployment target.",
+                nameof(StringHelper.DirectoryTarget_PathRequired), [],
                 CompilerExecutableName);
 
             return 239;

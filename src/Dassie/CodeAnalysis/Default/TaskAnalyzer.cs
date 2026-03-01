@@ -56,10 +56,10 @@ internal class TaskAnalyzer
         }
         catch (Exception ex)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0030_FileAccessDenied,
-                $"Could not read files: {ex.Message}",
+                nameof(StringHelper.TaskAnalyzer_FileReadingFailed), [ex.Message],
                 CompilerExecutableName);
         }
 
@@ -77,10 +77,10 @@ internal class TaskAnalyzer
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0030_FileAccessDenied,
-                $"Could not access file '{path}': {ex.Message}",
+                nameof(StringHelper.TaskAnalyzer_FileAccessDenied), [path, ex.Message],
                 CompilerExecutableName);
 
             return [];
@@ -142,7 +142,7 @@ internal class TaskAnalyzer
     {
         if (tasks == null || tasks.Count == 0)
         {
-            Console.WriteLine("No comments with markers found.");
+            Console.WriteLine(StringHelper.TaskAnalyzer_NoMarkerCommentsFound);
             return;
         }
 

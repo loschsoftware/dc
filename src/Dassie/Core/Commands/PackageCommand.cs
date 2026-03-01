@@ -1,9 +1,8 @@
-﻿using Antlr4.Runtime.Tree;
-using Dassie.Cli;
-using Dassie.CodeAnalysis;
+﻿using Dassie.Cli;
 using Dassie.Extensions;
 using Dassie.Extensions.Web;
 using Microsoft.VisualBasic.FileIO;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,39 +21,39 @@ internal class PackageCommand : CompilerCommand
 
     public override string Command => "package";
 
-    public override string Description => "Manages compiler extensions.";
+    public override string Description => StringHelper.PackageCommand_Description;
 
     public override CommandHelpDetails HelpDetails => GetHelpDetails();
     private static CommandHelpDetails GetHelpDetails()
     {
         StringBuilder commandsSb = new();
-        commandsSb.Append($"{"    list",-35}{HelpCommand.FormatLines("Displays a list of all installed extensions.", indentWidth: 35)}");
-        commandsSb.Append($"{"    info <Name>",-35}{HelpCommand.FormatLines("Displays advanced information about the specified extension.", indentWidth: 35)}");
-        commandsSb.Append($"{"    install <Name> [-g]",-35}{HelpCommand.FormatLines("Installs the specified extension from the package repository. Use the -g flag to install the package as a globally accessible tool.", indentWidth: 35)}");
-        commandsSb.Append($"{"    import <Path> [-o] [-g]",-35}{HelpCommand.FormatLines("Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.", indentWidth: 35)}");
-        commandsSb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines("Uninstalls the specified extension package.", indentWidth: 35)}");
-        commandsSb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines("Updates the specified extension to the newest version.", indentWidth: 35)}");
+        commandsSb.Append($"{"    list",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_ListDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    info <Name>",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_InfoDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    install <Name> [-g]",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_InstallDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    import <Path> [-o] [-g]",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_ImportDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_RemoveDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_UpdateDescription, indentWidth: 35)}");
 
         return new()
         {
-            Description = "Used to install and manage compiler extensions.",
+            Description = StringHelper.PackageCommand_HelpDetailsDescription,
             Usage = ["dc package [Command] [Options]"],
             Options =
             [
-                ("Command", "The subcommand to execute."),
-                ("Options", "Additional options passed to the subcommand.")
+                ("Command", StringHelper.PackageCommand_CommandOption),
+                ("Options", StringHelper.PackageCommand_OptionsOption)
             ],
             CustomSections =
             [
-                ("Available commands", commandsSb.ToString())
+                (StringHelper.PackageCommand_AvailableCommands, commandsSb.ToString())
             ],
             Examples =
             [
-                ("dc package list", "Displays a list of installed extensions."),
-                ("dc package info MyExtension", "Displays information about the extension 'MyExtension'."),
-                ("dc package install MyExtension", "Installs the extension 'MyExtension' from the package repository."),
-                ("dc package import ./extension.dll", "Installs an extension from the specified file path."),
-                ("dc package remove MyExtension", "Uninstalls the extension 'MyExtension'.")
+                ("dc package list", StringHelper.PackageCommand_Example1),
+                ("dc package info MyExtension", StringHelper.PackageCommand_Example2),
+                ("dc package install MyExtension", StringHelper.PackageCommand_Example3),
+                ("dc package import ./extension.dll", StringHelper.PackageCommand_Example4),
+                ("dc package remove MyExtension", StringHelper.PackageCommand_Example5)
             ]
         };
     }
@@ -112,22 +111,22 @@ internal class PackageCommand : CompilerCommand
 
         if (packages.Count == 0)
         {
-            Console.WriteLine("No extensions installed.");
+            Console.WriteLine(StringHelper.PackageCommand_NoExtensionsInstalled);
             return 0;
         }
 
         HelpCommand.DisplayLogo();
         Console.WriteLine();
-        Console.WriteLine("Installed modules and extensions:");
+        Console.WriteLine(StringHelper.PackageCommand_InstalledModulesAndExtensions);
         Console.WriteLine();
 
-        string header = $"{"\e[1mName\e[22m",-59}\e[1mVersion\e[22m";
+        string header = $"{$"\e[1m{StringHelper.PackageCommand_Name}\e[22m",-59}\e[1m{StringHelper.PackageCommand_Version}\e[22m";
         Console.WriteLine(header);
         Console.WriteLine(new string('-', header.Length - 18));
 
         foreach (IPackage package in packages)
         {
-            string packageDisplay = $"{(package == CorePackage.Instance ? "\e[1;31m[Built-in]\e[0m " : "")}{package.Metadata.Name}";
+            string packageDisplay = $"{(package == CorePackage.Instance ? $"\e[1;31m[{StringHelper.PackageCommand_BuiltIn}]\e[0m " : "")}{package.Metadata.Name}";
             if (packageDisplay.Length > 45)
                 packageDisplay = packageDisplay[0..45] + "...";
 
@@ -144,7 +143,7 @@ internal class PackageCommand : CompilerCommand
 
         if (!packages.Any(p => p.Metadata.Name == name))
         {
-            Console.WriteLine("The specified extension could not be found.");
+            Console.WriteLine(StringHelper.PackageCommand_SpecifiedExtensionNotFound);
             return -1;
         }
 
@@ -187,26 +186,27 @@ internal class PackageCommand : CompilerCommand
         }
 
         sb.AppendLine();
-        WriteHeading("Details");
+        WriteHeading(StringHelper.PackageCommand_Details);
 
-        sb.AppendLine($"{"    Name:",-50}{package.Metadata.Name}");
-        sb.AppendLine($"{"    Description:",-50}{package.Metadata.Description}");
-        sb.AppendLine($"{"    Author:",-50}{package.Metadata.Author}");
-        sb.AppendLine($"{"    Version:",-50}{package.Metadata.Version}");
-        sb.AppendLine($"{"    File:",-50}{package.GetType().Assembly.Location}");
+        sb.AppendLine($"{$"    {StringHelper.PackageCommand_NameColon}",-50}{package.Metadata.Name}");
+        sb.AppendLine($"{$"    {StringHelper.PackageCommand_DescriptionColon}",-50}{package.Metadata.Description}");
+        sb.AppendLine($"{$"    {StringHelper.PackageCommand_Author}",-50}{package.Metadata.Author}");
+        sb.AppendLine($"{$"    {StringHelper.PackageCommand_VersionColon}",-50}{package.Metadata.Version}");
+        sb.AppendLine($"{$"    {StringHelper.PackageCommand_File}",-50}{package.GetType().Assembly.Location}");
 
         IEnumerable<ICompilerCommand> definedCommands = ExtensionLoader.Commands.Where(c => !c.Options.HasFlag(CommandOptions.Hidden) && c.GetType().Assembly == package.GetType().Assembly);
-        PrintFeatures("Commands", definedCommands.Select(cmd => $"{$"{cmd.Command}",-46}{cmd.Description}"));
-        PrintFeatures("Code analyzers", package.CodeAnalyzers().Select(a => a.Name));
-        PrintFeatures("Configuration providers", package.ConfigurationProviders().Select(p => p.Name));
-        PrintFeatures("Project templates", package.ProjectTemplates().Select(t => t.Name));
-        PrintFeatures("Build log devices", package.BuildLogDevices().Select(d => d.Name));
-        PrintFeatures("Compiler directives", package.CompilerDirectives().Select(d => d.Identifier));
-        PrintFeatures("Document sources", package.DocumentSources().Select(s => $"{s.Name}: '{s.DocumentName}'"));
-        PrintFeatures("Deployment targets", package.DeploymentTargets().Select(t => t.Name));
-        PrintFeatures("Subsystems", package.Subsystems().Select(s => s.Name));
-        PrintFeatures("Build actions", package.BuildActions().Select(b => b.Name));
-        PrintFeatures("Macros", package.Macros().Select(b => b.Macro));
+        PrintFeatures(StringHelper.PackageCommand_Commands, definedCommands.Select(cmd => $"{$"{cmd.Command}",-46}{cmd.Description}"));
+        PrintFeatures(StringHelper.PackageCommand_CodeAnalyzers, package.CodeAnalyzers().Select(a => a.Name));
+        PrintFeatures(StringHelper.PackageCommand_ConfigurationProviders, package.ConfigurationProviders().Select(p => p.Name));
+        PrintFeatures(StringHelper.PackageCommand_ProjectTemplates, package.ProjectTemplates().Select(t => t.Name));
+        PrintFeatures(StringHelper.PackageCommand_BuildLogDevices, package.BuildLogDevices().Select(d => d.Name));
+        PrintFeatures(StringHelper.PackageCommand_CompilerDirectives, package.CompilerDirectives().Select(d => d.Identifier));
+        PrintFeatures(StringHelper.PackageCommand_DocumentSources, package.DocumentSources().Select(s => $"{s.Name}: '{s.DocumentName}'"));
+        PrintFeatures(StringHelper.PackageCommand_DeploymentTargets, package.DeploymentTargets().Select(t => t.Name));
+        PrintFeatures(StringHelper.PackageCommand_Subsystems, package.Subsystems().Select(s => s.Name));
+        PrintFeatures(StringHelper.PackageCommand_BuildActions, package.BuildActions().Select(b => b.Name));
+        PrintFeatures(StringHelper.PackageCommand_Macros, package.Macros().Select(b => b.Macro));
+        PrintFeatures(StringHelper.PackageCommand_LocalizationResourceProviders, package.LocalizationResourceProviders().Select(b => b.Culture));
 
         HelpCommand.DisplayLogo();
         Console.WriteLine(sb.ToString());
@@ -219,10 +219,10 @@ internal class PackageCommand : CompilerCommand
 
         if (extensions == null || extensions.Count == 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0227_PackageInstallNotFound,
-                $"The extension '{name}' could not be found.",
+                nameof(StringHelper.PackageCommand_ExtensionNotFound), [name],
                 CompilerExecutableName);
 
             return -1;
@@ -233,17 +233,17 @@ internal class PackageCommand : CompilerCommand
 
         if (File.Exists(path))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0229_PackageInstallAlreadyInstalled,
-                $"The extension '{name}' is already installed. Use the 'dc package update' command to update it to the newest version.",
+                nameof(StringHelper.PackageCommand_ExtensionAlreadyInstalled), [name],
                 CompilerExecutableName);
 
             return -1;
         }
 
         File.WriteAllBytes(path, dataBytes);
-        EmitMessage(0, 0, 0, DS0000_Success, $"Successfully installed extension '{name}', version {extensions[0].Metadata.Version}.", CompilerExecutableName);
+        EmitMessageFormatted(0, 0, 0, DS0000_Success, nameof(StringHelper.PackageCommand_InstallationSuccessful), [name, extensions[0].Metadata.Version], CompilerExecutableName);
         return 0;
     }
 
@@ -254,7 +254,7 @@ internal class PackageCommand : CompilerCommand
 
         if (!File.Exists(path))
         {
-            Console.WriteLine("The specified extension file could not be found.");
+            Console.WriteLine(StringHelper.PackageCommand_SpecifiedExtensionFileNotFound);
             return -1;
         }
 
@@ -274,7 +274,7 @@ internal class PackageCommand : CompilerCommand
             }
             else
             {
-                Console.WriteLine("The specified extension is already installed. Use the -o flag to overwrite existing extensions.");
+                Console.WriteLine(StringHelper.PackageCommand_ExtensionFileAlreadyInstalled);
                 return -1;
             }
         }
@@ -293,7 +293,7 @@ internal class PackageCommand : CompilerCommand
             FileSystem.CopyDirectory(toolPath, toolDir, true);
         else
         {
-            Console.WriteLine("The specified tool path could not be found.");
+            Console.WriteLine(StringHelper.PackageCommand_ToolPathNotFound);
             return -1;
         }
 
@@ -309,10 +309,10 @@ internal class PackageCommand : CompilerCommand
     {
         if (name == CorePackage.Instance.Metadata.Name)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0265_CorePackageRemoved,
-                $"The built-in module '{CorePackage.Instance.Metadata.Name}' cannot be uninstalled.",
+                nameof(StringHelper.PackageCommand_BuiltInModuleCannotBeUninstalled), [CorePackage.Instance.Metadata.Name],
                 CompilerExecutableName);
 
             return -1;
@@ -322,7 +322,7 @@ internal class PackageCommand : CompilerCommand
 
         if (!installed.Any(p => p.Metadata.Name == name))
         {
-            Console.WriteLine("The specified extension could not be found.");
+            Console.WriteLine(StringHelper.PackageCommand_SpecifiedExtensionNotFound);
             return -1;
         }
 
@@ -331,13 +331,13 @@ internal class PackageCommand : CompilerCommand
 
         if (packageAssembly.DefinedTypes.Where(t => t.GetInterfaces().Contains(typeof(IPackage))).Count() > 1)
         {
-            Console.WriteLine($"Warning: The extension {name} is located inside of an assembly containing multiple extensions. If you proceed with the removal, the following extensions will be removed:");
+            Console.WriteLine(StringHelper.Format(nameof(StringHelper.PackageCommand_ExtensionRemoveWarningLine1), name));
 
             foreach (var ext in ExtensionLoader.LoadInstalledExtensions(path))
                 Console.WriteLine($"    - {ext.Metadata.Name}");
 
             Console.WriteLine();
-            Console.WriteLine("Remove above extensions? [Y/N] ");
+            Console.WriteLine(StringHelper.PackageCommand_ExtensionRemoveWarningLine2);
 
             if (char.ToLower(Console.ReadKey().KeyChar) == 'n')
                 return 0;
@@ -349,10 +349,10 @@ internal class PackageCommand : CompilerCommand
 
     private static int Update(string name)
     {
-        EmitErrorMessage(
+        EmitErrorMessageFormatted(
             0, 0, 0,
             DS0064_UnsupportedFeature,
-            "This command is not yet implemented.",
+            nameof(StringHelper.PackageCommand_CommandNotImplemented), [],
             CompilerExecutableName);
 
         return -1;
