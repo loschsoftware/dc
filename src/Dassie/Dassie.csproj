@@ -11,6 +11,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<AdditionalFiles Include="Resources\strings.en-US.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
 		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
 		<PackageReference Include="Microsoft.NETCore.ILAsm" Version="10.0.0" />
@@ -21,6 +25,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Dassie.Configuration\Dassie.Configuration.csproj" />
 		<ProjectReference Include="..\Dassie.Core\Dassie.Core.csproj" />
+		<ProjectReference Include="..\Dassie.Generators\Dassie.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\Dassie.Text\Dassie.Text.csproj" />
 	</ItemGroup>
 

@@ -18,10 +18,10 @@ internal static class BuildEventHandler
 
             if (!ExtensionLoader.BuildActions.Any(a => a.Name == name))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0262_DCBuildInvalidActionName,
-                    $"The build action '{name}' could not be found.",
+                    nameof(StringHelper.BuildEventHandler_BuildActionNotFound), [name],
                     CompilerExecutableName);
 
                 continue;
@@ -34,20 +34,20 @@ internal static class BuildEventHandler
             if (isPreBuildEvent)
             {
                 currentMode = ActionModes.PreBuildEvent;
-                eventKind = "pre-build";
+                eventKind = StringHelper.BuildEventHandler_BuildActionModePreBuild;
             }
             else
             {
                 currentMode = ActionModes.PostBuildEvent;
-                eventKind = "post-build";
+                eventKind = StringHelper.BuildEventHandler_BuildActionModePostBuild;
             }
 
             if (!action.SupportedModes.HasFlag(currentMode))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0263_BuildActionInvalidMode,
-                    $"The build action '{name}' cannot be executed as part of a {eventKind} event.",
+                    nameof(StringHelper.BuildEventHandler_BuildActionInvalidMode), [name, eventKind],
                     CompilerExecutableName);
 
                 continue;
@@ -60,25 +60,26 @@ internal static class BuildEventHandler
                 currentMode,
                 buildEvent.Name));
 
-            string errMsg = $"The build action '{name}' ({buildEvent.CommandNodes.IndexOf(command) + 1}) ended with nonzero exit code {ret}.";
+            string errId = nameof(StringHelper.BuildEventHandler_BuildActionFailed);
+            object[] errArgs = [name, buildEvent.CommandNodes.IndexOf(command) + 1, ret];
 
             if (ret != 0)
             {
                 if (buildEvent.Critical)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0264_BuildActionFailed,
-                        errMsg,
+                        errId, errArgs,
                         CompilerExecutableName);
 
                     return ret;
                 }
 
-                EmitWarningMessage(
+                EmitWarningMessageFormatted(
                     0, 0, 0,
                     DS0264_BuildActionFailed,
-                    errMsg,
+                    errId, errArgs,
                     CompilerExecutableName);
             }
         }

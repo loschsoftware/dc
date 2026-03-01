@@ -53,9 +53,9 @@ internal static class CommandLineOptionParser
 
                 else if (args[i] == args.Last() || args[i + 1].StartsWith('-'))
                 {
-                    EmitErrorMessage(0, 0, 0,
+                    EmitErrorMessageFormatted(0, 0, 0,
                         DS0090_InvalidDSConfigProperty,
-                        $"Expected argument for option '{arg}' (alias for '{option}').",
+                        nameof(StringHelper.CommandLineOptionParser_ExpectedArgument), [arg, option],
                         CompilerExecutableName);
 
                     continue;
@@ -75,10 +75,10 @@ internal static class CommandLineOptionParser
         {
             foreach (string flag in args.Where(a => a.StartsWith('-') && !Aliases.ContainsKey(a[1..].ToUpperInvariant())))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0090_InvalidDSConfigProperty,
-                    $"Invalid flag '{flag[1..]}'.",
+                    nameof(StringHelper.CommandLineOptionParser_InvalidFlag), [flag[1..]],
                     CompilerExecutableName);
             }
 
@@ -118,10 +118,10 @@ internal static class CommandLineOptionParser
 
             else
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0090_InvalidDSConfigProperty,
-                    $"Invalid option '{arg[2..]}'.",
+                    nameof(StringHelper.CommandLineOptionParser_InvalidOption), [arg[2..]],
                     CompilerExecutableName);
             }
         }
@@ -164,10 +164,10 @@ internal static class CommandLineOptionParser
             }
             catch (Exception)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0090_InvalidDSConfigProperty,
-                    $"Invalid property value for '{prop.Name}': '{value}' cannot be converted to '{prop.PropertyType.FullName}'.",
+                    nameof(StringHelper.CommandLineOptionParser_InvalidPropertyValue), [prop.Name, value, prop.PropertyType.FullName],
                     CompilerExecutableName);
             }
 
@@ -175,10 +175,10 @@ internal static class CommandLineOptionParser
             return;
         }
 
-        EmitErrorMessage(
+        EmitErrorMessageFormatted(
             0, 0, 0,
             DS0090_InvalidDSConfigProperty,
-            $"Invalid option '{identifier}'.",
+            nameof(StringHelper.CommandLineOptionParser_InvalidOption), [identifier],
             CompilerExecutableName);
     }
 
@@ -195,10 +195,10 @@ internal static class CommandLineOptionParser
 
             if (!File.Exists(value))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0023_InvalidAssemblyReference,
-                    $"Reference '{value}' could not be resolved.",
+                    nameof(StringHelper.CommandLineOptionParser_InvalidReference), [value],
                     CompilerExecutableName);
 
                 return;
@@ -314,10 +314,10 @@ internal static class CommandLineOptionParser
             }
             catch (Exception)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0090_InvalidDSConfigProperty,
-                    $"Invalid property value for '{_prop.Name}': '{value}' cannot be converted to '{_prop.PropertyType.FullName}'.",
+                    nameof(StringHelper.CommandLineOptionParser_InvalidPropertyValue), [_prop.Name, value, _prop.PropertyType.FullName],
                     CompilerExecutableName);
             }
 

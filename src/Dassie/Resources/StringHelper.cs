@@ -2,7 +2,7 @@
 
 namespace Dassie.Resources;
 
-internal static class StringHelper
+internal static partial class StringHelper
 {
     private static IResourceProvider<string> _provider;
 
@@ -13,6 +13,9 @@ internal static class StringHelper
 
     public static string GetString(string id)
     {
+        if (_provider == null || _provider.Resources == null)
+            return id;
+
         if (_provider.Resources.TryGetValue(id, out string str))
             return str;
 

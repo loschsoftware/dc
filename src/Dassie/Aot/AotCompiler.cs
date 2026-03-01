@@ -38,17 +38,17 @@ internal class AotCompiler
     /// <returns></returns>
     public bool Compile()
     {
-        EmitBuildLogMessage($"Executing AOT compiler.", 2);
-
+        EmitBuildLogMessageFormatted(nameof(StringHelper.AotCompiler_Executing), [], 2);
+        
         string os = _config.Config.RuntimeIdentifier.Split('-')[0];
         if (os == "win") os = "windows";
 
         if (!string.IsNullOrEmpty(os) && !OperatingSystem.IsOSPlatform(os))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0211_CrossSystemAotCompilation,
-                $"Cross-system ahead-of-time compilation is not supported.",
+                nameof(StringHelper.AotCompiler_CrossCompilationNotSupported), [],
                 CompilerExecutableName);
 
             return false;
@@ -92,14 +92,14 @@ internal class AotCompiler
         string rspFile = Path.Combine(TemporaryBuildDirectoryName, AotBuildDirectoryName, Path.ChangeExtension(_config.Config.AssemblyFileName, "rsp"));
         string args = _cmdLineBuilder.GenerateIlcArgumentList();
         File.WriteAllText(rspFile, args);
-        EmitBuildLogMessage($"Invoking IL compiler with following arguments: {args}", 3);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.AotCompiler_IlcArgList), [args], 3);
         Process.Start(Path.Combine(_config.ILCompilerPackageRootDirectory, "tools", "ilc.exe"), $"@{rspFile}").WaitForExit();
     }
 
     private void InvokeLinker()
     {
         string args = _cmdLineBuilder.GenerateLinkerArgumentList(out string linkerPath);
-        EmitBuildLogMessage($"Invoking linker with following arguments: {args}", 3);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.AotCompiler_LinkerArgList), [args], 3);
         Process.Start(linkerPath, args).WaitForExit();
     }
 }

@@ -48,10 +48,10 @@ internal class Program
         }
         catch (Exception ex)
         {
-            bool verbose = EmitBuildLogMessage($"Unhandled exception occured. {ex}", 2);
+            bool verbose = EmitBuildLogMessageFormatted(nameof(StringHelper.Program_UnhandledExceptionBuildLogMessage), [ex], 2);
 
             if (!EmittedMessages.Any(m => m.Severity == Severity.Error))
-                EmitErrorMessage(0, 0, 0, DS0001_UnknownError, $"An internal compiler error or limitation was encountered. Unhandled exception of type '{ex.GetType()}'.", CompilerExecutableName);
+                EmitErrorMessageFormatted(0, 0, 0, DS0001_UnknownError, nameof(StringHelper.Program_UnhandledExceptionError), [ex.GetType()], CompilerExecutableName);
 
             ConsoleHelper.PrintException(ex, verbose);
 

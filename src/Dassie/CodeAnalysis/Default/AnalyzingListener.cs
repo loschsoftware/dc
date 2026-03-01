@@ -1,10 +1,8 @@
 ﻿using Antlr4.Runtime.Misc;
 using Dassie.CodeAnalysis.Rules;
 using Dassie.Configuration;
-using Dassie.Helpers;
 using Dassie.Messages;
 using Dassie.Parser;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -40,7 +38,7 @@ internal class AnalyzingListener : DassieParserBaseListener
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                $"'{context.Identifier().GetIdentifier()}': Naming convention violation: Mutable local variables should use camelCase capitalization.",
+                string.Format(StringHelper.AnalyzingListener_NamingConventionViolationMutableLocalVariable, context.Identifier().GetIdentifier()),
                 config: Configuration));
         }
     }
@@ -57,7 +55,7 @@ internal class AnalyzingListener : DassieParserBaseListener
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                $"'{context.Identifier().GetIdentifier()}': Naming convention violation: Instance methods should use PascalCase capitalization.",
+                string.Format(StringHelper.AnalyzingListener_NamingConventionViolationInstanceMethod, context.Identifier().GetIdentifier()),
                 config: Configuration));
         }
 
@@ -68,7 +66,7 @@ internal class AnalyzingListener : DassieParserBaseListener
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                $"'{context.Identifier().GetIdentifier()}': Application entry point should be called 'Main'.",
+                string.Format(StringHelper.AnalyzingListener_EntryPointName, context.Identifier().GetText()),
                 config: Configuration));
         }
     }
@@ -85,7 +83,7 @@ internal class AnalyzingListener : DassieParserBaseListener
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                $"'{context.Identifier().GetIdentifier()}': Naming convention violation: Type names should use PascalCase capitalization.",
+                string.Format(StringHelper.AnalyzingListener_NamingConventionViolationType, context.Identifier().GetIdentifier()),
                 config: Configuration));
         }
 
@@ -104,9 +102,9 @@ internal class AnalyzingListener : DassieParserBaseListener
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                $"'{context.Identifier().GetIdentifier()}': Globally accessible types should be defined inside of a namespace.",
+                string.Format(StringHelper.AnalyzingListener_MissingNamespace, context.Identifier().GetIdentifier()),
                 severity: Severity.Warning,
-                tip: "Use the 'export' directive to set the namespace for all types in the current file.",
+                tip: StringHelper.AnalyzingListener_MissingNamespaceTip,
                 config: Configuration));
         }
     }
@@ -127,7 +125,7 @@ internal class AnalyzingListener : DassieParserBaseListener
                     context.Identifier().Symbol.Line,
                     context.Identifier().Symbol.Column,
                     context.Identifier().GetIdentifier().Length,
-                    $"'{context.Identifier().GetIdentifier()}': Naming convention violation: Global properties should use PascalCase capitalization.",
+                    string.Format(StringHelper.AnalyzingListener_NamingConventionViolationGlobalProperty, context.Identifier().GetIdentifier()),
                     config: Configuration));
             }
 
@@ -141,7 +139,7 @@ internal class AnalyzingListener : DassieParserBaseListener
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
-                $"'{context.Identifier().GetIdentifier()}': Naming convention violation: Parameters should use camelCase capitalization.",
+                string.Format(StringHelper.AnalyzingListener_NamingConventionViolationParameter, context.Identifier().GetIdentifier()),
                 config: Configuration));
         }
     }

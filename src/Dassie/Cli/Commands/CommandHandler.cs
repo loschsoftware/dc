@@ -32,10 +32,10 @@ internal static class CommandHandler
 
             if (selectedCommand.Command == "compile")
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0250_DCCompileInvoked,
-                    $"The command 'compile' cannot be executed directly. To compile Dassie source files, use 'dc <Files>'.",
+                    nameof(StringHelper.CommandHandler_DirectInvocationNotSupported), [],
                     CompilerExecutableName);
 
                 errorCode = 250;

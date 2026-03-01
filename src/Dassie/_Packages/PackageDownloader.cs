@@ -4,7 +4,6 @@ using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
-using NuGet.Protocol.Plugins;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
@@ -95,10 +94,10 @@ internal static class PackageDownloader
 
             if (subDirs.Length == 0)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0104_NetworkError,
-                    $"Could not download package '{packageId}'.",
+                    nameof(StringHelper.PackageDownloader_DownloadFailed), [packageId],
                     CompilerExecutableName);
 
                 return "";
@@ -116,10 +115,10 @@ internal static class PackageDownloader
 
             else
             {
-                EmitWarningMessage(
+                EmitWarningMessageFormatted(
                     0, 0, 0,
                     DS0105_InvalidPackageReference,
-                    $"Version '{version}' not found in package '{packageId}'. Using latest version instead, which is '{targetVersion.ToFullString()}'.",
+                    nameof(StringHelper.PackageDownloader_VersionNotFound), [version, packageId, targetVersion.ToFullString()],
                     CompilerExecutableName);
             }
         }
@@ -132,7 +131,7 @@ internal static class PackageDownloader
 
         Progress<double> progress = new(percent =>
         {
-            WriteString($"\r{(isDependency ? "  - " : "")}Downloading package '{packageId}' ({FormatBytes(bytes)}). [{percent:000.00}%]");
+            WriteString($"\r{(isDependency ? "  - " : "")}{string.Format(StringHelper.PackageDownloader_ProgressIndicator, packageId, FormatBytes(bytes), percent.ToString("000.00"))}");
         });
 
         using MemoryStream ms = new();
@@ -178,11 +177,11 @@ internal static class PackageDownloader
     {
         (double value, string suffix) = (double)byteCount switch
         {
-            < 1e3 => (byteCount, "B"),
-            < 1e6 => (byteCount / 1e3, "KB"),
-            < 1e9 => (byteCount / 1e6, "MB"),
-            < 1e12 => (byteCount / 1e9, "GB"),
-            _ => (byteCount / 1e12, "TB")
+            < 1e3 => (byteCount, StringHelper.PackageDownloader_Byte),
+            < 1e6 => (byteCount / 1e3, StringHelper.PackageDownloader_Kiloyte),
+            < 1e9 => (byteCount / 1e6, StringHelper.PackageDownloader_Megabyte),
+            < 1e12 => (byteCount / 1e9, StringHelper.PackageDownloader_Gigabyte),
+            _ => (byteCount / 1e12, StringHelper.PackageDownloader_Terabyte)
         };
 
         return $"{value.ToString("#.##", CultureInfo.InvariantCulture)} {suffix}";

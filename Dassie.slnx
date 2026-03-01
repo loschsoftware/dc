@@ -17,6 +17,7 @@
     <Platform Project="x64" />
     <Build Solution="Debug|Any CPU" Project="false" />
   </Project>
+  <Project Path="src/Dassie.Generators/Dassie.Generators.csproj" Id="1f6761c8-e8bc-49d2-939b-f306459bdf13" />
   <Project Path="src/Dassie.Text/Dassie.Text.csproj">
     <Platform Project="x64" />
     <Build Solution="Debug|Any CPU" Project="false" />
