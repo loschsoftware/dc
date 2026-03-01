@@ -7,7 +7,7 @@ using System.Collections;
 namespace Dassie.Core;
 
 /// <summary>
-/// Provides functionality to write to the standard output.
+/// Provides functionality for writing to the standard output.
 /// </summary>
 public static class stdout
 {
