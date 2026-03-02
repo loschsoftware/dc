@@ -15,27 +15,25 @@ internal class TestCommand : CompilerCommand
 
     public override string Command => "test";
 
-    public override string Description => "Runs unit tests defined for the current project or project group.";
+    public override string Description => StringHelper.TestCommand_Description;
 
     public override CommandHelpDetails HelpDetails => new()
     {
         Description = Description,
         Usage = ["dc test [(-a|--assembly)=<Assembly>] [(-m|--module)=<Module>] [--failed]"],
-        Remarks = $"If ran on a project, this command first compiles the project and then collects and runs all unit tests defined in the project or specified module. "
-                  + "If ran on a project group, the command collects and runs all unit tests from all projects in the group."
-                  + $"{Environment.NewLine}A 'test module' is a module decorated with the <TestModule> attribute from the Dassie unit test library (Dassie.Tests). A test is a method of a test module decorated with the <Test> attribute.",
+        Remarks = StringHelper.TestCommand_Remarks,
         Options =
         [
-            ("-a|--assembly", "Run tests from the specified assembly."),
-            ("-m|--module", "Run tests from the specified test module. Multiple modules can be specified by using the option multiple times."),
-            ("--failed", "Only display failed tests")
+            ("-a|--assembly", StringHelper.TestCommand_AssemblyOption),
+            ("-m|--module", StringHelper.TestCommand_ModuleOption),
+            ("--failed", StringHelper.TestCommand_FailedOption)
         ],
         Examples =
         [
-            ("dc test", "Compiles the current project and runs all unit tests defined in it."),
-            ("dc test --failed", "Compiles the current project and runs all unit tests defined in it, only displaying failed tests."),
-            ("dc test -m=MyNamespace.MyTestModule", "Compiles the current project and runs all unit tests defined in the test module 'MyNamespace.MyTestModule'."),
-            ("dc test -a=./path/to/assembly.dll", "Runs all unit tests defined in the specified assembly.")
+            ("dc test", StringHelper.TestCommand_Example1),
+            ("dc test --failed", StringHelper.TestCommand_Example2),
+            ("dc test -m=MyNamespace.MyTestModule", StringHelper.TestCommand_Example3),
+            ("dc test -a=./path/to/assembly.dll", StringHelper.TestCommand_Example4)
         ]
     };
 
@@ -50,10 +48,10 @@ internal class TestCommand : CompilerCommand
 
             if (!File.Exists(assemblyPath))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0247_DCTestAssemblyNotFound,
-                    $"The assembly '{assemblyPath}' could not be found.",
+                    nameof(StringHelper.TestCommand_AssemblyNotFound), [assemblyPath],
                     CompilerExecutableName);
 
                 return -1;
@@ -68,10 +66,10 @@ internal class TestCommand : CompilerCommand
 
             if (isProjectGroup)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0249_DCTestProjectGroup,
-                    "The command 'dc test' is not yet supported for project groups.",
+                    nameof(StringHelper.TestCommand_NotSupportedForProjectGroup), [],
                     CompilerExecutableName);
 
                 return -1;
@@ -84,10 +82,10 @@ internal class TestCommand : CompilerCommand
         assemblyPath = Path.GetFullPath(assemblyPath);
         if (!File.Exists(assemblyPath))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0247_DCTestAssemblyNotFound,
-                $"Assembly '{assemblyPath}' could not be found. Consider setting the <AssemblyFileName> property in the project file.",
+                nameof(StringHelper.TestCommand_AssemblyNotFoundProjectFile), [assemblyPath],
                 CompilerExecutableName);
 
             return -1;
@@ -107,10 +105,10 @@ internal class TestCommand : CompilerCommand
 
                 if (type == null)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0248_DCTestInvalidModule,
-                        $"The assembly '{Path.GetFileName(assemblyPath)}' contains no test module named '{module}'.",
+                        nameof(StringHelper.TestCommand_TestModuleNotFound), [Path.GetFileName(assemblyPath), module],
                         CompilerExecutableName);
 
                     failed = true;
@@ -119,10 +117,10 @@ internal class TestCommand : CompilerCommand
 
                 if (type.GetCustomAttribute<TestModuleAttribute>() == null)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0248_DCTestInvalidModule,
-                        $"The type '{module}' in assembly '{Path.GetFileName(assemblyPath)}' is not a valid test module, since it is not marked with the '<TestModule>' attribute.",
+                        nameof(StringHelper.TestCommand_TypeNotValidTestModuleMissingAttribute), [module, Path.GetFileName(assemblyPath)],
                         CompilerExecutableName);
 
                     failed = true;
@@ -131,10 +129,10 @@ internal class TestCommand : CompilerCommand
 
                 if (!type.IsSealed || !type.IsAbstract)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0248_DCTestInvalidModule,
-                        $"'{module}' from assembly '{Path.GetFileName(assemblyPath)}' cannot be used as a test module since it is not a module. Test modules must not be instantiable.",
+                        nameof(StringHelper.TestCommand_TypeNotValidTestModuleNotModule), [module, Path.GetFileName(assemblyPath)],
                         CompilerExecutableName);
 
                     failed = true;
@@ -151,10 +149,10 @@ internal class TestCommand : CompilerCommand
 
         if (!testModules.Any() && !failed)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0246_DCTestNoTestModules,
-                $"The assembly '{Path.GetFileName(assemblyPath)}' contains no test modules.",
+                nameof(StringHelper.TestCommand_AssemblyContainsNoTestModules), [Path.GetFileName(assemblyPath)],
                 CompilerExecutableName);
 
             return -1;

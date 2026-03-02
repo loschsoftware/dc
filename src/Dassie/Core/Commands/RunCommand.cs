@@ -1,14 +1,11 @@
 ﻿using Dassie.Configuration;
-using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using Dassie.Messages;
-using Dassie.Validation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
 using SDProcess = System.Diagnostics.Process;
 
 namespace Dassie.Core.Commands;
@@ -20,7 +17,7 @@ internal class RunCommand : CompilerCommand
 
     public override string Command => "run";
 
-    public override string Description => "Compiles a project or project group and then runs the output executable with the specified arguments.";
+    public override string Description => StringHelper.RunCommand_Description;
 
     public override CommandHelpDetails HelpDetails => new()
     {
@@ -30,18 +27,17 @@ internal class RunCommand : CompilerCommand
             "dc run [Arguments]",
             "dc run -p|--profile=<Profile> -- [Arguments]"
         ],
-        Remarks = "This command requires the presence of a project or project group. If it is executed on a project group, the project that is executed is determined by the <Executable> property in the project group definition."
-                 + $"{Environment.NewLine}This command only recompiles the project if the source files have been updated since the last compilation or the output files have been deleted. Otherwise, the executable is launched immediately.",
+        Remarks = StringHelper.RunCommand_Remarks,
         Options =
         [
-            ("Arguments", "Command-line arguments passed to the program that is executed."),
-            ("-p|--profile=<Profile>", "The build profile to use for compilation. If not specified, the default profile is used.")
+            ("Arguments", StringHelper.RunCommand_ArgumentsOption),
+            ("-p|--profile=<Profile>", StringHelper.RunCommand_ProfileOption)
         ],
         Examples =
         [
-            ("dc run", "Compiles the current project and runs the resulting executable without any arguments."),
-            ("dc run arg1 arg2", "Compiles the current project and runs the resulting executable with the arguments 'arg1' and 'arg2'."),
-            ("dc run -p=CustomProfile", "Compiles the project with a specific build profile and runs the resulting executable without any arguments.")
+            ("dc run", StringHelper.RunCommand_Example1),
+            ("dc run arg1 arg2", StringHelper.RunCommand_Example2),
+            ("dc run -p=CustomProfile", StringHelper.RunCommand_Example3)
         ]
     };
 
@@ -67,10 +63,10 @@ internal class RunCommand : CompilerCommand
 
         if (!appType.IsExecutable)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0125_DCRunInvalidProjectType,
-                $"The current project cannot be executed. Projects with an application type of '{appType.Name}' are not executable.",
+                nameof(StringHelper.RunCommand_ProjectNotExecutable), [appType.Name],
                 CompilerExecutableName);
 
             return -1;
@@ -110,10 +106,10 @@ internal class RunCommand : CompilerCommand
         {
             if (!File.Exists(defaultPath))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0106_DCRunInsufficientInfo,
-                    "Insufficient information: The files to execute could not be determined. Create a project file (dsconfig.xml) and set the required properties 'BuildDirectory' and 'AssemblyFileName' to enable this command.",
+                    nameof(StringHelper.RunCommand_InsufficientInformation), [],
                     CompilerExecutableName);
 
                 return (-1, null, false, default, isProjectGroup);

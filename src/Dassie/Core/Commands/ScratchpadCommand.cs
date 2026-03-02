@@ -56,7 +56,7 @@ internal class ScratchpadCommand : CompilerCommand
                 Directory.Delete(path, true);
 
             Console.WriteLine();
-            Console.WriteLine("Cleared all scratches.");
+            Console.WriteLine(StringHelper.ScratchpadCommand_ClearedAllScratches);
             return 0;
         }
 
@@ -70,10 +70,10 @@ internal class ScratchpadCommand : CompilerCommand
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Dassie", "Scratchpad", name);
             if (!Directory.Exists(path))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0099_ScratchNotFound,
-                    $"The scratch '{name}' could not be found.",
+                    nameof(StringHelper.ScratchpadCommand_ScratchNotFound), [name],
                     CompilerExecutableName);
 
                 return -1;
@@ -93,10 +93,10 @@ internal class ScratchpadCommand : CompilerCommand
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Dassie", "Scratchpad", name);
             if (!Directory.Exists(path))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0099_ScratchNotFound,
-                    $"The scratch '{name}' could not be found.",
+                    nameof(StringHelper.ScratchpadCommand_ScratchNotFound), [name],
                     CompilerExecutableName);
 
                 return -1;
@@ -104,10 +104,10 @@ internal class ScratchpadCommand : CompilerCommand
 
             if (EditorProperty.Instance.GetValue().ToString().Equals("default", StringComparison.OrdinalIgnoreCase))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0259_DCScratchpadLoadDefaultEditor,
-                    $"The command 'load' is not supported if the editor is set to 'default'. Use 'dc config --global core.scratchpad.editor=<Editor>' to set a different editor.",
+                    nameof(StringHelper.ScratchpadCommand_LoadNotSupportedDefaultEditor), [],
                     CompilerExecutableName);
 
                 return -1;
@@ -122,7 +122,7 @@ internal class ScratchpadCommand : CompilerCommand
         /// <returns>Always returns the exit code 0.</returns>
         private static int ListScratches()
         {
-            Console.WriteLine("Saved scratches:");
+            Console.WriteLine(StringHelper.ScratchpadCommand_SavedScratches);
             Console.WriteLine();
             
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp", "Dassie", "Scratchpad");
@@ -133,12 +133,12 @@ internal class ScratchpadCommand : CompilerCommand
             string[] scratches = Directory.GetDirectories(path);
             if (scratches.Length == 0)
             {
-                Console.WriteLine("No scratches found.");
+                Console.WriteLine(StringHelper.ScratchpadCommand_NoScratchesFound);
                 return 0;
             }
 
             int dateStringLength = DateTime.Now.ToString().Length;
-            Console.WriteLine($"{"Last modified".PadRight(dateStringLength)}\tName");
+            Console.WriteLine($"{StringHelper.ScratchpadCommand_LastModified.PadRight(dateStringLength)}\t{StringHelper.ScratchpadCommand_Name}");
 
             foreach (DirectoryInfo di in scratches.Select(d => new DirectoryInfo(d)))
                 Console.WriteLine($"{di.LastWriteTime}\t{di.Name}");
@@ -195,7 +195,7 @@ internal class ScratchpadCommand : CompilerCommand
             {
                 if (!Console.IsInputRedirected)
                 {
-                    Console.WriteLine("To mark the end of the input, press Ctrl+Z in an empty line and hit Enter.");
+                    Console.WriteLine(StringHelper.ScratchpadCommand_MarkEndOfInput);
                     Console.WriteLine();
                 }
 
@@ -268,7 +268,7 @@ internal class ScratchpadCommand : CompilerCommand
 
     public override string Command => "scratchpad";
 
-    public override string Description => "Allows compiling and running Dassie source code from standard input.";
+    public override string Description => StringHelper.ScratchpadCommand_Description;
 
     public override List<string> Aliases => ["sp"];
 
@@ -276,36 +276,36 @@ internal class ScratchpadCommand : CompilerCommand
     private static CommandHelpDetails GetHelpDetails()
     {
         StringBuilder commandsSb = new();
-        commandsSb.Append($"{"    new [Options]",-35}{HelpCommand.FormatLines("Creates a new scratch.", indentWidth: 35)}");
-        commandsSb.Append($"{"        --name=<Name>",-35}{HelpCommand.FormatLines("Specifies the name of the scratch.", indentWidth: 35)}");
-        commandsSb.Append($"{"        --config=<Path>",-35}{HelpCommand.FormatLines("The compiler configuration (dsconfig.xml) file to use.", indentWidth: 35)}");
+        commandsSb.Append($"{"    new [Options]",-35}{HelpCommand.FormatLines(StringHelper.ScratchpadCommand_NewDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"        --name=<Name>",-35}{HelpCommand.FormatLines(StringHelper.ScratchpadCommand_NameOption, indentWidth: 35)}");
+        commandsSb.Append($"{"        --config=<Path>",-35}{HelpCommand.FormatLines(StringHelper.ScratchpadCommand_ConfigOption, indentWidth: 35)}");
         commandsSb.AppendLine();
 
-        commandsSb.Append($"{"    load <Name>",-35}{HelpCommand.FormatLines("Loads the specified scratch.", indentWidth: 35)}");
-        commandsSb.Append($"{"    list",-35}{HelpCommand.FormatLines("Lists all saved scratches.", indentWidth: 35)}");
-        commandsSb.Append($"{"    delete <Name>",-35}{HelpCommand.FormatLines("Deletes the specified scratch.", indentWidth: 35)}");
-        commandsSb.Append($"{"    clear",-35}{HelpCommand.FormatLines("Deletes all saved scratches.", indentWidth: 35)}");
+        commandsSb.Append($"{"    load <Name>",-35}{HelpCommand.FormatLines(StringHelper.ScratchpadCommand_LoadDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    list",-35}{HelpCommand.FormatLines(StringHelper.ScratchpadCommand_ListDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    delete <Name>",-35}{HelpCommand.FormatLines(StringHelper.ScratchpadCommand_DeleteDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    clear",-35}{HelpCommand.FormatLines(StringHelper.ScratchpadCommand_ClearDescription, indentWidth: 35)}");
 
         return new()
         {
-            Description = "Allows compiling and running Dassie source code from standard input.",
+            Description = StringHelper.ScratchpadCommand_Description,
             Usage = ["dc scratchpad [Command] [Options]"],
-            Remarks = "The 'scratchpad' command reads source code from standard input, compiles it into a temporary executable and immediately executes it. If standard input has been redirected (e.g. through a pipe) and the compilation is successful, the command will produce no output other than the output from the executed program. If no command is specified, the command 'new' is used implicitly.",
+            Remarks = StringHelper.ScratchpadCommand_Remarks,
             Options =
             [
-                ("Command", "The subcommand to execute."),
-                ("Options", "Additional options passed to the subcommand.")
+                ("Command", StringHelper.ScratchpadCommand_CommandOption),
+                ("Options", StringHelper.ScratchpadCommand_OptionsOption)
             ],
             CustomSections =
             [
-                ("Available commands", commandsSb.ToString())
+                (StringHelper.ScratchpadCommand_AvailableCommands, commandsSb.ToString())
             ],
             Examples =
             [
-                ("dc scratchpad", "Starts a new scratchpad session, allowing the user to enter Dassie source code from standard input."),
-                ("dc scratchpad new --name=myScratch", "Starts a new scratchpad session named 'myScratch'."),
-                ("dc scratchpad list", "Lists all saved scratches."),
-                ("dc scratchpad clear", "Deletes all saved scratches.")
+                ("dc scratchpad", StringHelper.ScratchpadCommand_Example1),
+                ("dc scratchpad new --name=myScratch", StringHelper.ScratchpadCommand_Example2),
+                ("dc scratchpad list", StringHelper.ScratchpadCommand_Example3),
+                ("dc scratchpad clear", StringHelper.ScratchpadCommand_Example4)
             ]
         };
     }
