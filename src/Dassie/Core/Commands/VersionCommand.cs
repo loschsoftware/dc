@@ -1,5 +1,6 @@
 ﻿using Dassie.Core.Properties;
 using Dassie.Extensions;
+using Dassie.Resources;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -31,33 +32,33 @@ internal class VersionCommand : CompilerCommand
 
         output.AppendLine();
         output.AppendLine(StringHelper.ProductNameFull);
-        output.AppendLine($"(C) 2023-{buildDate.Year} Losch");
+        output.AppendLine(StringHelper.Format(nameof(StringHelper.VersionCommand_Copyright), buildDate.Year));
 
         output.AppendLine();
-        output.AppendLine($"Build ID: {IdCommand.GetBuildID(version)}");
+        output.AppendLine(StringHelper.Format(nameof(StringHelper.VersionCommand_BuildID), IdCommand.GetBuildID(version)));
 
         output.AppendLine();
-        output.AppendLine("Environment:");
-        output.AppendLine($"{"    - Compiler version:".PadRight(padding)}{v.ToString(2)}");
-        output.AppendLine($"{"    - Build number:".PadRight(padding)}{version.Build}");
-        output.AppendLine($"{"    - Compilation date:".PadRight(padding)}{buildDate.ToShortDateString()}");
-        output.Append("    - Compiler architecture:".PadRight(padding));
+        output.AppendLine(StringHelper.VersionCommand_Environment);
+        output.AppendLine($"{StringHelper.VersionCommand_CompilerVersion.PadRight(padding)}{v.ToString(2)}");
+        output.AppendLine($"{StringHelper.VersionCommand_BuildNumber.PadRight(padding)}{version.Build}");
+        output.AppendLine($"{StringHelper.VersionCommand_CompilationDate.PadRight(padding)}{buildDate.ToShortDateString()}");
+        output.Append(StringHelper.VersionCommand_CompilerArchitecture.PadRight(padding));
 
 #if STANDALONE
-output.AppendLine("AOT, statically linked");
+output.AppendLine(StringHelper.VersionCommand_CompilerArchitectureAot);
 #else
-        output.AppendLine("JIT, dynamically linked");
+        output.AppendLine(StringHelper.VersionCommand_CompilerArchitectureJit);
 #endif
-        output.AppendLine($"{"    - .NET version:".PadRight(padding)}{typeof(object).Assembly.GetName().Version}");
-        output.AppendLine($"{"    - Operating system:".PadRight(padding)}{RuntimeInformation.OSDescription}");
-        output.AppendLine($"{"    - OS architecture:".PadRight(padding)}{RuntimeInformation.OSArchitecture}");
+        output.AppendLine($"{StringHelper.VersionCommand_DotNetVersion.PadRight(padding)}{typeof(object).Assembly.GetName().Version}");
+        output.AppendLine($"{StringHelper.VersionCommand_OperatingSystem.PadRight(padding)}{RuntimeInformation.OSDescription}");
+        output.AppendLine($"{StringHelper.VersionCommand_OSArchitecture.PadRight(padding)}{RuntimeInformation.OSArchitecture}");
 
         output.AppendLine();
-        output.AppendLine("Locations:");
-        output.AppendLine($"{"    - Extension storage:".PadRight(padding)}\"{ExtensionLocationProperty.Instance.GetValue()}\"");
-        output.AppendLine($"{"    - Global tools storage:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")}\"");
-        output.AppendLine($"{"    - NuGet package storage:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages")}\"");
-        output.AppendLine($"{"    - Tool paths file:".PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "tools.xml")}\"");
+        output.AppendLine(StringHelper.VersionCommand_Locations);
+        output.AppendLine($"{StringHelper.VersionCommand_ExtensionStorage.PadRight(padding)}\"{ExtensionLocationProperty.Instance.GetValue()}\"");
+        output.AppendLine($"{StringHelper.VersionCommand_GlobalToolsStorage.PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")}\"");
+        output.AppendLine($"{StringHelper.VersionCommand_NuGetPackageStorage.PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Packages")}\"");
+        output.AppendLine($"{StringHelper.VersionCommand_ToolPathsFile.PadRight(padding)}\"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "tools.xml")}\"");
 
         WriteString(output.ToString());
         return 0;

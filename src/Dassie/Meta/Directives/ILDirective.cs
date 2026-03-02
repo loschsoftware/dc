@@ -1,4 +1,5 @@
 ﻿using Dassie.Extensions;
+using Dassie.Resources;
 
 namespace Dassie.Meta.Directives;
 
@@ -18,7 +19,7 @@ internal class ILDirective : ICompilerDirective
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
                 DS0219_CompilerDirectiveInvalidArguments,
-                "Invalid arguments passed to 'il' directive. Expected [string].");
+                StringHelper.ILDirective_InvalidArguments);
 
             return null;
         }
@@ -30,7 +31,7 @@ internal class ILDirective : ICompilerDirective
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
                 DS0220_CompilerDirectiveInvalidScope,
-                "The 'il' compiler directive can only be used inside of a function.");
+                StringHelper.ILDirective_InvalidScope);
 
             return null;
         }

@@ -209,9 +209,9 @@ internal class TextWriterBuildLogDevice : IBuildLogDevice
                 SetColor();
                 outBuilder.Append($"{severityPrefix}{error.Severity switch
                 {
-                    Severity.Error => "error",
-                    Severity.Warning => "warning",
-                    _ => "message"
+                    Severity.Error => StringHelper.TextWriterBuildLogDevice_SeverityError,
+                    Severity.Warning => StringHelper.TextWriterBuildLogDevice_SeverityWarning,
+                    _ => StringHelper.TextWriterBuildLogDevice_SeverityMessage
                 }}");
 
                 if (!string.IsNullOrEmpty(errCode))

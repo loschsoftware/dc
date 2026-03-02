@@ -19,7 +19,7 @@ internal class ImportDirective : ICompilerDirective
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
                 DS0219_CompilerDirectiveInvalidArguments,
-                "Invalid arguments passed to 'import' directive. Expected between 1 and 3 arguments.");
+                StringHelper.ImportDirective_InvalidArguments);
 
             return null;
         }
@@ -48,7 +48,7 @@ internal class ImportDirective : ICompilerDirective
                     context.Rule.Start.Column,
                     context.Rule.GetText().Length,
                     DS0221_ImportDirectiveInvalidTarget,
-                    $"Invalid import target '{target}'. Expected 'local' or 'global'.");
+                    StringHelper.Format(nameof(StringHelper.ImportDirective_InvalidTarget), target));
 
                 return null;
             }

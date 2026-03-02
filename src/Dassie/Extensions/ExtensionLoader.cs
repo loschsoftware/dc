@@ -2,6 +2,7 @@
 using Dassie.CodeAnalysis;
 using Dassie.Core;
 using Dassie.Messages.Devices;
+using Dassie.Resources;
 using NuGet.Packaging;
 using System;
 using System.Collections.Generic;
@@ -213,9 +214,9 @@ internal static class ExtensionLoader
     {
         if (!File.Exists(assembly))
         {
-            EmitErrorMessage(0, 0, 0,
+            EmitErrorMessageFormatted(0, 0, 0,
                 DS0222_ExtensionFileNotFound,
-                $"Extension package '{assembly}' could not be found.",
+                nameof(StringHelper.ExtensionLoader_PackageNotFound), [assembly],
                 CompilerExecutableName);
 
             return [];
@@ -235,10 +236,10 @@ internal static class ExtensionLoader
 
                 if (loadTransient && !package.Modes().HasFlag(ExtensionModes.Transient))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0223_ExtensionUnsupportedMode,
-                        $"The extension '{package.Metadata.Name}' cannot be loaded in transient mode.",
+                        nameof(StringHelper.ExtensionLoader_CannotLoadTransient), [package.Metadata.Name],
                         CompilerExecutableName);
 
                     continue;
@@ -246,10 +247,10 @@ internal static class ExtensionLoader
 
                 if (!loadTransient && !package.Modes().HasFlag(ExtensionModes.Global))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0223_ExtensionUnsupportedMode,
-                        $"The extension '{package.Metadata.Name}' cannot be loaded in global mode.",
+                        nameof(StringHelper.ExtensionLoader_CannotLoadGlobal), [package.Metadata.Name],
                         CompilerExecutableName);
 
                     continue;
@@ -264,10 +265,10 @@ internal static class ExtensionLoader
                 }
                 catch (Exception ex)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0224_ExtensionInitializerFailed,
-                        $"The extension initializer of '{package.Metadata.Name}' threw an exception.",
+                        nameof(StringHelper.ExtensionLoader_InitializerException), [package.Metadata.Name],
                         CompilerExecutableName);
 
                     if (Context.Configuration.PrintExceptionInfo)
@@ -278,10 +279,10 @@ internal static class ExtensionLoader
 
                 if (ret != 0)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0224_ExtensionInitializerFailed,
-                        $"The extension initializer of '{package.Metadata.Name}' exited with a nonzero status code.",
+                        nameof(StringHelper.ExtensionLoader_InitializerNonzeroExit), [package.Metadata.Name],
                         CompilerExecutableName);
 
                     continue;
@@ -289,10 +290,10 @@ internal static class ExtensionLoader
 
                 if (loadTransient && InstalledExtensions.Any(p => p.Metadata.Id == package.Metadata.Id))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0225_ExtensionDuplicateMode,
-                        $"Extension '{package.Metadata.Name}' was loaded twice in different modes. Global mode will be unloaded.",
+                        nameof(StringHelper.ExtensionLoader_DuplicateMode), [package.Metadata.Name],
                         CompilerExecutableName);
 
                     IPackage duplicate = InstalledExtensions.First(p => p.Metadata.Id == package.Metadata.Id);
@@ -328,10 +329,10 @@ internal static class ExtensionLoader
         }
         catch (Exception ex)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0224_ExtensionInitializerFailed,
-                $"Finalizer of extension '{package.Metadata.Name}' threw an exception.",
+                nameof(StringHelper.ExtensionLoader_FinalizerException), [package.Metadata.Name],
                 CompilerExecutableName);
 
             if (Context.Configuration.PrintExceptionInfo)
@@ -389,10 +390,10 @@ internal static class ExtensionLoader
         if (Subsystems.Any(s => s.Name == name))
             return Subsystems.First(s => s.Name == name);
         
-        EmitErrorMessage(
+        EmitErrorMessageFormatted(
             0, 0, 0,
             DS0251_InvalidSubsystem,
-            $"The subsystem '{name}' could not be resolved.",
+            nameof(StringHelper.ExtensionLoader_SubsystemNotResolved), [name],
             ProjectConfigurationFileName);
 
         return Configuration.Subsystems.Console.Instance;

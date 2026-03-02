@@ -18,13 +18,13 @@ internal class WatchCommand : CompilerCommand
 
     public override string Command => "watch";
 
-    public override string Description => "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.";
+    public override string Description => StringHelper.WatchCommand_Description;
 
     public override List<string> Aliases => ["auto"];
 
     public override CommandHelpDetails HelpDetails => new()
     {
-        Description = "Watches all .ds files in the current folder structure and automatically recompiles when files are changed.",
+        Description = StringHelper.WatchCommand_Description,
         Usage =
         [
             "dc watch",
@@ -35,17 +35,17 @@ internal class WatchCommand : CompilerCommand
         ],
         Options =
         [
-            ("-c|--command <Command>", "Specifies the compiler command that is executed when files are changed. The default value is 'build'."),
-            ("-p|--profile <Profile>", "Specifies the build profile that is used when files are changed. If this option is set, the '--command' option cannot be used."),
-            ("<Directory>", "Specifies the directory that is watched for changed source files. Cannot be combined with the '--command' and '--profile' options."),
-            ("--quit", "Stops all currently running watchers.")
+            ("-c|--command <Command>", StringHelper.WatchCommand_CommandOptionDescription),
+            ("-p|--profile <Profile>", StringHelper.WatchCommand_ProfileOptionDescription),
+            ("<Directory>", StringHelper.WatchCommand_DirectoryOptionDescription),
+            ("--quit", StringHelper.WatchCommand_QuitOptionDescription)
         ],
         Examples =
         [
-            ("dc watch", "Rebuild whenever any .ds file changes."),
-            ("dc watch -c run", "Re-run the application automatically on save."),
-            ("dc watch -p Release", "Watch and rebuild using the Release profile."),
-            ("dc watch ./src", "Monitor the ./src folder only.")
+            ("dc watch", StringHelper.WatchCommand_Example1),
+            ("dc watch -c run", StringHelper.WatchCommand_Example2),
+            ("dc watch -p Release", StringHelper.WatchCommand_Example3),
+            ("dc watch ./src", StringHelper.WatchCommand_Example4)
         ]
     };
 
@@ -54,8 +54,8 @@ internal class WatchCommand : CompilerCommand
         if (args.Contains("--quit"))
             return Quit(args.Except(["--quit"]).ToArray());
 
-        if (args.Contains("--indefinetly"))
-            return WatchIndefinetly(args.Except(["--indefinetly"]).ToArray());
+        if (args.Contains("--indefinitely"))
+            return WatchIndefinitely(args.Except(["--indefinitely"]).ToArray());
 
         bool error = false;
         string command = "";
@@ -70,10 +70,10 @@ internal class WatchCommand : CompilerCommand
                 {
                     if (args.Length < i + 2)
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0194_ExpectedCliOptionValue,
-                            $"Expected value for option '{args[i]}'.",
+                            nameof(StringHelper.WatchCommand_ExpectedValue), [args[i]],
                             CompilerExecutableName);
 
                         return -1;
@@ -85,10 +85,10 @@ internal class WatchCommand : CompilerCommand
                     if (!string.IsNullOrEmpty(command))
                     {
                         error = true;
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0195_DCWatchInvalidCombination,
-                            $"'dc watch': Command to execute was already set to '{command}'",
+                            nameof(StringHelper.WatchCommand_CommandAlreadySet), [command],
                             CompilerExecutableName);
                     }
 
@@ -101,10 +101,10 @@ internal class WatchCommand : CompilerCommand
                     if (!string.IsNullOrEmpty(profile))
                     {
                         error = true;
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0195_DCWatchInvalidCombination,
-                            $"'dc watch': Build profile was already set to '{profile}'",
+                            nameof(StringHelper.WatchCommand_ProfileAlreadySet), [profile],
                             CompilerExecutableName);
                     }
 
@@ -115,30 +115,30 @@ internal class WatchCommand : CompilerCommand
                 if (!string.IsNullOrEmpty(command) || !string.IsNullOrEmpty(profile))
                 {
                     error = true;
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0195_DCWatchInvalidCombination,
-                        "'dc watch': Compilation target can only be manually specified if neither '--profile' nor '--command' are set.",
+                        nameof(StringHelper.WatchCommand_TargetOnlyWithoutOptions), [],
                         CompilerExecutableName);
                 }
 
                 if (!Directory.Exists(args[i]))
                 {
                     error = true;
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0195_DCWatchInvalidCombination,
-                        $"'dc watch': Directory '{args[i]}' does not exist.",
+                        nameof(StringHelper.WatchCommand_DirectoryNotExist), [args[i]],
                         CompilerExecutableName);
                 }
 
                 if (!string.IsNullOrEmpty(dir))
                 {
                     error = true;
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         0, 0, 0,
                         DS0195_DCWatchInvalidCombination,
-                        $"'dc watch': Compilation target directory was already set to '{args[i]}'.",
+                        nameof(StringHelper.WatchCommand_TargetDirectoryAlreadySet), [args[i]],
                         CompilerExecutableName);
                 }
 
@@ -149,10 +149,10 @@ internal class WatchCommand : CompilerCommand
         if (!string.IsNullOrEmpty(command) && !string.IsNullOrEmpty(profile))
         {
             error = true;
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0195_DCWatchInvalidCombination,
-                "'dc watch': The options '--command' and '--profile' cannot be combined.",
+                nameof(StringHelper.WatchCommand_CommandAndProfileCannotCombine), [],
                 CompilerExecutableName);
         }
 
@@ -170,21 +170,21 @@ internal class WatchCommand : CompilerCommand
         if (!string.IsNullOrEmpty(dir))
             processArgs = dir;
 
-        LogOut.Write("Watching file changes. Use ");
+        LogOut.Write(StringHelper.WatchCommand_WatchingFileChanges);
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        LogOut.Write("dc watch --quit");
+        LogOut.Write(StringHelper.WatchCommand_StopWatchingCommand);
         Console.ForegroundColor = ConsoleColor.Gray;
 
-        LogOut.WriteLine(" to stop watching changes.");
+        LogOut.WriteLine(StringHelper.WatchCommand_ToStopWatching);
         
         watchProcess = new SDProcess();
 #if STANDALONE
         watchProcess.StartInfo.FileName = $"{Environment.GetCommandLineArgs()[0]}";
-        watchProcess.StartInfo.Arguments = $"watch-indefinetly {processArgs}";
+        watchProcess.StartInfo.Arguments = $"watch-indefinitely {processArgs}";
 #else
         watchProcess.StartInfo.FileName = "dotnet";
-        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} watch --indefinetly {processArgs}";
+        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} watch --indefinitely {processArgs}";
 #endif
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;
@@ -194,8 +194,8 @@ internal class WatchCommand : CompilerCommand
         sw.WriteLine(watchProcess.Id);
         return 0;
     }
-
-    public static int WatchIndefinetly(string[] args)
+    
+    public static int WatchIndefinitely(string[] args)
     {
         FileSystemWatcher watcher;
 
@@ -242,10 +242,10 @@ internal class WatchCommand : CompilerCommand
         {
             foreach (string arg in args)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     0, 0, 0,
                     DS0212_UnexpectedArgument,
-                    $"Unexpected argument '{arg}'.",
+                    nameof(StringHelper.WatchCommand_UnexpectedArgument), [arg],
                     CompilerExecutableName);
             }
 
@@ -257,7 +257,7 @@ internal class WatchCommand : CompilerCommand
         string pidFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "pid.txt");
         if (!File.Exists(pidFilePath))
         {
-            LogOut.WriteLine("No file watchers running.");
+            LogOut.WriteLine(StringHelper.WatchCommand_NoWatchersRunning);
             return 0;
         }
 
@@ -269,7 +269,7 @@ internal class WatchCommand : CompilerCommand
 
         File.Delete(pidFilePath);
 
-        LogOut.WriteLine("No longer watching file changes.");
+        LogOut.WriteLine(StringHelper.WatchCommand_NoLongerWatching);
         return 0;
     }
 }

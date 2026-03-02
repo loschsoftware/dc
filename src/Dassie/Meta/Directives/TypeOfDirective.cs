@@ -20,7 +20,7 @@ internal class TypeOfDirective : ICompilerDirective
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
                 DS0219_CompilerDirectiveInvalidArguments,
-                $"Invalid arguments passed to 'typeof' directive. Expected 1 argument.");
+                StringHelper.TypeOfDirective_InvalidArguments);
 
             return null;
         }

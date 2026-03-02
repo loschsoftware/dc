@@ -27,11 +27,11 @@ internal static class TemplateBuilder
 
     private static void PrintAvailableTemplates()
     {
-        int templateNameWidth = ExtensionLoader.ProjectTemplates.Select(t => t.Name).Append("Template Name").Select(n => n.Length).Max();
-        WriteLine($"The following project templates are available:{Environment.NewLine}");
+        int templateNameWidth = ExtensionLoader.ProjectTemplates.Select(t => t.Name).Append(StringHelper.TemplateBuilder_TableHeaderTemplateName).Select(n => n.Length).Max();
+        WriteLine(StringHelper.Format(nameof(StringHelper.TemplateBuilder_AvailableTemplatesHeader), Environment.NewLine));
 
-        string tableHeader = $"{"Template Name".PadRight(templateNameWidth)}\t\tPackage";
-        int headerWidth = tableHeader.Length + ExtensionLoader.InstalledExtensions.Where(t => t.ProjectTemplates()?.Length > 0).Select(p => p.Metadata.Name).Append("Preinstalled").Select(p => p.Length).Max();
+        string tableHeader = $"{StringHelper.TemplateBuilder_TableHeaderTemplateName.PadRight(templateNameWidth)}\t\t{StringHelper.TemplateBuilder_TableHeaderPackage}";
+        int headerWidth = tableHeader.Length + ExtensionLoader.InstalledExtensions.Where(t => t.ProjectTemplates()?.Length > 0).Select(p => p.Metadata.Name).Append(StringHelper.TemplateBuilder_Preinstalled).Select(p => p.Length).Max();
 
         WriteLine(tableHeader);
         WriteLine(new('-', headerWidth));
@@ -44,7 +44,7 @@ internal static class TemplateBuilder
                 packageName = ExtensionLoader.InstalledExtensions.First(p => p.ProjectTemplates() != null && p.ProjectTemplates().Any(t => t.GetType() == template.GetType())).Metadata.Name;
 
             if (packageName == "Core")
-                packageName = "Preinstalled";
+                packageName = StringHelper.TemplateBuilder_Preinstalled;
 
             WriteLine($"{template.Name.PadRight(templateNameWidth)}\t\t{packageName}");
         }
@@ -135,7 +135,7 @@ internal static class TemplateBuilder
             BuildDirectoryStructure(dir, subDir, parser);
         }
 
-        WriteLine($"Built new project in {rootDir} based on template '{args[0]}'.");
+        WriteLine(StringHelper.Format(nameof(StringHelper.TemplateBuilder_ProjectBuilt), rootDir, args[0]));
         return 0;
     }
 

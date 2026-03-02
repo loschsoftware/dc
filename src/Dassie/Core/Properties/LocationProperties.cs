@@ -1,5 +1,6 @@
 ﻿using Dassie.Configuration.Global;
 using Dassie.Extensions;
+using Dassie.Resources;
 using System;
 
 namespace Dassie.Core.Properties;
@@ -23,10 +24,10 @@ internal class ExtensionLocationProperty : GlobalConfigProperty
         }
         catch
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0261_ExtensionsLocationPropertyInvalidPath,
-                $"The specified value '{value}' is not a valid path.",
+                nameof(StringHelper.LocationProperties_InvalidPath), [value],
                 CompilerExecutableName);
 
             return false;
@@ -47,10 +48,10 @@ internal class MsvcRootPathProperty : GlobalConfigProperty
     {
         if (!Directory.Exists(value.ToString()))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0261_ExtensionsLocationPropertyInvalidPath,
-                $"The specified directory '{value}' does not exist.");
+                nameof(StringHelper.LocationProperties_DirectoryNotExist), [value]);
 
             return false;
         }
@@ -72,10 +73,10 @@ internal class ILDasmPathProperty : GlobalConfigProperty
     {
         if (!File.Exists(value.ToString()))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0261_ExtensionsLocationPropertyInvalidPath,
-                $"The specified file '{value}' does not exist.");
+                nameof(StringHelper.LocationProperties_FileNotExist), [value]);
 
             return false;
         }

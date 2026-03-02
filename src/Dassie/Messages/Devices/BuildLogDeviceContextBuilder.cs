@@ -32,12 +32,12 @@ internal static class BuildLogDeviceContextBuilder
 
             if (!availableDevices.Any(d => d.Name == deviceName))
             {
-                EmitWarningMessage(
+                EmitWarningMessageFormatted(
                     loc.Row,
                     loc.Column,
                     loc.Length,
                     DS0171_InvalidBuildDeviceName,
-                    $"The specified build log device '{deviceName}' is not installed.",
+                    nameof(StringHelper.BuildLogDeviceContextBuilder_DeviceNotInstalled), [deviceName],
                     ProjectConfigurationFileName);
 
                 continue;

@@ -2,10 +2,8 @@
 using Antlr4.Runtime.Tree;
 using Dassie.Core.Commands;
 using Dassie.Parser;
-using Dassie.Resources;
 using System.Collections.Generic;
 using System.Linq;
-using static Dassie.Messages.MessageWriter;
 
 namespace Dassie.Lowering;
 

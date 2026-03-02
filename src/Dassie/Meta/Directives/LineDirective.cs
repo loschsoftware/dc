@@ -21,7 +21,7 @@ internal class LineDirective : ICompilerDirective
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
                 DS0219_CompilerDirectiveInvalidArguments,
-                $"Invalid arguments passed to 'line' directive. Expected [] or [int] or [int, bool].");
+                StringHelper.LineDirective_InvalidArguments);
 
             return null;
         }

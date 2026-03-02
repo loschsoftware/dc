@@ -1,8 +1,8 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Analysis;
 using Dassie.Core.Commands;
-using Dassie.Messages.Devices;
 using Dassie.Extensions;
+using Dassie.Messages.Devices;
 using Dassie.Text.Tooltips;
 using System;
 using System.Collections.Concurrent;
@@ -163,10 +163,10 @@ public static class MessageWriter
         {
             _disabledDevices.Add(device);
 
-            EmitWarningMessage(
+            EmitWarningMessageFormatted(
                 0, 0, 0,
                 DS0216_ExtensionThrewException,
-                $"An unhandled exception of type '{ex.GetType()}' was caused by the build log device '{device.Name}'. This build log device will be disabled for the rest of the compilation.",
+                nameof(StringHelper.MessageWriter_BuildLogDeviceException), [ex.GetType(), device.Name],
                 CompilerExecutableName);
             
             try

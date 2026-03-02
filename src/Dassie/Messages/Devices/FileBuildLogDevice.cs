@@ -22,10 +22,10 @@ internal class FileBuildLogDevice : IBuildLogDevice, IDisposable
     {
         if (!attributes.Any(a => a.Name == "Path"))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0172_FileBuildLogDeviceNoPathSpecified,
-                $"'Path' attribute is required for <File> build log device.",
+                nameof(StringHelper.FileBuildLogDevice_PathAttributeRequired), [],
                 ProjectConfigurationFileName);
 
             return;

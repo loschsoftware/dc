@@ -38,19 +38,19 @@ internal static class MessageHelpers
         StringBuilder errorMsgBuilder = new();
 
         if (!overloads.Any())
-            errorMsgBuilder.Append($"Member '{name}' not found in type '{TypeHelpers.TypeName(type)}'.");
+            errorMsgBuilder.Append(StringHelper.Format(nameof(StringHelper.MessageHelpers_MemberNotFoundInType), name, TypeHelpers.TypeName(type)));
 
         else
         {
-            errorMsgBuilder.AppendLine($"Wrong argument types passed to member '{name}':");
-            errorMsgBuilder.Append($"    * Expected: {GenerateParamList(overloads.First())}");
+            errorMsgBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.MessageHelpers_WrongArgumentTypes), name));
+            errorMsgBuilder.Append(StringHelper.Format(nameof(StringHelper.MessageHelpers_ExpectedArgs), GenerateParamList(overloads.First())));
 
             if (overloads.Count() > 1)
-                errorMsgBuilder.AppendLine($" ({overloads.Count() - 1} other overload{(overloads.Count() - 1 == 1 ? "" : "s")} available)");
+                errorMsgBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.MessageHelpers_OtherOverloadsAvailable), overloads.Count() - 1, overloads.Count() - 1 == 1 ? "" : "s"));
             else
                 errorMsgBuilder.AppendLine();
 
-            errorMsgBuilder.Append($"    * Provided: {GenerateParamList(providedArgs)}");
+            errorMsgBuilder.Append(StringHelper.Format(nameof(StringHelper.MessageHelpers_ProvidedArgs), GenerateParamList(providedArgs)));
         }
 
         EmitErrorMessage(

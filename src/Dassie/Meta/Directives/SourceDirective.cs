@@ -18,7 +18,7 @@ internal class SourceDirective : ICompilerDirective
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
                 DS0219_CompilerDirectiveInvalidArguments,
-                $"Invalid arguments passed to 'source' directive. Expected [string].");
+                StringHelper.SourceDirective_InvalidArguments);
 
             return null;
         }

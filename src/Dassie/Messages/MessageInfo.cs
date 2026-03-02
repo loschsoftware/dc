@@ -107,9 +107,9 @@ public class MessageInfo
         string code = Code == MessageCode.Custom ? CustomCode : Code.ToString().Split('_')[0];
         return $"{File}{(HideCodePosition ? "" : $" ({Location.Line},{Location.Column})")}: {Severity switch
         {
-            Severity.Warning => "warning",
-            Severity.Error => "error",
-            _ => "message"
+            Severity.Warning => StringHelper.TextWriterBuildLogDevice_SeverityWarning,
+            Severity.Error => StringHelper.TextWriterBuildLogDevice_SeverityError,
+            _ => StringHelper.TextWriterBuildLogDevice_SeverityMessage
         }} {code}: {Text}\r\n";
     }
 }

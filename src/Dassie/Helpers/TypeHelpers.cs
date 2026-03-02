@@ -2,6 +2,7 @@
 using Dassie.Core;
 using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Resources;
 using Dassie.Symbols;
 using System;
 using System.Collections;
@@ -569,10 +570,10 @@ internal static class TypeHelpers
         {
             if (throwErrors)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row, col, len,
                     DS0204_InvalidGenericArgument,
-                    $"Invalid generic argument '{TypeName(arg.Type)}': 'null' cannot be used as a type argument.");
+                    nameof(StringHelper.TypeHelpers_InvalidGenericArgumentNull), [TypeName(arg.Type)]);
             }
 
             return true;
@@ -582,16 +583,16 @@ internal static class TypeHelpers
         {
             if (throwErrors)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     row, col, len,
                     DS0204_InvalidGenericArgument,
-                    $"Invalid generic argument '{TypeName(arg.Type)}': References cannot be used as type arguments.");
+                    nameof(StringHelper.TypeHelpers_InvalidGenericArgumentRef), [TypeName(arg.Type)]);
             }
 
             return true;
         }
 
-        string errMsgStart = $"Generic argument '{Format(arg.Type)}' is incompatible with generic parameter '{Format(param)}': ";
+        string errMsgStart = StringHelper.Format(nameof(StringHelper.TypeHelpers_GenericArgIncompatibleStart), Format(arg.Type), Format(param));
         GenericParameterAttributes attributes = param.GenericParameterAttributes;
 
         if (attributes.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint))
@@ -603,7 +604,7 @@ internal static class TypeHelpers
                     EmitErrorMessage(
                         row, col, len,
                         DS0108_GenericTypeConstraintViolation,
-                        $"{errMsgStart}'{Format(param)}' only allows reference types.");
+                        $"{errMsgStart}{StringHelper.Format(nameof(StringHelper.TypeHelpers_GenericArgOnlyRefTypes), Format(param))}");
                 }
 
                 return false;
@@ -619,7 +620,7 @@ internal static class TypeHelpers
                     EmitErrorMessage(
                         row, col, len,
                         DS0108_GenericTypeConstraintViolation,
-                        $"{errMsgStart}'{Format(param)}' only allows value types.");
+                        $"{errMsgStart}{StringHelper.Format(nameof(StringHelper.TypeHelpers_GenericArgOnlyValueTypes), Format(param))}");
                 }
 
                 return false;
@@ -632,10 +633,10 @@ internal static class TypeHelpers
             {
                 if (throwErrors)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         row, col, len,
                         DS0108_GenericTypeConstraintViolation,
-                        $"{errMsgStart}The generic argument needs to define a parameterless constructor.");
+                        nameof(StringHelper.TypeHelpers_GenericArgNeedsParameterlessCtor), []);
                 }
 
                 return false;
@@ -653,7 +654,7 @@ internal static class TypeHelpers
                     EmitErrorMessage(
                         row, col, len,
                         DS0108_GenericTypeConstraintViolation,
-                        $"{errMsgStart}'{Format(arg.Type)}' violates constraint '{Format(constraint)}'.");
+                        $"{errMsgStart}{StringHelper.Format(nameof(StringHelper.TypeHelpers_GenericArgViolatesConstraint), Format(arg.Type), Format(constraint))}");
 
                     result = false;
                 }
@@ -681,12 +682,12 @@ internal static class TypeHelpers
 
             if (context.generic_parameter_variance().Equals() == null && !TypeContext.Current.Builder.IsInterface)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.generic_parameter_variance().Start.Line,
                     context.generic_parameter_variance().Start.Column,
                     context.generic_parameter_variance().GetText().Length,
                     DS0118_VarianceModifierOnConcreteType,
-                    $"The variance modifier '{context.generic_parameter_variance().GetText()}' is invalid on type '{Format(TypeContext.Current.Builder)}'. Only type parameters of template types can have variance modifiers.");
+                    nameof(StringHelper.TypeHelpers_VarianceModifierInvalidOnConcreteType), [context.generic_parameter_variance().GetText(), Format(TypeContext.Current.Builder)]);
             }
         }
 
@@ -725,23 +726,23 @@ internal static class TypeHelpers
 
                 if (duplicate)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         attrib.Start.Line,
                         attrib.Start.Column,
                         attrib.GetText().Length,
                         DS0111_DuplicateTypeParameterAttributes,
-                        $"Duplicate attribute '{attrib.GetText()}'.");
+                        nameof(StringHelper.TypeHelpers_DuplicateAttribute), [attrib.GetText()]);
                 }
             }
 
             if (attribs.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint) && attribs.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     context.Start.Line,
                     context.Start.Column,
                     context.GetText().Length,
                     DS0114_InvalidTypeParameterAttributes,
-                    $"The type parameter attributes 'ref' and 'val' are mutually exclusive.");
+                    nameof(StringHelper.TypeHelpers_RefValMutuallyExclusive), []);
             }
         }
 
@@ -769,12 +770,12 @@ internal static class TypeHelpers
                 {
                     if (baseTypeConstraint != null)
                     {
-                        EmitErrorMessage(
+                        EmitErrorMessageFormatted(
                             type.Start.Line,
                             type.Start.Column,
                             type.GetText().Length,
                             DS0112_DuplicateTypeParameterConstraint,
-                            $"Duplicate base type constraint '{Format(constraint)}': A generic type parameter can only define one base type.");
+                            nameof(StringHelper.TypeHelpers_DuplicateBaseTypeConstraint), [Format(constraint)]);
 
                         continue;
                     }
@@ -785,12 +786,12 @@ internal static class TypeHelpers
 
                 if (interfaceConstraints.Contains(constraint))
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         type.Start.Line,
                         type.Start.Column,
                         type.GetText().Length,
                         DS0112_DuplicateTypeParameterConstraint,
-                        $"Duplicate type constraint '{Format(constraint)}'");
+                        nameof(StringHelper.TypeHelpers_DuplicateTypeConstraint), [Format(constraint)]);
 
                     continue;
                 }
@@ -830,13 +831,12 @@ internal static class TypeHelpers
 
             if (classCount > 1)
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     typeName.Start.Line,
                     typeName.Start.Column,
                     typeName.GetText().Length,
                     DS0052_MoreThanOneClassInInheritanceList,
-                    "A type can only extend one base type."
-                    );
+                    nameof(StringHelper.TypeHelpers_TypeCanOnlyExtendOneBaseType), []);
             }
         }
 
@@ -890,22 +890,22 @@ internal static class TypeHelpers
 
             if (partTypes.Any(p => p.Name != null && p.Name == unionMemberName))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     unionMember.Identifier().Symbol.Line,
                     unionMember.Identifier().Symbol.Column,
                     unionMemberName.Length,
                     DS0183_UnionTypeDuplicateTagName,
-                    $"{kind} type contains duplicate tag name '{unionMemberName}'.");
+                    nameof(StringHelper.TypeHelpers_TupleTypeDuplicateTagName), [kind, unionMemberName]);
             }
 
             if (partTypes.Any(p => p.Type == type))
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                     unionMember.type_name().Start.Line,
                     unionMember.type_name().Start.Column,
                     unionMember.type_name().GetText().Length,
                     DS0184_UnionTypeDuplicateTagType,
-                    $"{kind} type contains multiple tags of type '{unionMemberName}'.");
+                    nameof(StringHelper.TypeHelpers_TupleTypeDuplicateTagType), [kind, unionMemberName]);
             }
 
             if (unionMember.Identifier() != null)
@@ -918,12 +918,12 @@ internal static class TypeHelpers
 
         if (!(namedTags == 0 || partTypes.Count == namedTags))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 name.Start.Line,
                 name.Start.Column,
                 name.GetText().Length,
                 DS0185_UnionTypeMixedTags,
-                $"{kind} type cannot contain mixed named and unnamed tags. All tags need to be either named or unnamed.");
+                nameof(StringHelper.TypeHelpers_TupleTypeMixedTags), [kind]);
         }
 
         return partTypes;

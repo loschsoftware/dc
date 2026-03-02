@@ -5,7 +5,7 @@ using Dassie.Core;
 using Dassie.Messages;
 using Dassie.Meta;
 using Dassie.Parser;
-using NuGet.Protocol;
+using Dassie.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,12 +39,12 @@ internal static class AttributeHelpers
 
         if (oopModifier != null && oopModifier.Closed() != null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 oopModifier.Start.Line,
                 oopModifier.Start.Column,
                 oopModifier.GetText().Length,
                 DS0053_InvalidAccessModifier,
-                "The modifier 'closed' is not supported by this element.");
+                nameof(StringHelper.AttributeHelpers_ModifierClosedNotSupported), []);
         }
 
         foreach (var modifier in specialModifiers)
@@ -62,23 +62,23 @@ internal static class AttributeHelpers
 
             else
             {
-                EmitErrorMessage(
+                EmitErrorMessageFormatted(
                 modifier.Start.Line,
                 modifier.Start.Column,
                 modifier.GetText().Length,
                 DS0053_InvalidAccessModifier,
-                $"The modifier '{modifier.GetText()}' is not supported by this element.");
+                nameof(StringHelper.AttributeHelpers_ModifierNotSupported), [modifier.GetText()]);
             }
         }
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && specialModifiers.Any(s => s.Static() != null))
         {
-            EmitMessage(
+            EmitMessageFormatted(
                 specialModifiers.First(s => s.GetText() == "static").Start.Line,
                 specialModifiers.First(s => s.GetText() == "static").Start.Column,
                 specialModifiers.First(s => s.GetText() == "static").GetText().Length,
                 DS0059_RedundantModifier,
-                "The 'static' modifier is implicit for module members and can be omitted.");
+                nameof(StringHelper.AttributeHelpers_RedundantStaticModifier), []);
         }
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && !baseAttributes.HasFlag(FieldAttributes.Static))
@@ -116,12 +116,12 @@ internal static class AttributeHelpers
 
                 if (oopModifier != null && oopModifier.Closed() != null && !ignoreDS0058)
                 {
-                    EmitMessage(
+                    EmitMessageFormatted(
                         oopModifier.Closed().Symbol.Line,
                         oopModifier.Closed().Symbol.Column,
                         oopModifier.Closed().GetText().Length,
                         DS0059_RedundantModifier,
-                        "Redundant modifier 'closed'.");
+                        nameof(StringHelper.AttributeHelpers_RedundantModifierClosed), []);
                 }
             }
 
@@ -137,12 +137,12 @@ internal static class AttributeHelpers
 
         if (TypeContext.Current.Builder.IsSealed && TypeContext.Current.Builder.IsAbstract && baseAttributes.HasFlag(MethodAttributes.Static) && !ignoreDS0058)
         {
-            EmitMessage(
+            EmitMessageFormatted(
                 specialModifiers.First(s => s.GetText() == "static").Start.Line,
                 specialModifiers.First(s => s.GetText() == "static").Start.Column,
                 specialModifiers.First(s => s.GetText() == "static").GetText().Length,
                 DS0059_RedundantModifier,
-                "Redundant modifier 'static'.");
+                nameof(StringHelper.AttributeHelpers_RedundantModifierStatic), []);
         }
 
         if (!isStatic && (oopModifier == null || oopModifier.Closed() == null))
@@ -250,12 +250,12 @@ internal static class AttributeHelpers
 
         if (typeKind.Module() != null && modifiers?.Open() != null)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 modifiers.Open().Symbol.Line,
                 modifiers.Open().Symbol.Column,
                 modifiers.Open().GetText().Length,
                 DS0244_ModuleInvalidModifiers,
-                "The modifier 'open' is invalid on modules.");
+                nameof(StringHelper.AttributeHelpers_ModifierOpenInvalidOnModule), []);
         }
 
         if (typeKind.Template() != null)
@@ -432,12 +432,12 @@ internal static class AttributeHelpers
 
                 if (value == null)
                 {
-                    EmitErrorMessage(
+                    EmitErrorMessageFormatted(
                         expr.Start.Line,
                         expr.Start.Column,
                         expr.GetText().Length,
                         DS0179_InvalidAttributeArgument,
-                        "This expression cannot be used as an argument for an attribute, since its value is not known at compile-time.");
+                        nameof(StringHelper.AttributeHelpers_InvalidAttributeArgument), []);
                 }
 
                 args.Add((value.Type, value.Value));
@@ -497,52 +497,52 @@ internal static class AttributeHelpers
     {
         if (!CurrentMethod.Builder.IsStatic)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
                 DS0167_ModuleInitializerInvalid,
-                $"Module initializers must be defined inside of a module or explicitly marked as 'static'.");
+                nameof(StringHelper.AttributeHelpers_ModuleInitializerMustBeStatic), []);
         }
 
         if (CurrentMethod.Parameters.Count > 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.parameter_list().Start.Line,
                 context.parameter_list().Start.Column,
                 context.parameter_list().GetText().Length,
                 DS0167_ModuleInitializerInvalid,
-                $"Module initializers must be parameterless.");
+                nameof(StringHelper.AttributeHelpers_ModuleInitializerMustBeParameterless), []);
         }
 
         if (CurrentMethod.Builder.ReturnType != typeof(void))
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
                 DS0167_ModuleInitializerInvalid,
-                $"Module initializers cannot return a value.");
+                nameof(StringHelper.AttributeHelpers_ModuleInitializerCannotReturnValue), []);
         }
 
         if (CurrentMethod.TypeParameters.Count > 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.generic_parameter_list().Start.Line,
                 context.generic_parameter_list().Start.Column,
                 context.generic_parameter_list().GetText().Length,
                 DS0167_ModuleInitializerInvalid,
-                $"Module initializers cannot be generic.");
+                nameof(StringHelper.AttributeHelpers_ModuleInitializerCannotBeGeneric), []);
         }
 
         if (TypeContext.Current.GenericParameters.Count > 0)
         {
-            EmitErrorMessage(
+            EmitErrorMessageFormatted(
                 context.Identifier().Symbol.Line,
                 context.Identifier().Symbol.Column,
                 context.Identifier().GetIdentifier().Length,
                 DS0167_ModuleInitializerInvalid,
-                $"Module initializers cannot be contained in generic types.");
+                nameof(StringHelper.AttributeHelpers_ModuleInitializerCannotBeInGenericType), []);
         }
     }
 
@@ -556,12 +556,12 @@ internal static class AttributeHelpers
         if (id == "module")
             return AttributeTarget.Module;
 
-        EmitErrorMessage(
+        EmitErrorMessageFormatted(
             node.Symbol.Line,
             node.Symbol.Column,
             id.Length,
             DS0182_InvalidAttributeTarget,
-            $"'{id}' is not a valid attribute target.");
+            nameof(StringHelper.AttributeHelpers_InvalidAttributeTargetName), [id]);
 
         return AttributeTarget.Type;
     }

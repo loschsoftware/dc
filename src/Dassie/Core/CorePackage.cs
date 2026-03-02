@@ -6,6 +6,7 @@ using Dassie.Deployment;
 using Dassie.Messages.Devices;
 using Dassie.Extensions;
 using Dassie.Meta.Directives;
+using Dassie.Resources;
 using Dassie.Templates;
 using System.Reflection;
 
@@ -23,8 +24,8 @@ internal class CorePackage : IPackage
 
     public PackageMetadata Metadata => new()
     {
-        Author = "Losch",
-        Description = "Contains core functionality of the Dassie compiler.",
+        Author = StringHelper.CorePackage_Author,
+        Description = StringHelper.CorePackage_Description,
         Name = "Core",
         Version = Assembly.GetCallingAssembly().GetName().Version
     };

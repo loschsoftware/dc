@@ -21,7 +21,10 @@ internal static class TestRunner
             if ((!hidePassedTests && mod.Tests.Count > 0) || failedCount > 0)
                 Console.WriteLine();
 
-            Console.WriteLine($"\e[1;{(failedCount == 0 ? "32" : "31")}mModule '{mod.Name}': {mod.Tests.Count - failedCount} of {mod.Tests.Count} test{(mod.Tests.Count > 1 ? "s" : "")} passed\e[0m");
+            string summaryResource = mod.Tests.Count == 1 
+                ? nameof(StringHelper.TestRunner_ModuleSummarySingular) 
+                : nameof(StringHelper.TestRunner_ModuleSummaryPlural);
+            Console.WriteLine($"\e[1;{(failedCount == 0 ? "32" : "31")}m{StringHelper.Format(summaryResource, mod.Name, mod.Tests.Count - failedCount, mod.Tests.Count)}\e[0m");
             Console.WriteLine();
             Console.WriteLine($"\e[38;5;244m{new string('▬', Console.WindowWidth)}\e[0m");
             Console.WriteLine();
@@ -80,12 +83,12 @@ internal static class TestRunner
 
         if (passed)
         {
-            Console.WriteLine("\e[1;32m✓ Passed\e[0m");
+            Console.WriteLine($"\e[1;32m{StringHelper.TestRunner_TestPassed}\e[0m");
             test.Status = Status.Passed;
         }
         else
         {
-            Console.WriteLine("\e[1;31m✘ Failed\e[0m");
+            Console.WriteLine($"\e[1;31m{StringHelper.TestRunner_TestFailed}\e[0m");
             Console.WriteLine(error);
             test.Status = Status.Failed;
         }

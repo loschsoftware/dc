@@ -18,7 +18,7 @@ internal class TodoDirective : ICompilerDirective
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
                 DS0219_CompilerDirectiveInvalidArguments,
-                "Invalid arguments passed to 'todo' directive. Expected [string].");
+                StringHelper.TodoDirective_InvalidArguments);
 
             return null;
         }
@@ -30,13 +30,13 @@ internal class TodoDirective : ICompilerDirective
                 context.Rule.Start.Column,
                 context.Rule.GetText().Length,
                 DS0220_CompilerDirectiveInvalidScope,
-                "The 'todo' compiler directive can only be used inside of a function.");
+                StringHelper.TodoDirective_InvalidScope);
 
             return null;
         }
 
         string todoDesc = context.Arguments[0].ToString().Trim('"');
-        string todoMsg = $"TODO ({Path.GetFileName(CurrentFile.Path)}, line {context.Rule.Start.Line + LineNumberOffset}): {todoDesc}";
+        string todoMsg = StringHelper.Format(nameof(StringHelper.TodoDirective_Message), Path.GetFileName(CurrentFile.Path), context.Rule.Start.Line + LineNumberOffset, todoDesc);
         CurrentMethod.IL.EmitWriteLine(todoMsg);
         return null;
     }
