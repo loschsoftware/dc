@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<RootNamespace>Dassie.Language</RootNamespace>
+		<Deterministic>false</Deterministic>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Platforms>AnyCPU;x64</Platforms>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<ResourceProviderGenerator_UseExplicitKeys>true</ResourceProviderGenerator_UseExplicitKeys>
+		<ResourceProviderGenerator_InputFileName>strings.de-DE.json</ResourceProviderGenerator_InputFileName>
+		<ResourceProviderGenerator_OutputNamespace>Dassie.Language</ResourceProviderGenerator_OutputNamespace>
+		<ResourceProviderGenerator_OutputTypeName>ResourceProvider</ResourceProviderGenerator_OutputTypeName>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<CompilerVisibleProperty Include="ResourceProviderGenerator_UseExplicitKeys" />
+		<CompilerVisibleProperty Include="ResourceProviderGenerator_InputFileName" />
+		<CompilerVisibleProperty Include="ResourceProviderGenerator_OutputNamespace" />
+		<CompilerVisibleProperty Include="ResourceProviderGenerator_OutputTypeName" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="strings.de-DE.json" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\..\Dassie\Dassie.csproj" />
+		<ProjectReference Include="..\..\Dassie.Generators\Dassie.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+</Project>

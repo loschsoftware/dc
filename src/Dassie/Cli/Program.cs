@@ -1,11 +1,10 @@
 ﻿using Dassie.Cli.Commands;
-using Dassie.Configuration;
 using Dassie.Configuration.Global;
 using Dassie.Core;
 using Dassie.Core.Commands;
-using Dassie.Messages.Devices;
 using Dassie.Extensions;
 using Dassie.Messages;
+using Dassie.Messages.Devices;
 using System;
 using System.Diagnostics;
 using System.Linq;
