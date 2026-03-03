@@ -81,7 +81,6 @@
   "SymbolResolver_NestedByRefNotPermitted": "Invalid type '{0}': Nested references are not permitted.",
   "SymbolResolver_NameNotResolved": "The name '{0}' could not be resolved.",
 
-
   "ExternalBlockRewriter_UnexpectedToken": "Unexpected token '{0}'. Expected 'as'.",
   "ExternalBlockRewriter_NestedExternalBlock": "'extern' blocks cannot be nested.",
 
@@ -196,9 +195,7 @@
   "ProjectGroupHelpers_ExecutableNotFound": "The executable component '{0}' could not be found.",
   "ProjectGroupHelpers_OnlyProjectsAsExecutable": "Currently, project group executables can only be projects.",
 
-
   "DocumentHelpers_SourceFileTooLarge": "The source file '{0}' is too large: The Dassie compiler is limited to input documents smaller than 2 GiB.",
-
 
   "DirectoryTarget_PathRequired": "Path required for 'Directory' deployment target.",
 
