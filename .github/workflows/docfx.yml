@@ -46,6 +46,9 @@ jobs:
             src/Dassie/Parser/DassieLexer.g4 \
             src/Dassie/Parser/DassieParser.g4
 
+      - name: Build project
+        run: dotnet build Dassie.slnx -c Release
+
       - name: Build Documentation
         run: docfx docs/docfx.json
 
