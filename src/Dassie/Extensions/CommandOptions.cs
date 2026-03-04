@@ -13,7 +13,7 @@ public enum CommandOptions
     /// </summary>
     None = 0,
     /// <summary>
-    /// The command is hidden, that is, it does not appear in the list of available commands.
+    /// The command is hidden; that is, it does not appear in the list of available commands.
     /// </summary>
     Hidden = 1,
     /// <summary>

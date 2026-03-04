@@ -29,7 +29,7 @@ public interface ICompilerCommand
     public virtual CommandHelpDetails HelpDetails => null;
 
     /// <summary>
-    /// Advanced options regarding the command within the command loading system.
+    /// Advanced options for the command within the command loading system.
     /// </summary>
     /// <returns>The options specified for the command.</returns>
     public virtual CommandOptions Options => CommandOptions.None;
