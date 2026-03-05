@@ -11,7 +11,10 @@ internal static partial class StringHelper
 
     public static void Initialize()
     {
-        string languageName = (string)LanguageProperty.Instance.GetValue();
+        string languageName = "en-US";
+
+        if (LanguageProperty.Instance.IsRegistered)
+            languageName = (string)LanguageProperty.Instance.GetValue();
 
         if (ExtensionLoader.LocalizationResourceProviders.Any(p => p.Culture == languageName))
         {
@@ -21,11 +24,14 @@ internal static partial class StringHelper
 
         void NotFound()
         {
-            EmitWarningMessageFormatted(
-                0, 0, 0,
-                DS0268_LanguageNotFound,
-                nameof(StringHelper_LanguageNotFound), [languageName],
-                CompilerExecutableName);
+            if (languageName != "en-US")
+            {
+                EmitWarningMessageFormatted(
+                    0, 0, 0,
+                    DS0268_LanguageNotFound,
+                    nameof(StringHelper_LanguageNotFound), [languageName],
+                    CompilerExecutableName);
+            }
 
             _provider = DefaultStrings.Instance;
         }

@@ -16,6 +16,9 @@ public abstract class GlobalConfigProperty
     /// </summary>
     public abstract string Name { get; }
 
+    internal string Key => $"{ExtensionIdentifier}.{Name}";
+    internal bool IsRegistered => ExtensionIdentifier != null && GlobalConfigManager.Properties.ContainsKey(Key);
+
     /// <summary>
     /// The data type of the property.
     /// </summary>
@@ -52,11 +55,10 @@ public abstract class GlobalConfigProperty
     /// <exception cref="InvalidOperationException"/>
     public object GetValue()
     {
-        string key = $"{ExtensionIdentifier}.{Name}";
-        if (ExtensionIdentifier == null || !GlobalConfigManager.Properties.TryGetValue(key, out (GlobalConfigDataType Type, object Value) prop))
+        if (!IsRegistered)
             throw new InvalidOperationException($"The property '{Name}' has not been registered.");
 
-        return prop.Value;
+        return GlobalConfigManager.Properties[Key].Value;
     }
 
     /// <summary>
@@ -66,8 +68,7 @@ public abstract class GlobalConfigProperty
     /// <exception cref="InvalidOperationException"/>
     public void SetValue(object value)
     {
-        string key = $"{ExtensionIdentifier}.{Name}";
-        if (ExtensionIdentifier == null || !GlobalConfigManager.Properties.ContainsKey(key))
+        if (!IsRegistered)
             throw new InvalidOperationException($"The property '{Name}' has not been registered.");
 
         foreach (var validator in Validators ?? [])
@@ -76,7 +77,7 @@ public abstract class GlobalConfigProperty
                 return;
         }
 
-        GlobalConfigManager.Set(key, Type, value);
+        GlobalConfigManager.Set(Key, Type, value);
     }
 
     /// <summary>
