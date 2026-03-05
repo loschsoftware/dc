@@ -2,8 +2,8 @@
 using Dassie.CodeAnalysis;
 using Dassie.Core;
 using Dassie.Messages.Devices;
-using Dassie.Resources;
 using NuGet.Packaging;
+using NuGet.Packaging.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,6 +22,7 @@ internal static class ExtensionLoader
         InstalledExtensions = [];
         InstalledExtensions.AddRange(LoadInstalledExtensions());
         InstalledExtensions.CollectionChanged += Update;
+        InitializeGlobalExtensions();
     }
 
     private static readonly IEnvironmentInfo _env = new CompilerEnvironmentInfo()
@@ -120,7 +121,7 @@ internal static class ExtensionLoader
             return;
 
         Dictionary<string, (ICompilerCommand command, IPackage package)> seenCommands = [];
-        
+
         foreach (IPackage package in InstalledExtensions)
         {
             foreach (ICompilerCommand cmd in package.Commands())
@@ -190,7 +191,7 @@ internal static class ExtensionLoader
             foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))
                 packages.AddRange(LoadInstalledExtensions(file));
         }
-        
+
         if (enableCorePackageStr == null || (bool.TryParse(enableCorePackageStr, out bool enableCorePackage) && enableCorePackage))
             packages.Add(CorePackage.Instance);
 
@@ -198,43 +199,68 @@ internal static class ExtensionLoader
         return packages;
     }
 
+    private static void InitializeGlobalExtensions()
+    {
+        foreach (IPackage package in InstalledExtensions)
+        {
+            int ret;
+
+            if (!package.Modes().HasFlag(ExtensionModes.Global))
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0223_ExtensionUnsupportedMode,
+                    nameof(StringHelper.ExtensionLoader_CannotLoadGlobal), [package.Metadata.Name],
+                    CompilerExecutableName);
+
+                continue;
+            }
+
+            try
+            {
+                ret = package.InitializeGlobal(_env);
+            }
+            catch (Exception ex)
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0224_ExtensionInitializerFailed,
+                    nameof(StringHelper.ExtensionLoader_InitializerException), [package.Metadata.Name],
+                    CompilerExecutableName);
+
+                if (Context.Configuration.PrintExceptionInfo)
+                    TextWriterBuildLogDevice.ErrorOut.WriteLine(ex.ToString());
+
+                continue;
+            }
+
+            if (ret != 0)
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0224_ExtensionInitializerFailed,
+                    nameof(StringHelper.ExtensionLoader_InitializerNonzeroExit), [package.Metadata.Name],
+                    CompilerExecutableName);
+
+                continue;
+            }
+
+            EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_ExtensionLoaded), [package.Metadata.Name], 2, true);
+        }
+    }
+
     public static void LoadTransientExtensions(IEnumerable<(string, List<XmlAttribute>, List<XmlElement>)> paths)
     {
         foreach ((string path, List<XmlAttribute> attribs, List<XmlElement> elems) in paths)
         {
             EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_TransientExtensionLoaded), [path], 2, true);
-            InstalledExtensions.AddRange(LoadInstalledExtensions(path, true, attribs, elems));
-        }
-    }
+            List<IPackage> packages = LoadInstalledExtensions(path);
 
-    public static List<IPackage> LoadInstalledExtensions(string assembly)
-        => LoadInstalledExtensions(assembly, false, null, null);
-
-    private static List<IPackage> LoadInstalledExtensions(string assembly, bool loadTransient, List<XmlAttribute> xmlAttributes, List<XmlElement> xmlElements)
-    {
-        if (!File.Exists(assembly))
-        {
-            EmitErrorMessageFormatted(0, 0, 0,
-                DS0222_ExtensionFileNotFound,
-                nameof(StringHelper.ExtensionLoader_PackageNotFound), [assembly],
-                CompilerExecutableName);
-
-            return [];
-        }
-
-        List<IPackage> packages = [];
-        Assembly extensionAssembly = Assembly.LoadFile(assembly);
-
-        try
-        {
-            Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPackage))).ToArray();
-
-            foreach (Type t in packageTypes)
+            foreach (IPackage package in packages)
             {
-                IPackage package = (IPackage)Activator.CreateInstance(t);
                 int ret = -1;
 
-                if (loadTransient && !package.Modes().HasFlag(ExtensionModes.Transient))
+                if (!package.Modes().HasFlag(ExtensionModes.Transient))
                 {
                     EmitErrorMessageFormatted(
                         0, 0, 0,
@@ -245,23 +271,9 @@ internal static class ExtensionLoader
                     continue;
                 }
 
-                if (!loadTransient && !package.Modes().HasFlag(ExtensionModes.Global))
-                {
-                    EmitErrorMessageFormatted(
-                        0, 0, 0,
-                        DS0223_ExtensionUnsupportedMode,
-                        nameof(StringHelper.ExtensionLoader_CannotLoadGlobal), [package.Metadata.Name],
-                        CompilerExecutableName);
-
-                    continue;
-                }
-
                 try
                 {
-                    if (loadTransient)
-                        ret = package.InitializeTransient(_env, xmlAttributes, xmlElements);
-                    else
-                        ret = package.InitializeGlobal(_env);
+                    ret = package.InitializeTransient(_env, attribs, elems);
                 }
                 catch (Exception ex)
                 {
@@ -288,7 +300,7 @@ internal static class ExtensionLoader
                     continue;
                 }
 
-                if (loadTransient && InstalledExtensions.Any(p => p.Metadata.Id == package.Metadata.Id))
+                if (InstalledExtensions.Any(p => p.Metadata.Id == package.Metadata.Id))
                 {
                     EmitErrorMessageFormatted(
                         0, 0, 0,
@@ -300,10 +312,34 @@ internal static class ExtensionLoader
                     Unload(duplicate);
                     InstalledExtensions.Remove(duplicate);
                 }
+            }
 
-                if (!loadTransient)
-                    EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_ExtensionLoaded), [package.Metadata.Name], 2, true);
+            InstalledExtensions.AddRange(packages);
+        }
+    }
 
+    public static List<IPackage> LoadInstalledExtensions(string assembly)
+    {
+        if (!File.Exists(assembly))
+        {
+            EmitErrorMessageFormatted(0, 0, 0,
+                DS0222_ExtensionFileNotFound,
+                nameof(StringHelper.ExtensionLoader_PackageNotFound), [assembly],
+                CompilerExecutableName);
+
+            return [];
+        }
+
+        List<IPackage> packages = [];
+        Assembly extensionAssembly = Assembly.LoadFile(assembly);
+
+        try
+        {
+            Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPackage))).ToArray();
+
+            foreach (Type t in packageTypes)
+            {
+                IPackage package = (IPackage)Activator.CreateInstance(t);
                 packages.Add(package);
             }
         }
@@ -389,7 +425,7 @@ internal static class ExtensionLoader
 
         if (Subsystems.Any(s => s.Name == name))
             return Subsystems.First(s => s.Name == name);
-        
+
         EmitErrorMessageFormatted(
             0, 0, 0,
             DS0251_InvalidSubsystem,
@@ -402,8 +438,8 @@ internal static class ExtensionLoader
     private static string GetProperty(string name)
     {
         string configPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
-            "Dassie", 
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Dassie",
             GlobalConfigurationFileName);
 
         if (!File.Exists(configPath))
