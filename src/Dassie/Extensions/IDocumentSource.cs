@@ -11,12 +11,12 @@ public interface IDocumentSource
     /// <summary>
     /// The name of the document source.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; }
 
     /// <summary>
     /// The name of the document this source represents.
     /// </summary>
-    public string DocumentName { get; set; }
+    public string DocumentName { get; }
 
     /// <summary>
     /// The method called when the document source is called.
