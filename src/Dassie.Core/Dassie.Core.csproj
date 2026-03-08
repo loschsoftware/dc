@@ -1,11 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Platforms>AnyCPU;x64</Platforms>
 		<RootNamespace>Dassie</RootNamespace>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<Deterministic>false</Deterministic>
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Dassie.Text\Dassie.Text.csproj" />

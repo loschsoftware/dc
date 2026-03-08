@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
 		<AssemblyName>dstx</AssemblyName>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Platforms>AnyCPU;x64</Platforms>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<Deterministic>false</Deterministic>
 	</PropertyGroup>
 </Project>
