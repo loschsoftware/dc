@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
 		<AssemblyName>dsconfig</AssemblyName>
-		<Platforms>AnyCPU;x64</Platforms>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<Deterministic>false</Deterministic>
 	</PropertyGroup>
 </Project>
