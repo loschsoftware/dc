@@ -1,4 +1,5 @@
-﻿using Dassie.Core.Commands;
+﻿using Dassie.Cli;
+using Dassie.Core.Commands;
 using Dassie.Messages;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace Dassie.Compiler;
 /// </summary>
 public static class DassieCompiler
 {
+    private static bool _isInitialized;
+
     /// <summary>
     /// Compiles a Dassie program.
     /// </summary>
@@ -20,6 +23,12 @@ public static class DassieCompiler
     /// <exception cref="ArgumentNullException"/>
     public static CompilationResult Compile(this CompilationContext context)
     {
+        if (!_isInitialized)
+        {
+            Program.Initialize();
+            _isInitialized = true;
+        }
+
         ArgumentNullException.ThrowIfNull(context);
 
         List<string> arglist = [];
@@ -33,6 +42,12 @@ public static class DassieCompiler
 
     private static CompilationResult CompileProjectWithArguments(string projectFilePath, string[] args)
     {
+        if (!_isInitialized)
+        {
+            Program.Initialize();
+            _isInitialized = true;
+        }
+
         ArgumentNullException.ThrowIfNull(projectFilePath);
         if (!File.Exists(projectFilePath))
             throw new FileNotFoundException($"Project file '{projectFilePath}' could not be found.", projectFilePath);

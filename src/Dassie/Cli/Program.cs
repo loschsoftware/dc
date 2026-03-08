@@ -18,21 +18,29 @@ namespace Dassie.Cli;
 internal class Program
 {
     /// <summary>
+    /// Initializes core compiler components.
+    /// </summary>
+    public static void Initialize()
+    {
+        Console.OutputEncoding = Encoding.Unicode;
+        ExtensionLoader.Initialize();
+        GlobalConfigManager.Initialize();
+        StringHelper.Initialize();
+    }
+
+    /// <summary>
     /// The compiler entry point.
     /// </summary>
     /// <param name="args">The command-line arguments passed to the compiler.</param>
     /// <returns>The exit code of the process.</returns>
     [EntryPoint]
-    internal static int Main(string[] args)
+    public static int Main(string[] args)
     {
         int exit = -1;
 
         try
         {
-            Console.OutputEncoding = Encoding.Unicode;
-            ExtensionLoader.Initialize();
-            GlobalConfigManager.Initialize();
-            StringHelper.Initialize();
+            Initialize();
 
             args ??= [];
             if (args.Length == 0)
