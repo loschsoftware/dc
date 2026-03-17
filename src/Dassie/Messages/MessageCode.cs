@@ -1106,5 +1106,25 @@ public enum MessageCode
     /// <summary>
     /// Emitted when the requested language is not found.
     /// </summary>
-    DS0268_LanguageNotFound
+    DS0268_LanguageNotFound,
+    /// <summary>
+    /// Emitted when a macro is changed as part of a 'dc config --global' invocation.
+    /// </summary>
+    DS0269_DCConfigMacroForGlobalConfig,
+    /// <summary>
+    /// Emitted when the 'dc config --macors' command is invoked, but no project file is present.
+    /// </summary>
+    DS0270_DCConfigMacrosOptionNoProjectFile,
+    /// <summary>
+    /// Emitted when a macro definition is missing a name.
+    /// </summary>
+    DS0271_MissingMacroName,
+    /// <summary>
+    /// Warning emitted when a macro with the same name is defined multiple times.
+    /// </summary>
+    DS0272_DuplicateMacro,
+    /// <summary>
+    /// Emitted when a macro definition or invocation has a syntax error.
+    /// </summary>
+    DS0273_MacroSyntaxError
 }

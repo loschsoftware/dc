@@ -16,7 +16,11 @@ public sealed class DassieConfig
 
     [Description("Loads the specified configuration file and applies its settings.")]
     [XmlAttribute]
-    public string Import { get; set; }
+    public string Base { get; set; }
+
+    [Description("A list of configuration files to import macros from.")]
+    [XmlElement]
+    public Import[] Imports { get; set; }
 
     [Description("Sets custom macro definitions.")]
     [DefaultValue(null)]

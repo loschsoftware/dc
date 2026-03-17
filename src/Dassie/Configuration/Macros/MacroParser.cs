@@ -1,5 +1,4 @@
-﻿using Dassie.Extensions;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +13,27 @@ internal partial class MacroParser
     {
         if (addDefaults)
             AddDefaultMacros();
+    }
+
+    public static List<(string Key, bool IsPredefined, string Value)> GetMacrosForProject(DassieConfig config, bool addBuiltIn = true)
+    {
+        List<(string, bool, string)> macrosWithData = [];
+        MacroParser mp = new(addBuiltIn);
+        macrosWithData.AddRange(mp._macros.Select(k => (k.Key, true, k.Value)));
+
+
+        Dictionary<string, string> projectMacros = [];
+        MacroGenerator.AddDefinedMacros(config, projectMacros);
+        macrosWithData.AddRange(projectMacros.Select(k => (k.Key, false, k.Value)));
+        projectMacros.Clear();
+
+        if (addBuiltIn)
+        {
+            MacroGenerator.AddPredefinedMacros(config, projectMacros);
+            macrosWithData.AddRange(projectMacros.Select(k => (k.Key, true, k.Value)));
+        }
+
+        return macrosWithData;
     }
 
     [GeneratedRegex(@"\$\([^$\)\(\r\n]+?\)")]
@@ -62,6 +82,9 @@ internal partial class MacroParser
     private void Normalize(object obj)
     {
         if (obj == null)
+            return;
+
+        if (obj is Define)
             return;
 
         foreach (PropertyInfo prop in obj.GetType().GetProperties())
@@ -140,8 +163,8 @@ internal partial class MacroParser
                 if (_macros.TryGetValue(macroName, out string value))
                     return value;
 
-                if (ExtensionLoader.Macros.Any(m => m.Macro == macroName))
-                    return ExtensionLoader.Macros.First(m => m.Macro == macroName).Expand();
+                //if (ExtensionLoader.Macros.Any(m => m.Name == macroName))
+                //    return ExtensionLoader.Macros.First(m => m.Name == macroName).Expand();
 
                 EmitErrorMessageFormatted(
                     0, 0, 0,

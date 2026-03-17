@@ -1,0 +1,48 @@
+<DassieConfig FormatVersion="1.0">
+    <MacroDefinitions>
+        <!-- Conditionals -->
+        <Define Macro="If" Parameters="[!Condition, Then, Else]" Trim="true">
+            $(Eval: ? $(@Condition) = { $(@Then) } : = { $(@Else) })
+        </Define>
+
+        <!-- Logic -->
+        <Define Macro="And" Parameters="[!A, B]" Trim="true">
+            $(If: $(@A), $(@B), false)
+        </Define>
+
+        <Define Macro="Or" Parameters="[!A, B]" Trim="true">
+            $(If: $(@A), true, $(@B))
+        </Define>
+
+        <Define Macro="Not" Parameters="[!Value]" Trim="true">
+            $(If: $(@Value), false, true)
+        </Define>
+
+        <!-- Strings -->
+        <Define Macro="Concat" Parameters="[A, B]" Trim="true">
+            $(Eval: $(@A) + $(@B))
+        </Define>
+
+        <Define Macro="Upper" Parameters="[Str]" Trim="true">
+            $(Eval: ^^"$(@Str)".ToUpper)
+        </Define>
+
+        <Define Macro="Lower" Parameters="[Str]" Trim="true">
+            $(Eval: ^^"$(@Str)".ToLower)
+        </Define>
+
+        <Define Macro="Trim" Parameters="[Str]" Trim="true">
+            $(Eval: ^^"$(@Str)".Trim)
+        </Define>
+
+        <!-- Paths -->
+        <Define Macro="FileName" Parameters="[Path]" Trim="true">
+            
+        </Define>
+
+        <!-- Other -->
+        <Define Macro="Default" Parameters="[!Value, Default]" Trim="true">
+            $(If: $(@Value) != (), $(@Value), $(@Default))
+        </Define>
+    </MacroDefinitions>
+</DassieConfig>

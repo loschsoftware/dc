@@ -439,6 +439,12 @@
   "ConfigCommand_Name": "Name",
   "ConfigCommand_Type": "Type",
   "ConfigCommand_Value": "Value",
+  "ConfigCommand_MacroForGlobalConfig": "Macros are not supported by the global configuration.",
+  "ConfigCommand_MacrosOption": "Displays all project file macros.",
+  "ConfigCommand_MacrosOptionNoProjectFile": "No project file found in current directory. Macros can only be displayed for projects.",
+  "ConfigCommand_NoMacrosToDisplay": "No macros to display.",
+  "ConfigCommand_NoPredefinedOption": "Do not display predefined macros",
+  "ConfigCommand_Predefined": "Predefined",
 
   "DbgCommand_Description": "Commands used for debugging and testing the compiler. To be used by compiler developers.",
   "DbgCommand_NoCommandSpecified": "No command specified.",

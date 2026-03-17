@@ -1,12 +1,12 @@
 ﻿using Dassie.Configuration.Subsystems;
 using Dassie.Core.Actions;
 using Dassie.Core.Commands;
+using Dassie.Core.Macros;
 using Dassie.Core.Properties;
 using Dassie.Deployment;
-using Dassie.Messages.Devices;
 using Dassie.Extensions;
+using Dassie.Messages.Devices;
 using Dassie.Meta.Directives;
-using Dassie.Resources;
 using Dassie.Templates;
 using System.Reflection;
 
@@ -103,5 +103,12 @@ internal class CorePackage : IPackage
     public IResourceProvider<string>[] LocalizationResourceProviders() =>
     [
         DefaultStrings.Instance
+    ];
+
+    public IMacro[] Macros() =>
+    [
+        EnvMacro.Instance,
+        EvalMacro.Instance,
+        PropMacro.Instance
     ];
 }

@@ -205,7 +205,7 @@ internal class PackageCommand : CompilerCommand
         PrintFeatures(StringHelper.PackageCommand_DeploymentTargets, package.DeploymentTargets().Select(t => t.Name));
         PrintFeatures(StringHelper.PackageCommand_Subsystems, package.Subsystems().Select(s => s.Name));
         PrintFeatures(StringHelper.PackageCommand_BuildActions, package.BuildActions().Select(b => b.Name));
-        PrintFeatures(StringHelper.PackageCommand_Macros, package.Macros().Select(b => b.Macro));
+        PrintFeatures(StringHelper.PackageCommand_Macros, package.Macros().Select(b => b.Name));
         PrintFeatures(StringHelper.PackageCommand_LocalizationResourceProviders, package.LocalizationResourceProviders().Select(b => b.Culture));
 
         HelpCommand.DisplayLogo();

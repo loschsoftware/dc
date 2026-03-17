@@ -48,4 +48,19 @@ public static class Value
 
         return val;
     }
+
+    /// <summary>
+    /// Formats an object for use in build system macros.
+    /// </summary>
+    /// <param name="obj">The object to format.</param>
+    /// <returns>A string representation for the object, suitable for use in build system macros.</returns>
+    public static string formatm(object obj)
+    {
+        string str = obj.ToString();
+
+        if (obj is bool)
+            str = str.ToLower();
+
+        return str;
+    }
 }

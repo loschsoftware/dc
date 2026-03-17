@@ -1,7 +1,9 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Global;
+using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -28,14 +30,17 @@ internal class ConfigCommand : CompilerCommand
         Usage =
         [
             "dc config [<Property>=[Value]]...",
-            "dc config --global [--reset] [--import <Path>] [<Property>=[Value]]..."
+            "dc config --global [--reset] [--import <Path>] [<Property>=[Value]]...",
+            "dc config --macros [--no-predefined]"
         ],
         Options =
         [
             ("Property=[Value]", StringHelper.ConfigCommand_PropertyOption),
             ("--global", StringHelper.ConfigCommand_GlobalOption),
             ("    --reset", StringHelper.ConfigCommand_ResetOption),
-            ("    --import <Path>", StringHelper.ConfigCommand_ImportOption)
+            ("    --import <Path>", StringHelper.ConfigCommand_ImportOption),
+            ("--macros", StringHelper.ConfigCommand_MacrosOption),
+            ("    --no-predefined", StringHelper.ConfigCommand_NoPredefinedOption),
         ],
         Remarks = StringHelper.ConfigCommand_Remarks,
         Examples =
@@ -50,16 +55,21 @@ internal class ConfigCommand : CompilerCommand
     public override int Invoke(string[] args)
     {
         Dictionary<string, string> properties = [];
+        Dictionary<string, string> macros = [];
 
         if (args != null)
         {
-            properties = args.Where(a => a.Contains('=')).Select(a =>
+            foreach (string arg in args.Where(a => a.Contains('=')))
             {
-                string[] parts = a.Split('=');
+                string[] parts = arg.Split('=');
                 string key = parts[0];
                 string value = string.Join('=', parts[1..]);
-                return new KeyValuePair<string, string>(key, value);
-            }).ToDictionary();
+
+                if (key.StartsWith("$(") && key.EndsWith(')'))
+                    macros.Add(key[2..^1], value);
+                else
+                    properties.TryAdd(key, value);
+            }
         }
 
         foreach (string arg in args.Where(a => !a.StartsWith('-') && !a.Contains('=')))
@@ -69,6 +79,26 @@ internal class ConfigCommand : CompilerCommand
                 DS0013_InvalidArgument,
                 nameof(StringHelper.ConfigCommand_UnexpectedArgument), [arg],
                 CompilerExecutableName);
+        }
+
+        if (args.Contains("--macros"))
+        {
+            if (!File.Exists(ProjectConfigurationFileName))
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0270_DCConfigMacrosOptionNoProjectFile,
+                    nameof(StringHelper.ConfigCommand_MacrosOptionNoProjectFile), [],
+                    CompilerExecutableName);
+
+                return -1;
+            }
+
+            DassieConfig config = ProjectFileDeserializer.DassieConfig;
+            Dictionary<string, string> definedMacros = MacroParser.GetMacrosForProject(config, !args.Contains("--no-predefined")).Select(
+                data => new KeyValuePair<string, string>($"{(data.IsPredefined ? $"[{StringHelper.ConfigCommand_Predefined}] " : "")}{data.Key}", data.Value)).ToDictionary();
+            PrintProperties(definedMacros.Select(k => (k.Key, "", k.Value)).OrderBy(k => k.Key).ToList(), true);
+            return 0;
         }
 
         if (args.Contains("--global"))
@@ -116,6 +146,15 @@ internal class ConfigCommand : CompilerCommand
                 return 0;
             }
 
+            if (macros.Count >= 1)
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0269_DCConfigMacroForGlobalConfig,
+                    nameof(StringHelper.ConfigCommand_MacroForGlobalConfig), [],
+                    CompilerExecutableName);
+            }
+
             foreach (KeyValuePair<string, string> prop in properties)
             {
                 if (!GlobalConfigManager.Properties.Any(p => p.Key.Equals(prop.Key, StringComparison.OrdinalIgnoreCase)))
@@ -143,7 +182,7 @@ internal class ConfigCommand : CompilerCommand
         {
             DassieConfig config = ProjectFileDeserializer.DassieConfig;
 
-            if (properties.Count == 0)
+            if (properties.Count == 0 && macros.Count == 0)
             {
                 List<(string Key, string Type, string Value)> props = [];
 
@@ -170,7 +209,7 @@ internal class ConfigCommand : CompilerCommand
                     }
 
                     if (!IsEqual())
-                        props.Add((prop.Name, HelpCommand.GetPropertyTypeName(prop.PropertyType), val?.ToString() ?? ""));
+                        props.Add((prop.Name, HelpCommand.GetPropertyTypeName(prop.PropertyType), FormatObject(val)));
                 }
 
                 PrintProperties(props);
@@ -179,6 +218,32 @@ internal class ConfigCommand : CompilerCommand
 
             XDocument doc = XDocument.Load(ProjectConfigurationFileName, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
             PropertyInfo[] dsconfigProps = typeof(DassieConfig).GetProperties();
+
+            if (macros.Count >= 1)
+                config.MacroDefinitions ??= [];
+
+            foreach (KeyValuePair<string, string> macro in macros)
+            {
+                XElement macroDefs = doc.Root.Element("MacroDefinitions");
+                if (macroDefs == null)
+                {
+                    macroDefs = new("MacroDefinitions");
+                    doc.Root.AddFirst(macroDefs);
+                }
+
+                XElement macroElement = macroDefs.Elements("Define")
+                         .FirstOrDefault(e => (string)e.Attribute("Macro") == macro.Key);
+
+                if (macroElement != null)
+                {
+                    if (string.IsNullOrEmpty(macro.Value))
+                        macroElement.Remove();
+                    else
+                        macroElement.Value = macro.Value;
+                }
+                else
+                    macroDefs.Add(new XElement("Define", new XAttribute("Macro", macro.Key), macro.Value));
+            }
 
             foreach (KeyValuePair<string, string> prop in properties)
             {
@@ -293,11 +358,40 @@ internal class ConfigCommand : CompilerCommand
         return 0;
     }
 
-    private static void PrintProperties(List<(string Key, string TypeName, string Value)> properties)
+    private static string FormatObject(object obj)
+    {
+        if (obj == null)
+            return "";
+
+        if (obj is string s)
+            return s;
+
+        if (obj is Define[] macroDefinitions)
+        {
+            return $"[{string.Join(", ", macroDefinitions.Select(m => $"$({m.Name})={m.Value}"))}]";
+        }
+
+        if (obj is IEnumerable collection)
+        {
+            List<string> elems = [];
+            foreach (object elem in collection)
+                elems.Add(FormatObject(elem));
+
+            return $"[{string.Join(", ", elems)}]";
+        }
+
+        return obj.ToString();
+    }
+
+    private static void PrintProperties(List<(string Key, string TypeName, string Value)> properties, bool displayMacros = false)
     {
         if (properties == null || properties.Count == 0)
         {
-            LogOut.WriteLine(StringHelper.ConfigCommand_NoPropertiesToDisplay);
+            string msg = StringHelper.ConfigCommand_NoPropertiesToDisplay;
+            if (displayMacros)
+                msg = StringHelper.ConfigCommand_NoMacrosToDisplay;
+
+            LogOut.WriteLine(msg);
             return;
         }
 
@@ -311,16 +405,16 @@ internal class ConfigCommand : CompilerCommand
         string space = "    ";
 
         int nameColumnWidth = Math.Max(nameColumn.Length, keys.MaxBy(k => k.Length).Length);
-        int typeColumnWidth = Math.Max(typeColumn.Length, types.MaxBy(t => t.Length).Length);
+        int typeColumnWidth = displayMacros ? 0 : Math.Max(typeColumn.Length, types.MaxBy(t => t.Length).Length);
         int valueColumnWidth = Math.Max(valueColumn.Length, values.MaxBy(v => v.Length).Length);
 
         StringBuilder sb = new();
-        sb.AppendLine($"{nameColumn.PadRight(nameColumnWidth)}{space}{typeColumn.PadRight(typeColumnWidth)}{space}{valueColumn}");
+        sb.AppendLine($"{nameColumn.PadRight(nameColumnWidth)}{(displayMacros ? "" : $"{space}{typeColumn.PadRight(typeColumnWidth)}")}{space}{valueColumn}");
         sb.AppendLine(new string('-', nameColumnWidth + space.Length + typeColumnWidth + space.Length + valueColumnWidth));
 
         foreach ((string key, string type, string val) in properties)
-            sb.AppendLine($"{key.PadRight(nameColumnWidth)}{space}{type.PadRight(typeColumnWidth)}{space}{val}");
+            sb.AppendLine($"{key.PadRight(nameColumnWidth)}{(displayMacros ? "" : $"{space}{type.PadRight(typeColumnWidth)}")}{space}{val}");
 
-        Console.Write(sb.ToString());
+        LogOut.Write(sb.ToString());
     }
 }
