@@ -5,12 +5,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace Dassie.Configuration;
+#pragma warning disable CS1591
 
-public interface IMacroEvaluator
-{
-    public (string Value, bool CanBeCached) Expand(string input);
-}
+namespace Dassie.Configuration;
 
 public class MalformedPropertyValueException(string propertyName, Exception innerException)
     : Exception($"Malformed property value for '{propertyName}'.", innerException)
@@ -22,7 +19,6 @@ public class PropertyStore
 {
     public static readonly PropertyStore Empty = new();
 
-    private readonly IMacroEvaluator _eval;
     private readonly IEnumerable<Property> _propertyDefs;
 
     // Value can be:
@@ -42,10 +38,9 @@ public class PropertyStore
         _propertyLocationMapping = [];
     }
 
-    public PropertyStore(IEnumerable<Property> defs, IMacroEvaluator eval, Dictionary<string, object> uninstantiatedValues = null)
+    public PropertyStore(IEnumerable<Property> defs, Dictionary<string, object> uninstantiatedValues = null)
     {
         _propertyDefs = defs;
-        _eval = eval;
         _uninstantiatedProperties = uninstantiatedValues ?? [];
     }
 
@@ -62,7 +57,8 @@ public class PropertyStore
             if (!str.Contains('$') && !str.Contains('^'))
                 return (str, true);
 
-            return _eval.Expand(str);
+            // TODO: Evaluate str here
+            return (str, false);
         }
 
         return (raw, false);

@@ -130,9 +130,7 @@ internal static class ProjectFileDeserializer
             rawValues.Add(name, GetRawValue(prop, matchingElements));
         }
 
-        // TODO: Delete dsconfig.dll and move everything into dc.dll
-        PropertyStore ps = new(props, eval: null, rawValues);
-                                    // ^--- TODO
+        PropertyStore ps = new(props, rawValues);
         DassieConfig cfg = new(ps);
 
         PropMacro propMacro = new(cfg); // TODO: Register this with the macro parser

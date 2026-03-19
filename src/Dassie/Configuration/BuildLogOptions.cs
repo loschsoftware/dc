@@ -5,10 +5,16 @@ using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
 
+/// <summary>
+/// Represents a list of build log devices.
+/// </summary>
 [Serializable]
 [XmlRoot("Devices")]
 public class BuildLogOptions
 {
+    /// <summary>
+    /// A list of XML elements representing the build log devices to enable.
+    /// </summary>
     [XmlAnyElement]
     public List<XmlElement> Elements { get; set; }
 }

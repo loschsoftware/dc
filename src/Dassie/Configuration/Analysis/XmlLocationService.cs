@@ -2,7 +2,7 @@
 
 namespace Dassie.Configuration.Analysis;
 
-public static class XmlLocationService
+internal static class XmlLocationService
 {
     public class Location
     {
