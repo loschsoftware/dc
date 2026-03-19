@@ -1,4 +1,7 @@
-﻿using System.Xml;
+﻿using System;
+using System.Xml.Serialization;
+
+using System.Xml;
 
 namespace Dassie.Configuration.ProjectGroups;
 

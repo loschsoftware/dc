@@ -14,6 +14,8 @@ internal class EnvMacro : IMacro
     private readonly List<MacroParameter> _params = [new("Variable")];
     public List<MacroParameter> Parameters => _params;
 
+    public MacroOptions Options => MacroOptions.None;
+
     public string Expand(Dictionary<string, string> arguments)
     {
         return Environment.GetEnvironmentVariable(arguments["Variable"].Trim());

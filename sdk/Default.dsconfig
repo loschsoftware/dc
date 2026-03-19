@@ -37,7 +37,11 @@
 
         <!-- Paths -->
         <Define Macro="FileName" Parameters="[Path]" Trim="true">
-            
+            $(Eval: System.Path.GetFileName ^^"$(@Path)")
+        </Define>
+
+        <Define Macro="DirName" Parameters="[Path]" Trim="true">
+            $(Eval: System.Path.GetDirectoryName ^^"$(@Path)")
         </Define>
 
         <!-- Other -->

@@ -18,6 +18,8 @@ internal class EvalMacro : IMacro
     private readonly List<MacroParameter> _params = [new("Expression")];
     public List<MacroParameter> Parameters => _params;
 
+    public MacroOptions Options => MacroOptions.None;
+
     private readonly DassieConfig _defaultConfig = new()
     {
         BuildDirectory = ".",

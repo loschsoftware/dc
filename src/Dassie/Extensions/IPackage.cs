@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
+using Dassie.Configuration;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -121,4 +122,9 @@ public interface IPackage
     /// A list of localization resource providers defined by this extension.
     /// </summary>
     public virtual IResourceProvider<string>[] LocalizationResourceProviders() => [];
+
+    /// <summary>
+    /// A list of build system property registrations.
+    /// </summary>
+    public virtual Property[] Properties() => [];
 }

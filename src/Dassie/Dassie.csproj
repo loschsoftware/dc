@@ -19,7 +19,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Dassie.Configuration\Dassie.Configuration.csproj" />
 		<ProjectReference Include="..\Dassie.Core\Dassie.Core.csproj" />
 		<ProjectReference Include="..\Dassie.Generators\Dassie.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\Dassie.Text\Dassie.Text.csproj" />

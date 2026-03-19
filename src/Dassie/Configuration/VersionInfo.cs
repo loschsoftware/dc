@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Xml.Serialization;
+
+using System.ComponentModel;
 
 namespace Dassie.Configuration;
 

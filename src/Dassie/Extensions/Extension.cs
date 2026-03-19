@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
+using Dassie.Configuration;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -73,4 +74,7 @@ public abstract class Extension : IPackage
 
     /// <inheritdoc/>
     public virtual IResourceProvider<string>[] LocalizationResourceProviders() => [];
+
+    /// <inheritdoc/>
+    public virtual Property[] Properties() => [];
 }

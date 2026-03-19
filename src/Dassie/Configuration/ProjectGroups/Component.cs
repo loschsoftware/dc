@@ -1,4 +1,7 @@
-﻿namespace Dassie.Configuration.ProjectGroups;
+﻿using System;
+using System.Xml.Serialization;
+
+namespace Dassie.Configuration.ProjectGroups;
 
 [XmlRoot]
 [Serializable]

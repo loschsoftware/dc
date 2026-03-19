@@ -1,4 +1,5 @@
-﻿namespace Dassie.Configuration;
+﻿using System;
+namespace Dassie.Configuration;
 
 [AttributeUsage(AttributeTargets.Property)]
 public class DescriptionAttribute: Attribute

@@ -1,4 +1,5 @@
-﻿using Dassie.Configuration.Subsystems;
+﻿using Dassie.Configuration;
+using Dassie.Configuration.Subsystems;
 using Dassie.Core.Actions;
 using Dassie.Core.Commands;
 using Dassie.Core.Macros;
@@ -108,7 +109,8 @@ internal class CorePackage : IPackage
     public IMacro[] Macros() =>
     [
         EnvMacro.Instance,
-        EvalMacro.Instance,
-        PropMacro.Instance
+        EvalMacro.Instance
     ];
+
+    public virtual Property[] Properties() => DassieConfig.DefaultPropertyRegistrations;
 }

@@ -1,4 +1,4 @@
-﻿using Dassie.Configuration.Macros;
+﻿using Dassie.Core.Macros;
 using Dassie.Extensions;
 using Dassie.Messages;
 using Dassie.Messages.Devices;
@@ -69,6 +69,40 @@ internal static class ProjectFileDeserializer
         return null;
     }
 
+    private static object GetRawValue(Property prop, IEnumerable<XElement> matchingElements, bool getArrayElement = false)
+    {
+        Type type = prop.Type;
+
+        if (type.IsArray && !getArrayElement)
+        {
+            if (!matchingElements.Any())
+            {
+                return prop.Default;
+            }
+
+            if (matchingElements.Count() == 1 && matchingElements.Single() is XElement array && array.Name.LocalName == prop.Name)
+                return GetRawValue(prop, array.Elements());
+
+            return matchingElements.Select(e => GetRawValue(prop, [e], true)).ToArray();
+        }
+
+        if (!matchingElements.Any())
+            return prop.Default;
+
+        if (matchingElements.Count() > 1)
+        {
+            // ERROR: Property specified multiple times
+            return null;
+        }
+
+        XElement elem = matchingElements.Single();
+
+        if (type == typeof(string) || type.IsPrimitive || type.IsEnum)
+            return elem.Value;
+
+        return elem;
+    }
+
     public static DassieConfig Deserialize(string path, bool handleImports = true)
     {
         if (!File.Exists(path))
@@ -77,10 +111,38 @@ internal static class ProjectFileDeserializer
         Path = System.IO.Path.GetFullPath(path);
 
         XDocument doc = XDocument.Load(path, LoadOptions.SetLineInfo);
-        ConfigImportManager.ImportMacroDefinitions(doc);
 
-        MacroParser2 parser = new(doc, path);
-        bool result = parser.Normalize();
+        IEnumerable<Property> props = ExtensionLoader.Properties;
+        IEnumerable<XAttribute> attributes = doc.Root.Attributes();
+        IEnumerable<XElement> elements = doc.Root.Elements();
+
+        if (attributes.Any(a => a.Name == "Base"))
+        {
+            string baseConfig = attributes.First(a => a.Name == "Base").Value;
+        }
+
+        Dictionary<string, object> rawValues = [];
+        foreach (Property prop in props)
+        {
+            string name = prop.Name;
+            Type type = prop.Type;
+            IEnumerable<XElement> matchingElements = elements.Where(e => e.Name.LocalName == name);
+            rawValues.Add(name, GetRawValue(prop, matchingElements));
+        }
+
+        // TODO: Delete dsconfig.dll and move everything into dc.dll
+        PropertyStore ps = new(props, eval: null, rawValues);
+                                    // ^--- TODO
+        DassieConfig cfg = new(ps);
+
+        PropMacro propMacro = new(cfg); // TODO: Register this with the macro parser
+
+        string asmName = cfg.GetProperty<string>("AssemblyFileName");
+        string asmName2 = cfg.GetProperty<string>("AssemblyFileName");
+
+        //ConfigImportManager.ImportMacroDefinitions(doc);
+        //MacroParser2 parser = new(doc, path);
+        //bool result = parser.Normalize();
 
         XmlSerializer xmls = new(typeof(DassieConfig));
         DassieConfig config = null;

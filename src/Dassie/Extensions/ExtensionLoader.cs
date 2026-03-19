@@ -1,9 +1,9 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
+using Dassie.Configuration;
 using Dassie.Core;
 using Dassie.Messages.Devices;
 using NuGet.Packaging;
-using NuGet.Packaging.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -92,6 +92,9 @@ internal static class ExtensionLoader
     private static IEnumerable<IResourceProvider<string>> _localizationResourceProviders = [];
     public static IEnumerable<IResourceProvider<string>> LocalizationResourceProviders => _localizationResourceProviders;
 
+    private static IEnumerable<Property> _properties = [];
+    public static IEnumerable<Property> Properties => _properties;
+
     private static void Update()
     {
         _gloablConfigProperties = InstalledExtensions.SelectMany(p => p.GlobalProperties());
@@ -107,6 +110,7 @@ internal static class ExtensionLoader
         _buildActions = InstalledExtensions.SelectMany(p => p.BuildActions());
         _macros = InstalledExtensions.SelectMany(p => p.Macros());
         _localizationResourceProviders = InstalledExtensions.SelectMany(p => p.LocalizationResourceProviders());
+        _properties = InstalledExtensions.SelectMany(p => p.Properties());
     }
 
     private static void Update(object sender, NotifyCollectionChangedEventArgs e)
