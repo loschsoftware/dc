@@ -1,4 +1,5 @@
-﻿using Dassie.Extensions;
+﻿using Dassie.Configuration;
+using Dassie.Extensions;
 
 namespace Dassie.Templates;
 
@@ -26,7 +27,7 @@ internal class ConsoleProject : IProjectTemplate
         Entries = [
             srcDir,
             new ProjectFile() {
-                Content = new() {
+                Content = new(PropertyStore.Empty_Todo) {
                     BuildDirectory = "./build",
                     RootNamespace = "$(ProjectName)",
                     AssemblyFileName = "$(ProjectName)"

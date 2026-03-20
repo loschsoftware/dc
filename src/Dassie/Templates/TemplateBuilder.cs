@@ -98,7 +98,7 @@ internal static class TemplateBuilder
         if (selectedTemplate.Entries.Any(t => t is ProjectFile))
             config = (selectedTemplate.Entries.First(t => t is ProjectFile) as ProjectFile).Content;
 
-        MacroParser parser = new(true);
+        MacroParser_Legacy parser = new(true);
         parser.ImportMacros(new()
         {
             ["ProjectName"] = args[1],
@@ -114,7 +114,7 @@ internal static class TemplateBuilder
         {
             if (entry is ProjectFile p)
             {
-                DassieConfig cfg = p.Content ?? new();
+                DassieConfig cfg = p.Content ?? new(PropertyStore.Empty_Todo);
                 parser.Normalize(cfg);
 
                 using StreamWriter sw = new(Path.Combine(rootDir, ProjectConfigurationFileName));
@@ -139,7 +139,7 @@ internal static class TemplateBuilder
         return 0;
     }
 
-    private static void BuildDirectoryStructure(ProjectTemplateDirectory dir, string baseDir, MacroParser parser)
+    private static void BuildDirectoryStructure(ProjectTemplateDirectory dir, string baseDir, MacroParser_Legacy parser)
     {
         XmlSerializerNamespaces ns = new();
         ns.Add("", "");
@@ -148,7 +148,7 @@ internal static class TemplateBuilder
         {
             if (child is ProjectFile p)
             {
-                DassieConfig cfg = p.Content ?? new();
+                DassieConfig cfg = p.Content ?? new(PropertyStore.Empty_Todo);
                 parser.Normalize(cfg);
 
                 using StreamWriter sw = new(Path.Combine(baseDir, ProjectConfigurationFileName));

@@ -209,7 +209,7 @@ internal static class CommandLineOptionParser
                 config.References =
                 [
                     .. config.References,
-                    new ProjectReference()
+                    new ProjectReference(PropertyStore.Empty_Todo)
                     {
                         CopyToOutput = true,
                         ProjectFile = value
@@ -221,7 +221,7 @@ internal static class CommandLineOptionParser
                 config.References =
                 [
                     .. config.References,
-                    new AssemblyReference()
+                    new AssemblyReference(PropertyStore.Empty_Todo)
                     {
                         CopyToOutput = true,
                         ImportNamespacesImplicitly = false,
@@ -244,7 +244,7 @@ internal static class CommandLineOptionParser
             config.IgnoredMessages =
             [
                 .. config.IgnoredMessages,
-                new Message()
+                new Message(PropertyStore.Empty_Todo)
                 {
                     Code = value
                 }

@@ -10,11 +10,18 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot("DocumentSources")]
 [Serializable]
-public class DocumentSourceList
+public class DocumentSourceList : ConfigObject
 {
+    /// <inheritdoc/>
+    public DocumentSourceList(PropertyStore store) : base(store) { }
+
     /// <summary>
     /// A list of XML elements representing the document sources to enable.
     /// </summary>
     [XmlAnyElement]
-    public List<XmlElement> Sources { get; set; }
+    public List<XmlElement> Sources
+    {
+        get => Get<List<XmlElement>>(nameof(Sources));
+        set => Set(nameof(Sources), value);
+    }
 }

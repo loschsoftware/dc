@@ -1,4 +1,5 @@
-﻿using Dassie.Meta;
+﻿using Dassie.Configuration;
+using Dassie.Meta;
 using Dassie.Runtime;
 using System;
 using System.Collections;
@@ -18,7 +19,7 @@ internal static class EmitHelpers
 
     public static void EmitAdd(Type type, bool? doOverflowCheck = null)
     {
-        doOverflowCheck ??= (DassieConfig ?? new()).EnableOverflowChecks;
+        doOverflowCheck ??= (ProjectFileDeserializer.DassieConfig ?? new(PropertyStore.Empty_Todo)).EnableOverflowChecks;
 
         if (IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Add_Ovf_Un);
@@ -30,7 +31,7 @@ internal static class EmitHelpers
 
     public static void EmitSub(Type type, bool? doOverflowCheck = null)
     {
-        doOverflowCheck ??= (DassieConfig ?? new()).EnableOverflowChecks;
+        doOverflowCheck ??= (ProjectFileDeserializer.DassieConfig ?? new(PropertyStore.Empty_Todo)).EnableOverflowChecks;
 
         if (IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Sub_Ovf_Un);
@@ -42,7 +43,7 @@ internal static class EmitHelpers
 
     public static void EmitMul(Type type, bool? doOverflowCheck = null)
     {
-        doOverflowCheck ??= (DassieConfig ?? new()).EnableOverflowChecks;
+        doOverflowCheck ??= (ProjectFileDeserializer.DassieConfig ?? new(PropertyStore.Empty_Todo)).EnableOverflowChecks;
 
         if (IsUnsignedIntegerType(type))
             CurrentMethod.IL.Emit(OpCodes.Mul_Ovf_Un);

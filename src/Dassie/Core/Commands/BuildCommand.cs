@@ -47,10 +47,10 @@ internal class BuildCommand : CompilerCommand
         if (overrideConfig != null)
             config = overrideConfig;
 
-        config ??= new();
+        config ??= new(PropertyStore.Empty_Todo);
         config.BuildProfiles ??= [];
 
-        MacroParser parser = new();
+        MacroParser_Legacy parser = new();
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
 

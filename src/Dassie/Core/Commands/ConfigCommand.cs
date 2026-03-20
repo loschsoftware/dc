@@ -95,7 +95,7 @@ internal class ConfigCommand : CompilerCommand
             }
 
             DassieConfig config = ProjectFileDeserializer.DassieConfig;
-            Dictionary<string, string> definedMacros = MacroParser.GetMacrosForProject(config, !args.Contains("--no-predefined")).Select(
+            Dictionary<string, string> definedMacros = MacroParser_Legacy.GetMacrosForProject(config, !args.Contains("--no-predefined")).Select(
                 data => new KeyValuePair<string, string>($"{(data.IsPredefined ? $"[{StringHelper.ConfigCommand_Predefined}] " : "")}{data.Key}", data.Value)).ToDictionary();
             PrintProperties(definedMacros.Select(k => (k.Key, "", k.Value)).OrderBy(k => k.Key).ToList(), true);
             return 0;
@@ -343,7 +343,7 @@ internal class ConfigCommand : CompilerCommand
         ns.Add("", "");
 
         XmlSerializer xmls = new(typeof(DassieConfig));
-        xmls.Serialize(configWriter, new DassieConfig(), ns);
+        xmls.Serialize(configWriter, new DassieConfig(PropertyStore.Empty_Todo), ns);
 
         configWriter.Dispose();
 

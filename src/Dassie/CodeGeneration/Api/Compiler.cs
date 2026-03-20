@@ -40,7 +40,7 @@ public static class Compiler
         config.AssemblyFileName = outputPath;
         config.ApplicationType = type.Name;
 
-        return CompileSource(sourceFiles, config ?? new());
+        return CompileSource(sourceFiles, config ?? new(PropertyStore.Empty_Todo));
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public static class Compiler
             return [];
         }
 
-        DassieConfig cfg = config ?? new();
+        DassieConfig cfg = config ?? new(PropertyStore.Empty_Todo);
 
         if (Context != null && Context.Configuration != null)
             cfg = Context.Configuration;

@@ -8,8 +8,11 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot]
 [Serializable]
-public abstract class Resource
+public abstract class Resource : ConfigObject
 {
+    /// <inheritdoc/>
+    protected Resource(PropertyStore store) : base(store) { }
+
     /// <summary>
     /// The path to the resource file.
     /// </summary>
@@ -22,7 +25,11 @@ public abstract class Resource
 /// </summary>
 [XmlRoot]
 [Serializable]
-public class UnmanagedResource : Resource { }
+public class UnmanagedResource : Resource
+{
+    /// <inheritdoc/>
+    public UnmanagedResource(PropertyStore store) : base(store) { }
+}
 
 /// <summary>
 /// Represents the type of a resource.
@@ -46,6 +53,9 @@ public enum ResourceType
 [Serializable]
 public class ManagedResource : Resource
 {
+    /// <inheritdoc/>
+    public ManagedResource(PropertyStore store) : base(store) { }
+
     /// <summary>
     /// Specifies the name which can be used to access the resource
     /// programmatically.

@@ -54,7 +54,7 @@ internal class CleanCommand : CompilerCommand
         }
 
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
-        config ??= new();
+        config ??= new(PropertyStore.Empty_Todo);
 
         if (config.ProjectGroup == null)
         {
@@ -88,9 +88,9 @@ internal class CleanCommand : CompilerCommand
         ProjectFileDeserializer.Reload();
 
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
-        config ??= new();
+        config ??= new(PropertyStore.Empty_Todo);
 
-        MacroParser parser = new();
+        MacroParser_Legacy parser = new();
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
 

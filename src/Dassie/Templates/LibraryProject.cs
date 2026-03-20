@@ -1,4 +1,5 @@
-﻿using Dassie.Extensions;
+﻿using Dassie.Configuration;
+using Dassie.Extensions;
 
 namespace Dassie.Templates;
 
@@ -27,7 +28,7 @@ internal class LibraryProject : IProjectTemplate
         Entries = [
             srcDir,
             new ProjectFile() {
-                Content = new() {
+                Content = new(PropertyStore.Empty_Todo) {
                     ApplicationType = "Library",
                     BuildDirectory = "./build",
                     RootNamespace = "$(ProjectName)",

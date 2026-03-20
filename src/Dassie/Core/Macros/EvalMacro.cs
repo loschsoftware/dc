@@ -1,7 +1,6 @@
 ﻿using Dassie.Configuration;
 using Dassie.Core.Commands;
 using Dassie.Extensions;
-using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -20,7 +19,7 @@ internal class EvalMacro : IMacro
 
     public MacroOptions Options => MacroOptions.None;
 
-    private readonly DassieConfig _defaultConfig = new()
+    private readonly DassieConfig _defaultConfig = new(PropertyStore.Empty_Todo)
     {
         BuildDirectory = ".",
         ApplicationType = "Library",

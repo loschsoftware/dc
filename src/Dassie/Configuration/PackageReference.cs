@@ -11,16 +11,27 @@ namespace Dassie.Configuration;
 [XmlRoot("PackageReference")]
 public class PackageReference : Reference
 {
+    /// <inheritdoc/>
+    public PackageReference(PropertyStore store) : base(store) { }
+
     /// <summary>
     /// The version of the package to import.
     /// </summary>
     [DefaultValue("")]
-    [XmlAttribute("Version")]
-    public string Version { get; set; } = "";
+    [XmlAttribute]
+    public string Version
+    {
+        get => Get<string>(nameof(Version));
+        set => Set(nameof(Version), value);
+    }
 
     /// <summary>
     /// The identifier of the package to import.
     /// </summary>
     [XmlText]
-    public string PackageId { get; set; }
+    public string PackageId
+    {
+        get => Get<string>(nameof(PackageId));
+        set => Set(nameof(PackageId), value);
+    }
 }

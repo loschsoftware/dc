@@ -8,11 +8,18 @@ namespace Dassie.Configuration;
 /// </summary>
 [Serializable]
 [XmlRoot]
-public class Import
+public class Import : ConfigObject
 {
+    /// <inheritdoc/>
+    public Import(PropertyStore store) : base(store) { }
+
     /// <summary>
     /// The path to the imported configuration file.
     /// </summary>
     [XmlAttribute]
-    public string Path { get; set; }
+    public string Path
+    {
+        get => Get<string>(nameof(Path));
+        set => Set(nameof(Path), value);
+    }
 }

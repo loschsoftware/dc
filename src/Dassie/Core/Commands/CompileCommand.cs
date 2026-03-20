@@ -115,7 +115,7 @@ internal class CompileCommand : CompilerCommand
         if (assemblyName != null)
             asmName = assemblyName;
 
-        config ??= new();
+        config ??= new(PropertyStore.Empty_Todo);
         config.AssemblyFileName ??= asmName;
 
         string[] documentArgs = args.Where(a => a.StartsWith("--Document:")).ToArray();
@@ -132,7 +132,7 @@ internal class CompileCommand : CompilerCommand
         EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_CompilationStarted), [config.Verbosity], 2);
         EmitDeferredBuildLogMessages();
 
-        MacroParser parser = new();
+        MacroParser_Legacy parser = new();
         parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
         parser.Normalize(config);
 

@@ -10,21 +10,36 @@ namespace Dassie.Configuration;
 [XmlRoot("AssemblyReference")]
 public class AssemblyReference : Reference
 {
+    /// <inheritdoc/>
+    public AssemblyReference(PropertyStore store) : base(store) { }
+
     /// <summary>
     /// The path to the referenced assembly.
     /// </summary>
     [XmlText]
-    public string AssemblyPath { get; set; }
+    public string AssemblyPath
+    {
+        get => Get<string>(nameof(AssemblyPath));
+        set => Set(nameof(AssemblyPath), value);
+    }
 
     /// <summary>
     /// Specifies wheter or not to copy the referenced assembly to the output directory of a build.
     /// </summary>
-    [XmlAttribute("CopyToOutput")]
-    public bool CopyToOutput { get; set; }
+    [XmlAttribute]
+    public bool CopyToOutput
+    {
+        get => Get<bool>(nameof(CopyToOutput));
+        set => Set(nameof(CopyToOutput), value);
+    }
 
     /// <summary>
     /// Specifies wheter or not to implicitly import all namespaces of the referenced assembly.
     /// </summary>
-    [XmlAttribute("ImportNamespacesImplicitly")]
-    public bool ImportNamespacesImplicitly { get; set; }
+    [XmlAttribute]
+    public bool ImportNamespacesImplicitly
+    {
+        get => Get<bool>(nameof(ImportNamespacesImplicitly));
+        set => Set(nameof(ImportNamespacesImplicitly), value);
+    }
 }

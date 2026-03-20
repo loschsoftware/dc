@@ -1,9 +1,11 @@
-﻿using Dassie.Core.Macros;
+﻿using Dassie.Configuration.Macros;
+using Dassie.Core.Macros;
 using Dassie.Extensions;
 using Dassie.Messages;
 using Dassie.Messages.Devices;
 using Dassie.Validation;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -71,9 +73,11 @@ internal static class ProjectFileDeserializer
 
     private static object GetRawValue(Property prop, IEnumerable<XElement> matchingElements, bool getArrayElement = false)
     {
-        Type type = prop.Type;
+        Type type = prop?.Type ??
+            ((matchingElements.Count() > 1 && !getArrayElement) ? typeof(object[])
+            : typeof(object));
 
-        if (type.IsArray && !getArrayElement)
+        if (type.IsAssignableTo(typeof(IEnumerable)) && !getArrayElement)
         {
             if (!matchingElements.Any())
             {
@@ -83,7 +87,7 @@ internal static class ProjectFileDeserializer
             if (matchingElements.Count() == 1 && matchingElements.Single() is XElement array && array.Name.LocalName == prop.Name)
                 return GetRawValue(prop, array.Elements());
 
-            return matchingElements.Select(e => GetRawValue(prop, [e], true)).ToArray();
+            return matchingElements.Select(e => GetRawValue(prop with { Type = PropertyStore.GetElementType(type) }, [e], true)).ToArray();
         }
 
         if (!matchingElements.Any())
@@ -130,13 +134,27 @@ internal static class ProjectFileDeserializer
             rawValues.Add(name, GetRawValue(prop, matchingElements));
         }
 
-        PropertyStore ps = new(props, rawValues);
+        foreach (IEnumerable<XElement> customProps in elements.Where(e => !rawValues.ContainsKey(e.Name.LocalName)).GroupBy(e => e.Name.LocalName))
+        {
+            XElement first = customProps.First();
+            Type type = (first.HasElements || first.HasAttributes) ? typeof(object) : typeof(string);
+
+            if (customProps.Count() > 1)
+                type = type.MakeArrayType();
+
+            Property prop = new(first.Name.LocalName, type);
+            rawValues.Add(first.Name.LocalName, GetRawValue(prop, customProps));
+        }
+
+        MacroParser parser = new();
+        PropertyStore ps = new(props, parser, rawValues);
         DassieConfig cfg = new(ps);
+        parser.BindPropertyResolver(key => cfg[key]);
 
-        PropMacro propMacro = new(cfg); // TODO: Register this with the macro parser
+        PropMacro propMacro = new(cfg);
+        parser.AddMacro(propMacro);
 
-        string asmName = cfg.GetProperty<string>("AssemblyFileName");
-        string asmName2 = cfg.GetProperty<string>("AssemblyFileName");
+        var x = cfg.BuildProfiles;
 
         //ConfigImportManager.ImportMacroDefinitions(doc);
         //MacroParser2 parser = new(doc, path);
