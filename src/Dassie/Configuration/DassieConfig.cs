@@ -27,6 +27,11 @@ public partial class DassieConfig : ConfigObject
     public DassieConfig(PropertyStore store) : base(store) { }
 
     /// <summary>
+    /// Creates an instance of <see cref="DassieConfig"/> with default values.
+    /// </summary>
+    public static DassieConfig Default => new(PropertyStore.Default);
+
+    /// <summary>
     /// Retrieves the value of the specified property.
     /// </summary>
     /// <typeparam name="T">The type of the property to evaluate.</typeparam>

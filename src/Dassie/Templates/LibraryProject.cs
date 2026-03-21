@@ -28,7 +28,7 @@ internal class LibraryProject : IProjectTemplate
         Entries = [
             srcDir,
             new ProjectFile() {
-                Content = new(PropertyStore.Empty_Todo) {
+                Content = new(null) {
                     ApplicationType = "Library",
                     BuildDirectory = "./build",
                     RootNamespace = "$(ProjectName)",

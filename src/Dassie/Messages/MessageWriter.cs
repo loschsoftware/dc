@@ -26,7 +26,7 @@ public static class MessageWriter
     {
         CurrentFile ??= new("");
         Context ??= new();
-        Context.Configuration ??= new(PropertyStore.Empty_Todo);
+        Context.Configuration ??= new(null);
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public static class MessageWriter
 
         Context ??= new();
         Context.Configuration ??= ProjectFileDeserializer.DassieConfig;
-        Context.Configuration ??= new(PropertyStore.Empty_Todo);
+        Context.Configuration ??= new(null);
         Context.ConfigurationPath ??= ProjectConfigurationFileName;
         Context.Configuration.IgnoredMessages ??= [];
 

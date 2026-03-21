@@ -19,7 +19,7 @@ internal class EvalMacro : IMacro
 
     public MacroOptions Options => MacroOptions.None;
 
-    private readonly DassieConfig _defaultConfig = new(PropertyStore.Empty_Todo)
+    private readonly DassieConfig _defaultConfig = new(null)
     {
         BuildDirectory = ".",
         ApplicationType = "Library",

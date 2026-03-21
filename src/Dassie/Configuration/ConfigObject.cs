@@ -16,7 +16,7 @@ public abstract class ConfigObject
     /// <param name="store"></param>
     protected ConfigObject(PropertyStore store)
     {
-        Store = store;
+        Store = store ?? PropertyStore.Empty;
     }
 
     /// <summary>

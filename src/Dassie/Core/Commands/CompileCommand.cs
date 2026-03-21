@@ -115,7 +115,7 @@ internal class CompileCommand : CompilerCommand
         if (assemblyName != null)
             asmName = assemblyName;
 
-        config ??= new(PropertyStore.Empty_Todo);
+        config ??= new(null);
         config.AssemblyFileName ??= asmName;
 
         string[] documentArgs = args.Where(a => a.StartsWith("--Document:")).ToArray();

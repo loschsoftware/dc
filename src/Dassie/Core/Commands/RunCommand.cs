@@ -160,7 +160,7 @@ internal class RunCommand : CompilerCommand
         bool recompile = !File.Exists(assemblyPath);
         List<FileInfo> sourceFiles = [];
 
-        foreach (string dir in ((config ??= new(PropertyStore.Empty_Todo)).References ?? []).Where(r => r is ProjectReference).Cast<ProjectReference>().Select(p => Path.GetDirectoryName(p.ProjectFile)).Append(Directory.GetCurrentDirectory()))
+        foreach (string dir in ((config ??= new(null)).References ?? []).Where(r => r is ProjectReference).Cast<ProjectReference>().Select(p => Path.GetDirectoryName(p.ProjectFile)).Append(Directory.GetCurrentDirectory()))
         {
             try
             {

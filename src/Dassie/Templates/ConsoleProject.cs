@@ -27,7 +27,7 @@ internal class ConsoleProject : IProjectTemplate
         Entries = [
             srcDir,
             new ProjectFile() {
-                Content = new(PropertyStore.Empty_Todo) {
+                Content = new(null) {
                     BuildDirectory = "./build",
                     RootNamespace = "$(ProjectName)",
                     AssemblyFileName = "$(ProjectName)"

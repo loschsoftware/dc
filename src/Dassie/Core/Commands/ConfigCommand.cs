@@ -343,7 +343,7 @@ internal class ConfigCommand : CompilerCommand
         ns.Add("", "");
 
         XmlSerializer xmls = new(typeof(DassieConfig));
-        xmls.Serialize(configWriter, new DassieConfig(PropertyStore.Empty_Todo), ns);
+        xmls.Serialize(configWriter, new DassieConfig(null), ns);
 
         configWriter.Dispose();
 

@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration.Macros;
+using Dassie.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,9 +21,22 @@ public class PropertyStore
     /// An empty property store without any registered properties.
     /// </summary>
     public static readonly PropertyStore Empty = new();
-    internal static readonly PropertyStore Empty_Todo = Empty;
 
-    private readonly IEnumerable<Property> _propertyDefs;
+    /// <summary>
+    /// Creates an instance of <see cref="PropertyStore"/> with a default set of registered properties.
+    /// </summary>
+    public static PropertyStore Default
+    {
+        get
+        {
+            MacroParser mp = new();
+            PropertyStore ps = new(ExtensionLoader.Properties, mp);
+            mp.BindPropertyResolver(ps.Get);
+            return ps;
+        }
+    }
+
+    private IEnumerable<Property> _propertyDefs;
     private readonly MacroParser _parser;
 
     // Value can be:
@@ -65,6 +79,11 @@ public class PropertyStore
     private Property GetPropertyDef(string key)
     {
         return _propertyDefs.FirstOrDefault(p => p.Name == key);
+    }
+
+    private void AddPropertyDef(Property prop)
+    {
+        _propertyDefs = _propertyDefs.Concat([prop]);
     }
 
     private static bool IsCollectionType(Type type)
@@ -442,6 +461,9 @@ public class PropertyStore
     /// <param name="value">The value to set the property represented by <paramref name="key"/> to.</param>
     public void Set(string key, object value)
     {
+        if (GetPropertyDef(key) is null)
+            AddPropertyDef(new(key, value.GetType()));
+
         _uninstantiatedProperties.Remove(key);
         _instantiatedProperties.Remove(key);
 

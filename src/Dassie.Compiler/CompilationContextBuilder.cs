@@ -23,7 +23,7 @@ public class CompilationContextBuilder
     public static CompilationContextBuilder CreateBuilder() => new();
 
     private readonly List<SourceDocument> _documents = [];
-    private DassieConfig _config = new(PropertyStore.Empty_Todo);
+    private DassieConfig _config = new(null);
 
     /// <summary>
     /// Sets the compiler configuration for the compilation context.

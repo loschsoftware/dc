@@ -114,7 +114,7 @@ internal static class TemplateBuilder
         {
             if (entry is ProjectFile p)
             {
-                DassieConfig cfg = p.Content ?? new(PropertyStore.Empty_Todo);
+                DassieConfig cfg = p.Content ?? new(null);
                 parser.Normalize(cfg);
 
                 using StreamWriter sw = new(Path.Combine(rootDir, ProjectConfigurationFileName));
@@ -148,7 +148,7 @@ internal static class TemplateBuilder
         {
             if (child is ProjectFile p)
             {
-                DassieConfig cfg = p.Content ?? new(PropertyStore.Empty_Todo);
+                DassieConfig cfg = p.Content ?? new(null);
                 parser.Normalize(cfg);
 
                 using StreamWriter sw = new(Path.Combine(baseDir, ProjectConfigurationFileName));

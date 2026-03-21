@@ -41,7 +41,7 @@ internal class DeployCommand : CompilerCommand
     private static int Deploy(string[] args, string baseDir, bool noDeleteTempDirectory)
     {
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
-        config ??= new(PropertyStore.Empty_Todo);
+        config ??= new(null);
 
         MacroParser_Legacy parser = new();
         parser.Normalize(config);
@@ -117,13 +117,13 @@ internal class DeployCommand : CompilerCommand
             }
 
             Project project = (Project)component;
-            ProjectReference reference = new(PropertyStore.Empty_Todo)
+            ProjectReference reference = new(null)
             {
                 CopyToOutput = true,
                 ProjectFile = project.Path
             };
 
-            DassieConfig projectConfig = new(PropertyStore.Empty_Todo) { References = [] };
+            DassieConfig projectConfig = new(null) { References = [] };
 
             bool result = ReferenceHandler.HandleProjectReference(
                 reference,
@@ -138,7 +138,7 @@ internal class DeployCommand : CompilerCommand
 
         MessagePrefix = "";
 
-        if (((group.Targets ??= new(PropertyStore.Empty_Todo)).Targets ??= []).Length == 0)
+        if (((group.Targets ??= new(null)).Targets ??= []).Length == 0)
         {
             EmitWarningMessageFormatted(
                 0, 0, 0,

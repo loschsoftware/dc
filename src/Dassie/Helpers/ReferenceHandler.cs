@@ -132,7 +132,7 @@ internal static class ReferenceHandler
 
         if (!reference.CopyToOutput)
         {
-            currentConfig.References = currentConfig.References.Append(new AssemblyReference(PropertyStore.Empty_Todo)
+            currentConfig.References = currentConfig.References.Append(new AssemblyReference(null)
             {
                 AssemblyPath = outFile
             }).ToArray();
@@ -157,7 +157,7 @@ internal static class ReferenceHandler
                 if (Path.GetFileName(fsEntry) == Path.GetFileName(outFile))
                 {
                     string assemblyPath = Path.Combine(destDir, Path.GetFileName(fsEntry));
-                    currentConfig.References = currentConfig.References.Append(new AssemblyReference(PropertyStore.Empty_Todo)
+                    currentConfig.References = currentConfig.References.Append(new AssemblyReference(null)
                     {
                         AssemblyPath = assemblyPath
                     }).ToArray();
@@ -198,7 +198,7 @@ internal static class ReferenceHandler
             {
                 config.References = [
                     .. config.References,
-                    new AssemblyReference(PropertyStore.Empty_Todo) {
+                    new AssemblyReference(null) {
                         AssemblyPath = asm,
                         CopyToOutput = true
                     }

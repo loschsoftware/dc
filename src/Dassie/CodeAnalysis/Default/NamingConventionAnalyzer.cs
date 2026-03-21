@@ -9,7 +9,7 @@ namespace Dassie.CodeAnalysis.Default;
 internal class NamingConventionAnalyzer : ParseTreeAnalyzer<IParseTree>
 {
     private readonly CodeAnalysisConfiguration _config;
-    public NamingConventionAnalyzer(DassieConfig config = null) => _config = (config ?? new(PropertyStore.Empty_Todo)).CodeAnalysisConfiguration;
+    public NamingConventionAnalyzer(DassieConfig config = null) => _config = (config ?? new(null)).CodeAnalysisConfiguration;
 
     public override List<MessageInfo> Analyze(List<IParseTree> trees)
     {

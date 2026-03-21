@@ -4,8 +4,10 @@ using System.Collections.Generic;
 
 namespace Dassie.Configuration.Macros;
 
-internal class MacroParser
+internal partial class MacroParser
 {
+    private record ExpansionResult(string Result, bool CanBeCached);
+
     private Func<string, object> _propertyResolver = static _ => null;
     private readonly Dictionary<string, string> _cachedMacros = [];
     private readonly List<IMacro> _additionalMacros = [];
@@ -20,6 +22,9 @@ internal class MacroParser
 
     public (string Value, bool CanBeCached) Expand(string input)
     {
+        if (string.IsNullOrEmpty(input))
+            return (input ?? "", true);
+
         if (!input.Contains('$') && !input.Contains('^'))
             return (input, true);
 
