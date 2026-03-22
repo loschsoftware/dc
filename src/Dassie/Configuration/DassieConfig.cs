@@ -27,6 +27,11 @@ public partial class DassieConfig : ConfigObject
     /// <param name="store">The <see cref="PropertyStore"/> backing the configuration.</param>
     public DassieConfig(PropertyStore store) : base(store) { }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DassieConfig"/> type.
+    /// </summary>
+    public DassieConfig() : this(PropertyStore.Default) { }
+
     internal XDocument Document { get; }
     internal DassieConfig(PropertyStore store, XDocument document) : base(store)
     {
