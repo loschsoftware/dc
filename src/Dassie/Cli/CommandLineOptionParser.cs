@@ -14,17 +14,17 @@ internal static class CommandLineOptionParser
 {
     public static readonly Dictionary<string, string> Aliases = new()
     {
-        ["o"] = "BuildDirectory",
-        ["t"] = "ApplicationType",
-        ["a"] = "AssemblyFileName",
-        ["r"] = "Runtime",
-        ["m"] = "ILOptimizations",
-        ["l"] = "MeasureElapsedTime",
-        ["i"] = "GenerateILFiles",
-        ["h"] = "GenerateNativeAppHost",
-        ["c"] = "CacheSourceFiles",
-        ["A"] = "RunAnalyzers",
-        ["v"] = "Verbosity"
+        ["o"] = nameof(DassieConfig.BuildDirectory),
+        ["t"] = nameof(DassieConfig.ApplicationType),
+        ["a"] = nameof(DassieConfig.AssemblyFileName),
+        ["r"] = nameof(DassieConfig.Runtime),
+        ["m"] = nameof(DassieConfig.ILOptimizations),
+        ["l"] = nameof(DassieConfig.MeasureElapsedTime),
+        ["i"] = nameof(DassieConfig.GenerateILFiles),
+        ["h"] = nameof(DassieConfig.GenerateNativeAppHost),
+        ["c"] = nameof(DassieConfig.CacheSourceFiles),
+        ["A"] = nameof(DassieConfig.RunAnalyzers),
+        ["v"] = nameof(DassieConfig.Verbosity)
     };
 
     private static readonly List<string> BooleanAliases = ["m", "l", "i", "h", "c", "A"];

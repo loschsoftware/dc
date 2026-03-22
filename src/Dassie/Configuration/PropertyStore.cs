@@ -20,7 +20,7 @@ public class PropertyStore
     /// <summary>
     /// An empty property store without any registered properties.
     /// </summary>
-    public static readonly PropertyStore Empty = new();
+    public static PropertyStore Empty => new();
 
     /// <summary>
     /// Creates an instance of <see cref="PropertyStore"/> with a default set of registered properties.

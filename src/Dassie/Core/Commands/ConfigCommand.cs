@@ -93,10 +93,9 @@ internal class ConfigCommand : CompilerCommand
                 return -1;
             }
 
-            //DassieConfig config = ProjectFileDeserializer.DassieConfig;
-            //Dictionary<string, string> definedMacros = MacroParser_Legacy.GetMacrosForProject(config, !args.Contains("--no-predefined")).Select(
-            //    data => new KeyValuePair<string, string>($"{(data.IsPredefined ? $"[{StringHelper.ConfigCommand_Predefined}] " : "")}{data.Key}", data.Value)).ToDictionary();
-            //PrintProperties(definedMacros.Select(k => (k.Key, "", k.Value)).OrderBy(k => k.Key).ToList(), true);
+            _ = ProjectFileDeserializer.DassieConfig;
+            Dictionary<string, string> definedMacros = ProjectFileDeserializer.MacroDefinitions.Select(d => new KeyValuePair<string, string>(d.Name, d.Value)).ToDictionary();
+            PrintProperties(definedMacros.Select(k => (k.Key, "", k.Value)).OrderBy(k => k.Key).ToList(), true);
             return 0;
         }
 
@@ -185,30 +184,30 @@ internal class ConfigCommand : CompilerCommand
             {
                 List<(string Key, string Type, string Value)> props = [];
 
-                foreach (PropertyInfo prop in typeof(DassieConfig).GetProperties())
+                foreach (Property prop in config.Store.Properties)
                 {
-                    object defaultVal = null;
-                    if (prop.GetCustomAttribute<DefaultValueAttribute>() is DefaultValueAttribute dva)
-                        defaultVal = dva.Value;
+                    if (prop.Name == nameof(DassieConfig.MacroDefinitions))
+                        continue;
 
-                    object val = prop.GetValue(config);
+                    object defaultVal = prop.Default;
+                    object val = config[prop.Name];
 
                     bool IsEqual()
                     {
-                        if (val == null && prop.PropertyType == typeof(string) && (string)defaultVal == "")
+                        if (val == null && prop.Type == typeof(string) && (string)defaultVal == "")
                             return true;
 
                         if (val == null)
                             return val == defaultVal;
 
-                        if (val is string s && s == "" && prop.PropertyType == typeof(string) && defaultVal == null)
+                        if (val is string s && s == "" && prop.Type == typeof(string) && defaultVal == null)
                             return true;
 
                         return val.Equals(defaultVal);
                     }
 
                     if (!IsEqual())
-                        props.Add((prop.Name, HelpCommand.GetPropertyTypeName(prop.PropertyType), FormatObject(val)));
+                        props.Add((prop.Name, HelpCommand.GetPropertyTypeName(prop.Type), FormatObject(val)));
                 }
 
                 PrintProperties(props);

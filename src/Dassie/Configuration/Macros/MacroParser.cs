@@ -10,6 +10,14 @@ namespace Dassie.Configuration.Macros;
 
 internal partial class MacroParser
 {
+    private class AdHocMacro(string name, MacroOptions options, Func<string> expansion) : IMacro
+    {
+        public string Name => name;
+        public List<MacroParameter> Parameters => [];
+        public MacroOptions Options => options;
+        public string Expand(Dictionary<string, string> arguments) => expansion();
+    }
+
     private record ExpansionResult(string Result, bool CanBeCached);
 
     private int _macroDefinitionResolutionDepth;
@@ -18,9 +26,12 @@ internal partial class MacroParser
     private readonly Dictionary<string, string> _cachedMacros = [];
     private readonly List<IMacro> _additionalMacros = [];
 
-    public MacroParser() { }
+    public MacroParser()
+    {
+        PopulateIntrinsicMacros();
+    }
 
-    public MacroParser(DassieConfig config)
+    public MacroParser(DassieConfig config) : this()
     {
         BindPropertyResolver(p => config[p]);
         AddMacro(new PropMacro(config));
@@ -31,6 +42,30 @@ internal partial class MacroParser
         _macroDefinitions = definitions?
             .Where(d => d != null)
             .ToList() ?? [];
+    }
+
+    private void PopulateIntrinsicMacros()
+    {
+#if STANDALONE
+        string compilerPath = Environment.GetCommandLineArgs()[0];
+        string compilerDir = Path.GetDirectoryName(compilerPath) + Path.DirectorySeparatorChar;
+#else
+        string compilerPath = typeof(MacroParser).Assembly.Location;
+        string compilerDir = Path.GetDirectoryName(compilerPath) + Path.DirectorySeparatorChar;
+#endif
+
+        List<AdHocMacro> macros =
+        [
+            new("Time", MacroOptions.None, () => DateTime.Now.ToShortTimeString()),
+            new("TimeExact", MacroOptions.None, () => DateTime.Now.ToString("HH:mm:ss.ffff")),
+            new("Date", MacroOptions.None, () => DateTime.Now.ToShortDateString()),
+            // Probably good to cache this, might be unexpected for the year to change midway through a build
+            new("Year", MacroOptions.AllowCaching, () => DateTime.Now.Year.ToString()),
+            new("CompilerDir", MacroOptions.AllowCaching, () => compilerDir),
+            new("CompilerPath", MacroOptions.AllowCaching, () => compilerPath)
+        ];
+
+        _additionalMacros.AddRange(macros);
     }
 
     private IMacro GetRuntimeMacro(string name)
