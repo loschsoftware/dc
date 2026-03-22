@@ -111,5 +111,5 @@ internal class CorePackage : IPackage
         EvalMacro.Instance
     ];
 
-    public virtual Property[] Properties() => [.. DassieConfig.GetDefaultPropertyRegistrations()];
+    public Property[] Properties() => [.. DassieConfig.GetDefaultPropertyRegistrations()];
 }
