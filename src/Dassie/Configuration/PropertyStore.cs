@@ -18,7 +18,7 @@ namespace Dassie.Configuration;
 public class PropertyStore
 {
     /// <summary>
-    /// An empty property store without any registered properties.
+    /// Creates a new property store without any registered properties.
     /// </summary>
     public static PropertyStore Empty => new();
 
