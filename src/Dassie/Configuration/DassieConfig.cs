@@ -13,7 +13,7 @@ namespace Dassie.Configuration;
 /// Represents the top-level configuration object of the Dassie project configuration system.
 /// </summary>
 [Serializable]
-[XmlRoot("DassieConfig")]
+[XmlRoot]
 public partial class DassieConfig : ConfigObject
 {
     /// <summary>
