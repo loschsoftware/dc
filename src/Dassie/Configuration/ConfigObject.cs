@@ -26,7 +26,7 @@ public abstract class ConfigObject
     /// <param name="name">The name of the property to evaluate.</param>
     /// <returns>The value of the specified property.</returns>
     protected T Get<T>(string name)
-        => (T)Store.Get(name);
+        => (T)(Store.Get(name) ?? default(T));
 
     /// <summary>
     /// Sets the specified property.
