@@ -203,6 +203,7 @@
 
   "ConfigImportManager_ImportNotFound": "Die importierte Konfigurationsdatei '{0}' konnte nicht gefunden werden.",
   "ConfigImportManager_CircularImport": "Das Importieren der Konfigurationsdatei '{0}' würde zu einer zirkulären Abhängigkeit führen.",
+  "ConfigImportManager_MissingAttributePath": "Fehlendes Attribut 'Path' in <Import/>-Definition.",
 
   "DocumentSourceManager_SourceNotFound": "Die Dokumentquelle '{0}' konnte nicht gefunden werden.",
   "DocumentSourceManager_DuplicateDocument": "Mehrere Dokumentquellen haben versucht, in das Dokument '{0}' zu schreiben.",
@@ -758,5 +759,7 @@
   "TestRunner_ModuleSummarySingular": "Modul '{0}': {1} von {2} Test bestanden",
   "TestRunner_ModuleSummaryPlural": "Modul '{0}': {1} von {2} Tests bestanden",
   "TestRunner_TestPassed": "✓ Bestanden",
-  "TestRunner_TestFailed": "✘ Fehlgeschlagen"
+  "TestRunner_TestFailed": "✘ Fehlgeschlagen",
+
+  "EvalMacro_EvaluationFailed": "Ausdruck '{0}' konnte nicht ausgewertet werden. {1}"
 }

@@ -37,14 +37,9 @@ public class PropertyStore
     }
 
     private IEnumerable<Property> _propertyDefs;
-    private readonly MacroParser _parser;
+    internal IEnumerable<Property> Properties => _propertyDefs;
 
-    // Value can be:
-    //      string              => "Primitive value" (string/bool/int/enum/...)
-    //      XElement            => complex type
-    //      (string|XElement)[] => array
-    //      object              => already evaluated (fallback value)
-    //      object[]            => array of evaluated values
+    private readonly MacroParser _parser;
     private readonly Dictionary<string, object> _uninstantiatedProperties;
     private readonly Dictionary<string, object> _instantiatedProperties = [];
     private readonly Dictionary<string, (int Line, int Column)> _propertyLocationMapping;
@@ -62,6 +57,9 @@ public class PropertyStore
         _parser = parser;
         _uninstantiatedProperties = uninstantiatedValues ?? [];
     }
+
+    internal bool IsPropertySet(string name) =>
+        _instantiatedProperties.ContainsKey(name) || _uninstantiatedProperties.ContainsKey(name);
 
     // Brittle, but works for all relevant cases;
     // can be updated if necessary in the future
@@ -88,8 +86,8 @@ public class PropertyStore
 
     private static bool IsCollectionType(Type type)
     {
-        return type.IsArray
-            || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>));
+        return type != null &&
+            (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)));
     }
     
     private static object ConvertCollectionType(object items, Type target, Type elemType)
@@ -367,6 +365,9 @@ public class PropertyStore
 
     private (object Result, bool CanBeCached) Evaluate(object raw, Type hintType)
     {
+        if (raw == null)
+            return (raw, true);
+
         Type type = raw.GetType();
 
         if (raw is string str)
@@ -374,7 +375,7 @@ public class PropertyStore
             return _parser.Expand(str);
         }
 
-        if (type.IsAssignableTo(typeof(IEnumerable)))
+        if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
         {
             Type elemType = GetElementType(type);
             List<object> items = [];
@@ -402,11 +403,14 @@ public class PropertyStore
     {
         try
         {
-            if (IsCollectionType(raw.GetType()) && IsCollectionType(type))
+            if (IsCollectionType(raw?.GetType()) && IsCollectionType(type))
                 return ConvertCollectionType(raw, type, GetElementType(type));
 
-            if (!raw.GetType().IsAssignableTo(typeof(IConvertible)))
+            if (raw == null || !raw.GetType().IsAssignableTo(typeof(IConvertible)))
                 return raw; // Hope and pray
+
+            if (raw is string enumField && type.IsEnum)
+                return Enum.Parse(type, enumField);
 
             return Convert.ChangeType(raw, type);
         }
@@ -448,7 +452,12 @@ public class PropertyStore
 
         if (prop != null)
         {
-            return prop.Default;
+            object defaultVal = prop.Default;
+
+            if (defaultVal == null && prop.Type.IsValueType)
+                return Activator.CreateInstance(prop.Type);
+
+            return defaultVal;
         }
 
         return null;
@@ -462,7 +471,7 @@ public class PropertyStore
     public void Set(string key, object value)
     {
         if (GetPropertyDef(key) is null)
-            AddPropertyDef(new(key, value.GetType()));
+            AddPropertyDef(new(key, value?.GetType() ?? typeof(object)));
 
         _uninstantiatedProperties.Remove(key);
         _instantiatedProperties.Remove(key);

@@ -1,6 +1,5 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Global;
-using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using System;
 using System.Collections;
@@ -94,10 +93,10 @@ internal class ConfigCommand : CompilerCommand
                 return -1;
             }
 
-            DassieConfig config = ProjectFileDeserializer.DassieConfig;
-            Dictionary<string, string> definedMacros = MacroParser_Legacy.GetMacrosForProject(config, !args.Contains("--no-predefined")).Select(
-                data => new KeyValuePair<string, string>($"{(data.IsPredefined ? $"[{StringHelper.ConfigCommand_Predefined}] " : "")}{data.Key}", data.Value)).ToDictionary();
-            PrintProperties(definedMacros.Select(k => (k.Key, "", k.Value)).OrderBy(k => k.Key).ToList(), true);
+            //DassieConfig config = ProjectFileDeserializer.DassieConfig;
+            //Dictionary<string, string> definedMacros = MacroParser_Legacy.GetMacrosForProject(config, !args.Contains("--no-predefined")).Select(
+            //    data => new KeyValuePair<string, string>($"{(data.IsPredefined ? $"[{StringHelper.ConfigCommand_Predefined}] " : "")}{data.Key}", data.Value)).ToDictionary();
+            //PrintProperties(definedMacros.Select(k => (k.Key, "", k.Value)).OrderBy(k => k.Key).ToList(), true);
             return 0;
         }
 

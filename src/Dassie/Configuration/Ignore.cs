@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -8,7 +8,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot]
 [Serializable]
-public class Ignore : ConfigObject
+public partial class Ignore : ConfigObject
 {
     /// <inheritdoc/>
     public Ignore(PropertyStore store) : base(store) { }
@@ -17,11 +17,8 @@ public class Ignore : ConfigObject
     /// The message code to ignore.
     /// </summary>
     [XmlText]
-    public string Code
-    {
-        get => Get<string>(nameof(Code));
-        set => Set(nameof(Code), value);
-    }
+    [ConfigProperty]
+    public partial string Code { get; set; }
 }
 
 /// <summary>

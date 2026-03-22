@@ -52,7 +52,20 @@ internal class EvalMacro : IMacro
         CompileCommand.Instance.Invoke(["main.ds"], _defaultConfig);
 
         Assembly asm = Assembly.LoadFile(Path.GetFullPath("eval.dll"));
-        string result = (string)asm.GetType("Eval").GetMethod("GetResult").Invoke(null, null);
+        string result = "";
+
+        try
+        {
+            result = (string)asm.GetType("Eval").GetMethod("GetResult").Invoke(null, null);
+        }
+        catch (Exception ex)
+        {
+            EmitErrorMessageFormatted(
+                0, 0, 0,
+                DS0274_EvalMacroFailed,
+                nameof(StringHelper.EvalMacro_EvaluationFailed), [expr, ex.ToString()],
+                ProjectConfigurationFileName);
+        }
 
         Directory.SetCurrentDirectory(prevWorkingDir);
         //FileSystem.DeleteDirectory(tempDir, DeleteDirectoryOption.DeleteAllContents);

@@ -88,11 +88,6 @@ internal class CleanCommand : CompilerCommand
         ProjectFileDeserializer.Reload();
 
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
-        config ??= new(null);
-
-        MacroParser_Legacy parser = new();
-        parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
-        parser.Normalize(config);
 
         if (Directory.Exists(config.BuildDirectory))
             Directory.Delete(config.BuildDirectory, true);

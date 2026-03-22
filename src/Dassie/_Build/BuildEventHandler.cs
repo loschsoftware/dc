@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration;
+using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using System.Linq;
 using System.Xml;
@@ -7,10 +8,17 @@ namespace Dassie.Build;
 
 internal static class BuildEventHandler
 {
-    public static int ExecuteBuildEvent(BuildEvent buildEvent, bool isPreBuildEvent)
+    public static int ExecuteBuildEvent(BuildEvent buildEvent, DassieConfig config, bool isPreBuildEvent)
     {
         if (buildEvent.CommandNodes is null or [])
             return 0;
+
+        Context ??= new();
+        Context.Configuration = config;
+        Context.ConfigurationPath ??= ProjectConfigurationFileName;
+
+        MacroParser parser = new(config);
+        parser.SetMacroDefinitions(ProjectFileDeserializer.MacroDefinitions);
 
         foreach (XmlElement command in buildEvent.CommandNodes)
         {
@@ -53,10 +61,12 @@ internal static class BuildEventHandler
                 continue;
             }
 
+            XmlElement expanded = ExpandElement(command, parser);
+
             int ret = action.Execute(new(
-                command.ChildNodes.Cast<XmlNode>().ToList(),
-                command.Attributes.Cast<XmlAttribute>().ToList(),
-                command.InnerText,
+                expanded.ChildNodes.Cast<XmlNode>().ToList(),
+                expanded.Attributes.Cast<XmlAttribute>().ToList(),
+                expanded.InnerText,
                 currentMode,
                 buildEvent.Name));
 
@@ -85,5 +95,33 @@ internal static class BuildEventHandler
         }
 
         return 0;
+    }
+
+    private static XmlElement ExpandElement(XmlElement source, MacroParser parser)
+    {
+        XmlDocument doc = new();
+        XmlElement clone = (XmlElement)doc.ImportNode(source, true);
+        doc.AppendChild(clone);
+
+        ExpandNodeRecursive(clone, parser);
+        return clone;
+    }
+
+    private static void ExpandNodeRecursive(XmlNode node, MacroParser parser)
+    {
+        if (node is XmlText or XmlCDataSection)
+        {
+            node.Value = parser.Expand(node.Value ?? "").Value;
+            return;
+        }
+
+        if (node is XmlElement elem)
+        {
+            foreach (XmlAttribute attribute in elem.Attributes.Cast<XmlAttribute>())
+                attribute.Value = parser.Expand(attribute.Value ?? "").Value;
+        }
+
+        foreach (XmlNode child in node.ChildNodes.Cast<XmlNode>())
+            ExpandNodeRecursive(child, parser);
     }
 }

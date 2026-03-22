@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -8,7 +8,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [Serializable]
 [XmlRoot("FileReference")]
-public class FileReference : Reference
+public partial class FileReference : Reference
 {
     /// <inheritdoc/>
     public FileReference(PropertyStore store) : base(store) { }
@@ -17,19 +17,13 @@ public class FileReference : Reference
     /// The path to the referenced file.
     /// </summary>
     [XmlText]
-    public string FileName
-    {
-        get => Get<string>(nameof(FileName));
-        set => Set(nameof(FileName), value);
-    }
+    [ConfigProperty]
+    public partial string FileName { get; set; }
 
     /// <summary>
     /// Specifies wheter or not to copy the referenced file to the build output directory.
     /// </summary>
     [XmlAttribute]
-    public bool CopyToOutput
-    {
-        get => Get<bool>(nameof(CopyToOutput));
-        set => Set(nameof(CopyToOutput), value);
-    }
+    [ConfigProperty]
+    public partial bool CopyToOutput { get; set; }
 }

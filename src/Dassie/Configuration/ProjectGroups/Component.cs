@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration.ProjectGroups;
@@ -19,7 +19,7 @@ public abstract class Component : ConfigObject
 /// </summary>
 [XmlRoot]
 [Serializable]
-public class Project : Component
+public partial class Project : Component
 {
     /// <inheritdoc/>
     public Project(PropertyStore store) : base(store) { }
@@ -28,11 +28,8 @@ public class Project : Component
     /// The path to the project file.
     /// </summary>
     [XmlText]
-    public string Path
-    {
-        get => Get<string>(nameof(Path));
-        set => Set(nameof(Path), value);
-    }
+    [ConfigProperty]
+    public partial string Path { get; set; }
 }
 
 /// <summary>
@@ -40,7 +37,7 @@ public class Project : Component
 /// </summary>
 [XmlRoot("ProjectGroup")]
 [Serializable]
-public class ProjectGroupComponent : Component
+public partial class ProjectGroupComponent : Component
 {
     /// <inheritdoc/>
     public ProjectGroupComponent(PropertyStore store) : base(store) { }
@@ -49,9 +46,6 @@ public class ProjectGroupComponent : Component
     /// The path to the project group file.
     /// </summary>
     [XmlText]
-    public string Path
-    {
-        get => Get<string>(nameof(Path));
-        set => Set(nameof(Path), value);
-    }
+    [ConfigProperty]
+    public partial string Path { get; set; }
 }

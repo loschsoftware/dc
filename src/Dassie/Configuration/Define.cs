@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -8,7 +8,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot("Define")]
 [Serializable]
-public class Define : ConfigObject
+public partial class Define : ConfigObject
 {
     /// <inheritdoc/>
     public Define(PropertyStore store) : base(store) { }
@@ -17,39 +17,27 @@ public class Define : ConfigObject
     /// Specifies the name of the macro.
     /// </summary>
     [XmlAttribute("Macro")]
-    public string Name
-    {
-        get => Get<string>(nameof(Name));
-        set => Set(nameof(Name), value);
-    }
+    [ConfigProperty]
+    public partial string Name { get; set; }
 
     /// <summary>
     /// The parameter list of the macro.
     /// </summary>
     [XmlAttribute]
-    public string Parameters
-    {
-        get => Get<string>(nameof(Parameters));
-        set => Set(nameof(Parameters), value);
-    }
+    [ConfigProperty]
+    public partial string Parameters { get; set; }
 
     /// <summary>
     /// Specifies wheter or not to trim leading and trailing whitespace of the expanded value.
     /// </summary>
     [XmlAttribute]
-    public bool Trim
-    {
-        get => Get<bool>(nameof(Trim));
-        set => Set(nameof(Trim), value);
-    }
+    [ConfigProperty]
+    public partial bool Trim { get; set; }
 
     /// <summary>
     /// The string this macro expands to.
     /// </summary>
     [XmlText]
-    public string Value
-    {
-        get => Get<string>(nameof(Value));
-        set => Set(nameof(Value), value);
-    }
+    [ConfigProperty]
+    public partial string Value { get; set; }
 }

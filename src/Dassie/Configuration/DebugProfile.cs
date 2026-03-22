@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -8,7 +8,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [Serializable]
 [XmlRoot]
-public class DebugProfile : ConfigObject
+public partial class DebugProfile : ConfigObject
 {
     /// <inheritdoc/>
     public DebugProfile(PropertyStore store) : base(store) { }
@@ -17,29 +17,20 @@ public class DebugProfile : ConfigObject
     /// The name of the profile.
     /// </summary>
     [XmlAttribute]
-    public string Name
-    {
-        get => Get<string>(nameof(Name));
-        set => Set(nameof(Name), value);
-    }
+    [ConfigProperty]
+    public partial string Name { get; set; }
 
     /// <summary>
     /// The command-line arguments to pass to the application being debugged.
     /// </summary>
     [XmlElement]
-    public string Arguments
-    {
-        get => Get<string>(nameof(Arguments));
-        set => Set(nameof(Arguments), value);
-    }
+    [ConfigProperty]
+    public partial string Arguments { get; set; }
 
     /// <summary>
     /// The working directory to start the application to debug in.
     /// </summary>
     [XmlElement]
-    public string WorkingDirectory
-    {
-        get => Get<string>(nameof(WorkingDirectory));
-        set => Set(nameof(WorkingDirectory), value);
-    }
+    [ConfigProperty]
+    public partial string WorkingDirectory { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -8,7 +8,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot]
 [Serializable]
-public abstract class Resource : ConfigObject
+public abstract partial class Resource : ConfigObject
 {
     /// <inheritdoc/>
     protected Resource(PropertyStore store) : base(store) { }
@@ -17,7 +17,8 @@ public abstract class Resource : ConfigObject
     /// The path to the resource file.
     /// </summary>
     [XmlText]
-    public string Path { get; set; }
+    [ConfigProperty]
+    public partial string Path { get; set; }
 }
 
 /// <summary>
@@ -25,7 +26,7 @@ public abstract class Resource : ConfigObject
 /// </summary>
 [XmlRoot]
 [Serializable]
-public class UnmanagedResource : Resource
+public partial class UnmanagedResource : Resource
 {
     /// <inheritdoc/>
     public UnmanagedResource(PropertyStore store) : base(store) { }
@@ -51,7 +52,7 @@ public enum ResourceType
 /// </summary>
 [XmlRoot]
 [Serializable]
-public class ManagedResource : Resource
+public partial class ManagedResource : Resource
 {
     /// <inheritdoc/>
     public ManagedResource(PropertyStore store) : base(store) { }
@@ -61,5 +62,6 @@ public class ManagedResource : Resource
     /// programmatically.
     /// </summary>
     [XmlAttribute]
-    public string Name { get; set; }
+    [ConfigProperty]
+    public partial string Name { get; set; }
 }

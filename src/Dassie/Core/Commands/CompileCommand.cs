@@ -106,8 +106,6 @@ internal class CompileCommand : CompilerCommand
         string workingDir = Directory.GetCurrentDirectory();
         long stopwatchTimeStamp = Stopwatch.GetTimestamp();
 
-        DassieConfig config = ProjectFileDeserializer.DassieConfig;
-
         string asmName = "";
         if (args.Where(File.Exists).Any())
             asmName = Path.GetFileNameWithoutExtension(args.Where(File.Exists).First());
@@ -115,7 +113,14 @@ internal class CompileCommand : CompilerCommand
         if (assemblyName != null)
             asmName = assemblyName;
 
-        config ??= new(null);
+        DassieConfig config = null;
+
+        if (overrideSettings != null)
+            config = overrideSettings;
+        else
+            config = ProjectFileDeserializer.DassieConfig;
+
+        config ??= DassieConfig.Default;
         config.AssemblyFileName ??= asmName;
 
         string[] documentArgs = args.Where(a => a.StartsWith("--Document:")).ToArray();
@@ -123,18 +128,11 @@ internal class CompileCommand : CompilerCommand
 
         CommandLineOptionParser.ParseOptions(ref args, config);
 
-        if (overrideSettings != null)
-            config = overrideSettings;
-
         Context ??= new();
         Context.Configuration = config;
 
         EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_CompilationStarted), [config.Verbosity], 2);
         EmitDeferredBuildLogMessages();
-
-        MacroParser_Legacy parser = new();
-        parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
-        parser.Normalize(config);
 
         ProjectFileCompatibilityTool.VerifyFormatVersionCompatibility(config);
 

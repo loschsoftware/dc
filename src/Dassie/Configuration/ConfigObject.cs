@@ -8,7 +8,7 @@ public abstract class ConfigObject
     /// <summary>
     /// The <see cref="PropertyStore"/> associated with the configuration object.
     /// </summary>
-    protected PropertyStore Store { get; }
+    internal PropertyStore Store { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigObject"/> type based on the specified <see cref="PropertyStore"/>.

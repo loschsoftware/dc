@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -8,7 +8,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [Serializable]
 [XmlRoot]
-public class Import : ConfigObject
+public partial class Import : ConfigObject
 {
     /// <inheritdoc/>
     public Import(PropertyStore store) : base(store) { }
@@ -17,9 +17,6 @@ public class Import : ConfigObject
     /// The path to the imported configuration file.
     /// </summary>
     [XmlAttribute]
-    public string Path
-    {
-        get => Get<string>(nameof(Path));
-        set => Set(nameof(Path), value);
-    }
+    [ConfigProperty]
+    public partial string Path { get; set; }
 }

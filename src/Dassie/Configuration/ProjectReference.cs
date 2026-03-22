@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
@@ -9,7 +9,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [Serializable]
 [XmlRoot]
-public class ProjectReference : Reference
+public partial class ProjectReference : Reference
 {
     /// <inheritdoc/>
     public ProjectReference(PropertyStore store) : base(store) { }
@@ -19,19 +19,13 @@ public class ProjectReference : Reference
     /// </summary>
     [DefaultValue(true)]
     [XmlAttribute]
-    public bool CopyToOutput
-    {
-        get => Get<bool>(nameof(CopyToOutput));
-        set => Set(nameof(CopyToOutput), value);
-    }
+    [ConfigProperty]
+    public partial bool CopyToOutput { get; set; }
 
     /// <summary>
     /// The path to the project file to reference.
     /// </summary>
     [XmlText]
-    public string ProjectFile
-    {
-        get => Get<string>(nameof(ProjectFile));
-        set => Set(nameof(ProjectFile), value);
-    }
+    [ConfigProperty]
+    public partial string ProjectFile { get; set; }
 }

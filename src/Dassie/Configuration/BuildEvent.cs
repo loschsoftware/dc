@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml;
@@ -11,7 +11,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [Serializable]
 [XmlRoot]
-public class BuildEvent : ConfigObject
+public partial class BuildEvent : ConfigObject
 {
     /// <inheritdoc/>
     public BuildEvent(PropertyStore store) : base(store) { }
@@ -21,11 +21,8 @@ public class BuildEvent : ConfigObject
     /// </summary>
     [DefaultValue("")]
     [XmlAttribute]
-    public string Name
-    {
-        get => Get<string>(nameof(Name));
-        set => Set(nameof(Name), value);
-    }
+    [ConfigProperty]
+    public partial string Name { get; set; }
 
     /// <summary>
     /// Specifies wheter or not the build event is critical.
@@ -33,19 +30,13 @@ public class BuildEvent : ConfigObject
     /// </summary>
     [DefaultValue(true)]
     [XmlAttribute]
-    public bool Critical
-    {
-        get => Get<bool>(nameof(Critical));
-        set => Set(nameof(Critical), value);
-    }
+    [ConfigProperty]
+    public partial bool Critical { get; set; }
 
     /// <summary>
     /// A list of XML elements representing the actions to execute as part of the build event.
     /// </summary>
     [XmlAnyElement]
-    public List<XmlElement> CommandNodes
-    {
-        get => Get<List<XmlElement>>(nameof(CommandNodes));
-        set => Set(nameof(CommandNodes), value);
-    }
+    [ConfigProperty]
+    public partial List<XmlElement> CommandNodes { get; set; }
 }

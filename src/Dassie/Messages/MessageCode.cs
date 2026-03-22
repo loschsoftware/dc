@@ -1126,5 +1126,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when a macro definition or invocation has a syntax error.
     /// </summary>
-    DS0273_MacroSyntaxError
+    DS0273_MacroSyntaxError,
+    /// <summary>
+    /// Emitted when an invocation of the $(Eval) macro is unsuccessful.
+    /// </summary>
+    DS0274_EvalMacroFailed
 }

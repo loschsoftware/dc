@@ -51,5 +51,5 @@ Escape_Sequence_M
     ;
 
 Text_M
-    : ~[(),:^$]+ -> type(Text)
+    : ~[),:^$@]+ -> type(Text)
     ;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -8,7 +8,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot]
 [Serializable]
-public class BuildProfile : ConfigObject
+public partial class BuildProfile : ConfigObject
 {
     /// <inheritdoc/>
     public BuildProfile(PropertyStore store) : base(store) { }
@@ -17,49 +17,34 @@ public class BuildProfile : ConfigObject
     /// The name of the build profile.
     /// </summary>
     [XmlAttribute]
-    public string Name
-    {
-        get => Get<string>(nameof(Name));
-        set => Set(nameof(Name), value);
-    }
+    [ConfigProperty]
+    public partial string Name { get; set; }
 
     /// <summary>
     /// The command-line arguments passed to the compiler when the build event is executed.
     /// </summary>
     [XmlElement]
-    public string Arguments
-    {
-        get => Get<string>(nameof(Arguments));
-        set => Set(nameof(Arguments), value);
-    }
+    [ConfigProperty]
+    public partial string Arguments { get; set; }
 
     /// <summary>
     /// Compiler configuration properties to specify for the build.
     /// </summary>
     [XmlElement]
-    public DassieConfig Settings
-    {
-        get => Get<DassieConfig>(nameof(Settings));
-        set => Set(nameof(Settings), value);
-    }
+    [ConfigProperty]
+    public partial DassieConfig Settings { get; set; }
 
     /// <summary>
     /// An array of pre-build events.
     /// </summary>
     [XmlArray]
-    public BuildEvent[] PreBuildEvents
-    {
-        get => Get<BuildEvent[]>(nameof(PreBuildEvents));
-        set => Set(nameof(PreBuildEvents), value);
-    }
+    [ConfigProperty]
+    public partial BuildEvent[] PreBuildEvents { get; set; }
 
     /// <summary>
     /// An array of post-build events.
     /// </summary>
     [XmlArray]
-    public BuildEvent[] PostBuildEvents
-    {
-        get => Get<BuildEvent[]>(nameof(PostBuildEvents));
-        set => Set(nameof(PostBuildEvents), value);
-    }
+    [ConfigProperty]
+    public partial BuildEvent[] PostBuildEvents { get; set; }
 }

@@ -378,6 +378,9 @@ internal static class TypeHelpers
 
     private static string GetTypeNameOrAlias(Type type)
     {
+        if (type == null)
+            return "";
+
         string name = type.FullName ?? type.Name;
 
         if (type.IsArray || type.IsByRef || type.IsPointer)
@@ -847,6 +850,9 @@ internal static class TypeHelpers
 
     public static string TypeName(Type t)
     {
+        if (t == null)
+            return "";
+
         bool isUnion = false;
 
         if (t is not TypeBuilder)

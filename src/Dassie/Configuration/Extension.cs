@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
@@ -10,7 +10,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot]
 [Serializable]
-public class Extension : ConfigObject
+public partial class Extension : ConfigObject
 {
     /// <inheritdoc/>
     public Extension(PropertyStore store) : base(store) { }
@@ -19,29 +19,20 @@ public class Extension : ConfigObject
     /// The path of the extension assembly.
     /// </summary>
     [XmlAttribute]
-    public string Path
-    {
-        get => Get<string>(nameof(Path));
-        set => Set(nameof(Path), value);
-    }
+    [ConfigProperty]
+    public partial string Path { get; set; }
 
     /// <summary>
     /// A list of XML attributes passed to the extension.
     /// </summary>
     [XmlAnyAttribute]
-    public List<XmlAttribute> Attributes
-    {
-        get => Get<List<XmlAttribute>>(nameof(Attributes));
-        set => Set(nameof(Attributes), value);
-    }
+    [ConfigProperty]
+    public partial List<XmlAttribute> Attributes { get; set; }
 
     /// <summary>
     /// A list of XML elements passed to the extension.
     /// </summary>
     [XmlAnyElement]
-    public List<XmlElement> Elements
-    {
-        get => Get<List<XmlElement>>(nameof(Elements));
-        set => Set(nameof(Elements), value);
-    }
+    [ConfigProperty]
+    public partial List<XmlElement> Elements { get; set; }
 }

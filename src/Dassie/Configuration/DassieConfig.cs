@@ -1,9 +1,10 @@
-﻿using Dassie.Configuration.ProjectGroups;
+using Dassie.Configuration.ProjectGroups;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -25,6 +26,12 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     /// <param name="store">The <see cref="PropertyStore"/> backing the configuration.</param>
     public DassieConfig(PropertyStore store) : base(store) { }
+
+    internal XDocument Document { get; }
+    internal DassieConfig(PropertyStore store, XDocument document) : base(store)
+    {
+        Document = document;
+    }
 
     /// <summary>
     /// Creates an instance of <see cref="DassieConfig"/> with default values.
@@ -98,33 +105,24 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("Specifies the version of the configuration format to use.")]
     [XmlAttribute]
-    public string FormatVersion
-    {
-        get => GetProperty<string>(nameof(FormatVersion));
-        set => SetProperty<string>(nameof(FormatVersion), value);
-    }
+    [ConfigProperty]
+    public partial string FormatVersion { get; set; }
 
     /// <summary>
     /// Loads the specified configuration file and applies its settings.
     /// </summary>
     [Description("Loads the specified configuration file and applies its settings.")]
     [XmlAttribute]
-    public string Base
-    {
-        get => GetProperty<string>(nameof(Base));
-        set => SetProperty<string>(nameof(Base), value);
-    }
+    [ConfigProperty]
+    public partial string Base { get; set; }
 
     /// <summary>
     /// A list of configuration files to import macros from.
     /// </summary>
     [Description("A list of configuration files to import macros from.")]
     [XmlElement]
-    public Import[] Imports
-    {
-        get => GetProperty<Import[]>(nameof(Imports));
-        set => SetProperty<Import[]>(nameof(Imports), value);
-    }
+    [ConfigProperty]
+    public partial Import[] Imports { get; set; }
 
     /// <summary>
     /// Specifies custom macro definitions.
@@ -133,11 +131,8 @@ public partial class DassieConfig : ConfigObject
     [DefaultValue(null)]
     [XmlArray]
     [XmlArrayItem(Type = typeof(Define))]
-    public Define[] MacroDefinitions
-    {
-        get => GetProperty<Define[]>(nameof(MacroDefinitions));
-        set => SetProperty<Define[]>(nameof(MacroDefinitions), value);
-    }
+    [ConfigProperty]
+    public partial Define[] MacroDefinitions { get; set; }
 
     /// <summary>
     /// Specifies that the config file defines a project group and sets project group-specific options.
@@ -145,11 +140,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Specifies that the config file defines a project group and sets project group-specific options.")]
     [DefaultValue(null)]
     [XmlElement]
-    public ProjectGroup ProjectGroup
-    {
-        get => GetProperty<ProjectGroup>(nameof(ProjectGroup));
-        set => SetProperty<ProjectGroup>(nameof(ProjectGroup), value);
-    }
+    [ConfigProperty]
+    public partial ProjectGroup ProjectGroup { get; set; }
 
     /// <summary>
     /// Manages references to external assemblies.
@@ -159,11 +151,8 @@ public partial class DassieConfig : ConfigObject
     [XmlArrayItem(Type = typeof(AssemblyReference))]
     [XmlArrayItem(Type = typeof(PackageReference))]
     [XmlArrayItem(Type = typeof(ProjectReference))]
-    public Reference[] References
-    {
-        get => GetProperty<Reference[]>(nameof(References));
-        set => SetProperty<Reference[]>(nameof(References), value);
-    }
+    [ConfigProperty]
+    public partial Reference[] References { get; set; }
 
     /// <summary>
     /// Manages references to external resources.
@@ -172,33 +161,24 @@ public partial class DassieConfig : ConfigObject
     [XmlArray]
     [XmlArrayItem(Type = typeof(ManagedResource))]
     [XmlArrayItem(Type = typeof(UnmanagedResource))]
-    public Resource[] Resources
-    {
-        get => GetProperty<Resource[]>(nameof(Resources));
-        set => SetProperty<Resource[]>(nameof(Resources), value);
-    }
+    [ConfigProperty]
+    public partial Resource[] Resources { get; set; }
 
     /// <summary>
     /// Used by editors to set the default namespace of source files.
     /// </summary>
     [Description("Used by editors to set the default namespace of source files.")]
     [XmlElement]
-    public string RootNamespace
-    {
-        get => GetProperty<string>(nameof(RootNamespace));
-        set => SetProperty<string>(nameof(RootNamespace), value);
-    }
+    [ConfigProperty]
+    public partial string RootNamespace { get; set; }
 
     /// <summary>
     /// Sets the name of the ouput assembly (without file extension).
     /// </summary>
     [Description("Sets the name of the ouput assembly (without file extension).")]
     [XmlElement]
-    public string AssemblyFileName
-    {
-        get => GetProperty<string>(nameof(AssemblyFileName));
-        set => SetProperty<string>(nameof(AssemblyFileName), value);
-    }
+    [ConfigProperty]
+    public partial string AssemblyFileName { get; set; }
 
     /// <summary>
     /// Sets the application type and subsystem of the program.
@@ -206,11 +186,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the application type and subsystem of the program.")]
     [XmlElement]
     [DefaultValue("Console")]
-    public string ApplicationType
-    {
-        get => GetProperty<string>(nameof(ApplicationType));
-        set => SetProperty<string>(nameof(ApplicationType), value);
-    }
+    [ConfigProperty]
+    public partial string ApplicationType { get; set; }
 
     /// <summary>
     /// Sets the runtime of the application. Valid values are 'Jit' and 'Aot'.
@@ -218,11 +195,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the runtime of the application. Valid values are 'Jit' and 'Aot'.")]
     [XmlElement]
     [DefaultValue(Runtime.Jit)]
-    public Runtime Runtime
-    {
-        get => GetProperty<Runtime>(nameof(Runtime));
-        set => SetProperty<Runtime>(nameof(Runtime), value);
-    }
+    [ConfigProperty]
+    public partial Runtime Runtime { get; set; }
 
     /// <summary>
     /// Sets the processor architecture of the application.
@@ -230,11 +204,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the processor architecture of the application.")]
     [XmlElement]
     [DefaultValue(Platform.Auto)]
-    public Platform Platform
-    {
-        get => GetProperty<Platform>(nameof(Platform));
-        set => SetProperty<Platform>(nameof(Platform), value);
-    }
+    [ConfigProperty]
+    public partial Platform Platform { get; set; }
 
     /// <summary>
     /// Sets the RID of the application to be used by the AOT compiler.
@@ -242,22 +213,16 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the RID of the application to be used by the AOT compiler.")]
     [XmlElement]
     [DefaultValue("")]
-    public string RuntimeIdentifier
-    {
-        get => GetProperty<string>(nameof(RuntimeIdentifier));
-        set => SetProperty<string>(nameof(RuntimeIdentifier), value);
-    }
+    [ConfigProperty]
+    public partial string RuntimeIdentifier { get; set; }
 
     /// <summary>
     /// Sets version information fields for the application.
     /// </summary>
     [Description("Sets version information fields for the application.")]
     [XmlElement]
-    public List<VersionInfo> VersionInfo
-    {
-        get => GetProperty<List<VersionInfo>>(nameof(VersionInfo));
-        set => SetProperty<List<VersionInfo>>(nameof(VersionInfo), value);
-    }
+    [ConfigProperty]
+    public partial List<VersionInfo> VersionInfo { get; set; }
 
     /// <summary>
     /// Sets the application icon file.
@@ -265,11 +230,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the application icon file.")]
     [DefaultValue("")]
     [XmlElement]
-    public string IconFile
-    {
-        get => GetProperty<string>(nameof(IconFile));
-        set => SetProperty<string>(nameof(IconFile), value);
-    }
+    [ConfigProperty]
+    public partial string IconFile { get; set; }
 
     /// <summary>
     /// Sets the directory where the compiled assemblies will be placed.
@@ -277,11 +239,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the directory where the compiled assemblies will be placed.")]
     [XmlElement]
     [DefaultValue("./build")]
-    public string BuildDirectory
-    {
-        get => GetProperty<string>(nameof(BuildDirectory));
-        set => SetProperty<string>(nameof(BuildDirectory), value);
-    }
+    [ConfigProperty]
+    public partial string BuildDirectory { get; set; }
 
     /// <summary>
     /// Toggles the generation of debug symbol data.
@@ -289,11 +248,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Toggles the generation of debug symbol data.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool EmitPdb
-    {
-        get => GetProperty<bool>(nameof(EmitPdb));
-        set => SetProperty<bool>(nameof(EmitPdb), value);
-    }
+    [ConfigProperty]
+    public partial bool EmitPdb { get; set; }
 
     /// <summary>
     /// If set, all 'information' messages are ignored.
@@ -301,11 +257,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, all 'information' messages are ignored.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool IgnoreAllMessages
-    {
-        get => GetProperty<bool>(nameof(IgnoreAllMessages));
-        set => SetProperty<bool>(nameof(IgnoreAllMessages), value);
-    }
+    [ConfigProperty]
+    public partial bool IgnoreAllMessages { get; set; }
 
     /// <summary>
     /// If set, all 'warning' messages are ignored.
@@ -313,11 +266,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, all 'warning' messages are ignored.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool IgnoreAllWarnings
-    {
-        get => GetProperty<bool>(nameof(IgnoreAllWarnings));
-        set => SetProperty<bool>(nameof(IgnoreAllWarnings), value);
-    }
+    [ConfigProperty]
+    public partial bool IgnoreAllWarnings { get; set; }
 
     /// <summary>
     /// If set, all 'warning' messages will be treated as errors.
@@ -325,11 +275,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, all 'warning' messages will be treated as errors.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool TreatWarningsAsErrors
-    {
-        get => GetProperty<bool>(nameof(TreatWarningsAsErrors));
-        set => SetProperty<bool>(nameof(TreatWarningsAsErrors), value);
-    }
+    [ConfigProperty]
+    public partial bool TreatWarningsAsErrors { get; set; }
 
     /// <summary>
     /// Toggles optimizations applied to the generated IL.
@@ -337,11 +284,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Toggles optimizations applied to the generated IL.")]
     [DefaultValue(true)]
     [XmlElement]
-    public bool ILOptimizations
-    {
-        get => GetProperty<bool>(nameof(ILOptimizations));
-        set => SetProperty<bool>(nameof(ILOptimizations), value);
-    }
+    [ConfigProperty]
+    public partial bool ILOptimizations { get; set; }
 
     /// <summary>
     /// If set, displays the elapsed time after the completion of a build.
@@ -349,11 +293,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, displays the elapsed time after the completion of a build.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool MeasureElapsedTime
-    {
-        get => GetProperty<bool>(nameof(MeasureElapsedTime));
-        set => SetProperty<bool>(nameof(MeasureElapsedTime), value);
-    }
+    [ConfigProperty]
+    public partial bool MeasureElapsedTime { get; set; }
 
     /// <summary>
     /// Sets the configuration of the generated assembly. Valid values are 'Debug' and 'Release'.
@@ -361,11 +302,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the configuration of the generated assembly. Valid values are 'Debug' and 'Release'.")]
     [XmlElement]
     [DefaultValue(ApplicationConfiguration.Debug)]
-    public ApplicationConfiguration Configuration
-    {
-        get => GetProperty<ApplicationConfiguration>(nameof(Configuration));
-        set => SetProperty<ApplicationConfiguration>(nameof(Configuration), value);
-    }
+    [ConfigProperty]
+    public partial ApplicationConfiguration Configuration { get; set; }
 
     /// <summary>
     /// If set, all referenced assemblies are copied to the build output directory.
@@ -373,11 +311,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, all referenced assemblies are copied to the build output directory.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool IncludeDependencies
-    {
-        get => GetProperty<bool>(nameof(IncludeDependencies));
-        set => SetProperty<bool>(nameof(IncludeDependencies), value);
-    }
+    [ConfigProperty]
+    public partial bool IncludeDependencies { get; set; }
 
     /// <summary>
     /// If set, includes a preview of the error location in all error messages.
@@ -385,11 +320,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, includes a preview of the error location in all error messages.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool AdvancedErrorMessages
-    {
-        get => GetProperty<bool>(nameof(AdvancedErrorMessages));
-        set => SetProperty<bool>(nameof(AdvancedErrorMessages), value);
-    }
+    [ConfigProperty]
+    public partial bool AdvancedErrorMessages { get; set; }
 
     /// <summary>
     /// Toggles further information on some error messages.
@@ -397,11 +329,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Toggles further information on some error messages.")]
     [DefaultValue(true)]
     [XmlElement]
-    public bool EnableTips
-    {
-        get => GetProperty<bool>(nameof(EnableTips));
-        set => SetProperty<bool>(nameof(EnableTips), value);
-    }
+    [ConfigProperty]
+    public partial bool EnableTips { get; set; }
 
     /// <summary>
     /// If set, does not delete the generated native '.res' file after the build is completed.
@@ -409,11 +338,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, does not delete the generated native '.res' file after the build is completed.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool PersistentResourceFile
-    {
-        get => GetProperty<bool>(nameof(PersistentResourceFile));
-        set => SetProperty<bool>(nameof(PersistentResourceFile), value);
-    }
+    [ConfigProperty]
+    public partial bool PersistentResourceFile { get; set; }
 
     /// <summary>
     /// If set, does not delete the generated '.rc' file after the build is completed.
@@ -421,11 +347,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, does not delete the generated '.rc' file after the build is completed.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool PersistentResourceScript
-    {
-        get => GetProperty<bool>(nameof(PersistentResourceScript));
-        set => SetProperty<bool>(nameof(PersistentResourceScript), value);
-    }
+    [ConfigProperty]
+    public partial bool PersistentResourceScript { get; set; }
 
     /// <summary>
     /// If set, does not delete intermediate source files.
@@ -433,11 +356,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, does not delete intermediate source files.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool KeepIntermediateFiles
-    {
-        get => GetProperty<bool>(nameof(KeepIntermediateFiles));
-        set => SetProperty<bool>(nameof(KeepIntermediateFiles), value);
-    }
+    [ConfigProperty]
+    public partial bool KeepIntermediateFiles { get; set; }
 
     /// <summary>
     /// If set, prepends a time stamp to all compiler messages.
@@ -445,11 +365,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, prepends a time stamp to all compiler messages.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool EnableMessageTimestamps
-    {
-        get => GetProperty<bool>(nameof(EnableMessageTimestamps));
-        set => SetProperty<bool>(nameof(EnableMessageTimestamps), value);
-    }
+    [ConfigProperty]
+    public partial bool EnableMessageTimestamps { get; set; }
 
     /// <summary>
     /// Sets the verbosity of compiler messages. Valid values are 0-3 (both inclusive).
@@ -457,11 +374,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the verbosity of compiler messages. Valid values are 0-3 (both inclusive).")]
     [DefaultValue(1)]
     [XmlElement]
-    public int Verbosity
-    {
-        get => GetProperty<int>(nameof(Verbosity));
-        set => SetProperty<int>(nameof(Verbosity), value);
-    }
+    [ConfigProperty]
+    public partial int Verbosity { get; set; }
 
     /// <summary>
     /// A list of log devices to write build messages to.
@@ -469,11 +383,8 @@ public partial class DassieConfig : ConfigObject
     [Description("A list of log devices to write build messages to.")]
     [DefaultValue(null)]
     [XmlElement]
-    public BuildLogOptions BuildLogDevices
-    {
-        get => GetProperty<BuildLogOptions>(nameof(BuildLogDevices));
-        set => SetProperty<BuildLogOptions>(nameof(BuildLogDevices), value);
-    }
+    [ConfigProperty]
+    public partial BuildLogOptions BuildLogDevices { get; set; }
 
     /// <summary>
     /// If set, generates CIL files in human-readable form.
@@ -481,11 +392,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, generates CIL files in human-readable form.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool GenerateILFiles
-    {
-        get => GetProperty<bool>(nameof(GenerateILFiles));
-        set => SetProperty<bool>(nameof(GenerateILFiles), value);
-    }
+    [ConfigProperty]
+    public partial bool GenerateILFiles { get; set; }
 
     /// <summary>
     /// If set, generates native executables along with .NET assemblies.
@@ -493,11 +401,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, generates native executables along with .NET assemblies.")]
     [DefaultValue(true)]
     [XmlElement]
-    public bool GenerateNativeAppHost
-    {
-        get => GetProperty<bool>(nameof(GenerateNativeAppHost));
-        set => SetProperty<bool>(nameof(GenerateNativeAppHost), value);
-    }
+    [ConfigProperty]
+    public partial bool GenerateNativeAppHost { get; set; }
 
     /// <summary>
     /// A list of error codes that are ignored and will never be emitted.
@@ -506,22 +411,16 @@ public partial class DassieConfig : ConfigObject
     [XmlArray]
     [XmlArrayItem(typeof(Message))]
     [XmlArrayItem(typeof(Warning))]
-    public Ignore[] IgnoredMessages
-    {
-        get => GetProperty<Ignore[]>(nameof(IgnoredMessages));
-        set => SetProperty<Ignore[]>(nameof(IgnoredMessages), value);
-    }
+    [ConfigProperty]
+    public partial Ignore[] IgnoredMessages { get; set; }
 
     /// <summary>
     /// The path to a .manifest file containing Windows-specific configuration.
     /// </summary>
     [Description("The path to a .manifest file containing Windows-specific configuration.")]
     [XmlElement]
-    public string AssemblyManifest
-    {
-        get => GetProperty<string>(nameof(AssemblyManifest));
-        set => SetProperty<string>(nameof(AssemblyManifest), value);
-    }
+    [ConfigProperty]
+    public partial string AssemblyManifest { get; set; }
 
     /// <summary>
     /// If set, implicitly imports parts of the standard library in every source file.
@@ -529,11 +428,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, implicitly imports parts of the standard library in every source file.")]
     [DefaultValue(true)]
     [XmlElement]
-    public bool ImplicitImports
-    {
-        get => GetProperty<bool>(nameof(ImplicitImports));
-        set => SetProperty<bool>(nameof(ImplicitImports), value);
-    }
+    [ConfigProperty]
+    public partial bool ImplicitImports { get; set; }
 
     /// <summary>
     /// If set, allows the use of type aliases such as 'int' for 'System.Int32'.
@@ -541,11 +437,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, allows the use of type aliases such as 'int' for 'System.Int32'.")]
     [DefaultValue(true)]
     [XmlElement]
-    public bool ImplicitTypeAliases
-    {
-        get => GetProperty<bool>(nameof(ImplicitTypeAliases));
-        set => SetProperty<bool>(nameof(ImplicitTypeAliases), value);
-    }
+    [ConfigProperty]
+    public partial bool ImplicitTypeAliases { get; set; }
 
     /// <summary>
     /// If set, prints the full exception message and stack trace if an exception occurs during compilation.
@@ -553,11 +446,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, prints the full exception message and stack trace if an exception occurs during compilation.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool PrintExceptionInfo
-    {
-        get => GetProperty<bool>(nameof(PrintExceptionInfo));
-        set => SetProperty<bool>(nameof(PrintExceptionInfo), value);
-    }
+    [ConfigProperty]
+    public partial bool PrintExceptionInfo { get; set; }
 
     /// <summary>
     /// If set, caches source files for limited incremental compilation capabilities.
@@ -565,11 +455,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, caches source files for limited incremental compilation capabilities.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool CacheSourceFiles
-    {
-        get => GetProperty<bool>(nameof(CacheSourceFiles));
-        set => SetProperty<bool>(nameof(CacheSourceFiles), value);
-    }
+    [ConfigProperty]
+    public partial bool CacheSourceFiles { get; set; }
 
     /// <summary>
     /// Sets and manages build profiles.
@@ -577,11 +464,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets and manages build profiles.")]
     [DefaultValue(null)]
     [XmlArray]
-    public BuildProfile[] BuildProfiles
-    {
-        get => GetProperty<BuildProfile[]>(nameof(BuildProfiles));
-        set => SetProperty<BuildProfile[]>(nameof(BuildProfiles), value);
-    }
+    [ConfigProperty]
+    public partial BuildProfile[] BuildProfiles { get; set; }
 
     /// <summary>
     /// Sets and manages debug profiles.
@@ -589,11 +473,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets and manages debug profiles.")]
     [DefaultValue(null)]
     [XmlArray]
-    public DebugProfile[] DebugProfiles
-    {
-        get => GetProperty<DebugProfile[]>(nameof(DebugProfiles));
-        set => SetProperty<DebugProfile[]>(nameof(DebugProfiles), value);
-    }
+    [ConfigProperty]
+    public partial DebugProfile[] DebugProfiles { get; set; }
 
     /// <summary>
     /// The color used for error messages (#RRGGBB).
@@ -601,11 +482,8 @@ public partial class DassieConfig : ConfigObject
     [Description("The color used for error messages (#RRGGBB).")]
     [DefaultValue(null)]
     [XmlElement]
-    public string ErrorColor
-    {
-        get => GetProperty<string>(nameof(ErrorColor));
-        set => SetProperty<string>(nameof(ErrorColor), value);
-    }
+    [ConfigProperty]
+    public partial string ErrorColor { get; set; }
 
     /// <summary>
     /// The color used for warning messages (#RRGGBB).
@@ -613,11 +491,8 @@ public partial class DassieConfig : ConfigObject
     [Description("The color used for warning messages (#RRGGBB).")]
     [DefaultValue(null)]
     [XmlElement]
-    public string WarningColor
-    {
-        get => GetProperty<string>(nameof(WarningColor));
-        set => SetProperty<string>(nameof(WarningColor), value);
-    }
+    [ConfigProperty]
+    public partial string WarningColor { get; set; }
 
     /// <summary>
     /// The color used for information messages (#RRGGBB).
@@ -625,11 +500,8 @@ public partial class DassieConfig : ConfigObject
     [Description("The color used for information messages (#RRGGBB).")]
     [DefaultValue(null)]
     [XmlElement]
-    public string MessageColor
-    {
-        get => GetProperty<string>(nameof(MessageColor));
-        set => SetProperty<string>(nameof(MessageColor), value);
-    }
+    [ConfigProperty]
+    public partial string MessageColor { get; set; }
 
     /// <summary>
     /// If set, arithmetic operations check for overflow and throw an appropriate exception at runtime.
@@ -637,11 +509,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, arithmetic operations check for overflow and throw an appropriate exception at runtime.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool EnableOverflowChecks
-    {
-        get => GetProperty<bool>(nameof(EnableOverflowChecks));
-        set => SetProperty<bool>(nameof(EnableOverflowChecks), value);
-    }
+    [ConfigProperty]
+    public partial bool EnableOverflowChecks { get; set; }
 
     /// <summary>
     /// Used to configure the default code analyzer.
@@ -649,11 +518,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Used to configure the default code analyzer.")]
     [DefaultValue(null)]
     [XmlElement("CodeAnalysis")]
-    public CodeAnalysisConfiguration CodeAnalysisConfiguration
-    {
-        get => GetProperty<CodeAnalysisConfiguration>(nameof(CodeAnalysisConfiguration));
-        set => SetProperty<CodeAnalysisConfiguration>(nameof(CodeAnalysisConfiguration), value);
-    }
+    [ConfigProperty]
+    public partial CodeAnalysisConfiguration CodeAnalysisConfiguration { get; set; }
 
     /// <summary>
     /// Sets the function or method that functions as the application entry point.
@@ -661,11 +527,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the function or method that functions as the application entry point.")]
     [DefaultValue("")]
     [XmlElement]
-    public string EntryPoint
-    {
-        get => GetProperty<string>(nameof(EntryPoint));
-        set => SetProperty<string>(nameof(EntryPoint), value);
-    }
+    [ConfigProperty]
+    public partial string EntryPoint { get; set; }
 
     /// <summary>
     /// If enabled, runs code analyzers before compilation.
@@ -673,11 +536,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If enabled, runs code analyzers before compilation.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool RunAnalyzers
-    {
-        get => GetProperty<bool>(nameof(RunAnalyzers));
-        set => SetProperty<bool>(nameof(RunAnalyzers), value);
-    }
+    [ConfigProperty]
+    public partial bool RunAnalyzers { get; set; }
 
     /// <summary>
     /// If enabled, the Dassie standard library (Dassie.Core.dll) is not implicitly referenced.
@@ -685,11 +545,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If enabled, the Dassie standard library (Dassie.Core.dll) is not implicitly referenced.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool NoStdLib
-    {
-        get => GetProperty<bool>(nameof(NoStdLib));
-        set => SetProperty<bool>(nameof(NoStdLib), value);
-    }
+    [ConfigProperty]
+    public partial bool NoStdLib { get; set; }
 
     /// <summary>
     /// If enabled, compiler messages will display an icon to distinguish them by severity.
@@ -697,11 +554,8 @@ public partial class DassieConfig : ConfigObject
     [Description("If enabled, compiler messages will display an icon to distinguish them by severity.")]
     [DefaultValue(false)]
     [XmlElement]
-    public bool EnableSeverityIndicators
-    {
-        get => GetProperty<bool>(nameof(EnableSeverityIndicators));
-        set => SetProperty<bool>(nameof(EnableSeverityIndicators), value);
-    }
+    [ConfigProperty]
+    public partial bool EnableSeverityIndicators { get; set; }
 
     /// <summary>
     /// Configures compiler extensions enabled only during the compilation.
@@ -709,11 +563,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Configures compiler extensions enabled only during the compilation.")]
     [DefaultValue(null)]
     [XmlArray]
-    public List<Extension> Extensions
-    {
-        get => GetProperty<List<Extension>>(nameof(Extensions));
-        set => SetProperty<List<Extension>>(nameof(Extensions), value);
-    }
+    [ConfigProperty]
+    public partial List<Extension> Extensions { get; set; }
 
     /// <summary>
     /// Configures the active document sources provided by compiler extensions.
@@ -721,11 +572,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Configures the active document sources provided by compiler extensions.")]
     [DefaultValue(null)]
     [XmlElement]
-    public DocumentSourceList DocumentSources
-    {
-        get => GetProperty<DocumentSourceList>(nameof(DocumentSources));
-        set => SetProperty<DocumentSourceList>(nameof(DocumentSources), value);
-    }
+    [ConfigProperty]
+    public partial DocumentSourceList DocumentSources { get; set; }
 
     /// <summary>
     /// Once this number of compilation errors is reached, the build process is terminated immediately.
@@ -733,11 +581,8 @@ public partial class DassieConfig : ConfigObject
     [Description("Once this number of compilation errors is reached, the build process is terminated immediately.")]
     [DefaultValue(0)]
     [XmlElement]
-    public int MaxErrors
-    {
-        get => GetProperty<int>(nameof(MaxErrors));
-        set => SetProperty<int>(nameof(MaxErrors), value);
-    }
+    [ConfigProperty]
+    public partial int MaxErrors { get; set; }
 }
 
 /// <summary>

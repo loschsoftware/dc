@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 
@@ -9,7 +9,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [Serializable]
 [XmlRoot]
-public class VersionInfo : ConfigObject
+public partial class VersionInfo : ConfigObject
 {
     /// <inheritdoc/>
     public VersionInfo(PropertyStore store) : base(store) { }
@@ -19,96 +19,70 @@ public class VersionInfo : ConfigObject
     /// </summary>
     [XmlAttribute]
     [DefaultValue("en-US")]
-    public string Language
-    {
-        get => Get<string>(nameof(Language));
-        set => Set(nameof(Language), value);
-    }
+    [ConfigProperty]
+    public partial string Language { get; set; }
 
     /// <summary>
     /// The locale identifier of the version info resource.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(1033)]
-    public int Lcid
-    {
-        get => Get<int>(nameof(Lcid));
-        set => Set(nameof(Lcid), value);
-    }
+    [ConfigProperty]
+    public partial int Lcid { get; set; }
 
     /// <summary>
     /// The product designation of the application.
     /// </summary>
     [XmlElement]
-    public string Product
-    {
-        get => Get<string>(nameof(Product));
-        set => Set(nameof(Product), value);
-    }
+    [ConfigProperty]
+    public partial string Product { get; set; }
 
     /// <summary>
     /// The author (company) of the application.
     /// </summary>
     [XmlElement]
-    public string Company
-    {
-        get => Get<string>(nameof(Company));
-        set => Set(nameof(Company), value);
-    }
+    [ConfigProperty]
+    public partial string Company { get; set; }
 
     /// <summary>
     /// The copyright string.
     /// </summary>
     [XmlElement]
-    public string Copyright
-    {
-        get => Get<string>(nameof(Copyright));
-        set => Set(nameof(Copyright), value);
-    }
+    [ConfigProperty]
+    public partial string Copyright { get; set; }
 
     /// <summary>
     /// The trademark.
     /// </summary>
     [XmlElement]
-    public string Trademark
-    {
-        get => Get<string>(nameof(Trademark));
-        set => Set(nameof(Trademark), value);
-    }
+    [ConfigProperty]
+    public partial string Trademark { get; set; }
 
     /// <summary>
     /// The product version.
     /// </summary>
     [XmlElement]
-    public string Version
-    {
-        get => Get<string>(nameof(Version));
-        set => Set(nameof(Version), value);
-    }
+    [ConfigProperty]
+    public partial string Version { get; set; }
 
     /// <summary>
     /// The file version.
     /// </summary>
     [XmlElement]
-    public string FileVersion
-    {
-        get => Get<string>(nameof(FileVersion));
-        set => Set(nameof(FileVersion), value);
-    }
+    [ConfigProperty]
+    public partial string FileVersion { get; set; }
 
     /// <summary>
     /// A description of the application.
     /// </summary>
     [XmlElement]
-    public string Description
-    {
-        get => Get<string>(nameof(Description));
-        set => Set(nameof(Description), value);
-    }
+    [ConfigProperty]
+    public partial string Description { get; set; }
 
     /// <summary>
     /// The internal name of the application.
     /// </summary>
     [XmlElement]
-    public string InternalName { get; set; }
+    [ConfigProperty]
+    public partial string InternalName { get; set; }
 }

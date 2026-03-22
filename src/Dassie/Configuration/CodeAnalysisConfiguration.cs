@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -8,7 +8,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot]
 [Serializable]
-public class CodeAnalysisConfiguration : ConfigObject
+public partial class CodeAnalysisConfiguration : ConfigObject
 {
     /// <inheritdoc/>
     public CodeAnalysisConfiguration(PropertyStore store) : base(store) { }
@@ -18,7 +18,7 @@ public class CodeAnalysisConfiguration : ConfigObject
     /// </summary>
     [XmlRoot("Configure")]
     [Serializable]
-    public class Configure : ConfigObject
+    public partial class Configure : ConfigObject
     {
         /// <inheritdoc/>
         public Configure(PropertyStore store) : base(store) { }
@@ -46,30 +46,21 @@ public class CodeAnalysisConfiguration : ConfigObject
         /// Specifies the code of the message to configure.
         /// </summary>
         [XmlAttribute]
-        public string Code
-        {
-            get => Get<string>(nameof(Code));
-            set => Set(nameof(Code), value);
-        }
+        [ConfigProperty]
+        public partial string Code { get; set; }
 
         /// <summary>
         /// Sets the severity of all messages with a code matching <see cref="Code"/>.
         /// </summary>
         [XmlAttribute]
-        public MessageSeverity Severity
-        {
-            get => Get<MessageSeverity>(nameof(Severity));
-            set => Set(nameof(Severity), value);
-        }
+        [ConfigProperty]
+        public partial MessageSeverity Severity { get; set; }
     }
 
     /// <summary>
     /// An array of message configurations.
     /// </summary>
     [XmlArray("Messages")]
-    public Configure[] MessageConfigurations
-    {
-        get => Get<Configure[]>(nameof(MessageConfigurations));
-        set => Set(nameof(MessageConfigurations), value);
-    }
+    [ConfigProperty]
+    public partial Configure[] MessageConfigurations { get; set; }
 }

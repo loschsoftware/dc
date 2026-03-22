@@ -1,6 +1,5 @@
 ﻿using Dassie.Build;
 using Dassie.Configuration;
-using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using System;
 using System.CommandLine.Parsing;
@@ -47,12 +46,8 @@ internal class BuildCommand : CompilerCommand
         if (overrideConfig != null)
             config = overrideConfig;
 
-        config ??= new(null);
+        config ??= DassieConfig.Default;
         config.BuildProfiles ??= [];
-
-        MacroParser_Legacy parser = new();
-        parser.ImportMacros(MacroGenerator.GenerateMacrosForProject(config));
-        parser.Normalize(config);
 
         if (config.ProjectGroup != null)
         {
@@ -124,12 +119,12 @@ internal class BuildCommand : CompilerCommand
     {
         if (profile.Settings != null)
         {
-            foreach (PropertyInfo property in profile.Settings.GetType().GetProperties())
+            foreach (Property prop in profile.Settings.Store.Properties)
             {
-                object val = property.GetValue(profile.Settings);
+                object val = profile.Settings.Store.Get(prop.Name);
 
                 if (val != null)
-                    config.GetType().GetProperty(property.Name).SetValue(config, val);
+                    config.Store.Set(prop.Name, val);
             }
         }
 
@@ -140,7 +135,7 @@ internal class BuildCommand : CompilerCommand
                 if (string.IsNullOrEmpty(preEvent.Name))
                     preEvent.Name = profile.PreBuildEvents.IndexOf(preEvent).ToString();
 
-                BuildEventHandler.ExecuteBuildEvent(preEvent, true);
+                BuildEventHandler.ExecuteBuildEvent(preEvent, config, true);
             }
         }
 
@@ -154,7 +149,7 @@ internal class BuildCommand : CompilerCommand
                 if (string.IsNullOrEmpty(postEvent.Name))
                     postEvent.Name = profile.PostBuildEvents.IndexOf(postEvent).ToString();
 
-                BuildEventHandler.ExecuteBuildEvent(postEvent, false);
+                BuildEventHandler.ExecuteBuildEvent(postEvent, config, false);
             }
         }
 

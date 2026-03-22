@@ -1,15 +1,11 @@
 ﻿using Dassie.Configuration.Macros;
 using Dassie.Core.Macros;
 using Dassie.Extensions;
-using Dassie.Messages;
 using Dassie.Messages.Devices;
-using Dassie.Validation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using System.Xml.Serialization;
 using IOPath = System.IO.Path;
 
 namespace Dassie.Configuration;
@@ -20,6 +16,7 @@ internal static class ProjectFileDeserializer
     public static DassieConfig DassieConfig => _config ??= Deserialize();
 
     public static string Path { get; private set; }
+    public static IReadOnlyList<Define> MacroDefinitions { get; private set; }
 
     public static void Reload() => _config = Deserialize();
     public static void Set(DassieConfig cfg) => _config = cfg;
@@ -30,9 +27,9 @@ internal static class ProjectFileDeserializer
     // Lookup paths for referenced configuration files
     private static readonly List<string> _lookupDirs =
     [
-        IOPath.Combine(IOPath.GetDirectoryName(typeof(ProjectFileDeserializer).Assembly.Location), SdkDirectoryName), // Application directory
-        IOPath.Combine(ApplicationDataDirectoryPath, SdkDirectoryName), // Application data directory
-        IOPath.Combine(IOPath.GetDirectoryName(IOPath.GetDirectoryName(typeof(ProjectFileDeserializer).Assembly.Location)), SdkDirectoryName), // Application binaries
+        IOPath.Combine(IOPath.GetDirectoryName(typeof(ProjectFileDeserializer).Assembly.Location), SdkDirectoryName),
+        IOPath.Combine(ApplicationDataDirectoryPath, SdkDirectoryName),
+        IOPath.Combine(IOPath.GetDirectoryName(IOPath.GetDirectoryName(typeof(ProjectFileDeserializer).Assembly.Location)), SdkDirectoryName)
     ];
 
     public static XDocument Load(string path)
@@ -71,13 +68,47 @@ internal static class ProjectFileDeserializer
         return null;
     }
 
+    private static List<Define> GetMacroDefinitions(Dictionary<string, object> rawValues)
+    {
+        if (!rawValues.TryGetValue(nameof(DassieConfig.MacroDefinitions), out object raw) || raw == null)
+            return [];
+
+        if (raw is IEnumerable<Define> alreadyTyped)
+            return alreadyTyped.Where(d => d != null).ToList();
+
+        IEnumerable<XElement> defineElements = raw switch
+        {
+            XElement single => [single],
+            object[] arr => arr.OfType<XElement>(),
+            IEnumerable<XElement> seq => seq,
+            _ => []
+        };
+
+        List<Define> snapshot = [];
+
+        foreach (XElement elem in defineElements.Where(e => e != null))
+        {
+            Define def = new(PropertyStore.Empty)
+            {
+                Name = (string)elem.Attribute("Macro"),
+                Parameters = (string)elem.Attribute("Parameters"),
+                Trim = (bool?)elem.Attribute("Trim") ?? false,
+                Value = elem.Value
+            };
+
+            snapshot.Add(def);
+        }
+
+        return snapshot;
+    }
+
     private static object GetRawValue(Property prop, IEnumerable<XElement> matchingElements, bool getArrayElement = false)
     {
         Type type = prop?.Type ??
             ((matchingElements.Count() > 1 && !getArrayElement) ? typeof(object[])
             : typeof(object));
 
-        if (type.IsAssignableTo(typeof(IEnumerable)) && !getArrayElement)
+        if ((type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) && !getArrayElement))
         {
             if (!matchingElements.Any())
             {
@@ -95,7 +126,7 @@ internal static class ProjectFileDeserializer
 
         if (matchingElements.Count() > 1)
         {
-            // ERROR: Property specified multiple times
+            // TODO: ERROR: Property specified multiple times
             return null;
         }
 
@@ -107,14 +138,9 @@ internal static class ProjectFileDeserializer
         return elem;
     }
 
-    public static DassieConfig Deserialize(string path, bool handleImports = true)
+    private static Dictionary<string, object> GetRawValues(XDocument doc)
     {
-        if (!File.Exists(path))
-            return null;
-
-        Path = System.IO.Path.GetFullPath(path);
-
-        XDocument doc = XDocument.Load(path, LoadOptions.SetLineInfo);
+        ConfigImportManager.ImportMacroDefinitions(doc);
 
         IEnumerable<Property> props = ExtensionLoader.Properties;
         IEnumerable<XAttribute> attributes = doc.Root.Attributes();
@@ -146,62 +172,36 @@ internal static class ProjectFileDeserializer
             rawValues.Add(first.Name.LocalName, GetRawValue(prop, customProps));
         }
 
+        return rawValues;
+    }
+
+    public static DassieConfig Deserialize(string path, bool handleImports = true)
+    {
+        if (!File.Exists(path))
+            return DassieConfig.Default;
+
+        Path = System.IO.Path.GetFullPath(path);
+
+        XDocument doc = XDocument.Load(path, LoadOptions.SetLineInfo);
+        Dictionary<string, object> rawValues = GetRawValues(doc);
+
+        MacroDefinitions = GetMacroDefinitions(rawValues);
+
         MacroParser parser = new();
-        PropertyStore ps = new(props, parser, rawValues);
-        DassieConfig cfg = new(ps);
-        parser.BindPropertyResolver(key => cfg[key]);
+        parser.SetMacroDefinitions(MacroDefinitions);
 
-        PropMacro propMacro = new(cfg);
+        PropertyStore ps = new(ExtensionLoader.Properties, parser, rawValues);
+        DassieConfig config = new(ps, doc);
+        parser.BindPropertyResolver(key => config[key]);
+
+        PropMacro propMacro = new(config);
         parser.AddMacro(propMacro);
-
-        var x = cfg.BuildProfiles;
-
-        //ConfigImportManager.ImportMacroDefinitions(doc);
-        //MacroParser2 parser = new(doc, path);
-        //bool result = parser.Normalize();
-
-        XmlSerializer xmls = new(typeof(DassieConfig));
-        DassieConfig config = null;
-
-        try
-        {
-            config = (DassieConfig)xmls.Deserialize(doc.Root.CreateReader());
-        }
-        catch (Exception ex)
-        {
-            /* TODO: Parsing will fail if a property of a type other than string is constructed from a macro, like in this example:
-             * 
-             * <DassieConfig>
-             *      <MacroDefinitions>
-             *          <Define Macro="V">2</Define>
-             *      </MacroDefinitions>
-             *      <Verbosity>$(V)</Verbosity>
-             * </DassieConfig>
-            */
-
-            int row = 0, col = 0;
-
-            if (ex.Message.Contains('('))
-            {
-                row = int.Parse(ex.Message.Split('(')[1].Split(',')[0]);
-                col = int.Parse(ex.Message.Split('(')[1].Split(',')[1][1..^2]);
-            }
-
-            EmitErrorMessageFormatted(
-                row, col, 0,
-                DS0091_MalformedConfigurationFile,
-                nameof(StringHelper.ProjectFileDeserializer_InvalidProjectFile), [string.Join(':', ex.InnerException.Message.Split(':')[1..])],
-                path);
-        }
 
         if (config.Extensions != null && config.Extensions.Count > 0)
             ExtensionLoader.LoadTransientExtensions(config.Extensions.Select(e => (IOPath.GetFullPath(e.Path), e.Attributes, e.Elements)));
 
         if (handleImports)
             ConfigImportManager.Merge(config);
-
-        foreach (MessageInfo error in ConfigValidation.Validate(path))
-            Emit(error);
 
         BuildLogDeviceContextBuilder.RegisterBuildLogDevices(config, path);
         return config;

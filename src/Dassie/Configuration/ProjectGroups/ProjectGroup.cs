@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -9,7 +9,7 @@ namespace Dassie.Configuration.ProjectGroups;
 /// </summary>
 [Serializable]
 [XmlRoot]
-public class ProjectGroup : ConfigObject
+public partial class ProjectGroup : ConfigObject
 {
     /// <inheritdoc/>
     public ProjectGroup(PropertyStore store) : base(store) { }
@@ -19,7 +19,7 @@ public class ProjectGroup : ConfigObject
     /// </summary>
     [Serializable]
     [XmlRoot]
-    public class TargetList : ConfigObject
+    public partial class TargetList : ConfigObject
     {
         /// <inheritdoc/>
         public TargetList(PropertyStore store) : base(store) { }
@@ -28,11 +28,8 @@ public class ProjectGroup : ConfigObject
         /// An array of XML nodes representing the deployment targets of a project group.
         /// </summary>
         [XmlAnyElement]
-        public XmlNode[] Targets
-        {
-            get => Get<XmlNode[]>(nameof(Targets));
-            set => Set(nameof(Targets), value);
-        }
+        [ConfigProperty]
+        public partial XmlNode[] Targets { get; set; }
     }
 
     /// <summary>
@@ -41,29 +38,20 @@ public class ProjectGroup : ConfigObject
     [XmlArray]
     [XmlArrayItem(typeof(Project))]
     [XmlArrayItem(typeof(ProjectGroupComponent))]
-    public Component[] Components
-    {
-        get => Get<Component[]>(nameof(Components));
-        set => Set(nameof(Components), value);
-    }
+    [ConfigProperty]
+    public partial Component[] Components { get; set; }
 
     /// <summary>
     /// Specifies the executable component of the project group.
     /// </summary>
     [XmlElement("Executable")]
-    public string ExecutableComponent
-    {
-        get => Get<string>(nameof(ExecutableComponent));
-        set => Set(nameof(ExecutableComponent), value);
-    }
+    [ConfigProperty]
+    public partial string ExecutableComponent { get; set; }
 
     /// <summary>
     /// A list of deployment targets.
     /// </summary>
     [XmlElement]
-    public TargetList Targets
-    {
-        get => Get<TargetList>(nameof(Targets));
-        set => Set(nameof(Targets), value);
-    }
+    [ConfigProperty]
+    public partial TargetList Targets { get; set; }
 }

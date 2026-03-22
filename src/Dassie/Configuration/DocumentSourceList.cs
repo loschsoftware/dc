@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
@@ -10,7 +10,7 @@ namespace Dassie.Configuration;
 /// </summary>
 [XmlRoot("DocumentSources")]
 [Serializable]
-public class DocumentSourceList : ConfigObject
+public partial class DocumentSourceList : ConfigObject
 {
     /// <inheritdoc/>
     public DocumentSourceList(PropertyStore store) : base(store) { }
@@ -19,9 +19,6 @@ public class DocumentSourceList : ConfigObject
     /// A list of XML elements representing the document sources to enable.
     /// </summary>
     [XmlAnyElement]
-    public List<XmlElement> Sources
-    {
-        get => Get<List<XmlElement>>(nameof(Sources));
-        set => Set(nameof(Sources), value);
-    }
+    [ConfigProperty]
+    public partial List<XmlElement> Sources { get; set; }
 }

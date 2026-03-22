@@ -41,11 +41,6 @@ internal class DeployCommand : CompilerCommand
     private static int Deploy(string[] args, string baseDir, bool noDeleteTempDirectory)
     {
         DassieConfig config = ProjectFileDeserializer.DassieConfig;
-        config ??= new(null);
-
-        MacroParser_Legacy parser = new();
-        parser.Normalize(config);
-
         ProjectGroup group = config.ProjectGroup;
 
         if (!File.Exists(ProjectConfigurationFileName))

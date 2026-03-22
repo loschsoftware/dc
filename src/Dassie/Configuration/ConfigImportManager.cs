@@ -1,9 +1,7 @@
 ﻿using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -32,7 +30,7 @@ internal static class ConfigImportManager
                         li.LinePosition,
                         import.ToString().Length,
                         DS0198_ImportedConfigFileNotFound,
-                        "Missing required attribute 'Path' for <Import/> definition.", [],
+                        nameof(StringHelper.ConfigImportManager_MissingAttributePath), [],
                         ProjectConfigurationFileName);
                 }
 
@@ -128,18 +126,14 @@ internal static class ConfigImportManager
 
     private static void ApplySettings(DassieConfig target, DassieConfig source)
     {
-        foreach (PropertyInfo property in typeof(DassieConfig).GetProperties())
+        foreach (Property property in source.Store.Properties)
         {
-            if (!property.CanWrite || !property.CanRead) continue;
+            string key = property.Name;
 
-            DefaultValueAttribute defaultValueAttr = (DefaultValueAttribute)Attribute.GetCustomAttribute(property, typeof(DefaultValueAttribute));
-            object defaultValue = defaultValueAttr?.Value;
+            if (target.Store.IsPropertySet(key))
+                continue;
 
-            object targetValue = property.GetValue(target);
-            object sourceValue = property.GetValue(source);
-
-            if (targetValue == null || targetValue.Equals(defaultValue))
-                property.SetValue(target, sourceValue);
+            target.Store.Set(key, source.Store.Get(key));
         }
     }
 }
