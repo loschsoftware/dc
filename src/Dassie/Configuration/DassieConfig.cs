@@ -87,8 +87,11 @@ public partial class DassieConfig : ConfigObject
     {
         List<Property> props = [];
 
-        foreach (PropertyInfo propInfo in typeof(DassieConfig).GetProperties().Skip(1))
+        foreach (PropertyInfo propInfo in typeof(DassieConfig).GetProperties())
         {
+            if (propInfo.GetCustomAttribute<ConfigPropertyAttribute>() == null)
+                continue;
+
             string name = propInfo.Name;
 
             if (propInfo.GetCustomAttribute<XmlElementAttribute>() is XmlElementAttribute elem && !string.IsNullOrWhiteSpace(elem.ElementName))

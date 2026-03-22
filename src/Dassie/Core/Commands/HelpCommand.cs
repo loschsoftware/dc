@@ -92,6 +92,7 @@ internal class HelpCommand : CompilerCommand
 
     public static string FormatLines(string text, bool initialPadLeft = false, int indentWidth = 35)
     {
+        text ??= "";
         int maxWidth = Console.BufferWidth - indentWidth;
 
         if (maxWidth < 30)
@@ -192,36 +193,22 @@ internal class HelpCommand : CompilerCommand
 
             int descriptionWidth = Console.WindowWidth - 62 - 5;
 
-            PropertyInfo[] properties = typeof(DassieConfig).GetProperties();
+            IEnumerable<Property> properties = PropertyStore.Default.Properties;
             List<(string PropertyName, string Text)> propertyLines = [];
 
-            foreach (PropertyInfo property in properties)
+            foreach (Property property in properties)
             {
                 string name = property.Name;
-
-                XmlElementAttribute element = property.GetCustomAttribute<XmlElementAttribute>();
-                XmlAttributeAttribute attrib = property.GetCustomAttribute<XmlAttributeAttribute>();
-
-                if (element != null && !string.IsNullOrEmpty(element.ElementName))
-                    name = element.ElementName;
-
-                if (attrib != null && !string.IsNullOrEmpty(attrib.AttributeName))
-                    name = attrib.AttributeName;
-
-                string defaultVal = "";
-
-                DefaultValueAttribute defaultValAttrib = property.GetCustomAttribute<DefaultValueAttribute>();
-                if (defaultValAttrib != null)
-                    defaultVal = (defaultValAttrib.Value ?? "").ToString();
+                string defaultVal = ConfigCommand.FormatObject(property.Default);
 
                 string alias = "";
                 if (CommandLineOptionParser.Aliases.ContainsValue(name))
                     alias = $"({CommandLineOptionParser.Aliases.First(a => a.Value == name).Key})";
 
-                string descriptionText = CommandLineOptionParser.GetDescription(property.Name);
+                string descriptionText = property.Description;
                 string descriptionFormatted = FormatLines(descriptionText, false, 62);
 
-                propertyLines.Add((name, $"{alias,-3} {property.Name,-30}{GetPropertyTypeName(property.PropertyType),-20}{defaultVal,-10}{descriptionFormatted}"));
+                propertyLines.Add((name, $"{alias,-3} {property.Name,-30}{GetPropertyTypeName(property.Type),-20}{defaultVal,-10}{descriptionFormatted}"));
             }
 
             foreach (string prop in propertyLines.OrderBy(p => p.PropertyName).Select(p => p.Text))

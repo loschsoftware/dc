@@ -341,7 +341,7 @@ internal class ConfigCommand : CompilerCommand
         return 0;
     }
 
-    private static string FormatObject(object obj)
+    internal static string FormatObject(object obj)
     {
         if (obj == null)
             return "";
