@@ -10,7 +10,7 @@ using IOPath = System.IO.Path;
 
 namespace Dassie.Configuration;
 
-internal static class ProjectFileDeserializer
+internal static class ProjectFileSerializer
 {
     private static DassieConfig _config;
     public static DassieConfig DassieConfig => _config ??= Deserialize();
@@ -21,15 +21,21 @@ internal static class ProjectFileDeserializer
     public static void Reload() => _config = Deserialize();
     public static void Set(DassieConfig cfg) => _config = cfg;
 
+    public static string SerializeEmpty() => $"""
+        <?xml version="1.0" encoding="utf-8"?>
+        <DassieConfig FormatVersion="{DassieConfig.CurrentFormatVersion}">
+        </DassieConfig>
+        """;
+
     private static DassieConfig Deserialize()
         => Deserialize(ProjectConfigurationFileName);
 
     // Lookup paths for referenced configuration files
     private static readonly List<string> _lookupDirs =
     [
-        IOPath.Combine(IOPath.GetDirectoryName(typeof(ProjectFileDeserializer).Assembly.Location), SdkDirectoryName),
+        IOPath.Combine(IOPath.GetDirectoryName(typeof(ProjectFileSerializer).Assembly.Location), SdkDirectoryName),
         IOPath.Combine(ApplicationDataDirectoryPath, SdkDirectoryName),
-        IOPath.Combine(IOPath.GetDirectoryName(IOPath.GetDirectoryName(typeof(ProjectFileDeserializer).Assembly.Location)), SdkDirectoryName)
+        IOPath.Combine(IOPath.GetDirectoryName(IOPath.GetDirectoryName(typeof(ProjectFileSerializer).Assembly.Location)), SdkDirectoryName)
     ];
 
     public static XDocument Load(string path)

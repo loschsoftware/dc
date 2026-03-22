@@ -53,7 +53,7 @@ internal class CleanCommand : CompilerCommand
             return -1;
         }
 
-        DassieConfig config = ProjectFileDeserializer.DassieConfig;
+        DassieConfig config = ProjectFileSerializer.DassieConfig;
         config ??= new(null);
 
         if (config.ProjectGroup == null)
@@ -85,9 +85,9 @@ internal class CleanCommand : CompilerCommand
     {
         string workingDir = Directory.GetCurrentDirectory();
         Directory.SetCurrentDirectory(baseDir);
-        ProjectFileDeserializer.Reload();
+        ProjectFileSerializer.Reload();
 
-        DassieConfig config = ProjectFileDeserializer.DassieConfig;
+        DassieConfig config = ProjectFileSerializer.DassieConfig;
 
         if (Directory.Exists(config.BuildDirectory))
             Directory.Delete(config.BuildDirectory, true);

@@ -18,7 +18,7 @@ internal static class BuildEventHandler
         Context.ConfigurationPath ??= ProjectConfigurationFileName;
 
         MacroParser parser = new(config);
-        parser.SetMacroDefinitions(ProjectFileDeserializer.MacroDefinitions);
+        parser.SetMacroDefinitions(ProjectFileSerializer.MacroDefinitions);
 
         foreach (XmlElement command in buildEvent.CommandNodes)
         {

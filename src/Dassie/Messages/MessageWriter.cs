@@ -171,7 +171,7 @@ public static class MessageWriter
             
             try
             {
-                if (ProjectFileDeserializer.DassieConfig.PrintExceptionInfo)
+                if (ProjectFileSerializer.DassieConfig.PrintExceptionInfo)
                     TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
             }
             catch { }
@@ -188,7 +188,7 @@ public static class MessageWriter
             return;
 
         Context ??= new();
-        Context.Configuration ??= ProjectFileDeserializer.DassieConfig;
+        Context.Configuration ??= ProjectFileSerializer.DassieConfig;
         Context.Configuration ??= DassieConfig.Default;
         Context.ConfigurationPath ??= ProjectConfigurationFileName;
         Context.Configuration.IgnoredMessages ??= [];

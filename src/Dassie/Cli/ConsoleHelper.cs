@@ -69,7 +69,7 @@ internal static partial class ConsoleHelper
         {
             try
             {
-                if (ProjectFileDeserializer.DassieConfig.PrintExceptionInfo)
+                if (ProjectFileSerializer.DassieConfig.PrintExceptionInfo)
                     TextWriterBuildLogDevice.ErrorOut.WriteLine(ex);
             }
             catch { }

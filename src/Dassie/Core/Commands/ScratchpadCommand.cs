@@ -212,7 +212,7 @@ internal class ScratchpadCommand : CompilerCommand
 
             Directory.SetCurrentDirectory(dir);
 
-            DassieConfig cfg = ProjectFileDeserializer.DassieConfig;
+            DassieConfig cfg = ProjectFileSerializer.DassieConfig;
 
             int result = CompileCommand.Instance.Invoke([file]);
 

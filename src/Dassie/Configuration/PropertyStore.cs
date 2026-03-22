@@ -39,6 +39,24 @@ public class PropertyStore
     private IEnumerable<Property> _propertyDefs;
     internal IEnumerable<Property> Properties => _propertyDefs;
 
+    internal IEnumerable<Property> PropertyScope
+    {
+        get
+        {
+            List<Property> props = [.. Properties];
+
+            foreach (string name in _instantiatedProperties.Keys.Concat(_uninstantiatedProperties.Keys))
+            {
+                if (props.Any(p => p.Name == name))
+                    continue;
+
+                props.Add(new(name, typeof(object)));
+            }
+
+            return props;
+        }
+    }
+
     private readonly MacroParser _parser;
     private readonly Dictionary<string, object> _uninstantiatedProperties;
     private readonly Dictionary<string, object> _instantiatedProperties = [];
@@ -434,7 +452,7 @@ public class PropertyStore
 
         if (_uninstantiatedProperties.TryGetValue(key, out object pval))
         {
-            (object value, bool canBeCached) = Evaluate(pval, prop.Type);
+            (object value, bool canBeCached) = Evaluate(pval, prop?.Type ?? typeof(object));
             
             if (prop != null)
             {

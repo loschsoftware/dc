@@ -93,7 +93,7 @@ internal class RunCommand : CompilerCommand
 
     internal static (int Status, string AssemblyPath, bool IsNative, ISubsystem Type, bool IsProjectGroup) Compile(bool ignoreDS0031 = false, bool isProjectGroup = false, string buildProfile = null)
     {
-        DassieConfig config = ProjectFileDeserializer.DassieConfig;
+        DassieConfig config = ProjectFileSerializer.DassieConfig;
 
         if (ignoreDS0031)
             IgnoredCodes.Add(DS0031_NoEntryPoint);

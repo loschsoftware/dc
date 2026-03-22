@@ -118,7 +118,7 @@ internal class CompileCommand : CompilerCommand
         if (overrideSettings != null)
             config = overrideSettings;
         else
-            config = ProjectFileDeserializer.DassieConfig;
+            config = ProjectFileSerializer.DassieConfig;
 
         config ??= DassieConfig.Default;
         config.AssemblyFileName ??= asmName;

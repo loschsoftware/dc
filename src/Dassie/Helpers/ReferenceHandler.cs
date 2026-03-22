@@ -53,30 +53,30 @@ internal static class ReferenceHandler
         MessagePrefix = Path.GetDirectoryName(reference.ProjectFile).Split(Path.DirectorySeparatorChar).Last();
 
         string dir = Directory.GetCurrentDirectory();
-        DassieConfig prevConfig = ProjectFileDeserializer.DassieConfig;
+        DassieConfig prevConfig = ProjectFileSerializer.DassieConfig;
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(reference.ProjectFile));
-        ProjectFileDeserializer.Reload();
-        ProjectFileDeserializer.DassieConfig.Verbosity = prevConfig.Verbosity;
+        ProjectFileSerializer.Reload();
+        ProjectFileSerializer.DassieConfig.Verbosity = prevConfig.Verbosity;
 
         if (track)
-            _referencedProjectPaths.Add(ProjectFileDeserializer.Path);
+            _referencedProjectPaths.Add(ProjectFileSerializer.Path);
 
-        if (ProjectFileDeserializer.DassieConfig.References != null && ProjectFileDeserializer.DassieConfig.References.Any(r => r is ProjectReference))
+        if (ProjectFileSerializer.DassieConfig.References != null && ProjectFileSerializer.DassieConfig.References.Any(r => r is ProjectReference))
         {
-            IEnumerable<ProjectReference> refs = ProjectFileDeserializer.DassieConfig.References.Where(r => r is ProjectReference).Cast<ProjectReference>();
+            IEnumerable<ProjectReference> refs = ProjectFileSerializer.DassieConfig.References.Where(r => r is ProjectReference).Cast<ProjectReference>();
             foreach (ProjectReference projRef in refs)
             {
                 ResolveProjectReference(projRef, Directory.GetCurrentDirectory());
 
                 if (_referencedProjectPaths.Contains(projRef.ProjectFile))
                 {
-                    if (ProjectFileDeserializer.Path == projRef.ProjectFile)
+                    if (ProjectFileSerializer.Path == projRef.ProjectFile)
                     {
                         EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0205_CircularProjectDependency,
-                            nameof(StringHelper.ReferenceHandler_SelfReference), [Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1]],
+                            nameof(StringHelper.ReferenceHandler_SelfReference), [Path.GetDirectoryName(ProjectFileSerializer.Path).Split(Path.DirectorySeparatorChar)[^1]],
                             ProjectConfigurationFileName);
                     }
                     else
@@ -84,7 +84,7 @@ internal static class ReferenceHandler
                         EmitErrorMessageFormatted(
                             0, 0, 0,
                             DS0205_CircularProjectDependency,
-                            nameof(StringHelper.ReferenceHandler_CircularDependency), [Path.GetDirectoryName(ProjectFileDeserializer.Path).Split(Path.DirectorySeparatorChar)[^1], Path.GetDirectoryName(projRef.ProjectFile).Split(Path.DirectorySeparatorChar)[^1]],
+                            nameof(StringHelper.ReferenceHandler_CircularDependency), [Path.GetDirectoryName(ProjectFileSerializer.Path).Split(Path.DirectorySeparatorChar)[^1], Path.GetDirectoryName(projRef.ProjectFile).Split(Path.DirectorySeparatorChar)[^1]],
                             ProjectConfigurationFileName);
                     }
 
@@ -96,14 +96,14 @@ internal static class ReferenceHandler
             }
         }
 
-        int errCode = BuildCommand.Instance.Invoke(args ?? [], ProjectFileDeserializer.DassieConfig);
+        int errCode = BuildCommand.Instance.Invoke(args ?? [], ProjectFileSerializer.DassieConfig);
         Context.Configuration.Verbosity = prevConfig.Verbosity;
         EmitBuildLogMessageFormatted(nameof(StringHelper.ReferenceHandler_ProjectReferenceCompilationEnded), [reference.ProjectFile, errCode]);
 
         if (errCode != 0)
             return false;
 
-        if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.AssemblyFileName))
+        if (string.IsNullOrEmpty(ProjectFileSerializer.DassieConfig.AssemblyFileName))
         {
             EmitErrorMessageFormatted(
                 0, 0, 0,
@@ -114,7 +114,7 @@ internal static class ReferenceHandler
             return false;
         }
 
-        if (string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildDirectory) && reference.CopyToOutput)
+        if (string.IsNullOrEmpty(ProjectFileSerializer.DassieConfig.BuildDirectory) && reference.CopyToOutput)
         {
             EmitErrorMessageFormatted(
                 0, 0, 0,
@@ -125,10 +125,10 @@ internal static class ReferenceHandler
             return false;
         }
 
-        string outFile = $"{ProjectFileDeserializer.DassieConfig.AssemblyFileName}.dll";
+        string outFile = $"{ProjectFileSerializer.DassieConfig.AssemblyFileName}.dll";
 
-        if (!string.IsNullOrEmpty(ProjectFileDeserializer.DassieConfig.BuildDirectory))
-            outFile = Path.Combine(ProjectFileDeserializer.DassieConfig.BuildDirectory, outFile);
+        if (!string.IsNullOrEmpty(ProjectFileSerializer.DassieConfig.BuildDirectory))
+            outFile = Path.Combine(ProjectFileSerializer.DassieConfig.BuildDirectory, outFile);
 
         if (!reference.CopyToOutput)
         {
@@ -168,7 +168,7 @@ internal static class ReferenceHandler
         }
 
         Directory.SetCurrentDirectory(dir);
-        ProjectFileDeserializer.Set(prevConfig);
+        ProjectFileSerializer.Set(prevConfig);
         Context.Configuration = prevConfig;
         return true;
     }

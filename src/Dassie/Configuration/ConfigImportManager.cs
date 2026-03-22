@@ -34,7 +34,7 @@ internal static class ConfigImportManager
                         ProjectConfigurationFileName);
                 }
 
-                XElement importedRoot = ProjectFileDeserializer.Load(pathAttribute.Value).Root;
+                XElement importedRoot = ProjectFileSerializer.Load(pathAttribute.Value).Root;
                 macros.AddRange(ExtractImportedMacros(importedRoot));
             }
         }
@@ -116,7 +116,7 @@ internal static class ConfigImportManager
                 return;
             }
 
-            importedConfig = ProjectFileDeserializer.Deserialize(importPath, false);
+            importedConfig = ProjectFileSerializer.Deserialize(importPath, false);
         }
 
         Directory.SetCurrentDirectory(Path.GetDirectoryName(importPath));

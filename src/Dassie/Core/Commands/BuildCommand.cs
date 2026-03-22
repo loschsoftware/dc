@@ -41,7 +41,7 @@ internal class BuildCommand : CompilerCommand
 
     internal int Invoke(string[] args, DassieConfig overrideConfig)
     {
-        DassieConfig config = ProjectFileDeserializer.DassieConfig;
+        DassieConfig config = ProjectFileSerializer.DassieConfig;
 
         if (overrideConfig != null)
             config = overrideConfig;

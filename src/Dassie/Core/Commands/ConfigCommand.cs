@@ -93,8 +93,8 @@ internal class ConfigCommand : CompilerCommand
                 return -1;
             }
 
-            _ = ProjectFileDeserializer.DassieConfig;
-            Dictionary<string, string> definedMacros = ProjectFileDeserializer.MacroDefinitions.Select(d => new KeyValuePair<string, string>(d.Name, d.Value)).ToDictionary();
+            _ = ProjectFileSerializer.DassieConfig;
+            Dictionary<string, string> definedMacros = ProjectFileSerializer.MacroDefinitions.Select(d => new KeyValuePair<string, string>(d.Name, d.Value)).ToDictionary();
             PrintProperties(definedMacros.Select(k => (k.Key, "", k.Value)).OrderBy(k => k.Key).ToList(), true);
             return 0;
         }
@@ -178,13 +178,13 @@ internal class ConfigCommand : CompilerCommand
 
         if (File.Exists(ProjectConfigurationFileName))
         {
-            DassieConfig config = ProjectFileDeserializer.DassieConfig;
+            DassieConfig config = ProjectFileSerializer.DassieConfig;
 
             if (properties.Count == 0 && macros.Count == 0)
             {
                 List<(string Key, string Type, string Value)> props = [];
 
-                foreach (Property prop in config.Store.Properties)
+                foreach (Property prop in config.Store.PropertyScope)
                 {
                     if (prop.Name == nameof(DassieConfig.MacroDefinitions))
                         continue;
@@ -215,7 +215,7 @@ internal class ConfigCommand : CompilerCommand
             }
 
             XDocument doc = XDocument.Load(ProjectConfigurationFileName, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-            PropertyInfo[] dsconfigProps = typeof(DassieConfig).GetProperties();
+            IEnumerable<Property> dsconfigProps = config.Store.Properties;
 
             if (macros.Count >= 1)
                 config.MacroDefinitions ??= [];
@@ -245,26 +245,15 @@ internal class ConfigCommand : CompilerCommand
 
             foreach (KeyValuePair<string, string> prop in properties)
             {
-                PropertyInfo dsconfigProperty = null;
+                Property dsconfigProperty = null;
 
                 if (dsconfigProps.Any(p => p.Name.Equals(prop.Key, StringComparison.OrdinalIgnoreCase)))
                     dsconfigProperty = dsconfigProps.First(p => p.Name.Equals(prop.Key, StringComparison.OrdinalIgnoreCase));
 
-                if (dsconfigProperty == null)
-                {
-                    EmitErrorMessageFormatted(
-                        0, 0, 0,
-                        DS0253_DCConfigInvalidProperty,
-                        nameof(StringHelper.ConfigCommand_InvalidProjectFileProperty), [prop.Key],
-                        CompilerExecutableName);
+                dsconfigProperty ??= new(prop.Key, typeof(string), "");
 
-                    continue;
-                }
-
-                Type propertyType = dsconfigProperty.PropertyType;
-                object defaultVal = null;
-                if (dsconfigProperty.GetCustomAttribute<DefaultValueAttribute>() is DefaultValueAttribute dva)
-                    defaultVal = dva.Value;
+                Type propertyType = dsconfigProperty.Type;
+                object defaultVal = dsconfigProperty.Default;
 
                 if (propertyType != typeof(string) && !propertyType.IsPrimitive && !propertyType.IsEnum)
                 {
@@ -326,7 +315,11 @@ internal class ConfigCommand : CompilerCommand
                 }
 
                 if (!doc.Descendants().Any(d => d.Name == dsconfigProperty.Name))
+                {
+                    doc.Root.Add(new XText("    "));
                     doc.Root.Add(new XElement(dsconfigProperty.Name, format));
+                    doc.Root.Add(new XText(Environment.NewLine));
+                }
 
                 removed.ForEach(e => e.Remove());
             }
@@ -335,15 +328,7 @@ internal class ConfigCommand : CompilerCommand
             return 0;
         }
 
-        using StreamWriter configWriter = new(ProjectConfigurationFileName);
-
-        XmlSerializerNamespaces ns = new();
-        ns.Add("", "");
-
-        XmlSerializer xmls = new(typeof(DassieConfig));
-        xmls.Serialize(configWriter, new DassieConfig(null), ns);
-
-        configWriter.Dispose();
+        File.WriteAllText(ProjectConfigurationFileName, ProjectFileSerializer.SerializeEmpty());
 
         if (properties.Count == 0)
         {

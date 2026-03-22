@@ -40,7 +40,7 @@ internal class DeployCommand : CompilerCommand
 
     private static int Deploy(string[] args, string baseDir, bool noDeleteTempDirectory)
     {
-        DassieConfig config = ProjectFileDeserializer.DassieConfig;
+        DassieConfig config = ProjectFileSerializer.DassieConfig;
         ProjectGroup group = config.ProjectGroup;
 
         if (!File.Exists(ProjectConfigurationFileName))
@@ -162,7 +162,7 @@ internal class DeployCommand : CompilerCommand
             if (exit != 0)
                 return exit;
 
-            DassieConfig executableProj = ProjectFileDeserializer.Deserialize(path);
+            DassieConfig executableProj = ProjectFileSerializer.Deserialize(path);
             XmlAttribute[] attribs = new XmlAttribute[target.Attributes.Count];
             target.Attributes.CopyTo(attribs, 0);
 
