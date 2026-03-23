@@ -113,7 +113,21 @@ internal partial class MacroParser
                         }
                     }
 
-                    string expanded = runtimeMacro.Expand(args) ?? string.Empty;
+                    string expanded = "";
+
+                    try
+                    {
+                        expanded = runtimeMacro.Expand(args) ?? string.Empty;
+                    }
+                    catch (Exception ex)
+                    {
+                        EmitErrorMessageFormatted(
+                            0, 0, 0,
+                            DS0083_InvalidDSConfigMacro,
+                            nameof(StringHelper.MacroParser_MacroThrewException), [invocationKey, ex.ToString()],
+                            ProjectConfigurationFileName);
+                    }
+
                     ExpansionResult nested = _owner.Expand(expanded, _paramScope, _stack);
                     canBeCached &= nested.CanBeCached;
                     canBeCached &= runtimeMacro.Options.HasFlag(MacroOptions.AllowCaching);

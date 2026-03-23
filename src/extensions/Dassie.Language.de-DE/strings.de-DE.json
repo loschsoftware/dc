@@ -338,6 +338,7 @@
 
   "MacroParser_MacroNotDefined": "Makro '{0}' konnte nicht expandiert werden: Makro ist nicht definiert.",
   "MacroParser_RecursionDepthReached": "Makro '{0}' konnte nicht expandiert werden: Maximale Rekursionstiefe erreicht.",
+  "MacroParser_MacroThrewException": "Makro '{0}' konnte nicht expandiert werden: Makro löste eine Ausnahme aus. {1}",
 
   "CompilerCommandBuildAction_MissingCommand": "Build-Aktion '{0}': Erforderliches Attribut 'Command' fehlt.",
 

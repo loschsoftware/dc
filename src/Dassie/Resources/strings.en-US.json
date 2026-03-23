@@ -338,6 +338,7 @@
 
   "MacroParser_MacroNotDefined": "Failed to expand macro '{0}': Macro is not defined.",
   "MacroParser_RecursionDepthReached": "Failed to expand macro '{0}': Maximum recursion depth reached.",
+  "MacroParser_MacroThrewException": "Failed to expand macro '{0}': Macro threw an exception. {1}",
 
   "CompilerCommandBuildAction_MissingCommand": "Build action '{0}': Missing required attribute 'Command'.",
 
