@@ -14,7 +14,7 @@ internal class EvalMacro : IMacro
 
     public string Name => "Eval";
 
-    private readonly List<MacroParameter> _params = [new("Expression")];
+    private readonly List<MacroParameter> _params = [new("Expression", true)];
     public List<MacroParameter> Parameters => _params;
 
     public MacroOptions Options => MacroOptions.None;
