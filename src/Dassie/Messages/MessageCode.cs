@@ -1130,5 +1130,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when an invocation of the $(Eval) macro is unsuccessful.
     /// </summary>
-    DS0274_EvalMacroFailed
+    DS0274_EvalMacroFailed,
+    /// <summary>
+    /// Emitted when an invocation of the 'SetEnvironmentVariable' build action fails due to a missing attribute.
+    /// </summary>
+    DS0275_SetEnvironmentVariableMissingAttribute
 }

@@ -8,7 +8,7 @@ internal class PropMacro(DassieConfig config) : IMacro
 {
     public string Name => "Prop";
 
-    private readonly List<MacroParameter> _params = [new("PropertyName")];
+    private readonly List<MacroParameter> _params = [new("PropertyName", true)];
     public List<MacroParameter> Parameters => _params;
 
     public MacroOptions Options => MacroOptions.None;

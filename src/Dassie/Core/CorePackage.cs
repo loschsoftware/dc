@@ -98,7 +98,8 @@ internal class CorePackage : IPackage
         new CompilerCommandBuildAction(),
         new ShellCommandBuildAction(),
         new PrintBuildAction(),
-        new LogBuildAction()
+        new LogBuildAction(),
+        new SetEnvironmentVariableBuildAction()
     ];
 
     public IResourceProvider<string>[] LocalizationResourceProviders() =>

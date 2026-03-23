@@ -762,5 +762,7 @@
   "TestRunner_TestPassed": "✓ Passed",
   "TestRunner_TestFailed": "✘ Failed",
 
-  "EvalMacro_EvaluationFailed": "Failed to evaluate expression '{0}'. {1}"
+  "EvalMacro_EvaluationFailed": "Failed to evaluate expression '{0}'. {1}",
+
+  "SetEnvironmentVariableBuildAction_MissingRequiredAttribute": "SetEnvironmentVariable: Missing required attribute '{0}'."
 }

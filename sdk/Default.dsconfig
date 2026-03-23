@@ -7,7 +7,7 @@
 
         <!-- Conditionals -->
         <Define Macro="If" Parameters="[!Condition, Then, Else]" Trim="true">
-            $(Eval: ? $(@Condition) = { $(@Then) } : = { $(@Else) })
+            $(Eval: ? $(@Condition) = { ^^"$(@Then)" } : = { ^^"$(@Else)" })
         </Define>
 
         <!-- Logic -->
