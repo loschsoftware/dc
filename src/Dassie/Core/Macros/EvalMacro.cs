@@ -35,10 +35,12 @@ internal class EvalMacro : IMacro
             return "";
 
         string code = $$"""
+            import Dassie.Core
+
             module Eval = {
                 GetResult (): string = {
-                    value = { {{expr}} }
-                    formatm value
+                    value = ({ {{expr}} } <: object)
+                    Value.formatm value
                 }
             }
             """;
