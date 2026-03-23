@@ -75,7 +75,19 @@ internal class CompileCommand : CompilerCommand
     }
 
     public override int Invoke(string[] args) => Compile(args);
-    public int Invoke(string[] args, DassieConfig overrideSettings, string assemblyName = null) => Compile(args, overrideSettings, assemblyName);
+    public int Invoke(string[] args, DassieConfig overrideSettings, string assemblyName = null)
+    {
+        DassieConfig prevConfig = Context?.Configuration;
+
+        try
+        {
+            return Compile(args, overrideSettings, assemblyName);
+        }
+        finally
+        {
+            Context?.Configuration = prevConfig;
+        }
+    }
 
     internal static void Abort()
     {
