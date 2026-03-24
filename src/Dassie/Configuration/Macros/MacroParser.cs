@@ -56,13 +56,20 @@ internal partial class MacroParser
 
         List<AdHocMacro> macros =
         [
+            // General
             new("Time", MacroOptions.None, () => DateTime.Now.ToShortTimeString()),
             new("TimeExact", MacroOptions.None, () => DateTime.Now.ToString("HH:mm:ss.ffff")),
             new("Date", MacroOptions.None, () => DateTime.Now.ToShortDateString()),
             // Probably good to cache this, might be unexpected for the year to change midway through a build
             new("Year", MacroOptions.AllowCaching, () => DateTime.Now.Year.ToString()),
             new("CompilerDir", MacroOptions.AllowCaching, () => compilerDir),
-            new("CompilerPath", MacroOptions.AllowCaching, () => compilerPath)
+            new("CompilerPath", MacroOptions.AllowCaching, () => compilerPath),
+            
+            // Project-specific
+            new("ProjectName", MacroOptions.AllowCaching, () => Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)).Split(Path.DirectorySeparatorChar).Last()),
+            new("ProjectDir", MacroOptions.AllowCaching, () => Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)) + Path.DirectorySeparatorChar),
+            new("OutputDir", MacroOptions.AllowCaching, () => Path.GetFullPath(_propertyResolver("BuildDirectory")?.ToString() ?? Directory.GetCurrentDirectory()) + Path.DirectorySeparatorChar),
+            new("TargetPath", MacroOptions.AllowCaching, () => Path.GetFullPath(Path.Combine(_propertyResolver("BuildDirectory").ToString(), $"{_propertyResolver("AssemblyFileName")}.dll")))
         ];
 
         _additionalMacros.AddRange(macros);
