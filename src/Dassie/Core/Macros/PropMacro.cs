@@ -15,6 +15,6 @@ internal class PropMacro(DassieConfig config) : IMacro
 
     public string Expand(Dictionary<string, string> arguments)
     {
-        return config[arguments["PropertyName"]]?.ToString() ?? "";
+        return Value.formatm(config[arguments["PropertyName"]]) ?? "";
     }
 }

@@ -56,6 +56,9 @@ public static class Value
     /// <returns>A string representation for the object, suitable for use in build system macros.</returns>
     public static string formatm(object obj)
     {
+        if (obj is null)
+            return "";
+
         string str = obj.ToString();
 
         if (obj is bool)
