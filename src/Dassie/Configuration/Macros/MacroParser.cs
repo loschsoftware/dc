@@ -64,8 +64,11 @@ internal partial class MacroParser
             new("Year", MacroOptions.AllowCaching, () => DateTime.Now.Year.ToString()),
             new("CompilerDir", MacroOptions.AllowCaching, () => compilerDir),
             new("CompilerPath", MacroOptions.AllowCaching, () => compilerPath),
+            new("Guid", MacroOptions.AllowCaching, () => Guid.NewGuid().ToString()),
+            new("NewGuid", MacroOptions.None, () => Guid.NewGuid().ToString()),
             
             // Project-specific
+            new("ProjectFilePath", MacroOptions.AllowCaching, () => Path.GetFullPath(ProjectConfigurationFileName)),
             new("ProjectName", MacroOptions.AllowCaching, () => Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)).Split(Path.DirectorySeparatorChar).Last()),
             new("ProjectDir", MacroOptions.AllowCaching, () => Path.GetDirectoryName(Path.GetFullPath(ProjectConfigurationFileName)) + Path.DirectorySeparatorChar),
             new("OutputDir", MacroOptions.AllowCaching, () => Path.GetFullPath(_propertyResolver("BuildDirectory")?.ToString() ?? Directory.GetCurrentDirectory()) + Path.DirectorySeparatorChar),

@@ -15,6 +15,9 @@ internal static class ProjectFileSerializer
     private static DassieConfig _config;
     public static DassieConfig DassieConfig => _config ??= Deserialize();
 
+    private static MacroParser _macroParser;
+    public static MacroParser MacroParser => _macroParser;
+
     public static string Path { get; private set; }
     public static IReadOnlyList<Define> MacroDefinitions { get; private set; }
 
@@ -193,15 +196,15 @@ internal static class ProjectFileSerializer
 
         MacroDefinitions = GetMacroDefinitions(rawValues);
 
-        MacroParser parser = new();
-        parser.SetMacroDefinitions(MacroDefinitions);
+        _macroParser = new();
+        _macroParser.SetMacroDefinitions(MacroDefinitions);
 
-        PropertyStore ps = new(ExtensionLoader.Properties, parser, rawValues);
+        PropertyStore ps = new(ExtensionLoader.Properties, _macroParser, rawValues);
         DassieConfig config = new(ps, doc);
-        parser.BindPropertyResolver(key => config[key]);
+        _macroParser.BindPropertyResolver(key => config[key]);
 
         PropMacro propMacro = new(config);
-        parser.AddMacro(propMacro);
+        _macroParser.AddMacro(propMacro);
 
         if (config.Extensions != null && config.Extensions.Count > 0)
             ExtensionLoader.LoadTransientExtensions(config.Extensions.Select(e => (IOPath.GetFullPath(e.Path), e.Attributes, e.Elements)));
