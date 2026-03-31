@@ -2,9 +2,7 @@ using Dassie.Configuration.ProjectGroups;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace Dassie.Configuration;
@@ -30,12 +28,9 @@ public partial class DassieConfig : ConfigObject
     /// <summary>
     /// Initializes a new instance of the <see cref="DassieConfig"/> type.
     /// </summary>
-    public DassieConfig() : this(PropertyStore.Default) { }
-
-    internal XDocument Document { get; }
-    internal DassieConfig(PropertyStore store, XDocument document) : base(store)
+    public DassieConfig() : this(PropertyStore.Default)
     {
-        Document = document;
+        FormatVersion = CurrentFormatVersion;
     }
 
     /// <summary>
@@ -113,6 +108,7 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("Specifies the version of the configuration format to use.")]
     [XmlAttribute]
+    [Explicit]
     [ConfigProperty]
     public partial string FormatVersion { get; set; }
 
@@ -194,6 +190,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the application type and subsystem of the program.")]
     [XmlElement]
     [DefaultValue("Console")]
+    [Explicit]
     [ConfigProperty]
     public partial string ApplicationType { get; set; }
 

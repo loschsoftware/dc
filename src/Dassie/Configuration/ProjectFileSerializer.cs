@@ -5,6 +5,8 @@ using Dassie.Messages.Devices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using IOPath = System.IO.Path;
 
@@ -29,6 +31,18 @@ internal static class ProjectFileSerializer
         <DassieConfig FormatVersion="{DassieConfig.CurrentFormatVersion}">
         </DassieConfig>
         """;
+
+    public static void Serialize(DassieConfig config, string path)
+    {
+        XmlWriterSettings settings = new()
+        {
+            Indent = true
+        };
+
+        using XmlWriter writer = XmlWriter.Create(path, settings);
+        config.Node.WriteTo(writer);
+        writer.Flush();
+    }
 
     private static DassieConfig Deserialize()
         => Deserialize(ProjectConfigurationFileName);
@@ -200,7 +214,7 @@ internal static class ProjectFileSerializer
         _macroParser.SetMacroDefinitions(MacroDefinitions);
 
         PropertyStore ps = new(ExtensionLoader.Properties, _macroParser, rawValues);
-        DassieConfig config = new(ps, doc);
+        DassieConfig config = new(ps);
         _macroParser.BindPropertyResolver(key => config[key]);
 
         PropMacro propMacro = new(config);

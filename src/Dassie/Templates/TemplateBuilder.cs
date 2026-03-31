@@ -106,9 +106,7 @@ internal static class TemplateBuilder
             if (entry is ProjectFile p)
             {
                 DassieConfig cfg = p.Content ?? DassieConfig.Default;
-                using StreamWriter sw = new(Path.Combine(rootDir, ProjectConfigurationFileName));
-                XmlSerializer xmls = new(typeof(DassieConfig));
-                xmls.Serialize(sw, cfg, ns);
+                ProjectFileSerializer.Serialize(cfg, Path.Combine(rootDir, ProjectConfigurationFileName));
                 continue;
             }
 
@@ -138,9 +136,7 @@ internal static class TemplateBuilder
             if (child is ProjectFile p)
             {
                 DassieConfig cfg = p.Content ?? DassieConfig.Default;
-                using StreamWriter sw = new(Path.Combine(baseDir, ProjectConfigurationFileName));
-                XmlSerializer xmls = new(typeof(DassieConfig));
-                xmls.Serialize(sw, cfg, ns);
+                ProjectFileSerializer.Serialize(cfg, Path.Combine(baseDir, ProjectConfigurationFileName));
                 continue;
             }
 
