@@ -58,7 +58,7 @@ public abstract class ConfigObject
             return [new XAttribute(attribName, val)];
         }
 
-        if (prop.GetCustomAttribute<XmlTextAttribute>() is XmlTextAttribute)
+        if (prop.GetCustomAttribute<XmlTextAttribute>() != null)
             return [new XText(val.ToString())];
 
         if (prop.GetCustomAttribute<XmlArrayAttribute>() is XmlArrayAttribute xmlArray)
@@ -71,7 +71,7 @@ public abstract class ConfigObject
             return [arrayElem];
         }
 
-        if (prop.GetCustomAttribute<XmlAnyElementAttribute>() is XmlAnyElementAttribute xmlAnyElement)
+        if (prop.GetCustomAttribute<XmlAnyElementAttribute>() != null)
         {
             List<XElement> elems = [];
 
@@ -84,7 +84,7 @@ public abstract class ConfigObject
             return elems;
         }
 
-        if (prop.GetCustomAttribute<XmlAnyAttributeAttribute>() is XmlAnyAttributeAttribute xmlAnyAttribute)
+        if (prop.GetCustomAttribute<XmlAnyAttributeAttribute>() != null)
         {
             List<XAttribute> attribs = [];
 
