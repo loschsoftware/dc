@@ -1,5 +1,4 @@
-﻿using Dassie.Configuration;
-using Dassie.Extensions;
+﻿using Dassie.Extensions;
 
 namespace Dassie.Templates;
 
@@ -17,9 +16,12 @@ internal class LibraryProject : IProjectTemplate
         {
             Name = "src",
             Children = [new ProjectTemplateFile() {
-                Name = "type1.ds",
+                Name = "Type1.ds",
                 FormattedContent = """
+                export $(ProjectName)
+
                 type Type1 = {
+                    
                 }
                 """
             }]

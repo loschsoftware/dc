@@ -93,63 +93,41 @@ internal static class TemplateBuilder
         }
 
         Directory.CreateDirectory(rootDir);
+        string prevWorkingDir = Directory.GetCurrentDirectory();
+        Directory.SetCurrentDirectory(rootDir);
         DassieConfig config = null;
 
         if (selectedTemplate.Entries.Any(t => t is ProjectFile))
             config = (selectedTemplate.Entries.First(t => t is ProjectFile) as ProjectFile).Content;
 
-        XmlSerializerNamespaces ns = new();
-        ns.Add("", "");
-
-        foreach (ProjectTemplateEntry entry in selectedTemplate.Entries ?? [])
-        {
-            if (entry is ProjectFile p)
-            {
-                DassieConfig cfg = p.Content ?? DassieConfig.Default;
-                ProjectFileSerializer.Serialize(cfg, Path.Combine(rootDir, ProjectConfigurationFileName));
-                continue;
-            }
-
-            if (entry is ProjectTemplateFile f)
-            {
-                using StreamWriter sw = new(Path.Combine(rootDir, f.Name));
-                // TODO: Expand macros in f
-                continue;
-            }
-
-            ProjectTemplateDirectory dir = entry as ProjectTemplateDirectory;
-            string subDir = Directory.CreateDirectory(Path.Combine(rootDir, dir.Name)).FullName;
-            BuildDirectoryStructure(dir, subDir);
-        }
-
+        SerializeContents(selectedTemplate.Entries ?? [], rootDir, config);
         WriteLine(StringHelper.Format(nameof(StringHelper.TemplateBuilder_ProjectBuilt), rootDir, args[0]));
+        Directory.SetCurrentDirectory(prevWorkingDir);
         return 0;
     }
 
-    private static void BuildDirectoryStructure(ProjectTemplateDirectory dir, string baseDir)
+    private static void SerializeContents(IEnumerable<ProjectTemplateEntry> entries, string baseDir, DassieConfig config)
     {
-        XmlSerializerNamespaces ns = new();
-        ns.Add("", "");
-
-        foreach (ProjectTemplateEntry child in dir.Children ?? [])
+        foreach (ProjectTemplateEntry entry in entries)
         {
-            if (child is ProjectFile p)
+            if (entry is ProjectFile p)
             {
                 DassieConfig cfg = p.Content ?? DassieConfig.Default;
                 ProjectFileSerializer.Serialize(cfg, Path.Combine(baseDir, ProjectConfigurationFileName));
                 continue;
             }
 
-            if (child is ProjectTemplateFile f)
+            if (entry is ProjectTemplateFile f)
             {
                 using StreamWriter sw = new(Path.Combine(baseDir, f.Name));
-                // TODO: Expand macros in f
+                MacroParser mp = new(config);
+                sw.Write(mp.Expand(f.FormattedContent).Value);
                 continue;
             }
 
-            ProjectTemplateDirectory sub = child as ProjectTemplateDirectory;
-            string newDir = Directory.CreateDirectory(Path.Combine(baseDir, sub.Name)).FullName;
-            BuildDirectoryStructure(sub, newDir);
+            ProjectTemplateDirectory dir = entry as ProjectTemplateDirectory;
+            string subDir = Directory.CreateDirectory(Path.Combine(baseDir, dir.Name)).FullName;
+            SerializeContents(dir.Children ?? [], subDir, config);
         }
     }
 }
