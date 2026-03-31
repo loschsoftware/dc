@@ -117,11 +117,17 @@ internal static class TemplateBuilder
                 continue;
             }
 
-            if (entry is ProjectTemplateFile f)
+            if (entry is ProjectTemplateSourceFile f)
             {
                 using StreamWriter sw = new(Path.Combine(baseDir, f.Name));
                 MacroParser mp = new(config);
                 sw.Write(mp.Expand(f.FormattedContent).Value);
+                continue;
+            }
+            
+            if (entry is ProjectTemplateAuxiliaryFile af)
+            {
+                File.WriteAllBytes(Path.Combine(baseDir, af.Name), af.Contents);
                 continue;
             }
 

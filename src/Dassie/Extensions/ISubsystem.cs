@@ -25,10 +25,10 @@ public interface ISubsystem
     /// <summary>
     /// A list of references that are automatically included when this subsystem is used.
     /// </summary>
-    public Reference[] References { get; }
+    public virtual Reference[] References => [];
 
     /// <summary>
     /// A list of namespaces and modules that are automatically imported when this subsystem is used.
     /// </summary>
-    public string[] Imports { get; }
+    public virtual string[] Imports => [];
 }

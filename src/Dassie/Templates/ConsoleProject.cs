@@ -1,5 +1,4 @@
-﻿using Dassie.Configuration;
-using Dassie.Extensions;
+﻿using Dassie.Extensions;
 
 namespace Dassie.Templates;
 
@@ -13,26 +12,18 @@ internal class ConsoleProject : IProjectTemplate
 
     private ConsoleProject()
     {
-        ProjectTemplateDirectory srcDir = new()
-        {
-            Name = "src",
-            Children = [new ProjectTemplateFile() {
-                Name = "main.ds",
-                FormattedContent = """
+        ProjectTemplateDirectory srcDir = new("src",
+            Children: [new ProjectTemplateSourceFile("main.ds", """
                 println "Hello World!"
-                """
-            }]
-        };
+                """)]);
 
         Entries = [
             srcDir,
-            new ProjectFile() {
-                Content = new() {
-                    BuildDirectory = "./build",
-                    RootNamespace = "$(ProjectName)",
-                    AssemblyFileName = "$(ProjectName)"
-                }
-            }
+            new ProjectFile(new() {
+                BuildDirectory = "./build",
+                RootNamespace = "$(ProjectName)",
+                AssemblyFileName = "$(ProjectName)"
+            })
         ];
     }
 

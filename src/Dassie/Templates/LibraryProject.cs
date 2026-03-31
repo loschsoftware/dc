@@ -12,31 +12,23 @@ internal class LibraryProject : IProjectTemplate
 
     private LibraryProject()
     {
-        ProjectTemplateDirectory srcDir = new()
-        {
-            Name = "src",
-            Children = [new ProjectTemplateFile() {
-                Name = "Type1.ds",
-                FormattedContent = """
+        ProjectTemplateDirectory srcDir = new("src",
+            Children: [new ProjectTemplateSourceFile("Type1.ds", """
                 export $(ProjectName)
 
                 type Type1 = {
                     
                 }
-                """
-            }]
-        };
+                """)]);
 
         Entries = [
             srcDir,
-            new ProjectFile() {
-                Content = new() {
-                    ApplicationType = "Library",
-                    BuildDirectory = "./build",
-                    RootNamespace = "$(ProjectName)",
-                    AssemblyFileName = "$(ProjectName)"
-                }
-            }
+            new ProjectFile(new() {
+                ApplicationType = "Library",
+                BuildDirectory = "./build",
+                RootNamespace = "$(ProjectName)",
+                AssemblyFileName = "$(ProjectName)"
+            })
         ];
     }
 
