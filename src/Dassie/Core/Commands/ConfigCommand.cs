@@ -217,9 +217,6 @@ internal class ConfigCommand : CompilerCommand
             XDocument doc = XDocument.Load(ProjectConfigurationFileName, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
             IEnumerable<Property> dsconfigProps = config.Store.Properties;
 
-            if (macros.Count >= 1)
-                config.MacroDefinitions ??= [];
-
             foreach (KeyValuePair<string, string> macro in macros)
             {
                 XElement macroDefs = doc.Root.Element("MacroDefinitions");
@@ -230,7 +227,7 @@ internal class ConfigCommand : CompilerCommand
                 }
 
                 XElement macroElement = macroDefs.Elements("Define")
-                         .FirstOrDefault(e => (string)e.Attribute("Macro") == macro.Key);
+                    .FirstOrDefault(e => (string)e.Attribute("Macro") == macro.Key);
 
                 if (macroElement != null)
                 {
@@ -245,6 +242,9 @@ internal class ConfigCommand : CompilerCommand
 
             foreach (KeyValuePair<string, string> prop in properties)
             {
+                if (string.IsNullOrWhiteSpace(prop.Key))
+                    continue;
+
                 Property dsconfigProperty = null;
 
                 if (dsconfigProps.Any(p => p.Name.Equals(prop.Key, StringComparison.OrdinalIgnoreCase)))
