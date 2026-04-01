@@ -238,7 +238,7 @@ div.CAUTION h5,
     --divider-color: #edebe9;
 
     --code-background: #f3f2f1;
-    --code-block-background: #1f1f1f;
+    --code-block-background: #f8f8f8;
 
     --border-radius-sm: 4px;
     --border-radius-md: 8px;
@@ -330,8 +330,9 @@ code {
 
 pre {
     background: var(--code-block-background);
-    border-radius: var(--border-radius-md);
-    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 0.875rem 1rem;
     overflow-x: auto;
 }
 
