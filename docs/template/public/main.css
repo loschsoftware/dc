@@ -328,14 +328,6 @@ code {
     border: 1px solid var(--border-color);
 }
 
-pre {
-    background: var(--code-block-background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    padding: .3rem;
-    overflow-x: auto;
-}
-
 table {
     width: 100%;
     border-collapse: collapse;
