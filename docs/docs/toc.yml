@@ -1,5 +1,27 @@
 - name: Overview
   href: index.md
+- name: Host Architecture
+  items:
+    - name: Overview
+      href: host/index.md
+    - name: Extensions
+      items:
+        - name: Overview
+          href: host/extensions/index.md
+        - name: Capabilities
+          href: host/extensions/capabilities.md
+        - name: Lifecycle
+          href: host/extensions/lifecycle.md
+    - name: Configuration
+      items:
+        - name: Global configuration
+          href: host/config/global-config.md
+        - name: Local configuration
+          href: host/config/local-config.md
+    - name: Localization
+      href: host/localization.md
+    - name: Messages
+      href: host/messages.md
 - name: Getting Started
   href: getting-started.md
 - name: Command-Line Reference
