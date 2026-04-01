@@ -1,6 +1,5 @@
 ﻿using Dassie.Core.Properties;
 using Dassie.Extensions;
-using Dassie.Resources;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,29 +18,32 @@ internal class VersionCommand : CompilerCommand
     public override CommandOptions Options => CommandOptions.Hidden | CommandOptions.NoHelpRouting;
     public override string Description => "";
 
+    public static Version GetFriendlyVersion(Version version)
+    {
+        // 8517 -> Days between 01/01/2000 and 27/04/2023, on which development on dc was started
+        return new(version.Major, version.Minor, version.Build - 8517);
+    }
+
+    public static Version AssemblyFriendlyVersion => GetFriendlyVersion(Assembly.GetExecutingAssembly().GetName().Version);
+    public static DateOnly AssemblyBuildDate => new DateOnly(2000, 1, 1).AddDays(AssemblyFriendlyVersion.Build);
+
     public override int Invoke(string[] args)
     {
         StringBuilder output = new();
-
-        Version v = Assembly.GetExecutingAssembly().GetName().Version;
-        // 8517 -> Days between 01/01/2000 and 27/04/2023, on which development on dc was started
-        Version version = new(v.Major, v.Minor, v.Build - 8517);
-        DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
-
         int padding = 35;
 
         output.AppendLine();
         output.AppendLine(StringHelper.ProductNameFull);
-        output.AppendLine(StringHelper.Format(nameof(StringHelper.VersionCommand_Copyright), buildDate.Year));
+        output.AppendLine(StringHelper.Format(nameof(StringHelper.VersionCommand_Copyright), AssemblyBuildDate.Year));
 
         output.AppendLine();
-        output.AppendLine(StringHelper.Format(nameof(StringHelper.VersionCommand_BuildID), IdCommand.GetBuildID(version)));
+        output.AppendLine(StringHelper.Format(nameof(StringHelper.VersionCommand_BuildID), IdCommand.GetBuildID(AssemblyFriendlyVersion)));
 
         output.AppendLine();
         output.AppendLine(StringHelper.VersionCommand_Environment);
-        output.AppendLine($"{StringHelper.VersionCommand_CompilerVersion.PadRight(padding)}{v.ToString(2)}");
-        output.AppendLine($"{StringHelper.VersionCommand_BuildNumber.PadRight(padding)}{version.Build}");
-        output.AppendLine($"{StringHelper.VersionCommand_CompilationDate.PadRight(padding)}{buildDate.ToShortDateString()}");
+        output.AppendLine($"{StringHelper.VersionCommand_CompilerVersion.PadRight(padding)}{AssemblyFriendlyVersion.ToString(2)}");
+        output.AppendLine($"{StringHelper.VersionCommand_BuildNumber.PadRight(padding)}{AssemblyFriendlyVersion.Build}");
+        output.AppendLine($"{StringHelper.VersionCommand_CompilationDate.PadRight(padding)}{AssemblyBuildDate.ToShortDateString()}");
         output.Append(StringHelper.VersionCommand_CompilerArchitecture.PadRight(padding));
 
 #if STANDALONE
@@ -76,9 +78,7 @@ internal class IdCommand : CompilerCommand
 
     public override int Invoke(string[] args)
     {
-        Version v = Assembly.GetExecutingAssembly().GetName().Version;
-        Version version = new(v.Major, v.Minor, v.Build - 8517);
-        WriteString($"{GetBuildID(version)}{Environment.NewLine}");
+        WriteString($"{GetBuildID(VersionCommand.AssemblyFriendlyVersion)}{Environment.NewLine}");
         return 0;
     }
 

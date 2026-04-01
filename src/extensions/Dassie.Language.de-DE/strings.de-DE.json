@@ -544,6 +544,7 @@
   "PackageCommand_SpecifiedExtensionNotFound": "Die angegebene Erweiterung konnte nicht gefunden werden.",
   "PackageCommand_Details": "Details",
   "PackageCommand_NameColon": "Name:",
+  "PackageCommand_ParentPackageColon": "Übergeordnetes Paket:",
   "PackageCommand_DescriptionColon": "Beschreibung:",
   "PackageCommand_Author": "Autor:",
   "PackageCommand_VersionColon": "Version:",
@@ -768,5 +769,7 @@
 
   "ProjectFileSerializer_PathDirectoryNotConfigFile": "Der Pfad '{0}' ist ein Verzeichnis, keine Konfigurationsdatei.",
   "ProjectFileSerializer_ConfigFileNotFound": "Die referenzierte Konfigurationsdatei '{0}' konnte nicht gefunden werden.",
-  "ProjectFileSerializer_PropertySetMultipleTimes": "Die Eigenschaft '{0}' wurde mehrfach gesetzt."
+  "ProjectFileSerializer_PropertySetMultipleTimes": "Die Eigenschaft '{0}' wurde mehrfach gesetzt.",
+
+  "CoreProperties_NoResourceProviderForSpecifiedLanguage": "Für die angegebene Sprache '{0}' sind keine Lokalisierungsressourcen installiert."
 }

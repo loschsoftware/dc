@@ -103,7 +103,22 @@ internal class PackageCommand : CompilerCommand
 
     private static int List()
     {
+        StringBuilder sb = new();
         List<IPackage> packages = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
+        Dictionary<IPackage, List<IPackage>> displayedPackages = [];
+
+        foreach (IPackage package in packages)
+        {
+            if (package.ParentPackage != null && packages.Any(p => p.GetType().Equals(package.ParentPackage)))
+            {
+                IPackage parent = packages.First(p => p.GetType().Equals(package.ParentPackage));
+                if (!displayedPackages.TryAdd(parent, [package]))
+                    displayedPackages[parent].Add(package);
+                continue;
+            }
+
+            displayedPackages.TryAdd(package, []);
+        }
 
         int corePackageIndex = packages.IndexOf(CorePackage.Instance);
         packages.RemoveAt(corePackageIndex);
@@ -116,23 +131,34 @@ internal class PackageCommand : CompilerCommand
         }
 
         HelpCommand.DisplayLogo();
-        Console.WriteLine();
-        Console.WriteLine(StringHelper.PackageCommand_InstalledModulesAndExtensions);
-        Console.WriteLine();
+        sb.AppendLine();
+        sb.AppendLine(StringHelper.PackageCommand_InstalledModulesAndExtensions);
+        sb.AppendLine();
 
         string header = $"{$"\e[1m{StringHelper.PackageCommand_Name}\e[22m",-59}\e[1m{StringHelper.PackageCommand_Version}\e[22m";
-        Console.WriteLine(header);
-        Console.WriteLine(new string('-', header.Length - 18));
+        sb.AppendLine(header);
+        sb.AppendLine(new string('-', header.Length - 18));
 
-        foreach (IPackage package in packages)
+        foreach ((IPackage package, List<IPackage> children) in displayedPackages)
         {
             string packageDisplay = $"{(package == CorePackage.Instance ? $"\e[1;31m[{StringHelper.PackageCommand_BuiltIn}]\e[0m " : "")}{package.Metadata.Name}";
             if (packageDisplay.Length > 45)
                 packageDisplay = packageDisplay[0..45] + "...";
 
-            Console.WriteLine($"{packageDisplay,-50}{(package == CorePackage.Instance ? new string(' ', 11) : "")}{package.Metadata.Version}");
+            Version version = package.Metadata.Version;
+            sb.AppendLine($"{packageDisplay,-50}{(package == CorePackage.Instance ? new string(' ', 11) : "")}{version}");
+
+            if (children.Count > 0)
+            {
+                foreach (IPackage child in children)
+                {
+                    Version childVersion = child.Metadata.Version;
+                    sb.AppendLine($"{$"    ↳ \e[3m{child.Metadata.Name}",-50 - 4}{(childVersion.Equals(version) ? "" : childVersion)}\e[23m");
+                }
+            }
         }
 
+        Console.Write(sb.ToString());
         return 0;
     }
 
@@ -148,6 +174,7 @@ internal class PackageCommand : CompilerCommand
         }
 
         IPackage package = packages.First(p => p.Metadata.Name == name);
+        IPackage parent = packages.FirstOrDefault(p => p.GetType().Equals(package.ParentPackage));
 
         void SetUnderline()
         {
@@ -189,6 +216,7 @@ internal class PackageCommand : CompilerCommand
         WriteHeading(StringHelper.PackageCommand_Details);
 
         sb.AppendLine($"{$"    {StringHelper.PackageCommand_NameColon}",-50}{package.Metadata.Name}");
+        if (parent != null) sb.AppendLine($"{$"    {StringHelper.PackageCommand_ParentPackageColon}",-50}{parent.Metadata.Name}");
         sb.AppendLine($"{$"    {StringHelper.PackageCommand_DescriptionColon}",-50}{package.Metadata.Description}");
         sb.AppendLine($"{$"    {StringHelper.PackageCommand_Author}",-50}{package.Metadata.Author}");
         sb.AppendLine($"{$"    {StringHelper.PackageCommand_VersionColon}",-50}{package.Metadata.Version}");

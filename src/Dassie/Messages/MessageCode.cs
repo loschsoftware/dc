@@ -1138,5 +1138,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when a configuration property is set multiple times.
     /// </summary>
-    DS0276_PropertySpecifiedMultipleTimes
+    DS0276_PropertySpecifiedMultipleTimes,
+    /// <summary>
+    /// Emitted when the specified language (localization resource) is not found.
+    /// </summary>
+    DS0277_LanguageNotFound
 }

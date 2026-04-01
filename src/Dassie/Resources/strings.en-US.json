@@ -441,7 +441,7 @@
   "ConfigCommand_Name": "Name",
   "ConfigCommand_Type": "Type",
   "ConfigCommand_Value": "Value",
-  "ConfigCommand_MacroForGlobalConfig": "Macros are not supported by the global configuration.",
+  "ConfigCommand_MacroForGlobalConfig": "Macros are not supported by the global configuration system.",
   "ConfigCommand_MacrosOption": "Displays all project file macros.",
   "ConfigCommand_MacrosOptionNoProjectFile": "No project file found in current directory. Macros can only be displayed for projects.",
   "ConfigCommand_NoMacrosToDisplay": "No macros to display.",
@@ -544,6 +544,7 @@
   "PackageCommand_SpecifiedExtensionNotFound": "The specified extension could not be found.",
   "PackageCommand_Details": "Details",
   "PackageCommand_NameColon": "Name:",
+  "PackageCommand_ParentPackageColon": "Parent package:",
   "PackageCommand_DescriptionColon": "Description:",
   "PackageCommand_Author": "Author:",
   "PackageCommand_VersionColon": "Version:",
@@ -768,5 +769,7 @@
 
   "ProjectFileSerializer_PathDirectoryNotConfigFile": "The path '{0}' refers to a directory, not to a configuration file.",
   "ProjectFileSerializer_ConfigFileNotFound": "The referenced configuration file '{0}' could not be found.",
-  "ProjectFileSerializer_PropertySetMultipleTimes": "The property '{0}' was set multiple times."
+  "ProjectFileSerializer_PropertySetMultipleTimes": "The property '{0}' was set multiple times.",
+
+  "CoreProperties_NoResourceProviderForSpecifiedLanguage": "There is no resource provider installed for the specified language '{0}'."
 }

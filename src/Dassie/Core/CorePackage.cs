@@ -9,28 +9,30 @@ using Dassie.Extensions;
 using Dassie.Messages.Devices;
 using Dassie.Meta.Directives;
 using Dassie.Templates;
-using System.Reflection;
 
 namespace Dassie.Core;
 
 /// <summary>
 /// Acts as an extension package for all built-in commands, project templates, build log devices, compiler directives, subsystems and actions.
 /// </summary>
-internal class CorePackage : IPackage
+public class CorePackage : IPackage
 {
     private static CorePackage _instance;
-    public static CorePackage Instance => _instance ??= new();
+    internal static CorePackage Instance => _instance ??= new();
 
+    /// <inheritdoc/>
     public bool Hidden() => false;
 
+    /// <inheritdoc/>
     public PackageMetadata Metadata => new()
     {
         Author = StringHelper.CorePackage_Author,
         Description = StringHelper.CorePackage_Description,
         Name = "Core",
-        Version = Assembly.GetCallingAssembly().GetName().Version
+        Version = VersionCommand.AssemblyFriendlyVersion
     };
 
+    /// <inheritdoc/>
     public ICompilerCommand[] Commands() =>
     [
         AnalyzeCommand.Instance,
@@ -51,6 +53,7 @@ internal class CorePackage : IPackage
         WatchCommand.Instance
     ];
 
+    /// <inheritdoc/>
     public GlobalConfigProperty[] GlobalProperties() =>
     [
         EditorProperty.Instance,
@@ -62,8 +65,10 @@ internal class CorePackage : IPackage
         ILDasmPathProperty.Instance
     ];
 
+    /// <inheritdoc/>
     public IProjectTemplate[] ProjectTemplates() => [LibraryProject.Instance, ConsoleProject.Instance];
 
+    /// <inheritdoc/>
     public IBuildLogDevice[] BuildLogDevices() =>
     [
         TextWriterBuildLogDevice.Instance,
@@ -71,6 +76,7 @@ internal class CorePackage : IPackage
         new FastConsoleBuildLogDevice()
     ];
 
+    /// <inheritdoc/>
     public ICompilerDirective[] CompilerDirectives() =>
     [
         LineDirective.Instance,
@@ -81,11 +87,13 @@ internal class CorePackage : IPackage
         TypeOfDirective.Instance
     ];
 
+    /// <inheritdoc/>
     public IDeploymentTarget[] DeploymentTargets() =>
     [
         new DirectoryTarget()
     ];
 
+    /// <inheritdoc/>
     public ISubsystem[] Subsystems() =>
     [
         Console.Instance,
@@ -93,6 +101,7 @@ internal class CorePackage : IPackage
         WinExe.Instance
     ];
 
+    /// <inheritdoc/>
     public IBuildAction[] BuildActions() =>
     [
         new CompilerCommandBuildAction(),
@@ -102,15 +111,18 @@ internal class CorePackage : IPackage
         new SetEnvironmentVariableBuildAction()
     ];
 
+    /// <inheritdoc/>
     public IResourceProvider<string>[] LocalizationResourceProviders() =>
     [
         DefaultStrings.Instance
     ];
 
+    /// <inheritdoc/>
     public IMacro[] Macros() =>
     [
         EvalMacro.Instance
     ];
 
+    /// <inheritdoc/>
     public Property[] Properties() => [.. DassieConfig.GetDefaultPropertyRegistrations()];
 }

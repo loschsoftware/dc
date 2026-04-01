@@ -72,17 +72,12 @@ internal class HelpCommand : CompilerCommand
 
     public static void DisplayLogo()
     {
+        Version version = VersionCommand.AssemblyFriendlyVersion;
+
         StringBuilder logoBuilder = new();
-
-        Version v = Assembly.GetExecutingAssembly().GetName().Version;
-
-        // 8517 -> Days between 01/01/2000 and 27/04/2023, on which development on dc was started
-        Version version = new(v.Major, v.Minor, v.Build - 8517);
-        DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
-
         logoBuilder.AppendLine();
-        logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductNameString), StringHelper.ProductNameFull, typeof(object).Assembly.GetName().Version.ToString(2)));
-        logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductVersionString), version.ToString(2), version.Build, buildDate.ToShortDateString()));
+        logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductNameString), StringHelper.ProductNameFull, version.ToString(2)));
+        logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductVersionString), version.ToString(2), version.Build, VersionCommand.AssemblyBuildDate.ToShortDateString()));
 
         ConsoleColor def = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -150,13 +145,11 @@ internal class HelpCommand : CompilerCommand
         // "Tsoding mode", to appeal to "minimalist developers"
         if (args.Any(a => a == "-s" || a == "--simple"))
         {
-            Version v = Assembly.GetExecutingAssembly().GetName().Version;
-            Version version = new(v.Major, v.Minor, v.Build - 8517);
-            DateTime buildDate = new DateTime(2000, 1, 1).AddDays(v.Build);
+            Version version = VersionCommand.AssemblyFriendlyVersion;
 
             StringBuilder sb = new();
             sb.AppendLine();
-            sb.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_SimplifiedModeHeader), StringHelper.ProductName, version.Build, buildDate.ToShortDateString()));
+            sb.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_SimplifiedModeHeader), StringHelper.ProductName, version.Build, VersionCommand.AssemblyBuildDate.ToShortDateString()));
             sb.AppendLine(StringHelper.HelpCommand_SimplifiedMode);
             sb.AppendLine();
             sb.AppendLine(StringHelper.HelpCommand_SimplifiedModeUsage);

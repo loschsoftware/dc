@@ -1,5 +1,6 @@
 ﻿using Dassie.Configuration;
 using Dassie.Configuration.Global;
+using Dassie.Core.Properties;
 using Dassie.Extensions;
 using System;
 using System.Collections;
@@ -155,7 +156,9 @@ internal class ConfigCommand : CompilerCommand
 
             foreach (KeyValuePair<string, string> prop in properties)
             {
-                if (!GlobalConfigManager.Properties.Any(p => p.Key.Equals(prop.Key, StringComparison.OrdinalIgnoreCase)))
+                bool CompareKey(string key) => key.Equals(prop.Key, StringComparison.OrdinalIgnoreCase);
+
+                if (!GlobalConfigManager.Properties.Any(p => CompareKey(p.Key)))
                 {
                     EmitErrorMessageFormatted(
                         0, 0, 0,
@@ -166,11 +169,20 @@ internal class ConfigCommand : CompilerCommand
                     continue;
                 }
 
-                (GlobalConfigDataType Type, object Value) value = GlobalConfigManager.Properties.First(p => p.Key.Equals(prop.Key, StringComparison.OrdinalIgnoreCase)).Value;
+                (GlobalConfigDataType Type, object Value) value = GlobalConfigManager.Properties.First(p => CompareKey(p.Key)).Value;
                 object val = GlobalConfigManager.GetValue(prop.Value, value.Type, out bool error);
 
                 if (!error)
+                {
+                    if (ExtensionLoader.GlobalConfigProperties.Any(p => CompareKey(p.Key)))
+                    {
+                        ExtensionLoader.GlobalConfigProperties.First(p => CompareKey(p.Key))
+                            .SetValue(val);
+                        continue;
+                    }
+
                     GlobalConfigManager.Set(prop.Key, value.Type, val);
+                }
             }
 
             return 0;

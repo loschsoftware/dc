@@ -197,7 +197,7 @@ internal static class ExtensionLoader
         }
 
         if (enableCorePackageStr == null || (bool.TryParse(enableCorePackageStr, out bool enableCorePackage) && enableCorePackage))
-            packages.Add(CorePackage.Instance);
+            packages.Insert(0, CorePackage.Instance);
 
         ActivateBuildLogWriters(packages);
         return packages;

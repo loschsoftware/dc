@@ -1,5 +1,7 @@
 ﻿using Dassie.Configuration.Global;
 using Dassie.Extensions;
+using System;
+using System.Linq;
 
 namespace Dassie.Core.Properties;
 
@@ -34,4 +36,20 @@ internal class LanguageProperty : GlobalConfigProperty
     public override string Name => "Language";
     public override GlobalConfigDataType Type => new(GlobalConfigBaseType.String, false);
     public override object DefaultValue => "en-US";
+
+    public override Func<object, bool>[] Validators => [v =>
+    {
+        if (!ExtensionLoader.LocalizationResourceProviders.Any(l => l.Culture == v.ToString()))
+        {
+            EmitErrorMessageFormatted(
+                0, 0, 0,
+                DS0277_LanguageNotFound,
+                nameof(StringHelper.CoreProperties_NoResourceProviderForSpecifiedLanguage), [v],
+                CompilerExecutableName);
+
+            return false;
+        }
+
+        return true;
+    }];
 }

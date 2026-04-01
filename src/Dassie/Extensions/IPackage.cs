@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using Dassie.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -21,6 +22,12 @@ public interface IPackage
     /// </summary>
     /// <returns>Wheter or not the package is hidden.</returns>
     public virtual bool Hidden() => false;
+
+    /// <summary>
+    /// If set to a non-abstract type implementing <see cref="IPackage"/>, causes this extension to act as a child
+    /// of the specified extension.
+    /// </summary>
+    public virtual Type ParentPackage => null;
 
     /// <summary>
     /// Specifies the modes the extension can be loaded in.

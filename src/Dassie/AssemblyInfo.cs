@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 [assembly: CLSCompliant(false)]
 [assembly: InternalsVisibleTo("lsedit")]
 [assembly: InternalsVisibleTo("Dassie.Compiler")]
+[assembly: InternalsVisibleTo("Dassie.Language.de-DE")]
 
 [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using Dassie.CodeAnalysis;
 using Dassie.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -20,6 +21,9 @@ public abstract class Extension : IPackage
 
     /// <inheritdoc/>
     public virtual bool Hidden() => false;
+
+    /// <inheritdoc/>
+    public virtual Type ParentPackage => null;
 
     /// <inheritdoc/>
     public virtual ExtensionModes Modes() => ExtensionModes.Global | ExtensionModes.Transient;
