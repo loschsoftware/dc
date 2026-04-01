@@ -10,6 +10,16 @@ using System.Xml.Serialization;
 namespace Dassie.Configuration;
 
 /// <summary>
+/// Specifies the format version a property was introduced in.
+/// </summary>
+/// <param name="minVersion"></param>
+[AttributeUsage(AttributeTargets.Property)]
+internal class MinVersionAttribute(string minVersion) : Attribute
+{
+    public string MinVersion => minVersion;
+}
+
+/// <summary>
 /// Represents the top-level configuration object of the Dassie project configuration system.
 /// </summary>
 [Serializable]
@@ -52,7 +62,7 @@ public partial class DassieConfig : ConfigObject
     /// <summary>
     /// Creates an instance of <see cref="DassieConfig"/> with default values.
     /// </summary>
-    public static DassieConfig Default => new(DefaultStore);
+    public static DassieConfig Default => new();
 
     /// <summary>
     /// Retrieves the value of the specified property.
@@ -124,6 +134,7 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("Specifies the version of the configuration format to use.")]
     [XmlAttribute]
+    [MinVersion("1.0")]
     [Explicit]
     [ConfigProperty]
     public partial string FormatVersion { get; set; }
@@ -133,6 +144,7 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("Loads the specified configuration file and applies its settings.")]
     [XmlAttribute]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string Base { get; set; }
 
@@ -141,6 +153,7 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("A list of configuration files to import macros from.")]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial Import[] Imports { get; set; }
 
@@ -160,6 +173,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Specifies that the config file defines a project group and sets project group-specific options.")]
     [DefaultValue(null)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial ProjectGroup ProjectGroup { get; set; }
 
@@ -171,6 +185,7 @@ public partial class DassieConfig : ConfigObject
     [XmlArrayItem(Type = typeof(AssemblyReference))]
     [XmlArrayItem(Type = typeof(PackageReference))]
     [XmlArrayItem(Type = typeof(ProjectReference))]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial Reference[] References { get; set; }
 
@@ -181,6 +196,7 @@ public partial class DassieConfig : ConfigObject
     [XmlArray]
     [XmlArrayItem(Type = typeof(ManagedResource))]
     [XmlArrayItem(Type = typeof(UnmanagedResource))]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial Resource[] Resources { get; set; }
 
@@ -189,6 +205,7 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("Used by editors to set the default namespace of source files.")]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string RootNamespace { get; set; }
 
@@ -197,6 +214,7 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("Sets the name of the ouput assembly (without file extension).")]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string AssemblyFileName { get; set; }
 
@@ -206,6 +224,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the application type and subsystem of the program.")]
     [XmlElement]
     [DefaultValue("Console")]
+    [MinVersion("1.0")]
     [Explicit]
     [ConfigProperty]
     public partial string ApplicationType { get; set; }
@@ -216,6 +235,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the runtime of the application. Valid values are 'Jit' and 'Aot'.")]
     [XmlElement]
     [DefaultValue(Runtime.Jit)]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial Runtime Runtime { get; set; }
 
@@ -225,6 +245,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the processor architecture of the application.")]
     [XmlElement]
     [DefaultValue(Platform.Auto)]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial Platform Platform { get; set; }
 
@@ -234,6 +255,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the RID of the application to be used by the AOT compiler.")]
     [XmlElement]
     [DefaultValue("")]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string RuntimeIdentifier { get; set; }
 
@@ -242,6 +264,7 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("Sets version information fields for the application.")]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial List<VersionInfo> VersionInfo { get; set; }
 
@@ -251,6 +274,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the application icon file.")]
     [DefaultValue("")]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string IconFile { get; set; }
 
@@ -260,6 +284,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the directory where the compiled assemblies will be placed.")]
     [XmlElement]
     [DefaultValue("./build")]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string BuildDirectory { get; set; }
 
@@ -269,6 +294,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Toggles the generation of debug symbol data.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool EmitPdb { get; set; }
 
@@ -278,6 +304,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, all 'information' messages are ignored.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool IgnoreAllMessages { get; set; }
 
@@ -287,6 +314,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, all 'warning' messages are ignored.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool IgnoreAllWarnings { get; set; }
 
@@ -296,6 +324,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, all 'warning' messages will be treated as errors.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool TreatWarningsAsErrors { get; set; }
 
@@ -305,6 +334,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Toggles optimizations applied to the generated IL.")]
     [DefaultValue(true)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool ILOptimizations { get; set; }
 
@@ -314,6 +344,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, displays the elapsed time after the completion of a build.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool MeasureElapsedTime { get; set; }
 
@@ -323,6 +354,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the configuration of the generated assembly. Valid values are 'Debug' and 'Release'.")]
     [XmlElement]
     [DefaultValue(ApplicationConfiguration.Debug)]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial ApplicationConfiguration Configuration { get; set; }
 
@@ -332,6 +364,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, all referenced assemblies are copied to the build output directory.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool IncludeDependencies { get; set; }
 
@@ -341,6 +374,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, includes a preview of the error location in all error messages.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool AdvancedErrorMessages { get; set; }
 
@@ -350,6 +384,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Toggles further information on some error messages.")]
     [DefaultValue(true)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool EnableTips { get; set; }
 
@@ -359,6 +394,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, does not delete the generated native '.res' file after the build is completed.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool PersistentResourceFile { get; set; }
 
@@ -368,6 +404,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, does not delete the generated '.rc' file after the build is completed.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool PersistentResourceScript { get; set; }
 
@@ -377,6 +414,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, does not delete intermediate source files.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool KeepIntermediateFiles { get; set; }
 
@@ -386,6 +424,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, prepends a time stamp to all compiler messages.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool EnableMessageTimestamps { get; set; }
 
@@ -395,6 +434,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the verbosity of compiler messages. Valid values are 0-3 (both inclusive).")]
     [DefaultValue(1)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial int Verbosity { get; set; }
 
@@ -404,6 +444,7 @@ public partial class DassieConfig : ConfigObject
     [Description("A list of log devices to write build messages to.")]
     [DefaultValue(null)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial BuildLogOptions BuildLogDevices { get; set; }
 
@@ -413,6 +454,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, generates CIL files in human-readable form.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool GenerateILFiles { get; set; }
 
@@ -422,6 +464,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, generates native executables along with .NET assemblies.")]
     [DefaultValue(true)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool GenerateNativeAppHost { get; set; }
 
@@ -432,6 +475,7 @@ public partial class DassieConfig : ConfigObject
     [XmlArray]
     [XmlArrayItem(typeof(Message))]
     [XmlArrayItem(typeof(Warning))]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial Ignore[] IgnoredMessages { get; set; }
 
@@ -440,6 +484,7 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     [Description("The path to a .manifest file containing Windows-specific configuration.")]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string AssemblyManifest { get; set; }
 
@@ -449,6 +494,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, implicitly imports parts of the standard library in every source file.")]
     [DefaultValue(true)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool ImplicitImports { get; set; }
 
@@ -458,6 +504,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, allows the use of type aliases such as 'int' for 'System.Int32'.")]
     [DefaultValue(true)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool ImplicitTypeAliases { get; set; }
 
@@ -467,6 +514,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, prints the full exception message and stack trace if an exception occurs during compilation.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool PrintExceptionInfo { get; set; }
 
@@ -476,6 +524,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, caches source files for limited incremental compilation capabilities.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool CacheSourceFiles { get; set; }
 
@@ -485,6 +534,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets and manages build profiles.")]
     [DefaultValue(null)]
     [XmlArray]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial BuildProfile[] BuildProfiles { get; set; }
 
@@ -494,6 +544,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets and manages debug profiles.")]
     [DefaultValue(null)]
     [XmlArray]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial DebugProfile[] DebugProfiles { get; set; }
 
@@ -503,6 +554,7 @@ public partial class DassieConfig : ConfigObject
     [Description("The color used for error messages (#RRGGBB).")]
     [DefaultValue(null)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string ErrorColor { get; set; }
 
@@ -512,6 +564,7 @@ public partial class DassieConfig : ConfigObject
     [Description("The color used for warning messages (#RRGGBB).")]
     [DefaultValue(null)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string WarningColor { get; set; }
 
@@ -521,6 +574,7 @@ public partial class DassieConfig : ConfigObject
     [Description("The color used for information messages (#RRGGBB).")]
     [DefaultValue(null)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string MessageColor { get; set; }
 
@@ -530,6 +584,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If set, arithmetic operations check for overflow and throw an appropriate exception at runtime.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool EnableOverflowChecks { get; set; }
 
@@ -539,6 +594,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Used to configure the default code analyzer.")]
     [DefaultValue(null)]
     [XmlElement("CodeAnalysis")]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial CodeAnalysisConfiguration CodeAnalysisConfiguration { get; set; }
 
@@ -548,6 +604,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Sets the function or method that functions as the application entry point.")]
     [DefaultValue("")]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial string EntryPoint { get; set; }
 
@@ -557,6 +614,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If enabled, runs code analyzers before compilation.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool RunAnalyzers { get; set; }
 
@@ -566,6 +624,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If enabled, the Dassie standard library (Dassie.Core.dll) is not implicitly referenced.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool NoStdLib { get; set; }
 
@@ -575,6 +634,7 @@ public partial class DassieConfig : ConfigObject
     [Description("If enabled, compiler messages will display an icon to distinguish them by severity.")]
     [DefaultValue(false)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool EnableSeverityIndicators { get; set; }
 
@@ -584,6 +644,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Configures compiler extensions enabled only during the compilation.")]
     [DefaultValue(null)]
     [XmlArray]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial List<Extension> Extensions { get; set; }
 
@@ -593,6 +654,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Configures the active document sources provided by compiler extensions.")]
     [DefaultValue(null)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial DocumentSourceList DocumentSources { get; set; }
 
@@ -602,6 +664,7 @@ public partial class DassieConfig : ConfigObject
     [Description("Once this number of compilation errors is reached, the build process is terminated immediately.")]
     [DefaultValue(0)]
     [XmlElement]
+    [MinVersion("1.0")]
     [ConfigProperty]
     public partial int MaxErrors { get; set; }
 }

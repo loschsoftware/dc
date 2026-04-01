@@ -1,5 +1,4 @@
 ﻿using Dassie.Configuration.Macros;
-using Dassie.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -61,6 +60,12 @@ public class PropertyStore
         _parser = parser;
         _uninstantiatedProperties = uninstantiatedValues ?? [];
     }
+
+    /// <summary>
+    /// Initializes a new <see cref="PropertyStore"/> based on the specified property registrations.
+    /// </summary>
+    /// <param name="defs">The properties to register.</param>
+    public PropertyStore(IEnumerable<Property> defs) : this(defs, null, null) { }
 
     internal bool IsPropertySet(string name) =>
         _instantiatedProperties.ContainsKey(name) || _uninstantiatedProperties.ContainsKey(name);
