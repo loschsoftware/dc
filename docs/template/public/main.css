@@ -332,7 +332,7 @@ pre {
     background: var(--code-block-background);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
-    padding: 0.875rem 1rem;
+    padding: .3rem;
     overflow-x: auto;
 }
 
