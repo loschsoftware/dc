@@ -22,20 +22,6 @@ public class PropertyStore
     /// </summary>
     public static PropertyStore Empty => new();
 
-    /// <summary>
-    /// Creates an instance of <see cref="PropertyStore"/> with a default set of registered properties.
-    /// </summary>
-    public static PropertyStore Default
-    {
-        get
-        {
-            MacroParser mp = new();
-            PropertyStore ps = new(ExtensionLoader.Properties, mp);
-            mp.BindPropertyResolver(ps.Get);
-            return ps;
-        }
-    }
-
     private IEnumerable<Property> _propertyDefs;
     internal IEnumerable<Property> Properties => _propertyDefs;
 

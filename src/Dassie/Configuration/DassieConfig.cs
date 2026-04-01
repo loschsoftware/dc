@@ -1,4 +1,6 @@
+using Dassie.Configuration.Macros;
 using Dassie.Configuration.ProjectGroups;
+using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,15 +30,29 @@ public partial class DassieConfig : ConfigObject
     /// <summary>
     /// Initializes a new instance of the <see cref="DassieConfig"/> type.
     /// </summary>
-    public DassieConfig() : this(PropertyStore.Default)
+    public DassieConfig() : this(DefaultStore)
     {
         FormatVersion = CurrentFormatVersion;
     }
 
     /// <summary>
+    /// Creates an instance of <see cref="PropertyStore"/> with a default set of registered properties.
+    /// </summary>
+    internal static PropertyStore DefaultStore
+    {
+        get
+        {
+            MacroParser mp = new();
+            PropertyStore ps = new(ExtensionLoader.Properties, mp);
+            mp.BindPropertyResolver(ps.Get);
+            return ps;
+        }
+    }
+
+    /// <summary>
     /// Creates an instance of <see cref="DassieConfig"/> with default values.
     /// </summary>
-    public static DassieConfig Default => new(PropertyStore.Default);
+    public static DassieConfig Default => new(DefaultStore);
 
     /// <summary>
     /// Retrieves the value of the specified property.

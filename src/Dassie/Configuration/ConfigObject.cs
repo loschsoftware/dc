@@ -124,7 +124,12 @@ public abstract class ConfigObject
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigObject"/> type based on the specified <see cref="PropertyStore"/>.
+    /// Initializes a new instance of the <see cref="ConfigObject"/> type backed by an empty <see cref="PropertyStore"/>.
+    /// </summary>
+    protected ConfigObject() : this(null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigObject"/> type backed by the specified <see cref="PropertyStore"/>.
     /// </summary>
     /// <param name="store"></param>
     protected ConfigObject(PropertyStore store)

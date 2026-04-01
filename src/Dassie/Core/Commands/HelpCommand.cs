@@ -193,7 +193,7 @@ internal class HelpCommand : CompilerCommand
 
             int descriptionWidth = Console.WindowWidth - 62 - 5;
 
-            IEnumerable<Property> properties = PropertyStore.Default.Properties;
+            IEnumerable<Property> properties = ExtensionLoader.Properties;
             List<(string PropertyName, string Text)> propertyLines = [];
 
             foreach (Property property in properties)
