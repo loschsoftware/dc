@@ -1,3 +1,3 @@
-# Extension System Capabilities
+# Extension Capabilities
 
 TODO

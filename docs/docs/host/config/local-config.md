@@ -1,3 +1,7 @@
 # Dassie Configuration System
 
-TODO
+## Structure
+
+## Macros
+
+## Evaluation semantics

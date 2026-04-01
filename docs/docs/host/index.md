@@ -1,3 +1,3 @@
 # Host Architecture Overview
 
-TODO
+The Dassie compiler (``dc``) is designed as a highly flexible and extensible host platform.
