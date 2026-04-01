@@ -1134,5 +1134,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when an invocation of the 'SetEnvironmentVariable' build action fails due to a missing attribute.
     /// </summary>
-    DS0275_SetEnvironmentVariableMissingAttribute
+    DS0275_SetEnvironmentVariableMissingAttribute,
+    /// <summary>
+    /// Emitted when a configuration property is set multiple times.
+    /// </summary>
+    DS0276_PropertySpecifiedMultipleTimes
 }

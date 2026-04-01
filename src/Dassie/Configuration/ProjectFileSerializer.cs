@@ -67,7 +67,7 @@ internal static class ProjectFileSerializer
             EmitErrorMessageFormatted(
                 0, 0, 0,
                 DS0198_ImportedConfigFileNotFound,
-                $"The path '{path}' refers to a directory, not to a configuration file.", [path],
+                nameof(StringHelper.ProjectFileSerializer_PathDirectoryNotConfigFile), [path],
                 path);
 
             return null;
@@ -84,7 +84,7 @@ internal static class ProjectFileSerializer
         EmitErrorMessageFormatted(
             0, 0, 0,
             DS0198_ImportedConfigFileNotFound,
-            $"The referenced configuration file '{path}' could not be found.", [path],
+            nameof(StringHelper.ProjectFileSerializer_ConfigFileNotFound), [path],
             path);
 
         return null;
@@ -148,7 +148,17 @@ internal static class ProjectFileSerializer
 
         if (matchingElements.Count() > 1)
         {
-            // TODO: ERROR: Property specified multiple times
+            XElement offendingElement = matchingElements.Skip(1).First();
+            IXmlLineInfo li = offendingElement;
+
+            EmitErrorMessageFormatted(
+                li.LineNumber,
+                li.LinePosition,
+                offendingElement.Value.Length,
+                DS0276_PropertySpecifiedMultipleTimes,
+                nameof(StringHelper.ProjectFileSerializer_PropertySetMultipleTimes), [prop.Name],
+                ProjectConfigurationFileName);
+
             return null;
         }
 

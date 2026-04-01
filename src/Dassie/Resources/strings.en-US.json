@@ -764,5 +764,9 @@
 
   "EvalMacro_EvaluationFailed": "Failed to evaluate expression '{0}'. {1}",
 
-  "SetEnvironmentVariableBuildAction_MissingRequiredAttribute": "SetEnvironmentVariable: Missing required attribute '{0}'."
+  "SetEnvironmentVariableBuildAction_MissingRequiredAttribute": "SetEnvironmentVariable: Missing required attribute '{0}'.",
+
+  "ProjectFileSerializer_PathDirectoryNotConfigFile": "The path '{0}' refers to a directory, not to a configuration file.",
+  "ProjectFileSerializer_ConfigFileNotFound": "The referenced configuration file '{0}' could not be found.",
+  "ProjectFileSerializer_PropertySetMultipleTimes": "The property '{0}' was set multiple times."
 }
