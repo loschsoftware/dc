@@ -405,6 +405,7 @@ launchSettings.json
 build/
 /.editorconfig
 /src/Dassie/Parser/Generated/
+/src/Dassie/Configuration/Macros/Parser/Generated/
 
 # DocFX
 docs/_site/
