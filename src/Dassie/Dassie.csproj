@@ -11,6 +11,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Remove="Parser\Generated\**\*.cs" />
+		<Compile Remove="Configuration\Macros\Parser\Generated\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
 		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
 		<PackageReference Include="Microsoft.NETCore.ILAsm" Version="10.0.0" />
