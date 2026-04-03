@@ -18,7 +18,7 @@ namespace Dassie.Cli;
 internal class Program
 {
     /// <summary>
-    /// Initializes core compiler components.
+    /// Initializes core application components.
     /// </summary>
     public static void Initialize()
     {
@@ -29,9 +29,9 @@ internal class Program
     }
 
     /// <summary>
-    /// The compiler entry point.
+    /// The application entry point.
     /// </summary>
-    /// <param name="args">The command-line arguments passed to the compiler.</param>
+    /// <param name="args">The command-line arguments passed to the process.</param>
     /// <returns>The exit code of the process.</returns>
     [EntryPoint]
     public static int Main(string[] args)
