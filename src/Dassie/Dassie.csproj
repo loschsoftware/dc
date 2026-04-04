@@ -30,19 +30,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="Microsoft.NET.HostModel">
-	    <HintPath>..\..\tools\Microsoft.NET.HostModel.dll</HintPath>
-	  </Reference>
+		<Reference Include="Microsoft.NET.HostModel">
+			<HintPath>..\..\tools\Microsoft.NET.HostModel.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Configuration\Macros\Parser\" />
+		<Folder Include="Configuration\Macros\Parser\" />
 	</ItemGroup>
 
-	<Target Name="CompileAntlrParser" BeforeTargets="BeforeCompile" Condition="'$(IsDocFx)' != 'true'">
+	<Target Name="CompileAntlrParser"
+			BeforeTargets="BeforeCompile"
+			Condition="'$(IsDocFx)' != 'true'">
+		
 		<Exec Command="java -jar $(SolutionDir)tools/antlr-4.13.1-complete.jar -visitor -Dlanguage=CSharp -package Dassie.Parser -o $(ProjectDir)Parser/Generated $(ProjectDir)Parser/DassieLexer.g4 $(ProjectDir)Parser/DassieParser.g4" />
 		<Exec Command="java -jar $(SolutionDir)tools/antlr-4.13.1-complete.jar -visitor -Dlanguage=CSharp -package Dassie.Configuration.Macros.Parser -o $(ProjectDir)Configuration/Macros/Parser/Generated $(ProjectDir)Configuration/Macros/Parser/MacroLexer.g4 $(ProjectDir)Configuration/Macros/Parser/MacroParser.g4" />
-	
+
 		<ItemGroup>
 			<Compile Include="Parser\Generated\**\*.cs" />
 			<Compile Include="Configuration\Macros\Parser\Generated\**\*.cs" />
@@ -55,7 +58,7 @@
 		<ItemGroup>
 			<SdkFiles Include="$(SolutionDir)sdk\**\*" />
 		</ItemGroup>
-		
+
 		<Copy SourceFiles="@(SdkFiles)" DestinationFolder="$(OutputPath)Sdk\%(RecursiveDir)" />
 	</Target>
 </Project>

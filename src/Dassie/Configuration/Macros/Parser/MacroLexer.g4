@@ -38,8 +38,12 @@ At
     : '@'
     ;
 
-Identifier
+fragment Identifier_Part
     : [a-zA-Z_] [a-zA-Z0-9_]*
+    ;
+
+Identifier
+    : Identifier_Part ('.' Identifier_Part)*
     ;
 
 Whitespace

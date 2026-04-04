@@ -24,40 +24,40 @@
         </Define>
 
         <!-- Numerics -->
-        <Define Macro="_Add" Parameters="[!A, !B]" Trim="true">
+        <Define Macro="Math.Add" Parameters="[!A, !B]" Trim="true">
             $(Eval: $(@A) + $(@B))
         </Define>
 
-        <Define Macro="_Sub" Parameters="[!A, !B]" Trim="true">
+        <Define Macro="Math.Sub" Parameters="[!A, !B]" Trim="true">
             $(Eval: $(@A) - $(@B))
         </Define>
 
-        <Define Macro="_Mul" Parameters="[!A, !B]" Trim="true">
+        <Define Macro="Math.Mul" Parameters="[!A, !B]" Trim="true">
             $(Eval: $(@A) * $(@B))
         </Define>
 
-        <Define Macro="_Div" Parameters="[!A, !B]" Trim="true">
+        <Define Macro="Math.Div" Parameters="[!A, !B]" Trim="true">
             $(Eval: $(@A) / $(@B))
         </Define>
 
         <!-- Strings -->
-        <Define Macro="_StrConcat" Parameters="[A, B]" Trim="true">
+        <Define Macro="Str.Concat" Parameters="[A, B]" Trim="true">
             $(Eval: $(@A) + $(@B))
         </Define>
 
-        <Define Macro="_StrUpper" Parameters="[Str]" Trim="true">
+        <Define Macro="Str.Upper" Parameters="[Str]" Trim="true">
             $(Eval: ^^"$(@Str)".ToUpper)
         </Define>
 
-        <Define Macro="_StrLower" Parameters="[Str]" Trim="true">
+        <Define Macro="Str.Lower" Parameters="[Str]" Trim="true">
             $(Eval: ^^"$(@Str)".ToLower)
         </Define>
 
-        <Define Macro="_StrTrim" Parameters="[Str]" Trim="true">
+        <Define Macro="Str.Trim" Parameters="[Str]" Trim="true">
             $(Eval: ^^"$(@Str)".Trim)
         </Define>
 
-        <Define Macro="_StrContains" Parameters="[Str, Value]" Trim="true">
+        <Define Macro="Str.Contains" Parameters="[Str, Value]" Trim="true">
             $(Eval: ^^"$(@Str)".Contains ^^"$(@Value)")s
         </Define>
 
@@ -66,23 +66,23 @@
             $(Eval: System.IO.Directory.GetCurrentDirectory)
         </Define>
 
-        <Define Macro="_FileName" Parameters="[!Path]" Trim="true">
+        <Define Macro="Path.FileName" Parameters="[!Path]" Trim="true">
             $(Eval: System.IO.Path.GetFileName ^^"$(@Path)")
         </Define>
 
-        <Define Macro="_DirName" Parameters="[!Path]" Trim="true">
+        <Define Macro="Path.DirName" Parameters="[!Path]" Trim="true">
             $(Eval: System.IO.Path.GetDirectoryName ^^"$(@Path)")
         </Define>
 
-        <Define Macro="_FileExtension" Parameters="[!Path]" Trim="true">
+        <Define Macro="Path.FileExtension" Parameters="[!Path]" Trim="true">
             $(Eval: System.IO.Path.GetExtension ^^"$(@Path)")
         </Define>
 
-        <Define Macro="_ChangeExtension" Parameters="[!Path, !NewExtension]" Trim="true">
+        <Define Macro="Path.ChangeExtension" Parameters="[!Path, !NewExtension]" Trim="true">
             $(Eval: System.IO.Path.ChangeExtension ^^"$(@Path)" ^^"$(@NewExtension)")
         </Define>
 
-        <Define Macro="_PathCombine" Parameters="[!Path1, !Path2]" Trim="true">
+        <Define Macro="Path.Combine" Parameters="[!Path1, !Path2]" Trim="true">
             $(Eval: System.IO.Path.Combine ^^"$(@Path1)", ^^"$(@Path2)")
         </Define>
 
