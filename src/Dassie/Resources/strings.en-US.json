@@ -204,6 +204,7 @@
   "ConfigImportManager_ImportNotFound": "The imported configuration file '{0}' could not be found.",
   "ConfigImportManager_CircularImport": "Importing the configuration file '{0}' would lead to a circular dependency.",
   "ConfigImportManager_MissingAttributePath": "Missing required attribute 'Path' for <Import/> definition.",
+  "ConfigImportManager_ImportedFileNotSdkDefinitionFile": "The imported configuration file '{0}' must be an SDK definition file.",
 
   "DocumentSourceManager_SourceNotFound": "The document source '{0}' could not be found.",
   "DocumentSourceManager_DuplicateDocument": "Multiple document sources attempted to write to document '{0}'.",

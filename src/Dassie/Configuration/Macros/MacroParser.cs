@@ -125,7 +125,7 @@ internal partial class MacroParser
         result = default;
 
         IEnumerable<Define> definitions = GetMacroDefinitions();
-        Define definition = definitions.FirstOrDefault(d => d?.Name == macroName);
+        Define definition = definitions.FirstOrDefault(d => d?.Macro == macroName);
 
         if (definition == null)
             return false;

@@ -1,4 +1,8 @@
-<DassieConfig FormatVersion="1.0">
+<DassieConfig
+    FormatVersion="1.0"
+    IsDefinitionFile="true"
+    SdkName="Core">
+
     <MacroDefinitions>
         <!-- Environment -->
         <Define Macro="Env" Parameters="[!VarName]" Trim="true">

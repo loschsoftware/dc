@@ -6,7 +6,7 @@ namespace Dassie.Configuration;
 /// <summary>
 /// Represents a macro definition.
 /// </summary>
-[XmlRoot("Define")]
+[XmlRoot]
 [Serializable]
 public partial class Define : ConfigObject
 {
@@ -16,9 +16,9 @@ public partial class Define : ConfigObject
     /// <summary>
     /// Specifies the name of the macro.
     /// </summary>
-    [XmlAttribute("Macro")]
+    [XmlAttribute]
     [ConfigProperty]
-    public partial string Name { get; set; }
+    public partial string Macro { get; set; }
 
     /// <summary>
     /// The parameter list of the macro.

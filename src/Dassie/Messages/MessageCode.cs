@@ -1142,5 +1142,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when the specified language (localization resource) is not found.
     /// </summary>
-    DS0277_LanguageNotFound
+    DS0277_LanguageNotFound,
+    /// <summary>
+    /// Emitted when an imported configuration file is not an SDK definition file.
+    /// </summary>
+    DS0278_ImportedConfigFileNotDefinitionFile
 }

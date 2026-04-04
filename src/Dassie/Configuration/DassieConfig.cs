@@ -140,6 +140,25 @@ public partial class DassieConfig : ConfigObject
     public partial string FormatVersion { get; set; }
 
     /// <summary>
+    /// Specifies wheter or not this configuration file is an SDK definition file.
+    /// </summary>
+    [Description("Specifies wheter or not this configuration file is an SDK definition file.")]
+    [DefaultValue(false)]
+    [XmlAttribute]
+    [MinVersion("1.0")]
+    [ConfigProperty]
+    public partial bool IsDefinitionFile { get; set; }
+
+    /// <summary>
+    /// Specifies the SDK identifier of this configuration.
+    /// </summary>
+    [Description("Specifies the SDK identifier of this configuration.")]
+    [XmlAttribute]
+    [MinVersion("1.0")]
+    [ConfigProperty]
+    public partial string SdkName { get; set; }
+
+    /// <summary>
     /// Loads the specified configuration file and applies its settings.
     /// </summary>
     [Description("Loads the specified configuration file and applies its settings.")]

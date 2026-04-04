@@ -54,24 +54,13 @@ internal static class ProjectFileSerializer
         IOPath.Combine(IOPath.GetDirectoryName(IOPath.GetDirectoryName(typeof(ProjectFileSerializer).Assembly.Location)), SdkDirectoryName)
     ];
 
-    public static XDocument Load(string path)
+    public static XDocument Load(string path, bool errorOnNotFound = true)
     {
         if (path == null)
             return null;
 
         if (File.Exists(path))
             return XDocument.Load(path);
-
-        if (Directory.Exists(path))
-        {
-            EmitErrorMessageFormatted(
-                0, 0, 0,
-                DS0198_ImportedConfigFileNotFound,
-                nameof(StringHelper.ProjectFileSerializer_PathDirectoryNotConfigFile), [path],
-                path);
-
-            return null;
-        }
 
         foreach (string lookupDir in _lookupDirs)
         {
@@ -81,11 +70,14 @@ internal static class ProjectFileSerializer
                 return Load(newPath);
         }
 
-        EmitErrorMessageFormatted(
-            0, 0, 0,
-            DS0198_ImportedConfigFileNotFound,
-            nameof(StringHelper.ProjectFileSerializer_ConfigFileNotFound), [path],
-            path);
+        if (errorOnNotFound)
+        {
+            EmitErrorMessageFormatted(
+                0, 0, 0,
+                DS0198_ImportedConfigFileNotFound,
+                nameof(StringHelper.ProjectFileSerializer_ConfigFileNotFound), [path],
+                path);
+        }
 
         return null;
     }
@@ -112,9 +104,9 @@ internal static class ProjectFileSerializer
         {
             Define def = new(PropertyStore.Empty)
             {
-                Name = (string)elem.Attribute("Macro"),
-                Parameters = (string)elem.Attribute("Parameters"),
-                Trim = (bool?)elem.Attribute("Trim") ?? false,
+                Macro = (string)elem.Attribute(nameof(Define.Macro)),
+                Parameters = (string)elem.Attribute(nameof(Define.Parameters)),
+                Trim = (bool?)elem.Attribute(nameof(Define.Trim)) ?? false,
                 Value = elem.Value
             };
 
@@ -178,9 +170,9 @@ internal static class ProjectFileSerializer
         IEnumerable<XAttribute> attributes = doc.Root.Attributes();
         IEnumerable<XElement> elements = doc.Root.Elements();
 
-        if (attributes.Any(a => a.Name == "Base"))
+        if (attributes.Any(a => a.Name == nameof(DassieConfig.Base)))
         {
-            string baseConfig = attributes.First(a => a.Name == "Base").Value;
+            string baseConfig = attributes.First(a => a.Name == nameof(DassieConfig.Base)).Value;
         }
 
         Dictionary<string, object> rawValues = [];
@@ -207,16 +199,9 @@ internal static class ProjectFileSerializer
         return rawValues;
     }
 
-    public static DassieConfig Deserialize(string path, bool handleImports = true)
+    public static DassieConfig Deserialize(XDocument doc, bool handleImports = true)
     {
-        if (!File.Exists(path))
-            return DassieConfig.Default;
-
-        Path = System.IO.Path.GetFullPath(path);
-
-        XDocument doc = XDocument.Load(path, LoadOptions.SetLineInfo);
         Dictionary<string, object> rawValues = GetRawValues(doc);
-
         MacroDefinitions = GetMacroDefinitions(rawValues);
 
         _macroParser = new();
@@ -235,6 +220,18 @@ internal static class ProjectFileSerializer
         if (handleImports)
             ConfigImportManager.Merge(config);
 
+        return config;
+    }
+
+    public static DassieConfig Deserialize(string path, bool handleImports = true)
+    {
+        if (!File.Exists(path))
+            return DassieConfig.Default;
+
+        Path = IOPath.GetFullPath(path);
+
+        XDocument doc = XDocument.Load(path, LoadOptions.SetLineInfo);
+        DassieConfig config = Deserialize(doc, handleImports);
         BuildLogDeviceContextBuilder.RegisterBuildLogDevices(config, path);
         return config;
     }

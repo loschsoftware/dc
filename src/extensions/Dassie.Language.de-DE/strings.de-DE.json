@@ -204,6 +204,7 @@
   "ConfigImportManager_ImportNotFound": "Die importierte Konfigurationsdatei '{0}' konnte nicht gefunden werden.",
   "ConfigImportManager_CircularImport": "Das Importieren der Konfigurationsdatei '{0}' würde zu einer zirkulären Abhängigkeit führen.",
   "ConfigImportManager_MissingAttributePath": "Fehlendes Attribut 'Path' in <Import/>-Definition.",
+  "ConfigImportManager_ImportedFileNotSdkDefinitionFile": "Die zu importierende Konfigurationsdatei '{0}' muss eine SDK-Definitionsdatei sein.",
 
   "DocumentSourceManager_SourceNotFound": "Die Dokumentquelle '{0}' konnte nicht gefunden werden.",
   "DocumentSourceManager_DuplicateDocument": "Mehrere Dokumentquellen haben versucht, in das Dokument '{0}' zu schreiben.",

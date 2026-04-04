@@ -15,34 +15,68 @@ internal static class ConfigImportManager
     private static List<XElement> ExtractImportedMacros(XElement root, bool skipRoot = false)
     {
         List<XElement> macros = [];
-        IEnumerable<XElement> imports = root.Descendants("Import");
+        IEnumerable<XElement> imports = root.Descendants(nameof(Import));
+        imports ??= (List<XElement>)[];
 
-        if (imports != null)
+        bool isCoreSdk = false;
+        bool hasCoreSdk = false;
+
+        if (root.Attribute(nameof(DassieConfig.IsDefinitionFile)) != null
+            && root.Attribute(nameof(DassieConfig.SdkName)) is XAttribute sdkNameAttrib
+            && sdkNameAttrib.Value == CoreSdkName)
+            isCoreSdk = true;
+
+        foreach (XElement import in imports)
         {
-            foreach (XElement import in imports)
-            {
-                XAttribute pathAttribute = import.Attribute("Path");
-                if (pathAttribute == null)
-                {
-                    IXmlLineInfo li = import;
-                    EmitErrorMessageFormatted(
-                        li.LineNumber,
-                        li.LinePosition,
-                        import.ToString().Length,
-                        DS0198_ImportedConfigFileNotFound,
-                        nameof(StringHelper.ConfigImportManager_MissingAttributePath), [],
-                        ProjectConfigurationFileName);
-                }
+            IXmlLineInfo li = import;
+            XAttribute pathAttribute = import.Attribute(nameof(Import.Path));
 
-                XElement importedRoot = ProjectFileSerializer.Load(pathAttribute.Value).Root;
-                macros.AddRange(ExtractImportedMacros(importedRoot));
+            if (pathAttribute == null)
+            {
+                EmitErrorMessageFormatted(
+                    li.LineNumber,
+                    li.LinePosition,
+                    import.ToString().Length,
+                    DS0198_ImportedConfigFileNotFound,
+                    nameof(StringHelper.ConfigImportManager_MissingAttributePath), [],
+                    ProjectConfigurationFileName);
+            }
+
+            XElement importedRoot = ProjectFileSerializer.Load(pathAttribute.Value).Root;
+            XAttribute definitionFileAttrib = importedRoot.Attribute(nameof(DassieConfig.IsDefinitionFile));
+
+            if (definitionFileAttrib == null
+                || !bool.TryParse(definitionFileAttrib.Value, out bool isDefinitionFile)
+                || !isDefinitionFile)
+            {
+                EmitErrorMessageFormatted(
+                    li.LineNumber,
+                    li.LinePosition,
+                    import.ToString().Length,
+                    DS0278_ImportedConfigFileNotDefinitionFile,
+                    nameof(StringHelper.ConfigImportManager_ImportedFileNotSdkDefinitionFile), [pathAttribute.Value],
+                    ProjectConfigurationFileName);
+            }
+
+            if (importedRoot.Attribute(nameof(DassieConfig.SdkName))?.Value == CoreSdkName)
+                hasCoreSdk = true;
+
+            macros.AddRange(ExtractImportedMacros(importedRoot));
+        }
+
+        if (!isCoreSdk && !hasCoreSdk)
+        {
+            XDocument coreDoc = ProjectFileSerializer.Load(CoreSdkFileName, false);
+            if (coreDoc != null)
+            {
+                macros.AddRange(ExtractImportedMacros(coreDoc.Root));
             }
         }
 
-        XElement macroDefs = root.Element("MacroDefinitions");
+        XElement macroDefs = root.Element(nameof(DassieConfig.MacroDefinitions));
         if (!skipRoot && macroDefs != null)
         {
-            IEnumerable<XElement> defines = macroDefs.Elements("Define");
+            IEnumerable<XElement> defines = macroDefs.Elements(nameof(Define));
             if (defines != null && defines.Any())
                 macros.AddRange(defines);
         }
@@ -57,11 +91,11 @@ internal static class ConfigImportManager
 
         XElement root = baseDocument.Root;
         IEnumerable<XElement> importedMacros = ExtractImportedMacros(root, true);
-        
-        XElement macroDefs = root.Element("MacroDefinitions");
+
+        XElement macroDefs = root.Element(nameof(DassieConfig.MacroDefinitions));
         if (macroDefs == null)
         {
-            macroDefs = new("MacroDefinitions");
+            macroDefs = new(nameof(DassieConfig.MacroDefinitions));
             root.AddFirst(macroDefs);
         }
 
@@ -69,7 +103,7 @@ internal static class ConfigImportManager
     }
 
     /// <summary>
-    /// Handles the '<c>Base</c>' attribute if it is set for the specified project configuration.
+    /// Handles the <see cref="DassieConfig.Base"/> attribute if it is set for the specified project configuration.
     /// </summary>
     /// <param name="config">The configuration to merge.</param>
     public static void Merge(DassieConfig config)
@@ -78,7 +112,7 @@ internal static class ConfigImportManager
         Merge(config, null);
         Directory.SetCurrentDirectory(workingDir);
     }
-    
+
     private static void Merge(DassieConfig config, HashSet<string> visitedFiles, string fileName = null)
     {
         if (config == null || string.IsNullOrEmpty(config.Base)) return;

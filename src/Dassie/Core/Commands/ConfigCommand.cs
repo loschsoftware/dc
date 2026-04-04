@@ -95,7 +95,7 @@ internal class ConfigCommand : CompilerCommand
             }
 
             _ = ProjectFileSerializer.DassieConfig;
-            Dictionary<string, string> definedMacros = ProjectFileSerializer.MacroDefinitions.Select(d => new KeyValuePair<string, string>(d.Name, d.Value)).ToDictionary();
+            Dictionary<string, string> definedMacros = ProjectFileSerializer.MacroDefinitions.Select(d => new KeyValuePair<string, string>(d.Macro, d.Value)).ToDictionary();
             PrintProperties(definedMacros.Select(k => (k.Key, "", k.Value)).OrderBy(k => k.Key).ToList(), true);
             return 0;
         }
@@ -363,7 +363,7 @@ internal class ConfigCommand : CompilerCommand
 
         if (obj is Define[] macroDefinitions)
         {
-            return $"[{string.Join(", ", macroDefinitions.Select(m => $"$({m.Name})={m.Value}"))}]";
+            return $"[{string.Join(", ", macroDefinitions.Select(m => $"$({m.Macro})={m.Value}"))}]";
         }
 
         if (obj is IEnumerable collection)
