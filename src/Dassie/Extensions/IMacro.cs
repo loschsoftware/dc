@@ -29,6 +29,17 @@ public enum MacroOptions
 }
 
 /// <summary>
+/// Specifies the location of a macro invocation.
+/// </summary>
+/// <param name="Document">The document the macro was invoked in.</param>
+/// <param name="Line">The line the macro was invoked on.</param>
+/// <param name="Column">The column of the first character of the macro invocation.</param>
+public record MacroInvocationInfo(
+    string Document,
+    int Line,
+    int Column);
+
+/// <summary>
 /// Defines a mechanism for extensions to provide build system macros.
 /// </summary>
 public interface IMacro
@@ -52,6 +63,7 @@ public interface IMacro
     /// The method called when a macro expansion is requested.
     /// </summary>
     /// <param name="arguments">The arguments passed to the macro.</param>
+    /// <param name="info">The location information of the macro invocation.</param>
     /// <returns>The expanded value of the current macro.</returns>
-    public string Expand(Dictionary<string, string> arguments);
+    public string Expand(Dictionary<string, string> arguments, MacroInvocationInfo info);
 }

@@ -71,6 +71,11 @@ internal partial class MacroParser
 
         public override ExpansionResult VisitMacro_call([NotNull] Parser.MacroParser.Macro_callContext context)
         {
+            // TODO: Fill in the correct information here
+            MacroInvocationInfo info = new(
+                ProjectConfigurationFileName,
+                0, 0);
+
             string macroName = context.Identifier().GetText();
             string invocationKey = context.GetText();
 
@@ -117,7 +122,7 @@ internal partial class MacroParser
 
                     try
                     {
-                        expanded = runtimeMacro.Expand(args) ?? string.Empty;
+                        expanded = runtimeMacro.Expand(args, info) ?? string.Empty;
                     }
                     catch (Exception ex)
                     {

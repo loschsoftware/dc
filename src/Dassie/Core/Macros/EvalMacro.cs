@@ -30,7 +30,7 @@ internal class EvalMacro : IMacro
     };
 
     // TODO: Make this more efficient!!
-    public string Expand(Dictionary<string, string> arguments)
+    public string Expand(Dictionary<string, string> arguments, MacroInvocationInfo info)
     {
         string expr = arguments["Expression"];
         if (string.IsNullOrEmpty(expr))
@@ -69,10 +69,12 @@ internal class EvalMacro : IMacro
         catch (Exception ex)
         {
             EmitErrorMessageFormatted(
-                0, 0, 0,
+                info.Line,
+                info.Column,
+                expr.Length,
                 DS0274_EvalMacroFailed,
                 nameof(StringHelper.EvalMacro_EvaluationFailed), [expr, ex.ToString()],
-                ProjectConfigurationFileName);
+                info.Document);
         }
 
         Directory.SetCurrentDirectory(prevWorkingDir);

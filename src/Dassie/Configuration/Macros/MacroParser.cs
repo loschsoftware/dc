@@ -15,7 +15,7 @@ internal partial class MacroParser
         public string Name => name;
         public List<MacroParameter> Parameters => [];
         public MacroOptions Options => options;
-        public string Expand(Dictionary<string, string> arguments) => expansion();
+        public string Expand(Dictionary<string, string> arguments, MacroInvocationInfo info) => expansion();
     }
 
     private record ExpansionResult(string Result, bool CanBeCached);

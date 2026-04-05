@@ -772,5 +772,10 @@
   "ProjectFileSerializer_ConfigFileNotFound": "Die referenzierte Konfigurationsdatei '{0}' konnte nicht gefunden werden.",
   "ProjectFileSerializer_PropertySetMultipleTimes": "Die Eigenschaft '{0}' wurde mehrfach gesetzt.",
 
-  "CoreProperties_NoResourceProviderForSpecifiedLanguage": "Für die angegebene Sprache '{0}' sind keine Lokalisierungsressourcen installiert."
+  "CoreProperties_NoResourceProviderForSpecifiedLanguage": "Für die angegebene Sprache '{0}' sind keine Lokalisierungsressourcen installiert.",
+
+  "PropMacro_IndexExpressionNotInteger": "Ungültiger Indexausdruck '{0}'. Der Index muss eine ganzzahlige Konstante sein.",
+  "PropMacro_IndexOutOfRange": "Ungültiger Indexausdruck '{0}'. Der Index liegt außerhalb des gültigen Bereichs (muss <= {1} sein).",
+  "PropMacro_IndexedPropertyNotEnumerable": "Ungültiger Indexausdruck '{0}'. Die zu indizierende Eigenschaft ist keine Liste.",
+  "PropMacro_InvalidMemberReference": "Referenz auf ungültige Eigenschaft '{0}' in Makro '{1}'."
 }

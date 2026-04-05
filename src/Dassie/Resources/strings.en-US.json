@@ -772,5 +772,10 @@
   "ProjectFileSerializer_ConfigFileNotFound": "The referenced configuration file '{0}' could not be found.",
   "ProjectFileSerializer_PropertySetMultipleTimes": "The property '{0}' was set multiple times.",
 
-  "CoreProperties_NoResourceProviderForSpecifiedLanguage": "There is no resource provider installed for the specified language '{0}'."
+  "CoreProperties_NoResourceProviderForSpecifiedLanguage": "There is no resource provider installed for the specified language '{0}'.",
+
+  "PropMacro_IndexExpressionNotInteger": "Invalid index expression '{0}'. Index must be an integral constant.",
+  "PropMacro_IndexOutOfRange": "Invalid index expression '{0}'. Index is out of range (must be <= {1}).",
+  "PropMacro_IndexedPropertyNotEnumerable": "Invalid index expression '{0}'. The indexed property is not enumerable.",
+  "PropMacro_InvalidMemberReference": "Reference to unknown member '{0}' in macro invocation '{1}'."
 }

@@ -1146,5 +1146,21 @@ public enum MessageCode
     /// <summary>
     /// Emitted when an imported configuration file is not an SDK definition file.
     /// </summary>
-    DS0278_ImportedConfigFileNotDefinitionFile
+    DS0278_ImportedConfigFileNotDefinitionFile,
+    /// <summary>
+    /// Emitted when the index specified in an invocation of the $(Prop) macro is not an integral constant.
+    /// </summary>
+    DS0279_PropMacroIndexNotInteger,
+    /// <summary>
+    /// Emitted when the index specified in an invocation of the $(Prop) macro results in an <see cref="IndexOutOfRangeException"/>.
+    /// </summary>
+    DS0280_PropMacroIndexOutOfRange,
+    /// <summary>
+    /// Emitted when an index expression is used in an invocation of the $(Prop) macro for a property that is not an enumerable.
+    /// </summary>
+    DS0281_PropMacroIndexElementNotEnumerable,
+    /// <summary>
+    /// Emitted when an invalid property is referenced in an invocation of the $(Prop) macro.
+    /// </summary>
+    DS0282_PropMacroInvalidMemberAccess
 }
