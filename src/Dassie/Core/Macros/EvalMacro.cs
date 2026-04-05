@@ -59,7 +59,8 @@ internal class EvalMacro : IMacro
         File.WriteAllText("main.ds", code);
         CompileCommand.Instance.Invoke(["main.ds"], _defaultConfig);
 
-        Assembly asm = Assembly.LoadFile(Path.GetFullPath("eval.dll"));
+        byte[] asmBytes = File.ReadAllBytes(Path.GetFullPath("eval.dll"));
+        Assembly asm = Assembly.Load(asmBytes);
         string result = "";
 
         try
@@ -78,7 +79,7 @@ internal class EvalMacro : IMacro
         }
 
         Directory.SetCurrentDirectory(prevWorkingDir);
-        //FileSystem.DeleteDirectory(tempDir, DeleteDirectoryOption.DeleteAllContents);
+        FileSystem.DeleteDirectory(tempDir, DeleteDirectoryOption.DeleteAllContents);
 
         foreach (MessageInfo msg in messages)
             EmittedMessages.Add(msg);
