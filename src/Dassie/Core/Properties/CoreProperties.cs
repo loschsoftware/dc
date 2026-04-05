@@ -39,7 +39,8 @@ internal class LanguageProperty : GlobalConfigProperty
 
     public override Func<object, bool>[] Validators => [v =>
     {
-        if (!ExtensionLoader.LocalizationResourceProviders.Any(l => l.Culture == v.ToString()))
+        if (!ExtensionLoader.LocalizationResourceProviders.Any(l => l.Culture == v.ToString())
+            && !File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Localization", $"strings.{v.ToString()}.json")))
         {
             EmitErrorMessageFormatted(
                 0, 0, 0,
