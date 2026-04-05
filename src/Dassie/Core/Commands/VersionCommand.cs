@@ -18,14 +18,18 @@ internal class VersionCommand : CompilerCommand
     public override CommandOptions Options => CommandOptions.Hidden | CommandOptions.NoHelpRouting;
     public override string Description => "";
 
+    /// <summary>
+    /// Days between 01/01/2000 and 27/04/2023, on which development on dc was started.
+    /// </summary>
+    private const int DateOffset = 8517;
+
     public static Version GetFriendlyVersion(Version version)
     {
-        // 8517 -> Days between 01/01/2000 and 27/04/2023, on which development on dc was started
-        return new(version.Major, version.Minor, version.Build - 8517);
+        return new(version.Major, version.Minor, version.Build - DateOffset);
     }
 
     public static Version AssemblyFriendlyVersion => GetFriendlyVersion(Assembly.GetExecutingAssembly().GetName().Version);
-    public static DateOnly AssemblyBuildDate => new DateOnly(2000, 1, 1).AddDays(AssemblyFriendlyVersion.Build);
+    public static DateOnly AssemblyBuildDate => new DateOnly(2000, 1, 1).AddDays(AssemblyFriendlyVersion.Build + DateOffset);
 
     public override int Invoke(string[] args)
     {
