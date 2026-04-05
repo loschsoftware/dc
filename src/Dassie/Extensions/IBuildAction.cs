@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Dassie.Configuration;
+using Dassie.Configuration.Macros;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -12,7 +14,17 @@ namespace Dassie.Extensions;
 /// <param name="Text">The string argument passed to the action.</param>
 /// <param name="Mode">The mode the action is being invoked in.</param>
 /// <param name="BuildEventName">The name of the build event executing the action, if the action is executed as part of a build event.</param>
-public record ActionContext(List<XmlNode> XmlElements, List<XmlAttribute> XmlAttributes, string Text, ActionModes Mode, string BuildEventName);
+/// <param name="Configuration">The configuration the build action is being invoked with.</param>
+public record ActionContext(
+    List<XmlNode> XmlElements,
+    List<XmlAttribute> XmlAttributes,
+    string Text,
+    ActionModes Mode,
+    string BuildEventName,
+    DassieConfig Configuration)
+{
+    internal MacroParser MacroParser { get; init; }
+}
 
 /// <summary>
 /// Specifies the modes in which an action can be executed.

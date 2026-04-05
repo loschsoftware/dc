@@ -1162,5 +1162,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when an invalid property is referenced in an invocation of the $(Prop) macro.
     /// </summary>
-    DS0282_PropMacroInvalidMemberAccess
+    DS0282_PropMacroInvalidMemberAccess,
+    /// <summary>
+    /// Emitted when an invocation of a build action is missing a parameter (element or attribute).
+    /// </summary>
+    DS0283_BuildActionMissingParameter
 }

@@ -24,7 +24,6 @@ internal static class BuildEventHandler
             parser = new(config);
             parser.SetMacroDefinitions(ProjectFileSerializer.MacroDefinitions);
         }
-        
 
         foreach (XmlElement command in buildEvent.CommandNodes)
         {
@@ -74,7 +73,11 @@ internal static class BuildEventHandler
                 expanded.Attributes.Cast<XmlAttribute>().ToList(),
                 expanded.InnerText,
                 currentMode,
-                buildEvent.Name));
+                buildEvent.Name,
+                config)
+            {
+                MacroParser = parser
+            });
 
             string errId = nameof(StringHelper.BuildEventHandler_BuildActionFailed);
             object[] errArgs = [name, buildEvent.CommandNodes.IndexOf(command) + 1, ret];

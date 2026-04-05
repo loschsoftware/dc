@@ -777,5 +777,8 @@
   "PropMacro_IndexExpressionNotInteger": "Invalid index expression '{0}'. Index must be an integral constant.",
   "PropMacro_IndexOutOfRange": "Invalid index expression '{0}'. Index is out of range (must be <= {1}).",
   "PropMacro_IndexedPropertyNotEnumerable": "Invalid index expression '{0}'. The indexed property is not enumerable.",
-  "PropMacro_InvalidMemberReference": "Reference to unknown member '{0}' in macro invocation '{1}'."
+  "PropMacro_InvalidMemberReference": "Reference to unknown member '{0}' in macro invocation '{1}'.",
+
+  "IBuildAction_MissingAttribute": "Build action '{0}': Missing required attribute '{1}'.",
+  "IBuildAction_FileNotFound": "Build action '{0}': Could not find file '{1}'."
 }

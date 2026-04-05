@@ -108,7 +108,10 @@ public class CorePackage : IPackage
         new ShellCommandBuildAction(),
         new PrintBuildAction(),
         new LogBuildAction(),
-        new SetEnvironmentVariableBuildAction()
+        new SetEnvironmentVariableBuildAction(),
+        new InputBuildAction(),
+        new AssignBuildAction(),
+        new ReadFileBuildAction()
     ];
 
     /// <inheritdoc/>

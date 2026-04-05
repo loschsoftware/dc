@@ -44,6 +44,14 @@ internal partial class MacroParser
             .ToList() ?? [];
     }
 
+    public void AddOrOverride(Define macro)
+    {
+        if (_macroDefinitions.Any(m => m.Macro == macro.Macro))
+            _macroDefinitions.First(m => m.Macro == macro.Macro).Value = macro.Value;
+
+        _macroDefinitions.Add(macro);
+    }
+
     private void PopulateIntrinsicMacros()
     {
 #if STANDALONE

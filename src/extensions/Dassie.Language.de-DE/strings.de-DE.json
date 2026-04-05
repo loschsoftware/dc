@@ -777,5 +777,8 @@
   "PropMacro_IndexExpressionNotInteger": "Ungültiger Indexausdruck '{0}'. Der Index muss eine ganzzahlige Konstante sein.",
   "PropMacro_IndexOutOfRange": "Ungültiger Indexausdruck '{0}'. Der Index liegt außerhalb des gültigen Bereichs (muss <= {1} sein).",
   "PropMacro_IndexedPropertyNotEnumerable": "Ungültiger Indexausdruck '{0}'. Die zu indizierende Eigenschaft ist keine Liste.",
-  "PropMacro_InvalidMemberReference": "Referenz auf ungültige Eigenschaft '{0}' in Makro '{1}'."
+  "PropMacro_InvalidMemberReference": "Referenz auf ungültige Eigenschaft '{0}' in Makro '{1}'.",
+
+  "IBuildAction_MissingAttribute": "Build-Aktion '{0}': Erforderliches Attribut '{1}' fehlt.",
+  "IBuildAction_FileNotFound": "Build-Aktion '{0}': Datei '{1}' konnte nicht gefunden werden."
 }
