@@ -19,5 +19,9 @@ public enum CommandOptions
     /// <summary>
     /// If set, the command system does not route invocations of the command with "--help" arguments to the standard command help system.
     /// </summary>
-    NoHelpRouting = 2
+    NoHelpRouting = 2,
+    /// <summary>
+    /// If set, the command system does not allow invoking this command by name through the command line.
+    /// </summary>
+    NoDirectInvocation = 4
 }

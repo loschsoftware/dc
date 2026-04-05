@@ -39,7 +39,8 @@ internal class CompileCommand : CompilerCommand
 
     public override string Command => "compile";
     public override string Description => StringHelper.CompileCommand_Description;
-    public override CommandOptions Options => CommandOptions.Hidden;
+    public override CommandRole Role => CommandRole.Default;
+    public override CommandOptions Options => CommandOptions.Hidden | CommandOptions.NoDirectInvocation;
 
     public override CommandHelpDetails HelpDetails => GetHelpDetails();
     private CommandHelpDetails GetHelpDetails()

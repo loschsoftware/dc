@@ -3,6 +3,26 @@
 namespace Dassie.Extensions;
 
 /// <summary>
+/// Specifies the role of a command in the runtime system.
+/// </summary>
+public enum CommandRole
+{
+    /// <summary>
+    /// Specifies no special role.
+    /// </summary>
+    None,
+    /// <summary>
+    /// Specifies that this command acts as the default help provider.
+    /// </summary>
+    Help,
+    /// <summary>
+    /// Specifies that this command acts as the default command
+    /// that is invoked if no command name is specified.
+    /// </summary>
+    Default
+}
+
+/// <summary>
 /// Defines a command used to add additional features to the Dassie compiler.
 /// </summary>
 public interface ICompilerCommand
@@ -33,6 +53,11 @@ public interface ICompilerCommand
     /// </summary>
     /// <returns>The options specified for the command.</returns>
     public virtual CommandOptions Options => CommandOptions.None;
+
+    /// <summary>
+    /// Specifies the role of the command.
+    /// </summary>
+    public virtual CommandRole Role => CommandRole.None;
 
     /// <summary>
     /// The method that is executed when the command is invoked.

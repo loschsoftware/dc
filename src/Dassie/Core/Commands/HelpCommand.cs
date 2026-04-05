@@ -3,11 +3,9 @@ using Dassie.Configuration;
 using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Xml.Serialization;
 
 namespace Dassie.Core.Commands;
 
@@ -17,8 +15,8 @@ internal class HelpCommand : CompilerCommand
     public static HelpCommand Instance => _instance ??= new();
 
     public override string Command => "help";
-
     public override List<string> Aliases => ["?", "-h", "-help", "--help", "-?", "/?", "/help"];
+    public override CommandRole Role => CommandRole.Help;
 
     public override string Description => StringHelper.HelpCommand_Description;
 

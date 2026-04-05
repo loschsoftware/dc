@@ -23,5 +23,8 @@ public abstract class CompilerCommand : ICompilerCommand
     public virtual CommandOptions Options => CommandOptions.None;
 
     /// <inheritdoc/>
+    public virtual CommandRole Role => CommandRole.None;
+
+    /// <inheritdoc/>
     public abstract int Invoke(string[] args);
 }

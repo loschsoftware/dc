@@ -26,7 +26,12 @@
   "AotCompiler_IlcArgList": "Invoking IL compiler with following arguments: {0}",
   "AotCompiler_LinkerArgList": "Invoking linker with following arguments: {0}",
 
-  "CommandHandler_DirectInvocationNotSupported": "The command 'compile' cannot be executed directly. To compile Dassie source files, use 'dc <Files>'.",
+  "CommandHandler_DirectInvocationNotSupported": "The command '{0}' cannot be executed directly.",
+  "CommandHandler_DirectInvocationNotSupported_Compile": "The command 'compile' cannot be executed directly. To compile Dassie source files, use 'dc <Files>'.",
+  "CommandHandler_NoHelpCommandInstalled": "No help command is installed.",
+  "CommandHandler_MultipleHelpCommandsInstalled": "Multiple help commands are installed. The command '{0}' defined in '{1}' will be used.",
+  "CommandHandler_NoDefaultCommandInstalled": "No default command is installed.",
+  "CommandHandler_MultipleDefaultCommandsInstalled": "Multiple default commands are installed. The command '{0}' defined in '{1}' will be used.",
 
   "CommandLineOptionParser_ExpectedArgument": "Expected argument for option '{0}' (alias for '{1}').",
   "CommandLineOptionParser_InvalidFlag": "Invalid flag '{0}'.",

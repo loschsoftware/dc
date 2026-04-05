@@ -44,14 +44,14 @@ internal class Program
 
             args ??= [];
             if (args.Length == 0)
-                exit = HelpCommand.Instance.Invoke(args);
+                exit = CommandHandler.InvokeHelpCommand(args);
             else
             {
                 string command = args[0];
                 if (CommandHandler.TryInvoke(command, args[1..], out int ret))
                     exit = ret;
                 else
-                    exit = CompileCommand.Instance.Invoke(args);
+                    exit = CommandHandler.InvokeDefaultCommand(args);
             }
         }
         catch (Exception ex)

@@ -26,7 +26,12 @@
   "AotCompiler_IlcArgList": "IL-Compiler wird mit folgenden Argumenten ausgeführt: {0}",
   "AotCompiler_LinkerArgList": "Linker wird mit folgenden Argumenten ausgeführt: {0}",
 
-  "CommandHandler_DirectInvocationNotSupported": "Der Befehl 'compile' kann nicht direkt ausgeführt werden. Um Dassie-Quelldateien zu kompilieren, benutzen Sie 'dc <Dateien>'.",
+  "CommandHandler_DirectInvocationNotSupported": "Der Befehl '{0}' kann nicht direkt ausgeführt werden.",
+  "CommandHandler_DirectInvocationNotSupported_Compile": "Der Befehl 'compile' kann nicht direkt ausgeführt werden. Um Dassie-Quelldateien zu kompilieren, benutzen Sie 'dc <Dateien>'.",
+  "CommandHandler_NoHelpCommandInstalled": "Kein Hilfe-Befehl ist installiert.",
+  "CommandHandler_MultipleHelpCommandsInstalled": "Mehrere Hilfe-Befehle sind installiert. Der Befehl '{0}' aus '{1}' wird genutzt.",
+  "CommandHandler_NoDefaultCommandInstalled": "Kein Standardbefehl ist installiert.",
+  "CommandHandler_MultipleDefaultCommandsInstalled": "Mehrere Standardbefehle sind installiert. Der Befehl '{0}' aus '{1}' wird genutzt.",
 
   "CommandLineOptionParser_ExpectedArgument": "Argument für Option '{0}' (Alias für '{1}') erwartet.",
   "CommandLineOptionParser_InvalidFlag": "Ungültiger Schalter '{0}'.",

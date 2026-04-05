@@ -1166,5 +1166,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when an invocation of a build action is missing a parameter (element or attribute).
     /// </summary>
-    DS0283_BuildActionMissingParameter
+    DS0283_BuildActionMissingParameter,
+    /// <summary>
+    /// Emitted when the invocation of a special command fails.
+    /// </summary>
+    DS0284_SpecialCommandInvocationFailed
 }
