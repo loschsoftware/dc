@@ -7,21 +7,13 @@ This project aims to implement a .NET compiler for the [Dassie](https://github.c
 To get started with Dassie development, either download a binary from the 'Releases' section of this repository or build the compiler from source. An installation of .NET 10 is required if compiling from source or using a framework-dependent compiler binary.
 
 ### Compiling from source
-> [!IMPORTANT]
-> Sometimes, the build script (``build.sh`` or ``build.cmd``) will fail on the first attempt. **This is normal and expected!** Simply run the script again and it should successfully compile. This only needs to be done once, every subsequent build will work normally.
-
-**Linux:**
-````bash
-git clone https://github.com/loschsoftware/dc.git
-cd dc
-./build.sh
-````
-**Windows:**
 ````cmd
 git clone https://github.com/loschsoftware/dc.git
 cd dc
-build
+dotnet build
 ````
+
+After the compilation, the generated binaries can be found in the ``artifacts`` directory.
 
 ## Using the compiler
 Here is the classic "Hello World" program in Dassie:
