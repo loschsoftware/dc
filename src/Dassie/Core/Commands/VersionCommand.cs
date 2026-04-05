@@ -28,6 +28,7 @@ internal class VersionCommand : CompilerCommand
         return new(version.Major, version.Minor, version.Build - DateOffset);
     }
 
+    public static Version FrameworkVersion => typeof(object).Assembly.GetName().Version;
     public static Version AssemblyFriendlyVersion => GetFriendlyVersion(Assembly.GetExecutingAssembly().GetName().Version);
     public static DateOnly AssemblyBuildDate => new DateOnly(2000, 1, 1).AddDays(AssemblyFriendlyVersion.Build + DateOffset);
 

@@ -76,7 +76,7 @@ internal class HelpCommand : CompilerCommand
 
         StringBuilder logoBuilder = new();
         logoBuilder.AppendLine();
-        logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductNameString), StringHelper.ProductNameFull, version.ToString(2)));
+        logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductNameString), StringHelper.ProductNameFull, VersionCommand.FrameworkVersion.ToString(2)));
         logoBuilder.AppendLine(StringHelper.Format(nameof(StringHelper.HelpCommand_ProductVersionString), version.ToString(2), version.Build, VersionCommand.AssemblyBuildDate.ToShortDateString()));
 
         ConsoleColor def = Console.ForegroundColor;
