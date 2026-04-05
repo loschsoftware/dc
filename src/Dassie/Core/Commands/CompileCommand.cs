@@ -143,7 +143,7 @@ internal class CompileCommand : CompilerCommand
         Context ??= new();
         Context.Configuration = config;
 
-        EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_CompilationStarted), [config.Verbosity], 2);
+        EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_CompilationStarted), [Math.Clamp(config.Verbosity, 0, 3)], 2);
         EmitDeferredBuildLogMessages();
 
         ProjectFileCompatibilityTool.VerifyFormatVersionCompatibility(config);
