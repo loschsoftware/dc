@@ -785,5 +785,18 @@
   "PropMacro_InvalidMemberReference": "Referenz auf ungültige Eigenschaft '{0}' in Makro '{1}'.",
 
   "IBuildAction_MissingAttribute": "Build-Aktion '{0}': Erforderliches Attribut '{1}' fehlt.",
-  "IBuildAction_FileNotFound": "Build-Aktion '{0}': Datei '{1}' konnte nicht gefunden werden."
+  "IBuildAction_FileNotFound": "Build-Aktion '{0}': Datei '{1}' konnte nicht gefunden werden.",
+
+  "FileSystemHelpers_CopyingFile": "Datei wird kopiert: '{0}' -> '{1}'.",
+  "FileSystemHelpers_CopyingDirectory": "Verzeichnis wird kopiert: '{0}' -> '{1}'.",
+  "FileSystemHelpers_MovingFile": "Datei wird verschoben: '{0}' -> '{1}'.",
+  "FileSystemHelpers_MovingDirectory": "Verzeichnis wird verschoben: '{0}' -> '{1}'.",
+  "FileSystemHelpers_DeletingFile": "Datei wird gelöscht: '{0}'.",
+  "FileSystemHelpers_DeletingDirectory": "Verzeichnis wird gelöscht: '{0}'.",
+  "FileSystemHelpers_FailedToCopyFile": "Datei '{0}' konnte nicht kopiert werden: '{1}'",
+  "FileSystemHelpers_FailedToCopyDirectory": "Verzeichnis '{0}' konnte nicht kopiert werden: '{1}'",
+  "FileSystemHelpers_FailedToMoveFile": "Datei '{0}' konnte nicht verschoben werden: '{1}'",
+  "FileSystemHelpers_FailedToMoveDirectory": "Verzeichnis '{0}' konnte nicht verschoben werden: '{1}'",
+  "FileSystemHelpers_FailedToDeleteFile": "Datei '{0}' konnte nicht gelöscht werden: '{1}'",
+  "FileSystemHelpers_FailedToDeleteDirectory": "Verzeichnis '{0}' konnte nicht gelöscht werden: '{1}'"
 }

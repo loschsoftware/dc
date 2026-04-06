@@ -17,6 +17,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+		<PackageReference Include="Glob.cs" Version="5.1.1643" />
 		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.4.0" />
 		<PackageReference Include="Microsoft.NETCore.ILAsm" Version="10.0.5" />
 		<PackageReference Include="NuGet.Protocol" Version="7.3.0" />

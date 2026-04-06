@@ -111,7 +111,10 @@ public class CorePackage : IPackage
         new SetEnvironmentVariableBuildAction(),
         new InputBuildAction(),
         new AssignBuildAction(),
-        new ReadFileBuildAction()
+        new ReadFileBuildAction(),
+        new CopyBuildAction(),
+        new MoveBuildAction(),
+        new DeleteBuildAction()
     ];
 
     /// <inheritdoc/>

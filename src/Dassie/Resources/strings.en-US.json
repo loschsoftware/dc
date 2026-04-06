@@ -785,5 +785,18 @@
   "PropMacro_InvalidMemberReference": "Reference to unknown member '{0}' in macro invocation '{1}'.",
 
   "IBuildAction_MissingAttribute": "Build action '{0}': Missing required attribute '{1}'.",
-  "IBuildAction_FileNotFound": "Build action '{0}': Could not find file '{1}'."
+  "IBuildAction_FileNotFound": "Build action '{0}': Could not find file '{1}'.",
+
+  "FileSystemHelpers_CopyingFile": "Copying file '{0}' -> '{1}'.",
+  "FileSystemHelpers_CopyingDirectory": "Copying directory '{0}' -> '{1}'.",
+  "FileSystemHelpers_MovingFile": "Moving file '{0}' -> '{1}'.",
+  "FileSystemHelpers_MovingDirectory": "Moving directory '{0}' -> '{1}'.",
+  "FileSystemHelpers_DeletingFile": "Deleting file '{0}'.",
+  "FileSystemHelpers_DeletingDirectory": "Deleting directory '{0}'.",
+  "FileSystemHelpers_FailedToCopyFile": "Failed to copy file '{0}': '{1}'",
+  "FileSystemHelpers_FailedToCopyDirectory": "Failed to copy directory '{0}': '{1}'",
+  "FileSystemHelpers_FailedToMoveFile": "Failed to move file '{0}': '{1}'",
+  "FileSystemHelpers_FailedToMoveDirectory": "Failed to move directory '{0}': '{1}'",
+  "FileSystemHelpers_FailedToDeleteFile": "Failed to delete file '{0}': '{1}'",
+  "FileSystemHelpers_FailedToDeleteDirectory": "Failed to delete directory '{0}': '{1}'"
 }

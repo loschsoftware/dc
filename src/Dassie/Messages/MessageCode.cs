@@ -1170,5 +1170,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when the invocation of a special command fails.
     /// </summary>
-    DS0284_SpecialCommandInvocationFailed
+    DS0284_SpecialCommandInvocationFailed,
+    /// <summary>
+    /// Emitted when a generic file system operation fails.
+    /// </summary>
+    DS0285_FileSystemOperationFailed
 }
