@@ -114,7 +114,8 @@ public class CorePackage : IPackage
         new ReadFileBuildAction(),
         new CopyBuildAction(),
         new MoveBuildAction(),
-        new DeleteBuildAction()
+        new DeleteBuildAction(),
+        new CodeBuildAction()
     ];
 
     /// <inheritdoc/>
