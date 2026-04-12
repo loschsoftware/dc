@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Dassie.Messages;
 
-internal class ParserErrorListener : BaseErrorListener
+internal class ParserErrorListener(string fileName = null) : BaseErrorListener
 {
     public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
     {
@@ -15,13 +15,13 @@ internal class ParserErrorListener : BaseErrorListener
             Length = offendingSymbol.Text.Length,
             Code = DS0002_SyntaxError,
             Text = new([char.ToUpperInvariant(msg[0]), .. msg[1..], '.']),
-            File = CurrentFile.Path,
+            File = fileName ?? CurrentFile.Path,
             Severity = Severity.Error
         });
     }
 }
 
-internal class LexerErrorListener : IAntlrErrorListener<int>
+internal class LexerErrorListener(string fileName = null) : IAntlrErrorListener<int>
 {
     public void SyntaxError(TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
     {
@@ -30,7 +30,7 @@ internal class LexerErrorListener : IAntlrErrorListener<int>
             Location = (line, charPositionInLine),
             Code = DS0002_SyntaxError,
             Text = new([char.ToUpperInvariant(msg[0]), .. msg[1..], '.']),
-            File = CurrentFile.Path,
+            File = fileName ?? CurrentFile.Path,
             Severity = Severity.Error
         });
     }

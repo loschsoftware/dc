@@ -2,6 +2,7 @@
 using Dassie.Configuration.Macros.Parser;
 using Dassie.Core.Macros;
 using Dassie.Extensions;
+using Dassie.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ internal partial class MacroParser
 
     private record ExpansionResult(string Result, bool CanBeCached);
 
+    private string _documentName = ProjectConfigurationFileName;
     private int _macroDefinitionResolutionDepth;
     private List<Define> _macroDefinitions = [];
     private Func<string, object> _propertyResolver = static _ => null;
@@ -33,6 +35,7 @@ internal partial class MacroParser
 
     public MacroParser(DassieConfig config) : this()
     {
+        _documentName = config.DocumentName;
         BindPropertyResolver(p => config[p]);
         AddMacro(new PropMacro(config));
     }
@@ -120,6 +123,10 @@ internal partial class MacroParser
         Parser.MacroParser parser = new(tokenStream);
         MacroVisitor visitor = new(this, paramScope, stack);
 
+        lexer.RemoveErrorListeners();
+        lexer.AddErrorListener(new LexerErrorListener(_documentName));
+        parser.RemoveErrorListeners();
+        parser.AddErrorListener(new ParserErrorListener(_documentName));
         return visitor.Visit(parser.document());
     }
 

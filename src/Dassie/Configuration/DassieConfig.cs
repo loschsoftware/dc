@@ -31,18 +31,23 @@ public partial class DassieConfig : ConfigObject
     /// </summary>
     public static readonly string CurrentFormatVersion = "1.0";
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DassieConfig"/> type.
-    /// </summary>
-    /// <param name="store">The <see cref="PropertyStore"/> backing the configuration.</param>
-    public DassieConfig(PropertyStore store) : base(store) { }
+    internal string DocumentName { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DassieConfig"/> type.
     /// </summary>
-    public DassieConfig() : this(DefaultStore)
+    /// <param name="store">The <see cref="PropertyStore"/> backing the configuration.</param>
+    public DassieConfig(PropertyStore store) : this(store, ProjectConfigurationFileName) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DassieConfig"/> type.
+    /// </summary>
+    public DassieConfig() : this(DefaultStore) { }
+
+    internal DassieConfig(PropertyStore store, string documentName) : base(store)
     {
         FormatVersion = CurrentFormatVersion;
+        DocumentName = documentName;
     }
 
     /// <summary>
