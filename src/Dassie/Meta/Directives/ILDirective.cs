@@ -1,5 +1,4 @@
 ﻿using Dassie.Extensions;
-using Dassie.Resources;
 
 namespace Dassie.Meta.Directives;
 

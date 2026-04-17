@@ -1,7 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Dassie.Configuration;
-using Dassie.Configuration.Macros;
 using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Parser;
@@ -72,7 +71,10 @@ internal class DbgCommand : CompilerCommand
 
         if (args[0] == "clear-cache")
             return ClearPackageCache();
-        
+
+        if (args[0] == "clear-temp")
+            return ClearTempDir();
+
         if (args[0] == "print")
             return PrintText(args[1..]);
 
@@ -170,6 +172,16 @@ internal class DbgCommand : CompilerCommand
             return 0;
 
         Directory.Delete(packageDir, true);
+        return 0;
+    }
+
+    private static int ClearTempDir()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), "Dassie");
+        if (!Directory.Exists(tempDir))
+            return 0;
+
+        Directory.Delete(tempDir, true);
         return 0;
     }
 

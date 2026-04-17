@@ -15,6 +15,9 @@ internal static class Constants
     public const string SdkDirectoryName = "Sdk";
     public const string CoreSdkName = "Core";
     public const string CoreSdkFileName = "Core.def";
+
+    public const string DassieSourceFileExtension = ".ds";
+    public const string DassieScriptFileExtension = ".dsx";
     
     public static string ApplicationDataDirectoryPath => Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ApplicationDataDirectoryName));
 }

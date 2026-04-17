@@ -9,6 +9,7 @@ using Dassie.Data;
 using Dassie.Extensions;
 using Dassie.Messages;
 using Dassie.Meta;
+using Dassie.Scripting;
 using Dassie.Unmanaged;
 using Microsoft.NET.HostModel.AppHost;
 using System;
@@ -150,6 +151,35 @@ internal class CompileCommand : CompilerCommand
         ProjectFileCompatibilityTool.VerifyFormatVersionCompatibility(config);
 
         string[] files = args.Where(s => !s.StartsWith('-') && !s.StartsWith('/') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
+
+        // Execute script file (.dsx)
+
+        if (files.Any(f => Path.GetExtension(f) == DassieScriptFileExtension))
+        {
+            if (files.Any(f => Path.GetExtension(f) != DassieScriptFileExtension))
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0286_CompileCommandMixedScriptSourceFiles,
+                    nameof(StringHelper.CompileCommand_ScriptFilesMixedWithNonScriptFiles), [],
+                    CompilerExecutableName);
+
+                return -1;
+            }
+
+            if (files.Length > 1)
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0287_MultipleScriptFilesSpecified,
+                    nameof(StringHelper.CompileCommand_MultipleScriptFilesSpecified), [],
+                    CompilerExecutableName);
+
+                return -1;
+            }
+
+            return ScriptRunner.Execute(File.ReadAllText(files.Single()));
+        }
 
         if (args.Where(s => (s.StartsWith('-') || s.StartsWith('/') || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;

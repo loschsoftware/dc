@@ -422,6 +422,8 @@
   "CompileCommand_ClosestMatch": "Closest match is '{0}'.",
   "CompileCommand_DCHelp": "Use 'dc help' for a list of available commands.",
   "CompileCommand_SourceFileNotFound": "The source file '{0}' could not be found.",
+  "CompileCommand_ScriptFilesMixedWithNonScriptFiles": "Script files (*.dsx) cannot be combined with non-script files.",
+  "CompileCommand_MultipleScriptFilesSpecified": "Only one script file (*.dsx) can be specified for execution.",
 
   "ConfigCommand_Description": "Manages compiler settings and project configurations.",
   "ConfigCommand_PropertyOption": "The property to modify. Multiple can be specified, separated by spaces. The value is optional, if omitted, the default value is used. Note that the equals sign (=) is still required.",
@@ -798,5 +800,7 @@
   "FileSystemHelpers_FailedToMoveFile": "Failed to move file '{0}': '{1}'",
   "FileSystemHelpers_FailedToMoveDirectory": "Failed to move directory '{0}': '{1}'",
   "FileSystemHelpers_FailedToDeleteFile": "Failed to delete file '{0}': '{1}'",
-  "FileSystemHelpers_FailedToDeleteDirectory": "Failed to delete directory '{0}': '{1}'"
+  "FileSystemHelpers_FailedToDeleteDirectory": "Failed to delete directory '{0}': '{1}'",
+
+  "IncludeDirective_InvalidArguments": "Invalid arguments passed to 'include' directive. Expected [string]."
 }

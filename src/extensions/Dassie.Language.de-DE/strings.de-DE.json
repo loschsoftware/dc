@@ -422,6 +422,8 @@
   "CompileCommand_ClosestMatch": "Beste Übereinstimmung ist '{0}'.",
   "CompileCommand_DCHelp": "Verwenden Sie 'dc help', um eine Liste verfügbarer Befehle anzuzeigen.",
   "CompileCommand_SourceFileNotFound": "Die Quelldatei '{0}' konnte nicht gefunden werden.",
+  "CompileCommand_ScriptFilesMixedWithNonScriptFiles": "Skriptdateien (*.dsx) können nicht mit anderen Dateien kombiniert werden.",
+  "CompileCommand_MultipleScriptFilesSpecified": "Es kann nur eine Skriptdatei (*.dsx) zur Ausführung angegeben werden.",
 
   "ConfigCommand_Description": "Verwaltet Compilereinstellungen und Projektkonfigurationen.",
   "ConfigCommand_PropertyOption": "Die zu ändernde Eigenschaft. Es können mehrere angegeben werden, durch Leerzeichen getrennt. Der Wert ist optional; wenn er weggelassen wird, wird der Standardwert verwendet. Beachten Sie, dass das Gleichheitszeichen (=) dennoch erforderlich ist.",
@@ -742,17 +744,17 @@
 
   "DirectiveHandler_DirectiveNotResolved": "Die Compilerdirektive '{0}' konnte nicht aufgelöst werden.",
 
-  "ILDirective_InvalidArguments": "Ungültige Argumente an 'il'-Direktive übergeben. Erwartet [string].",
+  "ILDirective_InvalidArguments": "Ungültige Argumente an 'il'-Direktive übergeben. Erwartet wurde [string].",
   "ILDirective_InvalidScope": "Die 'il'-Compilerdirektive kann nur innerhalb einer Funktion verwendet werden.",
 
   "ImportDirective_InvalidArguments": "Ungültige Argumente an 'import'-Direktive übergeben. Erwartet werden 1 bis 3 Argumente.",
   "ImportDirective_InvalidTarget": "Ungültiges Importziel '{0}'. Erwartet wird 'local' oder 'global'.",
 
-  "LineDirective_InvalidArguments": "Ungültige Argumente an 'line'-Direktive übergeben. Erwartet [] oder [int] oder [int, bool].",
+  "LineDirective_InvalidArguments": "Ungültige Argumente an 'line'-Direktive übergeben. Erwartet wurde [] oder [int] oder [int, bool].",
 
-  "SourceDirective_InvalidArguments": "Ungültige Argumente an 'source'-Direktive übergeben. Erwartet [string].",
+  "SourceDirective_InvalidArguments": "Ungültige Argumente an 'source'-Direktive übergeben. Erwartet wurde [string].",
 
-  "TodoDirective_InvalidArguments": "Ungültige Argumente an 'todo'-Direktive übergeben. Erwartet [string].",
+  "TodoDirective_InvalidArguments": "Ungültige Argumente an 'todo'-Direktive übergeben. Erwartet wurde [string].",
   "TodoDirective_InvalidScope": "Die 'todo'-Compilerdirektive kann nur innerhalb einer Funktion verwendet werden.",
   "TodoDirective_Message": "TODO ({0}, Zeile {1}): {2}",
 
@@ -798,5 +800,7 @@
   "FileSystemHelpers_FailedToMoveFile": "Datei '{0}' konnte nicht verschoben werden: '{1}'",
   "FileSystemHelpers_FailedToMoveDirectory": "Verzeichnis '{0}' konnte nicht verschoben werden: '{1}'",
   "FileSystemHelpers_FailedToDeleteFile": "Datei '{0}' konnte nicht gelöscht werden: '{1}'",
-  "FileSystemHelpers_FailedToDeleteDirectory": "Verzeichnis '{0}' konnte nicht gelöscht werden: '{1}'"
+  "FileSystemHelpers_FailedToDeleteDirectory": "Verzeichnis '{0}' konnte nicht gelöscht werden: '{1}'",
+
+  "IncludeDirective_InvalidArguments": "Ungültige Argumente an 'include'-Direktive übergeben. Erwartet wurde [string]."
 }

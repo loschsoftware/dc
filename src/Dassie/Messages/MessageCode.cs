@@ -1174,5 +1174,13 @@ public enum MessageCode
     /// <summary>
     /// Emitted when a generic file system operation fails.
     /// </summary>
-    DS0285_FileSystemOperationFailed
+    DS0285_FileSystemOperationFailed,
+    /// <summary>
+    /// Emitted when the 'compile' command is invoked with file arguments containing Dassie script files (*.dsx) among non-script files.
+    /// </summary>
+    DS0286_CompileCommandMixedScriptSourceFiles,
+    /// <summary>
+    /// Emitted when multiple script files are specified in an invocation of the 'compile' command.
+    /// </summary>
+    DS0287_MultipleScriptFilesSpecified
 }
