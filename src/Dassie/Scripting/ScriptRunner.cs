@@ -35,7 +35,7 @@ internal static class ScriptRunner
         string scriptCacheDirPath = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "Dassie", "Scripts")).FullName;
         string scriptCacheFilePath = Path.Combine(scriptCacheDirPath, "scripts.dat");
 
-        Dictionary<string, string> cache;
+        Dictionary<string, string> cache = [];
 
         if (File.Exists(scriptCacheFilePath))
         {
@@ -47,6 +47,8 @@ internal static class ScriptRunner
                     continue;
 
                 string[] parts = line.Split(':');
+                cache.Add(parts[0], parts[1]);
+
                 if (parts[0] != hash)
                     continue;
 
@@ -61,8 +63,6 @@ internal static class ScriptRunner
                 return ExecuteAssembly(scriptFile);
             }
         }
-
-        cache = [];
 
         string cacheDirGuid = Guid.NewGuid().ToString();
         string prevWorkingDir = Directory.GetCurrentDirectory();

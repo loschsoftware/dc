@@ -153,7 +153,6 @@ internal class CompileCommand : CompilerCommand
         string[] files = args.Where(s => !s.StartsWith('-') && !s.StartsWith('/') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
 
         // Execute script file (.dsx)
-
         if (files.Any(f => Path.GetExtension(f) == DassieScriptFileExtension))
         {
             if (files.Any(f => Path.GetExtension(f) != DassieScriptFileExtension))
