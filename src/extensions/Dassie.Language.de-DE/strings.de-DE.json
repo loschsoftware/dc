@@ -590,6 +590,7 @@
   "RunCommand_Example3": "Kompiliert das Projekt mit einem bestimmten Build-Profil und führt die resultierende ausführbare Datei ohne Argumente aus.",
   "RunCommand_ProjectNotExecutable": "Das aktuelle Projekt kann nicht ausgeführt werden. Projekte mit dem Anwendungstyp '{0}' sind nicht ausführbar.",
   "RunCommand_InsufficientInformation": "Unzureichende Informationen: Die auszuführenden Dateien konnten nicht ermittelt werden. Erstellen Sie eine Projektdatei (dsconfig.xml) und setzen Sie die erforderlichen Eigenschaften 'BuildDirectory' und 'AssemblyFileName', um diesen Befehl zu aktivieren.",
+  "RunCommand_NotExecutableMinimalOutput": "Projekte mit 'MinimalOutput=true' können nicht ausgeführt werden.",
 
   "ScratchpadCommand_ClearedAllScratches": "Alle Scratches gelöscht.",
   "ScratchpadCommand_ScratchNotFound": "Der Scratch '{0}' konnte nicht gefunden werden.",

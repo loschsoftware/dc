@@ -590,6 +590,7 @@
   "RunCommand_Example3": "Compiles the project with a specific build profile and runs the resulting executable without any arguments.",
   "RunCommand_ProjectNotExecutable": "The current project cannot be executed. Projects with an application type of '{0}' are not executable.",
   "RunCommand_InsufficientInformation": "Insufficient information: The files to execute could not be determined. Create a project file (dsconfig.xml) and set the required properties 'BuildDirectory' and 'AssemblyFileName' to enable this command.",
+  "RunCommand_NotExecutableMinimalOutput": "Projects with 'MinimalOutput=true' cannot be executed.",
 
   "ScratchpadCommand_ClearedAllScratches": "Cleared all scratches.",
   "ScratchpadCommand_ScratchNotFound": "The scratch '{0}' could not be found.",

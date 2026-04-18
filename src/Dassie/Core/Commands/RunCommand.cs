@@ -72,6 +72,17 @@ internal class RunCommand : CompilerCommand
             return -1;
         }
 
+        if (ProjectFileSerializer.DassieConfig?.MinimalOutput == true)
+        {
+            EmitErrorMessageFormatted(
+                0, 0, 0,
+                DS0125_DCRunInvalidProjectType,
+                nameof(StringHelper.RunCommand_NotExecutableMinimalOutput), [],
+                CompilerExecutableName);
+
+            return -1;
+        }
+
         string process = "dotnet";
         string arglist = string.Join(' ', (string[])[$"\"{assemblyPath}\"", .. _args]);
 
