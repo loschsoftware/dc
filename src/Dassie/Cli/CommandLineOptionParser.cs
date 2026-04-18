@@ -36,6 +36,9 @@ internal static class CommandLineOptionParser
             if (!args[i].StartsWith('-'))
                 continue;
 
+            if (args[i] == "--")
+                return;
+
             string arg = args[i][1..];
 
             if (Aliases.TryGetValue(arg, out string option))

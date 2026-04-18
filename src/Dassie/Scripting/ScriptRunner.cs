@@ -20,15 +20,18 @@ internal static class ScriptRunner
         IgnoreAllWarnings = true
     };
 
-    private static int ExecuteAssembly(string path)
+    private static int ExecuteAssembly(string path, string[] args)
     {
         byte[] asmBytes = File.ReadAllBytes(path);
         Assembly asm = Assembly.Load(asmBytes);
-        asm.GetType("Program").GetMethod("Main").Invoke(null, [Array.Empty<string>()]);
+        asm.GetType("Program").GetMethod("Main").Invoke(null, [args ?? []]);
         return 0;
     }
 
     public static int Execute(string source)
+        => Execute(source, null);
+
+    public static int Execute(string source, string[] args)
     {
         string hash = string.Join("", SHA256.HashData(Encoding.UTF8.GetBytes(source)).Select(b => b.ToString("x2")));
 
@@ -60,7 +63,7 @@ internal static class ScriptRunner
                 if (!File.Exists(scriptFile))
                     continue;
 
-                return ExecuteAssembly(scriptFile);
+                return ExecuteAssembly(scriptFile, args);
             }
         }
 
@@ -75,7 +78,7 @@ internal static class ScriptRunner
 
         File.WriteAllText("main.ds", source);
         CompileCommand.Instance.Invoke(["main.ds"], _defaultConfig);
-        ExecuteAssembly(Path.GetFullPath("eval.dll"));
+        ExecuteAssembly(Path.GetFullPath("eval.dll"), args);
         Directory.SetCurrentDirectory(prevWorkingDir);
 
         foreach (MessageInfo msg in messages)

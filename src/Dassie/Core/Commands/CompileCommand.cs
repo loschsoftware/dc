@@ -3,7 +3,6 @@ using Dassie.Cli;
 using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
-using Dassie.Configuration.Macros;
 using Dassie.Core.Properties;
 using Dassie.Data;
 using Dassie.Extensions;
@@ -150,7 +149,7 @@ internal class CompileCommand : CompilerCommand
 
         ProjectFileCompatibilityTool.VerifyFormatVersionCompatibility(config);
 
-        string[] files = args.Where(s => !s.StartsWith('-') && !s.StartsWith('/') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
+        string[] files = args.TakeWhile(a => a != "--").Where(s => !s.StartsWith('-') && !s.StartsWith('/') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
 
         // Execute script file (.dsx)
         if (files.Any(f => Path.GetExtension(f) == DassieScriptFileExtension))
@@ -177,7 +176,11 @@ internal class CompileCommand : CompilerCommand
                 return -1;
             }
 
-            return ScriptRunner.Execute(File.ReadAllText(files.Single()));
+            string[] scriptArgs = [];
+            if (args.Contains("--"))
+                scriptArgs = args.SkipWhile(a => a != "--").Skip(1).ToArray();
+
+            return ScriptRunner.Execute(File.ReadAllText(files.Single()), scriptArgs);
         }
 
         if (args.Where(s => (s.StartsWith('-') || s.StartsWith('/') || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())

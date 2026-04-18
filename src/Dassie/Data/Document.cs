@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace Dassie.Data;
 
@@ -35,8 +36,14 @@ public enum DocumentKind
 /// </summary>
 public record Document
 {
-    private string _path;
+    private readonly string _path;
     private readonly byte[] _data;
+    private byte[] _hash;
+
+    /// <summary>
+    /// The hash of document data.
+    /// </summary>
+    public byte[] Hash => _hash ??= SHA256.HashData(_data);
 
     /// <summary>
     /// The identifier of the document, most commonly a file name.
