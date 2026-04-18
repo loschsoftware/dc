@@ -711,6 +711,16 @@ public partial class DassieConfig : ConfigObject
     [MinVersion("1.0")]
     [ConfigProperty]
     public partial bool NoScript { get; set; }
+
+    /// <summary>
+    /// If enabled, only generates .NET assemblies with no additional metadata.
+    /// </summary>
+    [Description("If enabled, only generates .NET assemblies with no additional metadata.")]
+    [DefaultValue(false)]
+    [XmlElement]
+    [MinVersion("1.0")]
+    [ConfigProperty]
+    public partial bool MinimalOutput { get; set; }
 }
 
 /// <summary>

@@ -531,7 +531,7 @@ internal class CompileCommand : CompilerCommand
                 Context.EntryPoint,
                 resources,
                 assembly,
-                config.Configuration == ApplicationConfiguration.Debug || config.EmitPdb,
+                !config.MinimalOutput && (config.Configuration == ApplicationConfiguration.Debug || config.EmitPdb),
                 config.Platform == Platform.x86);
 
             BlobBuilder peBlob = new();
@@ -555,7 +555,7 @@ internal class CompileCommand : CompilerCommand
             peBlob.WriteContentTo(fs);
             fs.Dispose();
 
-            if (subsystem.IsExecutable && config.GenerateNativeAppHost)
+            if (subsystem.IsExecutable && config.GenerateNativeAppHost && !config.MinimalOutput)
             {
                 string executableExtension = OperatingSystem.IsWindows() ? "exe" : "";
                 string frameworkBaseDir = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk")).Last();
@@ -575,7 +575,7 @@ internal class CompileCommand : CompilerCommand
                 compiler.Compile();
             }
 
-            if (!config.NoStdLib)
+            if (!config.NoStdLib && !config.MinimalOutput)
             {
                 string coreLib = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dassie.Core.dll");
 
@@ -589,19 +589,22 @@ internal class CompileCommand : CompilerCommand
                 }
             }
 
-            foreach (string dependency in Context.ReferencedAssemblies.Select(a => a.Location))
+            if (!config.MinimalOutput)
             {
-                if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(Path.GetDirectoryName(dependency)))
+                foreach (string dependency in Context.ReferencedAssemblies.Select(a => a.Location))
                 {
-                    try
+                    if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(Path.GetDirectoryName(dependency)))
                     {
-                        File.Copy(dependency, Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(dependency)), true);
+                        try
+                        {
+                            File.Copy(dependency, Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(dependency)), true);
+                        }
+                        catch (IOException) { }
                     }
-                    catch (IOException) { }
                 }
-            }
 
-            RuntimeConfigWriter.GenerateRuntimeConfigFile(Path.GetFileNameWithoutExtension(assembly) + ".runtimeconfig.json");
+                RuntimeConfigWriter.GenerateRuntimeConfigFile(Path.GetFileNameWithoutExtension(assembly) + ".runtimeconfig.json");
+            }
 
             if (File.Exists(resFile) && !Context.Configuration.PersistentResourceFile)
                 File.Delete(resFile);

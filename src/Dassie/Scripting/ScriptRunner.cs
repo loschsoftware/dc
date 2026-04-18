@@ -18,7 +18,8 @@ internal static class ScriptRunner
         ApplicationType = "Library",
         AssemblyFileName = "eval",
         IgnoreAllWarnings = true,
-        NoScript = true
+        NoScript = true,
+        MinimalOutput = true
     };
 
     private static int ExecuteAssembly(string path, string[] args)
