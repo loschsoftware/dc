@@ -311,7 +311,7 @@ internal class CompileCommand : CompilerCommand
             }
         }
 
-        if (config.DocumentTransformers is DocumentTransformerList dtl)
+        if (config.DocumentTransformers is DocumentTransformerList dtl && dtl.Transformers?.Count > 0)
             documents = DocumentTransformHandler.Transform(documents, dtl);
 
         // Run analyzers (if enabled)
