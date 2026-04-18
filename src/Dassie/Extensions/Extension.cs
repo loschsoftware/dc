@@ -81,4 +81,7 @@ public abstract class Extension : IPackage
 
     /// <inheritdoc/>
     public virtual Property[] Properties() => [];
+
+    /// <inheritdoc/>
+    public virtual IDocumentTransformer[] DocumentTransformers() => [];
 }

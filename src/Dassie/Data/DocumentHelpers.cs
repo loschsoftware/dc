@@ -4,16 +4,16 @@ using System.IO;
 namespace Dassie.Data;
 
 /// <summary>
-/// Helpers to construct instances of <see cref="InputDocument"/> from various data sources.
+/// Helpers to construct instances of <see cref="Document"/> from various data sources.
 /// </summary>
 internal static class DocumentHelpers
 {
     /// <summary>
-    /// Creates an instance of <see cref="InputDocument"/> from a file.
+    /// Creates an instance of <see cref="Document"/> from a file.
     /// </summary>
     /// <param name="path">The path to the file to create a document for.</param>
-    /// <returns>An instance of <see cref="InputDocument"/> corresponding to the specified file.</returns>
-    public static InputDocument FromFile(string path)
+    /// <returns>An instance of <see cref="Document"/> corresponding to the specified file.</returns>
+    public static Document FromFile(string path)
     {
         string text = "";
 
@@ -42,6 +42,6 @@ internal static class DocumentHelpers
                 CompilerExecutableName);
         }
 
-        return new InputDocument(text, path);
+        return new Document(text, path, path);
     }
 }

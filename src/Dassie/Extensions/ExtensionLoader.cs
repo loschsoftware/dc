@@ -95,6 +95,9 @@ internal static class ExtensionLoader
     private static IEnumerable<Property> _properties = [];
     public static IEnumerable<Property> Properties => _properties;
 
+    private static IEnumerable<IDocumentTransformer> _documentTransformers = [];
+    public static IEnumerable<IDocumentTransformer> DocumentTransformers => _documentTransformers;
+
     private static void Update()
     {
         _gloablConfigProperties = InstalledExtensions.SelectMany(p => p.GlobalProperties());
@@ -111,6 +114,7 @@ internal static class ExtensionLoader
         _macros = InstalledExtensions.SelectMany(p => p.Macros());
         _localizationResourceProviders = InstalledExtensions.SelectMany(p => p.LocalizationResourceProviders());
         _properties = InstalledExtensions.SelectMany(p => p.Properties());
+        _documentTransformers = InstalledExtensions.SelectMany(p => p.DocumentTransformers());
     }
 
     private static void Update(object sender, NotifyCollectionChangedEventArgs e)

@@ -569,6 +569,7 @@
   "PackageCommand_BuildActions": "Build actions",
   "PackageCommand_Macros": "Macros",
   "PackageCommand_LocalizationResourceProviders": "Localization resource providers",
+  "PackageCommand_DocumentTransformers": "Document transformers",
   "PackageCommand_ExtensionNotFound": "The extension '{0}' could not be found.",
   "PackageCommand_ExtensionAlreadyInstalled": "The extension '{0}' is already installed. Use the 'dc package update' command to update it to the newest version.",
   "PackageCommand_InstallationSuccessful": "Successfully installed extension '{0}', version {1}.",
@@ -802,5 +803,7 @@
   "FileSystemHelpers_FailedToDeleteFile": "Failed to delete file '{0}': '{1}'",
   "FileSystemHelpers_FailedToDeleteDirectory": "Failed to delete directory '{0}': '{1}'",
 
-  "IncludeDirective_InvalidArguments": "Invalid arguments passed to 'include' directive. Expected [string]."
+  "IncludeDirective_InvalidArguments": "Invalid arguments passed to 'include' directive. Expected [string].",
+
+  "DocumentTransformHandler_BuildLogMessage": "Transformed documents {0} -> {1} through document transformer '{2}'."
 }

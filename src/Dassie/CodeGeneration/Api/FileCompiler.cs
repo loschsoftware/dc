@@ -44,7 +44,7 @@ public static class FileCompiler
                 path);
         }
 
-        InputDocument doc = new(text, path);
+        Document doc = new(text, path);
         DassieParser parser = DocumentCompiler.CreateParser(doc, config, out string intermediatePath);
 
         return DocumentCompiler.CompileDocument(doc, config, parser.compilation_unit(), intermediatePath, parser).ToArray();

@@ -8,12 +8,12 @@ namespace Dassie.Data;
 
 internal static class DocumentSourceManager
 {
-    public static List<InputDocument> GetDocuments(DassieConfig config)
+    public static List<Document> GetDocuments(DassieConfig config)
     {
         if (config.DocumentSources == null || config.DocumentSources.Sources.Count == 0)
             return [];
 
-        List<InputDocument> docs = [];
+        List<Document> docs = [];
 
         foreach (XmlElement sourceElement in config.DocumentSources.Sources)
         {

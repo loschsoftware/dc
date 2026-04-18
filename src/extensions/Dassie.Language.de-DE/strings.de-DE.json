@@ -569,6 +569,7 @@
   "PackageCommand_BuildActions": "Build-Aktionen",
   "PackageCommand_Macros": "Makros",
   "PackageCommand_LocalizationResourceProviders": "Lokalisierungsdaten",
+  "PackageCommand_DocumentTransformers": "Dokument-Transformer",
   "PackageCommand_ExtensionNotFound": "Die Erweiterung '{0}' konnte nicht gefunden werden.",
   "PackageCommand_ExtensionAlreadyInstalled": "Die Erweiterung '{0}' ist bereits installiert. Verwenden Sie den Befehl 'dc package update', um sie auf die neueste Version zu aktualisieren.",
   "PackageCommand_InstallationSuccessful": "Erweiterung '{0}', Version {1} erfolgreich installiert.",
@@ -802,5 +803,7 @@
   "FileSystemHelpers_FailedToDeleteFile": "Datei '{0}' konnte nicht gelöscht werden: '{1}'",
   "FileSystemHelpers_FailedToDeleteDirectory": "Verzeichnis '{0}' konnte nicht gelöscht werden: '{1}'",
 
-  "IncludeDirective_InvalidArguments": "Ungültige Argumente an 'include'-Direktive übergeben. Erwartet wurde [string]."
+  "IncludeDirective_InvalidArguments": "Ungültige Argumente an 'include'-Direktive übergeben. Erwartet wurde [string].",
+
+  "DocumentTransformHandler_BuildLogMessage": "Dokumente {0} wurden nach {1} transformiert durch Transformator '{2}'."
 }

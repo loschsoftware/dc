@@ -691,6 +691,16 @@ public partial class DassieConfig : ConfigObject
     [MinVersion("1.0")]
     [ConfigProperty]
     public partial int MaxErrors { get; set; }
+
+    /// <summary>
+    /// Configures active document transformers.
+    /// </summary>
+    [Description("Configures active document transformers.")]
+    [DefaultValue(null)]
+    [XmlElement]
+    [MinVersion("1.0")]
+    [ConfigProperty]
+    public partial DocumentTransformerList DocumentTransformers { get; set; }
 }
 
 /// <summary>

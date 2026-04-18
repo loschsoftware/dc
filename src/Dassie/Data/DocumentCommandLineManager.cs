@@ -12,10 +12,10 @@ internal static class DocumentCommandLineManager
     /// Extracts input documents from command-line arguments starting with '--Document'.
     /// </summary>
     /// <param name="args">An array of command-line arguments.</param>
-    /// <returns>An enumerable of <see cref="InputDocument"/> instances representing the documents extracted from the command-line arguments that were passed.</returns>
-    public static IEnumerable<InputDocument> ExtractDocuments(string[] args)
+    /// <returns>An enumerable of <see cref="Document"/> instances representing the documents extracted from the command-line arguments that were passed.</returns>
+    public static IEnumerable<Document> ExtractDocuments(string[] args)
     {
-        List<InputDocument> docs = [];
+        List<Document> docs = [];
 
         foreach (string documentArg in args.Where(arg => arg.StartsWith("--Document:")))
         {

@@ -294,7 +294,7 @@ internal class CompileCommand : CompilerCommand
                 File.Copy(ProjectConfigurationFileName, Path.Combine(".cache", ProjectConfigurationFileName), true);
         }
 
-        List<InputDocument> documents = files.Select(DocumentHelpers.FromFile).ToList();
+        List<Data.Document> documents = files.Select(DocumentHelpers.FromFile).ToList();
         documents.AddRange(DocumentCommandLineManager.ExtractDocuments(documentArgs));
         documents.AddRange(DocumentSourceManager.GetDocuments(Context.Configuration));
 
@@ -306,10 +306,13 @@ internal class CompileCommand : CompilerCommand
                 EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_None), [], 2);
             else
             {
-                foreach (InputDocument doc in documents)
+                foreach (Data.Document doc in documents)
                     EmitBuildLogMessage($"    - {doc.Name}", 2);
             }
         }
+
+        if (config.DocumentTransformers is DocumentTransformerList dtl)
+            documents = DocumentTransformHandler.Transform(documents, dtl);
 
         // Run analyzers (if enabled)
         if (config.RunAnalyzers)

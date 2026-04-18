@@ -235,6 +235,7 @@ internal class PackageCommand : CompilerCommand
         PrintFeatures(StringHelper.PackageCommand_BuildActions, package.BuildActions().Select(b => b.Name));
         PrintFeatures(StringHelper.PackageCommand_Macros, package.Macros().Select(b => b.Name));
         PrintFeatures(StringHelper.PackageCommand_LocalizationResourceProviders, package.LocalizationResourceProviders().Select(b => b.Culture));
+        PrintFeatures(StringHelper.PackageCommand_DocumentTransformers, package.DocumentTransformers().Select(t => t.Name));
 
         HelpCommand.DisplayLogo();
         Console.WriteLine(sb.ToString());

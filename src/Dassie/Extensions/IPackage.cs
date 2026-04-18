@@ -134,4 +134,9 @@ public interface IPackage
     /// A list of build system property registrations.
     /// </summary>
     public virtual Property[] Properties() => [];
+
+    /// <summary>
+    /// A list of document transformers.
+    /// </summary>
+    public virtual IDocumentTransformer[] DocumentTransformers() => [];
 }

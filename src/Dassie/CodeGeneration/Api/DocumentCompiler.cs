@@ -11,7 +11,7 @@ namespace Dassie.CodeGeneration.Api;
 
 internal static class DocumentCompiler
 {
-    public static DassieParser CreateParser(InputDocument document, DassieConfig config, out string intermediatePath)
+    public static DassieParser CreateParser(Document document, DassieConfig config, out string intermediatePath)
     {
         if (string.IsNullOrEmpty(CurrentFile.Path))
             CurrentFile.Path = document.Name;
@@ -38,7 +38,7 @@ internal static class DocumentCompiler
         return parser;
     }
 
-    public static List<MessageInfo> CompileDocument(InputDocument document, DassieConfig config, IParseTree compilationUnit, string intermediatePath, DassieParser parser)
+    public static List<MessageInfo> CompileDocument(Document document, DassieConfig config, IParseTree compilationUnit, string intermediatePath, DassieParser parser)
     {
         EmitBuildLogMessageFormatted(nameof(StringHelper.DocumentCompiler_CompilingDocument), [document.Name], 2);
 
@@ -72,7 +72,7 @@ internal static class DocumentCompiler
         return CurrentFile.Errors;
     }
 
-    public static List<MessageInfo> DeclareSymbols(InputDocument document, DassieConfig config, IParseTree compilationUnit)
+    public static List<MessageInfo> DeclareSymbols(Document document, DassieConfig config, IParseTree compilationUnit)
     {
         SetupBogusAssembly();
         CurrentFile = Context.GetFile(document.Name);

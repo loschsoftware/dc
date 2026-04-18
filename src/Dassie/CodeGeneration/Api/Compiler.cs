@@ -55,7 +55,7 @@ public static class Compiler
         return CompileSource(Directory.EnumerateFiles(rootDirectory, "*.ds", includeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToArray(), config);
     }
 
-    internal static List<List<MessageInfo>> CompileSource(IEnumerable<InputDocument> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName, string[] imports = null)
+    internal static List<List<MessageInfo>> CompileSource(IEnumerable<Document> documents, DassieConfig config = null, string configFileName = ProjectConfigurationFileName, string[] imports = null)
     {
         if (!documents.Any() && EmittedMessages.Count(m => m.Severity == Severity.Error) == 0)
         {
@@ -107,9 +107,9 @@ public static class Compiler
         if (!config.NoStdLib)
             Context.ReferencedAssemblies.Add(typeof(stdout).Assembly);
 
-        List<(InputDocument document, IParseTree compilationUnit, string intermediatePath, DassieParser parser)> docs = [];
+        List<(Document document, IParseTree compilationUnit, string intermediatePath, DassieParser parser)> docs = [];
 
-        foreach (InputDocument doc in documents)
+        foreach (Document doc in documents)
         {
             DassieParser parser = DocumentCompiler.CreateParser(doc, cfg, out string intermediatePath);
             IParseTree compilationUnit = parser.compilation_unit();
@@ -126,7 +126,7 @@ public static class Compiler
                 SymbolAssociationResolver.SetMethodSignature(method);
         }
 
-        foreach ((InputDocument doc, IParseTree compilationUnit, string intermediatePath, DassieParser parser) in docs)
+        foreach ((Document doc, IParseTree compilationUnit, string intermediatePath, DassieParser parser) in docs)
             errors.Add(DocumentCompiler.CompileDocument(doc, cfg, compilationUnit, intermediatePath, parser));
 
         TypeFinalizer.CreateTypes(Context.Types);
