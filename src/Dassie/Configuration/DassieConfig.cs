@@ -701,6 +701,16 @@ public partial class DassieConfig : ConfigObject
     [MinVersion("1.0")]
     [ConfigProperty]
     public partial DocumentTransformerList DocumentTransformers { get; set; }
+
+    /// <summary>
+    /// If enabled, .dsx files are treated as normal source files instead of scripts.
+    /// </summary>
+    [Description("If enabled, .dsx files are treated as normal source files instead of scripts.")]
+    [DefaultValue(false)]
+    [XmlElement]
+    [MinVersion("1.0")]
+    [ConfigProperty]
+    public partial bool NoScript { get; set; }
 }
 
 /// <summary>

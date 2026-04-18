@@ -152,7 +152,7 @@ internal class CompileCommand : CompilerCommand
         string[] files = args.TakeWhile(a => a != "--").Where(s => !s.StartsWith('-') && !s.StartsWith('/') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
 
         // Execute script file (.dsx)
-        if (files.Any(f => Path.GetExtension(f) == DassieScriptFileExtension))
+        if (!config.NoScript && files.Any(f => Path.GetExtension(f) == DassieScriptFileExtension))
         {
             if (files.Any(f => Path.GetExtension(f) != DassieScriptFileExtension))
             {
@@ -180,7 +180,8 @@ internal class CompileCommand : CompilerCommand
             if (args.Contains("--"))
                 scriptArgs = args.SkipWhile(a => a != "--").Skip(1).ToArray();
 
-            return ScriptRunner.Execute(File.ReadAllText(files.Single()), scriptArgs);
+            string scriptFile = files.Single();
+            return ScriptRunner.Execute(File.ReadAllText(scriptFile), scriptFile, scriptArgs);
         }
 
         if (args.Where(s => (s.StartsWith('-') || s.StartsWith('/') || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())

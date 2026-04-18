@@ -17,7 +17,8 @@ internal static class ScriptRunner
         BuildDirectory = ".",
         ApplicationType = "Library",
         AssemblyFileName = "eval",
-        IgnoreAllWarnings = true
+        IgnoreAllWarnings = true,
+        NoScript = true
     };
 
     private static int ExecuteAssembly(string path, string[] args)
@@ -29,9 +30,9 @@ internal static class ScriptRunner
     }
 
     public static int Execute(string source)
-        => Execute(source, null);
+        => Execute(source, "main.ds", null);
 
-    public static int Execute(string source, string[] args)
+    public static int Execute(string source, string fileName, string[] args)
     {
         string hash = string.Join("", SHA256.HashData(Encoding.UTF8.GetBytes(source)).Select(b => b.ToString("x2")));
 
@@ -76,8 +77,8 @@ internal static class ScriptRunner
         EmittedMessages.CopyTo(messages, 0);
         EmittedMessages.Clear();
 
-        File.WriteAllText("main.ds", source);
-        CompileCommand.Instance.Invoke(["main.ds"], _defaultConfig);
+        File.WriteAllText(fileName, source);
+        CompileCommand.Instance.Invoke([fileName], _defaultConfig);
         ExecuteAssembly(Path.GetFullPath("eval.dll"), args);
         Directory.SetCurrentDirectory(prevWorkingDir);
 
