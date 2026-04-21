@@ -1,4 +1,5 @@
-﻿using Dassie.Core.Properties;
+﻿using Dassie.Cli;
+using Dassie.Core.Properties;
 using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,55 @@ internal class VersionCommand : CompilerCommand
     public static Version FrameworkVersion => typeof(object).Assembly.GetName().Version;
     public static Version AssemblyFriendlyVersion => GetFriendlyVersion(Assembly.GetExecutingAssembly().GetName().Version);
     public static DateOnly AssemblyBuildDate => new DateOnly(2000, 1, 1).AddDays(AssemblyFriendlyVersion.Build + DateOffset);
+
+#pragma warning disable IL3000
+    public static string AssemblyDirectory
+    {
+        get
+        {
+            string loc = typeof(Program).Assembly.Location;
+            if (string.IsNullOrWhiteSpace(loc))
+                loc = AppContext.BaseDirectory;
+
+            return loc;
+        }
+    }
+
+    public static bool AssemblyIsManagedDll
+    {
+        get
+        {
+#if STANDALONE
+            return false;
+#else
+            return true;
+#endif
+        }
+    }
+
+    public static string AssemblyFile
+    {
+        get
+        {
+            string loc = typeof(Program).Assembly.Location;
+            if (!string.IsNullOrWhiteSpace(loc))
+                return loc;
+
+            string dir = AssemblyDirectory;
+            string ext = ".dll";
+
+            // Heuristics that are hopefully accurate enough
+            if (!AssemblyIsManagedDll)
+            {
+                if (OperatingSystem.IsWindows())
+                    ext = ".exe";
+                else
+                    ext = "";
+            }
+
+            return Path.Combine(dir, $"{CompilerExecutableName}{ext}");
+        }
+    }
 
     public override int Invoke(string[] args)
     {

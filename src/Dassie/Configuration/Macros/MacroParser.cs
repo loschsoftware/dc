@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Dassie.Configuration.Macros.Parser;
+using Dassie.Core.Commands;
 using Dassie.Core.Macros;
 using Dassie.Extensions;
 using Dassie.Messages;
@@ -61,7 +62,7 @@ internal partial class MacroParser
         string compilerPath = Environment.GetCommandLineArgs()[0];
         string compilerDir = Path.GetDirectoryName(compilerPath) + Path.DirectorySeparatorChar;
 #else
-        string compilerPath = typeof(MacroParser).Assembly.Location;
+        string compilerPath = VersionCommand.AssemblyFile;
         string compilerDir = Path.GetDirectoryName(compilerPath) + Path.DirectorySeparatorChar;
 #endif
 

@@ -1,4 +1,5 @@
 ﻿using Dassie.Configuration.Macros;
+using Dassie.Core.Commands;
 using Dassie.Core.Macros;
 using Dassie.Extensions;
 using Dassie.Messages.Devices;
@@ -49,9 +50,9 @@ internal static class ProjectFileSerializer
     // Lookup paths for referenced configuration files
     private static readonly List<string> _lookupDirs =
     [
-        IOPath.Combine(IOPath.GetDirectoryName(typeof(ProjectFileSerializer).Assembly.Location), SdkDirectoryName),
+        IOPath.Combine(VersionCommand.AssemblyDirectory, SdkDirectoryName),
         IOPath.Combine(ApplicationDataDirectoryPath, SdkDirectoryName),
-        IOPath.Combine(IOPath.GetDirectoryName(IOPath.GetDirectoryName(typeof(ProjectFileSerializer).Assembly.Location)), SdkDirectoryName)
+        IOPath.Combine(VersionCommand.AssemblyDirectory, SdkDirectoryName)
     ];
 
     public static XDocument Load(string path, bool errorOnNotFound = true)

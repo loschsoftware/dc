@@ -1182,5 +1182,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when multiple script files are specified in an invocation of the 'compile' command.
     /// </summary>
-    DS0287_MultipleScriptFilesSpecified
+    DS0287_MultipleScriptFilesSpecified,
+    /// <summary>
+    /// Emitted when a referenced assembly is not available.
+    /// </summary>
+    DS0288_ReferenceNotAvailable
 }

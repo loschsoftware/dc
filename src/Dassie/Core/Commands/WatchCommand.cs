@@ -184,7 +184,7 @@ internal class WatchCommand : CompilerCommand
         watchProcess.StartInfo.Arguments = $"watch-indefinitely {processArgs}";
 #else
         watchProcess.StartInfo.FileName = "dotnet";
-        watchProcess.StartInfo.Arguments = $"{Assembly.GetCallingAssembly().Location} watch --indefinitely {processArgs}";
+        watchProcess.StartInfo.Arguments = $"{VersionCommand.AssemblyFile} watch --indefinitely {processArgs}";
 #endif
         watchProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         watchProcess.StartInfo.CreateNoWindow = true;
@@ -210,7 +210,7 @@ internal class WatchCommand : CompilerCommand
 #if STANDALONE
             string cmd = $"{Environment.GetCommandLineArgs()[0]} {string.Join(" ", args)}";
 #else
-        string cmd = $"{Assembly.GetCallingAssembly().Location} {string.Join(" ", args)}";
+        string cmd = $"{VersionCommand.AssemblyFile} {string.Join(" ", args)}";
 #endif
 
         watcher.Changed += Compile;

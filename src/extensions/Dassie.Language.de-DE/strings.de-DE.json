@@ -424,6 +424,7 @@
   "CompileCommand_SourceFileNotFound": "Die Quelldatei '{0}' konnte nicht gefunden werden.",
   "CompileCommand_ScriptFilesMixedWithNonScriptFiles": "Skriptdateien (*.dsx) können nicht mit anderen Dateien kombiniert werden.",
   "CompileCommand_MultipleScriptFilesSpecified": "Es kann nur eine Skriptdatei (*.dsx) zur Ausführung angegeben werden.",
+  "CompileCommand_ReferenceNotAvailable": "The referenced assembly '{0}' is not available.",
 
   "ConfigCommand_Description": "Verwaltet Compilereinstellungen und Projektkonfigurationen.",
   "ConfigCommand_PropertyOption": "Die zu ändernde Eigenschaft. Es können mehrere angegeben werden, durch Leerzeichen getrennt. Der Wert ist optional; wenn er weggelassen wird, wird der Standardwert verwendet. Beachten Sie, dass das Gleichheitszeichen (=) dennoch erforderlich ist.",

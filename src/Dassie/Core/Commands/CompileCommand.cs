@@ -591,13 +591,26 @@ internal class CompileCommand : CompilerCommand
 
             if (!config.MinimalOutput)
             {
-                foreach (string dependency in Context.ReferencedAssemblies.Select(a => a.Location))
+                foreach (Assembly asm in Context.ReferencedAssemblies)
                 {
-                    if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(Path.GetDirectoryName(dependency)))
+                    string location = AssemblyResolver.GetAssemblyPath(asm);
+
+                    if (string.IsNullOrWhiteSpace(location))
+                    {
+                        EmitWarningMessageFormatted(
+                            0, 0, 0,
+                            DS0288_ReferenceNotAvailable,
+                            nameof(StringHelper.CompileCommand_ReferenceNotAvailable), [asm.FullName],
+                            CompilerExecutableName);
+
+                        continue;
+                    }
+
+                    if (Path.GetFullPath(Directory.GetCurrentDirectory()) != Path.GetFullPath(Path.GetDirectoryName(location)))
                     {
                         try
                         {
-                            File.Copy(dependency, Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(dependency)), true);
+                            File.Copy(location, Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(location)), true);
                         }
                         catch (IOException) { }
                     }
