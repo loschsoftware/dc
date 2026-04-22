@@ -498,7 +498,7 @@ public static class MessageWriter
         if (Disabled)
             return;
 
-        if (Context.Configuration.Verbosity < 1)
+        if (Verbosity < 1)
             return;
 
         List<IBuildLogDevice> devices = BuildLogDevices; // Get a thread-safe copy
