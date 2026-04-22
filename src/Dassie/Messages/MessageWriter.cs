@@ -153,6 +153,42 @@ public static class MessageWriter
         }
     }
 
+    private static int GetVerbosityFromEnvironmentVariable()
+    {
+        static bool GetBoolEnvVar(string name)
+        {
+            return Environment.GetEnvironmentVariable(name) is string val && ToBool(val);
+        }
+
+        static bool ToBool(string str)
+        {
+            if (bool.TryParse(str, out bool b))
+                return b;
+
+            if (int.TryParse(str, out int i))
+                return i > 0;
+
+            return false;
+        }
+
+        List<int> candidates = [0];
+
+        if (GetBoolEnvVar("DC_TRACE")
+            || GetBoolEnvVar("DC_VERBOSE"))
+            candidates.Add(3);
+
+        if (GetBoolEnvVar("DC_DEBUG"))
+            candidates.Add(2);
+
+        if (Environment.GetEnvironmentVariable("DC_VERBOSITY") is string verbosityStr && int.TryParse(verbosityStr, out int verbosity))
+            candidates.Add(verbosity);
+
+        return candidates.Max();
+    }
+
+    internal static bool EnableDefer => Verbosity > GetVerbosityFromEnvironmentVariable();
+    internal static int Verbosity => Math.Max(GetVerbosityFromEnvironmentVariable(), Context?.Configuration?.Verbosity ?? 0);
+
     private static void BuildLogDeviceSafeCall(IBuildLogDevice device, Action<IBuildLogDevice> func)
     {
         try
@@ -275,8 +311,7 @@ public static class MessageWriter
     /// <returns><see langword="true"/> if the message was emitted or deferred. <see langword="false"/> if the message was not emitted due to an insufficient verbosity configuration.</returns>
     public static bool EmitBuildLogMessage(string message, int minimumVerbosity = 2, bool defer = false)
     {
-        if (!defer && Context.Configuration.Verbosity < minimumVerbosity)
-            return false;
+        _ = defer;
 
         MessageInfo msg = new()
         {
@@ -291,13 +326,18 @@ public static class MessageWriter
             ToolTip = null
         };
 
-        if (defer)
+        if (Verbosity < minimumVerbosity)
         {
-            lock (_deferredMessagesLock)
+            if (Context?.Configuration?.Verbosity == null && Verbosity == 0)
             {
-                _deferredMessages.Add((msg, minimumVerbosity));
+                lock (_deferredMessagesLock)
+                {
+                    _deferredMessages.Add((msg, minimumVerbosity));
+                }
+                return true;
             }
-            return true;
+
+            return false;
         }
 
         Emit(msg);

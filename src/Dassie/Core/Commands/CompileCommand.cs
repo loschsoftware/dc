@@ -144,9 +144,7 @@ internal class CompileCommand : CompilerCommand
         Context ??= new();
         Context.Configuration = config;
 
-        EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_CompilationStarted), [Math.Clamp(config.Verbosity, 0, 3)], 2);
-        EmitDeferredBuildLogMessages();
-
+        int verbosity = Math.Clamp(Math.Max(config.Verbosity, Verbosity), 0, 3);
         ProjectFileCompatibilityTool.VerifyFormatVersionCompatibility(config);
 
         string[] files = args.TakeWhile(a => a != "--").Where(s => !s.StartsWith('-') && !s.StartsWith('/') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
@@ -181,8 +179,16 @@ internal class CompileCommand : CompilerCommand
                 scriptArgs = args.SkipWhile(a => a != "--").Skip(1).ToArray();
 
             string scriptFile = files.Single();
+
+            EmitBuildLogMessageFormatted(
+                nameof(StringHelper.CompileCommand_RunningScriptFile),
+                [scriptFile, verbosity], 2);
+
             return ScriptRunner.Execute(File.ReadAllText(scriptFile), scriptFile, scriptArgs);
         }
+
+        EmitBuildLogMessageFormatted(nameof(StringHelper.CompileCommand_CompilationStarted), [verbosity], 2);
+        EmitDeferredBuildLogMessages();
 
         if (args.Where(s => (s.StartsWith('-') || s.StartsWith('/') || s.StartsWith("--")) && s.EndsWith("diagnostics")).Any())
             GlobalConfig.AdvancedDiagnostics = true;

@@ -3,6 +3,7 @@ using Dassie.Core.Commands;
 using Dassie.Messages;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -24,6 +25,8 @@ internal static class ScriptRunner
 
     private static int ExecuteAssembly(string path, string[] args)
     {
+        EmitBuildLogMessageFormatted(nameof(StringHelper.ScriptRunner_InvokingAssembly), [path]);
+
         byte[] asmBytes = File.ReadAllBytes(path);
         Assembly asm = Assembly.Load(asmBytes);
         asm.GetType("Program").GetMethod("Main").Invoke(null, [args ?? []]);
@@ -65,6 +68,7 @@ internal static class ScriptRunner
                 if (!File.Exists(scriptFile))
                     continue;
 
+                EmitBuildLogMessageFormatted(nameof(StringHelper.ScriptRunner_ScriptIsCached), []);
                 return ExecuteAssembly(scriptFile, args);
             }
         }

@@ -425,6 +425,7 @@
   "CompileCommand_ScriptFilesMixedWithNonScriptFiles": "Skriptdateien (*.dsx) können nicht mit anderen Dateien kombiniert werden.",
   "CompileCommand_MultipleScriptFilesSpecified": "Es kann nur eine Skriptdatei (*.dsx) zur Ausführung angegeben werden.",
   "CompileCommand_ReferenceNotAvailable": "The referenced assembly '{0}' is not available.",
+  "CompileCommand_RunningScriptFile": "Skriptdatei '{0}' wird ausgeführt. Protokollierungsstufe ist {1}.",
 
   "ConfigCommand_Description": "Verwaltet Compilereinstellungen und Projektkonfigurationen.",
   "ConfigCommand_PropertyOption": "Die zu ändernde Eigenschaft. Es können mehrere angegeben werden, durch Leerzeichen getrennt. Der Wert ist optional; wenn er weggelassen wird, wird der Standardwert verwendet. Beachten Sie, dass das Gleichheitszeichen (=) dennoch erforderlich ist.",
@@ -807,5 +808,8 @@
 
   "IncludeDirective_InvalidArguments": "Ungültige Argumente an 'include'-Direktive übergeben. Erwartet wurde [string].",
 
-  "DocumentTransformHandler_BuildLogMessage": "Dokumente {0} wurden nach {1} transformiert durch Transformator '{2}'."
+  "DocumentTransformHandler_BuildLogMessage": "Dokumente {0} wurden nach {1} transformiert durch Transformator '{2}'.",
+
+  "ScriptRunner_InvokingAssembly": "Assembly '{0}' wird ausgeführt.",
+  "ScriptRunner_ScriptIsCached": "Skript ist im Cache, Build wird übersprungen."
 }

@@ -425,6 +425,7 @@
   "CompileCommand_ScriptFilesMixedWithNonScriptFiles": "Script files (*.dsx) cannot be combined with non-script files.",
   "CompileCommand_MultipleScriptFilesSpecified": "Only one script file (*.dsx) can be specified for execution.",
   "CompileCommand_ReferenceNotAvailable": "The referenced assembly '{0}' is not available.",
+  "CompileCommand_RunningScriptFile": "Running script file '{0}'. Log verbosity is {1}.",
 
   "ConfigCommand_Description": "Manages compiler settings and project configurations.",
   "ConfigCommand_PropertyOption": "The property to modify. Multiple can be specified, separated by spaces. The value is optional, if omitted, the default value is used. Note that the equals sign (=) is still required.",
@@ -807,5 +808,8 @@
 
   "IncludeDirective_InvalidArguments": "Invalid arguments passed to 'include' directive. Expected [string].",
 
-  "DocumentTransformHandler_BuildLogMessage": "Transformed documents {0} -> {1} through document transformer '{2}'."
+  "DocumentTransformHandler_BuildLogMessage": "Transformed documents {0} -> {1} through document transformer '{2}'.",
+
+  "ScriptRunner_InvokingAssembly": "Invoking assembly '{0}'.",
+  "ScriptRunner_ScriptIsCached": "Script is cached, skipping rebuild."
 }

@@ -1,7 +1,6 @@
 ﻿using Dassie.Cli.Commands;
 using Dassie.Configuration.Global;
 using Dassie.Core;
-using Dassie.Core.Commands;
 using Dassie.Extensions;
 using Dassie.Messages;
 using Dassie.Messages.Devices;
