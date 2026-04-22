@@ -15,7 +15,7 @@ internal static class AssemblyResolver
 
         if (Environment.GetEnvironmentVariable("DC_PROBE_DIR") is string pd)
         {
-            foreach (string dir in pd.Split(';').Where(Directory.Exists))
+            foreach (string dir in pd.Split(Path.PathSeparator).Where(Directory.Exists))
                 yield return dir;
         }
     }
