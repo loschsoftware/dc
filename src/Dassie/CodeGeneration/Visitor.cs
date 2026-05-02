@@ -2445,6 +2445,25 @@ internal class Visitor : DassieParserBaseVisitor<Type>
         return t.MakeByRefType();
     }
 
+    public override Type VisitDereference_expression([NotNull] DassieParser.Dereference_expressionContext context)
+    {
+        Type t = Visit(context.expression());
+
+        if (!t.IsByRef && !t.IsPointer)
+        {
+            EmitErrorMessageFormatted(
+                context.Start.Line,
+                context.Start.Column,
+                context.GetText().Length,
+                DS0289_DereferenceNonReference,
+                nameof(StringHelper.Visitor_DereferenceNotReference), [TypeName(t)]);
+
+            return t;
+        }
+
+        return t.GetElementType();
+    }
+
     public Type GetConstructorOrCast(Type cType, DassieParser.ArglistContext arglist, int line, int column, int length)
     {
         if (arglist != null)
@@ -4987,12 +5006,14 @@ internal class Visitor : DassieParserBaseVisitor<Type>
 
         if (t.IsByRef && context.Var() == null)
         {
-            EmitErrorMessageFormatted(
-                context.Identifier().Symbol.Line,
-                context.Identifier().Symbol.Column,
-                context.Identifier().GetIdentifier().Length,
-                DS0149_ImmutableValueOfByRefType,
-                nameof(StringHelper.Visitor_ImmutableByRefType), [TypeName(t), context.Identifier().GetIdentifier()]);
+            // TODO: Check type of immutable local is not MutableRef[T]
+
+            //EmitErrorMessageFormatted(
+            //    context.Identifier().Symbol.Line,
+            //    context.Identifier().Symbol.Column,
+            //    context.Identifier().GetIdentifier().Length,
+            //    DS0149_ImmutableValueOfByRefType,
+            //    nameof(StringHelper.Visitor_ImmutableByRefType), [TypeName(t), context.Identifier().GetIdentifier()]);
         }
 
         CurrentFile.Fragments.Add(new()

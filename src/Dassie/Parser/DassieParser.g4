@@ -62,6 +62,7 @@ expression
     | expression Less_Than_Question_Mark_Colon type_name #safe_conversion_expression
     | Ampersand expression #byref_expression
     | expression Double_Colon expression #index_expression
+    | Asterisk expression #dereference_expression
     | parameter_list (Colon type_name)? Equals_Greater expression #anonymous_function_expression
     | op=(Func | Func_Ampersand) function_pointer_parameter_list expression #function_pointer_expression
     | expression Double_Dot_Question_Mark expression #implementation_query_expression

@@ -292,6 +292,7 @@
   "Visitor_ArrayIndexNotInteger": "The index expression has to be of type Int32.",
   "Visitor_EmittingIL": "Emitting IL for '{0}'.",
   "Visitor_DirectiveResultNotConstant": "The result of compiler directive '{0}' was not a compile time constant. The type of the result was '{1}'.",
+  "Visitor_DereferenceNotReference": "Only references and pointers can be dereferenced. The '*' operator was applied to a value of type '{0}', which is not a reference or pointer.",
 
   "ExtensionLoader_TransientExtensionLoaded": "Loaded transient extension '{0}'.",
   "ExtensionLoader_ExtensionLoaded": "Loaded extension '{0}'.",

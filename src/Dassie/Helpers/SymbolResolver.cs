@@ -1397,7 +1397,8 @@ internal static class SymbolResolver
                     return elemType.MakeArrayType(rank);
                 }
 
-                if (aliasType == typeof(Ref<>))
+                if (aliasType == typeof(Ref<>)
+                    || aliasType == typeof(MutableRef<>)) // TODO: Store mutability information somewhere
                 {
                     Type type = t.GetGenericArguments()[0];
 
@@ -1422,6 +1423,10 @@ internal static class SymbolResolver
 
                 if (aliasType == typeof(Ptr))
                     return typeof(void*);
+
+                if (aliasType == typeof(TypedRef<>)
+                    || aliasType == typeof(MutableTypedRef<>))
+                    return typeof(TypedReference);
 
                 if (aliasType.FullName.StartsWith("Dassie.Core.FuncPtr"))
                 {

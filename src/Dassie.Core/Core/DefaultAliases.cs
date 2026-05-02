@@ -28,11 +28,32 @@ public class Array<T, D> { }
 public class Buffer<T, L> { }
 
 /// <summary>
-/// Defines '<c>Ref[T]</c>' as an alias for <c><typeparamref name="T"/>&amp;</c>.
+/// Defines '<c>Ref[T]</c>' as an alias for a managed, read-only reference.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Alias(typeof(Ref<>))]
 public class Ref<T> { }
+
+/// <summary>
+/// Defines '<c>MutableRef[T]</c>' as an alias for a managed, read/write reference.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Alias(typeof(MutableRef<>))]
+public class MutableRef<T> { }
+
+/// <summary>
+/// Defines '<c>TypedRef[T]</c>' as an alias for a managed, read-only typed reference.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Alias(typeof(TypedRef<>))]
+public class TypedRef<T> { }
+
+/// <summary>
+/// Defines '<c>MutableTypedRef[T]</c>' as an alias for a managed, read/write typed reference.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Alias(typeof(MutableTypedRef<>))]
+public class MutableTypedRef<T> { }
 
 /// <summary>
 /// Defines '<c>Ptr[T]</c>' as an alias for <c><typeparamref name="T"/>*</c>.

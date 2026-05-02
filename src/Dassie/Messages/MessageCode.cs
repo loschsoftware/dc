@@ -1186,5 +1186,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when a referenced assembly is not available.
     /// </summary>
-    DS0288_ReferenceNotAvailable
+    DS0288_ReferenceNotAvailable,
+    /// <summary>
+    /// Emitted when the dereference operator is applied to a value that is not a reference or a pointer.
+    /// </summary>
+    DS0289_DereferenceNonReference
 }

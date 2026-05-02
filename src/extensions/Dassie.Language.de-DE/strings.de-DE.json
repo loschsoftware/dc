@@ -292,6 +292,7 @@
   "Visitor_ArrayIndexNotInteger": "Der Indexausdruck muss vom Typ 'int32' sein.",
   "Visitor_EmittingIL": "IL für '{0}' wird generiert.",
   "Visitor_DirectiveResultNotConstant": "Das Ergebnis der Compilerdirektive '{0}' war keine Kompilierzeitkonstante. Der Typ des Ergebnisses war '{1}'.",
+  "Visitor_DereferenceNotReference": "Nur Referenzen und Zeiger können dereferenziert werden. Der Operator '*' wurde auf einen Wert vom Typ '{0}' angewendet, was kein Referenz- oder Zeigertyp ist.",
 
   "ExtensionLoader_TransientExtensionLoaded": "Transiente Erweiterung '{0}' geladen.",
   "ExtensionLoader_ExtensionLoaded": "Erweiterung '{0}' geladen.",
