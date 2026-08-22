@@ -27,7 +27,7 @@ internal static class SourceFileRewriter
             EmitBuildLogMessageFormatted(nameof(StringHelper.SourceFileRewriter_TokenDetail), [i + 1, token.StartIndex, token.StopIndex, DassieLexer.DefaultVocabulary.GetSymbolicName(token.Type), token.Text], 3);
 
         EmitBuildLogMessageFormatted(nameof(StringHelper.SourceFileRewriter_ParseTreeStructure), [], 3);
-        EmitBuildLogMessage(DbgCommand.ParseTreePrinter.PrintTree(compilationUnit, parser), 3);
+        EmitBuildLogMessage(DbgCommand.TreePrinter.PrintParseTree(compilationUnit, parser), 3);
 
         LoweringListener lowerer = new(charStream, source);
         ParseTreeWalker.Default.Walk(lowerer, compilationUnit);

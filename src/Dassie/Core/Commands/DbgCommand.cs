@@ -4,10 +4,13 @@ using Dassie.Configuration;
 using Dassie.Extensions;
 using Dassie.Meta;
 using Dassie.Parser;
+using Dassie.Syntax;
 using Dassie.Text;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static Dassie.Helpers.MermaidTreePrinter;
 
 namespace Dassie.Core.Commands;
 
@@ -15,9 +18,55 @@ internal class DebugException(string message) : Exception(message) { }
 
 internal class DbgCommand : CompilerCommand
 {
-    internal class ParseTreePrinter
+    private enum TreeKind
     {
-        public static string PrintTree(IParseTree tree, DassieParser parser, int indentLevel = 0)
+        Tokens,
+        ParseTree,
+        SyntaxTree,
+        BoundTree
+    }
+
+    internal class TreePrinter
+    {
+        public static string PrintMermaid(IParseTree tree, DassieParser parser)
+        {
+            Node GetNode(IParseTree tree)
+            {
+                if (tree is TerminalNodeImpl terminalNode)
+                    return new(terminalNode.GetText(), []);
+                else if (tree is ParserRuleContext ruleContext)
+                {
+                    List<Node> children = [];
+                    for (int i = 0; i < tree.ChildCount; i++)
+                        children.Add(GetNode(tree.GetChild(i)));
+
+                    return new(parser.RuleNames[ruleContext.RuleIndex], children);
+                }
+
+                return null;
+            }
+
+            return MermaidTreePrinter.PrintMermaid(GetNode(tree));
+        }
+
+        public static string PrintMermaid(SyntaxNode node)
+        {
+            static Node GetNode(SyntaxNode node)
+            {
+                if (node is SyntaxToken token)
+                    return new(token.Text, []);
+
+                List<Node> children = [];
+                foreach (SyntaxNode child in node.GetChildren())
+                    children.Add(GetNode(child));
+
+                return new(node.GetType().Name, children);
+            }
+
+            return MermaidTreePrinter.PrintMermaid(GetNode(node));
+        }
+
+        public static string PrintParseTree(IParseTree tree, DassieParser parser, int indentLevel = 0)
         {
             StringBuilder sb = new();
             PrintNode(tree, parser, indentLevel, sb);
@@ -37,6 +86,28 @@ internal class DbgCommand : CompilerCommand
 
                 for (int i = 0; i < node.ChildCount; i++)
                     PrintNode(node.GetChild(i), parser, indentLevel + 1, sb);
+            }
+        }
+
+        public static string PrintSyntaxNode(SyntaxNode node, int indentLevel = 0)
+        {
+            StringBuilder sb = new();
+            PrintNode(node, indentLevel, sb);
+            return sb.ToString();
+        }
+
+        private static void PrintNode(SyntaxNode node, int indentLevel, StringBuilder sb)
+        {
+            string indent = new(' ', indentLevel * 2);
+
+            if (node is SyntaxToken token)
+                sb.AppendLine($"{indent}\"{token.Value}\"");
+            else
+            {
+                sb.AppendLine($"{indent}{node.GetType().Name}");
+
+                foreach (SyntaxNode child in node.GetChildren())
+                    PrintNode(child, indentLevel + 1, sb);
             }
         }
     }
@@ -60,8 +131,14 @@ internal class DbgCommand : CompilerCommand
         if (args[0] == "fail")
             return Fail();
 
-        if (args[0] == "ast")
+        if (args[0] == "parse-tree")
             return PrintParseTree(args[1..]);
+
+        if (args[0] == "syntax-tree")
+            return PrintSyntaxTree(args[1..]);
+
+        if (args[0] == "bound-tree")
+            return PrintBoundTree(args[1..]);
 
         if (args[0] == "tokens")
             return PrintTokens(args[1..]);
@@ -117,7 +194,7 @@ internal class DbgCommand : CompilerCommand
         throw new DebugException("Exception thrown due to call of 'dbg fail'");
     }
 
-    private static int Print(bool tree, string[] args)
+    private static int Print(TreeKind kind, string[] args)
     {
         if (args == null || args.Length == 0)
         {
@@ -137,15 +214,34 @@ internal class DbgCommand : CompilerCommand
         CommonTokenStream tokens = new(lexer);
         DassieParser parser = new(tokens);
 
-        // Print parse tree
-        if (tree)
+        if (kind == TreeKind.ParseTree)
         {
             if (args.Contains("-c") || args.Contains("--compressed"))
                 LogOut.WriteLine(parser.compilation_unit().ToStringTree(parser));
+            else if (args.Contains("-m") || args.Contains("--mermaid"))
+                LogOut.WriteLine(TreePrinter.PrintMermaid(parser.compilation_unit(), parser));
             else
-                LogOut.WriteLine(ParseTreePrinter.PrintTree(parser.compilation_unit(), parser));
+                LogOut.WriteLine(TreePrinter.PrintParseTree(parser.compilation_unit(), parser));
 
             return 0;
+        }
+
+        if (kind == TreeKind.SyntaxTree)
+        {
+            SyntaxTreeGenerator generator = new();
+            SyntaxNode node = generator.Visit(parser.compilation_unit());
+
+            if (args.Contains("-m") || args.Contains("--mermaid"))
+                LogOut.WriteLine(TreePrinter.PrintMermaid(node));
+            else
+                LogOut.WriteLine(TreePrinter.PrintSyntaxNode(node));
+
+            return 0;
+        }
+
+        if (kind == TreeKind.BoundTree)
+        {
+            throw new NotSupportedException();
         }
 
         // Print tokens
@@ -157,12 +253,22 @@ internal class DbgCommand : CompilerCommand
 
     private static int PrintParseTree(string[] args)
     {
-        return Print(true, args);
+        return Print(TreeKind.ParseTree, args);
+    }
+
+    private static int PrintSyntaxTree(string[] args)
+    {
+        return Print(TreeKind.SyntaxTree, args);
+    }
+
+    private static int PrintBoundTree(string[] args)
+    {
+        return Print(TreeKind.BoundTree, args);
     }
 
     private static int PrintTokens(string[] args)
     {
-        return Print(false, args);
+        return Print(TreeKind.Tokens, args);
     }
 
     private static int ClearPackageCache()
