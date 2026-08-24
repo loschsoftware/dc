@@ -2,6 +2,8 @@
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Dassie.Parser;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Dassie.Syntax;
 
@@ -12,12 +14,51 @@ internal class SyntaxTreeGenerator : DassieParserBaseVisitor<SyntaxNode>
 
     private static SyntaxToken ToSyntaxToken(IToken token)
     {
-        return new();
+        return new()
+        {
+            Text = token.Text,
+            Value = token.Text,
+            LeadingTrivia = [],
+            TrailingTrivia = []
+        };
+    }
+
+    private static TextSpan GetSpan(ParserRuleContext rule)
+    {
+        return TextSpan.FromBounds(rule.Start.StartIndex, rule.Stop.StopIndex);
+    }
+
+    private static ModifierListSyntax GetModifierList(IEnumerable<IParseTree> modifiers)
+    {
+        return new()
+        {
+            Modifiers = modifiers.Select(m => new SyntaxToken()
+            {
+                Text = m.GetText(),
+                Value = m.GetText()
+            }).ToList()
+        };
     }
 
     public override SyntaxNode VisitAccess_modifier_member_group([NotNull] DassieParser.Access_modifier_member_groupContext context)
     {
-        return base.VisitAccess_modifier_member_group(context);
+        List<SyntaxNode> children = [];
+
+        foreach (IParseTree child in context.type_member())
+            children.Add(Visit(child));
+
+        return new AccessModifierMemberGroupSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            FullSpan = GetSpan(context),
+            OpenBraceToken = ToSyntaxToken(context.Open_Brace()),
+            CloseBraceToken = ToSyntaxToken(context.Close_Brace()),
+            EqualsToken = ToSyntaxToken(context.Equals()),
+            Modifiers = GetModifierList([context.member_access_modifier(), context.member_oop_modifier(), .. context.member_special_modifier()]),
+            Members = children
+        };
     }
 
     public override SyntaxNode VisitAddition_expression([NotNull] DassieParser.Addition_expressionContext context)
@@ -26,8 +67,8 @@ internal class SyntaxTreeGenerator : DassieParserBaseVisitor<SyntaxNode>
         {
             FirstToken = ToSyntaxToken(context.Start),
             LastToken = ToSyntaxToken(context.Stop),
-            Span = new(), // TODO
-            FullSpan = new(),
+            Span = GetSpan(context),
+            FullSpan = GetSpan(context),
             OperatorToken = ToSyntaxToken(context.Plus()),
             Left = (ExpressionSyntax)Visit(context.expression()[0]),
             Right = (ExpressionSyntax)Visit(context.expression()[1])
@@ -146,7 +187,13 @@ internal class SyntaxTreeGenerator : DassieParserBaseVisitor<SyntaxNode>
 
     public override SyntaxNode VisitCompilation_unit([NotNull] DassieParser.Compilation_unitContext context)
     {
-        return base.VisitCompilation_unit(context);
+        return new CompilationUnitSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            FullSpan = GetSpan(context)
+        };
     }
 
     public override SyntaxNode VisitConversion_expression([NotNull] DassieParser.Conversion_expressionContext context)
