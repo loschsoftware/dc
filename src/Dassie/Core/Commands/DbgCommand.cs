@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static Dassie.Helpers.MermaidTreePrinter;
+using static Dassie.Helpers.TreeExportHelper;
 
 namespace Dassie.Core.Commands;
 
@@ -46,7 +46,7 @@ internal class DbgCommand : CompilerCommand
                 return null;
             }
 
-            return MermaidTreePrinter.PrintMermaid(GetNode(tree));
+            return TreeExportHelper.ExportMermaid(GetNode(tree));
         }
 
         public static string PrintMermaid(SyntaxNode node)
@@ -63,7 +63,7 @@ internal class DbgCommand : CompilerCommand
                 return new(node.GetType().Name, children);
             }
 
-            return MermaidTreePrinter.PrintMermaid(GetNode(node));
+            return TreeExportHelper.ExportMermaid(GetNode(node));
         }
 
         public static string PrintParseTree(IParseTree tree, DassieParser parser, int indentLevel = 0)

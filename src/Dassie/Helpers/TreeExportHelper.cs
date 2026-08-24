@@ -4,16 +4,16 @@ using System.Web;
 
 namespace Dassie.Helpers;
 
-internal static class MermaidTreePrinter
+internal static class TreeExportHelper
 {
     public record Node(string Value, IEnumerable<Node> Children);
 
-    public static string PrintAscii(Node node)
+    public static string ExportTextual(Node node)
     {
         return null;
     }
 
-    public static string PrintMermaid(Node node)
+    public static string ExportMermaid(Node node)
     {
         int nodeId = 0;
 
