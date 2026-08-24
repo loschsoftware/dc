@@ -15,6 +15,9 @@
   <Project Path="src/Dassie.Generators/Dassie.Generators.csproj">
     <Platform Solution="Debug|x64" Project="x64" />
   </Project>
+  <Project Path="src/Dassie.Tests/Dassie.Tests.csproj" Id="f56f4ca6-c7ae-41ac-b613-1a933b14fbb6">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
   <Project Path="src/Dassie.Text/Dassie.Text.csproj">
     <Platform Solution="Debug|x64" Project="x64" />
   </Project>
