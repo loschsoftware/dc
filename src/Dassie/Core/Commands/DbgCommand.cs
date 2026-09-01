@@ -9,6 +9,7 @@ using Dassie.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using static Dassie.Helpers.TreeExportHelper;
 
@@ -33,20 +34,20 @@ internal class DbgCommand : CompilerCommand
             Node GetNode(IParseTree tree)
             {
                 if (tree is TerminalNodeImpl terminalNode)
-                    return new(terminalNode.GetText(), []);
+                    return new(terminalNode.GetText(), [], []);
                 else if (tree is ParserRuleContext ruleContext)
                 {
-                    List<Node> children = [];
+                    List<(string, IReadOnlyList<Node>)> children = [];
                     for (int i = 0; i < tree.ChildCount; i++)
-                        children.Add(GetNode(tree.GetChild(i)));
+                        children.Add((null, [GetNode(tree.GetChild(i))]));
 
-                    return new(parser.RuleNames[ruleContext.RuleIndex], children);
+                    return new(parser.RuleNames[ruleContext.RuleIndex], Data: [], children);
                 }
 
                 return null;
             }
 
-            return TreeExportHelper.ExportMermaid(GetNode(tree));
+            return ExportMermaid(GetNode(tree));
         }
 
         public static string PrintMermaid(SyntaxNode node)
@@ -54,16 +55,36 @@ internal class DbgCommand : CompilerCommand
             static Node GetNode(SyntaxNode node)
             {
                 if (node is SyntaxToken token)
-                    return new(token.Text, []);
+                    return new(token.Text, [], []);
 
-                List<Node> children = [];
-                foreach (SyntaxNode child in node.GetChildren())
-                    children.Add(GetNode(child));
+                List<(string, IReadOnlyList<Node>)> children = [];
+                PropertyInfo[] childProperties = node.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p => p.PropertyType.IsAssignableTo(typeof(SyntaxNode)))
+                    .Where(p => p.DeclaringType != typeof(SyntaxNode))
+                    .ToArray();
 
-                return new(node.GetType().Name, children);
+                foreach (PropertyInfo prop in childProperties)
+                    children.Add((prop.Name, [GetNode((SyntaxNode)prop.GetValue(node))]));
+
+                PropertyInfo[] arrayProperties = node.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition().IsAssignableTo(typeof(IReadOnlyList<>)))
+                    .Where(p => p.PropertyType.GetGenericArguments()[0].IsAssignableTo(typeof(SyntaxNode)))
+                    .Where(p => p.DeclaringType != typeof(SyntaxNode) && p.DeclaringType != typeof(SyntaxToken))
+                    .ToArray();
+
+                foreach (PropertyInfo arrayProp in arrayProperties)
+                {
+                    IReadOnlyList<SyntaxNode> syntaxNodes = (IReadOnlyList<SyntaxNode>)arrayProp.GetValue(node);
+                    IReadOnlyList<Node> nodes = syntaxNodes.Select(n => GetNode(n)).ToList();
+                    children.Add((arrayProp.Name, nodes));
+                }
+
+                // TODO: SeparatedSyntaxList
+
+                return new(node.GetType().Name, Data: [], children);
             }
 
-            return TreeExportHelper.ExportMermaid(GetNode(node));
+            return ExportMermaid(GetNode(node));
         }
 
         public static string PrintParseTree(IParseTree tree, DassieParser parser, int indentLevel = 0)
@@ -154,6 +175,22 @@ internal class DbgCommand : CompilerCommand
 
         if (args[0] == "print")
             return PrintText(args[1..]);
+
+        if (args[0] == "test-tree")
+        {
+            static Node Terminal(string text) => new(text, [], []);
+            static Node Single(string text, string label, Node child) => new(text, [], [(label, [child])]);
+
+            Node importSystem = Single("ImportDirective", "Name", Terminal("System"));
+            Node importSystemIO = Single("ImportDirective", "Name", Terminal("System.IO"));
+
+            Node root = new("Compilation Unit", [], 
+            [("ImportDirectives", [importSystem, importSystemIO]),
+            ("FileBody", [Terminal("<EOF>")])]);
+
+            File.WriteAllText(@"C:\Users\Jonas\Desktop\tree.txt", ExportMermaid(root));
+            return 0;
+        }
 
         LogOut.WriteLine(StringHelper.Format(nameof(StringHelper.DbgCommand_InvalidCommand), args[0]));
         return -1;
