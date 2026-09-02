@@ -465,6 +465,7 @@
   "DbgCommand_SourceFileNotFound": "The specified source file '{0}' could not be found.",
   "DbgCommand_NoFileSpecified": "No file specified.",
   "DbgCommand_FileDoesNotExist": "The specified file does not exist.",
+  "DbgCommand_AvailableCommands": "Available commands: {0}",
 
   "DeployCommand_Description": "Builds and deploys a project group.",
   "DeployCommand_Remarks": "This is the primary command for interacting with project groups. The 'deploy' command first builds all component projects and then executes all targets defined in the project group file. A project group is defined using the <ProjectGroup> tag inside of a compiler configuration file ({0}).",

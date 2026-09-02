@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -9,7 +8,7 @@ internal static class TreeExportHelper
 {
     public record Node(
         string Value,
-        List<string> Data,
+        IReadOnlyList<string> Data,
         IEnumerable<(string Label, IReadOnlyList<Node> Nodes)> Children);
 
     private static readonly string Indent = "    ";

@@ -119,7 +119,7 @@ internal record ImportDirectiveSyntax : DirectiveSyntax
     public SyntaxToken BangToken { get; init; }
     public SyntaxToken ImportKeyword { get; init; } = SyntaxToken.None;
     public SeparatedSyntaxList<NameSyntax> Names { get; init; } = new();
-    public bool IsForcedOrBangImport => BangToken is not null;
+    public bool IsGlobalImport => BangToken is not null;
 
     public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(BangToken, ImportKeyword, Names);
 }
@@ -435,14 +435,14 @@ internal record ExternalBlockSyntax : MemberDeclarationSyntax
     public override SyntaxKind Kind => SyntaxKind.ExternalBlock;
     public SyntaxToken ExternKeyword { get; init; } = SyntaxToken.None;
     public SyntaxToken StringLiteral { get; init; } = SyntaxToken.None;
-    public SyntaxToken LanguageIdentifier { get; init; }
-    public SyntaxToken AbiIdentifier { get; init; }
+    public SyntaxToken AsToken { get; init; }
+    public SyntaxToken TypeName { get; init; }
     public SyntaxToken EqualsToken { get; init; } = SyntaxToken.None;
     public SyntaxToken OpenBraceToken { get; init; } = SyntaxToken.None;
     public IReadOnlyList<SyntaxNode> Members { get; init; } = [];
     public SyntaxToken CloseBraceToken { get; init; } = SyntaxToken.None;
 
-    public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(ExternKeyword, StringLiteral, LanguageIdentifier, AbiIdentifier, EqualsToken, OpenBraceToken, Members, CloseBraceToken);
+    public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(ExternKeyword, StringLiteral, AsToken, TypeName, EqualsToken, OpenBraceToken, Members, CloseBraceToken);
 }
 
 internal record AccessModifierMemberGroupSyntax : MemberDeclarationSyntax

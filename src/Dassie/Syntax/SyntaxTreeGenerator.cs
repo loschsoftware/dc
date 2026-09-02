@@ -1,13 +1,14 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Dassie.Messages;
 using Dassie.Parser;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Dassie.Syntax;
 
-internal class SyntaxTreeGenerator : DassieParserBaseVisitor<SyntaxNode>
+internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisitor<SyntaxNode>
 {
     private static SyntaxToken ToSyntaxToken(ITerminalNode terminal)
         => ToSyntaxToken(terminal.Symbol);
@@ -17,9 +18,10 @@ internal class SyntaxTreeGenerator : DassieParserBaseVisitor<SyntaxNode>
         return new()
         {
             Text = token.Text,
-            Value = token.Text,
-            LeadingTrivia = [],
-            TrailingTrivia = []
+            Value = token.Text, // TODO: Retrieve actual value (ExpressionEvaluator)
+
+            LeadingTrivia = [], // not needed
+            TrailingTrivia = [] // for now
         };
     }
 

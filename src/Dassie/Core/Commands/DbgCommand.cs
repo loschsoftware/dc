@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Tree;
 using Dassie.Configuration;
 using Dassie.Extensions;
+using Dassie.Messages;
 using Dassie.Meta;
 using Dassie.Parser;
 using Dassie.Syntax;
@@ -139,58 +140,38 @@ internal class DbgCommand : CompilerCommand
     public override string Command => "dbg";
 
     public override string Description => StringHelper.DbgCommand_Description;
-    public override CommandOptions Options => CommandOptions.Hidden;
+    public override CommandOptions Options => CommandOptions.Hidden | CommandOptions.NoHelpRouting;
+
+    private static readonly Dictionary<string, Func<string[], int>> _commands = new()
+    {
+        ["fail"] = _ => Fail(),
+        ["parse-tree"] = PrintParseTree,
+        ["syntax-tree"] = PrintSyntaxTree,
+        ["bound-tree"] = PrintBoundTree,
+        ["tokens"] = PrintTokens,
+        ["fragments"] = PrintFragments,
+        ["clear-cache"] = _ => ClearPackageCache(),
+        ["clear-temp"] = _ => ClearTempDir(),
+        ["print"] = PrintText,
+        ["--help"] = _ => PrintCommandList(),
+    };
+
+    private static int PrintCommandList()
+    {
+        LogOut.WriteLine(StringHelper.Format(nameof(StringHelper.DbgCommand_AvailableCommands), string.Join(", ", _commands.Keys.ToList())));
+        return 0;
+    }
 
     public override int Invoke(string[] args)
     {
         if (args == null || args.Length == 0)
         {
-            LogOut.WriteLine(StringHelper.DbgCommand_NoCommandSpecified);
+            PrintCommandList();
             return -1;
         }
 
-        if (args[0] == "fail")
-            return Fail();
-
-        if (args[0] == "parse-tree")
-            return PrintParseTree(args[1..]);
-
-        if (args[0] == "syntax-tree")
-            return PrintSyntaxTree(args[1..]);
-
-        if (args[0] == "bound-tree")
-            return PrintBoundTree(args[1..]);
-
-        if (args[0] == "tokens")
-            return PrintTokens(args[1..]);
-
-        if (args[0] == "fragments")
-            return PrintFragments(args[1..]);
-
-        if (args[0] == "clear-cache")
-            return ClearPackageCache();
-
-        if (args[0] == "clear-temp")
-            return ClearTempDir();
-
-        if (args[0] == "print")
-            return PrintText(args[1..]);
-
-        if (args[0] == "test-tree")
-        {
-            static Node Terminal(string text) => new(text, [], []);
-            static Node Single(string text, string label, Node child) => new(text, [], [(label, [child])]);
-
-            Node importSystem = Single("ImportDirective", "Name", Terminal("System"));
-            Node importSystemIO = Single("ImportDirective", "Name", Terminal("System.IO"));
-
-            Node root = new("Compilation Unit", [], 
-            [("ImportDirectives", [importSystem, importSystemIO]),
-            ("FileBody", [Terminal("<EOF>")])]);
-
-            File.WriteAllText(@"C:\Users\Jonas\Desktop\tree.txt", ExportMermaid(root));
-            return 0;
-        }
+        if (_commands.TryGetValue(args[0], out Func<string[], int> cmd))
+            return cmd(args[1..]);
 
         LogOut.WriteLine(StringHelper.Format(nameof(StringHelper.DbgCommand_InvalidCommand), args[0]));
         return -1;
@@ -265,7 +246,8 @@ internal class DbgCommand : CompilerCommand
 
         if (kind == TreeKind.SyntaxTree)
         {
-            SyntaxTreeGenerator generator = new();
+            DiagnosticManager dm = null;
+            SyntaxTreeGenerator generator = new(dm);
             SyntaxNode node = generator.Visit(parser.compilation_unit());
 
             if (args.Contains("-m") || args.Contains("--mermaid"))

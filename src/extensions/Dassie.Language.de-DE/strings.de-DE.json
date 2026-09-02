@@ -465,6 +465,7 @@
   "DbgCommand_SourceFileNotFound": "Die angegebene Quelldatei '{0}' konnte nicht gefunden werden.",
   "DbgCommand_NoFileSpecified": "Keine Datei angegeben.",
   "DbgCommand_FileDoesNotExist": "Die angegebene Datei existiert nicht.",
+  "DbgCommand_AvailableCommands": "Verfügbare Befehle: {0}",
 
   "DeployCommand_Description": "Erstellt und stellt eine Projektgruppe bereit.",
   "DeployCommand_Remarks": "Dies ist der primäre Befehl zur Interaktion mit Projektgruppen. Der Befehl 'deploy' erstellt zunächst alle Komponentenprojekte und führt dann alle in der Projektgruppendatei definierten Ziele aus. Eine Projektgruppe wird mit dem <ProjectGroup>-Tag in einer Compilerkonfigurationsdatei ({0}) definiert.",
