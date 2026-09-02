@@ -40,7 +40,7 @@ internal class DbgCommand : CompilerCommand
                 {
                     List<(string, IReadOnlyList<Node>)> children = [];
                     for (int i = 0; i < tree.ChildCount; i++)
-                        children.Add((null, [GetNode(tree.GetChild(i))]));
+                        children.Add(($"[{i + 1}]", [GetNode(tree.GetChild(i))]));
 
                     return new(parser.RuleNames[ruleContext.RuleIndex], Data: [], children);
                 }

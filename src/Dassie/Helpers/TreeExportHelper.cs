@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Dassie.Syntax.Helpers;
+using System.Collections.Generic;
 using System.Text;
 using System.Web;
 
@@ -21,7 +22,7 @@ internal static class TreeExportHelper
 
     public static string ExportMermaid(Node node)
     {
-        static string Escape(string value) => HttpUtility.HtmlEncode(value);
+        static string Escape(string value) => HttpUtility.HtmlEncode(StringHelpers.EscapeString(value));
 
         StringBuilder sb = new();
         sb.AppendLine("flowchart TD");

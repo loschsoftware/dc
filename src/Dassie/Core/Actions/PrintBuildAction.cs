@@ -1,5 +1,5 @@
-﻿using Dassie.CodeGeneration.Helpers;
-using Dassie.Extensions;
+﻿using Dassie.Extensions;
+using Dassie.Syntax.Helpers;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -13,7 +13,7 @@ internal class PrintBuildAction : IBuildAction
 
     public int Execute(ActionContext context)
     {
-        StringBuilder sb = new(ExpressionEvaluator.GetRawString(context.Text));
+        StringBuilder sb = new(StringHelpers.UnescapeString(context.Text));
 
         XmlAttribute newLineAttrib = context.XmlAttributes.FirstOrDefault(a => a.Name == "NewLine");
         if (newLineAttrib == null || newLineAttrib.Value == "true")
