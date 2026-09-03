@@ -35,7 +35,7 @@ internal class DbgCommand : CompilerCommand
             Node GetNode(IParseTree tree)
             {
                 if (tree is TerminalNodeImpl terminalNode)
-                    return new(terminalNode.GetText(), [], [], NodeKind.Terminal);
+                    return new(terminalNode.GetText(), [], [], NodeStyle.Terminal);
                 else if (tree is ParserRuleContext ruleContext)
                 {
                     List<(string, IReadOnlyList<Node>)> children = [];
@@ -65,7 +65,7 @@ internal class DbgCommand : CompilerCommand
             static Node GetNode(SyntaxNode node)
             {
                 if (node == null)
-                    return new("<NULL>", [], [], NodeKind.Special);
+                    return new("<NULL>", [], [], NodeStyle.Special);
 
                 if (node is SyntaxToken token)
                 {
@@ -77,7 +77,7 @@ internal class DbgCommand : CompilerCommand
                     if (string.IsNullOrEmpty(text))
                         text = " ";
 
-                    return new(text, [], [], NodeKind.Terminal);
+                    return new(text, [], [], NodeStyle.Terminal);
                 }
 
                 IEnumerable<PropertyInfo> props = node.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);

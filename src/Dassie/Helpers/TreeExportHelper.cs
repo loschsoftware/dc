@@ -8,7 +8,7 @@ namespace Dassie.Helpers;
 
 internal static class TreeExportHelper
 {
-    public enum NodeKind
+    public enum NodeStyle
     {
         /// <summary>
         /// Represents a regular node with children.
@@ -32,10 +32,10 @@ internal static class TreeExportHelper
         string Value,
         IReadOnlyList<string> Data,
         IEnumerable<(string Label, IReadOnlyList<Node> Nodes)> Children,
-        NodeKind Kind = NodeKind.Regular);
+        NodeStyle Style = NodeStyle.Regular);
 
     private static readonly string Indent = "    ";
-    private static Node EmptyNode => new("<empty>", [], [], NodeKind.Special);
+    private static Node EmptyNode => new("<empty>", [], [], NodeStyle.Special);
 
     public static string ExportTextual(Node node)
     {
@@ -68,7 +68,7 @@ internal static class TreeExportHelper
                 string start = "[";
                 string end = "]";
 
-                if (node.Kind is NodeKind.Terminal or NodeKind.Special)
+                if (node.Style is NodeStyle.Terminal or NodeStyle.Special)
                 {
                     start = "([";
                     end = "])";
@@ -78,10 +78,10 @@ internal static class TreeExportHelper
                 sb.AppendLine($"{Indent}{nodeId}{start}\"{Escape(node.Value)}\"{end}");
                 nodes.Add(node, nodeId);
 
-                if (node.Kind == NodeKind.Synthetic)
+                if (node.Style == NodeStyle.Synthetic)
                     sb.AppendLine($"{Indent}class {nodeId} synthetic");
 
-                if (node.Kind == NodeKind.Special)
+                if (node.Style == NodeStyle.Special)
                     sb.AppendLine($"{Indent}class {nodeId} special");
             }
 
@@ -112,7 +112,7 @@ internal static class TreeExportHelper
                 }
                 else
                 {
-                    Node group = new(label, [], [], NodeKind.Synthetic);
+                    Node group = new(label, [], [], NodeStyle.Synthetic);
 
                     string groupId = GetId(group);
                     AddEdge(id, groupId, label);
