@@ -1,5 +1,6 @@
 ﻿using Dassie.Syntax.Helpers;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -7,13 +8,34 @@ namespace Dassie.Helpers;
 
 internal static class TreeExportHelper
 {
+    public enum NodeKind
+    {
+        /// <summary>
+        /// Represents a regular node with children.
+        /// </summary>
+        Regular,
+        /// <summary>
+        /// Represents a visual grouping node not corresponding to a syntax node.
+        /// </summary>
+        Synthetic,
+        /// <summary>
+        /// Represents a terminal node.
+        /// </summary>
+        Terminal,
+        /// <summary>
+        /// Represents a special terminal inserted by the generator, with no corresponding syntax node.
+        /// </summary>
+        Special
+    }
+
     public record Node(
         string Value,
         IReadOnlyList<string> Data,
-        IEnumerable<(string Label, IReadOnlyList<Node> Nodes)> Children);
+        IEnumerable<(string Label, IReadOnlyList<Node> Nodes)> Children,
+        NodeKind Kind = NodeKind.Regular);
 
     private static readonly string Indent = "    ";
-    private static readonly Node EmptyNode = new("<empty>", [], []);
+    private static Node EmptyNode => new("<empty>", [], [], NodeKind.Special);
 
     public static string ExportTextual(Node node)
     {
@@ -22,10 +44,19 @@ internal static class TreeExportHelper
 
     public static string ExportMermaid(Node node)
     {
-        static string Escape(string value) => HttpUtility.HtmlEncode(StringHelpers.EscapeString(value));
+        static string Escape(string value)
+        {
+            string escapedString = StringHelpers.EscapeString(value);
+            if (value.StartsWith('"') && value.EndsWith('"'))
+                escapedString = $"\"{escapedString[2..^2]}\"";
+
+            return HttpUtility.HtmlEncode(escapedString);
+        }
 
         StringBuilder sb = new();
         sb.AppendLine("flowchart TD");
+        sb.AppendLine($"{Indent}classDef synthetic stroke-dasharray: 5 5");
+        sb.AppendLine($"{Indent}classDef special stroke-dasharray: 2 2,font-style: italic\r\n");
 
         int index = 0;
         Dictionary<Node, string> nodes = new(ReferenceEqualityComparer.Instance);
@@ -34,9 +65,24 @@ internal static class TreeExportHelper
         {
             if (!nodes.TryGetValue(node, out string nodeId))
             {
+                string start = "[";
+                string end = "]";
+
+                if (node.Kind is NodeKind.Terminal or NodeKind.Special)
+                {
+                    start = "([";
+                    end = "])";
+                }
+
                 nodeId = $"node{++index}";
-                sb.AppendLine($"{Indent}{nodeId}[\"{Escape(node.Value)}\"]");
+                sb.AppendLine($"{Indent}{nodeId}{start}\"{Escape(node.Value)}\"{end}");
                 nodes.Add(node, nodeId);
+
+                if (node.Kind == NodeKind.Synthetic)
+                    sb.AppendLine($"{Indent}class {nodeId} synthetic");
+
+                if (node.Kind == NodeKind.Special)
+                    sb.AppendLine($"{Indent}class {nodeId} special");
             }
 
             return nodeId;
@@ -66,15 +112,15 @@ internal static class TreeExportHelper
                 }
                 else
                 {
-                    Node group = new(label, [], []);
+                    Node group = new(label, [], [], NodeKind.Synthetic);
 
                     string groupId = GetId(group);
                     AddEdge(id, groupId, label);
 
-                    foreach (Node child in children)
+                    foreach ((int i, Node child) in children.Index())
                     {
                         AddNode(child);
-                        AddEdge(groupId, GetId(child), "");
+                        AddEdge(groupId, GetId(child), $"[{i + 1}]");
                     }
                 }
             }

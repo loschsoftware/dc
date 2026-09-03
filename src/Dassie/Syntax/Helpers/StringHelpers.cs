@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Dassie.Syntax.Helpers;
 
-internal class StringHelpers
+internal static class StringHelpers
 {
     private static readonly Dictionary<char, char> _escapeTable = new()
     {

@@ -415,3 +415,4 @@ docs/obj/
 docs/log/
 docs/.manifest
 docs/.publish.json
+/docs/compilation-pipeline.md

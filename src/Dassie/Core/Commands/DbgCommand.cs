@@ -30,7 +30,7 @@ internal class DbgCommand : CompilerCommand
 
     internal class TreePrinter
     {
-        public static string PrintMermaid(IParseTree tree, DassieParser parser)
+        public static string PrintMermaid(IParseTree tree, DassieLexer lexer, DassieParser parser)
         {
             Node GetNode(IParseTree tree)
             {
@@ -40,9 +40,18 @@ internal class DbgCommand : CompilerCommand
                 {
                     List<(string, IReadOnlyList<Node>)> children = [];
                     for (int i = 0; i < tree.ChildCount; i++)
-                        children.Add(($"[{i + 1}]", [GetNode(tree.GetChild(i))]));
+                    {
+                        IParseTree child = tree.GetChild(i);
+                        string label = $"[{i + 1}]";
+                        if (child is ParserRuleContext cr)
+                            label = parser.RuleNames[cr.RuleIndex];
+                        else if (child is TerminalNodeImpl ct)
+                            label = lexer.Vocabulary.GetSymbolicName(ct.Symbol.Type);
 
-                    return new(parser.RuleNames[ruleContext.RuleIndex], Data: [], children);
+                        children.Add((label, [GetNode(child)]));
+                    }
+
+                    return new(tree.GetType().Name, Data: [], children);
                 }
 
                 return null;
@@ -55,11 +64,26 @@ internal class DbgCommand : CompilerCommand
         {
             static Node GetNode(SyntaxNode node)
             {
+                if (node == null)
+                    return new("<NULL>", [], [], NodeKind.Special);
+
                 if (node is SyntaxToken token)
-                    return new(token.Text, [], []);
+                {
+                    string text = token.Text;
+
+                    if (token.TokenKind == SyntaxKind.EndOfFileToken)
+                        text = "<EOF>";
+
+                    if (string.IsNullOrEmpty(text))
+                        text = " ";
+
+                    return new(text, [], [], NodeKind.Terminal);
+                }
+
+                IEnumerable<PropertyInfo> props = node.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
                 List<(string, IReadOnlyList<Node>)> children = [];
-                PropertyInfo[] childProperties = node.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                PropertyInfo[] childProperties = props
                     .Where(p => p.PropertyType.IsAssignableTo(typeof(SyntaxNode)))
                     .Where(p => p.DeclaringType != typeof(SyntaxNode))
                     .ToArray();
@@ -67,7 +91,7 @@ internal class DbgCommand : CompilerCommand
                 foreach (PropertyInfo prop in childProperties)
                     children.Add((prop.Name, [GetNode((SyntaxNode)prop.GetValue(node))]));
 
-                PropertyInfo[] arrayProperties = node.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                PropertyInfo[] arrayProperties = props
                     .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition().IsAssignableTo(typeof(IReadOnlyList<>)))
                     .Where(p => p.PropertyType.GetGenericArguments()[0].IsAssignableTo(typeof(SyntaxNode)))
                     .Where(p => p.DeclaringType != typeof(SyntaxNode) && p.DeclaringType != typeof(SyntaxToken))
@@ -75,12 +99,21 @@ internal class DbgCommand : CompilerCommand
 
                 foreach (PropertyInfo arrayProp in arrayProperties)
                 {
-                    IReadOnlyList<SyntaxNode> syntaxNodes = (IReadOnlyList<SyntaxNode>)arrayProp.GetValue(node);
+                    IReadOnlyList<SyntaxNode> syntaxNodes = (IReadOnlyList<SyntaxNode>)arrayProp.GetValue(node) ?? [];
                     IReadOnlyList<Node> nodes = syntaxNodes.Select(n => GetNode(n)).ToList();
                     children.Add((arrayProp.Name, nodes));
                 }
 
-                // TODO: SeparatedSyntaxList
+                PropertyInfo[] syntaxListProperties = props
+                    .Where(p => p.PropertyType.IsGenericType && p.PropertyType.BaseType == typeof(SeparatedSyntaxList))
+                    .ToArray();
+
+                foreach (PropertyInfo syntaxListProp in syntaxListProperties)
+                {
+                    IReadOnlyList<SyntaxNode> syntaxNodes = ((SeparatedSyntaxList)syntaxListProp.GetValue(node)).GetChildren().ToList();
+                    IReadOnlyList<Node> nodes = syntaxNodes.Select(n => GetNode(n)).ToList();
+                    children.Add((syntaxListProp.Name, nodes));
+                }
 
                 return new(node.GetType().Name, Data: [], children);
             }
@@ -153,7 +186,7 @@ internal class DbgCommand : CompilerCommand
         ["clear-cache"] = _ => ClearPackageCache(),
         ["clear-temp"] = _ => ClearTempDir(),
         ["print"] = PrintText,
-        ["--help"] = _ => PrintCommandList(),
+        ["--help"] = _ => PrintCommandList()
     };
 
     private static int PrintCommandList()
@@ -237,7 +270,7 @@ internal class DbgCommand : CompilerCommand
             if (args.Contains("-c") || args.Contains("--compressed"))
                 LogOut.WriteLine(parser.compilation_unit().ToStringTree(parser));
             else if (args.Contains("-m") || args.Contains("--mermaid"))
-                LogOut.WriteLine(TreePrinter.PrintMermaid(parser.compilation_unit(), parser));
+                LogOut.WriteLine(TreePrinter.PrintMermaid(parser.compilation_unit(), lexer, parser));
             else
                 LogOut.WriteLine(TreePrinter.PrintParseTree(parser.compilation_unit(), parser));
 

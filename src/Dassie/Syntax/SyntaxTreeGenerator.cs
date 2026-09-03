@@ -15,6 +15,8 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     private static SyntaxToken ToSyntaxToken(IToken token)
     {
+        // TODO: Get rid of this method
+
         return new()
         {
             Text = token.Text,
@@ -24,6 +26,15 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             TrailingTrivia = [] // for now
         };
     }
+
+    private static SyntaxToken Token(SyntaxKind kind, ITerminalNode terminal) => Token(kind, terminal.GetText());
+    private static SyntaxToken Token(SyntaxKind kind, string text) => Token(kind, text, text);
+    private static SyntaxToken Token<T>(SyntaxKind kind, string text, T value) => new()
+    {
+        TokenKind = kind,
+        Text = text,
+        Value = value
+    };
 
     private static TextSpan GetSpan(ParserRuleContext rule)
     {
@@ -55,9 +66,9 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
             FullSpan = GetSpan(context),
-            OpenBraceToken = ToSyntaxToken(context.Open_Brace()),
-            CloseBraceToken = ToSyntaxToken(context.Close_Brace()),
-            EqualsToken = ToSyntaxToken(context.Equals()),
+            OpenBraceToken = Token(SyntaxKind.OpenBraceToken, context.Open_Brace()),
+            CloseBraceToken = Token(SyntaxKind.CloseBraceToken, context.Close_Brace()),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
             Modifiers = GetModifierList([context.member_access_modifier(), context.member_oop_modifier(), .. context.member_special_modifier()]),
             Members = children
         };
@@ -71,7 +82,7 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
             FullSpan = GetSpan(context),
-            OperatorToken = ToSyntaxToken(context.Plus()),
+            OperatorToken = Token(SyntaxKind.PlusToken, context.Plus()),
             Left = (ExpressionSyntax)Visit(context.expression()[0]),
             Right = (ExpressionSyntax)Visit(context.expression()[1])
         };
@@ -79,17 +90,38 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitAdd_handler([NotNull] DassieParser.Add_handlerContext context)
     {
-        return base.VisitAdd_handler(context);
+        return new AccessorDeclarationSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            FullSpan = GetSpan(context),
+            Keyword = Token(SyntaxKind.AddHandlerKeyword, context.Add_Handler()),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit(context.expression())
+        };
     }
 
     public override SyntaxNode VisitAnd_expression([NotNull] DassieParser.And_expressionContext context)
     {
-        return base.VisitAnd_expression(context);
+        return new BinaryExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            FullSpan = GetSpan(context),
+            OperatorToken = Token(SyntaxKind.AmpersandToken, context.Ampersand()),
+            Left = (ExpressionSyntax)Visit(context.expression()[0]),
+            Right = (ExpressionSyntax)Visit(context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitAnonymous_function_expression([NotNull] DassieParser.Anonymous_function_expressionContext context)
     {
-        return base.VisitAnonymous_function_expression(context);
+        return new LambdaExpressionSyntax()
+        {
+
+        };
     }
 
     public override SyntaxNode VisitArglist([NotNull] DassieParser.ArglistContext context)

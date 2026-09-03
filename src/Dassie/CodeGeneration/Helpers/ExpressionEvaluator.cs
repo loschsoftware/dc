@@ -1,7 +1,6 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Dassie.CodeGeneration.Structure;
-using Dassie.Helpers;
 using Dassie.Meta;
 using Dassie.Meta.Directives;
 using Dassie.Parser;
@@ -10,10 +9,8 @@ using Dassie.Text;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using static Dassie.Helpers.SymbolResolver;
 

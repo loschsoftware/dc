@@ -21,6 +21,7 @@ internal record SyntaxToken : SyntaxNode
 {
     public static SyntaxToken None { get; } = new();
     public override SyntaxKind Kind => SyntaxKind.None;
+    public SyntaxKind TokenKind { get; init; }
 
     public string Text { get; init; }
     public object Value { get; init; }
@@ -591,7 +592,7 @@ internal record LiteralExpressionSyntax : ExpressionSyntax
     public override SyntaxKind Kind => SyntaxKind.LiteralExpression;
     public SyntaxToken LiteralToken { get; init; } = SyntaxToken.None;
     public object Value { get; init; }
-
+    
     public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(LiteralToken);
 }
 
@@ -965,7 +966,7 @@ internal record ForEachExpressionSyntax : ExpressionSyntax
     public override SyntaxKind Kind => SyntaxKind.ForEachExpression;
     public SyntaxToken AtToken { get; init; } = SyntaxToken.None;
     public IReadOnlyList<ForEachVariableSyntax> Variables { get; init; } = [];
-    public SyntaxToken SourceSeparatorToken { get; init; } = SyntaxToken.None;
+    public SyntaxToken SourceSeparatorToken { get; init; } = SyntaxToken.None; // ':>' token
     public ExpressionSyntax Source { get; init; }
     public SyntaxToken EqualsToken { get; init; } = SyntaxToken.None;
     public ExpressionSyntax Body { get; init; }
