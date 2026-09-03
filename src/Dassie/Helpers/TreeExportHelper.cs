@@ -6,8 +6,14 @@ using System.Web;
 
 namespace Dassie.Helpers;
 
+/// <summary>
+/// Provides functionality for exporting trees as Mermaid flowcharts.
+/// </summary>
 internal static class TreeExportHelper
 {
+    /// <summary>
+    /// Specifies the role of a node, which corresponds to a distinct visual style.
+    /// </summary>
     public enum NodeStyle
     {
         /// <summary>
@@ -28,6 +34,13 @@ internal static class TreeExportHelper
         Special
     }
 
+    /// <summary>
+    /// Represents a tree node to export.
+    /// </summary>
+    /// <param name="Value">The value of the node.</param>
+    /// <param name="Data">Additional data attached to the node.</param>
+    /// <param name="Children">A collection of labeled edges to zero or more children.</param>
+    /// <param name="Style">The style of the node.</param>
     public record Node(
         string Value,
         IReadOnlyList<string> Data,
@@ -37,11 +50,21 @@ internal static class TreeExportHelper
     private static readonly string Indent = "    ";
     private static Node EmptyNode => new("<empty>", [], [], NodeStyle.Special);
 
+    /// <summary>
+    /// Exports a tree in a textual format.
+    /// </summary>
+    /// <param name="node">The node to export.</param>
+    /// <returns>A <see cref="string"/> representing the tree in textual format.</returns>
     public static string ExportTextual(Node node)
     {
         return null;
     }
 
+    /// <summary>
+    /// Exports a tree as a Mermaid flowchart.
+    /// </summary>
+    /// <param name="node">The node to export.</param>
+    /// <returns>A <see cref="string"/> of Mermaid source code representing the tree.</returns>
     public static string ExportMermaid(Node node)
     {
         static string Escape(string value)

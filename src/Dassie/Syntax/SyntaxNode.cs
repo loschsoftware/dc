@@ -59,7 +59,6 @@ internal abstract record SyntaxNode
 {
     public abstract SyntaxKind Kind { get; }
     public TextSpan Span { get; init; } = TextSpan.None;
-    public TextSpan FullSpan { get; init; } = TextSpan.None;
     public SyntaxToken FirstToken { get; init; } = SyntaxToken.None;
     public SyntaxToken LastToken { get; init; } = SyntaxToken.None;
 

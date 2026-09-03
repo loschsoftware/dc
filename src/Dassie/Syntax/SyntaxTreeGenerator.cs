@@ -10,22 +10,12 @@ namespace Dassie.Syntax;
 
 internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisitor<SyntaxNode>
 {
-    private static SyntaxToken ToSyntaxToken(ITerminalNode terminal)
-        => ToSyntaxToken(terminal.Symbol);
-
-    private static SyntaxToken ToSyntaxToken(IToken token)
+    private static SyntaxToken ToSyntaxToken(IToken token) => new()
     {
-        // TODO: Get rid of this method
-
-        return new()
-        {
-            Text = token.Text,
-            Value = token.Text, // TODO: Retrieve actual value (ExpressionEvaluator)
-
-            LeadingTrivia = [], // not needed
-            TrailingTrivia = [] // for now
-        };
-    }
+        Text = token.Text,
+        Value = token.Text,
+        Span = TextSpan.FromBounds(token.StartIndex, token.StopIndex)
+    };
 
     private static SyntaxToken Token(SyntaxKind kind, ITerminalNode terminal) => Token(kind, terminal.GetText());
     private static SyntaxToken Token(SyntaxKind kind, string text) => Token(kind, text, text);
@@ -65,7 +55,6 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             FirstToken = ToSyntaxToken(context.Start),
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
-            FullSpan = GetSpan(context),
             OpenBraceToken = Token(SyntaxKind.OpenBraceToken, context.Open_Brace()),
             CloseBraceToken = Token(SyntaxKind.CloseBraceToken, context.Close_Brace()),
             EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
@@ -81,7 +70,6 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             FirstToken = ToSyntaxToken(context.Start),
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
-            FullSpan = GetSpan(context),
             OperatorToken = Token(SyntaxKind.PlusToken, context.Plus()),
             Left = (ExpressionSyntax)Visit(context.expression()[0]),
             Right = (ExpressionSyntax)Visit(context.expression()[1])
@@ -95,7 +83,6 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             FirstToken = ToSyntaxToken(context.Start),
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
-            FullSpan = GetSpan(context),
             Keyword = Token(SyntaxKind.AddHandlerKeyword, context.Add_Handler()),
             EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
             Body = (ExpressionSyntax)Visit(context.expression())
@@ -109,7 +96,6 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             FirstToken = ToSyntaxToken(context.Start),
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
-            FullSpan = GetSpan(context),
             OperatorToken = Token(SyntaxKind.AmpersandToken, context.Ampersand()),
             Left = (ExpressionSyntax)Visit(context.expression()[0]),
             Right = (ExpressionSyntax)Visit(context.expression()[1])
@@ -226,7 +212,6 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             FirstToken = ToSyntaxToken(context.Start),
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
-            FullSpan = GetSpan(context)
         };
     }
 

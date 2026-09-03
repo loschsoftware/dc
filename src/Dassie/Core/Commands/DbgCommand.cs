@@ -16,7 +16,7 @@ using static Dassie.Helpers.TreeExportHelper;
 
 namespace Dassie.Core.Commands;
 
-internal class DebugException(string message) : Exception(message) { }
+internal class DebugException(string message) : Exception(message);
 
 internal class DbgCommand : CompilerCommand
 {
