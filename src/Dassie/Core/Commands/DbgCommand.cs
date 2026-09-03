@@ -35,7 +35,7 @@ internal class DbgCommand : CompilerCommand
             Node GetNode(IParseTree tree)
             {
                 if (tree is TerminalNodeImpl terminalNode)
-                    return new(terminalNode.GetText(), [], []);
+                    return new(terminalNode.GetText(), [], [], NodeKind.Terminal);
                 else if (tree is ParserRuleContext ruleContext)
                 {
                     List<(string, IReadOnlyList<Node>)> children = [];
