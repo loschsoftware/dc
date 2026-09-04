@@ -76,7 +76,6 @@ internal static class StringHelpers
                 {
                     sb.Append(escapeChar switch
                     {
-                        // TODO: Emit error if length of input is insufficient
                         'u' => GetCharSequence(ReadString(sr, 4)),
                         'U' => GetCharSequence(ReadString(sr, 8)),
                         'x' => HandleVariableLengthUnicodeEscapeSequence(sr),
