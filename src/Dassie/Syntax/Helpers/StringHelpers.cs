@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Dassie.Syntax.Helpers;
@@ -75,8 +76,9 @@ internal static class StringHelpers
                 {
                     sb.Append(escapeChar switch
                     {
-                        'u' => HandleUtf16EscapeSequence(sr),
-                        'U' => HandleUtf32EscapeSequence(sr),
+                        // TODO: Emit error if length of input is insufficient
+                        'u' => GetCharSequence(ReadString(sr, 4)),
+                        'U' => GetCharSequence(ReadString(sr, 8)),
                         'x' => HandleVariableLengthUnicodeEscapeSequence(sr),
                         _ => escapeChar
                     });
@@ -86,9 +88,6 @@ internal static class StringHelpers
 
         return sb.ToString();
     }
-
-    private static char HandleUtf16EscapeSequence(StringReader reader) => GetChar(reader, 4);
-    private static char HandleUtf32EscapeSequence(StringReader reader) => GetChar(reader, 8);
 
     private static char HandleVariableLengthUnicodeEscapeSequence(StringReader reader)
     {
@@ -103,13 +102,16 @@ internal static class StringHelpers
 
         return (char)int.Parse(sequence.ToString(), NumberStyles.HexNumber);
     }
-
-    private static char GetChar(StringReader reader, int count)
+    
+    private static string ReadString(StringReader sr, int count)
     {
-        StringBuilder sequence = new();
-        for (int i = 0; i < count; i++)
-            sequence.Append((char)reader.Read());
+        StringBuilder sb = new();
+        for (int i = 0; i < count && sr.Peek() != -1; i++)
+            sb.Append((char)sr.Read());
 
-        return (char)int.Parse(sequence.ToString(), NumberStyles.HexNumber);
+        return sb.ToString();
     }
+
+    private static string GetCharSequence(string str) =>
+        char.ConvertFromUtf32(int.Parse(str, NumberStyles.HexNumber));
 }

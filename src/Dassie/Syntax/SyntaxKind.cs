@@ -113,7 +113,7 @@ internal enum SyntaxKind
     AttributedExpression,
     SpecialSymbolExpression,
     TerminatedExpression,
-
+    
     NamePredicate,
     BinaryPredicate,
     RelationalPredicate,

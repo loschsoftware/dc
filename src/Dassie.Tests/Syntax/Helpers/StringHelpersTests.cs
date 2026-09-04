@@ -34,6 +34,7 @@ public class StringHelpersTests
     [InlineData("^x41Z", "AZ")]
     [InlineData("^u0041", "A")]
     [InlineData("^U00000041", "A")]
+    [InlineData("^U0001F47D", "👽")]
     public static void UnescapeString_UnescapesUnicodeSequences(string escaped, string expected)
     {
         Assert.Equal(expected, StringHelpers.UnescapeString(escaped));
