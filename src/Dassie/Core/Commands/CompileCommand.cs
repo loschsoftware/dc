@@ -111,10 +111,24 @@ internal class CompileCommand : CompilerCommand
         Program.Exit(234);
     }
 
+    private static readonly List<string> _newEngineNames = ["v2.5", "new"];
+
     private static int Compile(string[] args, DassieConfig overrideSettings = null, string assemblyName = null)
     {
         if (!ExtensionLoader.Commands.Contains(Instance))
             return HelpCommand.Instance.Invoke([]);
+
+        if (args.Any(a => a.StartsWith("--engine=")) && _newEngineNames.Contains(string.Join('=', args.First(a => a.StartsWith("--engine")).Split('=')[1..])))
+        {
+            EmitMessageFormatted(
+                0, 0, 0,
+                DS0290_NewCompilationEngine,
+                nameof(StringHelper.CompileCommand_CompilationEngine),
+                [_newEngineNames[0]],
+                CompilerExecutableName);
+
+            return 0;
+        }
 
         string workingDir = Directory.GetCurrentDirectory();
         long stopwatchTimeStamp = Stopwatch.GetTimestamp();

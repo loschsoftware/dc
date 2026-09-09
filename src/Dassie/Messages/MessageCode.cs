@@ -1190,5 +1190,9 @@ public enum MessageCode
     /// <summary>
     /// Emitted when the dereference operator is applied to a value that is not a reference or a pointer.
     /// </summary>
-    DS0289_DereferenceNonReference
+    DS0289_DereferenceNonReference,
+    /// <summary>
+    /// Diagnostic message emitted when the new compilation engine is used.
+    /// </summary>
+    DS0290_NewCompilationEngine
 }
