@@ -13,6 +13,7 @@ internal enum SyntaxKind
     IdentifierName,
     QualifiedName,
     GenericName,
+    AttributedName,
 
     NameType,
     GenericType,

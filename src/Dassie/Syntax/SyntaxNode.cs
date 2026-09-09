@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Antlr4.Runtime;
+using System;
 using System.Collections.Generic;
 
 namespace Dassie.Syntax;
@@ -136,6 +137,15 @@ internal record ExportDirectiveSyntax : DirectiveSyntax
 internal abstract record NameSyntax : SyntaxNode;
 
 internal abstract record SimpleNameSyntax : NameSyntax;
+
+internal record AttributedNameSyntax : NameSyntax
+{
+    public override SyntaxKind Kind => SyntaxKind.AttributedName;
+    public AttributeListSyntax Attributes { get; init; } = new();
+    public NameSyntax Name { get; init; }
+
+    public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(Attributes, Name);
+}
 
 internal record IdentifierNameSyntax : SimpleNameSyntax
 {

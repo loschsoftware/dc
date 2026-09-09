@@ -33,9 +33,37 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
         Value = value
     };
 
+    private static SyntaxToken Identifier(ITerminalNode node)
+    {
+        return new SyntaxToken()
+        {
+            TokenKind = SyntaxKind.IdentifierToken,
+            Text = node?.GetText(),
+            Value = node.GetIdentifier()
+        };
+    }
+
     private static TextSpan GetSpan(ParserRuleContext rule)
     {
         return TextSpan.FromBounds(rule.Start.StartIndex, rule.Stop.StopIndex);
+    }
+
+    private static TextSpan GetSpan(ITerminalNode node)
+    {
+        return TextSpan.FromBounds(node.Symbol.StartIndex, node.Symbol.StopIndex);
+    }
+
+    private static TextSpan GetSpan(IToken start, IToken end)
+    {
+        return TextSpan.FromBounds(start.StartIndex, end.StopIndex);
+    }
+
+    private static SyntaxNode VisitOrNull(IParseTree tree)
+    {
+        if (tree == null)
+            return null;
+
+        return VisitOrNull(tree);
     }
 
     private static ModifierListSyntax GetModifierList(IEnumerable<IParseTree> modifiers)
@@ -119,7 +147,26 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitArglist([NotNull] DassieParser.ArglistContext context)
     {
-        return base.VisitArglist(context);
+        return new ArgumentListSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            Arguments = new()
+            {
+                Separators = context.Comma().Select(c => Token(SyntaxKind.CommaToken, c)).ToList(),
+                Nodes = context.expression().Select(e => new ArgumentSyntax()
+                {
+                    FirstToken = ToSyntaxToken(e.Start),
+                    LastToken = ToSyntaxToken(e.Stop),
+                    Span = GetSpan(e),
+                    Name = null, // TODO: Match name with expression correctly, if that is even possible...
+                    ColonToken = null,
+                    Expression = (ExpressionSyntax)Visit(e)
+                }).ToList()
+            },
+            DoubleCommaToken = Token(SyntaxKind.DoubleCommaToken, context.Double_Comma())
+        };
     }
 
     public override SyntaxNode VisitArray_element_assignment([NotNull] DassieParser.Array_element_assignmentContext context)
@@ -181,12 +228,19 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitBitwise_complement_expression([NotNull] DassieParser.Bitwise_complement_expressionContext context)
     {
-        return base.VisitBitwise_complement_expression(context);
+        return new UnaryExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            OperatorToken = Token(SyntaxKind.TildeToken, context.Tilde()),
+            Operand = (ExpressionSyntax)Visit(context.expression())
+        };
     }
 
     public override SyntaxNode VisitBlock_expression([NotNull] DassieParser.Block_expressionContext context)
     {
-        return base.VisitBlock_expression(context);
+        return Visit(context.code_block());
     }
 
     public override SyntaxNode VisitBoolean_atom([NotNull] DassieParser.Boolean_atomContext context)
@@ -211,12 +265,29 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitClosed_ended_range_expression([NotNull] DassieParser.Closed_ended_range_expressionContext context)
     {
-        return base.VisitClosed_ended_range_expression(context);
+        return new RangeExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            DoubleDotToken = Token(SyntaxKind.DoubleDotToken, context.Double_Dot()),
+            Start = null,
+            End = (ExpressionSyntax)Visit(context.expression())
+        };
     }
 
     public override SyntaxNode VisitCode_block([NotNull] DassieParser.Code_blockContext context)
     {
-        return base.VisitCode_block(context);
+        return new BlockExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            OpenBraceToken = Token(SyntaxKind.OpenBraceToken, context.Open_Brace()),
+            CloseBraceToken = Token(SyntaxKind.CloseBraceToken, context.Close_Brace()),
+            Placeholder = (PlaceholderExpressionSyntax)Visit(context.placeholder()),
+            Expressions = context.expression().Select(Visit).Cast<ExpressionSyntax>().ToList()
+        };
     }
 
     public override SyntaxNode VisitComparison_expression([NotNull] DassieParser.Comparison_expressionContext context)
@@ -247,12 +318,23 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
             FirstToken = ToSyntaxToken(context.Start),
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
+            Directives = context.import_directive().Select(Visit).Cast<DirectiveSyntax>().ToList(),
+            Body = (FileBodySyntax)Visit(context.file_body()),
+            EndOfFileToken = Token(SyntaxKind.EndOfFileToken, context.Eof())
         };
     }
 
     public override SyntaxNode VisitConversion_expression([NotNull] DassieParser.Conversion_expressionContext context)
     {
-        return base.VisitConversion_expression(context);
+        return new ConversionExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            Expression = (ExpressionSyntax)Visit(context.expression()),
+            OperatorToken = Token(SyntaxKind.LessThanColonToken, context.Less_Than_Colon()),
+            Type = (TypeSyntax)Visit(context.type_name())
+        };
     }
 
     public override SyntaxNode VisitCustom_operator_binary_expression([NotNull] DassieParser.Custom_operator_binary_expressionContext context)
@@ -262,7 +344,15 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitDelimited_range_expression([NotNull] DassieParser.Delimited_range_expressionContext context)
     {
-        return base.VisitDelimited_range_expression(context);
+        return new RangeExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            DoubleDotToken = Token(SyntaxKind.DoubleDotToken, context.Double_Dot()),
+            Start = (ExpressionSyntax)Visit(context.expression()[0]),
+            End = (ExpressionSyntax)Visit(context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitDereference_expression([NotNull] DassieParser.Dereference_expressionContext context)
@@ -290,17 +380,43 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitElif_branch([NotNull] DassieParser.Elif_branchContext context)
     {
-        return base.VisitElif_branch(context);
+        return new ElseIfClauseSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            ColonToken = Token(SyntaxKind.ColonToken, context.Colon()),
+            Condition = (ExpressionSyntax)Visit(context.expression()[0]),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit((IParseTree)context.code_block() ?? context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitElse_branch([NotNull] DassieParser.Else_branchContext context)
     {
-        return base.VisitElse_branch(context);
+        return new ElseClauseSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            ColonToken = Token(SyntaxKind.ColonToken, context.Colon()),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit((IParseTree)context.code_block() ?? context.expression())
+        };
     }
 
     public override SyntaxNode VisitElse_unless_branch([NotNull] DassieParser.Else_unless_branchContext context)
     {
-        return base.VisitElse_unless_branch(context);
+        return new ElseUnlessClauseSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            ElseUnlessToken = Token(SyntaxKind.ExclamationColonToken, context.Exclamation_Colon()),
+            Condition = (ExpressionSyntax)Visit(context.expression()[0]),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit((IParseTree)context.code_block() ?? context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitEmpty_atom([NotNull] DassieParser.Empty_atomContext context)
@@ -382,7 +498,13 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitFile_body([NotNull] DassieParser.File_bodyContext context)
     {
-        return base.VisitFile_body(context);
+        return new FileBodySyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            Items = context.children.Select(Visit).ToList()
+        };
     }
 
     public override SyntaxNode VisitFinally_branch([NotNull] DassieParser.Finally_branchContext context)
@@ -397,35 +519,98 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitFull_identifier([NotNull] DassieParser.Full_identifierContext context)
     {
-        // A.B.C:
-        // Left: A.B
-        // Right: C
+        if (context.Identifier().Length == 1)
+        {
+            return new IdentifierNameSyntax()
+            {
+                FirstToken = ToSyntaxToken(context.Start),
+                LastToken = ToSyntaxToken(context.Stop),
+                Span = GetSpan(context),
+                Identifier = Identifier(context.Identifier()[0])
+            };
+        }
 
-        // Dot ist letzer Punkt
-        // Right ist letzter Identifier
+        List<IParseTree> remainingChildren = context.children.Take(context.ChildCount - 2).ToList();
+        DassieParser.Full_identifierContext left = new((ParserRuleContext)context.Parent, context.invokingState)
+        {
+            Start = ((ITerminalNode)context.children[1]).Symbol,
+            Stop = ((ITerminalNode)remainingChildren.Last()).Symbol,
+            children = remainingChildren
+        };
+
+        ITerminalNode last = context.Identifier().Last();
 
         return new QualifiedNameSyntax()
         {
             FirstToken = ToSyntaxToken(context.Start),
             LastToken = ToSyntaxToken(context.Stop),
             Span = GetSpan(context),
-            Left = null // <- TODO
+            Left = (NameSyntax)VisitFull_identifier(left),
+            DotToken = Token(SyntaxKind.DotToken, context.Dot().Last()),
+            Right = new IdentifierNameSyntax()
+            {
+                FirstToken = ToSyntaxToken(last.Symbol),
+                LastToken = ToSyntaxToken(last.Symbol),
+                Span = GetSpan(last),
+                Identifier = Identifier(last)
+            }
         };
     }
 
     public override SyntaxNode VisitFull_identifier_member_access_expression([NotNull] DassieParser.Full_identifier_member_access_expressionContext context)
     {
-        return base.VisitFull_identifier_member_access_expression(context);
-    }
+        NameSyntax fullId = (NameSyntax)Visit(context.full_identifier());
 
+        if (context.generic_arg_list() != null)
+        {
+            fullId = new GenericNameSyntax()
+            {
+                FirstToken = fullId.FirstToken,
+                LastToken = ToSyntaxToken(context.generic_arg_list().Stop),
+                Span = GetSpan(context.full_identifier().Start, context.generic_arg_list().Stop),
+                Name = fullId,
+                TypeArguments = (GenericArgumentListSyntax)Visit(context.generic_arg_list())
+            };
+        }
+
+        return new InvocationExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            Callee = new NameExpressionSyntax()
+            {
+                FirstToken = fullId.FirstToken,
+                LastToken = fullId.LastToken,
+                Span = fullId.Span,
+                Name = fullId
+            },
+            Arguments = (ArgumentListSyntax)VisitOrNull(context.arglist())
+        };
+    }
+    
     public override SyntaxNode VisitFull_program([NotNull] DassieParser.Full_programContext context)
     {
-        return base.VisitFull_program(context);
+        return new FileBodySyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Start),
+            Span = GetSpan(context),
+            Items = context.children.Select(Visit).ToList()
+        };
     }
 
     public override SyntaxNode VisitFull_range_expression([NotNull] DassieParser.Full_range_expressionContext context)
     {
-        return base.VisitFull_range_expression(context);
+        return new RangeExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            DoubleDotToken = Token(SyntaxKind.DoubleDotToken, context.Double_Dot()),
+            Start = null,
+            End = null
+        };
     }
 
     public override SyntaxNode VisitFunction_pointer_expression([NotNull] DassieParser.Function_pointer_expressionContext context)
@@ -473,14 +658,18 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
         return base.VisitGeneric_parameter_variance(context);
     }
 
-    public override SyntaxNode VisitIdentifier_atom([NotNull] DassieParser.Identifier_atomContext context)
-    {
-        return base.VisitIdentifier_atom(context);
-    }
-
     public override SyntaxNode VisitIf_branch([NotNull] DassieParser.If_branchContext context)
     {
-        return base.VisitIf_branch(context);
+        return new IfClauseSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            QuestionToken = Token(SyntaxKind.QuestionMarkToken, context.Question_Mark()),
+            Condition = (ExpressionSyntax)Visit(context.expression()[0]),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit((IParseTree)context.code_block() ?? context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitImplementation_query_expression([NotNull] DassieParser.Implementation_query_expressionContext context)
@@ -520,7 +709,15 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitLeft_pipe_expression([NotNull] DassieParser.Left_pipe_expressionContext context)
     {
-        return base.VisitLeft_pipe_expression(context);
+        return new BinaryExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            OperatorToken = Token(SyntaxKind.ArrowLeftToken, context.Arrow_Left()),
+            Left = (ExpressionSyntax)Visit(context.expression()[0]),
+            Right = (ExpressionSyntax)Visit(context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitLeft_shift_expression([NotNull] DassieParser.Left_shift_expressionContext context)
@@ -553,7 +750,16 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitLock_statement([NotNull] DassieParser.Lock_statementContext context)
     {
-        return base.VisitLock_statement(context);
+        return new LockExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            LockKeyword = Token(SyntaxKind.LockKeyword, context.Lock()),
+            Target = (ExpressionSyntax)Visit(context.expression()[0]),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit(context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitLogical_and_expression([NotNull] DassieParser.Logical_and_expressionContext context)
@@ -666,12 +872,20 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitNewlined_expression([NotNull] DassieParser.Newlined_expressionContext context)
     {
-        return base.VisitNewlined_expression(context);
+        return Visit(context.expression());
     }
 
     public override SyntaxNode VisitOpen_ended_range_expression([NotNull] DassieParser.Open_ended_range_expressionContext context)
     {
-        return base.VisitOpen_ended_range_expression(context);
+        return new RangeExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            DoubleDotToken = Token(SyntaxKind.DoubleDotToken, context.Double_Dot()),
+            Start = (ExpressionSyntax)Visit(context.expression()),
+            End = null
+        };
     }
 
     public override SyntaxNode VisitOr_expression([NotNull] DassieParser.Or_expressionContext context)
@@ -704,32 +918,52 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitPlaceholder([NotNull] DassieParser.PlaceholderContext context)
     {
-        return base.VisitPlaceholder(context);
-    }
-
-    public override SyntaxNode VisitPostfix_if_branch([NotNull] DassieParser.Postfix_if_branchContext context)
-    {
-        return base.VisitPostfix_if_branch(context);
+        return new PlaceholderExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            DotToken = Token(SyntaxKind.DotToken, context.Dot())
+        };
     }
 
     public override SyntaxNode VisitPostfix_if_expression([NotNull] DassieParser.Postfix_if_expressionContext context)
     {
-        return base.VisitPostfix_if_expression(context);
-    }
-
-    public override SyntaxNode VisitPostfix_unless_branch([NotNull] DassieParser.Postfix_unless_branchContext context)
-    {
-        return base.VisitPostfix_unless_branch(context);
+        return new PostfixIfExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            QuestionToken = Token(SyntaxKind.QuestionMarkToken, context.postfix_if_branch().Question_Mark()),
+            Expression = (ExpressionSyntax)Visit(context.expression()),
+            Condition = (ExpressionSyntax)Visit(context.postfix_if_branch().expression())
+        };
     }
 
     public override SyntaxNode VisitPostfix_unless_expression([NotNull] DassieParser.Postfix_unless_expressionContext context)
     {
-        return base.VisitPostfix_unless_expression(context);
+        return new PostfixUnlessExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            UnlessToken = Token(SyntaxKind.ExclamationQuestionToken, context.postfix_unless_branch().Exclamation_Question()),
+            Expression = (ExpressionSyntax)Visit(context.expression()),
+            Condition = (ExpressionSyntax)Visit(context.postfix_unless_branch().expression())
+        };
     }
 
     public override SyntaxNode VisitPower_expression([NotNull] DassieParser.Power_expressionContext context)
     {
-        return base.VisitPower_expression(context);
+        return new BinaryExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            OperatorToken = Token(SyntaxKind.DoubleAsteriskToken, context.Double_Asterisk()),
+            Left = (ExpressionSyntax)Visit(context.expression()[0]),
+            Right = (ExpressionSyntax)Visit(context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitPredicate([NotNull] DassieParser.PredicateContext context)
@@ -739,12 +973,28 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitPrefix_if_expression([NotNull] DassieParser.Prefix_if_expressionContext context)
     {
-        return base.VisitPrefix_if_expression(context);
+        return new IfExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            IfClause = (IfClauseSyntax)Visit(context.if_branch()),
+            ElseClause = (ElseClauseSyntax)Visit(context.else_branch()),
+            ElseIfClauses = context.elif_branch()?.Select(Visit).Cast<ElseIfClauseSyntax>().ToList()
+        };
     }
 
     public override SyntaxNode VisitPrefix_unless_expression([NotNull] DassieParser.Prefix_unless_expressionContext context)
     {
-        return base.VisitPrefix_unless_expression(context);
+        return new UnlessExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            UnlessClause = (UnlessClauseSyntax)Visit(context.unless_branch()),
+            ElseClause = (ElseClauseSyntax)Visit(context.else_branch()),
+            ElseUnlessClauses = context.else_unless_branch()?.Select(Visit).Cast<ElseUnlessClauseSyntax>().ToList()
+        };
     }
 
     public override SyntaxNode VisitProperty_getter([NotNull] DassieParser.Property_getterContext context)
@@ -764,12 +1014,26 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitRaise_expression([NotNull] DassieParser.Raise_expressionContext context)
     {
-        return base.VisitRaise_expression(context);
+        return new RaiseExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            RaiseKeyword = Token(SyntaxKind.RaiseKeyword, context.Raise()),
+            Expression = (ExpressionSyntax)Visit(context.expression())
+        };
     }
 
     public override SyntaxNode VisitRange_index_expression([NotNull] DassieParser.Range_index_expressionContext context)
     {
-        return base.VisitRange_index_expression(context);
+        return new RangeIndexExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            CaretToken = Token(SyntaxKind.CaretToken, context.Caret()),
+            Index = (ExpressionSyntax)Visit(context.integer_atom())
+        };
     }
 
     public override SyntaxNode VisitReal_atom([NotNull] DassieParser.Real_atomContext context)
@@ -797,12 +1061,27 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitRethrow_exception([NotNull] DassieParser.Rethrow_exceptionContext context)
     {
-        return base.VisitRethrow_exception(context);
+        return new RaiseExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            RaiseKeyword = Token(SyntaxKind.RaiseKeyword, context.Raise()),
+            Expression = null
+        };
     }
 
     public override SyntaxNode VisitRight_pipe_expression([NotNull] DassieParser.Right_pipe_expressionContext context)
     {
-        return base.VisitRight_pipe_expression(context);
+        return new BinaryExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            OperatorToken = Token(SyntaxKind.ArrowRightToken, context.Arrow_Right()),
+            Left = (ExpressionSyntax)Visit(context.expression()[0]),
+            Right = (ExpressionSyntax)Visit(context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitRight_shift_expression([NotNull] DassieParser.Right_shift_expressionContext context)
@@ -820,12 +1099,20 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitSafe_conversion_expression([NotNull] DassieParser.Safe_conversion_expressionContext context)
     {
-        return base.VisitSafe_conversion_expression(context);
+        return new ConversionExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            Expression = (ExpressionSyntax)Visit(context.expression()),
+            OperatorToken = Token(SyntaxKind.LessThanQuestionMarkColonToken, context.Less_Than_Question_Mark_Colon()),
+            Type = (TypeSyntax)Visit(context.type_name())
+        };
     }
 
     public override SyntaxNode VisitSeparated_expression([NotNull] DassieParser.Separated_expressionContext context)
     {
-        return base.VisitSeparated_expression(context);
+        return Visit(context.expression());
     }
 
     public override SyntaxNode VisitSpecial_symbol([NotNull] DassieParser.Special_symbolContext context)
@@ -840,6 +1127,7 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitString_atom([NotNull] DassieParser.String_atomContext context)
     {
+        // TODO: Make separate InterpolatedStringSyntax for interpolated strings
         return base.VisitString_atom(context);
     }
 
@@ -858,7 +1146,13 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitThis_atom([NotNull] DassieParser.This_atomContext context)
     {
-        return base.VisitThis_atom(context);
+        return new ThisExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            ThisKeyword = Token(SyntaxKind.ThisKeyword, context.This())
+        };
     }
 
     public override SyntaxNode VisitTry_branch([NotNull] DassieParser.Try_branchContext context)
@@ -873,7 +1167,21 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitTuple_expression([NotNull] DassieParser.Tuple_expressionContext context)
     {
-        return base.VisitTuple_expression(context);
+        SeparatedSyntaxList<ExpressionSyntax> items = new()
+        {
+            Nodes = context.expression().Select(Visit).Cast<ExpressionSyntax>().ToList(),
+            Separators = context.Comma().Select(t => Token(SyntaxKind.CommaToken, t)).ToList()
+        };
+
+        return new TupleExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            OpenParenToken = Token(SyntaxKind.OpenParenToken, context.Open_Paren()),
+            CloseParenToken = Token(SyntaxKind.CloseParenToken, context.Close_Paren()),
+            Elements = items
+        };
     }
 
     public override SyntaxNode VisitType([NotNull] DassieParser.TypeContext context)
@@ -903,6 +1211,55 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitType_name([NotNull] DassieParser.Type_nameContext context)
     {
+        if (context.identifier_atom() != null)
+        {
+            return new NameTypeSyntax()
+            {
+                FirstToken = ToSyntaxToken(context.Start),
+                LastToken = ToSyntaxToken(context.Stop),
+                Span = GetSpan(context),
+                Name = (NameSyntax)Visit(context.identifier_atom())
+            };
+        }
+
+        SeparatedSyntaxList<TypeMemberSyntax> typeMemberList = new()
+        {
+            Nodes = context.union_or_tuple_type_member()?.Select(Visit).Cast<TypeMemberSyntax>().ToList()
+        };
+
+        if (context.Bar()?.Length > 0)
+        {
+            return new UnionTypeSyntax()
+            {
+                FirstToken = ToSyntaxToken(context.Start),
+                LastToken = ToSyntaxToken(context.Stop),
+                Span = GetSpan(context),
+                OpenParenToken = Token(SyntaxKind.OpenParenToken, context.Open_Paren()),
+                CloseParenToken = Token(SyntaxKind.CloseParenToken, context.Close_Paren()),
+                Members = typeMemberList with
+                {
+                    Separators = context.Bar().Select(b => Token(SyntaxKind.BarToken, b)).ToList()
+                }
+            };
+        }
+
+        if (context.Comma()?.Length > 0)
+        {
+            return new TupleTypeSyntax()
+            {
+                FirstToken = ToSyntaxToken(context.Start),
+                LastToken = ToSyntaxToken(context.Stop),
+                Span = GetSpan(context),
+                OpenParenToken = Token(SyntaxKind.OpenParenToken, context.Open_Paren()),
+                CloseParenToken = Token(SyntaxKind.CloseParenToken, context.Close_Paren()),
+                Members = typeMemberList with
+                {
+                    Separators = context.Comma().Select(b => Token(SyntaxKind.CommaToken, b)).ToList()
+                }
+            };
+        }
+
+        // TODO: Handle remaining type names
         return base.VisitType_name(context);
     }
 
@@ -913,27 +1270,68 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
 
     public override SyntaxNode VisitUnion_or_tuple_type_member([NotNull] DassieParser.Union_or_tuple_type_memberContext context)
     {
-        return base.VisitUnion_or_tuple_type_member(context);
+        return new NamedTypeMemberSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            Name = Identifier(context.Identifier()),
+            ColonToken = Token(SyntaxKind.ColonToken, context.Colon()),
+            Type = (TypeSyntax)Visit(context.type_name())
+        };
     }
 
     public override SyntaxNode VisitUnless_branch([NotNull] DassieParser.Unless_branchContext context)
     {
-        return base.VisitUnless_branch(context);
+        return new UnlessClauseSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            UnlessToken = Token(SyntaxKind.ExclamationQuestionToken, context.Exclamation_Question()),
+            Condition = (ExpressionSyntax)Visit(context.expression()[0]),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit((IParseTree)context.code_block() ?? context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitUntil_loop([NotNull] DassieParser.Until_loopContext context)
     {
-        return base.VisitUntil_loop(context);
+        return new UntilExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            UntilToken = Token(SyntaxKind.ExclamationAtToken, context.Exclamation_At()),
+            Condition = (ExpressionSyntax)Visit(context.expression()[0]),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit(context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitWhile_loop([NotNull] DassieParser.While_loopContext context)
     {
-        return base.VisitWhile_loop(context);
+        return new WhileExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            AtToken = Token(SyntaxKind.AtSignToken, context.At_Sign()),
+            Condition = (ExpressionSyntax)Visit(context.expression()[0]),
+            EqualsToken = Token(SyntaxKind.EqualsToken, context.Equals()),
+            Body = (ExpressionSyntax)Visit(context.expression()[1])
+        };
     }
 
     public override SyntaxNode VisitWildcard_atom([NotNull] DassieParser.Wildcard_atomContext context)
     {
-        return base.VisitWildcard_atom(context);
+        return new WildcardExpressionSyntax()
+        {
+            FirstToken = ToSyntaxToken(context.Start),
+            LastToken = ToSyntaxToken(context.Stop),
+            Span = GetSpan(context),
+            UnderscoreToken = Token(SyntaxKind.UnderscoreToken, context.Underscore())
+        };
     }
 
     public override SyntaxNode VisitXor_expression([NotNull] DassieParser.Xor_expressionContext context)
