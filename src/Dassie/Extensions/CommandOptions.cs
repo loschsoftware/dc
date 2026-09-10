@@ -23,5 +23,13 @@ public enum CommandOptions
     /// <summary>
     /// If set, the command system does not allow invoking this command by name through the command line.
     /// </summary>
-    NoDirectInvocation = 4
+    NoDirectInvocation = 4,
+    /// <summary>
+    /// If set, subcommands are not displayed on the help page.
+    /// </summary>
+    NoListSubcommands = 8,
+    /// <summary>
+    /// If set, an error is emitted if the first argument passed to the command is not a valid subcommand.
+    /// </summary>
+    ErrorOnInvalidSubcommand = 16
 }

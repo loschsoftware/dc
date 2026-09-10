@@ -1194,5 +1194,9 @@ public enum MessageCode
     /// <summary>
     /// Diagnostic message emitted when the new compilation engine is used.
     /// </summary>
-    DS0290_NewCompilationEngine
+    DS0290_NewCompilationEngine,
+    /// <summary>
+    /// Emitted when a command is invoked with an invalid subcommand name.
+    /// </summary>
+    DS0291_InvalidSubcommand
 }

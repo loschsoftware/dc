@@ -1,4 +1,5 @@
-﻿using Dassie.Extensions;
+﻿using Dassie.Core.Commands;
+using Dassie.Extensions;
 using System.Linq;
 
 namespace Dassie.Cli.Commands;
@@ -17,6 +18,18 @@ internal static class CommandHandler
     /// <returns>The return value of the invocation.</returns>
     public static int InvokeHelpCommand(string[] args)
     {
+        if (GetHelpCommand() is ICompilerCommand helpCommand)
+            return helpCommand.Invoke(args);
+
+        return -1;
+    }
+
+    private static ICompilerCommand _helpCommand;
+    private static ICompilerCommand GetHelpCommand()
+    {
+        if (_helpCommand != null)
+            return _helpCommand;
+
         if (!ExtensionLoader.Commands.Any(c => c.Role == CommandRole.Help))
         {
             EmitErrorMessageFormatted(
@@ -25,12 +38,13 @@ internal static class CommandHandler
                 nameof(StringHelper.CommandHandler_NoHelpCommandInstalled), [],
                 CompilerExecutableName);
 
-            return -1;
+            return null;
         }
 
         ICompilerCommand helpCommand = ExtensionLoader.Commands.First(c => c.Role == CommandRole.Help);
+        _helpCommand = helpCommand;
 
-        if (ExtensionLoader.Commands.Where(c => c.Role == CommandRole.Help).Count() > 1)
+        if (ExtensionLoader.Commands.Count(c => c.Role == CommandRole.Help) > 1)
         {
             IPackage containingPackage = ExtensionLoader.InstalledExtensions.First(p => p.Commands().Contains(helpCommand));
 
@@ -41,7 +55,20 @@ internal static class CommandHandler
                 CompilerExecutableName);
         }
 
-        return helpCommand.Invoke(args);
+        return helpCommand;
+    }
+
+    private static int InvokeHelpCommand(ICompilerCommand command)
+    {
+        if (GetHelpCommand() is ICompilerCommand helpCommand)
+        {
+            if (helpCommand == HelpCommand.Instance)
+                return HelpCommand.DisplayHelpForCommand(command);
+
+            return InvokeHelpCommand([command.Command]);
+        }
+
+        return -1;
     }
 
     /// <summary>
@@ -78,6 +105,8 @@ internal static class CommandHandler
         return defaultCommand.Invoke(args);
     }
 
+    private static bool MatchCommandName(ICompilerCommand command, string name) => command.Command == name || command.Aliases.Contains(name);
+
     /// <summary>
     /// Attempts to invoke a command with specific arguments.
     /// </summary>
@@ -87,44 +116,69 @@ internal static class CommandHandler
     /// <returns><see langword="true"/>, if the command was executed. <see langword="false"/>, if the command could not be found.</returns>
     public static bool TryInvoke(string name, string[] args, out int errorCode)
     {
-        if (ExtensionLoader.Commands.Any(c => c.Command == name || c.Aliases.Any(a => a == name)))
+        if (ExtensionLoader.Commands.Any(c => MatchCommandName(c, name)))
         {
-            ICompilerCommand selectedCommand = ExtensionLoader.Commands.First(c => c.Command == name || c.Aliases.Any(a => a == name));
-
-            if (args != null && args.Length >= 1 && _helpOptions.Contains(args[0]) && !selectedCommand.Options.HasFlag(CommandOptions.NoHelpRouting))
-            {
-                errorCode = InvokeHelpCommand([selectedCommand.Command]);
-                return true;
-            }
-
-            if (selectedCommand.Options.HasFlag(CommandOptions.NoDirectInvocation))
-            {
-                if (selectedCommand.Role == CommandRole.Default && selectedCommand.Command == "compile")
-                {
-                    EmitErrorMessageFormatted(
-                        0, 0, 0,
-                        DS0250_DCCompileInvoked,
-                        nameof(StringHelper.CommandHandler_DirectInvocationNotSupported_Compile), [],
-                        CompilerExecutableName);
-                }
-                else
-                {
-                    EmitErrorMessageFormatted(
-                        0, 0, 0,
-                        DS0250_DCCompileInvoked,
-                        nameof(StringHelper.CommandHandler_DirectInvocationNotSupported), [selectedCommand.Command],
-                        CompilerExecutableName);
-                }
-
-                errorCode = 250;
-                return true;
-            }
-
-            errorCode = selectedCommand.Invoke(args);
-            return true;
+            ICompilerCommand selectedCommand = ExtensionLoader.Commands.First(c => MatchCommandName(c, name));
+            return TryInvoke(selectedCommand, args, out errorCode);
         }
 
         errorCode = 0;
         return false;
+    }
+
+    private static bool TryInvoke(ICompilerCommand command, string[] args, out int errorCode)
+    {
+        if (args != null && args.Length >= 1 && _helpOptions.Contains(args[0]) && !command.Options.HasFlag(CommandOptions.NoHelpRouting))
+        {
+            errorCode = InvokeHelpCommand(command);
+            return true;
+        }
+
+        if (command.Options.HasFlag(CommandOptions.NoDirectInvocation))
+        {
+            if (command.Role == CommandRole.Default && command.Command == "compile")
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0250_DCCompileInvoked,
+                    nameof(StringHelper.CommandHandler_DirectInvocationNotSupported_Compile), [],
+                    CompilerExecutableName);
+            }
+            else
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0250_DCCompileInvoked,
+                    nameof(StringHelper.CommandHandler_DirectInvocationNotSupported), [command.Command],
+                    CompilerExecutableName);
+            }
+
+            errorCode = 250;
+            return true;
+        }
+
+        if (args.Length > 0 && command.Subcommands != null)
+        {
+            if (command.Subcommands.Any(c => MatchCommandName(c, args[0])))
+            {
+                ICompilerCommand subCommand = command.Subcommands.First(c => MatchCommandName(c, args[0]));
+                return TryInvoke(subCommand, args[1..], out errorCode);
+            }
+            else if (command.Options.HasFlag(CommandOptions.ErrorOnInvalidSubcommand))
+            {
+                EmitErrorMessageFormatted(
+                    0, 0, 0,
+                    DS0291_InvalidSubcommand,
+                    nameof(StringHelper.CommandHandler_InvalidSubcommand),
+                    [command.Command, args[0]],
+                    CompilerExecutableName);
+
+                errorCode = 291;
+                return true;
+            }
+        }
+
+        errorCode = command.Invoke(args);
+        return true;
     }
 }

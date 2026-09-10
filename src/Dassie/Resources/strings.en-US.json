@@ -32,6 +32,7 @@
   "CommandHandler_MultipleHelpCommandsInstalled": "Multiple help commands are installed. The command '{0}' defined in '{1}' will be used.",
   "CommandHandler_NoDefaultCommandInstalled": "No default command is installed.",
   "CommandHandler_MultipleDefaultCommandsInstalled": "Multiple default commands are installed. The command '{0}' defined in '{1}' will be used.",
+  "CommandHandler_InvalidSubcommand": "The command '{0}' does not define a subcommand '{1}'.",
 
   "CommandLineOptionParser_ExpectedArgument": "Expected argument for option '{0}' (alias for '{1}').",
   "CommandLineOptionParser_InvalidFlag": "Invalid flag '{0}'.",
@@ -522,6 +523,7 @@
   "HelpCommand_Options": "Options:",
   "HelpCommand_Remarks": "Remarks:",
   "HelpCommand_Examples": "Examples:",
+  "HelpCommand_Subcommands": "Subcommands:",
 
   "NewCommand_Description": "Creates the file structure of a Dassie project.",
   "NewCommand_Remarks": "This command creates a new directory with the specified project name and creates the file structure of the specified project template inside. Project templates are installed as part of compiler extensions (packages). Managing compiler extensions is facilitated through the 'dc package' command. The Dassie compiler includes the templates 'Console' and 'Library' by default.",

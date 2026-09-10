@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Dassie.Extensions;
 
@@ -28,6 +29,11 @@ public enum CommandRole
 public interface ICompilerCommand
 {
     /// <summary>
+    /// A reference to the parent command, if the current command is a subcommand.
+    /// </summary>
+    internal ICompilerCommand Parent { get; set; }
+
+    /// <summary>
     /// The name used to invoke the command in the console.
     /// </summary>
     public string Command { get; }
@@ -40,7 +46,12 @@ public interface ICompilerCommand
     /// <summary>
     /// A list of alternative command names.
     /// </summary>
-    public virtual List<string> Aliases => [];
+    public virtual IReadOnlyList<string> Aliases => [];
+
+    /// <summary>
+    /// A list of subcommands.
+    /// </summary>
+    public virtual IReadOnlyList<ICompilerCommand> Subcommands => [];
 
     /// <summary>
     /// Represents the information displayed on the command's help page.

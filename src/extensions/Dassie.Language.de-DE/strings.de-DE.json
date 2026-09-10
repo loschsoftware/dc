@@ -32,6 +32,7 @@
   "CommandHandler_MultipleHelpCommandsInstalled": "Mehrere Hilfe-Befehle sind installiert. Der Befehl '{0}' aus '{1}' wird genutzt.",
   "CommandHandler_NoDefaultCommandInstalled": "Kein Standardbefehl ist installiert.",
   "CommandHandler_MultipleDefaultCommandsInstalled": "Mehrere Standardbefehle sind installiert. Der Befehl '{0}' aus '{1}' wird genutzt.",
+  "CommandHandler_InvalidSubcommand": "Der Befehl '{0}' definiert keinen Unterbefehl '{1}'.",
 
   "CommandLineOptionParser_ExpectedArgument": "Argument für Option '{0}' (Alias für '{1}') erwartet.",
   "CommandLineOptionParser_InvalidFlag": "Ungültiger Schalter '{0}'.",
@@ -522,6 +523,7 @@
   "HelpCommand_Options": "Optionen:",
   "HelpCommand_Remarks": "Hinweise:",
   "HelpCommand_Examples": "Beispiele:",
+  "HelpCommand_Subcommands": "Unterbefehle:",
 
   "NewCommand_Description": "Erstellt die Dateistruktur eines Dassie-Projekts.",
   "NewCommand_Remarks": "Dieser Befehl erstellt ein neues Verzeichnis mit dem angegebenen Projektnamen und erzeugt darin die Dateistruktur der angegebenen Projektvorlage. Projektvorlagen werden als Teil von Compilererweiterungen (Paketen) installiert. Die Verwaltung von Compilererweiterungen erfolgt über den Befehl 'dc package'. Der Dassie-Compiler enthält standardmäßig die Vorlagen 'Console' und 'Library'.",

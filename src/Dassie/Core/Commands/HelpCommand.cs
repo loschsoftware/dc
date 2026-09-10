@@ -301,8 +301,16 @@ internal class HelpCommand : CompilerCommand
         CommandHelpDetails hd = command.HelpDetails;
         StringBuilder sb = new();
 
+        StringBuilder parentCommandSb = new(" ");
+        ICompilerCommand currentParent = command.Parent;
+        while (currentParent != null)
+        {
+            parentCommandSb.Insert(1, $"{currentParent.Command} ");
+            currentParent = currentParent.Parent;
+        }
+
         sb.AppendLine();
-        sb.AppendLine($"dc {command.Command}: {(string.IsNullOrEmpty(hd.Description) ? command.Description : hd.Description)}");
+        sb.AppendLine($"dc{parentCommandSb.ToString()}{command.Command}: {(string.IsNullOrEmpty(hd.Description) ? command.Description : hd.Description)}");
 
         if (command.Aliases != null && command.Aliases.Count > 0)
             sb.AppendLine($"{(command.Aliases.Count > 1 ? StringHelper.HelpCommand_AliasPlural : StringHelper.HelpCommand_AliasSingular)} {(command.Aliases.Count == 1 ? command.Aliases.Single() : string.Join(", ", command.Aliases))}");
@@ -322,6 +330,14 @@ internal class HelpCommand : CompilerCommand
         }
 
         sb.AppendLine();
+
+        if (command.Subcommands != null && command.Subcommands.Count > 0 && !command.Options.HasFlag(CommandOptions.NoListSubcommands))
+        {
+            sb.AppendLine(StringHelper.HelpCommand_Subcommands);
+            foreach (ICompilerCommand subCommand in command.Subcommands)
+                sb.Append($"{$"    {subCommand.Command}",-35}{FormatLines(subCommand.Description, indentWidth: 35)}");
+            sb.AppendLine();
+        }
 
         if (hd.Options != null && hd.Options.Count > 0)
         {

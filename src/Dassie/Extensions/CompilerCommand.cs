@@ -7,6 +7,8 @@ namespace Dassie.Extensions;
 /// </summary>
 public abstract class CompilerCommand : ICompilerCommand
 {
+    ICompilerCommand ICompilerCommand.Parent { get; set; }
+
     /// <inheritdoc/>
     public abstract string Command { get; }
 
@@ -14,7 +16,10 @@ public abstract class CompilerCommand : ICompilerCommand
     public abstract string Description { get; }
 
     /// <inheritdoc/>
-    public virtual List<string> Aliases => [];
+    public virtual IReadOnlyList<string> Aliases => [];
+
+    /// <inheritdoc/>
+    public virtual IReadOnlyList<ICompilerCommand> Subcommands => [];
 
     /// <inheritdoc/>
     public virtual CommandHelpDetails HelpDetails => null;

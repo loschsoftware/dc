@@ -58,12 +58,12 @@ internal class SyntaxTreeGenerator(DiagnosticManager dm) : DassieParserBaseVisit
         return TextSpan.FromBounds(start.StartIndex, end.StopIndex);
     }
 
-    private static SyntaxNode VisitOrNull(IParseTree tree)
+    private SyntaxNode VisitOrNull(IParseTree tree)
     {
         if (tree == null)
             return null;
 
-        return VisitOrNull(tree);
+        return Visit(tree);
     }
 
     private static ModifierListSyntax GetModifierList(IEnumerable<IParseTree> modifiers)
