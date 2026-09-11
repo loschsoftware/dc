@@ -81,10 +81,14 @@ public abstract class GlobalConfigProperty
     }
 
     /// <summary>
-    /// An array of validation delegates that are invoked every time the property is set. The parameter of the validator represents the new value
-    /// of the property. The return value of the validator should indicate wheter or not the specified property value is valid. 
-    /// In case of failure, the validator should handle the emission of error messages itself. If one of the validators returns <see langword="false"/>,
-    /// the set operation is aborted and none of the remaining validators are invoked.
+    /// Gets the validation delegates that are invoked whenever the property is set.
     /// </summary>
+    /// <remarks>
+    /// Each validator receives the proposed new property value and returns whether the value is valid.
+    /// Validators are invoked in order. If a validator returns <see langword="false"/>, the set operation
+    /// is aborted and no remaining validators are invoked.
+    /// <para/>
+    /// Validators are responsible for emitting their own validation error messages.
+    /// </remarks>
     public virtual Func<object, bool>[] Validators => [];
 }
