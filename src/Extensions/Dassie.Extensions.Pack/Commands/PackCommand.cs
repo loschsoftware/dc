@@ -3,10 +3,10 @@ using Dassie.Resources;
 
 namespace Dassie.Extensions.Pack.Commands;
 
-internal class PackCommand(IEnvironmentInfo env) : CompilerCommand
+internal class PackCommand(IEnvironmentInfo env, LocalizationProvider lp) : CompilerCommand
 {
     public override string Command => "pack";
-    public override string Description => StringHelper.PackCommand_Description;
+    public override string Description => lp.GetString("PackCommand_Description");
 
     public override int Invoke(string[] args)
     {

@@ -1,6 +1,7 @@
 ﻿using Dassie.Core.Properties;
 using Dassie.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Dassie.Resources;
@@ -10,7 +11,8 @@ namespace Dassie.Resources;
 /// </summary>
 internal static partial class StringHelper
 {
-    private static IResourceProvider<string> _provider;
+    private static IResourceProvider<string> _globalProvider;
+    private static readonly Dictionary<string, IResourceProvider<string>> _localProviders = [];
 
     /// <summary>
     /// Initializes the string registry for the current language.
@@ -24,8 +26,20 @@ internal static partial class StringHelper
 
         if (ExtensionLoader.LocalizationResourceProviders.Any(p => p.Culture == languageName))
         {
-            SetStringSource(ExtensionLoader.LocalizationResourceProviders.First(p => p.Culture == languageName));
-            return;
+            foreach (IResourceProvider<string> provider in ExtensionLoader.LocalizationResourceProviders.Where(p => p.Culture == languageName))
+            {
+                if (provider.Scope == ResourceScope.Global)
+                {
+                    AddGlobalProvider(provider);
+                    continue;
+                }
+
+                IExtension declaringExtension = ExtensionLoader.InstalledExtensions.First(e => e.LocalizationResourceProviders()?.Contains(provider) == true);
+                AddLocalProvider(declaringExtension.Metadata?.PackageIdentity, provider);
+            }
+
+            if (_globalProvider != null)
+                return;
         }
 
         void NotFound()
@@ -39,7 +53,7 @@ internal static partial class StringHelper
                     CompilerExecutableName);
             }
 
-            _provider = DefaultStrings.Instance;
+            _globalProvider = DefaultStrings.Instance;
         }
 
         string probeDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Localization");
@@ -67,7 +81,42 @@ internal static partial class StringHelper
     /// <param name="resourceProvider">The resource provider acting as the source of localized strings.</param>
     public static void SetStringSource(IResourceProvider<string> resourceProvider)
     {
-        _provider = resourceProvider;
+        _globalProvider = resourceProvider;
+    }
+
+    private static void AddGlobalProvider(IResourceProvider<string> provider)
+    {
+        if (_globalProvider == null)
+        {
+            SetStringSource(provider);
+            return;
+        }
+
+        if (_globalProvider is MutableStringProvider msp)
+        {
+            msp.Merge(provider);
+            return;
+        }
+
+        _globalProvider = new MutableStringProvider(_globalProvider);
+        AddGlobalProvider(provider);
+    }
+
+    private static void AddLocalProvider(string id, IResourceProvider<string> provider)
+    {
+        if (_localProviders.TryAdd(id, provider))
+            return;
+
+        IResourceProvider<string> existingProvider = _localProviders[id];
+
+        if (existingProvider is MutableStringProvider msp)
+        {
+            msp.Merge(provider);
+            return;
+        }
+
+        _localProviders[id] = new MutableStringProvider(existingProvider);
+        AddLocalProvider(id, provider);
     }
 
     /// <summary>
@@ -76,7 +125,7 @@ internal static partial class StringHelper
     /// <param name="jsonFile">The path to a JSON file containing localized string resources.</param>
     public static void SetStringSource(string jsonFile)
     {
-        _provider = new JsonStringProvider(jsonFile);
+        _globalProvider = new JsonStringProvider(jsonFile);
     }
 
     /// <summary>
@@ -86,7 +135,7 @@ internal static partial class StringHelper
     /// <returns>The localized string whose key is equal to <paramref name="id"/>.</returns>
     public static string GetString(string id)
     {
-        if (_provider == null || _provider.Resources == null || !_provider.Resources.TryGetValue(id, out string str))
+        if (_globalProvider == null || _globalProvider.Resources == null || !_globalProvider.Resources.TryGetValue(id, out string str))
         {
             if (DefaultStrings.Instance.Resources.TryGetValue(id, out string defaultStr))
                 return defaultStr;
@@ -95,6 +144,14 @@ internal static partial class StringHelper
         }
 
         return str;
+    }
+
+    private static string StringFormat(string str, params object[] args)
+    {
+        if (args == null || args.Length == 0)
+            return str;
+
+        return string.Format(str, args);
     }
 
     /// <summary>
@@ -106,10 +163,23 @@ internal static partial class StringHelper
     public static string Format(string id, params object[] args)
     {
         string str = GetString(id);
+        return StringFormat(str, args);
+    }
 
-        if (args == null || args.Length == 0)
-            return str;
+    public static string GetStringLocal(string package, string id)
+    {
+        if (_localProviders.TryGetValue(package, out IResourceProvider<string> provider))
+        {
+            if (provider.Resources.TryGetValue(id, out string str))
+                return str;
+        }
 
-        return string.Format(str, args);
+        return GetString(id);
+    }
+
+    public static string FormatLocal(string package, string id, params object[] args)
+    {
+        string str = GetStringLocal(package, id);
+        return StringFormat(str, args);
     }
 }

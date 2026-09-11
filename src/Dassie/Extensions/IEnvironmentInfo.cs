@@ -5,7 +5,7 @@ using System.Globalization;
 namespace Dassie.Extensions;
 
 /// <summary>
-/// Represents the environment in which a compiler extension is loaded.
+/// Represents the environment in which a compiler extension is loaded in.
 /// </summary>
 public interface IEnvironmentInfo
 {

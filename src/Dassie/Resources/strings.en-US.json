@@ -829,8 +829,5 @@
   "PackageSourceCommand_SetPrimaryDescription": "Sets the specified package source as the primary source.",
   "PackageSourceCommand_Example1": "Lists all installed package sources.",
   "PackageSourceCommand_Example2": "Adds the package source 'default' from the specified URI.",
-  "PackageSourceCommand_Example3": "Disables the package source 'source1'.",
-
-  "PackExtension_Description": "Provides tools for building and packing .dcx extension packages.",
-  "PackCommand_Description": "Builds and packs .dcx extension packages."
+  "PackageSourceCommand_Example3": "Disables the package source 'source1'."
 }

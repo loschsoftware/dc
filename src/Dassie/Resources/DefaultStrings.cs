@@ -8,6 +8,7 @@ internal partial class DefaultStrings : IResourceProvider<string>
     public static DefaultStrings Instance => _instance ??= new();
 
     public string Culture => "en-US";
+    ResourceScope IResourceProvider<string>.Scope => ResourceScope.Global;
 
     // String table is source-generated from strings.en-US.json
 }

@@ -365,7 +365,7 @@ internal static class ExtensionLoader
                 packages.Add(package);
             }
         }
-        catch (ReflectionTypeLoadException)
+        catch (Exception ex) when (ex is ReflectionTypeLoadException or TargetInvocationException)
         {
             EmitWarningMessageFormatted(0, 0, 0,
                 DS0124_InvalidExtensionPackage,

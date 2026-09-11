@@ -4,6 +4,7 @@
 		<AssemblyName>dc</AssemblyName>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<InstallFirstPartyExtensions Condition="'$(InstallFirstPartyExtensions)' == '' and '$(OS)' == 'Windows_NT' and '$(CI)' != 'true'">true</InstallFirstPartyExtensions>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -52,7 +53,7 @@
 			<FileWrites Include="Configuration\Macros\Parser\Generated\**\*.cs" />
 		</ItemGroup>
 	</Target>
-
+	
 	<Target Name="CopySdkFiles" AfterTargets="Build">
 		<ItemGroup>
 			<SdkFiles Include="$(SolutionDir)sdk\**\*" />
