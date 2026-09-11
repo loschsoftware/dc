@@ -41,9 +41,6 @@ internal static partial class StringHelper
                 IExtension declaringExtension = ExtensionLoader.InstalledExtensions.First(e => e.LocalizationResourceProviders()?.Contains(provider) == true);
                 AddLocalProvider(declaringExtension.Metadata?.PackageIdentity, provider);
             }
-
-            if (_globalProvider != null)
-                return;
         }
 
         foreach (KeyValuePair<string, IResourceProvider<string>> kvp in _localProviders.Where(l => l.Value == null))
@@ -54,6 +51,9 @@ internal static partial class StringHelper
 
             AddLocalProvider(kvp.Key, ext.LocalizationResourceProviders()?.First(l => l.Culture == _fallbackLanguageName));
         }
+
+        if (_globalProvider != null)
+            return;
 
         void NotFound()
         {
