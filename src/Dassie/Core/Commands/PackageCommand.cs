@@ -111,14 +111,14 @@ internal class PackageCommand : CompilerCommand
     private static int List()
     {
         StringBuilder sb = new();
-        List<IPackage> packages = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
-        Dictionary<IPackage, List<IPackage>> displayedPackages = [];
+        List<IExtension> packages = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
+        Dictionary<IExtension, List<IExtension>> displayedPackages = [];
 
-        foreach (IPackage package in packages)
+        foreach (IExtension package in packages)
         {
             if (package.ParentPackage != null && packages.Any(p => p.GetType().Equals(package.ParentPackage)))
             {
-                IPackage parent = packages.First(p => p.GetType().Equals(package.ParentPackage));
+                IExtension parent = packages.First(p => p.GetType().Equals(package.ParentPackage));
                 if (!displayedPackages.TryAdd(parent, [package]))
                     displayedPackages[parent].Add(package);
                 continue;
@@ -146,7 +146,7 @@ internal class PackageCommand : CompilerCommand
         sb.AppendLine(header);
         sb.AppendLine(new string('-', header.Length - 18));
 
-        foreach ((IPackage package, List<IPackage> children) in displayedPackages)
+        foreach ((IExtension package, List<IExtension> children) in displayedPackages)
         {
             string packageDisplay = $"{(package == CorePackage.Instance ? $"\e[1;31m[{StringHelper.PackageCommand_BuiltIn}]\e[0m " : "")}{package.Metadata.Name}";
             if (packageDisplay.Length > 45)
@@ -157,7 +157,7 @@ internal class PackageCommand : CompilerCommand
 
             if (children.Count > 0)
             {
-                foreach (IPackage child in children)
+                foreach (IExtension child in children)
                 {
                     Version childVersion = child.Metadata.Version;
                     sb.AppendLine($"{$"    ↳ \e[3m{child.Metadata.Name}",-50 - 4}{(childVersion.Equals(version) ? "" : childVersion)}\e[23m");
@@ -172,7 +172,7 @@ internal class PackageCommand : CompilerCommand
     private static int Info(string name)
     {
         StringBuilder sb = new();
-        List<IPackage> packages = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
+        List<IExtension> packages = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
 
         if (!packages.Any(p => p.Metadata.Name == name))
         {
@@ -180,8 +180,8 @@ internal class PackageCommand : CompilerCommand
             return -1;
         }
 
-        IPackage package = packages.First(p => p.Metadata.Name == name);
-        IPackage parent = packages.FirstOrDefault(p => p.GetType().Equals(package.ParentPackage));
+        IExtension package = packages.First(p => p.Metadata.Name == name);
+        IExtension parent = packages.FirstOrDefault(p => p.GetType().Equals(package.ParentPackage));
 
         void SetUnderline()
         {
@@ -354,7 +354,7 @@ internal class PackageCommand : CompilerCommand
             return -1;
         }
 
-        List<IPackage> installed = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
+        List<IExtension> installed = ExtensionLoader.InstalledExtensions.Where(p => !p.Hidden()).ToList();
 
         if (!installed.Any(p => p.Metadata.Name == name))
         {
@@ -365,7 +365,7 @@ internal class PackageCommand : CompilerCommand
         Assembly packageAssembly = installed.First(p => p.Metadata.Name == name).GetType().Assembly;
         string path = packageAssembly.Location;
 
-        if (packageAssembly.DefinedTypes.Where(t => t.GetInterfaces().Contains(typeof(IPackage))).Count() > 1)
+        if (packageAssembly.DefinedTypes.Where(t => t.GetInterfaces().Contains(typeof(IExtension))).Count() > 1)
         {
             Console.WriteLine(StringHelper.Format(nameof(StringHelper.PackageCommand_ExtensionRemoveWarningLine1), name));
 

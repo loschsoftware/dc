@@ -24,5 +24,5 @@ public interface IEnvironmentInfo
     /// Retrieves the currently loaded extension packages.
     /// </summary>
     /// <returns>An enumerable of compiler extensions that are currently loaded.</returns>
-    public IEnumerable<IPackage> InstalledExtensions();
+    public IEnumerable<IExtension> InstalledExtensions();
 }

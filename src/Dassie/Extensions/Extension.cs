@@ -8,9 +8,9 @@ using System.Xml;
 namespace Dassie.Extensions;
 
 /// <summary>
-/// Provides an abstract implementation of the <see cref="IPackage"/> interface.
+/// Provides an abstract implementation of the <see cref="IExtension"/> interface.
 /// </summary>
-public abstract class Extension : IPackage
+public abstract class Extension : IExtension
 {
     /// <inheritdoc/>
     public virtual PackageMetadata Metadata => new()

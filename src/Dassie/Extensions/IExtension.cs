@@ -10,7 +10,7 @@ namespace Dassie.Extensions;
 /// <summary>
 /// Defines a Dassie compiler extension.
 /// </summary>
-public interface IPackage
+public interface IExtension
 {
     /// <summary>
     /// The metadata of the extension.
@@ -24,7 +24,7 @@ public interface IPackage
     public virtual bool Hidden() => false;
 
     /// <summary>
-    /// If set to a non-abstract type implementing <see cref="IPackage"/>, causes this extension to act as a child
+    /// If set to a non-abstract type implementing <see cref="IExtension"/>, causes this extension to act as a child
     /// of the specified extension.
     /// </summary>
     public virtual Type ParentPackage => null;

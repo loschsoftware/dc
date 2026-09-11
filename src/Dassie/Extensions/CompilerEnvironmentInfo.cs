@@ -12,13 +12,13 @@ namespace Dassie.Extensions;
 internal class CompilerEnvironmentInfo : IEnvironmentInfo
 {
     internal Func<DassieConfig> ConfigurationFunc { get; set; } = () => null;
-    internal Func<IEnumerable<IPackage>> ExtensionsFunc { get; set; } = () => [];
+    internal Func<IEnumerable<IExtension>> ExtensionsFunc { get; set; } = () => [];
 
     /// <inheritdoc/>
     public DassieConfig Configuration() => ConfigurationFunc();
 
     /// <inheritdoc/>
-    public IEnumerable<IPackage> InstalledExtensions() => ExtensionsFunc();
+    public IEnumerable<IExtension> InstalledExtensions() => ExtensionsFunc();
 
     /// <inheritdoc/>
     public Dictionary<string, object> GlobalConfiguration()

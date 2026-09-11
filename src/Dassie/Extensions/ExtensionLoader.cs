@@ -39,7 +39,7 @@ internal static class ExtensionLoader
     public static string DefaultExtensionSource => field ??= Directory.CreateDirectory(GetProperty("Locations.Extensions") ?? _extensionsDefaultPath).FullName;
     public static string GlobalToolsPath => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Tools")).FullName;
 
-    public static ObservableCollection<IPackage> InstalledExtensions
+    public static ObservableCollection<IExtension> InstalledExtensions
     {
         get => field;
         set
@@ -140,9 +140,9 @@ internal static class ExtensionLoader
         if (_commands == null || !_commands.Any())
             return;
 
-        Dictionary<string, (ICompilerCommand command, IPackage package)> seenCommands = [];
+        Dictionary<string, (ICompilerCommand command, IExtension package)> seenCommands = [];
 
-        foreach (IPackage package in InstalledExtensions)
+        foreach (IExtension package in InstalledExtensions)
         {
             foreach (ICompilerCommand cmd in package.Commands())
             {
@@ -174,7 +174,7 @@ internal static class ExtensionLoader
         }
     }
 
-    private static List<IPackage> LoadInstalledExtensions()
+    private static List<IExtension> LoadInstalledExtensions()
     {
         if (File.Exists(Path.Combine(DefaultExtensionSource, "RemovalList.txt")))
         {
@@ -201,7 +201,7 @@ internal static class ExtensionLoader
             File.Delete(Path.Combine(DefaultExtensionSource, "RenameList.txt"));
         }
 
-        List<IPackage> packages = [];
+        List<IExtension> packages = [];
 
         string enableExtensionsStr = GetProperty("EnableExtensions");
         string enableCorePackageStr = GetProperty("EnableCorePackage");
@@ -221,7 +221,7 @@ internal static class ExtensionLoader
 
     private static void InitializeGlobalExtensions()
     {
-        foreach (IPackage package in InstalledExtensions)
+        foreach (IExtension package in InstalledExtensions)
         {
             int ret;
 
@@ -274,9 +274,9 @@ internal static class ExtensionLoader
         foreach ((string path, List<XmlAttribute> attribs, List<XmlElement> elems) in paths)
         {
             EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_TransientExtensionLoaded), [path], 2, true);
-            List<IPackage> packages = LoadInstalledExtensions(path);
+            List<IExtension> packages = LoadInstalledExtensions(path);
 
-            foreach (IPackage package in packages)
+            foreach (IExtension package in packages)
             {
                 int ret = -1;
 
@@ -328,7 +328,7 @@ internal static class ExtensionLoader
                         nameof(StringHelper.ExtensionLoader_DuplicateMode), [package.Metadata.Name],
                         CompilerExecutableName);
 
-                    IPackage duplicate = InstalledExtensions.First(p => p.Metadata.Id == package.Metadata.Id);
+                    IExtension duplicate = InstalledExtensions.First(p => p.Metadata.Id == package.Metadata.Id);
                     Unload(duplicate);
                     InstalledExtensions.Remove(duplicate);
                 }
@@ -338,7 +338,7 @@ internal static class ExtensionLoader
         }
     }
 
-    public static List<IPackage> LoadInstalledExtensions(string assembly)
+    public static List<IExtension> LoadInstalledExtensions(string assembly)
     {
         if (!File.Exists(assembly))
         {
@@ -350,16 +350,16 @@ internal static class ExtensionLoader
             return [];
         }
 
-        List<IPackage> packages = [];
+        List<IExtension> packages = [];
         Assembly extensionAssembly = Assembly.LoadFile(assembly);
 
         try
         {
-            Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPackage))).ToArray();
+            Type[] packageTypes = extensionAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IExtension))).ToArray();
 
             foreach (Type t in packageTypes)
             {
-                IPackage package = (IPackage)Activator.CreateInstance(t);
+                IExtension package = (IExtension)Activator.CreateInstance(t);
                 packages.Add(package);
             }
         }
@@ -374,7 +374,7 @@ internal static class ExtensionLoader
         return packages;
     }
 
-    public static void Unload(IPackage package)
+    public static void Unload(IExtension package)
     {
         if (!InstalledExtensions.Contains(package))
             return;
@@ -404,7 +404,7 @@ internal static class ExtensionLoader
         if (InstalledExtensions == null)
             return;
 
-        foreach (IPackage package in InstalledExtensions.ToArray())
+        foreach (IExtension package in InstalledExtensions.ToArray())
             Unload(package);
     }
 
@@ -420,7 +420,7 @@ internal static class ExtensionLoader
         return false;
     }
 
-    public static void ActivateBuildLogWriters(List<IPackage> packages)
+    public static void ActivateBuildLogWriters(List<IExtension> packages)
     {
         if (packages == null)
             return;

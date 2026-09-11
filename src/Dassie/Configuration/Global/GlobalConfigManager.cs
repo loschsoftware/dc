@@ -98,7 +98,7 @@ internal static class GlobalConfigManager
             if (unknownModules.Contains(module.Name.LocalName))
                 continue;
 
-            IPackage package = ExtensionLoader.InstalledExtensions.First(p => p.Metadata.Name.Equals(module.Name.LocalName, StringComparison.OrdinalIgnoreCase));
+            IExtension package = ExtensionLoader.InstalledExtensions.First(p => p.Metadata.Name.Equals(module.Name.LocalName, StringComparison.OrdinalIgnoreCase));
             GlobalConfigProperty[] properties = package.GlobalProperties();
 
             foreach (GlobalConfigProperty prop in properties)

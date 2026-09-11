@@ -15,7 +15,7 @@ namespace Dassie.Core;
 /// <summary>
 /// Acts as an extension package for all built-in commands, project templates, build log devices, compiler directives, subsystems and actions.
 /// </summary>
-public class CorePackage : IPackage
+public class CorePackage : IExtension
 {
     private static CorePackage _instance;
     internal static CorePackage Instance => _instance ??= new();

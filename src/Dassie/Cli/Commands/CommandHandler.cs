@@ -46,7 +46,7 @@ internal static class CommandHandler
 
         if (ExtensionLoader.Commands.Count(c => c.Role == CommandRole.Help) > 1)
         {
-            IPackage containingPackage = ExtensionLoader.InstalledExtensions.First(p => p.Commands().Contains(helpCommand));
+            IExtension containingPackage = ExtensionLoader.InstalledExtensions.First(p => p.Commands().Contains(helpCommand));
 
             EmitWarningMessageFormatted(
                 0, 0, 0,
@@ -93,7 +93,7 @@ internal static class CommandHandler
 
         if (ExtensionLoader.Commands.Where(c => c.Role == CommandRole.Default).Count() > 1)
         {
-            IPackage containingPackage = ExtensionLoader.InstalledExtensions.First(p => p.Commands().Contains(defaultCommand));
+            IExtension containingPackage = ExtensionLoader.InstalledExtensions.First(p => p.Commands().Contains(defaultCommand));
 
             EmitWarningMessageFormatted(
                 0, 0, 0,
