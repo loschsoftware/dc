@@ -27,7 +27,7 @@ public interface IExtension
     /// If set to a non-abstract type implementing <see cref="IExtension"/>, causes this extension to act as a child
     /// of the specified extension.
     /// </summary>
-    public virtual Type ParentPackage => null;
+    public virtual Type ParentExtension => null;
 
     /// <summary>
     /// Specifies the modes the extension can be loaded in.

@@ -16,7 +16,7 @@ public class GermanLanguageExtension : Extension
         Version = VersionCommand.GetFriendlyVersion(Assembly.GetExecutingAssembly().GetName().Version ?? new(1, 0))
     };
 
-    public override Type ParentPackage => typeof(CorePackage);
+    public override Type ParentExtension => typeof(CorePackage);
 
     private readonly IResourceProvider<string>[] _providers = [new ResourceProvider()];
     public override IResourceProvider<string>[] LocalizationResourceProviders() => _providers;

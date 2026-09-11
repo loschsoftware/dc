@@ -116,9 +116,9 @@ internal class PackageCommand : CompilerCommand
 
         foreach (IExtension package in packages)
         {
-            if (package.ParentPackage != null && packages.Any(p => p.GetType().Equals(package.ParentPackage)))
+            if (package.ParentExtension != null && packages.Any(p => p.GetType().Equals(package.ParentExtension)))
             {
-                IExtension parent = packages.First(p => p.GetType().Equals(package.ParentPackage));
+                IExtension parent = packages.First(p => p.GetType().Equals(package.ParentExtension));
                 if (!displayedPackages.TryAdd(parent, [package]))
                     displayedPackages[parent].Add(package);
                 continue;
@@ -181,7 +181,7 @@ internal class PackageCommand : CompilerCommand
         }
 
         IExtension package = packages.First(p => p.Metadata.Name == name);
-        IExtension parent = packages.FirstOrDefault(p => p.GetType().Equals(package.ParentPackage));
+        IExtension parent = packages.FirstOrDefault(p => p.GetType().Equals(package.ParentExtension));
 
         void SetUnderline()
         {

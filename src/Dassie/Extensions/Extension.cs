@@ -23,7 +23,7 @@ public abstract class Extension : IExtension
     public virtual bool Hidden() => false;
 
     /// <inheritdoc/>
-    public virtual Type ParentPackage => null;
+    public virtual Type ParentExtension => null;
 
     /// <inheritdoc/>
     public virtual ExtensionModes Modes() => ExtensionModes.Global | ExtensionModes.Transient;
