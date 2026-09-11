@@ -11,15 +11,19 @@ namespace Dassie.Resources;
 /// </summary>
 internal static partial class StringHelper
 {
+    private static readonly string _fallbackLanguageName = "en-US";
+
     private static IResourceProvider<string> _globalProvider;
-    private static readonly Dictionary<string, IResourceProvider<string>> _localProviders = [];
+    private static Dictionary<string, IResourceProvider<string>> _localProviders;
 
     /// <summary>
     /// Initializes the string registry for the current language.
     /// </summary>
     public static void Initialize()
     {
-        string languageName = "en-US";
+        _localProviders = ExtensionLoader.InstalledExtensions.Select(e => new KeyValuePair<string, IResourceProvider<string>>(e.Metadata?.PackageIdentity, null)).ToDictionary();
+
+        string languageName = _fallbackLanguageName;
 
         if (LanguageProperty.Instance.IsRegistered)
             languageName = (string)LanguageProperty.Instance.GetValue();
@@ -42,9 +46,18 @@ internal static partial class StringHelper
                 return;
         }
 
+        foreach (KeyValuePair<string, IResourceProvider<string>> kvp in _localProviders.Where(l => l.Value == null))
+        {
+            IExtension ext = ExtensionLoader.InstalledExtensions.First(e => e.Metadata?.PackageIdentity == kvp.Key);
+            if (ext.LocalizationResourceProviders()?.Any(l => l.Culture == _fallbackLanguageName) == false)
+                continue;
+
+            AddLocalProvider(kvp.Key, ext.LocalizationResourceProviders()?.First(l => l.Culture == _fallbackLanguageName));
+        }
+
         void NotFound()
         {
-            if (languageName != "en-US")
+            if (languageName != _fallbackLanguageName)
             {
                 EmitWarningMessageFormatted(
                     0, 0, 0,
@@ -53,7 +66,7 @@ internal static partial class StringHelper
                     CompilerExecutableName);
             }
 
-            _globalProvider = DefaultStrings.Instance;
+            AddGlobalProvider(DefaultStrings.Instance);
         }
 
         string probeDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Dassie", "Localization");
@@ -108,6 +121,12 @@ internal static partial class StringHelper
             return;
 
         IResourceProvider<string> existingProvider = _localProviders[id];
+
+        if (existingProvider == null)
+        {
+            _localProviders[id] = provider;
+            return;
+        }
 
         if (existingProvider is MutableStringProvider msp)
         {
@@ -170,7 +189,7 @@ internal static partial class StringHelper
     {
         if (_localProviders.TryGetValue(package, out IResourceProvider<string> provider))
         {
-            if (provider.Resources.TryGetValue(id, out string str))
+            if (provider != null && provider.Resources.TryGetValue(id, out string str))
                 return str;
         }
 
