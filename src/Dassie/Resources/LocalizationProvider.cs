@@ -52,4 +52,25 @@ public class LocalizationProvider
     {
         return StringHelper.FormatLocal(_packageId, id, args);
     }
+
+    /// <summary>
+    /// Retrieves a string resource from the global resource provider.
+    /// </summary>
+    /// <param name="id">The resource key to look up.</param>
+    /// <returns>The localized string whose local key is equal to <paramref name="id"/>.</returns>
+    public static string GetStringGlobal(string id)
+    {
+        return StringHelper.GetString(id);
+    }
+
+    /// <summary>
+    /// Formats a localized string from the global resource provider.
+    /// </summary>
+    /// <param name="id">The key of the string to format.</param>
+    /// <param name="args">The arguments used for formatting.</param>
+    /// <returns>The formatted localized string whose local key is equal to <paramref name="id"/>.</returns>
+    public static string FormatGlobal(string id, params object[] args)
+    {
+        return StringHelper.Format(id, args);
+    }
 }
