@@ -67,10 +67,10 @@ internal class PackageSourceCommand : CompilerCommand
             return RemoveExtensionSource(args[1..]);
 
         if (command == "enable" && args.Length > 1)
-            return RemoveExtensionSource(args[1..]);
+            return EnableExtensionSource(args[1..]);
 
         if (command == "disable" && args.Length > 1)
-            return RemoveExtensionSource(args[1..]);
+            return DisableExtensionSource(args[1..]);
 
         if (command == "set-primary" && args.Length > 1)
             return SetPrimarySource(args[1..]);
