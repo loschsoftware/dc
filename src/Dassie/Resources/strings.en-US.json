@@ -542,7 +542,8 @@
   "PackageCommand_ImportDescription": "Installs an extension from the specified file path. Use the -o flag to overwrite existing extensions.",
   "PackageCommand_RemoveDescription": "Uninstalls the specified extension package.",
   "PackageCommand_UpdateDescription": "Updates the specified extension to the newest version.",
-  "PackageCommand_HelpDetailsDescription": "Used to install and manage compiler extensions.",
+  "PackageCommand_SourceDescription": "Manages extension package sources. Use 'dc package source --help' for more information.",
+  "PackageCommand_HelpDetailsDescription": "Installs and manages compiler extensions.",
   "PackageCommand_CommandOption": "The subcommand to execute.",
   "PackageCommand_OptionsOption": "Additional options to pass to the subcommand.",
   "PackageCommand_AvailableCommands": "Available commands",
@@ -551,6 +552,7 @@
   "PackageCommand_Example3": "Installs the extension 'MyExtension' from the package repository.",
   "PackageCommand_Example4": "Installs an extension from the specified file path.",
   "PackageCommand_Example5": "Uninstalls the extension 'MyExtension'.",
+  "PackageCommand_Example6": "Displays available options for 'dc package source'.",
   "PackageCommand_NoExtensionsInstalled": "No extensions installed.",
   "PackageCommand_InstalledModulesAndExtensions": "Installed modules and extensions:",
   "PackageCommand_Name": "Name",
@@ -816,5 +818,16 @@
   "DocumentTransformHandler_BuildLogMessage": "Transformed documents {0} -> {1} through document transformer '{2}'.",
 
   "ScriptRunner_InvokingAssembly": "Invoking assembly '{0}'.",
-  "ScriptRunner_ScriptIsCached": "Script is cached, skipping rebuild."
+  "ScriptRunner_ScriptIsCached": "Script is cached, skipping rebuild.",
+
+  "PackageSourceCommand_Description": "Manages extension package sources.",
+  "PackageSourceCommand_ListDescription": "Lists all installed package sources.",
+  "PackageSourceCommand_AddDescription": "Adds a new package source from the specified URI and sets a local name.",
+  "PackageSourceCommand_RemoveDescription": "Uninstalls the specified package source.",
+  "PackageSourceCommand_EnableDescription": "Enables the specified package source.",
+  "PackageSourceCommand_DisableDescription": "Disables the specified package source.",
+  "PackageSourceCommand_SetPrimaryDescription": "Sets the specified package source as the primary source.",
+  "PackageSourceCommand_Example1": "Lists all installed package sources.",
+  "PackageSourceCommand_Example2": "Adds the package source 'default' from the specified URI.",
+  "PackageSourceCommand_Example3": "Disables the package source 'source1'."
 }

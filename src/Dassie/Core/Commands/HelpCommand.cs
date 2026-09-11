@@ -310,7 +310,7 @@ internal class HelpCommand : CompilerCommand
         }
 
         sb.AppendLine();
-        sb.AppendLine($"dc{parentCommandSb.ToString()}{command.Command}: {(string.IsNullOrEmpty(hd.Description) ? command.Description : hd.Description)}");
+        sb.AppendLine($"{CompilerExecutableName}{parentCommandSb.ToString()}{command.Command}: {(string.IsNullOrEmpty(hd.Description) ? command.Description : hd.Description)}");
 
         if (command.Aliases != null && command.Aliases.Count > 0)
             sb.AppendLine($"{(command.Aliases.Count > 1 ? StringHelper.HelpCommand_AliasPlural : StringHelper.HelpCommand_AliasSingular)} {(command.Aliases.Count == 1 ? command.Aliases.Single() : string.Join(", ", command.Aliases))}");

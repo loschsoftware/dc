@@ -15,16 +15,23 @@
   <Project Path="src/Dassie.Generators/Dassie.Generators.csproj">
     <Platform Solution="Debug|x64" Project="x64" />
   </Project>
-  <Project Path="src/Dassie.Tests/Dassie.Tests.csproj" Id="f56f4ca6-c7ae-41ac-b613-1a933b14fbb6">
-    <Platform Solution="*|x64" Project="x64" />
-  </Project>
   <Project Path="src/Dassie.Text/Dassie.Text.csproj">
-    <Platform Solution="Debug|x64" Project="x64" />
+      <Platform Solution="Debug|x64" Project="x64" />
   </Project>
   <Project Path="src/Dassie/Dassie.csproj">
     <Platform Solution="Debug|x64" Project="x64" />
   </Project>
-  <Project Path="src/extensions/Dassie.Language.de-DE/Dassie.Language.de-DE.csproj">
-    <Platform Solution="Debug|x64" Project="x64" />
-  </Project>
+  <Folder Name="/Extensions/">
+    <Project Path="src/Extensions/Dassie.Extensions.Pack/Dassie.Extensions.Pack.csproj">
+      <Platform Solution="Debug|x64" Project="x64" />
+    </Project>
+    <Project Path="src/Extensions/Dassie.Language.de-DE/Dassie.Language.de-DE.csproj">
+      <Platform Solution="Debug|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/Dassie.Tests/Dassie.Tests.csproj" Id="f56f4ca6-c7ae-41ac-b613-1a933b14fbb6">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
 </Solution>

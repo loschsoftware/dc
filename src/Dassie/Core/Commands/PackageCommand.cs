@@ -2,7 +2,6 @@
 using Dassie.Extensions;
 using Dassie.Extensions.Web;
 using Microsoft.VisualBasic.FileIO;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +22,9 @@ internal class PackageCommand : CompilerCommand
 
     public override string Description => StringHelper.PackageCommand_Description;
 
+    public override CommandOptions Options => CommandOptions.NoListSubcommands;
+    public override IReadOnlyList<ICompilerCommand> Subcommands => [PackageSourceCommand.Instance];
+
     public override CommandHelpDetails HelpDetails => GetHelpDetails();
     private static CommandHelpDetails GetHelpDetails()
     {
@@ -33,6 +35,7 @@ internal class PackageCommand : CompilerCommand
         commandsSb.Append($"{"    import <Path> [-o] [-g]",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_ImportDescription, indentWidth: 35)}");
         commandsSb.Append($"{"    remove <Name>",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_RemoveDescription, indentWidth: 35)}");
         commandsSb.Append($"{"    update <Name>",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_UpdateDescription, indentWidth: 35)}");
+        commandsSb.Append($"{"    source [Options]",-35}{HelpCommand.FormatLines(StringHelper.PackageCommand_SourceDescription, indentWidth: 35)}");
 
         return new()
         {
@@ -53,7 +56,8 @@ internal class PackageCommand : CompilerCommand
                 ("dc package info MyExtension", StringHelper.PackageCommand_Example2),
                 ("dc package install MyExtension", StringHelper.PackageCommand_Example3),
                 ("dc package import ./extension.dll", StringHelper.PackageCommand_Example4),
-                ("dc package remove MyExtension", StringHelper.PackageCommand_Example5)
+                ("dc package remove MyExtension", StringHelper.PackageCommand_Example5),
+                ("dc package source --help", StringHelper.PackageCommand_Example6)
             ]
         };
     }
@@ -97,6 +101,9 @@ internal class PackageCommand : CompilerCommand
 
         if (command == "update" && args.Length > 1)
             return Update(args[1]);
+
+        if (command == "source" && args.Length > 1) // Shouldn't happen, but better safe than sorry
+            return PackageSourceCommand.Instance.Invoke(args[1..]);
 
         return ShowUsage();
     }
@@ -387,5 +394,5 @@ internal class PackageCommand : CompilerCommand
         return -1;
     }
 
-    private static int ShowUsage() => HelpCommand.Instance.Invoke(["package"]);
+    private static int ShowUsage() => HelpCommand.DisplayHelpForCommand(Instance);
 }

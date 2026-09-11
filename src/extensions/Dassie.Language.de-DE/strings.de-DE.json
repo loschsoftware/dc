@@ -542,6 +542,7 @@
   "PackageCommand_ImportDescription": "Installiert eine Erweiterung aus dem angegebenen Dateipfad. Verwenden Sie das Flag -o, um vorhandene Erweiterungen zu überschreiben.",
   "PackageCommand_RemoveDescription": "Deinstalliert das angegebene Erweiterungspaket.",
   "PackageCommand_UpdateDescription": "Aktualisiert die angegebene Erweiterung auf die neueste Version.",
+  "PackageCommand_SourceDescription": "Verwaltet Paketquellen. Für weitere Informationen, siehe 'dc package source --help'.",
   "PackageCommand_HelpDetailsDescription": "Wird zum Installieren und Verwalten von Compilererweiterungen verwendet.",
   "PackageCommand_CommandOption": "Der auszuführende Unterbefehl.",
   "PackageCommand_OptionsOption": "Zusätzliche Optionen, die an den Unterbefehl übergeben werden.",
@@ -551,6 +552,7 @@
   "PackageCommand_Example3": "Installiert die Erweiterung 'MyExtension' aus dem Paket-Repository.",
   "PackageCommand_Example4": "Installiert eine Erweiterung aus dem angegebenen Dateipfad.",
   "PackageCommand_Example5": "Deinstalliert die Erweiterung 'MyExtension'.",
+  "PackageCommand_Example6": "Zeigt verfügbare Optionen für 'dc package source' an.",
   "PackageCommand_NoExtensionsInstalled": "Keine Erweiterungen installiert.",
   "PackageCommand_InstalledModulesAndExtensions": "Installierte Module und Erweiterungen:",
   "PackageCommand_Name": "Name",
@@ -816,5 +818,16 @@
   "DocumentTransformHandler_BuildLogMessage": "Dokumente {0} wurden nach {1} transformiert durch Transformator '{2}'.",
 
   "ScriptRunner_InvokingAssembly": "Assembly '{0}' wird ausgeführt.",
-  "ScriptRunner_ScriptIsCached": "Skript ist im Cache, Build wird übersprungen."
+  "ScriptRunner_ScriptIsCached": "Skript ist im Cache, Build wird übersprungen.",
+
+  "PackageSourceCommand_Description": "Verwaltet Paketquellen für Compilererweiterungen.",
+  "PackageSourceCommand_ListDescription": "Zeigt eine Liste aller installierten Paketquellen an.",
+  "PackageSourceCommand_AddDescription": "Registriert die Paketquelle von der angegebenen URI mit einem lokalen Namen.",
+  "PackageSourceCommand_RemoveDescription": "Entfernt die angegebene Paketquelle.",
+  "PackageSourceCommand_EnableDescription": "Aktiviert die angegebene Paketquelle.",
+  "PackageSourceCommand_DisableDescription": "Deaktiviert die angegebene Paketquelle.",
+  "PackageSourceCommand_SetPrimaryDescription": "Legt die angegebene Paketquelle als primäre Quelle fest.",
+  "PackageSourceCommand_Example1": "Zeigt eine Liste aller installierten Paketquellen an.",
+  "PackageSourceCommand_Example2": "Fügt die Paketquelle 'default' von der angegebenen URI hinzu.",
+  "PackageSourceCommand_Example3": "Deaktiviert die Paketquelle 'source1'."
 }
