@@ -2,6 +2,7 @@
 using Dassie.CodeAnalysis;
 using Dassie.Configuration;
 using Dassie.Core;
+using Dassie.Core.Properties;
 using Dassie.Messages.Devices;
 using NuGet.Packaging;
 using System;
@@ -28,7 +29,8 @@ internal static class ExtensionLoader
     private static readonly IEnvironmentInfo _env = new CompilerEnvironmentInfo()
     {
         ConfigurationFunc = () => Context.Configuration,
-        ExtensionsFunc = () => InstalledExtensions
+        ExtensionsFunc = () => InstalledExtensions,
+        UICultureFunc = () => new(LanguageProperty.Instance.GetValue().ToString())
     };
 
     private static readonly string _extensionsDefaultPath = Path.Combine(
@@ -115,9 +117,6 @@ internal static class ExtensionLoader
         _localizationResourceProviders = InstalledExtensions.SelectMany(p => p.LocalizationResourceProviders());
         _properties = InstalledExtensions.SelectMany(p => p.Properties());
         _documentTransformers = InstalledExtensions.SelectMany(p => p.DocumentTransformers());
-
-        foreach (ICompilerCommand command in _commands)
-            HandleSubcommands(command);
     }
 
     private static void HandleSubcommands(ICompilerCommand command)
@@ -144,7 +143,7 @@ internal static class ExtensionLoader
 
         foreach (IExtension package in InstalledExtensions)
         {
-            foreach (ICompilerCommand cmd in package.Commands())
+            foreach (ICompilerCommand cmd in package.Commands().Where(c => c is not null))
             {
                 if (seenCommands.TryGetValue(cmd.Command, out var existing))
                 {
@@ -214,6 +213,9 @@ internal static class ExtensionLoader
 
         if (enableCorePackageStr == null || (bool.TryParse(enableCorePackageStr, out bool enableCorePackage) && enableCorePackage))
             packages.Insert(0, CorePackage.Instance);
+
+        foreach (ICompilerCommand command in _commands)
+            HandleSubcommands(command);
 
         ActivateBuildLogWriters(packages);
         return packages;

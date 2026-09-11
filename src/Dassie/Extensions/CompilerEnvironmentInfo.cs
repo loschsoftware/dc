@@ -2,6 +2,7 @@
 using Dassie.Configuration.Global;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Dassie.Extensions;
@@ -13,6 +14,7 @@ internal class CompilerEnvironmentInfo : IEnvironmentInfo
 {
     internal Func<DassieConfig> ConfigurationFunc { get; set; } = () => null;
     internal Func<IEnumerable<IExtension>> ExtensionsFunc { get; set; } = () => [];
+    internal Func<CultureInfo> UICultureFunc { get; set; } = () => CultureInfo.InvariantCulture;
 
     /// <inheritdoc/>
     public DassieConfig Configuration() => ConfigurationFunc();
@@ -25,4 +27,7 @@ internal class CompilerEnvironmentInfo : IEnvironmentInfo
     {
         return GlobalConfigManager.Properties.Select(t => new KeyValuePair<string, object>(t.Key, t.Value)).ToDictionary();
     }
+
+    /// <inheritdoc/>
+    public CultureInfo UICulture => UICultureFunc();
 }

@@ -1,5 +1,6 @@
 ﻿using Dassie.Configuration;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Dassie.Extensions;
 
@@ -25,4 +26,9 @@ public interface IEnvironmentInfo
     /// </summary>
     /// <returns>An enumerable of compiler extensions that are currently loaded.</returns>
     public IEnumerable<IExtension> InstalledExtensions();
+
+    /// <summary>
+    /// Retrieves the current UI culture.
+    /// </summary>
+    public CultureInfo UICulture { get; }
 }

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("lsedit")]
 [assembly: InternalsVisibleTo("Dassie.Compiler")]
 [assembly: InternalsVisibleTo("Dassie.Language.de-DE")]
+[assembly: InternalsVisibleTo("Dassie.Extensions.Pack")]
 [assembly: InternalsVisibleTo("Dassie.Tests")]
 
 [assembly: AssemblyVersion("1.0.*")]
