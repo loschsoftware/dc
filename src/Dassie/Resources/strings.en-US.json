@@ -431,7 +431,7 @@
   "CompileCommand_RunningScriptFile": "Running script file '{0}'. Log verbosity is {1}.",
   "CompileCommand_CompilationEngine": "Using compilation engine '{0}'.",
 
-  "ConfigCommand_Description": "Manages compiler settings and project configurations.",
+  "ConfigCommand_Description": "Manages compiler settings and project configuration.",
   "ConfigCommand_PropertyOption": "The property to modify. Multiple can be specified, separated by spaces. The value is optional, if omitted, the default value is used. Note that the equals sign (=) is still required.",
   "ConfigCommand_GlobalOption": "Indicates that the operation displays or modifies the global configuration, as opposed to a project file.",
   "ConfigCommand_ResetOption": "Resets all global properties to their default value.",
