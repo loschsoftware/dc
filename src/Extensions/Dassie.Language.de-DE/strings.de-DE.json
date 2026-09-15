@@ -298,6 +298,7 @@
   "ExtensionLoader_TransientExtensionLoaded": "Transiente Erweiterung '{0}' geladen.",
   "ExtensionLoader_ExtensionLoaded": "Erweiterung '{0}' geladen.",
   "ExtensionLoader_ExtensionUnloaded": "Erweiterung '{0}' entladen.",
+  "ExtensionLoader_SafeMode": "Sicherer Modus ist aktiviert. Externe Pakete werden nicht geladen.",
 
   "ReferenceHandler_CompilingProjectReference": "Projektreferenz '{0}' wird kompiliert.",
   "ReferenceHandler_ProjectReferenceCompilationEnded": "Buildvorgang der Projektreferenz '{0}' mit Code {1} beendet.",

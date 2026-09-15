@@ -35,4 +35,7 @@ public class PackExtension : Extension
 
     private readonly IResourceProvider<string>[] _stringProviders = [new Strings_deDE(), new Strings_enUS()];
     public override IResourceProvider<string>[] LocalizationResourceProviders() => _stringProviders;
+
+    // TODO: Subsytem & Project template for extension package
+    // PackCommand handles a project, also supporting .csproj
 }

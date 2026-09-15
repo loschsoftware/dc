@@ -22,7 +22,7 @@ internal class Program
     public static void Initialize()
     {
         Console.OutputEncoding = Encoding.Unicode;
-        ExtensionLoader.Initialize();
+        ExtensionLoader.Initialize(EnvironmentVariableHelpers.GetBoolEnvVar("DC_SAFE_MODE"));
         GlobalConfigManager.Initialize();
         StringHelper.Initialize();
     }

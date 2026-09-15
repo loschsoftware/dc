@@ -18,10 +18,10 @@ namespace Dassie.Extensions;
 
 internal static class ExtensionLoader
 {
-    public static void Initialize()
+    public static void Initialize(bool safeMode = false)
     {
         InstalledExtensions = [];
-        InstalledExtensions.AddRange(LoadInstalledExtensions());
+        InstalledExtensions.AddRange(LoadInstalledExtensions(safeMode));
         InstalledExtensions.CollectionChanged += Update;
         InitializeGlobalExtensions();
     }
@@ -173,7 +173,7 @@ internal static class ExtensionLoader
         }
     }
 
-    private static List<IExtension> LoadInstalledExtensions()
+    private static List<IExtension> LoadInstalledExtensions(bool safeMode = false)
     {
         if (File.Exists(Path.Combine(DefaultExtensionSource, "RemovalList.txt")))
         {
@@ -205,7 +205,7 @@ internal static class ExtensionLoader
         string enableExtensionsStr = GetProperty("EnableExtensions");
         string enableCorePackageStr = GetProperty("EnableCorePackage");
 
-        if (enableExtensionsStr == null || (bool.TryParse(enableExtensionsStr, out bool enableExtensions) && enableExtensions))
+        if (!safeMode && (enableExtensionsStr == null || (bool.TryParse(enableExtensionsStr, out bool enableExtensions) && enableExtensions)))
         {
             foreach (string file in Directory.EnumerateFiles(DefaultExtensionSource, "*.dll", SearchOption.AllDirectories))
                 packages.AddRange(LoadInstalledExtensions(file));
@@ -218,6 +218,10 @@ internal static class ExtensionLoader
             HandleSubcommands(command);
 
         ActivateBuildLogWriters(packages);
+
+        if (safeMode)
+            EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_SafeMode), [], 2);
+
         return packages;
     }
 

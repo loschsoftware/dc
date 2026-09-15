@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using static Dassie.Cli.EnvironmentVariableHelpers;
 
 namespace Dassie.Messages;
 
@@ -155,22 +156,6 @@ public static class MessageWriter
 
     private static int GetVerbosityFromEnvironmentVariable()
     {
-        static bool GetBoolEnvVar(string name)
-        {
-            return Environment.GetEnvironmentVariable(name) is string val && ToBool(val);
-        }
-
-        static bool ToBool(string str)
-        {
-            if (bool.TryParse(str, out bool b))
-                return b;
-
-            if (int.TryParse(str, out int i))
-                return i > 0;
-
-            return false;
-        }
-
         List<int> candidates = [0];
 
         if (GetBoolEnvVar("DC_TRACE")
@@ -229,7 +214,7 @@ public static class MessageWriter
         Context.ConfigurationPath ??= ProjectConfigurationFileName;
         Context.Configuration.IgnoredMessages ??= [];
 
-        if (Context.Configuration.Verbosity < 1)
+        if (Verbosity < 1)
             return;
 
         error.Location = (error.Location.Line + LineNumberOffset, error.Location.Column);

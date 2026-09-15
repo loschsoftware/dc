@@ -298,6 +298,7 @@
   "ExtensionLoader_TransientExtensionLoaded": "Loaded transient extension '{0}'.",
   "ExtensionLoader_ExtensionLoaded": "Loaded extension '{0}'.",
   "ExtensionLoader_ExtensionUnloaded": "Unloaded extension '{0}'.",
+  "ExtensionLoader_SafeMode": "Safe mode enabled. Loading of external packages is disabled.",
 
   "ReferenceHandler_CompilingProjectReference": "Compiling project reference '{0}'.",
   "ReferenceHandler_ProjectReferenceCompilationEnded": "Compilation of project reference '{0}' ended with exit code {1}.",
