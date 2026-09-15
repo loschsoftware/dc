@@ -40,18 +40,7 @@ internal class Program
         try
         {
             Initialize();
-
-            args ??= [];
-            if (args.Length == 0)
-                exit = CommandHandler.InvokeHelpCommand(args);
-            else
-            {
-                string command = args[0];
-                if (CommandHandler.TryInvoke(command, args[1..], out int ret))
-                    exit = ret;
-                else
-                    exit = CommandHandler.InvokeDefaultCommand(args);
-            }
+            CommandHandler.HandleCommandLineArguments(args);
         }
         catch (Exception ex)
         {

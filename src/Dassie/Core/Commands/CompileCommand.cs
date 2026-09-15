@@ -1,5 +1,6 @@
 ﻿using Dassie.Aot;
 using Dassie.Cli;
+using Dassie.Cli.Commands;
 using Dassie.CodeGeneration;
 using Dassie.CodeGeneration.Auxiliary;
 using Dassie.Configuration;
@@ -75,7 +76,14 @@ internal class CompileCommand : CompilerCommand
         };
     }
 
-    public override int Invoke(string[] args) => Compile(args);
+    public override int Invoke(string[] args)
+    {
+        if (args == null || args.Length == 0)
+            return CommandHandler.InvokeHelpCommand(args);
+
+        return Compile(args);
+    }
+
     public int Invoke(string[] args, DassieConfig overrideSettings, string assemblyName = null)
     {
         DassieConfig prevConfig = Context?.Configuration;

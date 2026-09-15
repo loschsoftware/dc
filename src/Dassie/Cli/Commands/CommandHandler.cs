@@ -105,6 +105,14 @@ internal static class CommandHandler
         return defaultCommand.Invoke(args);
     }
 
+    public static int HandleCommandLineArguments(string[] args)
+    {
+        if (args?.Length == 0 || !TryInvoke(args[0], args[1..], out int exit))
+            return InvokeDefaultCommand(args);
+
+        return exit;
+    }
+
     private static bool MatchCommandName(ICompilerCommand command, string name) => command.Command == name || command.Aliases.Contains(name);
 
     /// <summary>
