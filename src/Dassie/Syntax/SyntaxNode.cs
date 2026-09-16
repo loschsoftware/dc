@@ -608,11 +608,11 @@ internal record LiteralExpressionSyntax : ExpressionSyntax
 internal record ProcessedStringExpressionSyntax : ExpressionSyntax
 {
     public override SyntaxKind Kind => SyntaxKind.ProcessedStringExpression;
-    public LiteralExpressionSyntax StringLiteral { get; init; }
+    public ExpressionSyntax Expression { get; init; }
     public SyntaxToken ColonToken { get; init; }
     public SyntaxToken IdentifierToken { get; init; }
 
-    public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(StringLiteral, ColonToken, IdentifierToken);
+    public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(Expression, ColonToken, IdentifierToken);
 }
 
 internal record InterpolatedStringExpressionSyntax : ExpressionSyntax
