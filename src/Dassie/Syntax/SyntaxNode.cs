@@ -605,6 +605,25 @@ internal record LiteralExpressionSyntax : ExpressionSyntax
     public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(LiteralToken);
 }
 
+internal record ProcessedStringExpressionSyntax : ExpressionSyntax
+{
+    public override SyntaxKind Kind => SyntaxKind.ProcessedStringExpression;
+    public LiteralExpressionSyntax StringLiteral { get; init; }
+    public SyntaxToken DotToken { get; init; }
+    public SyntaxToken IdentifierToken { get; init; }
+
+    public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren(StringLiteral, DotToken, IdentifierToken);
+}
+
+internal record InterpolatedStringExpressionSyntax : ExpressionSyntax
+{
+    public override SyntaxKind Kind => SyntaxKind.InterpolatedStringExpression;
+
+    // TODO: Define InterpolatedStringExpressionSyntax
+
+    public override IEnumerable<SyntaxNode> GetChildren() => EnumerateChildren();
+}
+
 internal record NameExpressionSyntax : ExpressionSyntax
 {
     public override SyntaxKind Kind => SyntaxKind.NameExpression;

@@ -58,6 +58,8 @@ internal enum SyntaxKind
     GenericParameterVariance,
 
     LiteralExpression,
+    ProcessedStringExpression,
+    InterpolatedStringExpression,
     NameExpression,
     ThisExpression,
     EmptyExpression,
