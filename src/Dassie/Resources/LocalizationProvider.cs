@@ -21,7 +21,7 @@ public class LocalizationProvider
     /// data from the specified extension package.
     /// </summary>
     /// <param name="packageId">The ID of the extension package providing the localization resources.</param>
-    /// <returns>An instance of <see cref="LocalizationProvider"/> for the specified packag.e</returns>
+    /// <returns>An instance of <see cref="LocalizationProvider"/> for the specified package.</returns>
     public static LocalizationProvider ForPackage(string packageId)
     {
         if (_providers.TryGetValue(packageId, out LocalizationProvider provider))
