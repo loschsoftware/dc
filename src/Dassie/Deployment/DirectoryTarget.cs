@@ -5,7 +5,7 @@ namespace Dassie.Deployment;
 
 internal class DirectoryTarget : IDeploymentTarget
 {
-    public string Name { get; set; } = "Directory";
+    public string Name => "Directory";
 
     public int Execute(DeploymentContext context)
     {

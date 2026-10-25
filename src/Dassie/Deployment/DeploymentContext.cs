@@ -17,5 +17,4 @@ public record DeploymentContext(
     DassieConfig ProjectGroup,
     DassieConfig ExecutableProject,
     List<XmlAttribute> Attributes,
-    List<XmlNode> Elements
-    );
+    List<XmlNode> Elements);

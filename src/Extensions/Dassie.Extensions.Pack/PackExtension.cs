@@ -23,7 +23,7 @@ public class PackExtension : Extension
     public override int InitializeGlobal(IEnvironmentInfo environment)
     {
         _env = environment;
-        _packCommand = new PackCommand(_env, LocalizationProvider);
+        _packCommand = new PackCommand(LocalizationProvider);
 
         return 0;
     }
