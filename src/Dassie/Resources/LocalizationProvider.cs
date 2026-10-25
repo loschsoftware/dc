@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Dassie.Extensions;
+using System.Collections.Generic;
 
 namespace Dassie.Resources;
 
@@ -31,6 +32,15 @@ public class LocalizationProvider
         _providers.Add(packageId, provider);
         return provider;
     }
+
+    /// <summary>
+    /// Creates or retrieves an instance of <see cref="LocalizationProvider"/> to provide localization
+    /// data for the specified extension package.
+    /// </summary>
+    /// <param name="extension">The extension package providing the localization resources.</param>
+    /// <returns>An instance of <see cref="LocalizationProvider"/> for the specified extension.</returns>
+    public static LocalizationProvider ForExtension(IExtension extension)
+        => ForPackage(extension.Metadata.PackageIdentity);
 
     /// <summary>
     /// Retrieves a string resource.

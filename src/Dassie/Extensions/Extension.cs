@@ -12,6 +12,12 @@ namespace Dassie.Extensions;
 /// </summary>
 public abstract class Extension : IExtension
 {
+    /// <summary>
+    /// An instance of <see cref="Resources.LocalizationProvider"/> to retrieve localization
+    /// resources for the current extension.
+    /// </summary>
+    protected LocalizationProvider LocalizationProvider => LocalizationProvider.ForExtension(this);
+
     /// <inheritdoc/>
     public virtual PackageMetadata Metadata => new()
     {

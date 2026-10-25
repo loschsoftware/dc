@@ -1,7 +1,6 @@
 ﻿using Dassie.Core.Commands;
 using Dassie.Extensions.Pack.Commands;
 using Dassie.Extensions.Pack.Resources;
-using Dassie.Resources;
 using System.Reflection;
 
 namespace Dassie.Extensions.Pack;
@@ -20,13 +19,11 @@ public class PackExtension : Extension
 
     private IEnvironmentInfo _env;
     private ICompilerCommand _packCommand;
-    private LocalizationProvider _provider;
 
     public override int InitializeGlobal(IEnvironmentInfo environment)
     {
         _env = environment;
-        _provider = new(Metadata.PackageIdentity);
-        _packCommand = new PackCommand(_env, _provider);
+        _packCommand = new PackCommand(_env, LocalizationProvider);
 
         return 0;
     }
