@@ -21,7 +21,7 @@ internal class Program
     /// </summary>
     public static void Initialize()
     {
-        Console.OutputEncoding = Encoding.Unicode;
+        Console.OutputEncoding = new UTF8Encoding(false);
         ExtensionLoader.Initialize(EnvironmentVariableHelpers.GetBoolEnvVar("DC_SAFE_MODE"));
         GlobalConfigManager.Initialize();
         StringHelper.Initialize();
