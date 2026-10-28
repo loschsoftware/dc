@@ -169,7 +169,7 @@ internal class CompileCommand : CompilerCommand
         int verbosity = Math.Clamp(Math.Max(config.Verbosity, Verbosity), 0, 3);
         ProjectFileCompatibilityTool.VerifyFormatVersionCompatibility(config);
 
-        string[] files = args.TakeWhile(a => a != "--").Where(s => !s.StartsWith('-') && !s.StartsWith('/') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
+        string[] files = args.TakeWhile(a => a != "--").Where(s => !s.StartsWith('-') && !s.StartsWith("--")).Select(PatternToFileList).SelectMany(f => f).Select(Path.GetFullPath).ToArray();
 
         // Execute script file (.dsx)
         if (!config.NoScript && files.Any(f => Path.GetExtension(f) == DassieScriptFileExtension))
