@@ -35,7 +35,7 @@ internal class Program
     [EntryPoint]
     public static int Main(string[] args)
     {
-        int exit = -1;
+        int exit = 0;
 
         try
         {
