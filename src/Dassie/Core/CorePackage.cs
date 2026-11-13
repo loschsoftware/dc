@@ -33,6 +33,14 @@ public class CorePackage : IExtension
     };
 
     /// <inheritdoc/>
+    public void Unload()
+    {
+        // This caches 'Verbosity' and related properties so 'EmitBuildLogMessageFormatted'
+        // works even once the Core package is unloaded
+        EmitBuildLogMessageFormatted(nameof(StringHelper.ExtensionLoader_UnloadingCoreExtension), [], 2);
+    }
+
+    /// <inheritdoc/>
     public ICompilerCommand[] Commands() =>
     [
         AnalyzeCommand.Instance,
