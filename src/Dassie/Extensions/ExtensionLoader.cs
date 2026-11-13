@@ -410,7 +410,7 @@ internal static class ExtensionLoader
         if (InstalledExtensions == null)
             return;
 
-        foreach (IExtension package in InstalledExtensions.ToArray())
+        foreach (IExtension package in InstalledExtensions.Reverse())
             Unload(package);
     }
 
