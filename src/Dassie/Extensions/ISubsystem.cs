@@ -13,12 +13,12 @@ public interface ISubsystem
     public string Name { get; }
 
     /// <summary>
-    /// Specifies wheter the application type is executable.
+    /// Specifies whether the application type is executable.
     /// </summary>
     public bool IsExecutable { get; }
 
     /// <summary>
-    /// Specifies wheter the application type is a Windows GUI application.
+    /// Specifies whether the application type is a Windows GUI application.
     /// </summary>
     public bool WindowsGui { get; }
 

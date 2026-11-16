@@ -30,7 +30,7 @@ public class Tooltip : IEquatable<Tooltip>
     /// </summary>
     /// <param name="left">The first tooltip.</param>
     /// <param name="right">The second tooltip.</param>
-    /// <returns>Wheter the tooltips are equal.</returns>
+    /// <returns>Whether the tooltips are equal.</returns>
     public static bool operator ==(Tooltip left, Tooltip right)
     {
         left ??= new();
@@ -44,7 +44,7 @@ public class Tooltip : IEquatable<Tooltip>
     /// </summary>
     /// <param name="left">The first tooltip.</param>
     /// <param name="right">The second tooltip.</param>
-    /// <returns>Wheter the tooltips are not equal.</returns>
+    /// <returns>Whether the tooltips are not equal.</returns>
     public static bool operator !=(Tooltip left, Tooltip right) => !(left == right);
 
     /// <summary>
@@ -61,7 +61,7 @@ public class Tooltip : IEquatable<Tooltip>
     /// Compares the current instance of <see cref="Tooltip"/> with any object.
     /// </summary>
     /// <param name="obj">The object to compare to.</param>
-    /// <returns>Wheter the objects are equal.</returns>
+    /// <returns>Whether the objects are equal.</returns>
     public override bool Equals(object obj)
     {
         if (obj is Tooltip t)
@@ -74,7 +74,7 @@ public class Tooltip : IEquatable<Tooltip>
     /// Compares the current instance with another tooltip.
     /// </summary>
     /// <param name="other">The tooltip to compare.</param>
-    /// <returns>Wheter the tooltips are equal.</returns>
+    /// <returns>Whether the tooltips are equal.</returns>
     public bool Equals(Tooltip other) => this == other;
 
 #pragma warning disable CS1591

@@ -27,7 +27,7 @@ public static class Assert
         => assert(condition, "Assertion failed.");
 
     /// <summary>
-    /// Checks wheter its two arguments are equal. If they are not, throws a runtime exception.
+    /// Checks whether its two arguments are equal. If they are not, throws a runtime exception.
     /// </summary>
     /// <param name="obj1"></param>
     /// <param name="obj2"></param>

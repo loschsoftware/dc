@@ -111,7 +111,7 @@ public class CompilationContextBuilder
     /// Adds a directory containing Dassie source files to the compilation context.
     /// </summary>
     /// <param name="path">The path to the directory to add.</param>
-    /// <param name="recursive">Wheter to include source files from subdirectories.</param>
+    /// <param name="recursive">Whether to include source files from subdirectories.</param>
     /// <returns>The current instance of <see cref="CompilationContextBuilder"/>.</returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>

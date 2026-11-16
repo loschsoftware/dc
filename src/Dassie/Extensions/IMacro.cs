@@ -7,7 +7,7 @@ namespace Dassie.Extensions;
 /// Represents a parameter of a macro.
 /// </summary>
 /// <param name="Name">The name of the parameter.</param>
-/// <param name="IsEager">Wheter or not the parameter is eagerly evaluated. The default value is <see langword="false"/>.</param>
+/// <param name="IsEager">Whether or not the parameter is eagerly evaluated. The default value is <see langword="false"/>.</param>
 public record MacroParameter(
     string Name,
     bool IsEager = false);

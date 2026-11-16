@@ -25,7 +25,7 @@ public partial class BuildEvent : ConfigObject
     public partial string Name { get; set; }
 
     /// <summary>
-    /// Specifies wheter or not the build event is critical.
+    /// Specifies whether or not the build event is critical.
     /// A critical build event will cause a build process to terminate immediately in case of failure.
     /// </summary>
     [DefaultValue(true)]

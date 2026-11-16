@@ -16,6 +16,6 @@ public interface IDeploymentTarget
     /// The method called when the deployment target is executed.
     /// </summary>
     /// <param name="context">The context of the deployment.</param>
-    /// <returns>An exit code indicating wheter the operation was successful.</returns>
+    /// <returns>An exit code indicating whether the operation was successful.</returns>
     public int Execute(DeploymentContext context);
 }

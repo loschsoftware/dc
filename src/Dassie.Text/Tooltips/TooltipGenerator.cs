@@ -15,7 +15,7 @@ public static class TooltipGenerator
     /// Generates a tooltip for a local value.
     /// </summary>
     /// <param name="name">The name of the local.</param>
-    /// <param name="mutable">Wheter the local is mutable.</param>
+    /// <param name="mutable">Whether the local is mutable.</param>
     /// <param name="local">The local to generate a tooltip for.</param>
     /// <returns>The generated tooltip.</returns>
     public static Tooltip Local(string name, bool mutable, LocalVariableInfo local)
@@ -396,11 +396,11 @@ public static class TooltipGenerator
     /// Generates a tooltip for a type.
     /// </summary>
     /// <param name="type">The type to generate a tooltip for.</param>
-    /// <param name="showBaseType">Wheter to include the base type in the tooltip.</param>
+    /// <param name="showBaseType">Whether to include the base type in the tooltip.</param>
     /// <param name="omitNamespace">If <see langword="true"/>, omits the namespace of the type from the tooltip.</param>
     /// <param name="noModifiers">If <see langword="true"/>, hides all type modifiers from the tooltip.</param>
     /// <param name="doc">Optional XML documentation of the type.</param>
-    /// <param name="ignoreBuiltinAliases">Wheter to ignore built-in type aliases.</param>
+    /// <param name="ignoreBuiltinAliases">Whether to ignore built-in type aliases.</param>
     /// <returns>Returns the generated tooltip.</returns>
     public static Tooltip Type(TypeInfo type, bool showBaseType, bool omitNamespace = false, bool noModifiers = false, Tooltip doc = null, bool ignoreBuiltinAliases = false)
     {

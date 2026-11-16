@@ -149,7 +149,7 @@ internal static class TypeHelpers
     }
 
     /// <summary>
-    /// Checks wheter a specified type can be used in a place that requires a boolean value.
+    /// Checks whether a specified type can be used in a place that requires a boolean value.
     /// </summary>
     /// <param name="t">The type to check</param>
     /// <returns>Returns <see langword="true"/> if at least one of the following is <see langword="true"/>:
@@ -188,7 +188,7 @@ internal static class TypeHelpers
     /// <param name="line">The line in the code used for error messages.</param>
     /// <param name="col">The column in the code used for error messages.</param>
     /// <param name="length">The length of the symbol causing a code error..</param>
-    /// <param name="throwError">Wheter to throw an error if the type could not be converted.</param>
+    /// <param name="throwError">Whether to throw an error if the type could not be converted.</param>
     public static void EnsureBoolean(Type t, int line = 0, int col = 0, int length = 0, bool throwError = true)
     {
         if (!IsBoolean(t))
@@ -207,11 +207,11 @@ internal static class TypeHelpers
     }
 
     /// <summary>
-    /// Checks wheter type <paramref name="from"/> can be converted into type <paramref name="to"/>.
+    /// Checks whether type <paramref name="from"/> can be converted into type <paramref name="to"/>.
     /// </summary>
     /// <param name="from">The type to convert from.</param>
     /// <param name="to">The type to convert into.</param>
-    /// <returns>Wheter or not a conversion from <paramref name="from"/> to <paramref name="to"/> exists.</returns>
+    /// <returns>Whether or not a conversion from <paramref name="from"/> to <paramref name="to"/> exists.</returns>
     public static bool CanBeConverted(Type from, Type to)
     {
         if (from.IsByRef)
@@ -485,7 +485,7 @@ internal static class TypeHelpers
     /// <param name="col"/>
     /// <param name="len"/>
     /// <param name="emitErrors"/>
-    /// <returns>Wheter or not the specified generic type can be initialized with the specified type arguments.</returns>
+    /// <returns>Whether or not the specified generic type can be initialized with the specified type arguments.</returns>
     public static bool CheckGenericTypeCompatibility(Type genericType, Generics.GenericArgumentContext[] genericArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
     {
         if (genericType == null)
@@ -510,7 +510,7 @@ internal static class TypeHelpers
     /// <param name="col"/>
     /// <param name="len"/>
     /// <param name="emitErrors"/>
-    /// <returns>Wheter or not the specified generic type can be initialized with the specified type arguments.</returns>
+    /// <returns>Whether or not the specified generic type can be initialized with the specified type arguments.</returns>
     public static bool CheckGenericMethodCompatibility(MethodBase method, Generics.GenericArgumentContext[] genericArgs, int row = 0, int col = 0, int len = 0, bool emitErrors = true)
     {
         if (!method.IsGenericMethod)
@@ -555,7 +555,7 @@ internal static class TypeHelpers
     }
 
     /// <summary>
-    /// Checks wheter or not <paramref name="arg"/> can be used as an argument for the generic parameter <paramref name="param"/>.
+    /// Checks whether or not <paramref name="arg"/> can be used as an argument for the generic parameter <paramref name="param"/>.
     /// </summary>
     /// <param name="param"></param>
     /// <param name="arg"></param>

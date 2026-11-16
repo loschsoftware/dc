@@ -21,7 +21,7 @@ public partial class FileReference : Reference
     public partial string FileName { get; set; }
 
     /// <summary>
-    /// Specifies wheter or not to copy the referenced file to the build output directory.
+    /// Specifies whether or not to copy the referenced file to the build output directory.
     /// </summary>
     [XmlAttribute]
     [ConfigProperty]

@@ -72,7 +72,7 @@ internal static class PackageDownloader
     /// </summary>
     /// <param name="packageId">The ID of the package.</param>
     /// <param name="version">The package version to download. If <see langword="null"/>, the latest version is downloaded.</param>
-    /// <param name="isDependency">Wheter or not the package is downloaded as a dependency of another package.</param>
+    /// <param name="isDependency">Whether or not the package is downloaded as a dependency of another package.</param>
     /// <returns>The downloaded version string.</returns>
     public static string DownloadPackage(string packageId, string version = null, bool isDependency = false)
     {

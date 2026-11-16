@@ -21,14 +21,14 @@ public partial class AssemblyReference : Reference
     public partial string AssemblyPath { get; set; }
 
     /// <summary>
-    /// Specifies wheter or not to copy the referenced assembly to the output directory of a build.
+    /// Specifies whether or not to copy the referenced assembly to the output directory of a build.
     /// </summary>
     [XmlAttribute]
     [ConfigProperty]
     public partial bool CopyToOutput { get; set; }
 
     /// <summary>
-    /// Specifies wheter or not to implicitly import all namespaces of the referenced assembly.
+    /// Specifies whether or not to implicitly import all namespaces of the referenced assembly.
     /// </summary>
     [XmlAttribute]
     [ConfigProperty]

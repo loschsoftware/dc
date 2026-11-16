@@ -47,7 +47,7 @@ public static class Compiler
     /// Compiles all Dassie source files in the specified directory.
     /// </summary>
     /// <param name="rootDirectory">The root directory containing source files to be compiled.</param>
-    /// <param name="includeSubDirectories">Specifies wheter source files in subdirectories should be included in the compilation process.</param>
+    /// <param name="includeSubDirectories">Specifies whether source files in subdirectories should be included in the compilation process.</param>
     /// <param name="config">Optional configuration for the compiler.</param>
     /// <returns></returns>
     public static IEnumerable<MessageInfo[]> CompileSource(string rootDirectory, bool includeSubDirectories, DassieConfig config = null)

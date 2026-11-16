@@ -33,7 +33,7 @@ public struct Word : IEquatable<Word>
     /// </summary>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
-    /// <returns>Wheter the words are equal.</returns>
+    /// <returns>Whether the words are equal.</returns>
     public static bool operator ==(Word left, Word right) => left.Fragment == right.Fragment && left.Text == right.Text;
 
     /// <summary>
@@ -41,14 +41,14 @@ public struct Word : IEquatable<Word>
     /// </summary>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
-    /// <returns>Wheter the words are not equal.</returns>
+    /// <returns>Whether the words are not equal.</returns>
     public static bool operator !=(Word left, Word right) => !(left == right);
 
     /// <summary>
     /// Compares the current instance of <see cref="Word"/> with any object.
     /// </summary>
     /// <param name="obj">The object to compare to.</param>
-    /// <returns>Wheter the objects are equal.</returns>
+    /// <returns>Whether the objects are equal.</returns>
     public override readonly bool Equals(object obj)
     {
         if (obj is Word w)
@@ -61,7 +61,7 @@ public struct Word : IEquatable<Word>
     /// Compares two instances of <see cref="Word"/>.
     /// </summary>
     /// <param name="other">The word to compare.</param>
-    /// <returns>Wheter the words are equal.</returns>
+    /// <returns>Whether the words are equal.</returns>
     public readonly bool Equals(Word other) => this == other;
 
 #pragma warning disable CS1591

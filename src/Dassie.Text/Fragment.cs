@@ -72,7 +72,7 @@ public struct Fragment : IEquatable<Fragment>
     public Tooltip ToolTip { get; set; }
 
     /// <summary>
-    /// Specifies wheter the fragment can be reached by a navigation command. Supports the "Go to definition" feature of many editors.
+    /// Specifies whether the fragment can be reached by a navigation command. Supports the "Go to definition" feature of many editors.
     /// </summary>
     public bool IsNavigationTarget { get; set; }
 
@@ -88,7 +88,7 @@ public struct Fragment : IEquatable<Fragment>
     /// <param name="column">The column that is the first character of the fragment.</param>
     /// <param name="length">The length of the fragment.</param>
     /// <param name="color">The color of the fragment.</param>
-    /// <param name="navigable">Specifies wheter the fragment can be reached by a navigation command.</param>
+    /// <param name="navigable">Specifies whether the fragment can be reached by a navigation command.</param>
     /// <param name="navigationKind">Specifies the type of navigation target.</param>
     public Fragment(int line, int column, int length, Color color, bool navigable = false, NavigationKind navigationKind = NavigationKind.Default)
     {

@@ -20,7 +20,7 @@ public interface IExtension
     /// <summary>
     /// If <see langword="true"/>, the extension is hidden and does not appear in the list of installed extensions.
     /// </summary>
-    /// <returns>Wheter or not the package is hidden.</returns>
+    /// <returns>Whether or not the package is hidden.</returns>
     public virtual bool Hidden() => false;
 
     /// <summary>

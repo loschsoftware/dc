@@ -145,9 +145,9 @@ public partial class DassieConfig : ConfigObject
     public partial string FormatVersion { get; set; }
 
     /// <summary>
-    /// Specifies wheter or not this configuration file is an SDK definition file.
+    /// Specifies whether or not this configuration file is an SDK definition file.
     /// </summary>
-    [Description("Specifies wheter or not this configuration file is an SDK definition file.")]
+    [Description("Specifies whether or not this configuration file is an SDK definition file.")]
     [DefaultValue(false)]
     [XmlAttribute]
     [MinVersion("1.0")]

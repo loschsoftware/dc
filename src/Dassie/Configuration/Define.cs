@@ -28,7 +28,7 @@ public partial class Define : ConfigObject
     public partial string Parameters { get; set; }
 
     /// <summary>
-    /// Specifies wheter or not to trim leading and trailing whitespace of the expanded value.
+    /// Specifies whether or not to trim leading and trailing whitespace of the expanded value.
     /// </summary>
     [XmlAttribute]
     [ConfigProperty]

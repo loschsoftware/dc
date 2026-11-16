@@ -15,7 +15,7 @@ public partial class ProjectReference : Reference
     public ProjectReference(PropertyStore store) : base(store) { }
 
     /// <summary>
-    /// Specifies wheter or not to copy the output files of the project to the build output directory.
+    /// Specifies whether or not to copy the output files of the project to the build output directory.
     /// </summary>
     [DefaultValue(true)]
     [XmlAttribute]

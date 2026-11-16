@@ -51,7 +51,7 @@ public class MessageInfo
     public (int Line, int Column) Location { get; set; }
 
     /// <summary>
-    /// Specifies wheter or not to display the code location in the generated output.
+    /// Specifies whether or not to display the code location in the generated output.
     /// </summary>
     public bool HideCodePosition { get; set; }
 
