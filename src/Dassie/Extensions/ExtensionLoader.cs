@@ -117,11 +117,14 @@ internal static class ExtensionLoader
         _localizationResourceProviders = InstalledExtensions.SelectMany(p => p.LocalizationResourceProviders());
         _properties = InstalledExtensions.SelectMany(p => p.Properties());
         _documentTransformers = InstalledExtensions.SelectMany(p => p.DocumentTransformers());
+
+        foreach (ICompilerCommand command in _commands)
+            HandleSubcommands(command);
     }
 
     private static void HandleSubcommands(ICompilerCommand command)
     {
-        foreach (ICompilerCommand child in command.Subcommands ?? [])
+        foreach (ICompilerCommand child in command?.Subcommands ?? [])
         {
             child.Parent = command;
             HandleSubcommands(child);

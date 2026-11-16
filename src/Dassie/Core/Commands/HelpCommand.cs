@@ -1,4 +1,5 @@
 ﻿using Dassie.Cli;
+using Dassie.Cli.Help;
 using Dassie.Configuration;
 using Dassie.Extensions;
 using System;
@@ -27,7 +28,8 @@ internal class HelpCommand : CompilerCommand
         [
             "dc help",
             "dc help <Command>",
-            "dc help <(--options | --simple | --no-external | --commands)>"
+            "dc help <(--options | --simple | --no-external | --commands)>",
+            "dc help --generate-docs [Path]"
         ],
         Options =
         [
@@ -35,14 +37,16 @@ internal class HelpCommand : CompilerCommand
             ("-o|--options", StringHelper.HelpCommand_OptionsOption),
             ("-s|--simple", StringHelper.HelpCommand_SimpleOption),
             ("--commands", StringHelper.HelpCommand_CommandsOption),
-            ("--no-external", StringHelper.HelpCommand_NoExternalOption)
+            ("--no-external", StringHelper.HelpCommand_NoExternalOption),
+            ("--generate-docs", StringHelper.HelpCommand_GenerateDocsOption)
         ],
         Examples =
         [
             ("dc help", StringHelper.HelpCommand_Example1),
             ("dc help --no-external", StringHelper.HelpCommand_Example2),
             ("dc help -o", StringHelper.HelpCommand_Example3),
-            ("dc help build", StringHelper.HelpCommand_Example4)
+            ("dc help build", StringHelper.HelpCommand_Example4),
+            ("dc help --generate-docs ./docs", StringHelper.HelpCommand_Example5)
         ],
     };
 
@@ -140,6 +144,16 @@ internal class HelpCommand : CompilerCommand
 
     private static int DisplayHelpMessage(string[] args)
     {
+        if (args?.Length >= 1 && args[0] == "--generate-docs")
+        {
+            string baseDir = args.Length >= 2 ? args[1] : "docs";
+            baseDir = Directory.CreateDirectory(baseDir).FullName;
+            bool includeExternal = !args.Contains("--no-external");
+
+            Directory.SetCurrentDirectory(baseDir);
+            return DocumentationGenerator.GenerateDocumentation(includeExternal);
+        }
+
         // "Tsoding mode", to appeal to "minimalist developers"
         if (args.Any(a => a == "-s" || a == "--simple"))
         {
