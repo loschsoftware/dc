@@ -411,6 +411,7 @@ build/
 docs/_site/
 docs/_site_*/
 docs/api/
+/docs/cli/
 docs/obj/
 docs/log/
 docs/.manifest

@@ -6,7 +6,7 @@ Thank you for your interest in contributing to the Dassie compiler! This section
 
 ### Prerequisites
 
-- .NET 10 SDK or later
+- .NET 11 SDK or later
 - Git
 - A code editor (Visual Studio, VS Code, Rider, etc.)
 
@@ -77,16 +77,17 @@ All contributions go through code review. Reviewers will check:
 
 ### Building Documentation
 
-The documentation uses [DocFX](https://dotnet.github.io/docfx/). To build locally:
+The documentation uses [DocFX](https://dotnet.github.io/docfx/). Run these commands from the repository root to generate the CLI reference and build the site.
 
 ```bash
-cd docs
-docfx build
+dotnet build Dassie.slnx -c Release
+dotnet artifacts/bin/Dassie/release/dc.dll help --generate-docs docs/cli
+docfx docs/docfx.json
 ```
 
 To preview:
 ```bash
-docfx serve _site
+docfx serve docs/_site
 ```
 
 ## Areas for Contribution

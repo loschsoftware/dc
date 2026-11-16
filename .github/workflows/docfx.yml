@@ -40,6 +40,9 @@ jobs:
       - name: Build project
         run: dotnet build Dassie.slnx -c Release
 
+      - name: Generate CLI documentation
+        run: dotnet artifacts/bin/Dassie/release/dc.dll help --generate-docs docs/cli
+
       - name: Build Documentation
         run: docfx docs/docfx.json
 

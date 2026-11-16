@@ -90,6 +90,10 @@ internal class HelpCommand : CompilerCommand
     public static string FormatLines(string text, bool initialPadLeft = false, int indentWidth = 35)
     {
         text ??= "";
+
+        if (Console.IsOutputRedirected)
+            return $"{text}{Environment.NewLine}";
+
         int maxWidth = Console.BufferWidth - indentWidth;
 
         if (maxWidth < 30)

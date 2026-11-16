@@ -1,4 +1,6 @@
 - name: Docs
   href: docs/
+- name: CLI Reference
+  href: cli/index.md
 - name: API
   href: api/
