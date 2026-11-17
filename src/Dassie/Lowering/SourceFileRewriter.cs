@@ -21,10 +21,13 @@ internal static class SourceFileRewriter
         parser.RemoveErrorListeners();
 
         IParseTree compilationUnit = parser.compilation_unit();
-        
-        EmitBuildLogMessageFormatted(nameof(StringHelper.SourceFileRewriter_LexerTokens), [], 3);
-        foreach ((int i, IToken token) in tokens.Index())
-            EmitBuildLogMessageFormatted(nameof(StringHelper.SourceFileRewriter_TokenDetail), [i + 1, token.StartIndex, token.StopIndex, DassieLexer.DefaultVocabulary.GetSymbolicName(token.Type), token.Text], 3);
+
+        bool printTokens = EmitBuildLogMessageFormatted(nameof(StringHelper.SourceFileRewriter_LexerTokens), [], 3);
+        if (printTokens)
+        {
+            foreach ((int i, IToken token) in tokens.Index())
+                EmitBuildLogMessageFormatted(nameof(StringHelper.SourceFileRewriter_TokenDetail), [i + 1, token.StartIndex, token.StopIndex, DassieLexer.DefaultVocabulary.GetSymbolicName(token.Type), token.Text], 3);
+        }
 
         EmitBuildLogMessageFormatted(nameof(StringHelper.SourceFileRewriter_ParseTreeStructure), [], 3);
         EmitBuildLogMessage(DbgCommand.TreePrinter.PrintParseTree(compilationUnit, parser), 3);

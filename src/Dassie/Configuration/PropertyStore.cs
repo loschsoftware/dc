@@ -56,7 +56,7 @@ public class PropertyStore
 
     internal PropertyStore(IEnumerable<Property> defs, MacroParser parser, Dictionary<string, object> uninstantiatedValues = null)
     {
-        _propertyDefs = defs;
+        _propertyDefs = defs.ToArray();
         _parser = parser;
         _uninstantiatedProperties = uninstantiatedValues ?? [];
     }
@@ -436,10 +436,10 @@ public class PropertyStore
     /// <returns>The value of the requested property.</returns>
     public object Get(string key)
     {
-        Property prop = GetPropertyDef(key);
-
         if (_instantiatedProperties.TryGetValue(key, out object cached))
             return cached;
+
+        Property prop = GetPropertyDef(key);
 
         if (_uninstantiatedProperties.TryGetValue(key, out object pval))
         {
