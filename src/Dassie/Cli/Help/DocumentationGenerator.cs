@@ -17,35 +17,35 @@ internal static class DocumentationGenerator
 {
     private const char Arrow = '↳';
 
-    [InterpolatedStringHandler]
-    private readonly struct MarkdownInterpolatedStringHandler(int literalLength, int formattedCount)
-    {
-        private readonly StringBuilder _sb = new(literalLength);
-
-        public readonly void AppendLiteral(string s)
-        {
-            _sb.Append(s);
-        }
-
-        public readonly void AppendFormatted<T>(T t)
-        {
-            _sb.Append(t?.ToString()
-                .Replace("\\", "\\\\")
-                .Replace("|", "\\|"));
-        }
-
-        public static implicit operator MarkdownInterpolatedStringHandler(string value)
-        {
-            MarkdownInterpolatedStringHandler handler = new(value.Length, 0);
-            handler.AppendLiteral(value);
-            return handler;
-        }
-
-        public override string ToString() => _sb.ToString();
-    }
-
     private class MarkdownWriter
     {
+        [InterpolatedStringHandler]
+        public readonly struct MarkdownInterpolatedStringHandler(int literalLength, int formattedCount)
+        {
+            private readonly StringBuilder _sb = new(literalLength);
+
+            public readonly void AppendLiteral(string s)
+            {
+                _sb.Append(s);
+            }
+
+            public readonly void AppendFormatted<T>(T t)
+            {
+                _sb.Append(t?.ToString()
+                    .Replace("\\", "\\\\")
+                    .Replace("|", "\\|"));
+            }
+
+            public static implicit operator MarkdownInterpolatedStringHandler(string value)
+            {
+                MarkdownInterpolatedStringHandler handler = new(value.Length, 0);
+                handler.AppendLiteral(value);
+                return handler;
+            }
+
+            public override string ToString() => _sb.ToString();
+        }
+
         private readonly StringBuilder _sb = new();
 
         public void Heading1(MarkdownInterpolatedStringHandler text)
