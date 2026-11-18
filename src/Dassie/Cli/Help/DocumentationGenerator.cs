@@ -19,19 +19,23 @@ internal static class DocumentationGenerator
         private readonly StringBuilder _sb = new();
 
         public void Heading1(string text)
-            => _sb.AppendLine($"# {text}{Environment.NewLine}");
+            => AppendLine($"# {text}{Environment.NewLine}");
 
         public void Heading2(string text)
-            => _sb.AppendLine($"## {text}{Environment.NewLine}");
+            => AppendLine($"## {text}{Environment.NewLine}");
 
         public void Paragraph(string text)
-            => _sb.AppendLine($"{text}{Environment.NewLine}");
+            => AppendLine($"{text}{Environment.NewLine}");
 
         public void AppendLine()
-            => _sb.AppendLine();
+            => AppendLine("");
 
         public void AppendLine(string text)
-            => _sb.AppendLine(text);
+        {
+            _sb.AppendLine(text
+                .Replace("\\", "\\\\")
+                .Replace("|", "\\|"));
+        }
 
         public override string ToString()
         {
