@@ -1,4 +1,5 @@
-﻿using Dassie.Extensions;
+﻿using Dassie.Core;
+using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,17 +52,17 @@ internal static class DocumentationGenerator
     /// <returns>A status code; 0 indicates success.</returns>
     public static int GenerateDocumentation(bool includeExternal = true)
     {
-        GenerateGlobalIndex();
+        GenerateGlobalIndex(includeExternal);
         return 0;
     }
 
-    private static void GenerateGlobalIndex()
+    private static void GenerateGlobalIndex(bool includeExternal)
     {
         MarkdownWriter writer = new();
         writer.Heading1(StringHelper.DocumentationGenerator_DassieCompilerDocumentation);
         writer.Heading2(StringHelper.DocumentationGenerator_Extensions);
 
-        foreach (IExtension extension in ExtensionLoader.InstalledExtensions)
+        foreach (IExtension extension in includeExternal ? ExtensionLoader.InstalledExtensions : [CorePackage.Instance])
         {
             GenerateForPackage(extension);
             writer.AppendLine($"- {Link(extension.Metadata.Name, Path.Combine(".", extension.Metadata.Name, "index.md"))}");

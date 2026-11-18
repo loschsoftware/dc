@@ -150,12 +150,12 @@ internal class HelpCommand : CompilerCommand
     {
         if (args?.Length >= 1 && args[0] == "--generate-docs")
         {
-            string baseDir = args.Length >= 2 ? args[1] : "docs";
+            bool noExternal = args.Contains("--no-external");
+            string baseDir = args.Length >= (noExternal ? 3 : 2) && args.Any(a => !a.StartsWith('-')) ? args.First(a => !a.StartsWith('-')) : "docs";
             baseDir = Directory.CreateDirectory(baseDir).FullName;
-            bool includeExternal = !args.Contains("--no-external");
 
             Directory.SetCurrentDirectory(baseDir);
-            return DocumentationGenerator.GenerateDocumentation(includeExternal);
+            return DocumentationGenerator.GenerateDocumentation(!noExternal);
         }
 
         // "Tsoding mode", to appeal to "minimalist developers"
