@@ -151,7 +151,7 @@ internal class HelpCommand : CompilerCommand
         if (args?.Length >= 1 && args[0] == "--generate-docs")
         {
             bool noExternal = args.Contains("--no-external");
-            string baseDir = args.Length >= (noExternal ? 3 : 2) && args.Any(a => !a.StartsWith('-')) ? args.First(a => !a.StartsWith('-')) : "docs";
+            string baseDir = args.FirstOrDefault(a => !a.StartsWith('-')) ?? "docs";
             baseDir = Directory.CreateDirectory(baseDir).FullName;
 
             Directory.SetCurrentDirectory(baseDir);
