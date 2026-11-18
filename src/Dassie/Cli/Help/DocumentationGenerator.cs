@@ -3,9 +3,12 @@ using Dassie.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Dassie.Cli.Help;
+
+#pragma warning disable CS9113
 
 /// <summary>
 /// Provides helpers for generating compiler documentation files in Markdown format.
@@ -14,28 +17,51 @@ internal static class DocumentationGenerator
 {
     private const char Arrow = '↳';
 
+    [InterpolatedStringHandler]
+    private readonly struct MarkdownInterpolatedStringHandler(int literalLength, int formattedCount)
+    {
+        private readonly StringBuilder _sb = new(literalLength);
+
+        public readonly void AppendLiteral(string s)
+        {
+            _sb.Append(s);
+        }
+
+        public readonly void AppendFormatted<T>(T t)
+        {
+            _sb.Append(t?.ToString()
+                .Replace("\\", "\\\\")
+                .Replace("|", "\\|"));
+        }
+
+        public static implicit operator MarkdownInterpolatedStringHandler(string value)
+        {
+            MarkdownInterpolatedStringHandler handler = new(value.Length, 0);
+            handler.AppendLiteral(value);
+            return handler;
+        }
+
+        public override string ToString() => _sb.ToString();
+    }
+
     private class MarkdownWriter
     {
         private readonly StringBuilder _sb = new();
 
-        public void Heading1(string text)
+        public void Heading1(MarkdownInterpolatedStringHandler text)
             => AppendLine($"# {text}{Environment.NewLine}");
 
-        public void Heading2(string text)
+        public void Heading2(MarkdownInterpolatedStringHandler text)
             => AppendLine($"## {text}{Environment.NewLine}");
 
-        public void Paragraph(string text)
+        public void Paragraph(MarkdownInterpolatedStringHandler text)
             => AppendLine($"{text}{Environment.NewLine}");
 
         public void AppendLine()
             => AppendLine("");
 
-        public void AppendLine(string text)
-        {
-            _sb.AppendLine(text
-                .Replace("\\", "\\\\")
-                .Replace("|", "\\|"));
-        }
+        public void AppendLine(MarkdownInterpolatedStringHandler text)
+            => _sb.AppendLine(text.ToString());
 
         public override string ToString()
         {
